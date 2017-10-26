@@ -1,19 +1,21 @@
 inspecode:
+  experimental:
+    ignore:
+    - **/*-test.cc
+
   ### tools for Shell [41.9%]
   shellcheck:
     ## (#1) Failed ... #issues=69131
-  - input: egs/**
-  - input: misc/**
-  - input: src/**
-  - input: tools/**
-    #options:
-    #  -e:
-    #  - SC2002
-    #  - SC2006
-    #  - SC2016
-    #  - SC2048
-    #  - SC2086
-    #  - SC2148
+  - input:
+    - egs/**
+    options:
+      -e:
+      - SC2048
+      - SC2086
+  - input:
+    - misc/**
+    - src/**
+    - tools/**
 
   ### tools for C++ [41.7%]
   #astyle:
@@ -21,11 +23,15 @@ inspecode:
   clang-format: default
     ## (#3) Failed ... #issues=1165
   cppcheck:     default
-  cpplint:      default
+  cpplint:
     ## (#3) Failed ... #issues=26530
+    options:
+      filter:
+      - -whitespace
   #infer:        default     #### failed (#2)
   #scan-build:   default     #### failed (#2)
-  uncrustify:   default
+  uncrustify:
+    ## (#3) Failed ... #issues=1155
 
   ### tools for Python [6.8%]
   autopep8:     default
@@ -35,17 +41,12 @@ inspecode:
       --ignore:
       - E1
       - E2
+      - E3
       - E5
       - E7
-      - W191
+      - W19
+      - W29
   - input: misc/
-    options:
-      --ignore:
-      - E1
-      - E2
-      - E5
-      - E7
-      - W191
   prospector:   default
   pycodestyle:              # #issues=15930 (#2:default)
   - input: egs/
@@ -55,15 +56,9 @@ inspecode:
       - E2
       - E5
       - E7
-      - W191
+      - W19
+      - W29
   - input: misc/
-    options:
-      --ignore:
-      - E1
-      - E2
-      - E5
-      - E7
-      - W191
   pyflakes:     default
   #pylint:       default
     ## (#2) Aborted ... RuntimeError: maximum recursion depth exceeded while calling a Python object
