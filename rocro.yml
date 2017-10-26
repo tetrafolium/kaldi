@@ -10,45 +10,28 @@ inspecode:
     ## (#7/[1]) Failed ... #issues=21303
     ## (#9/[0]) Failed ... #issues=1298
     ## (#9/[1]) Succeeded ... #issues=794  (=2092-1298)
-  - input:
-    - egs/babel/**
-  - input:
-    - egs/wsj/**
-  - input:
-    - egs/swbd/**
-  - input:
-    - egs/**
-    ignore:
-    - egs/babel/**
-    - egs/wsj/**
-    - egs/swbd/**
-    #options:
-    #  -e:
-    #  - SC2086
-    #  - SC2048
-    #  - SC1091
-    #  - SC2006
-    #  - SC2154
-    #  - SC2002
-    #  - SC2007
-    #  - SC2034
-    #  - SC2046
-    #  - SC2145
-    #  - SC2001
-    #  - SC2148
-    #  - SC2155
-    #  - SC2068
-    #  - SC1090
-    #  - SC2119
-    #  - SC2043
-    #  - SC2164
-    #  - SC2059
-    #  - SC2166
-  - ignore:
-    - egs/**
-    #options:
-    #  -e:
-    #  - SC2086
+    ## (#10) / use no `-e` options
+    ##   [0] egs/babel/**    #issues=15351
+    ##   [1] egs/wsj/**      #issues=23694
+    ##   [2] egs/swbd/**     #issues=4381
+    ##   [3] egs/{remains}   #issues=24584
+    ##   [4] {remains}       #issues=1121
+  - input:  [ egs/babel/** ]
+    options:
+      -e:   [ SC2086, SC2006, SC2154, SC1091, SC2002, SC2034, SC2046 ]
+  - input:  [ egs/wsj/** ]
+    options:
+      -e:   [ SC2086, SC2007, SC2006, SC1091, SC2002 ]
+  - input:  [ egs/swbd/** ]
+    options:
+      -e:   [ SC2086, SC1091, SC2154 ]
+  - input:  [ egs/** ]
+    ignore: [ egs/babel/**, egs/wsj/**, egs/swbd/** ]
+    options:
+      -e:   [ SC2086, SC1091, SC2006, SC2002, SC2154, SC2034, SC2046 ]
+  - ignore: [ egs/** ]
+    options:
+      -e:   [ SC2086 ]
 
   ### tools for C++ [41.7%]
   #astyle:
@@ -79,39 +62,25 @@ inspecode:
     ## (#3) Failed ... #issues=1155
     ## (#7) Failed ... #issues=1029
     config-file: rocro-uncrustify.cfg
+    auto-fix: true
 
   ### tools for Python [6.8%]
   autopep8:     default
   flake8:                   # #issues=16118 (#2:default)
   - input: egs/
     options:
-      --ignore:
-      - E1
-      - E2
-      - E3
-      - E5
-      - E7
-      - W19
-      - W29
+      --ignore: [ E1, E2, E3, E5, E7, W19, W29 ]
   - input: misc/
     options:
-      --ignore:
-      - E111
+      --ignore: [ E111 ]
   prospector:   default
   pycodestyle:              # #issues=15930 (#2:default)
   - input: egs/
     options:
-      --ignore:
-      - E1
-      - E2
-      - E5
-      - E7
-      - W19
-      - W29
+      --ignore: [ E1, E2, E5, E7, W19, W29 ]
   - input: misc/
     options:
-      --ignore:
-      - E111
+      --ignore: [ E111 ]
   pyflakes:     default
   #pylint:       default
     ## (#2) Aborted ... RuntimeError: maximum recursion depth exceeded while calling a Python object
