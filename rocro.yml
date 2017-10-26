@@ -28,7 +28,8 @@ inspecode:
   - input:  [ egs/** ]
     ignore: [ egs/babel/**, egs/wsj/**, egs/swbd/** ]
     options:
-      -e:   [ SC2086, SC1091, SC2006, SC2002, SC2154, SC2034, SC2046 ]
+      -e:   [ SC2086, SC1091, SC2006, SC2002, SC2154, SC2034, SC2046,
+              SC2007, SC2145, SC2148, SC2043, SC1090, SC2155 ]
   - ignore: [ egs/** ]
     options:
       -e:   [ SC2086 ]
