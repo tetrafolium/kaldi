@@ -1,0 +1,29 @@
+inspecode:
+  ### tools for Shell [41.9%]
+  shellcheck:   default     # #issues=69131
+
+  ### tools for C++ [41.7%]
+  astyle:       default
+  clang-format: default
+  cppcheck:     default
+  cpplint:      default
+  infer:        default
+  scan-build:   default
+  uncrustify:   default
+
+  ### tools for Python [6.8%]
+  autopep8:     default
+  flake8:       default
+  prospector:   default
+  pycodestyle:  default
+  pyflakes:     default
+  pylint:       default
+  yapf:         default
+
+  ### tools for multi-languages
+  cpd:          default     ## for [ C++ Python ]
+  unused:       default     ## for [ Shell C++ Python ]
+
+  ### tools for any languages
+  grep:         default
+  misspell:     default
