@@ -1,7 +1,7 @@
 inspecode:
   experimental:
     ignore:
-    - **/*-test.cc
+    - '**/*-test.cc'
 
   ### tools for Shell [41.9%]
   shellcheck:
