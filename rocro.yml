@@ -47,7 +47,7 @@ inspecode:
   ### tools for C++ [41.7%]
   #astyle:
     ## (#3) Failed ...
-  clang-format: default
+  clang-format:
     ## (#3) Failed ... #issues=1165
     ## (#7) Failed ... #issues=1039
     options:
