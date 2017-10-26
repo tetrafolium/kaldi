@@ -18,13 +18,13 @@ inspecode:
     ##   [4] {remains}       #issues=1121
   - input:  [ egs/babel/** ]
     options:
-      -e:   [ SC2086, SC2006, SC2154, SC1091, SC2002, SC2034, SC2046 ]
+      -e:   [ SC2086, SC2006, SC2154, SC1091, SC2002, SC2034, SC2046, SC2119 ]
   - input:  [ egs/wsj/** ]
     options:
-      -e:   [ SC2086, SC2007, SC2006, SC1091, SC2002 ]
-  - input:  [ egs/swbd/** ]
-    options:
-      -e:   [ SC2086, SC1091, SC2154 ]
+      -e:   [ SC2086, SC2007, SC2006, SC1091, SC2002, SC2034, SC2145 ]
+  #- input:  [ egs/swbd/** ]
+  #  options:
+  #    -e:   [ SC2086, SC1091, SC2154 ]
   - input:  [ egs/** ]
     ignore: [ egs/babel/**, egs/wsj/**, egs/swbd/** ]
     options:
@@ -61,6 +61,10 @@ inspecode:
   uncrustify:
     ## (#3) Failed ... #issues=1155
     ## (#7) Failed ... #issues=1029
+  - input: src/**
+    config-file: rocro-uncrustify.cfg
+    auto-fix: true
+  - input: tools/**
     config-file: rocro-uncrustify.cfg
     auto-fix: true
 
