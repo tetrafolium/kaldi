@@ -3,21 +3,36 @@ inspecode:
   shellcheck:   default     # #issues=69131
 
   ### tools for C++ [41.7%]
-  astyle:       default
-  clang-format: default
+  astyle:
+    input: src
+  clang-format: default     # #issues=1165
   cppcheck:     default
   cpplint:      default
-  infer:        default
-  scan-build:   default
+  #infer:        default     #### failed (#2)
+  #scan-build:   default     #### failed (#2)
   uncrustify:   default
 
   ### tools for Python [6.8%]
   autopep8:     default
-  flake8:       default
+  flake8:                   # #issues=16118 (#2:default)
+    options:
+      --ignore:
+      - E1
+      - E2
+      - E5
+      - E7
+      - W191
   prospector:   default
-  pycodestyle:  default
+  pycodestyle:              # #issues=15930 (#2:default)
+    options:
+      --ignore:
+      - E1
+      - E2
+      - E5
+      - E7
+      - W191
   pyflakes:     default
-  pylint:       default
+  #pylint:       default     #### aborted (#2)
   yapf:         default
 
   ### tools for multi-languages
