@@ -30,9 +30,7 @@ inspecode:
     ## (#3) Failed ... #issues=1165
     ## (#7) Failed ... #issues=1039
     options:
-      -style:
-        BasedOnStyle: Mozilla
-        IndentWidth:  2
+      -style: Mozilla
   cppcheck:     default
   cpplint:
     options:
