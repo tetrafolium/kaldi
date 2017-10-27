@@ -4,5 +4,5 @@ inspecode:
     - '**/*-test.cc'
 
   clang-format:
-    options: { -style: Mozilla }
+    options: { -style: Google }
     auto-fix: true
