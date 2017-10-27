@@ -89,7 +89,7 @@ inspecode:
   unused:                   ## for [ Shell C++ Python ]
     options:
       --single-occurrence:
-      --all-likeliness:
+      --all-likelihoods:
 
   ### tools for any languages
   grep:         default
