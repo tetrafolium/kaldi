@@ -5,11 +5,6 @@ inspecode:
 
   ### tools for Shell [41.9%]
   shellcheck:
-    ## (#1) Failed ... #issues=69131
-    ## (#7/[0]) Failed ... #issues=1121
-    ## (#7/[1]) Failed ... #issues=21303
-    ## (#9/[0]) Failed ... #issues=1298
-    ## (#9/[1]) Succeeded ... #issues=794  (=2092-1298)
     ## (#10) / use no `-e` options
     ##   [0] egs/babel/**    #issues=15351
     ##   [1] egs/wsj/**      #issues=23694
@@ -22,9 +17,9 @@ inspecode:
   - input:  [ egs/wsj/** ]
     options:
       -e:   [ SC2086, SC2007, SC2006, SC1091, SC2002, SC2034, SC2145 ]
-  #- input:  [ egs/swbd/** ]
-  #  options:
-  #    -e:   [ SC2086, SC1091, SC2154 ]
+  - input:  [ egs/swbd/** ]
+    options:
+      -e:   [ SC2086, SC1091, SC2154 ]
   - input:  [ egs/** ]
     ignore: [ egs/babel/**, egs/wsj/**, egs/swbd/** ]
     options:
@@ -91,7 +86,10 @@ inspecode:
   ### tools for multi-languages
   #cpd:          default     ## for [ C++ Python ]
     ## (#3) Failed ... Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
-  unused:       default     ## for [ Shell C++ Python ]
+  unused:                   ## for [ Shell C++ Python ]
+    options:
+      --single-occurrence
+      --all-likeliness
 
   ### tools for any languages
   grep:         default
