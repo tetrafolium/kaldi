@@ -5,12 +5,6 @@ inspecode:
 
   ### tools for Shell [41.9%]
   shellcheck:
-    ## (#10) / use no `-e` options
-    ##   [0] egs/babel/**    #issues=15351
-    ##   [1] egs/wsj/**      #issues=23694
-    ##   [2] egs/swbd/**     #issues=4381
-    ##   [3] egs/{remains}   #issues=24584
-    ##   [4] {remains}       #issues=1121
   - input:  [ egs/babel/** ]
     options:
       -e:   [ SC2086, SC2006, SC2154, SC1091, SC2002, SC2034, SC2046, SC2119 ]
@@ -30,19 +24,17 @@ inspecode:
       -e:   [ SC2086 ]
 
   ### tools for C++ [41.7%]
-  #astyle:
+  astyle:       default
     ## (#3) Failed ...
-#  clang-format:
-#    ## (#3) Failed ... #issues=1165
-#    ## (#7) Failed ... #issues=1039
-#    options:
-#      -style:
-#        BasedOnStyle: Mozilla
-#        IndentWidth:  2
+  clang-format:
+    ## (#3) Failed ... #issues=1165
+    ## (#7) Failed ... #issues=1039
+    options:
+      -style:
+        BasedOnStyle: Mozilla
+        IndentWidth:  2
   cppcheck:     default
   cpplint:
-    ## (#3) Failed ... #issues=26530
-    ## (#7) Failed ... #issues=3157
     options:
       --filter:
       - -whitespace
@@ -52,11 +44,9 @@ inspecode:
       - -build/storage_class
       - -runtime/int
       - -runtime/string
-  #infer:        default     #### failed (#2)
-  #scan-build:   default     #### failed (#2)
+  infer:        default     #### failed (#2)
+  scan-build:   default     #### failed (#2)
   uncrustify:
-    ## (#3) Failed ... #issues=1155
-    ## (#7) Failed ... #issues=1029
     config-file: rocro-uncrustify.cfg
     auto-fix: true
 
@@ -78,13 +68,13 @@ inspecode:
     options:
       --ignore: [ E111 ]
   pyflakes:     default
-  #pylint:       default
+  pylint:       default
     ## (#2) Aborted ... RuntimeError: maximum recursion depth exceeded while calling a Python object
-  #yapf:         default
+  yapf:         default
     ## (#3) Failed ... YAPF finished with errors.
 
   ### tools for multi-languages
-  #cpd:          default     ## for [ C++ Python ]
+  cpd:          default     ## for [ C++ Python ]
     ## (#3) Failed ... Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
   unused:                   ## for [ Shell C++ Python ]
     options:
