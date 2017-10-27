@@ -88,8 +88,8 @@ inspecode:
     ## (#3) Failed ... Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
   unused:                   ## for [ Shell C++ Python ]
     options:
-      --single-occurrence
-      --all-likeliness
+      --single-occurrence:
+      --all-likeliness:
 
   ### tools for any languages
   grep:         default
