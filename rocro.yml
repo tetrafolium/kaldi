@@ -31,7 +31,7 @@ inspecode:
     ## (#20) Failed ... #issues=1039 -style=mozilla
     ##
     options:
-      -style: Google
+      -style: "{BasedOnStyle: LLVM, DisableFormat: true, SortIncludes: false}"
   cppcheck:     default
   cpplint:
     options:
