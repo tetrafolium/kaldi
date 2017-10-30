@@ -24,14 +24,12 @@ inspecode:
       -e:   [ SC2086 ]
 
   ### tools for C++ [41.7%]
-  #astyle:       default
+  astyle:       default
     ## (#3) Failed ...
   clang-format:
-    ##  (#3) Failed ... #issues=1165 -style=llvm (default)
-    ## (#20) Failed ... #issues=1039 -style=mozilla
-    ##
     options:
       -style: "{BasedOnStyle: LLVM, DisableFormat: true, SortIncludes: false}"
+    auto-fix: true
   cppcheck:     default
   cpplint:
     options:
@@ -45,7 +43,7 @@ inspecode:
       - -runtime/string
   infer:
     ## failed (#2)
-    ignore: misc/papers/**
+    #ignore: misc/papers/**
   scan-build:   default     #### failed (#2)
   uncrustify:
     config-file: rocro-uncrustify.cfg
@@ -69,10 +67,10 @@ inspecode:
     options:
       --ignore: [ E111 ]
   pyflakes:     default
-  #pylint:       default
+  pylint:       default
     ## (#2) Aborted ... RuntimeError: maximum recursion depth exceeded while calling a Python object
     ## (#21) Failed ... Too many issues detected: 13912 > 1000 # (includes above)
-  #yapf:         default
+  yapf:         default
     ## (#3) Failed ... YAPF finished with errors.
 
   ### tools for multi-languages
