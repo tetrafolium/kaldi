@@ -4,5 +4,5 @@ inspecode:
     - '**/*-test.cc'
 
   clang-format:
-    options: { -style: Webkit }
+    options: { -style: "{BasedOnStyle: LLVM, DisableFormat: true}" }
     auto-fix: true
