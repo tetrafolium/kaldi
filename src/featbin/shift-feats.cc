@@ -23,15 +23,15 @@
 #include "matrix/kaldi-matrix.h"
 
 namespace kaldi {
-  void ShiftFeatureMatrix(const Matrix<BaseFloat> &src, int32 shift,
-                          Matrix<BaseFloat>* rearranged) {
-    for (int32 r = 0; r < src.NumRows(); r++) {
-      int32 src_r = r - shift;
-      if (src_r < 0) src_r = 0;
-      if (src_r >= src.NumRows()) src_r = src.NumRows() - 1;
-      rearranged->Row(r).CopyFromVec(src.Row(src_r));
-    }
+void ShiftFeatureMatrix(const Matrix<BaseFloat> &src, int32 shift,
+    Matrix<BaseFloat>* rearranged) {
+  for (int32 r = 0; r < src.NumRows(); r++) {
+    int32 src_r = r - shift;
+    if (src_r < 0) src_r = 0;
+    if (src_r >= src.NumRows()) src_r = src.NumRows() - 1;
+    rearranged->Row(r).CopyFromVec(src.Row(src_r));
   }
+}
 }
 
 int main(int argc, char *argv[]) {
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
       return (num_done > 0 ? 0 : 1);
     } else {
       std::string feat_rxfilename = po.GetArg(1),
-                  feat_wxfilename = po.GetArg(2);
+          feat_wxfilename = po.GetArg(2);
       Matrix<BaseFloat> src;
       ReadKaldiObject(feat_rxfilename, &src);
       if (src.NumRows() == 0)
@@ -109,15 +109,15 @@ int main(int argc, char *argv[]) {
 
 
 /*
-test:
-  echo "foo [ 1 1; 2 2; 3 3 ]" | shift-feats --shift=1 ark:- ark,t:-
-  outputs:
-  foo  [
-  1 1
-  1 1
-  2 2 ]
+   test:
+   echo "foo [ 1 1; 2 2; 3 3 ]" | shift-feats --shift=1 ark:- ark,t:-
+   outputs:
+   foo  [
+   1 1
+   1 1
+   2 2 ]
 
 
-  echo "[ 1 1; 2 2; 3 3 ]" | ./shift-feats --print-args=false --binary=false \
+   echo "[ 1 1; 2 2; 3 3 ]" | ./shift-feats --print-args=false --binary=false \
     --shift=1 - -
-*/
+ */

@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     SequentialPosteriorReader posterior_reader(posteriors_rspecifier);
     RandomAccessInt32VectorReader alignments_reader(alignments_rspecifier);
     BaseFloatVectorWriter confidences_writer(confidences_wspecifier);
-    
+
     for (; !posterior_reader.Done(); posterior_reader.Next()) {
       std::string key = posterior_reader.Key();
       if (!alignments_reader.HasKey(key)) {

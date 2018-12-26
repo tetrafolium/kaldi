@@ -34,11 +34,11 @@ namespace kaldi {
 /// could inherit from it.
 template<class Real>
 class OptimizableInterface {
- public:
+public:
   /// computes gradient for a parameter params and returns it
   /// in gradient_out
   virtual void ComputeGradient(const Vector<Real> &params,
-                               Vector<Real> *gradient_out) = 0;
+      Vector<Real> *gradient_out) = 0;
   /// computes the function value for a parameter params
   /// and returns it
   virtual Real ComputeValue(const Vector<Real> &params) = 0;

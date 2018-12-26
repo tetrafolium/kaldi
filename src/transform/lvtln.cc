@@ -95,19 +95,19 @@ void LinearVtln::Write(std::ostream &os, bool binary) const {
 
 /// Compute the transform for the speaker.
 void LinearVtln::ComputeTransform(const FmllrDiagGmmAccs &accs,
-                                  std::string norm_type,  // "none", "offset", "diag"
-                                  BaseFloat logdet_scale,
-                                  MatrixBase<BaseFloat> *Ws,  // output fMLLR transform, should be size dim x dim+1
-                                  int32 *class_idx,  // the transform that was chosen...
-                                  BaseFloat *logdet_out,
-                                  BaseFloat *objf_impr,  // versus no transform
-                                  BaseFloat *count) {
+    std::string norm_type,                                // "none", "offset", "diag"
+    BaseFloat logdet_scale,
+    MatrixBase<BaseFloat> *Ws,                                // output fMLLR transform, should be size dim x dim+1
+    int32 *class_idx,                                // the transform that was chosen...
+    BaseFloat *logdet_out,
+    BaseFloat *objf_impr,                                // versus no transform
+    BaseFloat *count) {
   int32 dim = Dim();
   KALDI_ASSERT(dim != 0);
   if (norm_type != "none"  && norm_type != "offset" && norm_type != "diag")
     KALDI_ERR << "LinearVtln::ComputeTransform, norm_type should be "
-        "one of \"none\", \"offset\" or \"diag\"";
-  
+      "one of \"none\", \"offset\" or \"diag\"";
+
   if (accs.beta_ == 0.0) {
     KALDI_WARN << "no stats, returning default transform";
     int32 dim = Dim();
@@ -122,7 +122,7 @@ void LinearVtln::ComputeTransform(const FmllrDiagGmmAccs &accs,
     if (count) *count = 0;
     return;
   }
-  
+
   Matrix<BaseFloat> best_transform(dim, dim+1);
   best_transform.SetUnit();
   BaseFloat old_objf = FmllrAuxFuncDiagGmm(best_transform, accs),
@@ -146,7 +146,7 @@ void LinearVtln::ComputeTransform(const FmllrDiagGmmAccs &accs,
 
     if (logdet_scale != 1.0)
       objf += accs.beta_ * (logdet_scale - 1.0) * logdets_[i];
-    
+
     if (objf > best_objf) {
       best_objf = objf;
       best_class = i;

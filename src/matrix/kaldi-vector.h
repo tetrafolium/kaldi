@@ -37,7 +37,7 @@ namespace kaldi {
 ///  It encapsulates basic operations and memory optimizations.
 template<typename Real>
 class VectorBase {
- public:
+public:
   /// Set vector to all zeros.
   void SetZero();
 
@@ -99,7 +99,7 @@ class VectorBase {
    *  @return A SubVector object that aliases the data of the Vector object.
    *  See @c SubVector class for details   */
   const SubVector<Real> Range(const MatrixIndexT o,
-                              const MatrixIndexT l) const {
+      const MatrixIndexT l) const {
     return SubVector<Real>(*this, o, l);
   }
 
@@ -191,26 +191,26 @@ class VectorBase {
   /// Add matrix times vector : this <-- beta*this + alpha*M*v.
   /// Calls BLAS GEMV.
   void AddMatVec(const Real alpha, const MatrixBase<Real> &M,
-                 const MatrixTransposeType trans,  const VectorBase<Real> &v,
-                 const Real beta); // **beta previously defaulted to 0.0**
+      const MatrixTransposeType trans,  const VectorBase<Real> &v,
+      const Real beta);            // **beta previously defaulted to 0.0**
 
   /// This is as AddMatVec, except optimized for where v contains a lot
   /// of zeros.
   void AddMatSvec(const Real alpha, const MatrixBase<Real> &M,
-                  const MatrixTransposeType trans,  const VectorBase<Real> &v,
-                  const Real beta); // **beta previously defaulted to 0.0**
+      const MatrixTransposeType trans,  const VectorBase<Real> &v,
+      const Real beta);             // **beta previously defaulted to 0.0**
 
 
   /// Add symmetric positive definite matrix times vector:
   ///  this <-- beta*this + alpha*M*v.   Calls BLAS SPMV.
   void AddSpVec(const Real alpha, const SpMatrix<Real> &M,
-                const VectorBase<Real> &v, const Real beta);  // **beta previously defaulted to 0.0**
+      const VectorBase<Real> &v, const Real beta);            // **beta previously defaulted to 0.0**
 
   /// Add triangular matrix times vector: this <-- beta*this + alpha*M*v.
   /// Works even if rv == *this.
   void AddTpVec(const Real alpha, const TpMatrix<Real> &M,
-                const MatrixTransposeType trans, const VectorBase<Real> &v,
-                const Real beta);  // **beta previously defaulted to 0.0**
+      const MatrixTransposeType trans, const VectorBase<Real> &v,
+      const Real beta);            // **beta previously defaulted to 0.0**
 
   /// Set each element to y = (x == orig ? changed : x).
   void ReplaceValue(Real orig, Real changed);
@@ -233,12 +233,12 @@ class VectorBase {
   /// Add element-by-element product of vectlrs:
   //  this <-- alpha * v .* r + beta*this .
   void AddVecVec(Real alpha, const VectorBase<Real> &v,
-                 const VectorBase<Real> &r, Real beta);
+      const VectorBase<Real> &r, Real beta);
 
   /// Add element-by-element quotient of two vectors.
   ///  this <---- alpha*v/r + beta*this
   void AddVecDivVec(Real alpha, const VectorBase<Real> &v,
-                    const VectorBase<Real> &r, Real beta);
+      const VectorBase<Real> &r, Real beta);
 
   /// Multiplies all elements by this constant.
   void Scale(Real alpha);
@@ -277,7 +277,7 @@ class VectorBase {
 
   /// Extracts a column of the matrix M.
   template<typename OtherReal>
-  void CopyColFromMat(const MatrixBase<OtherReal> &M , MatrixIndexT col);
+  void CopyColFromMat(const MatrixBase<OtherReal> &M, MatrixIndexT col);
 
   /// Extracts the diagonal of the matrix M.
   void CopyDiagFromMat(const MatrixBase<Real> &M);
@@ -324,14 +324,14 @@ class VectorBase {
   /// *this = diag(M M^T) +  beta * *this (if trans == kNoTrans), or
   /// *this = diag(M^T M) +  beta * *this (if trans == kTrans).
   void AddDiagMat2(Real alpha, const MatrixBase<Real> &M,
-                   MatrixTransposeType trans = kNoTrans, Real beta = 1.0);
+      MatrixTransposeType trans = kNoTrans, Real beta = 1.0);
 
   /// Add the diagonal of a matrix product: *this = diag(M N), assuming the
   /// "trans" arguments are both kNoTrans; for transpose arguments, it behaves
   /// as you would expect.
   void AddDiagMatMat(Real alpha, const MatrixBase<Real> &M, MatrixTransposeType transM,
-                     const MatrixBase<Real> &N, MatrixTransposeType transN,
-                     Real beta = 1.0);
+      const MatrixBase<Real> &N, MatrixTransposeType transN,
+      Real beta = 1.0);
 
   /// Returns log(sum(exp())) without exp overflow
   /// If prune > 0.0, ignores terms less than the max - prune.
@@ -350,14 +350,14 @@ class VectorBase {
   friend class VectorBase<float>;
   friend class CuVectorBase<Real>;
   friend class CuVector<Real>;
- protected:
+protected:
   /// Destructor;  does not deallocate memory, this is handled by child classes.
   /// This destructor is protected so this object so this object can only be
   /// deleted via a child.
   ~VectorBase() {}
 
   /// Empty initializer, corresponds to vector of zero size.
-  explicit VectorBase(): data_(NULL), dim_(0) {
+  explicit VectorBase() : data_(NULL), dim_(0) {
     KALDI_ASSERT_IS_FLOATING_TYPE(Real);
   }
 
@@ -385,15 +385,15 @@ class VectorBase {
  *  It encapsulates basic operations and memory optimizations.  */
 template<typename Real>
 class Vector: public VectorBase<Real> {
- public:
+public:
   /// Constructor that takes no arguments.  Initializes to empty.
-  Vector(): VectorBase<Real>() {}
+  Vector() : VectorBase<Real>() {}
 
   /// Constructor with specific size.  Sets to all-zero by default
   /// if set_zero == false, memory contents are undefined.
   explicit Vector(const MatrixIndexT s,
-                  MatrixResizeType resize_type = kSetZero)
-      : VectorBase<Real>() {  Resize(s, resize_type);  }
+      MatrixResizeType resize_type = kSetZero)
+    : VectorBase<Real>() {  Resize(s, resize_type);  }
 
   /// Copy constructor from CUDA vector
   /// This is defined in ../cudamatrix/cu-vector.h
@@ -414,7 +414,7 @@ class Vector: public VectorBase<Real> {
 
   /// Type conversion constructor.
   template<typename OtherReal>
-  explicit Vector(const VectorBase<OtherReal> &v): VectorBase<Real>() {
+  explicit Vector(const VectorBase<OtherReal> &v) : VectorBase<Real>() {
     Resize(v.Dim(), kUndefined);
     this->CopyFromVec(v);
   }
@@ -424,7 +424,7 @@ class Vector: public VectorBase<Real> {
 //  /// it owns.
 //  Vector(const Real* Data, const MatrixIndexT s): VectorBase<Real>() {
 //    Resize(s);
-  //    CopyFromPtr(Data, s);
+//    CopyFromPtr(Data, s);
 //  }
 
 
@@ -463,7 +463,7 @@ class Vector: public VectorBase<Real> {
     this->CopyFromVec(other);
     return *this;
   }
- private:
+private:
   /// Init assumes the current contents of the class are invalid (i.e. junk or
   /// has already been freed), and it sets the vector to newly allocated memory
   /// with the specified dimension.  dim == 0 is acceptable.  The memory contents
@@ -480,12 +480,12 @@ class Vector: public VectorBase<Real> {
 /// as a sub-vector of higher-level vector [or as the row of a matrix].
 template<typename Real>
 class SubVector : public VectorBase<Real> {
- public:
+public:
   /// Constructor from a Vector or SubVector.
   /// SubVectors are not const-safe and it's very hard to make them
   /// so for now we just give up.  This function contains const_cast.
   SubVector(const VectorBase<Real> &t, const MatrixIndexT origin,
-            const MatrixIndexT length) : VectorBase<Real>() {
+      const MatrixIndexT length) : VectorBase<Real>() {
     // following assert equiv to origin>=0 && length>=0 &&
     // origin+length <= rt.dim_
     KALDI_ASSERT(static_cast<UnsignedMatrixIndexT>(origin)+
@@ -525,7 +525,7 @@ class SubVector : public VectorBase<Real> {
 
   ~SubVector() {}  ///< Destructor (does nothing; no pointers are owned here).
 
- private:
+private:
   /// Disallow assignment operator.
   SubVector & operator = (const SubVector &other) {}
 };
@@ -555,13 +555,13 @@ std::istream & operator >> (std::istream & in, Vector<Real> & v);
 
 template<typename Real>
 bool ApproxEqual(const VectorBase<Real> &a,
-                 const VectorBase<Real> &b, Real tol = 0.01) {
+    const VectorBase<Real> &b, Real tol = 0.01) {
   return a.ApproxEqual(b, tol);
 }
 
 template<typename Real>
 inline void AssertEqual(VectorBase<Real> &a, VectorBase<Real> &b,
-                        float tol = 0.01) {
+    float tol = 0.01) {
   KALDI_ASSERT(a.ApproxEqual(b, tol));
 }
 
@@ -578,7 +578,7 @@ Real VecVec(const VectorBase<Real> &v1, const VectorBase<OtherReal> &v2);
 /// Not as efficient as it could be where v1 == v2.
 template<typename Real>
 Real VecMatVec(const VectorBase<Real> &v1, const MatrixBase<Real> &M,
-               const VectorBase<Real> &v2);
+    const VectorBase<Real> &v2);
 
 /// @} End of "addtogroup matrix_funcs_scalar"
 

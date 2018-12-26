@@ -21,7 +21,7 @@
 #ifndef KALDI_FEAT_FEATURE_FBANK_H_
 #define KALDI_FEAT_FEATURE_FBANK_H_
 
-#include<map>
+#include <map>
 #include <string>
 
 #include "feat/feature-common.h"
@@ -48,16 +48,16 @@ struct FbankOptions {
   bool use_log_fbank;  // if true (default), produce log-filterbank, else linear
   bool use_power;  // if true (default), use power in filterbank analysis, else magnitude.
 
-  FbankOptions(): mel_opts(23),
-                 // defaults the #mel-banks to 23 for the FBANK computations.
-                 // this seems to be common for 16khz-sampled data,
-                 // but for 8khz-sampled data, 15 may be better.
-                 use_energy(false),
-                 energy_floor(0.0),  // not in log scale: a small value e.g. 1.0e-10
-                 raw_energy(true),
-                 htk_compat(false),
-                 use_log_fbank(true),
-                 use_power(true) {}
+  FbankOptions() : mel_opts(23),
+    // defaults the #mel-banks to 23 for the FBANK computations.
+    // this seems to be common for 16khz-sampled data,
+    // but for 8khz-sampled data, 15 may be better.
+    use_energy(false),
+    energy_floor(0.0),               // not in log scale: a small value e.g. 1.0e-10
+    raw_energy(true),
+    htk_compat(false),
+    use_log_fbank(true),
+    use_power(true) {}
 
   void Register(OptionsItf *opts) {
     frame_opts.Register(opts);
@@ -82,7 +82,7 @@ struct FbankOptions {
 /// Class for computing mel-filterbank features; see \ref feat_mfcc for more
 /// information.
 class FbankComputer {
- public:
+public:
   typedef FbankOptions Options;
 
   explicit FbankComputer(const FbankOptions &opts);
@@ -118,15 +118,15 @@ class FbankComputer {
        vector as a workspace, which is why it's a non-const pointer.
      @param [out] feature  Pointer to a vector of size this->Dim(), to which
          the computed feature will be written.
-  */
+   */
   void Compute(BaseFloat signal_log_energy,
-               BaseFloat vtln_warp,
-               VectorBase<BaseFloat> *signal_frame,
-               VectorBase<BaseFloat> *feature);
+      BaseFloat vtln_warp,
+      VectorBase<BaseFloat> *signal_frame,
+      VectorBase<BaseFloat> *feature);
 
   ~FbankComputer();
 
- private:
+private:
   const MelBanks *GetMelBanks(BaseFloat vtln_warp);
 
 

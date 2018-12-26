@@ -108,7 +108,7 @@ void RegtreeFmllrDiagGmm::ComputeLogDets() {
   logdet_.Resize(num_xforms_);
   for (int32 r = 0; r < num_xforms_; r++) {
     SubMatrix<BaseFloat> tmp_a(xform_matrices_[r], 0, dim_, 0,
-                               dim_);
+        dim_);
     logdet_(r) = tmp_a.LogDet();
     KALDI_ASSERT(!KALDI_ISNAN(logdet_(r)));
   }
@@ -116,7 +116,7 @@ void RegtreeFmllrDiagGmm::ComputeLogDets() {
 }
 
 void RegtreeFmllrDiagGmm::TransformFeature(const VectorBase<BaseFloat> &in,
-                                    vector<Vector<BaseFloat> > *out) const {
+    vector<Vector<BaseFloat> > *out) const {
   KALDI_ASSERT(out != NULL);
 
   if (xform_matrices_.size() == 0) {  // empty transform
@@ -137,7 +137,7 @@ void RegtreeFmllrDiagGmm::TransformFeature(const VectorBase<BaseFloat> &in,
     KALDI_ASSERT(num_xforms_ > 0);
     out->resize(num_xforms_);
     for (int32 xform_index = 0; xform_index < num_xforms_;
-         ++xform_index) {
+        ++xform_index) {
       (*out)[xform_index].Resize(dim_);
       (*out)[xform_index].AddMatVec(1.0, xform_matrices_[xform_index],
                                     kNoTrans, extended_feat, 0.0);
@@ -180,7 +180,7 @@ void RegtreeFmllrDiagGmm::Read(std::istream &in, bool binary) {
     ExpectToken(in, binary, "<XFORM>");
     xform_itr->Read(in, binary);
     KALDI_ASSERT(xform_itr->NumRows() == (xform_itr->NumCols() - 1)
-           && xform_itr->NumRows() == dim_);
+        && xform_itr->NumRows() == dim_);
   }
 
   ExpectToken(in, binary, "<BCLASS2XFORMS>");
@@ -207,7 +207,7 @@ void RegtreeFmllrDiagGmmAccs::Init(size_t num_bclass, size_t dim) {
     DeletePointers(&baseclass_stats_);
     baseclass_stats_.resize(num_bclass);
     for (vector<AffineXformStats*>::iterator it = baseclass_stats_.begin(),
-             end = baseclass_stats_.end(); it != end; ++it) {
+        end = baseclass_stats_.end(); it != end; ++it) {
       *it = new AffineXformStats();
       (*it)->Init(dim, dim);
     }
@@ -216,14 +216,14 @@ void RegtreeFmllrDiagGmmAccs::Init(size_t num_bclass, size_t dim) {
 
 void RegtreeFmllrDiagGmmAccs::SetZero() {
   for (vector<AffineXformStats*>::iterator it = baseclass_stats_.begin(),
-           end = baseclass_stats_.end(); it != end; ++it) {
+      end = baseclass_stats_.end(); it != end; ++it) {
     (*it)->SetZero();
   }
 }
 
 BaseFloat RegtreeFmllrDiagGmmAccs::AccumulateForGmm(
-    const RegressionTree &regtree, const AmDiagGmm &am,
-    const VectorBase<BaseFloat> &data, size_t pdf_index, BaseFloat weight) {
+  const RegressionTree &regtree, const AmDiagGmm &am,
+  const VectorBase<BaseFloat> &data, size_t pdf_index, BaseFloat weight) {
   const DiagGmm &pdf = am.GetPdf(pdf_index);
   int32 num_comp = pdf.NumGauss();
   Vector<BaseFloat> posterior(num_comp);
@@ -259,9 +259,9 @@ BaseFloat RegtreeFmllrDiagGmmAccs::AccumulateForGmm(
 }
 
 void RegtreeFmllrDiagGmmAccs::AccumulateForGaussian(
-    const RegressionTree &regtree, const AmDiagGmm &am,
-    const VectorBase<BaseFloat> &data, size_t pdf_index, size_t gauss_index,
-    BaseFloat weight) {
+  const RegressionTree &regtree, const AmDiagGmm &am,
+  const VectorBase<BaseFloat> &data, size_t pdf_index, size_t gauss_index,
+  BaseFloat weight) {
   const DiagGmm &pdf = am.GetPdf(pdf_index);
   size_t dim = static_cast<size_t>(dim_);
   Vector<double> extended_data(dim+1);
@@ -291,7 +291,7 @@ void RegtreeFmllrDiagGmmAccs::Write(std::ostream &out, bool binary) const {
   WriteToken(out, binary, "<STATS>");
   vector<AffineXformStats*>::const_iterator itr = baseclass_stats_.begin(),
       end = baseclass_stats_.end();
-  for ( ; itr != end; ++itr)
+  for (; itr != end; ++itr)
     (*itr)->Write(out, binary);
   WriteToken(out, binary, "</FMLLRACCS>");
 }
@@ -307,7 +307,7 @@ void RegtreeFmllrDiagGmmAccs::Read(std::istream &in, bool binary, bool add) {
   ExpectToken(in, binary, "<STATS>");
   vector<AffineXformStats*>::iterator itr = baseclass_stats_.begin(),
       end = baseclass_stats_.end();
-  for ( ; itr != end; ++itr) {
+  for (; itr != end; ++itr) {
     *itr = new AffineXformStats();
     (*itr)->Init(dim_, dim_);
     (*itr)->Read(in, binary, add);
@@ -317,10 +317,10 @@ void RegtreeFmllrDiagGmmAccs::Read(std::istream &in, bool binary, bool add) {
 
 
 void RegtreeFmllrDiagGmmAccs::Update(const RegressionTree &regtree,
-                              const RegtreeFmllrOptions &opts,
-                              RegtreeFmllrDiagGmm *out_fmllr,
-                              BaseFloat *auxf_impr_out,
-                              BaseFloat *tot_t_out) const {
+    const RegtreeFmllrOptions &opts,
+    RegtreeFmllrDiagGmm *out_fmllr,
+    BaseFloat *auxf_impr_out,
+    BaseFloat *tot_t_out) const {
   BaseFloat tot_auxf_impr = 0.0, tot_t = 0.0;
   Matrix<BaseFloat> xform_mat(dim_, dim_+1);
   if (opts.use_regtree) {  // estimate transforms using a regression tree
@@ -334,7 +334,7 @@ void RegtreeFmllrDiagGmmAccs::Update(const RegressionTree &regtree,
       out_fmllr->Init(regclass_stats.size(), dim_);
       size_t num_rclass = regclass_stats.size();
       for (size_t rclass_index = 0;
-           rclass_index < num_rclass; ++rclass_index) {
+          rclass_index < num_rclass; ++rclass_index) {
         KALDI_ASSERT(regclass_stats[rclass_index]->beta_ >= opts.min_count);
         xform_mat.SetUnit();
         tot_t += regclass_stats[rclass_index]->beta_;
@@ -342,7 +342,7 @@ void RegtreeFmllrDiagGmmAccs::Update(const RegressionTree &regtree,
         tot_auxf_impr +=
             ComputeFmllrMatrixDiagGmmFull(xform_mat, *(regclass_stats[rclass_index]),
                                           opts.num_iters, &xform_mat);
-        
+
         out_fmllr->SetParameters(xform_mat, rclass_index);
       }
       KALDI_LOG << "Estimated " << num_rclass << " regression classes.";
@@ -353,14 +353,14 @@ void RegtreeFmllrDiagGmmAccs::Update(const RegressionTree &regtree,
     // end of estimation using regression tree
   } else {  // No regtree: estimate 1 transform per baseclass (if enough count)
     for (int32 bclass_index = 0; bclass_index < num_baseclasses_;
-         ++bclass_index) {
+        ++bclass_index) {
       tot_t += baseclass_stats_[bclass_index]->beta_;
     }
 
     out_fmllr->Init(num_baseclasses_, dim_);
     vector<int32> base2regclass(num_baseclasses_);
     for (int32 bclass_index = 0; bclass_index < num_baseclasses_;
-         ++bclass_index) {
+        ++bclass_index) {
       if (baseclass_stats_[bclass_index]->beta_ >= opts.min_count) {
         xform_mat.SetUnit();
 

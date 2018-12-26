@@ -27,14 +27,14 @@ namespace kaldi {
 namespace nnet3 {
 
 Compiler::Compiler(
-    const ComputationRequest &request,
-    const Nnet &nnet): nnet_(nnet) {
+  const ComputationRequest &request,
+  const Nnet &nnet) : nnet_(nnet) {
   requests_.push_back(&request);
 }
 
 Compiler::Compiler(
-    const std::vector<const ComputationRequest*> &requests,
-    const Nnet &nnet): requests_(requests), nnet_(nnet) {
+  const std::vector<const ComputationRequest*> &requests,
+  const Nnet &nnet) : requests_(requests), nnet_(nnet) {
   KALDI_ASSERT(requests_.size() >= 1);
   // We are currently not supporting getting model derivatives for multi-segment
   // (online) computations.
@@ -48,7 +48,7 @@ Compiler::Compiler(
 }
 
 void Compiler::CreateComputation(const CompilerOptions &opts,
-                                 NnetComputation *computation) {
+    NnetComputation *computation) {
   computation->Clear();
   ComputationGraphBuilder builder(nnet_, &graph_);
   // note: there are only >1 segments in a 'looped' computation.
@@ -78,7 +78,7 @@ void Compiler::CreateComputation(const CompilerOptions &opts,
     // note: this class will output to 'steps' and to 'cindex_id_to_location_'.
     // it may incidentally change 'graph_' by adding a few cindexes.
     ComputationStepsComputer steps_computer(nnet_, &graph_, &steps,
-                                            &cindex_id_to_location_);
+        &cindex_id_to_location_);
 
     for (size_t segment = 0; segment < requests_.size(); segment++) {
       steps_computer.ComputeForSegment(*(requests_[segment]),
@@ -105,8 +105,8 @@ void Compiler::CreateComputation(const CompilerOptions &opts,
 }
 
 void Compiler::AddCommands(const std::vector<bool> &deriv_needed,
-                           const std::vector<int32> &step_to_segment,
-                           NnetComputation *computation) {
+    const std::vector<int32> &step_to_segment,
+    NnetComputation *computation) {
   computation->need_model_derivative = requests_[0]->need_model_derivative;
   int32 arbitrary_factor = 8;
   computation->commands.reserve(computation->matrices.size()
@@ -140,9 +140,9 @@ void Compiler::AddCommands(const std::vector<bool> &deriv_needed,
 
 
 void Compiler::ComputeStepDependencies(
-    const std::vector<int32> &this_step,
-    int32 step_index,
-    unordered_set<int32> *dep_steps) {
+  const std::vector<int32> &this_step,
+  int32 step_index,
+  unordered_set<int32> *dep_steps) {
   dep_steps->clear();
   if (this_step.empty())
     return;
@@ -174,9 +174,9 @@ void Compiler::ComputeStepDependencies(
 }
 
 void Compiler::ComputeDerivNeeded(
-    const std::vector<std::vector<int32> > &steps,
-    const std::vector<int32> &step_to_segment,
-    std::vector<bool> *deriv_needed) {
+  const std::vector<std::vector<int32> > &steps,
+  const std::vector<int32> &step_to_segment,
+  std::vector<bool> *deriv_needed) {
   KALDI_ASSERT(steps.size() == step_to_segment.size() &&
                step_to_segment[0] == 0 &&
                step_to_segment.back() + 1 == requests_.size());
@@ -266,10 +266,10 @@ MatrixStrideType Compiler::GetStrideType(int32 node_index) const {
   const Component *c = nnet_.GetComponent(node.u.component_index);
   if (is_input) {
     return (c->Properties() & kInputContiguous) ?
-        kStrideEqualNumCols : kDefaultStride;
+           kStrideEqualNumCols : kDefaultStride;
   } else {
     return (c->Properties() & kOutputContiguous) ?
-        kStrideEqualNumCols : kDefaultStride;
+           kStrideEqualNumCols : kDefaultStride;
   }
 }
 
@@ -277,10 +277,10 @@ MatrixStrideType Compiler::GetStrideType(int32 node_index) const {
 // Note: "by_step" is an input but is passed as a pointer because this
 // function destroys it.
 void Compiler::CreateStepInfo(
-    const std::vector<bool> &deriv_needed,
-    const std::vector<int32> &step_to_segment,
-    std::vector<std::vector<int32> > *by_step,
-    NnetComputation *computation) {
+  const std::vector<bool> &deriv_needed,
+  const std::vector<int32> &step_to_segment,
+  std::vector<std::vector<int32> > *by_step,
+  NnetComputation *computation) {
   KALDI_ASSERT(!by_step->empty());
   int32 num_steps = by_step->size();
   steps_.resize(num_steps);
@@ -389,33 +389,33 @@ bool Compiler::IsInputStep(int32 step) const {
 }
 
 void Compiler::DoForwardComputation(int32 step,
-                                    NnetComputation *computation) const {
+    NnetComputation *computation) const {
   KALDI_ASSERT(step < static_cast<int32>(steps_.size()));
   const StepInfo &step_info = steps_[step];
   const NetworkNode &node = nnet_.GetNode(step_info.node_index);
   switch (node.node_type) {
-    case kInput:  // Note: input nodes appear before other node types.
-      AddForwardStepInput(step, computation);
-      if (!IsInputStep(step + 1))  // Make sure forward computation is nonempty.
-        computation->commands.push_back(
+  case kInput:    // Note: input nodes appear before other node types.
+    AddForwardStepInput(step, computation);
+    if (!IsInputStep(step + 1))    // Make sure forward computation is nonempty.
+      computation->commands.push_back(
             NnetComputation::Command(kNoOperationPermanent));
-      break;
-    case kDimRange: break;  // Nothing to do.
-    case kComponent:
-      AddForwardStepComponent(step, computation);
-      break;
-    case kDescriptor:
-      DoForwardComputationDescriptor(step, computation);
-      break;
-    default:
-      KALDI_ERR << "Invalid node type";
+    break;
+  case kDimRange: break;    // Nothing to do.
+  case kComponent:
+    AddForwardStepComponent(step, computation);
+    break;
+  case kDescriptor:
+    DoForwardComputationDescriptor(step, computation);
+    break;
+  default:
+    KALDI_ERR << "Invalid node type";
   }
 
 }
 
 
 void Compiler::DoForwardComputationDescriptor(
-    int32 step, NnetComputation *computation) const {
+  int32 step, NnetComputation *computation) const {
   int32 num_parts = steps_[step].value_parts.size();
   for (int32 part = 0; part < num_parts; part++)
     DoForwardComputationSumDescriptor(step, part, computation);
@@ -440,9 +440,9 @@ void Compiler::DoForwardComputationDescriptor(
 // the output becomes a sum over the rows in the i'th list (or zero if that list
 // is empty).  These locations will be pairs [step-index, row-index].
 void Compiler::ComputeInputLocationsList(
-    int32 step, int32 part_index,
-    std::vector<std::vector<std::pair<int32, int32> > > *submat_locations_list)
-    const {
+  int32 step, int32 part_index,
+  std::vector<std::vector<std::pair<int32, int32> > > *submat_locations_list)
+const {
 
   KALDI_ASSERT(static_cast<size_t>(step) < steps_.size());
   const StepInfo &step_info = steps_[step];
@@ -487,8 +487,8 @@ void Compiler::ComputeInputLocationsList(
 }
 
 void Compiler::ComputeValueSubmatLocationsList(
-const std::vector<std::vector<std::pair<int32, int32> > > &input_locations_list,
-    std::vector<std::vector<std::pair<int32, int32> > >*submat_locations_list)
+  const std::vector<std::vector<std::pair<int32, int32> > > &input_locations_list,
+  std::vector<std::vector<std::pair<int32, int32> > >*submat_locations_list)
 const {
   submat_locations_list->clear();
   submat_locations_list->resize(input_locations_list.size());
@@ -515,9 +515,9 @@ const {
 
 
 void Compiler::ComputeDerivSubmatLocationsList(
- const std::vector<std::vector<std::pair<int32, int32> > > &input_locations_list,
-    std::vector<std::vector<std::pair<int32, int32> > > *submat_locations_list)
-    const {
+  const std::vector<std::vector<std::pair<int32, int32> > > &input_locations_list,
+  std::vector<std::vector<std::pair<int32, int32> > > *submat_locations_list)
+const {
   submat_locations_list->clear();
   submat_locations_list->resize(input_locations_list.size());
   int32 size = submat_locations_list->size();
@@ -540,7 +540,7 @@ void Compiler::ComputeDerivSubmatLocationsList(
 
 
 void Compiler::DoForwardComputationSumDescriptor(
-    int32 step, int32 part_index, NnetComputation *computation) const {
+  int32 step, int32 part_index, NnetComputation *computation) const {
   const StepInfo &step_info = steps_[step];
   std::vector<std::vector<std::pair<int32, int32> > > submat_locations_list;
   ComputeValueSubmatLocationsList(step_info.input_locations_list[part_index],
@@ -553,11 +553,11 @@ void Compiler::DoForwardComputationSumDescriptor(
 }
 
 void Compiler::DoForwardComputationFromIndexes(
-    int32 value_submatrix_index,
-    int32 input_submatrix_index,
-    bool is_first_term_in_sum,
-    const std::vector<int32> &indexes,
-    NnetComputation *computation) const {
+  int32 value_submatrix_index,
+  int32 input_submatrix_index,
+  bool is_first_term_in_sum,
+  const std::vector<int32> &indexes,
+  NnetComputation *computation) const {
 
   int32 input_num_rows =
       computation->submatrices[input_submatrix_index].num_rows,
@@ -570,7 +570,7 @@ void Compiler::DoForwardComputationFromIndexes(
     if (i == num_rows) {  // Simplest case: just matrix addition.
       CommandType ctype =
           (is_first_term_in_sum ?
-           kMatrixCopy : kMatrixAdd);
+          kMatrixCopy : kMatrixAdd);
       computation->commands.push_back(
           NnetComputation::Command(ctype, value_submatrix_index,
                                    input_submatrix_index));
@@ -584,7 +584,7 @@ void Compiler::DoForwardComputationFromIndexes(
   computation->indexes.push_back(indexes);
   CommandType ctype =
       (is_first_term_in_sum ?
-       kCopyRows : kAddRows);
+      kCopyRows : kAddRows);
   computation->commands.push_back(
       NnetComputation::Command(ctype, value_submatrix_index,
                                input_submatrix_index, indexes_index));
@@ -592,10 +592,10 @@ void Compiler::DoForwardComputationFromIndexes(
 }
 
 void Compiler::DoForwardComputationFromSubmatLocations(
-    int32 value_submatrix_index,
-    bool is_first_term_in_sum,
-    const std::vector<std::pair<int32, int32> > &submat_locations,
-    NnetComputation *computation) const {
+  int32 value_submatrix_index,
+  bool is_first_term_in_sum,
+  const std::vector<std::pair<int32, int32> > &submat_locations,
+  NnetComputation *computation) const {
 
 
   int32 input_submatrix_index = -1;
@@ -612,7 +612,7 @@ void Compiler::DoForwardComputationFromSubmatLocations(
     // There are multiple source matrices.
     CommandType ctype =
         (is_first_term_in_sum ?
-         kCopyRowsMulti : kAddRowsMulti);
+        kCopyRowsMulti : kAddRowsMulti);
     int32 indexes_multi_index = computation->indexes_multi.size();
     computation->indexes_multi.push_back(submat_locations);
     computation->commands.push_back(
@@ -623,9 +623,9 @@ void Compiler::DoForwardComputationFromSubmatLocations(
 }
 
 void Compiler::DoForwardComputationFromSubmatLocationsList(
-    int32 value_submatrix_index,
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    NnetComputation *computation) const {
+  int32 value_submatrix_index,
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  NnetComputation *computation) const {
   std::vector<std::vector<std::pair<int32, int32> > > split_lists;
   SplitLocations(submat_lists, &split_lists);
   int32 size = split_lists.size();
@@ -640,9 +640,9 @@ void Compiler::DoForwardComputationFromSubmatLocationsList(
 
 
 void Compiler::DoBackwardComputationFromSubmatLocationsList(
-    int32 deriv_submatrix_index,
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    NnetComputation *computation) const {
+  int32 deriv_submatrix_index,
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  NnetComputation *computation) const {
   std::vector<std::vector<std::pair<int32, int32> > > split_lists;
   SplitLocationsBackward(submat_lists, &split_lists);
   int32 size = split_lists.size();  // size may be zero e.g. for unused outputs.
@@ -655,7 +655,7 @@ void Compiler::DoBackwardComputationFromSubmatLocationsList(
 
 
 void Compiler::DoBackwardComputationSumDescriptor(
-    int32 step, int32 part_index, NnetComputation *computation) const {
+  int32 step, int32 part_index, NnetComputation *computation) const {
   const StepInfo &step_info = steps_[step];
   std::vector<std::vector<std::pair<int32, int32> > > submat_locations_list;
   ComputeDerivSubmatLocationsList(step_info.input_locations_list[part_index],
@@ -671,9 +671,9 @@ void Compiler::DoBackwardComputationSumDescriptor(
 
 
 void Compiler::DoBackwardComputationFromSubmatLocations(
-    int32 deriv_submatrix_index,
-    const std::vector<std::pair<int32, int32> > &submat_locations,
-    NnetComputation *computation) const {
+  int32 deriv_submatrix_index,
+  const std::vector<std::pair<int32, int32> > &submat_locations,
+  NnetComputation *computation) const {
   // This function creates a command to handle an individual piece of the
   // Descriptor, for backprop.  Note: because the backprop case is a little
   // trickier to implement efficiently on the GPU, there may be cases
@@ -720,10 +720,10 @@ void Compiler::DoBackwardComputationFromSubmatLocations(
 }
 
 void Compiler::DoBackwardComputationFromIndexes(
-    int32 deriv_submatrix_index,
-    int32 input_deriv_submatrix_index,
-    const std::vector<int32> &indexes,
-    NnetComputation *computation) const {
+  int32 deriv_submatrix_index,
+  int32 input_deriv_submatrix_index,
+  const std::vector<int32> &indexes,
+  NnetComputation *computation) const {
 
   int32 num_rows = computation->submatrices[deriv_submatrix_index].num_rows,
       input_num_rows =
@@ -735,7 +735,7 @@ void Compiler::DoBackwardComputationFromIndexes(
       if (indexes[i] != i)
         break;
     if (i == num_rows) {  // Simplest case: just matrix addition.
-        computation->commands.push_back(
+      computation->commands.push_back(
             NnetComputation::Command(kMatrixAdd,
                                      input_deriv_submatrix_index,
                                      deriv_submatrix_index));
@@ -764,12 +764,12 @@ void Compiler::DoBackwardComputationFromIndexes(
       // There were no repeated elements, and this strategy will work.
       int32 indexes_index = computation->indexes.size();
       computation->indexes.push_back(reverse_indexes);
-        computation->commands.push_back(
+      computation->commands.push_back(
             NnetComputation::Command(kAddRows,
                                      input_deriv_submatrix_index,
                                      deriv_submatrix_index,
                                      indexes_index));
-        return;
+      return;
     }
   }
   std::vector<std::pair<int32, int32> > ranges;
@@ -806,14 +806,14 @@ void Compiler::DoBackwardComputationFromIndexes(
 
 
 void Compiler::DoBackwardComputationDescriptor(
-    int32 step, NnetComputation *computation) {
+  int32 step, NnetComputation *computation) {
   StepInfo &step_info = steps_[step];
   if (nnet_.IsOutputNode(step_info.node_index) &&
       step_info.deriv > 0) {
     int32 deriv_submatrix_index = step_info.deriv;
     KALDI_ASSERT(computation->IsWholeMatrix(deriv_submatrix_index));
     NnetComputation::Command c(kAcceptInput, deriv_submatrix_index,
-                               step_info.node_index);
+        step_info.node_index);
     computation->commands.push_back(c);
   }
 
@@ -827,29 +827,29 @@ void Compiler::DoBackwardComputationDescriptor(
 
 
 void Compiler::DoBackwardComputation(int32 step,
-                                     NnetComputation *computation) {
+    NnetComputation *computation) {
   KALDI_ASSERT(step < static_cast<int32>(steps_.size()));
   const StepInfo &step_info = steps_[step];
   int32 node_index = step_info.node_index;
   const NetworkNode &node = nnet_.GetNode(node_index);
 
   switch (node.node_type) {
-    case kInput:
-      AddBackwardStepInput(step, computation);
-      if (!IsInputStep(step + 1))  // Make sure backward computation is nonempty.
-        computation->commands.push_back(
+  case kInput:
+    AddBackwardStepInput(step, computation);
+    if (!IsInputStep(step + 1))    // Make sure backward computation is nonempty.
+      computation->commands.push_back(
             NnetComputation::Command(kNoOperationPermanent));
-      break;
-    case kDimRange:
-      break;  // Nothing to do.
-    case kComponent:
-      AddBackwardStepComponent(step, computation);
-      break;
-    case kDescriptor:
-      DoBackwardComputationDescriptor(step, computation);
-      break;
-    default:
-      KALDI_ERR << "Invalid node type";
+    break;
+  case kDimRange:
+    break;    // Nothing to do.
+  case kComponent:
+    AddBackwardStepComponent(step, computation);
+    break;
+  case kDescriptor:
+    DoBackwardComputationDescriptor(step, computation);
+    break;
+  default:
+    KALDI_ERR << "Invalid node type";
   }
 }
 
@@ -857,7 +857,7 @@ void Compiler::DoBackwardComputation(int32 step,
 // expect input from the user.  Because inputs are always listed first in
 // 'steps', these will precede the actual commands.
 void Compiler::AddForwardStepInput(int32 step,
-                                   NnetComputation *computation) const {
+    NnetComputation *computation) const {
   KALDI_ASSERT(static_cast<size_t>(step) < steps_.size());
   const StepInfo &step_info = steps_[step];
   int32 node_index = step_info.node_index,
@@ -874,7 +874,7 @@ void Compiler::AddForwardStepInput(int32 step,
 
 
 void Compiler::AddForwardStepComponent(int32 step,
-                                       NnetComputation *computation) const {
+    NnetComputation *computation) const {
   KALDI_ASSERT(static_cast<size_t>(step) < steps_.size());
   const StepInfo &step_info = steps_[step];
   int32 input_step = step - 1;
@@ -894,21 +894,21 @@ void Compiler::AddForwardStepComponent(int32 step,
       output_submatrix_index = step_info.value,
       memo_index = (step_info.deriv > 0 && (properties & kUsesMemo) ? step : 0),
       store_stats = (requests_[0]->store_component_stats &&
-                     (properties & kStoresStats) ?  1 : 0);
+      (properties & kStoresStats) ?  1 : 0);
 
   NnetComputation::Command c(kPropagate,
-                             component_index,
-                             step_info.precomputed_indexes_index,
-                             input_submatrix_index,
-                             output_submatrix_index,
-                             memo_index,
-                             store_stats);
+      component_index,
+      step_info.precomputed_indexes_index,
+      input_submatrix_index,
+      output_submatrix_index,
+      memo_index,
+      store_stats);
   computation->commands.push_back(c);
 }
 
 
 void Compiler::AddBackwardStepInput(int32 step,
-                                    NnetComputation *computation) const {
+    NnetComputation *computation) const {
   KALDI_ASSERT(static_cast<size_t>(step) < steps_.size());
   const StepInfo &step_info = steps_[step];
   int32 node_index = step_info.node_index,
@@ -926,7 +926,7 @@ void Compiler::AddBackwardStepInput(int32 step,
 
 
 void Compiler::AddBackwardStepComponent(int32 step,
-                                        NnetComputation *computation) const {
+    NnetComputation *computation) const {
   KALDI_ASSERT(static_cast<size_t>(step) < steps_.size());
   const StepInfo &step_info = steps_[step];
   int32 input_step = step - 1;
@@ -944,29 +944,29 @@ void Compiler::AddBackwardStepComponent(int32 step,
       output_deriv_submatrix_index = step_info.deriv,
       memo_index = (properties & kUsesMemo ? step : 0);
   KALDI_ASSERT(output_deriv_submatrix_index > 0 &&
-               (input_deriv_submatrix_index > 0 ||
-                properties & kUpdatableComponent));
+      (input_deriv_submatrix_index > 0 ||
+      properties & kUpdatableComponent));
 
-  if (! (properties & kBackpropNeedsInput))
+  if (!(properties & kBackpropNeedsInput))
     input_submatrix_index = 0;
-  if (! (properties & kBackpropNeedsOutput))
+  if (!(properties & kBackpropNeedsOutput))
     output_submatrix_index = 0;
 
   NnetComputation::Command c(kBackprop,
-                             component_index,
-                             step_info.precomputed_indexes_index,
-                             input_submatrix_index,
-                             output_submatrix_index,
-                             output_deriv_submatrix_index,
-                             input_deriv_submatrix_index,
-                             memo_index);
+      component_index,
+      step_info.precomputed_indexes_index,
+      input_submatrix_index,
+      output_submatrix_index,
+      output_deriv_submatrix_index,
+      input_deriv_submatrix_index,
+      memo_index);
   computation->commands.push_back(c);
 }
 
 
 
 void Compiler::AllocateMatrices(const std::vector<int32> &whole_submatrices,
-                                NnetComputation *computation) const {
+    NnetComputation *computation) const {
   KALDI_ASSERT(computation->commands.empty());
   // Work out which matrices are inputs to the computation (or output-derivs,
   // which are also supplied as inputs to the computation); we won't be setting
@@ -1013,8 +1013,8 @@ void Compiler::AllocateMatrices(const std::vector<int32> &whole_submatrices,
 
 
 void Compiler::SetUpPrecomputedIndexes(
-    const std::vector<int32> &step_to_segment,
-    NnetComputation *computation) {
+  const std::vector<int32> &step_to_segment,
+  NnetComputation *computation) {
   int32 num_steps = steps_.size();
   KALDI_ASSERT(computation->component_precomputed_indexes.empty());
   // the zeroth commponent is special, contains a NULL pointer.
@@ -1067,8 +1067,8 @@ void Compiler::SetUpPrecomputedIndexes(
 }
 
 void Compiler::DeallocateMatrices(const std::vector<int32> &whole_submatrices,
-                                  const std::vector<int32> &step_to_segment,
-                                  NnetComputation *computation) {
+    const std::vector<int32> &step_to_segment,
+    NnetComputation *computation) {
   // This adds the commands to destroy all the matrices- but not the
   // ones that might be needed as outputs of the computation.  The ones that
   // are spared from destruction are those corresponding to outputs of the
@@ -1104,7 +1104,7 @@ void Compiler::DeallocateMatrices(const std::vector<int32> &whole_submatrices,
                                      // this name
       if (has_deriv) {
         int32 deriv_matrix_index =
-          computation->submatrices[step_info.deriv].matrix_index;
+            computation->submatrices[step_info.deriv].matrix_index;
         will_destroy[deriv_matrix_index] = false;
       }
     }
@@ -1149,7 +1149,7 @@ void Compiler::OutputDebugInfo(NnetComputation *computation) const {
 }
 
 void AppendCindexes(int32 node, const std::vector<Index> &indexes,
-                    std::vector<Cindex> *out) {
+    std::vector<Cindex> *out) {
   size_t indexes_size = indexes.size();
   if (indexes_size > out->size())
     out->reserve(out->size() + indexes_size);

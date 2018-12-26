@@ -87,14 +87,14 @@ void Questions::Read(std::istream &is, bool binary) {
 }
 
 void Questions::InitRand(const BuildTreeStatsType &stats, int32 num_quest, int32 num_iters_refine,
-                                AllKeysType all_keys_type) {
+    AllKeysType all_keys_type) {
   std::vector<EventKeyType> all_keys;
   FindAllKeys(stats, all_keys_type, &all_keys);  // get all keys.
   if (all_keys_type == kAllKeysUnion) {
     KALDI_WARN << "Questions::InitRand(), using union of all keys.  This may work depending on how you are building the tree but may crash (depends if you have already ensured that stats currently on the same leaf all share the same set of keys.)";
   }
 
-  for (size_t i = 0;i < all_keys.size();i++) {
+  for (size_t i = 0; i < all_keys.size(); i++) {
     EventKeyType key = all_keys[i];
     std::vector<EventValueType> all_values;
     bool b = PossibleValues(key, stats, &all_values);  // get possible values.
@@ -107,9 +107,9 @@ void Questions::InitRand(const BuildTreeStatsType &stats, int32 num_quest, int32
       ;  // Do nothing.  No questions.
     } else {
       q_for_key.initial_questions.resize((size_t)num_quest);
-      for (size_t i = 0;i < (size_t)num_quest;i++) {
+      for (size_t i = 0; i < (size_t)num_quest; i++) {
         std::vector<EventValueType> &this_quest = q_for_key.initial_questions[i];
-        for (size_t j = 0;j < all_values.size()/2;j++)
+        for (size_t j = 0; j < all_values.size()/2; j++)
           this_quest.push_back(all_values[RandInt(0, all_values.size()-1)]);
         SortAndUniq(&this_quest);
         KALDI_ASSERT(!this_quest.empty());

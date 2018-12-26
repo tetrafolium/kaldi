@@ -30,8 +30,8 @@ namespace nnet2 {
 // vector in the associated pointer.  This enables us to write the egs more
 // compactly to disk in this common case.
 bool HasSimpleLabels(
-    const NnetExample &eg,
-    std::vector<int32> *simple_labels) {
+  const NnetExample &eg,
+  std::vector<int32> *simple_labels) {
   size_t num_frames = eg.labels.size();
   for (int32 t = 0; t < num_frames; t++)
     if (eg.labels[t].size() != 1 || eg.labels[t][0].second != 1.0)
@@ -157,10 +157,10 @@ static bool nnet_example_warned_left = false, nnet_example_warned_right = false;
 
 // Self-constructor that can reduce the number of frames and/or context.
 NnetExample::NnetExample(const NnetExample &input,
-                         int32 start_frame,
-                         int32 new_num_frames,
-                         int32 new_left_context,
-                         int32 new_right_context): spk_info(input.spk_info) {
+    int32 start_frame,
+    int32 new_num_frames,
+    int32 new_left_context,
+    int32 new_right_context) : spk_info(input.spk_info) {
   int32 num_label_frames = input.labels.size();
   if (start_frame < 0) start_frame = 0;  // start_frame is offset in the labeled
                                          // frames.
@@ -193,11 +193,11 @@ NnetExample::NnetExample(const NnetExample &input,
 
   int32 new_tot_frames = new_left_context + new_num_frames + new_right_context,
       left_frames_lost = (input.left_context - new_left_context) + start_frame;
-  
+
   CompressedMatrix new_input_frames(input.input_frames,
-                                    left_frames_lost,
-                                    new_tot_frames,
-                                    0, input.input_frames.NumCols());
+      left_frames_lost,
+      new_tot_frames,
+      0, input.input_frames.NumCols());
   new_input_frames.Swap(&input_frames);  // swap with class-member.
   left_context = new_left_context;  // set class-member.
   labels.clear();
@@ -207,7 +207,7 @@ NnetExample::NnetExample(const NnetExample &input,
 }
 
 void ExamplesRepository::AcceptExamples(
-    std::vector<NnetExample> *examples) {
+  std::vector<NnetExample> *examples) {
   KALDI_ASSERT(!examples->empty());
   empty_semaphore_.Wait();
   KALDI_ASSERT(examples_.empty());
@@ -223,7 +223,7 @@ void ExamplesRepository::ExamplesDone() {
 }
 
 bool ExamplesRepository::ProvideExamples(
-    std::vector<NnetExample> *examples) {
+  std::vector<NnetExample> *examples) {
   full_semaphore_.Wait();
   if (done_) {
     KALDI_ASSERT(examples_.empty());
@@ -240,7 +240,7 @@ bool ExamplesRepository::ProvideExamples(
 
 
 void DiscriminativeNnetExample::Write(std::ostream &os,
-                                              bool binary) const {
+    bool binary) const {
   // Note: weight, num_ali, den_lat, input_frames, left_context and spk_info are
   // members.  This is a struct.
   WriteToken(os, binary, "<DiscriminativeNnetExample>");
@@ -250,7 +250,7 @@ void DiscriminativeNnetExample::Write(std::ostream &os,
   WriteIntegerVector(os, binary, num_ali);
   if (!WriteCompactLattice(os, binary, den_lat)) {
     // We can't return error status from this function so we
-    // throw an exception. 
+    // throw an exception.
     KALDI_ERR << "Error writing CompactLattice to stream";
   }
   WriteToken(os, binary, "<InputFrames>");
@@ -267,7 +267,7 @@ void DiscriminativeNnetExample::Write(std::ostream &os,
 }
 
 void DiscriminativeNnetExample::Read(std::istream &is,
-                                             bool binary) {
+    bool binary) {
   // Note: weight, num_ali, den_lat, input_frames, left_context and spk_info are
   // members.  This is a struct.
   ExpectToken(is, binary, "<DiscriminativeNnetExample>");
@@ -278,7 +278,7 @@ void DiscriminativeNnetExample::Read(std::istream &is,
   CompactLattice *den_lat_tmp = NULL;
   if (!ReadCompactLattice(is, binary, &den_lat_tmp) || den_lat_tmp == NULL) {
     // We can't return error status from this function so we
-    // throw an exception. 
+    // throw an exception.
     KALDI_ERR << "Error reading CompactLattice from stream";
   }
   den_lat = *den_lat_tmp;

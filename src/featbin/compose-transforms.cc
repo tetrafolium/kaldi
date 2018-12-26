@@ -65,30 +65,30 @@ int main(int argc, char *argv[]) {
 
     bool a_is_rspecifier =
         (ClassifyRspecifier(transform_a_fn, NULL, NULL)
-         != kNoRspecifier),
+        != kNoRspecifier),
         b_is_rspecifier =
         (ClassifyRspecifier(transform_b_fn, NULL, NULL)
-         != kNoRspecifier),
+        != kNoRspecifier),
         c_is_wspecifier =
         (ClassifyWspecifier(transform_c_fn, NULL, NULL, NULL)
-         != kNoWspecifier);
+        != kNoWspecifier);
 
 
     RandomAccessTokenReader utt2spk_reader;
     if (utt2spk_rspecifier != "") {
       if (!(a_is_rspecifier && b_is_rspecifier))
         KALDI_ERR << "Error: utt2spk option provided compose transforms but "
-            "at least one of the inputs is a global transform.";
+          "at least one of the inputs is a global transform.";
       if (!utt2spk_reader.Open(utt2spk_rspecifier))
         KALDI_ERR << "Error upening utt2spk map from "
-                   << utt2spk_rspecifier;
+                  << utt2spk_rspecifier;
     }
 
 
     if ( (a_is_rspecifier || b_is_rspecifier) !=  c_is_wspecifier)
       KALDI_ERR << "Formats of the input and output rspecifiers/rxfilenames do "
-          "not match (if either a or b is an rspecifier, then the output must "
-          "be a wspecifier.";
+        "not match (if either a or b is an rspecifier, then the output must "
+        "be a wspecifier.";
 
 
     if (a_is_rspecifier || b_is_rspecifier) {
@@ -97,13 +97,13 @@ int main(int argc, char *argv[]) {
         SequentialBaseFloatMatrixReader a_reader(transform_a_fn);
         if (b_is_rspecifier) {  // both are rspecifiers.
           RandomAccessBaseFloatMatrixReader b_reader(transform_b_fn);
-          for (;!a_reader.Done(); a_reader.Next()) {
+          for (; !a_reader.Done(); a_reader.Next()) {
             if (utt2spk_rspecifier != "") {  // assume a is per-utt, b is per-spk.
               std::string utt = a_reader.Key();
               if (!utt2spk_reader.HasKey(utt)) {
                 KALDI_WARN << "No speaker provided for utterance " << utt
                            << " (perhaps you wrongly provided utt2spk option to "
-                    " compose-transforms?)";
+                  " compose-transforms?)";
                 continue;
               }
               std::string spk = utt2spk_reader.Value(utt);
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
         } else {  // a is rspecifier,  b is rxfilename
           Matrix<BaseFloat> b;
           ReadKaldiObject(transform_b_fn, &b);
-          for (;!a_reader.Done(); a_reader.Next()) {
+          for (; !a_reader.Done(); a_reader.Next()) {
             Matrix<BaseFloat> c;
             if (!ComposeTransforms(a_reader.Value(), b,
                                   b_is_affine, &c))

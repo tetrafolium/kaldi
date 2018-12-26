@@ -33,9 +33,9 @@ int main(int argc, char *argv[]) {
         "Usage:  am-info [options] <model-in>\n"
         "e.g.:\n"
         " am-info 1.mdl\n";
-    
+
     ParseOptions po(usage);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 1) {

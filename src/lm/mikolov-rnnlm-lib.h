@@ -82,12 +82,12 @@ struct vocab_word {
 };
 
 const unsigned int PRIMES[] = {108641969, 116049371, 125925907, 133333309,
-  145678979, 175308587, 197530793, 234567803, 251851741, 264197411,
-  330864029, 399999781,
-  407407183, 459258997, 479012069, 545678687, 560493491, 607407037, 629629243,
-  656789717, 716048933, 718518067, 725925469, 733332871, 753085943, 755555077,
-  782715551, 790122953, 812345159, 814814293, 893826581, 923456189, 940740127,
-  953085797, 985184539, 990122807};
+                               145678979, 175308587, 197530793, 234567803, 251851741, 264197411,
+                               330864029, 399999781,
+                               407407183, 459258997, 479012069, 545678687, 560493491, 607407037, 629629243,
+                               656789717, 716048933, 718518067, 725925469, 733332871, 753085943, 755555077,
+                               782715551, 790122953, 812345159, 814814293, 893826581, 923456189, 940740127,
+                               953085797, 985184539, 990122807};
 const unsigned int PRIMES_SIZE  =  sizeof(PRIMES) / sizeof(PRIMES[0]);
 
 const int MAX_NGRAM_ORDER = 20;
@@ -95,7 +95,7 @@ const int MAX_NGRAM_ORDER = 20;
 enum FileTypeEnum {TEXT, BINARY, COMPRESSED};  // COMPRESSED not yet implemented
 
 class CRnnLM {
- protected:
+protected:
   char train_file[MAX_FILENAME_STRING];
   char valid_file[MAX_FILENAME_STRING];
   char test_file[MAX_FILENAME_STRING];
@@ -186,7 +186,7 @@ class CRnnLM {
   unordered_map<std::string, float> unk_penalty;
   std::string unk_sym;
 
- public:
+public:
 
   int alpha_set, train_file_set;
 
@@ -216,17 +216,17 @@ class CRnnLM {
   void copyHiddenLayerToInput();
 
   void matrixXvector(struct neuron *dest, struct neuron *srcvec,
-                     struct synapse *srcmatrix, int matrix_width,
-                     int from, int to, int from2, int to2, int type);
+      struct synapse *srcmatrix, int matrix_width,
+      int from, int to, int from2, int to2, int type);
 
   void restoreContextFromVector(const std::vector<float> &context_in);
   void saveContextToVector(std::vector<float> *context_out);
 
   float computeConditionalLogprob(
-      std::string current_word,
-      const std::vector<std::string> &history_words,
-      const std::vector<float> &context_in,
-      std::vector<float> *context_out);
+    std::string current_word,
+    const std::vector<std::string> &history_words,
+    const std::vector<float> &context_in,
+    std::vector<float> *context_out);
 
   void setUnkSym(const std::string &unk);
   void setUnkPenalty(const std::string &filename);

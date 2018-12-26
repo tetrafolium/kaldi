@@ -43,8 +43,8 @@ void OnlineFasterDecoder::ResetDecoder(bool full) {
 
 void
 OnlineFasterDecoder::MakeLattice(const Token *start,
-                                 const Token *end,
-                                 fst::MutableFst<LatticeArc> *out_fst) const {
+    const Token *end,
+    fst::MutableFst<LatticeArc> *out_fst) const {
   out_fst->DeleteStates();
   if (start == NULL) return;
   bool is_final = false;
@@ -58,9 +58,9 @@ OnlineFasterDecoder::MakeLattice(const Token *start,
         graph_cost = tok->arc_.weight.Value(),
         ac_cost = tot_cost - graph_cost;
     LatticeArc l_arc(tok->arc_.ilabel,
-                     tok->arc_.olabel,
-                     LatticeWeight(graph_cost, ac_cost),
-                     tok->arc_.nextstate);
+        tok->arc_.olabel,
+        LatticeWeight(graph_cost, ac_cost),
+        tok->arc_.nextstate);
     arcs_reverse.push_back(l_arc);
   }
   if(arcs_reverse.back().nextstate == fst_.Start()) {
@@ -157,7 +157,7 @@ OnlineFasterDecoder::FinishTraceBack(fst::MutableFst<LatticeArc> *out_fst) {
 
 void
 OnlineFasterDecoder::TracebackNFrames(int32 nframes,
-                                      fst::MutableFst<LatticeArc> *out_fst) {
+    fst::MutableFst<LatticeArc> *out_fst) {
   Token *best_tok = NULL;
   for (const Elem *e = toks_.GetList(); e != NULL; e = e->tail)
     if (best_tok == NULL || *best_tok < *(e->val) )
@@ -170,7 +170,7 @@ OnlineFasterDecoder::TracebackNFrames(int32 nframes,
   bool is_final = false;
   double this_cost = best_tok->cost_ +
       fst_.Final(best_tok->arc_.nextstate).Value();
-                             
+
   if (this_cost != std::numeric_limits<double>::infinity())
     is_final = true;
   std::vector<LatticeArc> arcs_reverse;  // arcs in reverse order.
@@ -182,9 +182,9 @@ OnlineFasterDecoder::TracebackNFrames(int32 nframes,
     BaseFloat graph_cost = tok->arc_.weight.Value();
     BaseFloat ac_cost = tot_cost - graph_cost;
     LatticeArc larc(tok->arc_.ilabel,
-                     tok->arc_.olabel,
-                     LatticeWeight(graph_cost, ac_cost),
-                     tok->arc_.nextstate);
+        tok->arc_.olabel,
+        LatticeWeight(graph_cost, ac_cost),
+        tok->arc_.nextstate);
     arcs_reverse.push_back(larc);
   }
   if(arcs_reverse.back().nextstate == fst_.Start())
@@ -237,7 +237,7 @@ OnlineFasterDecoder::Decode(DecodableInterface *decodable) {
   double64 tstart = timer.Elapsed(), tstart_batch = tstart;
   BaseFloat factor = -1;
   for (; !decodable->IsLastFrame(frame_ - 1) && batch_frame < opts_.batch_size;
-       ++frame_, ++utt_frames_, ++batch_frame) {
+      ++frame_, ++utt_frames_, ++batch_frame) {
     if (batch_frame != 0 && (batch_frame % opts_.update_interval) == 0) {
       // adjust the beam if needed
       BaseFloat tend = timer.Elapsed();
@@ -246,9 +246,9 @@ OnlineFasterDecoder::Decode(DecodableInterface *decodable) {
       factor = elapsed / (opts_.rt_max * opts_.update_interval * 10);
       BaseFloat min_factor = (opts_.rt_min / opts_.rt_max);
       if (factor > 1 || factor < min_factor) {
-        BaseFloat update_factor = (factor > 1)?
-            -std::min(opts_.beam_update * factor, opts_.max_beam_update):
-             std::min(opts_.beam_update / factor, opts_.max_beam_update);
+        BaseFloat update_factor = (factor > 1) ?
+            -std::min(opts_.beam_update * factor, opts_.max_beam_update) :
+            std::min(opts_.beam_update / factor, opts_.max_beam_update);
         effective_beam_ += effective_beam_ * update_factor;
         effective_beam_ = std::min(effective_beam_, max_beam_);
       }
@@ -257,9 +257,9 @@ OnlineFasterDecoder::Decode(DecodableInterface *decodable) {
     if (batch_frame != 0 && (frame_ % 200) == 0)
       // one log message at every 2 seconds assuming 10ms frames
       KALDI_VLOG(3) << "Beam: " << effective_beam_
-          << "; Speed: "
-          << ((timer.Elapsed() - tstart_batch) * 1000) / (batch_frame*10)
-          << " xRT";
+                    << "; Speed: "
+                    << ((timer.Elapsed() - tstart_batch) * 1000) / (batch_frame*10)
+                    << " xRT";
     BaseFloat weight_cutoff = ProcessEmitting(decodable);
     ProcessNonemitting(weight_cutoff);
   }

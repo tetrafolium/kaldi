@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
         "Splice features with left and right context (e.g. prior to LDA)\n"
         "Usage: splice-feats [options] <feature-rspecifier> <feature-wspecifier>\n"
         "e.g.: splice-feats scp:feats.scp ark:-\n";
-        
+
 
     ParseOptions po(usage);
     int32 left_context = 4, right_context = 4;

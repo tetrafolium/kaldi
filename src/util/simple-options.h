@@ -36,7 +36,7 @@ namespace kaldi {
 /// functionality.
 /// The class ParseOptions should be used for command-line options.
 class SimpleOptions : public OptionsItf {
- public:
+public:
   SimpleOptions() {
   }
 
@@ -50,7 +50,7 @@ class SimpleOptions : public OptionsItf {
   void Register(const std::string &name, float *ptr, const std::string &doc);
   void Register(const std::string &name, double *ptr, const std::string &doc);
   void Register(const std::string &name, std::string *ptr,
-                const std::string &doc);
+      const std::string &doc);
 
   // set option with the specified key, return true if successful
   bool SetOption(const std::string &key, const bool &value);
@@ -95,7 +95,7 @@ class SimpleOptions : public OptionsItf {
    */
   bool GetOptionType(const std::string &key, OptionType *type);
 
- private:
+private:
 
   std::vector<std::pair<std::string, OptionInfo> > option_info_list_;
 

@@ -24,26 +24,26 @@ namespace nnet2 {
 
 
 class NnetRescaler {
- public:
+public:
   NnetRescaler(const NnetRescaleConfig &config,
-               const std::vector<NnetExample> &examples,
-               Nnet *nnet):
-      config_(config), examples_(examples), nnet_(nnet) {}
-                            
+      const std::vector<NnetExample> &examples,
+      Nnet *nnet) :
+    config_(config), examples_(examples), nnet_(nnet) {}
+
   void Rescale();
 
- private:
+private:
   /// takes the input and formats as a single matrix, in forward_data_[0].
   void FormatInput(const std::vector<NnetExample> &data,
-                   CuMatrix<BaseFloat> *input);
+      CuMatrix<BaseFloat> *input);
   void RescaleComponent(int32 c, int32 num_chunks,
-                        CuMatrixBase<BaseFloat> *cur_data_in,
-                        CuMatrix<BaseFloat> *next_data);
+      CuMatrixBase<BaseFloat> *cur_data_in,
+      CuMatrix<BaseFloat> *next_data);
 
   void ComputeRelevantIndexes();
-  
+
   BaseFloat GetTargetAvgDeriv(int32 c);
-  
+
   const NnetRescaleConfig &config_;
   const std::vector<NnetExample> &examples_;
   Nnet *nnet_;
@@ -54,14 +54,14 @@ class NnetRescaler {
 
 
 void NnetRescaler::FormatInput(const std::vector<NnetExample> &data,
-                               CuMatrix<BaseFloat> *input) {
+    CuMatrix<BaseFloat> *input) {
   KALDI_ASSERT(data.size() > 0);
   int32 num_splice = nnet_->LeftContext() + 1 + nnet_->RightContext();
   KALDI_ASSERT(data[0].input_frames.NumRows() == num_splice);
 
   int32 feat_dim = data[0].input_frames.NumCols(),
-         spk_dim = data[0].spk_info.Dim(),
-         tot_dim = feat_dim + spk_dim; // we append these at the neural net
+      spk_dim = data[0].spk_info.Dim(),
+      tot_dim = feat_dim + spk_dim;    // we append these at the neural net
                                        // input... note, spk_dim might be 0.
   KALDI_ASSERT(tot_dim == nnet_->InputDim());
   int32 num_chunks = data.size();
@@ -70,14 +70,14 @@ void NnetRescaler::FormatInput(const std::vector<NnetExample> &data,
                 tot_dim);
   for (int32 chunk = 0; chunk < num_chunks; chunk++) {
     CuSubMatrix<BaseFloat> dest(*input,
-                                chunk * num_splice, num_splice,
-                                0, feat_dim);
+        chunk * num_splice, num_splice,
+        0, feat_dim);
     Matrix<BaseFloat> src(data[chunk].input_frames);
     dest.CopyFromMat(src);
     if (spk_dim != 0) {
       CuSubMatrix<BaseFloat> spk_dest(*input,
-                                      chunk * num_splice, num_splice,
-                                      feat_dim, spk_dim);
+          chunk * num_splice, num_splice,
+          feat_dim, spk_dim);
       spk_dest.CopyRowsFromVec(data[chunk].spk_info);
     }
   }
@@ -90,7 +90,7 @@ void NnetRescaler::ComputeRelevantIndexes() {
   for (int32 c = 0; c + 1 < nnet_->NumComponents(); c++)
     if (dynamic_cast<AffineComponent*>(&nnet_->GetComponent(c)) != NULL &&
         (dynamic_cast<NonlinearComponent*>(&nnet_->GetComponent(c+1)) != NULL &&
-         dynamic_cast<SoftmaxComponent*>(&nnet_->GetComponent(c+1)) == NULL))
+        dynamic_cast<SoftmaxComponent*>(&nnet_->GetComponent(c+1)) == NULL))
       relevant_indexes_.insert(c);
 }
 
@@ -104,7 +104,7 @@ BaseFloat NnetRescaler::GetTargetAvgDeriv(int32 c) {
     factor = 1.0;
   else
     KALDI_ERR << "This type of nonlinear component is not handled: index  " << c;
-  
+
   int32 last_c = *std::max_element(relevant_indexes_.begin(), relevant_indexes_.end()),
       first_c = *std::min_element(relevant_indexes_.begin(), relevant_indexes_.end());
   if (c == first_c)
@@ -119,19 +119,19 @@ BaseFloat NnetRescaler::GetTargetAvgDeriv(int32 c) {
 // c + 1 is the index of the nonlinear component; *cur_data is the
 // output of the affine component.
 void NnetRescaler::RescaleComponent(
-    int32 c,
-    int32 num_chunks,
-    CuMatrixBase<BaseFloat> *cur_data_in,
-    CuMatrix<BaseFloat> *next_data) {
+  int32 c,
+  int32 num_chunks,
+  CuMatrixBase<BaseFloat> *cur_data_in,
+  CuMatrix<BaseFloat> *next_data) {
   int32 rows = cur_data_in->NumRows(), cols = cur_data_in->NumCols();
   // Only handle sigmoid or tanh here.
   if (dynamic_cast<SigmoidComponent*>(&(nnet_->GetComponent(c + 1))) == NULL &&
       dynamic_cast<TanhComponent*>(&(nnet_->GetComponent(c + 1))) == NULL)
     KALDI_ERR << "This type of nonlinear component is not handled: index  " << c;
   KALDI_ASSERT(chunk_info_out_[0].NumChunks() == num_chunks); //TODO verify how this component can be used
-                                                             // rewrite the
-                                                             // chunk_info_out_
-                                                             // computation
+                                                              // rewrite the
+                                                              // chunk_info_out_
+                                                              // computation
   // the nonlinear component:
   NonlinearComponent &nc =
       *(dynamic_cast<NonlinearComponent*>(&(nnet_->GetComponent(c + 1))));
@@ -142,10 +142,10 @@ void NnetRescaler::RescaleComponent(
   BaseFloat orig_avg_deriv, target_avg_deriv = GetTargetAvgDeriv(c);
   BaseFloat cur_scaling = 1.0; // current rescaling factor (on input).
   int32 num_iters = 10;
-  
+
   CuMatrix<BaseFloat> cur_data(*cur_data_in),
-      ones(rows, cols), in_deriv(rows, cols);
-      
+  ones(rows, cols), in_deriv(rows, cols);
+
   ones.Set(1.0);
   nc.Propagate(in_info, out_info, cur_data, next_data);
   nc.Backprop(in_info, out_info, cur_data, *next_data, ones, NULL, &in_deriv);
@@ -168,13 +168,13 @@ void NnetRescaler::RescaleComponent(
     BaseFloat proposed_change = (target_avg_deriv - cur_avg_deriv) / gradient;
     KALDI_VLOG(2) << "cur_avg_deriv = " << cur_avg_deriv << ", target_avg_deriv = "
                   << target_avg_deriv << ", gradient = " << gradient
-                  << ", proposed_change " << proposed_change; 
+                  << ", proposed_change " << proposed_change;
     // Limit size of proposed change in "cur_scaling", to ensure stability.
     if (fabs(proposed_change / cur_scaling) > config_.max_change)
       proposed_change = cur_scaling * config_.max_change *
           (proposed_change > 0.0 ? 1.0 : -1.0);
     cur_scaling += proposed_change;
-    
+
     cur_data.CopyFromMat(*cur_data_in);
     cur_data.Scale(cur_scaling);
     nc.Propagate(in_info, out_info, cur_data, next_data);
@@ -184,17 +184,17 @@ void NnetRescaler::RescaleComponent(
     // optimization
   }
   UpdatableComponent *uc = dynamic_cast<UpdatableComponent*>(
-      &nnet_->GetComponent(c));
+    &nnet_->GetComponent(c));
   KALDI_ASSERT(uc != NULL);
   uc->Scale(cur_scaling); // scale the parameters of the previous
   // AffineComponent.
-  
+
   KALDI_LOG << "For component " << c << ", scaling parameters by "
             << cur_scaling << "; average "
             << "derivative changed from " << orig_avg_deriv << " to "
             << cur_avg_deriv << "; target was " << target_avg_deriv;
 }
-    
+
 
 
 void NnetRescaler::Rescale() {
@@ -216,8 +216,8 @@ void NnetRescaler::Rescale() {
 }
 
 void RescaleNnet(const NnetRescaleConfig &rescale_config,
-                 const std::vector<NnetExample> &examples,
-                 Nnet *nnet) {
+    const std::vector<NnetExample> &examples,
+    Nnet *nnet) {
   NnetRescaler rescaler(rescale_config, examples, nnet);
   rescaler.Rescale();
 }

@@ -40,7 +40,7 @@ DiscriminativeObjectiveInfo::DiscriminativeObjectiveInfo(int32 num_pdfs) :
 
 // Constructor from config structure
 DiscriminativeObjectiveInfo::DiscriminativeObjectiveInfo(
-    const DiscriminativeOptions &opts) :
+  const DiscriminativeOptions &opts) :
   accumulate_gradients(opts.accumulate_gradients),
   accumulate_output(opts.accumulate_output),
   num_pdfs(opts.num_pdfs) {
@@ -81,7 +81,7 @@ class DiscriminativeComputation {
   typedef Lattice::Arc Arc;
   typedef Arc::StateId StateId;
 
- public:
+public:
   // Initialize the objcect.  Note: we expect the 'nnet_output' to have the
   // same number of rows as supervision.num_frames * supervision.num_sequences,
   // and the same number of columns as tmodel.NumPdfs(); but the
@@ -107,7 +107,7 @@ class DiscriminativeComputation {
   // deriv_weight to 'nnet_output_deriv'.
   void Compute();
 
- private:
+private:
   const DiscriminativeOptions &opts_;
   const TransitionModel &tmodel_;
 
@@ -148,27 +148,27 @@ class DiscriminativeComputation {
   // denominator lattice and the alignment in the case of "mmi" objective
   // using the CuMatrix::Lookup() and stores them in "answers"
   void LookupNnetOutput(std::vector<Int32Pair> *requested_indexes,
-                        std::vector<BaseFloat> *answers) const ;
+      std::vector<BaseFloat> *answers) const;
 
   // Converts the answers looked up by LookupNnetOutput function into
   // log-likelihoods scaled by acoustic scale.
   void ConvertAnswersToLogLike(
-      const std::vector<Int32Pair>& requested_indexes,
-      std::vector<BaseFloat> *answers) const;
+    const std::vector<Int32Pair>& requested_indexes,
+    std::vector<BaseFloat> *answers) const;
 
   // Does acoustic rescoring of lattice to put the negative (scaled) acoustic
   // log-likelihoods in the arcs of the lattice. Returns the number of
   // indexes of log-likelihoods read from the "answers" vector.
   static size_t LatticeAcousticRescore(const std::vector<BaseFloat> &answers,
-                                size_t index,
-                                Lattice *lat);
+      size_t index,
+      Lattice *lat);
 
   // Process the derivative stored as posteriors into CuMatrix.
   // Optionally accumulate numerator and denominator posteriors.
   void ProcessPosteriors(const Posterior &post,
-                         CuMatrixBase<BaseFloat> *output_deriv_temp,
-                         double *tot_num_post = NULL,
-                         double *tot_den_post = NULL) const;
+      CuMatrixBase<BaseFloat> *output_deriv_temp,
+      double *tot_num_post = NULL,
+      double *tot_den_post = NULL) const;
 
   static inline Int32Pair MakePair(int32 first, int32 second) {
     Int32Pair ans;
@@ -179,14 +179,14 @@ class DiscriminativeComputation {
 };
 
 DiscriminativeComputation::DiscriminativeComputation(
-                            const DiscriminativeOptions &opts,
-                            const TransitionModel &tmodel,
-                            const CuVectorBase<BaseFloat> &log_priors,
-                            const DiscriminativeSupervision &supervision,
-                            const CuMatrixBase<BaseFloat> &nnet_output,
-                            DiscriminativeObjectiveInfo *stats,
-                            CuMatrixBase<BaseFloat> *nnet_output_deriv,
-                            CuMatrixBase<BaseFloat> *xent_output_deriv)
+  const DiscriminativeOptions &opts,
+  const TransitionModel &tmodel,
+  const CuVectorBase<BaseFloat> &log_priors,
+  const DiscriminativeSupervision &supervision,
+  const CuMatrixBase<BaseFloat> &nnet_output,
+  DiscriminativeObjectiveInfo *stats,
+  CuMatrixBase<BaseFloat> *nnet_output_deriv,
+  CuMatrixBase<BaseFloat> *xent_output_deriv)
   : opts_(opts), tmodel_(tmodel), log_priors_(log_priors),
   supervision_(supervision), nnet_output_(nnet_output),
   stats_(stats),
@@ -204,8 +204,8 @@ DiscriminativeComputation::DiscriminativeComputation(
 }
 
 void DiscriminativeComputation::LookupNnetOutput(
-    std::vector<Int32Pair> *requested_indexes,
-    std::vector<BaseFloat> *answers) const {
+  std::vector<Int32Pair> *requested_indexes,
+  std::vector<BaseFloat> *answers) const {
   BaseFloat wiggle_room = 1.3; // value not critical.. it's just 'reserve'
 
   int32 num_frames = supervision_.frames_per_sequence * supervision_.num_sequences;
@@ -229,7 +229,7 @@ void DiscriminativeComputation::LookupNnetOutput(
   for (StateId s = 0; s < num_states; s++) {
     int32 t = state_times[s];
     int32 seq = t / supervision_.frames_per_sequence,
-          idx = t % supervision_.frames_per_sequence;
+        idx = t % supervision_.frames_per_sequence;
 
     for (fst::ArcIterator<Lattice> aiter(den_lat_, s); !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
@@ -245,9 +245,9 @@ void DiscriminativeComputation::LookupNnetOutput(
     // Numerator probabilities to look up from alignment
     for (int32 t = 0; t < num_frames; t++) {
       int32 seq = t / supervision_.frames_per_sequence,
-            idx = t % supervision_.frames_per_sequence;
+          idx = t % supervision_.frames_per_sequence;
       int32 tid = supervision_.num_ali[t],
-                  pdf_id = tmodel_.TransitionIdToPdf(tid);
+          pdf_id = tmodel_.TransitionIdToPdf(tid);
       KALDI_ASSERT(pdf_id >= 0 && pdf_id < num_pdfs);
       requested_indexes->push_back(MakePair(idx * supervision_.num_sequences + seq, pdf_id));
     }
@@ -261,8 +261,8 @@ void DiscriminativeComputation::LookupNnetOutput(
 }
 
 void DiscriminativeComputation::ConvertAnswersToLogLike(
-    const std::vector<Int32Pair>& requested_indexes,
-    std::vector<BaseFloat> *answers) const {
+  const std::vector<Int32Pair>& requested_indexes,
+  std::vector<BaseFloat> *answers) const {
   int32 num_floored = 0;
 
   BaseFloat floor_val = -20 * kaldi::Log(10.0); // floor for posteriors.
@@ -284,7 +284,7 @@ void DiscriminativeComputation::ConvertAnswersToLogLike(
       int32 pdf_id = requested_indexes[index].second;
       KALDI_ASSERT(log_post <= 0 && log_priors(pdf_id) <= 0);
       BaseFloat pseudo_loglike = (log_post - log_priors(pdf_id))
-                                  * opts_.acoustic_scale;
+          * opts_.acoustic_scale;
       KALDI_ASSERT(!KALDI_ISINF(pseudo_loglike) && !KALDI_ISNAN(pseudo_loglike));
       (*answers)[index] = pseudo_loglike;
     } else {
@@ -298,13 +298,13 @@ void DiscriminativeComputation::ConvertAnswersToLogLike(
 }
 
 size_t DiscriminativeComputation::LatticeAcousticRescore(
-    const std::vector<BaseFloat> &answers,
-    size_t index, Lattice *lat) {
+  const std::vector<BaseFloat> &answers,
+  size_t index, Lattice *lat) {
   int32 num_states = lat->NumStates();
 
   for (StateId s = 0; s < num_states; s++) {
     for (fst::MutableArcIterator<Lattice> aiter(lat, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       Arc arc = aiter.Value();
       if (arc.ilabel != 0) { // input-side has transition-ids, output-side empty
         arc.weight.SetValue2(-answers[index]);
@@ -324,16 +324,16 @@ size_t DiscriminativeComputation::LatticeAcousticRescore(
 }
 
 void DiscriminativeComputation::ProcessPosteriors(
-                                const Posterior &post,
-                                CuMatrixBase<BaseFloat> *output_deriv_temp,
-                                double *tot_num_post,
-                                double *tot_den_post) const {
+  const Posterior &post,
+  CuMatrixBase<BaseFloat> *output_deriv_temp,
+  double *tot_num_post,
+  double *tot_den_post) const {
   std::vector<Int32Pair> deriv_indexes;
   std::vector<BaseFloat> deriv_data;
   for (size_t t = 0; t < post.size(); t++) {
     for (size_t j = 0; j < post[t].size(); j++) {
       int32 seq = t / supervision_.frames_per_sequence,
-            idx = t % supervision_.frames_per_sequence;
+          idx = t % supervision_.frames_per_sequence;
       int32 pdf_id = post[t][j].first;
 
       // Same ordering as for 'chain' models
@@ -417,7 +417,7 @@ void DiscriminativeComputation::Compute() {
   Posterior post;
   Posterior xent_post;
   double objf = ComputeObjfAndDeriv(&post,
-                (xent_output_deriv_ ? &xent_post : NULL));
+          (xent_output_deriv_ ? &xent_post : NULL));
 
   this_stats.tot_objf += supervision_.weight * objf;
 
@@ -461,7 +461,7 @@ void DiscriminativeComputation::Compute() {
   this_stats.tot_t_weighted = num_frames * supervision_.weight;
 
   if (!(this_stats.TotalObjf(opts_.criterion) ==
-        this_stats.TotalObjf(opts_.criterion))) {
+      this_stats.TotalObjf(opts_.criterion))) {
     // inf or NaN detected
     if (nnet_output_deriv_)
       nnet_output_deriv_->SetZero();
@@ -485,8 +485,8 @@ void DiscriminativeComputation::Compute() {
   // of 'incorrect' pdf-ids.
   if (nnet_output_deriv_ && GetVerboseLevel() >= 1) {
     int32 tot_frames = nnet_output_deriv_->NumRows(),
- frames_per_sequence = supervision_.frames_per_sequence,
-       num_sequences = supervision_.num_sequences;
+        frames_per_sequence = supervision_.frames_per_sequence,
+        num_sequences = supervision_.num_sequences;
     CuVector<BaseFloat> row_products(tot_frames);
     row_products.AddDiagMat2(1.0, *nnet_output_deriv_, kNoTrans, 0.0);
     Vector<BaseFloat> row_products_cpu(row_products);
@@ -510,7 +510,7 @@ void DiscriminativeComputation::Compute() {
 }
 
 double DiscriminativeComputation::ComputeObjfAndDeriv(Posterior *post,
-                                                      Posterior *xent_post) {
+    Posterior *xent_post) {
 
   if (xent_post) {
     Posterior tid_post;
@@ -544,16 +544,16 @@ double DiscriminativeComputation::ComputeObjfAndDeriv(Posterior *post,
 
 
 void ComputeDiscriminativeObjfAndDeriv(const DiscriminativeOptions &opts,
-                                       const TransitionModel &tmodel,
-                                       const CuVectorBase<BaseFloat> &log_priors,
-                                       const DiscriminativeSupervision &supervision,
-                                       const CuMatrixBase<BaseFloat> &nnet_output,
-                                       DiscriminativeObjectiveInfo *stats,
-                                       CuMatrixBase<BaseFloat> *nnet_output_deriv,
-                                       CuMatrixBase<BaseFloat> *xent_output_deriv) {
+    const TransitionModel &tmodel,
+    const CuVectorBase<BaseFloat> &log_priors,
+    const DiscriminativeSupervision &supervision,
+    const CuMatrixBase<BaseFloat> &nnet_output,
+    DiscriminativeObjectiveInfo *stats,
+    CuMatrixBase<BaseFloat> *nnet_output_deriv,
+    CuMatrixBase<BaseFloat> *xent_output_deriv) {
   DiscriminativeComputation computation(opts, tmodel, log_priors, supervision,
-                                        nnet_output, stats,
-                                        nnet_output_deriv, xent_output_deriv);
+      nnet_output, stats,
+      nnet_output_deriv, xent_output_deriv);
   computation.Compute();
 }
 
@@ -575,11 +575,11 @@ void DiscriminativeObjectiveInfo::Add(const DiscriminativeObjectiveInfo &other) 
 }
 
 void DiscriminativeObjectiveInfo::Print(const std::string &criterion,
-                                        bool print_avg_gradients,
-                                        bool print_avg_output) const {
+    bool print_avg_gradients,
+    bool print_avg_output) const {
   if (criterion == "mmi") {
     double num_objf = tot_num_objf / tot_t_weighted,
-           den_objf = tot_objf / tot_t_weighted;
+        den_objf = tot_objf / tot_t_weighted;
     double objf = num_objf - den_objf;
 
     double avg_post_per_frame = tot_num_count / tot_t_weighted;

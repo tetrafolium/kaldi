@@ -27,8 +27,8 @@ namespace chain {
 
 
 DenominatorGraph::DenominatorGraph(const fst::StdVectorFst &fst,
-                                   int32 num_pdfs):
-    num_pdfs_(num_pdfs) {
+    int32 num_pdfs) :
+  num_pdfs_(num_pdfs) {
   SetTransitions(fst, num_pdfs);
   SetInitialProbs(fst);
 }
@@ -50,15 +50,15 @@ const CuVector<BaseFloat>& DenominatorGraph::InitialProbs() const {
 }
 
 void DenominatorGraph::SetTransitions(const fst::StdVectorFst &fst,
-                                      int32 num_pdfs) {
+    int32 num_pdfs) {
   int32 num_states = fst.NumStates();
 
   std::vector<std::vector<DenominatorGraphTransition> >
-      transitions_out(num_states),
-      transitions_in(num_states);
+  transitions_out(num_states),
+  transitions_in(num_states);
   for (int32 s = 0; s < num_states; s++) {
     for (fst::ArcIterator<fst::StdVectorFst> aiter(fst, s); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       const fst::StdArc &arc = aiter.Value();
       DenominatorGraphTransition transition;
       transition.transition_prob = exp(-arc.weight.Value());
@@ -109,7 +109,7 @@ void DenominatorGraph::SetInitialProbs(const fst::StdVectorFst &fst) {
   for (int32 s = 0; s < num_states; s++) {
     double tot_prob = exp(-fst.Final(s).Value());
     for (fst::ArcIterator<fst::StdVectorFst> aiter(fst, s); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       tot_prob += exp(-aiter.Value().weight.Value());
     }
     KALDI_ASSERT(tot_prob > 0.0 && tot_prob < 100.0);
@@ -117,7 +117,7 @@ void DenominatorGraph::SetInitialProbs(const fst::StdVectorFst &fst) {
   }
 
   Vector<double> cur_prob(num_states), next_prob(num_states),
-      avg_prob(num_states);
+  avg_prob(num_states);
   cur_prob(fst.Start()) = 1.0;
   for (int32 iter = 0; iter < num_iters; iter++) {
     avg_prob.AddVec(1.0 / num_iters, cur_prob);
@@ -125,7 +125,7 @@ void DenominatorGraph::SetInitialProbs(const fst::StdVectorFst &fst) {
       double prob = cur_prob(s) * normalizing_factor(s);
 
       for (fst::ArcIterator<fst::StdVectorFst> aiter(fst, s); !aiter.Done();
-           aiter.Next()) {
+          aiter.Next()) {
         const fst::StdArc &arc = aiter.Value();
         next_prob(arc.nextstate) += prob * exp(-arc.weight.Value());
       }
@@ -142,7 +142,7 @@ void DenominatorGraph::SetInitialProbs(const fst::StdVectorFst &fst) {
 }
 
 void DenominatorGraph::GetNormalizationFst(const fst::StdVectorFst &ifst,
-                                           fst::StdVectorFst *ofst) {
+    fst::StdVectorFst *ofst) {
   KALDI_ASSERT(ifst.NumStates() == initial_probs_.Dim());
   if (&ifst != ofst)
     *ofst = ifst;
@@ -163,11 +163,11 @@ void DenominatorGraph::GetNormalizationFst(const fst::StdVectorFst &ifst,
 
 
 void MapFstToPdfIdsPlusOne(const TransitionModel &trans_model,
-                           fst::StdVectorFst *fst) {
+    fst::StdVectorFst *fst) {
   int32 num_states = fst->NumStates();
   for (int32 s = 0; s < num_states; s++) {
     for (fst::MutableArcIterator<fst::StdVectorFst> aiter(fst, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       fst::StdArc arc = aiter.Value();
       KALDI_ASSERT(arc.ilabel == arc.olabel);
       if (arc.ilabel > 0) {
@@ -184,7 +184,7 @@ void MinimizeAcceptorNoPush(fst::StdVectorFst *fst) {
                                          // aggressive minimimization.
   fst::ArcMap(fst, fst::QuantizeMapper<fst::StdArc>(delta));
   fst::EncodeMapper<fst::StdArc> encoder(fst::kEncodeLabels | fst::kEncodeWeights,
-                                         fst::ENCODE);
+      fst::ENCODE);
   fst::Encode(fst, &encoder);
   fst::internal::AcceptorMinimize(fst);
   fst::Decode(fst, encoder);
@@ -206,7 +206,7 @@ static void SortOnTransitionCount(fst::StdVectorFst *fst) {
   }
   for (int32 i = 0; i < num_states; i++) {
     for (fst::ArcIterator<fst::StdVectorFst> aiter(*fst, i); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       negative_num_transitions[i].first--;
       negative_num_transitions[aiter.Value().nextstate].first--;
     }
@@ -256,7 +256,7 @@ static void PrintDenGraphStats(const fst::StdVectorFst &den_graph) {
     }
     tot_arcs += den_graph.NumArcs(s);
     for (fst::ArcIterator<fst::StdVectorFst> aiter(den_graph, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       int32 dest_state = aiter.Value().nextstate;
       num_in_arcs[dest_state]++;
     }
@@ -276,12 +276,12 @@ static void PrintDenGraphStats(const fst::StdVectorFst &den_graph) {
 
 // Check that every pdf is seen, warn if some are not.
 static void CheckDenominatorFst(int32 num_pdfs,
-                                const fst::StdVectorFst &den_fst) {
+    const fst::StdVectorFst &den_fst) {
   std::vector<bool> pdf_seen(num_pdfs);
   int32 num_states = den_fst.NumStates();
   for (int32 s = 0; s < num_states; s++) {
     for (fst::ArcIterator<fst::StdVectorFst> aiter(den_fst, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       int32 pdf_id = aiter.Value().ilabel - 1;
       KALDI_ASSERT(pdf_id >= 0 && pdf_id < num_pdfs);
       pdf_seen[pdf_id] = true;
@@ -295,9 +295,9 @@ static void CheckDenominatorFst(int32 num_pdfs,
 }
 
 void CreateDenominatorFst(const ContextDependency &ctx_dep,
-                          const TransitionModel &trans_model,
-                          const fst::StdVectorFst &phone_lm_in,
-                          fst::StdVectorFst *den_fst) {
+    const TransitionModel &trans_model,
+    const fst::StdVectorFst &phone_lm_in,
+    fst::StdVectorFst *den_fst) {
   using fst::StdVectorFst;
   using fst::StdArc;
   KALDI_ASSERT(phone_lm_in.NumStates() != 0);
@@ -316,8 +316,8 @@ void CreateDenominatorFst(const ContextDependency &ctx_dep,
   }
   std::vector<int32> disambig_syms;  // empty list of diambiguation symbols.
   fst::ContextFst<StdArc> cfst(subsequential_symbol, trans_model.GetPhones(),
-                               disambig_syms, ctx_dep.ContextWidth(),
-                               ctx_dep.CentralPosition());
+      disambig_syms, ctx_dep.ContextWidth(),
+      ctx_dep.CentralPosition());
   StdVectorFst context_dep_lm;
   fst::ComposeContextFst(cfst, phone_lm, &context_dep_lm);
   // at this point, context_dep_lm will have indexes into 'ilabels' as its

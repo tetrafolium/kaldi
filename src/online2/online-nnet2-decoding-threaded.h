@@ -61,9 +61,9 @@ namespace kaldi {
    the object and were successful you call UnlockSuccess; and you call
    UnlockSuccess even if, for your own reasons, you ended up not changing the
    state of the buffer.
-*/
+ */
 class ThreadSynchronizer {
- public:
+public:
   ThreadSynchronizer();
 
   // Most calls to this class should provide the thread-type of the caller,
@@ -95,7 +95,7 @@ class ThreadSynchronizer {
 
   ~ThreadSynchronizer();
 
- private:
+private:
   bool abort_;
   bool producer_waiting_;  // true if producer is/will be waiting on semaphore
   bool consumer_waiting_;  // true if consumer is/will be waiting on semaphore
@@ -186,28 +186,28 @@ struct OnlineNnet2DecodingThreadedConfig {
    happen in different threads.
    Note: we assume that all calls to its public interface happen from a single
    thread.
-*/
+ */
 class SingleUtteranceNnet2DecoderThreaded {
- public:
+public:
   // Constructor.  Unlike SingleUtteranceNnet2Decoder, we create the
   // feature_pipeline object inside this class, since access to it needs to be
   // controlled by a mutex and this class knows how to handle that.  The
   // feature_info and adaptation_state arguments are used to initialize the
   // (locally owned) feature pipeline.
   SingleUtteranceNnet2DecoderThreaded(
-      const OnlineNnet2DecodingThreadedConfig &config,
-      const TransitionModel &tmodel,
-      const nnet2::AmNnet &am_nnet,
-      const fst::Fst<fst::StdArc> &fst,
-      const OnlineNnet2FeaturePipelineInfo &feature_info,
-      const OnlineIvectorExtractorAdaptationState &adaptation_state);
+    const OnlineNnet2DecodingThreadedConfig &config,
+    const TransitionModel &tmodel,
+    const nnet2::AmNnet &am_nnet,
+    const fst::Fst<fst::StdArc> &fst,
+    const OnlineNnet2FeaturePipelineInfo &feature_info,
+    const OnlineIvectorExtractorAdaptationState &adaptation_state);
 
 
 
   /// You call this to provide this class with more waveform to decode.  This
   /// call is, for all practical purposes, non-blocking.
   void AcceptWaveform(BaseFloat samp_freq,
-                      const VectorBase<BaseFloat> &wave_part);
+      const VectorBase<BaseFloat> &wave_part);
 
   /// Returns the number of pieces of waveform that are still waiting to be
   /// processed.  This may be useful for calling code to judge whether to supply
@@ -266,8 +266,8 @@ class SingleUtteranceNnet2DecoderThreaded {
   /// closer to 0 if a final-state was close to the best-likelihood state
   /// active on the last frame, at the time we obtained the lattice.
   void GetLattice(bool end_of_utterance,
-                  CompactLattice *clat,
-                  BaseFloat *final_relative_cost) const;
+      CompactLattice *clat,
+      BaseFloat *final_relative_cost) const;
 
   /// Outputs an FST corresponding to the single best path through the current
   /// lattice. If "use_final_probs" is true AND we reached the final-state of
@@ -279,8 +279,8 @@ class SingleUtteranceNnet2DecoderThreaded {
   /// closer to 0 if a final-state were close to the best-likelihood state
   /// active on the last frame, at the time we got the best path.
   void GetBestPath(bool end_of_utterance,
-                   Lattice *best_path,
-                   BaseFloat *final_relative_cost) const;
+      Lattice *best_path,
+      BaseFloat *final_relative_cost) const;
 
   /// This function calls EndpointDetected from online-endpoint.h,
   /// with the required arguments.
@@ -301,7 +301,7 @@ class SingleUtteranceNnet2DecoderThreaded {
   BaseFloat GetRemainingWaveform(Vector<BaseFloat> *waveform_out) const;
 
   ~SingleUtteranceNnet2DecoderThreaded();
- private:
+private:
 
   // This function will instruct all threads to abort operation as soon as they
   // can safely do so, by calling SetAbort() in the threads
@@ -322,7 +322,7 @@ class SingleUtteranceNnet2DecoderThreaded {
   // the following function is called inside RunNnetEvaluationInternal(); it
   // takes the log and subtracts the prior.
   void ProcessLoglikes(const CuVector<BaseFloat> &log_inv_prior,
-                       CuMatrixBase<BaseFloat> *loglikes);
+      CuMatrixBase<BaseFloat> *loglikes);
   // called from RunNnetEvaluationInternal().  Returns true in the normal case,
   // false on error; if it returns false, then we expect that the calling thread
   // will terminate.  This assumes the caller has already

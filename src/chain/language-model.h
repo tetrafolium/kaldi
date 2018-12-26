@@ -50,10 +50,10 @@ struct LanguageModelOptions {
                                // tends to make for a more compact graph (since
                                // the context FST anyway expands to trigram).
 
-  LanguageModelOptions():
-      ngram_order(4),
-      num_extra_lm_states(1000),
-      no_prune_ngram_order(3) { }
+  LanguageModelOptions() :
+    ngram_order(4),
+    num_extra_lm_states(1000),
+    no_prune_ngram_order(3) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("ngram-order", &ngram_order, "n-gram order for the phone "
@@ -82,9 +82,9 @@ struct LanguageModelOptions {
    Because this maps very naturally to an FST, we output it as an FST.
  */
 class LanguageModelEstimator {
- public:
-  LanguageModelEstimator(LanguageModelOptions &opts): opts_(opts),
-                                                      num_active_lm_states_(0) {
+public:
+  LanguageModelEstimator(LanguageModelOptions &opts) : opts_(opts),
+    num_active_lm_states_(0) {
     KALDI_ASSERT(opts.ngram_order >= 1 && opts.no_prune_ngram_order >= 1);
   }
 
@@ -97,7 +97,7 @@ class LanguageModelEstimator {
   // no concept here of backoff arcs.
   void Estimate(fst::StdVectorFst *fst);
 
- protected:
+protected:
   struct LmState {
     // the phone history associated with this state (length can vary).
     std::vector<int32> history;
@@ -144,13 +144,13 @@ class LanguageModelEstimator {
     void Add(const LmState &other);
     // Clear all counts from this state.
     void Clear();
-    LmState(): tot_count(0), tot_count_with_parents(0),  backoff_lmstate_index(-1),
-               fst_state(-1), backoff_allowed(false) { }
-    LmState(const LmState &other):
-        history(other.history), phone_to_count(other.phone_to_count),
-        tot_count(other.tot_count), tot_count_with_parents(other.tot_count_with_parents),
-        backoff_lmstate_index(other.backoff_lmstate_index),
-        fst_state(other.fst_state), backoff_allowed(other.backoff_allowed) { }
+    LmState() : tot_count(0), tot_count_with_parents(0),  backoff_lmstate_index(-1),
+      fst_state(-1), backoff_allowed(false) { }
+    LmState(const LmState &other) :
+      history(other.history), phone_to_count(other.phone_to_count),
+      tot_count(other.tot_count), tot_count_with_parents(other.tot_count_with_parents),
+      backoff_lmstate_index(other.backoff_lmstate_index),
+      fst_state(other.fst_state), backoff_allowed(other.backoff_allowed) { }
   };
 
   // maps from history to int32
@@ -188,7 +188,7 @@ class LanguageModelEstimator {
 
   // adds the counts for this ngram (called from AddCounts()).
   inline void IncrementCount(const std::vector<int32> &history,
-                             int32 next_phone);
+      int32 next_phone);
 
 
   // Computes whether backoff should be allowed for this lm_state.  (the caller
@@ -255,8 +255,8 @@ class LanguageModelEstimator {
   int32 FindInitialFstState() const;
 
   void OutputToFst(
-      int32 num_fst_states,
-      fst::StdVectorFst *fst) const;
+    int32 num_fst_states,
+    fst::StdVectorFst *fst) const;
 
 };
 

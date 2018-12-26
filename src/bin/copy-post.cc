@@ -26,7 +26,7 @@
 int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
-    typedef kaldi::int32 int32;  
+    typedef kaldi::int32 int32;
 
     const char *usage =
         "Copy archives of posteriors, with optional scaling\n"
@@ -43,15 +43,15 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-      
+
     std::string post_rspecifier = po.GetArg(1),
         post_wspecifier = po.GetArg(2);
 
     kaldi::SequentialPosteriorReader posterior_reader(post_rspecifier);
-    kaldi::PosteriorWriter posterior_writer(post_wspecifier); 
+    kaldi::PosteriorWriter posterior_writer(post_wspecifier);
 
     int32 num_done = 0;
-   
+
     for (; !posterior_reader.Done(); posterior_reader.Next()) {
       std::string key = posterior_reader.Key();
 

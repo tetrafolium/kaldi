@@ -57,8 +57,8 @@ int main(int argc, char** argv) {
 
     const char *usage =
         "Sends an audio file to the KALDI audio server (onlinebin/online-audio-server-decode-faster)\n"
-            "and prints the result optionally saving it to an HTK label file or WebVTT subtitles file\n\n"
-            "e.g.: ./online-audio-client 192.168.50.12 9012 'scp:wav_files.scp'\n\n";
+        "and prints the result optionally saving it to an HTK label file or WebVTT subtitles file\n\n"
+        "e.g.: ./online-audio-client 192.168.50.12 9012 'scp:wav_files.scp'\n\n";
     ParseOptions po(usage);
 
     bool htk = false, vtt = false;
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
     }
 
     KALDI_VLOG(2) << "Connected to KALDI server at host " << server_addr_str
-        << " port " << server_port << std::endl;
+                  << " port " << server_port << std::endl;
 
     char* pack_buffer = new char[packet_size];
 
@@ -139,12 +139,12 @@ int main(int argc, char** argv) {
           this_chan = 0;
           if (num_chan != 1)
             KALDI_WARN << "Channel not specified but you have data with "
-                << num_chan << " channels; defaulting to zero";
+                       << num_chan << " channels; defaulting to zero";
         } else {
           if (this_chan >= num_chan) {
             KALDI_WARN << "File with id " << wav_key << " has " << num_chan
-                << " channels but you specified channel " << channel
-                << ", producing no output.";
+                       << " channels but you specified channel " << channel
+                       << ", producing no output.";
             continue;
           }
         }
@@ -258,7 +258,7 @@ int main(int argc, char** argv) {
       {
         float speed = total_input_dur / total_reco_dur;
         KALDI_VLOG(2) << "Recognized (" << speed << "xRT): " << reco_output
-            << std::endl;
+                      << std::endl;
       }
 
       if (htk) {
@@ -266,7 +266,7 @@ int main(int argc, char** argv) {
         std::ofstream htk_file(name.c_str());
         for (size_t i = 0; i < results.size(); i++)
           htk_file << (int) (results[i].start * 10000000) << " "
-              << (int) (results[i].end * 10000000) << " " << results[i].word << std::endl;
+                   << (int) (results[i].end * 10000000) << " " << results[i].word << std::endl;
         htk_file.close();
       }
 
@@ -313,8 +313,8 @@ int main(int argc, char** argv) {
 
         for (size_t i = 0; i < subtitles.size(); i++)
           vtt_file << (i + 1) << std::endl << TimeToTimecode(subtitles[i].start)
-              << " --> " << TimeToTimecode(subtitles[i].end) << std::endl
-              << subtitles[i].word << std::endl << std::endl;
+                   << " --> " << TimeToTimecode(subtitles[i].end) << std::endl
+                   << subtitles[i].word << std::endl << std::endl;
 
         vtt_file.close();
       }

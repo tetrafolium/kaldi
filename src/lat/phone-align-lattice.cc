@@ -26,7 +26,7 @@
 namespace kaldi {
 
 class LatticePhoneAligner {
- public:
+public:
   typedef CompactLatticeArc::StateId StateId;
   typedef CompactLatticeArc::Label Label;
 
@@ -34,13 +34,13 @@ class LatticePhoneAligner {
     /// along a single path in the lattice, we work out the phone
     /// boundaries and output phone-aligned arcs. [These may or may not have
     /// words on them; the word symbols are not aligned with anything.
-   public:
+public:
 
     /// Advance the computation state by adding the symbols and weights
     /// from this arc.  Gets rid of the weight and puts it in "weight" which
     /// will be put on the output arc; this keeps the state-space small.
     void Advance(const CompactLatticeArc &arc, const PhoneAlignLatticeOptions &opts,
-                 LatticeWeight *weight) {
+        LatticeWeight *weight) {
       const std::vector<int32> &string = arc.weight.String();
       transition_ids_.insert(transition_ids_.end(),
                              string.begin(), string.end());
@@ -59,18 +59,18 @@ class LatticePhoneAligner {
     /// Note: the "next_state" of the arc will not be set, you have to do that
     /// yourself.
     bool OutputPhoneArc(const TransitionModel &tmodel,
-                        const PhoneAlignLatticeOptions &opts,
-                        CompactLatticeArc *arc_out,
-                        bool *error);
+        const PhoneAlignLatticeOptions &opts,
+        CompactLatticeArc *arc_out,
+        bool *error);
 
     /// This will succeed (and output the arc) if we have >1 word in words_;
     /// the arc won't have any transition-ids on it.  This is intended to fix
     /// a particular pathology where too many words were pending and we had
     /// blowup.
     bool OutputWordArc(const TransitionModel &tmodel,
-                       const PhoneAlignLatticeOptions &opts,
-                       CompactLatticeArc *arc_out,
-                       bool *error);
+        const PhoneAlignLatticeOptions &opts,
+        CompactLatticeArc *arc_out,
+        bool *error);
 
     bool IsEmpty() { return (transition_ids_.empty() && word_labels_.empty()); }
 
@@ -92,9 +92,9 @@ class LatticePhoneAligner {
     /// happen for lattices that were somehow broken, i.e.
     /// had not reached the final state.
     void OutputArcForce(const TransitionModel &tmodel,
-                        const PhoneAlignLatticeOptions &opts,
-                        CompactLatticeArc *arc_out,
-                        bool *error);
+        const PhoneAlignLatticeOptions &opts,
+        CompactLatticeArc *arc_out,
+        bool *error);
 
     size_t Hash() const {
       VectorHasher<int32> vh;
@@ -109,15 +109,15 @@ class LatticePhoneAligner {
     // Just need an arbitrary complete order.
     bool operator == (const ComputationState &other) const {
       return (transition_ids_ == other.transition_ids_
-              && word_labels_ == other.word_labels_
-              && weight_ == other.weight_);
+             && word_labels_ == other.word_labels_
+             && weight_ == other.weight_);
     }
 
-    ComputationState(): weight_(LatticeWeight::One()) { } // initial state.
-    ComputationState(const ComputationState &other):
-        transition_ids_(other.transition_ids_), word_labels_(other.word_labels_),
-        weight_(other.weight_) { }
-   private:
+    ComputationState() : weight_(LatticeWeight::One()) { } // initial state.
+    ComputationState(const ComputationState &other) :
+      transition_ids_(other.transition_ids_), word_labels_(other.word_labels_),
+      weight_(other.weight_) { }
+private:
     std::vector<int32> transition_ids_;
     std::vector<int32> word_labels_;
     LatticeWeight weight_; // contains two floats.
@@ -125,8 +125,8 @@ class LatticePhoneAligner {
 
 
   struct Tuple {
-    Tuple(StateId input_state, ComputationState comp_state):
-        input_state(input_state), comp_state(comp_state) {}
+    Tuple(StateId input_state, ComputationState comp_state) :
+      input_state(input_state), comp_state(comp_state) {}
     StateId input_state;
     ComputationState comp_state;
   };
@@ -141,7 +141,7 @@ class LatticePhoneAligner {
     bool operator () (const Tuple &state1, const Tuple &state2) const {
       // treat this like operator ==
       return (state1.input_state == state2.input_state
-              && state1.comp_state == state2.comp_state);
+             && state1.comp_state == state2.comp_state);
     }
   };
 
@@ -242,11 +242,11 @@ class LatticePhoneAligner {
   }
 
   LatticePhoneAligner(const CompactLattice &lat,
-                      const TransitionModel &tmodel,
-                      const PhoneAlignLatticeOptions &opts,
-                     CompactLattice *lat_out):
-      lat_(lat), tmodel_(tmodel), opts_(opts), lat_out_(lat_out),
-      error_(false) {
+      const TransitionModel &tmodel,
+      const PhoneAlignLatticeOptions &opts,
+      CompactLattice *lat_out) :
+    lat_(lat), tmodel_(tmodel), opts_(opts), lat_out_(lat_out),
+    error_(false) {
     fst::CreateSuperFinal(&lat_); // Creates a super-final state, so the
     // only final-probs are One().
   }
@@ -290,10 +290,10 @@ class LatticePhoneAligner {
 };
 
 bool LatticePhoneAligner::ComputationState::OutputPhoneArc(
-    const TransitionModel &tmodel,
-    const PhoneAlignLatticeOptions &opts,
-    CompactLatticeArc *arc_out,
-    bool *error) {
+  const TransitionModel &tmodel,
+  const PhoneAlignLatticeOptions &opts,
+  CompactLatticeArc *arc_out,
+  bool *error) {
   if (transition_ids_.empty()) return false;
   int32 phone = tmodel.TransitionIdToPhone(transition_ids_[0]);
   // we assume the start of transition_ids_ is the start of the phone;
@@ -304,12 +304,12 @@ bool LatticePhoneAligner::ComputationState::OutputPhoneArc(
   for (i = 0; i < len; i++) {
     int32 tid = transition_ids_[i];
     int32 this_phone = tmodel.TransitionIdToPhone(tid);
-    if (this_phone != phone && ! *error) { // error condition: should have
+    if (this_phone != phone && !*error) {  // error condition: should have
                                            // reached final transition-id first.
       *error = true;
       KALDI_WARN << phone << " -> " << this_phone;
       KALDI_WARN << "Phone changed before final transition-id found "
-          "[broken lattice or mismatched model or wrong --reorder option?]";
+        "[broken lattice or mismatched model or wrong --reorder option?]";
     }
     if (tmodel.IsFinal(tid))
       break;
@@ -322,7 +322,7 @@ bool LatticePhoneAligner::ComputationState::OutputPhoneArc(
 
   // interpret i as the number of transition-ids to consume.
   std::vector<int32> tids_out(transition_ids_.begin(),
-                              transition_ids_.begin()+i);
+      transition_ids_.begin()+i);
 
   Label output_label = 0;
   if (!word_labels_.empty()) {
@@ -340,10 +340,10 @@ bool LatticePhoneAligner::ComputationState::OutputPhoneArc(
 }
 
 bool LatticePhoneAligner::ComputationState::OutputWordArc(
-    const TransitionModel &tmodel,
-    const PhoneAlignLatticeOptions &opts,
-    CompactLatticeArc *arc_out,
-    bool *error) {
+  const TransitionModel &tmodel,
+  const PhoneAlignLatticeOptions &opts,
+  CompactLatticeArc *arc_out,
+  bool *error) {
   // output a word but no phones.
   if (word_labels_.size() < 2) return false;
 
@@ -359,10 +359,10 @@ bool LatticePhoneAligner::ComputationState::OutputWordArc(
 
 
 void LatticePhoneAligner::ComputationState::OutputArcForce(
-    const TransitionModel &tmodel,
-    const PhoneAlignLatticeOptions &opts,
-    CompactLatticeArc *arc_out,
-    bool *error) {
+  const TransitionModel &tmodel,
+  const PhoneAlignLatticeOptions &opts,
+  CompactLatticeArc *arc_out,
+  bool *error) {
   KALDI_ASSERT(!IsEmpty());
 
   int32 phone = -1; // This value -1 will never be used,
@@ -380,12 +380,12 @@ void LatticePhoneAligner::ComputationState::OutputArcForce(
       int32 this_phone = tmodel.TransitionIdToPhone(this_tid);
       bool is_final = tmodel.IsFinal(this_tid); // should be exactly one.
       if (is_final) num_final++;
-      if (this_phone != phone && ! *error) {
+      if (this_phone != phone && !*error) {
         KALDI_WARN << "Mismatch in phone: error in lattice or mismatched transition model?";
         *error = true;
       }
     }
-    if (num_final != 1 && ! *error) {
+    if (num_final != 1 && !*error) {
       KALDI_WARN << "Problem phone-aligning lattice: saw " << num_final
                  << " final-states in last phone in lattice (forced out?) "
                  << "Producing partial lattice.";
@@ -408,9 +408,9 @@ void LatticePhoneAligner::ComputationState::OutputArcForce(
 }
 
 bool PhoneAlignLattice(const CompactLattice &lat,
-                       const TransitionModel &tmodel,
-                       const PhoneAlignLatticeOptions &opts,
-                       CompactLattice *lat_out) {
+    const TransitionModel &tmodel,
+    const PhoneAlignLatticeOptions &opts,
+    CompactLattice *lat_out) {
   LatticePhoneAligner aligner(lat, tmodel, opts, lat_out);
   return aligner.AlignLattice();
 }

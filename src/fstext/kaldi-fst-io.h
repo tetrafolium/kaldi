@@ -48,10 +48,10 @@ VectorFst<StdArc> *ReadFstKaldi(std::string rxfilename);
 // This version currently supports ConstFst<StdArc> or VectorFst<StdArc>
 // (const-fst can give better performance for decoding).
 Fst<StdArc> *ReadFstKaldiGeneric(std::string rxfilename,
-                                 bool throw_on_err = true);
+    bool throw_on_err = true);
 
 // This function attempts to dynamic_cast the pointer 'fst' (which will likely
-// have been returned by ReadFstGeneric()), to the more derived 
+// have been returned by ReadFstGeneric()), to the more derived
 // type VectorFst<StdArc>. If this succeeds, it returns the same pointer;
 // if it fails, it converts the FST type (by creating a new VectorFst<stdArc>
 // initialized by 'fst'), prints a warning, and deletes 'fst'.
@@ -65,7 +65,7 @@ void ReadFstKaldi(std::string rxfilename, VectorFst<StdArc> *ofst);
 // On error, throws using KALDI_ERR.  For use only in code in fstbin/,
 // as it doesn't support the text-mode option.
 void WriteFstKaldi(const VectorFst<StdArc> &fst,
-                   std::string wxfilename);
+    std::string wxfilename);
 
 // This is a more general Kaldi-type-IO mechanism of writing FSTs to
 // streams, supporting binary or text-mode writing.  (note: we just
@@ -73,13 +73,13 @@ void WriteFstKaldi(const VectorFst<StdArc> &fst,
 // On error, throws using KALDI_ERR.
 template <class Arc>
 void WriteFstKaldi(std::ostream &os, bool binary,
-                   const VectorFst<Arc> &fst);
+    const VectorFst<Arc> &fst);
 
 // A generic Kaldi-type-IO mechanism of reading FSTs from streams,
 // supporting binary or text-mode reading/writing.
 template <class Arc>
 void ReadFstKaldi(std::istream &is, bool binary,
-                  VectorFst<Arc> *fst);
+    VectorFst<Arc> *fst);
 
 // This is a Holder class with T = VectorFst<Arc>, that meets the requirements
 // of a Holder class as described in ../util/kaldi-holder.h. This enables us to
@@ -90,10 +90,10 @@ void ReadFstKaldi(std::istream &is, bool binary,
 // the arc.
 template<class Arc>
 class VectorFstTplHolder {
- public:
+public:
   typedef VectorFst<Arc> T;
 
-  VectorFstTplHolder(): t_(NULL) { }
+  VectorFstTplHolder() : t_(NULL) { }
 
   static bool Write(std::ostream &os, bool binary, const T &t);
 
@@ -130,7 +130,7 @@ class VectorFstTplHolder {
   }
 
   bool ExtractRange(const VectorFstTplHolder<Arc> &other,
-                    const std::string &range) {
+      const std::string &range) {
     KALDI_ERR << "ExtractRange is not defined for this type of holder.";
     return false;
   }
@@ -138,7 +138,7 @@ class VectorFstTplHolder {
   ~VectorFstTplHolder() { Clear(); }
   // No destructor.  Assignment and
   // copy constructor take their default implementations.
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(VectorFstTplHolder);
   T *t_;
 };

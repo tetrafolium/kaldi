@@ -34,11 +34,11 @@ namespace kaldi {
 // the same dimensions.
 
 class DecodableSum: public DecodableInterface {
- public:
+public:
   // Does not take ownership of pointers!  They are just
   // pointers because they are non-const.
   DecodableSum(DecodableInterface *d1, BaseFloat w1,
-               DecodableInterface *d2, BaseFloat w2) {
+      DecodableInterface *d2, BaseFloat w2) {
     decodables_.push_back(std::make_pair(d1, w1));
     decodables_.push_back(std::make_pair(d2, w2));
     CheckSizes();
@@ -46,12 +46,12 @@ class DecodableSum: public DecodableInterface {
 
   // Does not take ownership of pointers!
   DecodableSum(
-      const std::vector<std::pair<DecodableInterface*, BaseFloat> > &decodables) :
-      decodables_(decodables) { CheckSizes(); }
+    const std::vector<std::pair<DecodableInterface*, BaseFloat> > &decodables) :
+    decodables_(decodables) { CheckSizes(); }
 
   void CheckSizes() {
     KALDI_ASSERT(decodables_.size() >= 1
-                 && decodables_[0].first != NULL);
+        && decodables_[0].first != NULL);
     for (size_t i = 1; i < decodables_.size(); i++)
       KALDI_ASSERT(decodables_[i].first != NULL &&
                    decodables_[i].first->NumIndices() ==
@@ -64,14 +64,14 @@ class DecodableSum: public DecodableInterface {
     BaseFloat sum = 0.0;
     // int32 i=1;
     for (std::vector<std::pair<DecodableInterface*, BaseFloat> >::iterator iter = decodables_.begin();
-         iter != decodables_.end();
-         ++iter) {
+        iter != decodables_.end();
+        ++iter) {
       sum += iter->first->LogLikelihood(frame, state_index) * iter->second;
       // BaseFloat tmp = iter->first->LogLikelihood(frame, state_index);
       // KALDI_LOG << "ITEM " << i << " contributed with loglike=" << tmp << " scaled by=" << iter->second;
       // i+=1;
       // sum += tmp * iter->second;
-     }
+    }
     return sum;
   }
 
@@ -82,27 +82,27 @@ class DecodableSum: public DecodableInterface {
     return decodables_[0].first->IsLastFrame(frame);
   }
 
- private:
+private:
   std::vector<std::pair<DecodableInterface*, BaseFloat> > decodables_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableSum);
 };
 
 class DecodableSumScaled : public DecodableSum {
- public:
+public:
   DecodableSumScaled(DecodableInterface *d1, BaseFloat w1,
-                     DecodableInterface *d2, BaseFloat w2,
-                     BaseFloat scale)
+      DecodableInterface *d2, BaseFloat w2,
+      BaseFloat scale)
     : DecodableSum(d1, w1, d2, w2), scale_(scale) {}
 
   DecodableSumScaled(const std::vector<std::pair<DecodableInterface*, BaseFloat> > &decodables,
-                     BaseFloat scale)
+      BaseFloat scale)
     : DecodableSum(decodables), scale_(scale) {}
 
   virtual BaseFloat LogLikelihood(int32 frame, int32 state_index) {
     return scale_ * DecodableSum::LogLikelihood(frame, state_index);
   }
 
- private:
+private:
   BaseFloat scale_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableSumScaled);
 };

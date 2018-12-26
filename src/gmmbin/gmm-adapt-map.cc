@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
       }  // end looping over speakers
     } else {  // per-utterance adaptation
       SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
-      for ( ; !feature_reader.Done(); feature_reader.Next() ) {
+      for (; !feature_reader.Done(); feature_reader.Next() ) {
         std::string utt = feature_reader.Key();
         AmDiagGmm copy_am_gmm;
         copy_am_gmm.CopyFromAmDiagGmm(am_gmm);

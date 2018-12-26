@@ -40,7 +40,7 @@ namespace fst {
 /*
    DeterminizeStar implements determinization with epsilon removal, which we
    distinguish with a star.
-   
+
    We define a determinized* FST as one in which no state has more than one
    transition with the same input-label.  Epsilon input labels are not allowed
    except starting from states that have exactly one arc exiting them (and are
@@ -54,8 +54,8 @@ namespace fst {
    float-weight.  It does epsilon removal and determinization.
    This algorithm may fail if the input has epsilon cycles under
    certain circumstances (i.e. the semiring is non-idempotent, e.g. the log
-   semiring, or there are negative cost epsilon cycles).  
-   
+   semiring, or there are negative cost epsilon cycles).
+
    This implementation is much less fancy than the one in fst/determinize.h, and
    does not have an "on-demand" version.
 
@@ -63,7 +63,7 @@ namespace fst {
    memory the subsets of states, together with their leftover strings and their
    weights.  The only difference is we detect input epsilon transitions and
    treat them "specially".
-*/
+ */
 
 
 // This algorithm will be slightly faster if you sort the input fst on input label.
@@ -82,13 +82,13 @@ namespace fst {
     out an error.
     The function will return false if partial FST is generated, and true if the
     complete determinized FST is generated.
-*/
+ */
 template<class F>
 bool DeterminizeStar(F &ifst, MutableFst<typename F::Arc> *ofst,
-                     float delta = kDelta,
-                     bool *debug_ptr = NULL,
-                     int max_states = -1,
-                     bool allow_partial = false);
+    float delta = kDelta,
+    bool *debug_ptr = NULL,
+    int max_states = -1,
+    bool allow_partial = false);
 
 
 
@@ -102,12 +102,12 @@ bool DeterminizeStar(F &ifst, MutableFst<typename F::Arc> *ofst,
     out an error.
     The function will return false if partial FST is generated, and true if the
     complete determinized FST is generated.
-*/
+ */
 template<class F>
 bool DeterminizeStar(F &ifst, MutableFst<GallicArc<typename F::Arc> > *ofst,
-                     float delta = kDelta, bool *debug_ptr = NULL,
-                     int max_states = -1,
-                     bool allow_partial = false);
+    float delta = kDelta, bool *debug_ptr = NULL,
+    int max_states = -1,
+    bool allow_partial = false);
 
 
 /// @} end "addtogroup fst_extensions"

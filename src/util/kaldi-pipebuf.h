@@ -25,7 +25,7 @@
 #ifndef KALDI_UTIL_KALDI_PIPEBUF_H_
 #define KALDI_UTIL_KALDI_PIPEBUF_H_
 
-#include<string>
+#include <string>
 #if !defined(_LIBCPP_VERSION)  // libc++
 #include <fstream>
 #else
@@ -43,12 +43,12 @@ namespace kaldi {
 #elif defined(_LIBCPP_VERSION)  // libc++
 template<class CharType, class Traits = std::char_traits<CharType> >
 class basic_pipebuf : public basic_filebuf<CharType, Traits> {
- public:
+public:
   typedef basic_pipebuf<CharType, Traits>   ThisType;
 
- public:
+public:
   basic_pipebuf(FILE *fptr, std::ios_base::openmode mode)
-      : basic_filebuf<CharType, Traits>() {
+    : basic_filebuf<CharType, Traits>() {
     this->open(fptr, mode);
     if (!this->is_open()) {
       KALDI_WARN << "Error initializing pipebuf";  // probably indicates
@@ -60,12 +60,12 @@ class basic_pipebuf : public basic_filebuf<CharType, Traits> {
 #else
 template<class CharType, class Traits = std::char_traits<CharType> >
 class basic_pipebuf : public std::basic_filebuf<CharType, Traits> {
- public:
+public:
   typedef basic_pipebuf<CharType, Traits>   ThisType;
 
- public:
+public:
   basic_pipebuf(FILE *fptr, std::ios_base::openmode mode)
-      : std::basic_filebuf<CharType, Traits>() {
+    : std::basic_filebuf<CharType, Traits>() {
     this->_M_file.sys_open(fptr, mode);
     if (!this->is_open()) {
       KALDI_WARN << "Error initializing pipebuf";  // probably indicates

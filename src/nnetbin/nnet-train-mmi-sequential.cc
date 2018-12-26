@@ -43,9 +43,9 @@ namespace kaldi {
 namespace nnet1 {
 
 void LatticeAcousticRescore(const Matrix<BaseFloat> &log_like,
-                            const TransitionModel &trans_model,
-                            const std::vector<int32> &state_times,
-                            Lattice *lat) {
+    const TransitionModel &trans_model,
+    const std::vector<int32> &state_times,
+    Lattice *lat) {
   kaldi::uint64 props = lat->Properties(fst::kFstProperties, false);
   if (!(props & fst::kTopSorted))
     KALDI_ERR << "Input lattice must be topologically sorted.";
@@ -58,14 +58,14 @@ void LatticeAcousticRescore(const Matrix<BaseFloat> &log_like,
       time_to_state[state_times[i]].push_back(i);
     else
       KALDI_ASSERT(state_times[i] == log_like.NumRows()
-                   && "There appears to be lattice/feature mismatch.");
+          && "There appears to be lattice/feature mismatch.");
   }
 
   for (int32 t = 0; t < log_like.NumRows(); t++) {
     for (size_t i = 0; i < time_to_state[t].size(); i++) {
       int32 state = time_to_state[t][i];
       for (fst::MutableArcIterator<Lattice> aiter(lat, state); !aiter.Done();
-           aiter.Next()) {
+          aiter.Next()) {
         LatticeArc arc = aiter.Value();
         int32 trans_id = arc.ilabel;
         if (trans_id != 0) {  // Non-epsilon input label on arc
@@ -88,15 +88,15 @@ int main(int argc, char *argv[]) {
   typedef kaldi::int32 int32;
   try {
     const char *usage =
-      "Perform one iteration of MMI training using SGD with per-utterance"
-      "updates\n"
+        "Perform one iteration of MMI training using SGD with per-utterance"
+        "updates\n"
 
-      "Usage:  nnet-train-mmi-sequential [options] "
-      "<model-in> <transition-model-in> <feature-rspecifier> "
-      "<den-lat-rspecifier> <ali-rspecifier> [<model-out>]\n"
+        "Usage:  nnet-train-mmi-sequential [options] "
+        "<model-in> <transition-model-in> <feature-rspecifier> "
+        "<den-lat-rspecifier> <ali-rspecifier> [<model-out>]\n"
 
-      "e.g.: nnet-train-mmi-sequential nnet.init trans.mdl scp:feats.scp "
-      "scp:denlats.scp ark:ali.ark nnet.iter1\n";
+        "e.g.: nnet-train-mmi-sequential nnet.init trans.mdl scp:feats.scp "
+        "scp:denlats.scp ark:ali.ark nnet.iter1\n";
 
     ParseOptions po(usage);
 
@@ -201,10 +201,10 @@ int main(int argc, char *argv[]) {
 
     if (drop_frames) {
       KALDI_LOG << "--drop-frames=true :"
-                   " we will zero gradient for frames with total den/num mismatch."
-                   " The mismatch is likely to be caused by missing correct path "
-                   " from den-lattice due wrong annotation or search error."
-                   " Leaving such frames out stabilizes the training.";
+        " we will zero gradient for frames with total den/num mismatch."
+        " The mismatch is likely to be caused by missing correct path "
+        " from den-lattice due wrong annotation or search error."
+        " Leaving such frames out stabilizes the training.";
     }
 
     Timer time;
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
     KALDI_LOG << "TRAINING STARTED";
 
     int32 num_done = 0, num_no_num_ali = 0, num_no_den_lat = 0,
-          num_other_error = 0, num_frm_drop = 0;
+        num_other_error = 0, num_frm_drop = 0;
 
     kaldi::int64 total_frames = 0;
     double lat_like;  // total likelihood of the lattice
@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
     double total_post_on_ali = 0.0, post_on_ali = 0.0;
 
     // main loop over utterances,
-    for ( ; !feature_reader.Done(); feature_reader.Next()) {
+    for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string utt = feature_reader.Key();
       if (!den_lat_reader.HasKey(utt)) {
         KALDI_WARN << "Missing lattice of " << utt;
@@ -247,8 +247,8 @@ int main(int argc, char *argv[]) {
       }
       if (mat.NumRows() > max_frames) {
         KALDI_WARN << "Skipping " << utt
-          << " that has " << mat.NumRows() << " frames,"
-          << " it is longer than '--max-frames'" << max_frames;
+                   << " that has " << mat.NumRows() << " frames,"
+                   << " it is longer than '--max-frames'" << max_frames;
         num_other_error++;
         continue;
       }
@@ -277,16 +277,16 @@ int main(int argc, char *argv[]) {
       // check duration of den. lattice,
       if (max_time != mat.NumRows()) {
         KALDI_WARN << "Duration mismatch!"
-          << " denominator lattice " << max_time
-          << " features " << mat.NumRows() << ","
-          << " skipping " << utt;
+                   << " denominator lattice " << max_time
+                   << " features " << mat.NumRows() << ","
+                   << " skipping " << utt;
         num_other_error++;
         continue;
       }
 
       // get dims,
       int32 num_frames = mat.NumRows(),
-            num_pdfs = nnet.OutputDim();
+          num_pdfs = nnet.OutputDim();
 
       // 3) get the pre-softmax outputs from NN,
       // apply transform,
@@ -342,12 +342,12 @@ int main(int argc, char *argv[]) {
 
       // Report,
       KALDI_VLOG(1) << "Lattice #" << num_done + 1 << " processed"
-        << " (" << utt << "): found " << den_lat.NumStates()
-        << " states and " << fst::NumArcs(den_lat) << " arcs.";
+                    << " (" << utt << "): found " << den_lat.NumStates()
+                    << " states and " << fst::NumArcs(den_lat) << " arcs.";
 
       KALDI_VLOG(1) << "Utterance " << utt << ": Average MMI obj. value = "
-        << (mmi_obj/num_frames) << " over " << num_frames << " frames."
-        << " (Avg. den-posterior on ali " << post_on_ali / num_frames << ")";
+                    << (mmi_obj/num_frames) << " over " << num_frames << " frames."
+                    << " (Avg. den-posterior on ali " << post_on_ali / num_frames << ")";
 
 
       // 7a) Search for the frames with num/den mismatch,
@@ -378,7 +378,7 @@ int main(int argc, char *argv[]) {
       // Report the frame dropping
       if (frm_drop > 0) {
         std::stringstream ss;
-        ss << (drop_frames?"Dropped":"[dropping disabled] Would drop")
+        ss << (drop_frames ? "Dropped" : "[dropping disabled] Would drop")
            << " frames in " << utt << " " << frm_drop << "/" << num_frames
            << ",";
         // get frame intervals from vec frm_drop_vec,
@@ -415,8 +415,8 @@ int main(int argc, char *argv[]) {
       if (num_done % 100 == 0) {
         time_now = time.Elapsed();
         KALDI_VLOG(1) << "After " << num_done << " utterances: "
-          << "time elapsed = " << time_now / 60 << " min; "
-          << "processed " << total_frames / time_now << " frames per sec.";
+                      << "time elapsed = " << time_now / 60 << " min; "
+                      << "processed " << total_frames / time_now << " frames per sec.";
 #if HAVE_CUDA == 1
         // check that GPU computes accurately,
         CuDevice::Instantiate().CheckGpuHealth();

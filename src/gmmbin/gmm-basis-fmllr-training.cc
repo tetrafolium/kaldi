@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
         "Estimate fMLLR basis representation. Reads a set of gradient scatter\n"
         "accumulations. Outputs basis matrices.\n"
         "Usage: gmm-basis-fmllr-training [options] <model-in> <basis-wspecifier>"
-         "<accs-in1> <accs-in2> ...\n";
+        "<accs-in1> <accs-in2> ...\n";
 
     bool binary_write = true;
     ParseOptions po(usage);

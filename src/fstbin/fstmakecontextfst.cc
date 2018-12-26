@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     bool binary = true;  // binary output to ilabels_output_file.
     std::string disambig_rxfilename, disambig_wxfilename;
     int32 N = 3, P = 1;
-    
+
     ParseOptions po(usage);
     po.Register("read-disambig-syms", &disambig_rxfilename,
                 "List of disambiguation symbols to read");
@@ -90,8 +90,8 @@ int main(int argc, char *argv[]) {
 
     if ( (disambig_wxfilename != "") && (disambig_rxfilename == "") )
       KALDI_ERR << "fstmakecontextfst: cannot specify --write-disambig-syms if "
-          "not specifying --read-disambig-syms\n";
-    
+        "not specifying --read-disambig-syms\n";
+
     std::vector<int32> disambig_in;
     if (disambig_rxfilename != "") {
       if (!ReadIntegerVectorSimple(disambig_rxfilename, &disambig_in))
@@ -100,20 +100,20 @@ int main(int argc, char *argv[]) {
     }
 
     if (std::binary_search(phone_syms.begin(), phone_syms.end(), subseq_sym)
-       ||std::binary_search(disambig_in.begin(), disambig_in.end(), subseq_sym))
+        ||std::binary_search(disambig_in.begin(), disambig_in.end(), subseq_sym))
       KALDI_ERR << "Invalid subsequential symbol "<<(subseq_sym)<<", already a phone or disambiguation symbol.";
 
 
     ContextFst<StdArc, int32> cfst(subseq_sym,
-                                   phone_syms,
-                                   disambig_in,
-                                   N,
-                                   P);
+        phone_syms,
+        disambig_in,
+        N,
+        P);
 
     VectorFst<StdArc> vfst(cfst);  // Copy the fst to a VectorFst.
 
     WriteFstKaldi(vfst, fst_out_filename);
-    
+
     const std::vector<std::vector<int32> >  &ilabels = cfst.ILabelInfo();
     WriteILabelInfo(Output(ilabels_out_filename, binary).Stream(),
                     binary, ilabels);

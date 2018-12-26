@@ -32,8 +32,8 @@ using std::set;
 typedef unordered_set<fst::StdArc::Label> LabelSet;
 
 void ReadSymbolList(const std::string &rxfilename,
-                    fst::SymbolTable *word_syms,
-                    LabelSet *lset) {
+    fst::SymbolTable *word_syms,
+    LabelSet *lset) {
   Input ki(rxfilename);
   std::string line;
   KALDI_ASSERT(lset != NULL);
@@ -59,10 +59,10 @@ void ReadSymbolList(const std::string &rxfilename,
 void MapWildCards(const LabelSet &wildcards, fst::StdVectorFst *ofst) {
   // map all wildcards symbols to epsilons
   for (fst::StateIterator<fst::StdVectorFst> siter(*ofst);
-       !siter.Done(); siter.Next()) {
+      !siter.Done(); siter.Next()) {
     fst::StdArc::StateId s = siter.Value();
     for (fst::MutableArcIterator<fst::StdVectorFst> aiter(ofst, s);
-         !aiter.Done();  aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       fst::StdArc arc(aiter.Value());
       LabelSet::const_iterator it = wildcards.find(arc.ilabel);
       if (it != wildcards.end()) {
@@ -83,8 +83,8 @@ void MapWildCards(const LabelSet &wildcards, fst::StdVectorFst *ofst) {
 // also maps wildcard symbols to epsilons
 // then removes epsilons
 void ConvertLatticeToUnweightedAcceptor(const kaldi::Lattice &ilat,
-                                        const LabelSet &wildcards,
-                                        fst::StdVectorFst *ofst) {
+    const LabelSet &wildcards,
+    fst::StdVectorFst *ofst) {
   // first convert from  lattice to normal FST
   fst::ConvertLattice(ilat, ofst);
   // remove weights, project to output, sort according to input arg
@@ -97,8 +97,8 @@ void ConvertLatticeToUnweightedAcceptor(const kaldi::Lattice &ilat,
 }
 
 void CreateEditDistance(const fst::StdVectorFst &fst1,
-                        const fst::StdVectorFst &fst2,
-                        fst::StdVectorFst *pfst) {
+    const fst::StdVectorFst &fst2,
+    fst::StdVectorFst *pfst) {
   typedef fst::StdArc StdArc;
   typedef fst::StdArc::Weight Weight;
   typedef fst::StdArc::Label Label;
@@ -134,11 +134,11 @@ void CreateEditDistance(const fst::StdVectorFst &fst1,
 }
 
 void CountErrors(const fst::StdVectorFst &fst,
-                 int32 *correct,
-                 int32 *substitutions,
-                 int32 *insertions,
-                 int32 *deletions,
-                 int32 *num_words) {
+    int32 *correct,
+    int32 *substitutions,
+    int32 *insertions,
+    int32 *deletions,
+    int32 *num_words) {
   typedef fst::StdArc::StateId StateId;
   typedef fst::StdArc::Weight Weight;
   *correct = *substitutions = *insertions = *deletions = *num_words = 0;
@@ -147,7 +147,7 @@ void CountErrors(const fst::StdVectorFst &fst,
   StateId src = fst.Start();
   while (fst.Final(src)== Weight::Zero()) {  // while not final
     for (fst::ArcIterator<fst::StdVectorFst> aiter(fst, src);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       fst::StdArc arc = aiter.Value();
       if (arc.ilabel == arc.olabel && arc.ilabel != 0) {
         (*correct)++;
@@ -280,7 +280,7 @@ int main(int argc, char *argv[]) {
 
     int32 n_done = 0, n_fail = 0;
     int32 tot_correct = 0, tot_substitutions = 0,
-          tot_insertions = 0, tot_deletions = 0, tot_words = 0;
+        tot_insertions = 0, tot_deletions = 0, tot_words = 0;
 
     for (; !lattice_reader.Done(); lattice_reader.Next()) {
       std::string key = lattice_reader.Key();
@@ -362,7 +362,7 @@ int main(int argc, char *argv[]) {
             std::string s = word_syms->Find(oracle_words[i]);
             if (s == "")
               KALDI_ERR << "Word-id " << oracle_words[i]
-                  << " not in symbol table.";
+                        << " not in symbol table.";
             std::cerr << s << ' ';
           }
           std::cerr << '\n' << key << " (reference) ";

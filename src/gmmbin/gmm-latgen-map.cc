@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     bool binary = true;
     bool allow_partial = true;
     BaseFloat acoustic_scale = 0.1;
-        
+
     std::string word_syms_filename, utt2spk_rspecifier;
     LatticeFasterDecoderConfig decoder_opts;
     decoder_opts.Register(&po);
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
       trans_model.Read(is.Stream(), binary_read);
     }
     RandomAccessMapAmDiagGmmReaderMapped gmms_reader(gmms_rspecifier,
-                                                     utt2spk_rspecifier);
+        utt2spk_rspecifier);
 
     Int32VectorWriter words_writer(words_wspecifier);
     Int32VectorWriter alignment_writer(alignment_wspecifier);
@@ -104,12 +104,12 @@ int main(int argc, char *argv[]) {
     LatticeWriter lattice_writer;
 
     if (lattice_wspecifier != "") {
-      if (! (determinize ? compact_lattice_writer.Open(lattice_wspecifier)
-             : lattice_writer.Open(lattice_wspecifier)))
+      if (!(determinize ? compact_lattice_writer.Open(lattice_wspecifier)
+          : lattice_writer.Open(lattice_wspecifier)))
         KALDI_ERR << "Could not open table for writing lattices: "
                   << lattice_wspecifier;
     }
-        
+
     fst::SymbolTable *word_syms = NULL;
     if (word_syms_filename != "") {
       word_syms = fst::SymbolTable::ReadText(word_syms_filename);
@@ -151,8 +151,8 @@ int main(int argc, char *argv[]) {
 
         LatticeFasterDecoder decoder(*decode_fst, decoder_opts);
         kaldi::DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model,
-                                                      features,
-                                                      acoustic_scale);
+            features,
+            acoustic_scale);
         double like;
         if (DecodeUtteranceLatticeFaster(
                 decoder, gmm_decodable, trans_model, word_syms, utt,
@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
         }
         AmDiagGmm am_gmm;
         am_gmm.CopyFromAmDiagGmm(gmms_reader.Value(utt));
-        
+
         Matrix<BaseFloat> features(feature_reader.Value());
         feature_reader.FreeCurrent();
         if (features.NumRows() == 0) {
@@ -196,8 +196,8 @@ int main(int argc, char *argv[]) {
 
         LatticeFasterDecoder decoder(fst_reader.Value(utt), decoder_opts);
         kaldi::DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model,
-                                                      features,
-                                                      acoustic_scale);
+            features,
+            acoustic_scale);
         double like;
         if (DecodeUtteranceLatticeFaster(
                 decoder, gmm_decodable, trans_model, word_syms, utt,
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
         } else num_fail++;
       }  // end looping over all utterances
     }
-    KALDI_LOG << "Average log-likelihood per frame is " 
+    KALDI_LOG << "Average log-likelihood per frame is "
               << (tot_like / frame_count) << " over " << frame_count << " frames.";
 
     double elapsed = timer.Elapsed();

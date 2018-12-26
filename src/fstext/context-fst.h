@@ -46,7 +46,7 @@
    context windows (e.g. "a, b, c") to individual phone, e.g. "a".  The context
    FST is an on-demand FST.  It has its own matcher type that makes it particularly
    efficient to compose with.
-*/
+ */
 
 #include <unordered_map>
 using std::unordered_map;
@@ -68,13 +68,13 @@ namespace internal {
 
 /*
    ContextFstImpl inherits from CacheImpl, which handles caching of states.
-*/
+ */
 
 template <class Arc,
-          class LabelT = int32> // make the vector<Label> things actually vector<int32> for
+    class LabelT = int32>       // make the vector<Label> things actually vector<int32> for
                                 // easier compatibility with Kaldi code.
 class ContextFstImpl : public CacheImpl<Arc> {
- public:
+public:
 
   // Inherit the stuff about setting "type", properties and symbol-tables, from
   // FstImpl, which we inherit from (in a long chain) via CacheImpl<Arc>.
@@ -90,18 +90,18 @@ class ContextFstImpl : public CacheImpl<Arc> {
   typedef DefaultCacheStore<Arc> Store;
   typedef typename Store::State State;
   typedef unordered_map<vector<LabelT>,
-                        StateId, kaldi::VectorHasher<LabelT> > VectorToStateType;
+          StateId, kaldi::VectorHasher<LabelT> > VectorToStateType;
   typedef unordered_map<vector<LabelT>,
-                        Label, kaldi::VectorHasher<LabelT> > VectorToLabelType;
+          Label, kaldi::VectorHasher<LabelT> > VectorToLabelType;
 
   typedef typename VectorToStateType::const_iterator VectorToStateIter;
   typedef typename VectorToLabelType::const_iterator VectorToLabelIter;
 
   ContextFstImpl(Label subsequential_symbol,  // epsilon not allowed.
-                 const vector<LabelT> &phones,
-                 const vector<LabelT> &disambig_syms,
-                 int32 N,  // size of ctx window
-                 int32 P);
+      const vector<LabelT> &phones,
+      const vector<LabelT> &disambig_syms,
+      int32 N,             // size of ctx window
+      int32 P);
 
   ContextFstImpl(const ContextFstImpl &other);
 
@@ -138,7 +138,7 @@ class ContextFstImpl : public CacheImpl<Arc> {
   // This function expands arcs only [not final state weight].
   void Expand(StateId s);
 
- private:
+private:
   //! Finds state-id corresponding to this vector of phones.  Inserts it if necessary.
   StateId FindState(const vector<LabelT> &seq);
 
@@ -155,7 +155,7 @@ class ContextFstImpl : public CacheImpl<Arc> {
   inline void CreateDisambigArc(StateId s, Label olabel, Arc *oarc);  // called from CreateArc.
 
   inline bool CreatePhoneOrEpsArc(StateId src, StateId dst, Label olabel,
-                                  const vector<LabelT> &phone_seq, Arc *oarc);
+      const vector<LabelT> &phone_seq, Arc *oarc);
 
   // maps from vector<LabelT> to StateId.
   VectorToStateType state_map_;
@@ -199,15 +199,15 @@ class ContextFstImpl : public CacheImpl<Arc> {
    symbols, plus the subsequential symbol.  This is required to be able to
    enumerate all output symbols (if we want to access it in an inefficient way), and
    also to distinguish between phones and disambiguation symbols.
-*/
+ */
 
 template <class Arc,
-          class LabelT = int32> // make the vector<LabelT> things actually vector<int32> for
+    class LabelT = int32>       // make the vector<LabelT> things actually vector<int32> for
                                 // easier compatibility with Kaldi code.
-class ContextFst : public ImplToFst<internal::ContextFstImpl<Arc, LabelT>> {
- public:
-  friend class ArcIterator<ContextFst<Arc>>;
-  friend class StateIterator<ContextFst<Arc>>;
+class ContextFst : public ImplToFst<internal::ContextFstImpl<Arc, LabelT> > {
+public:
+  friend class ArcIterator<ContextFst<Arc> >;
+  friend class StateIterator<ContextFst<Arc> >;
 
   typedef typename Arc::Weight Weight;
   typedef typename Arc::Label Label;
@@ -218,17 +218,17 @@ class ContextFst : public ImplToFst<internal::ContextFstImpl<Arc, LabelT>> {
 
   /// See \ref graph_context for more details.
   ContextFst(Label subsequential_symbol,  // epsilon not allowed.
-             const vector<LabelT>& phones,  // symbols on output side of fst.
-             const vector<LabelT>& disambig_syms,  // symbols on output side of fst.
-             int32 N,  // Size of context window
-             int32 P)  // Pos of "central" phone in ctx window, from 0..N-1.
-      : ImplToFst<Impl>(std::make_shared<Impl>(
+      const vector<LabelT>& phones,         // symbols on output side of fst.
+      const vector<LabelT>& disambig_syms,         // symbols on output side of fst.
+      int32 N,         // Size of context window
+      int32 P)         // Pos of "central" phone in ctx window, from 0..N-1.
+    : ImplToFst<Impl>(std::make_shared<Impl>(
             subsequential_symbol, phones, disambig_syms, N, P)) {
     assert(std::numeric_limits<LabelT>::is_signed);
   }
 
   ContextFst(const ContextFst<Arc, LabelT> &fst, bool safe = false)
-      : ImplToFst<Impl>(fst, safe) {}
+    : ImplToFst<Impl>(fst, safe) {}
 
   ContextFst<Arc, LabelT> *Copy(bool safe = false) const override {
     return new ContextFst<Arc, LabelT>(*this, safe);
@@ -254,7 +254,7 @@ class ContextFst : public ImplToFst<internal::ContextFstImpl<Arc, LabelT>> {
     return GetImpl()->ILabelInfo();
   }
 
- private:
+private:
   using ImplToFst<Impl>::GetImpl;
   using ImplToFst<Impl>::GetMutableImpl;
 
@@ -265,21 +265,21 @@ class ContextFst : public ImplToFst<internal::ContextFstImpl<Arc, LabelT>> {
 /// writes as int32 for binary compatibility since it will typically be "int".
 template<class I>
 void WriteILabelInfo(std::ostream &os, bool binary,
-                     const vector<vector<I> > &info);
+    const vector<vector<I> > &info);
 
 /// Useful utility function for reading these vectors from disk.
 /// writes as int32 (see WriteILabelInfo above).
 template<class I>
 void ReadILabelInfo(std::istream &is, bool binary,
-                    vector<vector<I> > *info);
+    vector<vector<I> > *info);
 
 
 /// The following function is mainly of use for printing and debugging.
 template<class I>
 SymbolTable *CreateILabelInfoSymbolTable(const vector<vector<I> > &info,
-                                         const SymbolTable &phones_symtab,
-                                         std::string separator,
-                                         std::string disambig_prefix);  // e.g. separator = "/", disambig_prefix = "#"
+    const SymbolTable &phones_symtab,
+    std::string separator,
+    std::string disambig_prefix);                                       // e.g. separator = "/", disambig_prefix = "#"
 
 
 
@@ -287,8 +287,8 @@ SymbolTable *CreateILabelInfoSymbolTable(const vector<vector<I> > &info,
 // Just directs to use the one from CacheFst.
 template<class A>
 class StateIterator< ContextFst<A> >
-    : public CacheStateIterator< ContextFst<A> > {
- public:
+  : public CacheStateIterator< ContextFst<A> > {
+public:
   explicit StateIterator(const ContextFst<A> &fst)
     : CacheStateIterator< ContextFst<A> >(fst, fst.GetMutableImpl()) {}
 };
@@ -298,8 +298,8 @@ class StateIterator< ContextFst<A> >
 // Just directs to use the one from CacheFst.
 template <class A>
 class ArcIterator< ContextFst<A> >
-    : public CacheArcIterator< ContextFst<A> > {
- public:
+  : public CacheArcIterator< ContextFst<A> > {
+public:
   typedef typename A::StateId StateId;
 
   ArcIterator(const ContextFst<A> &fst, StateId s)
@@ -328,7 +328,7 @@ void ContextFst<Arc, I>::InitStateIterator(StateIteratorData<Arc> *data) const {
 
 template <class Arc, class LabelT>
 class ContextMatcher : public MatcherBase<Arc> {  // CAREFUL: templated on arc, not on FST like normal Matcher.
- public:
+public:
   typedef Fst<Arc> FST;  // basic FST type that we get passed
   // because this is used in composition, typically one side will be a ContextFst,
   // and one will be some other type which we just treat as Fst<Arc>
@@ -342,10 +342,10 @@ class ContextMatcher : public MatcherBase<Arc> {  // CAREFUL: templated on arc, 
   // Otherwise we do not match.
 
   ContextMatcher(const FST &fst, MatchType match_type)
-      : fst_(fst.Copy()),
-        match_label_(kNoLabel),
-        s_ (kNoStateId),
-        ready_(false) {
+    : fst_(fst.Copy()),
+    match_label_(kNoLabel),
+    s_ (kNoStateId),
+    ready_(false) {
     if (match_type == MATCH_OUTPUT && fst.Type() == (string)"context") {
       match_type_ = MATCH_OUTPUT;
     } else {
@@ -354,11 +354,11 @@ class ContextMatcher : public MatcherBase<Arc> {  // CAREFUL: templated on arc, 
   }
 
   ContextMatcher(const ContextMatcher<Arc, LabelT> &matcher, bool safe)
-      : fst_(matcher.fst_->Copy(safe)),
-        match_type_(matcher.match_type_),
-        match_label_(kNoLabel),
-        s_ (kNoStateId),
-        ready_(false) {}
+    : fst_(matcher.fst_->Copy(safe)),
+    match_type_(matcher.match_type_),
+    match_label_(kNoLabel),
+    s_ (kNoStateId),
+    ready_(false) {}
 
   virtual ~ContextMatcher() {
     delete fst_;
@@ -400,7 +400,7 @@ class ContextMatcher : public MatcherBase<Arc> {  // CAREFUL: templated on arc, 
   virtual uint64 Properties(uint64 props) const { return props; } // simple matcher that does
   // not change its FST, so properties are properties of FST it is applied to
 
- private:
+private:
   virtual void SetState_(StateId s) { SetState(s); }
   virtual bool Find_(Label label) { return Find(label); }
   virtual bool Done_() const { return Done(); }
@@ -427,11 +427,11 @@ class ContextMatcher : public MatcherBase<Arc> {  // CAREFUL: templated on arc, 
    a normal matcher.
    The fst ifst2 must have the subsequential loop (if not a left-context-only
    system)
-*/
+ */
 template<class Arc, class LabelT>
 void ComposeContextFst(const ContextFst<Arc, LabelT> &ifst1, const Fst<Arc> &ifst2,
-                       MutableFst<Arc> *ofst,
-                       const ComposeOptions &opts = ComposeOptions()) {
+    MutableFst<Arc> *ofst,
+    const ComposeOptions &opts = ComposeOptions()) {
   ComposeFstOptions<Arc, ContextMatcher<Arc, LabelT> > nopts;
   nopts.gc_limit = 0;  // Cache only the most recent state for fastest copy.
   *ofst = ComposeFst<Arc>(ifst1, ifst2, nopts);
@@ -446,29 +446,29 @@ void ComposeContextFst(const ContextFst<Arc, LabelT> &ifst1, const Fst<Arc> &ifs
    subsequential loop.
  */
 inline void ComposeContext(const vector<int32> &disambig_syms,
-                           int N, int P,
-                           VectorFst<StdArc> *ifst,
-                           VectorFst<StdArc> *ofst,
-                           vector<vector<int32> > *ilabels_out);
+    int N, int P,
+    VectorFst<StdArc> *ifst,
+    VectorFst<StdArc> *ofst,
+    vector<vector<int32> > *ilabels_out);
 
 
 /**
-  Modifies an FST so that it transuces the same paths, but the input side of the
-  paths can all have the subsequential symbol '$' appended to them any number of
-  times (we could easily specify the number of times, but accepting any number of
-  repetitions is just more convenient).  The actual way we do this is for each
-  final state, we add a transition with weight equal to the final-weight of that
-  state, with input-symbol '$' and output-symbols \<eps\>, and ending in a new
-  super-final state that has unit final-probability and a unit-weight self-loop
-  with '$' on its input and \<eps\> on its output.  The reason we don't just
-  add a loop to each final-state has to do with preserving stochasticity
-  (see \ref fst_algo_stochastic).  We keep the final-probability in all the
-  original final-states rather than setting them to zero, so the resulting FST
-  can accept zero '$' symbols at the end (in case we had no right context).
-*/
+   Modifies an FST so that it transuces the same paths, but the input side of the
+   paths can all have the subsequential symbol '$' appended to them any number of
+   times (we could easily specify the number of times, but accepting any number of
+   repetitions is just more convenient).  The actual way we do this is for each
+   final state, we add a transition with weight equal to the final-weight of that
+   state, with input-symbol '$' and output-symbols \<eps\>, and ending in a new
+   super-final state that has unit final-probability and a unit-weight self-loop
+   with '$' on its input and \<eps\> on its output.  The reason we don't just
+   add a loop to each final-state has to do with preserving stochasticity
+   (see \ref fst_algo_stochastic).  We keep the final-probability in all the
+   original final-states rather than setting them to zero, so the resulting FST
+   can accept zero '$' symbols at the end (in case we had no right context).
+ */
 template<class Arc>
 void AddSubsequentialLoop(typename Arc::Label subseq_symbol,
-                          MutableFst<Arc> *fst);
+    MutableFst<Arc> *fst);
 
 /// @}
 }  // namespace fst

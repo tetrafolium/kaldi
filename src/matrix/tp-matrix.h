@@ -36,20 +36,20 @@ template<typename Real>
 class TpMatrix : public PackedMatrix<Real> {
   friend class CuTpMatrix<float>;
   friend class CuTpMatrix<double>;
- public:
+public:
   TpMatrix() : PackedMatrix<Real>() {}
   explicit TpMatrix(MatrixIndexT r, MatrixResizeType resize_type = kSetZero)
-      : PackedMatrix<Real>(r, resize_type) {}
+    : PackedMatrix<Real>(r, resize_type) {}
   TpMatrix(const TpMatrix<Real>& orig) : PackedMatrix<Real>(orig) {}
 
   /// Copy constructor from CUDA TpMatrix
   /// This is defined in ../cudamatrix/cu-tp-matrix.cc
   explicit TpMatrix(const CuTpMatrix<Real> &cu);
-  
-  
+
+
   template<typename OtherReal> explicit TpMatrix(const TpMatrix<OtherReal>& orig)
-      : PackedMatrix<Real>(orig) {}
-  
+    : PackedMatrix<Real>(orig) {}
+
   Real operator() (MatrixIndexT r, MatrixIndexT c) const {
     if (static_cast<UnsignedMatrixIndexT>(c) >
         static_cast<UnsignedMatrixIndexT>(r)) {
@@ -76,7 +76,7 @@ class TpMatrix : public PackedMatrix<Real> {
   }
   // Note: Cholesky may throw std::runtime_error
   void Cholesky(const SpMatrix<Real>& orig);
-  
+
   void Invert();
 
   // Inverts in double precision.
@@ -95,11 +95,11 @@ class TpMatrix : public PackedMatrix<Real> {
   /// CopyFromMat copies the lower triangle of M into *this
   /// (or the upper triangle, if Trans == kTrans).
   void CopyFromMat(const MatrixBase<Real> &M,
-                   MatrixTransposeType Trans = kNoTrans);
+      MatrixTransposeType Trans = kNoTrans);
 
   /// This is implemented in ../cudamatrix/cu-tp-matrix.cc
   void CopyFromMat(const CuTpMatrix<Real> &other);
-  
+
   /// CopyFromTp copies another triangular matrix into this one.
   void CopyFromTp(const TpMatrix<Real> &other) {
     PackedMatrix<Real>::CopyFromPacked(other);

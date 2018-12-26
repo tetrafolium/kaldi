@@ -38,7 +38,7 @@ namespace kaldi {
 
 template<typename Real>
 void CuPackedMatrix<Real>::Resize(MatrixIndexT rows,
-                                  MatrixResizeType resize_type) {
+    MatrixResizeType resize_type) {
   // This code does not currently support the other resize_type options.
   KALDI_ASSERT(resize_type == kSetZero || resize_type == kUndefined);
 
@@ -181,7 +181,7 @@ void CuPackedMatrix<Real>::CopyToPacked(PackedMatrix<Real> *dst) const {
     if (num_rows_ == 0) return; // Nothing to do.
     CuTimer tim;
     size_t nr = static_cast<size_t>(num_rows_),
-      num_bytes = ((nr * (nr+1)) / 2) * sizeof(Real);
+        num_bytes = ((nr * (nr+1)) / 2) * sizeof(Real);
 
     CU_SAFE_CALL(cudaMemcpy(dst->data_, data_, num_bytes,
                             cudaMemcpyDeviceToHost));
@@ -195,14 +195,14 @@ void CuPackedMatrix<Real>::CopyToPacked(PackedMatrix<Real> *dst) const {
 }
 
 /*
-template<typename Real>
-void CuPackedMatrix<Real>::CopyRowsFromPacked(int32 r, const CuPackedMatrix<Real> &src, int32 src_ro, int32 dst_ro) {
-  KALDI_ASSERT(r+src_ro <= src.NumRows());
-  KALDI_ASSERT(r+dst_ro <= NumRows());
-  KALDI_ASSERT(NumCols() == src.NumCols());
+   template<typename Real>
+   void CuPackedMatrix<Real>::CopyRowsFromPacked(int32 r, const CuPackedMatrix<Real> &src, int32 src_ro, int32 dst_ro) {
+   KALDI_ASSERT(r+src_ro <= src.NumRows());
+   KALDI_ASSERT(r+dst_ro <= NumRows());
+   KALDI_ASSERT(NumCols() == src.NumCols());
 
-  #if HAVE_CUDA == 1
-  if (CuDevice::Instantiate().Enabled()) {
+ #if HAVE_CUDA == 1
+   if (CuDevice::Instantiate().Enabled()) {
     CuTimer tim;
 
     MatrixIndexT dst_pitch = stride_*sizeof(Real);
@@ -215,12 +215,12 @@ void CuPackedMatrix<Real>::CopyRowsFromPacked(int32 r, const CuPackedMatrix<Real
     CU_SAFE_CALL(cudaMemcpy2D(p_dst, dst_pitch, p_src, src_pitch, width, r, cudaMemcpyDeviceToDevice));
 
     CuDevice::Instantiate().AccuProfile("CuMatrix::CopyRowsD2D", tim);
-  } else
-  #endif
-  {
+   } else
+ #endif
+   {
     memcpy(Data()+dst_ro*stride_, src.Data()+src_ro*src.Stride(), r*stride_*sizeof(Real));
-  }
-} */
+   }
+   } */
 
 
 
@@ -245,7 +245,7 @@ void CuPackedMatrix<Real>::SetZero() {
   if (CuDevice::Instantiate().Enabled()) {
     CuTimer tim;
     size_t nr = static_cast<size_t>(num_rows_),
-      num_bytes = ((nr * (nr+1)) / 2) * sizeof(Real);
+        num_bytes = ((nr * (nr+1)) / 2) * sizeof(Real);
 
     CU_SAFE_CALL(cudaMemset(reinterpret_cast<void*>(this->data_), 0, num_bytes));
     CuDevice::Instantiate().AccuProfile("CuPackedMatrix::SetZero", tim);

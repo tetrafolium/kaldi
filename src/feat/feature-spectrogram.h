@@ -55,7 +55,7 @@ struct SpectrogramOptions {
 
 /// Class for computing spectrogram features.
 class SpectrogramComputer {
- public:
+public:
   typedef SpectrogramOptions Options;
   explicit SpectrogramComputer(const SpectrogramOptions &opts);
   SpectrogramComputer(const SpectrogramComputer &other);
@@ -86,15 +86,15 @@ class SpectrogramComputer {
        vector as a workspace, which is why it's a non-const pointer.
      @param [out] feature  Pointer to a vector of size this->Dim(), to which
          the computed feature will be written.
-  */
+   */
   void Compute(BaseFloat signal_log_energy,
-               BaseFloat vtln_warp,
-               VectorBase<BaseFloat> *signal_frame,
-               VectorBase<BaseFloat> *feature);
+      BaseFloat vtln_warp,
+      VectorBase<BaseFloat> *signal_frame,
+      VectorBase<BaseFloat> *feature);
 
   ~SpectrogramComputer();
 
- private:
+private:
   SpectrogramOptions opts_;
   BaseFloat log_energy_floor_;
   SplitRadixRealFft<BaseFloat> *srfft_;

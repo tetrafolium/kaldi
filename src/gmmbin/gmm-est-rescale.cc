@@ -35,20 +35,20 @@ int main(int argc, char *argv[]) {
         "  Does not update the transitions or weights.\n"
         "Usage: gmm-est-rescale [options] <model-in> <old-stats-in> <new-stats-in> <model-out>\n"
         "e.g.: gmm-est-rescale 1.mdl old.acc new.acc 2.mdl\n";
-    
+
     bool binary_write = true;
     MleDiagGmmOptions opts; // Not passed to command-line-- just a mechanism to
     // ensure our options have the same default values as those ones.
     BaseFloat min_variance = opts.min_variance;
     BaseFloat min_gaussian_occupancy = opts.min_gaussian_occupancy;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("min-variance", &min_variance,
                 "Variance floor (absolute variance).");
     po.Register("min-gaussian-occupancy", &min_gaussian_occupancy,
                 "Minimum occupancy to update a Gaussian.");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 4) {
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
     DoRescalingUpdate(old_gmm_accs, new_gmm_accs,
                       min_variance, min_gaussian_occupancy,
                       &am_gmm);
-    
+
     {
       Output ko(model_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);

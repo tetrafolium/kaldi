@@ -27,21 +27,21 @@
 int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
-    typedef kaldi::int32 int32;  
+    typedef kaldi::int32 int32;
 
     const char *usage =
         "Scale posteriors with either a global scale, or a different scale for "
         " each utterance.\n"
         "Usage: scale-post <post-rspecifier> (<scale-rspecifier>|<scale>) <post-wspecifier>\n";
-    
-    ParseOptions po(usage); 
+
+    ParseOptions po(usage);
     po.Read(argc, argv);
 
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
     }
-      
+
     std::string post_rspecifier = po.GetArg(1),
         scale_or_scale_rspecifier = po.GetArg(2),
         post_wspecifier = po.GetArg(3);
@@ -58,10 +58,10 @@ int main(int argc, char *argv[]) {
 
     SequentialPosteriorReader posterior_reader(post_rspecifier);
     RandomAccessBaseFloatReader scale_reader(scale_or_scale_rspecifier);
-    PosteriorWriter posterior_writer(post_wspecifier); 
+    PosteriorWriter posterior_writer(post_wspecifier);
 
-    int32 num_scaled = 0, num_no_scale = 0;  
-   
+    int32 num_scaled = 0, num_no_scale = 0;
+
     for (; !posterior_reader.Done(); posterior_reader.Next()) {
       std::string key = posterior_reader.Key();
       Posterior posterior = posterior_reader.Value();
@@ -70,9 +70,9 @@ int main(int argc, char *argv[]) {
         num_no_scale++;
       } else {
         BaseFloat post_scale = (scale_or_scale_rspecifier == "" ? global_scale
-                                : scale_reader.Value(key));
+            : scale_reader.Value(key));
         ScalePosterior(post_scale, &posterior);
-        num_scaled++; 
+        num_scaled++;
         posterior_writer.Write(key, posterior);
       }
     }

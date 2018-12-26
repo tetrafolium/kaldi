@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
       ReadBuildTreeStats(ki.Stream(), binary_in, gc, &stats);
     }
     KALDI_LOG << "Number of separate statistics is " << stats.size();
-    
+
     Questions qo;
     {
       bool binary_in;
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
           KALDI_VLOG(1) << "For pdf-id " << i << ", low count "
                         << SumNormalizer(split_stats[i]);
     }
-    
+
     ContextDependency ctx_dep(N, P, to_pdf);  // takes ownership
     // of pointer "to_pdf", so set it NULL.
     to_pdf = NULL;

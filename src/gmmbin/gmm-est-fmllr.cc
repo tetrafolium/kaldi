@@ -33,10 +33,10 @@ using std::vector;
 
 namespace kaldi {
 void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
-                            const Posterior &post,
-                            const TransitionModel &trans_model,
-                            const AmDiagGmm &am_gmm,
-                            FmllrDiagGmmAccs *spk_stats) {
+    const Posterior &post,
+    const TransitionModel &trans_model,
+    const AmDiagGmm &am_gmm,
+    FmllrDiagGmmAccs *spk_stats) {
   Posterior pdf_post;
   ConvertPosteriorToPdfs(trans_model, post, &pdf_post);
   for (size_t i = 0; i < post.size(); i++) {
@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
 
         if (static_cast<int32>(post.size()) != feats.NumRows()) {
           KALDI_WARN << "Posterior has wrong size " << (post.size())
-              << " vs. " << (feats.NumRows());
+                     << " vs. " << (feats.NumRows());
           num_other_error++;
           continue;
         }

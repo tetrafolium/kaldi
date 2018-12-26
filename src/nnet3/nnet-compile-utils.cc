@@ -46,10 +46,10 @@ struct FirstElementComparator {
 // This comparator is used with std::find_if function to search for pairs
 // whose first element is equal to the given pair
 struct FirstElementIsEqualComparator :
-      public std::unary_function<std::pair<int32, int32>, bool>
+  public std::unary_function<std::pair<int32, int32>, bool>
 {
-  explicit FirstElementIsEqualComparator(const int32 element):
-      element_(element) {}
+  explicit FirstElementIsEqualComparator(const int32 element) :
+    element_(element) {}
   bool operator() (std::pair<int32, int32> const &arg)
   { return (arg.first == element_); }
   int32 element_;
@@ -58,10 +58,10 @@ struct FirstElementIsEqualComparator :
 // This comparator is used with std::find_if function to search for pairs
 // whose .first and .second elements are equal to the given pair
 struct PairIsEqualComparator  :
-      public std::unary_function<std::pair<int32, int32>, bool>
+  public std::unary_function<std::pair<int32, int32>, bool>
 {
-  explicit PairIsEqualComparator(const std::pair<int32, int32> pair):
-      pair_(pair) {}
+  explicit PairIsEqualComparator(const std::pair<int32, int32> pair) :
+    pair_(pair) {}
   bool operator() (std::pair<int32, int32> const &arg)
   {
     if (pair_.first == arg.first)
@@ -76,7 +76,7 @@ struct PairIsEqualComparator  :
 // note, std::sort accepts an actual function as an alternative to a
 // function object.
 bool  SecondElementComparator(const std::pair<int32, int32>& first_pair,
-                              const std::pair<int32, int32>& second_pair) {
+    const std::pair<int32, int32>& second_pair) {
   if (first_pair.second == second_pair.second)
     return first_pair.first > second_pair.first;
   return first_pair.second > second_pair.second;
@@ -85,14 +85,14 @@ bool  SecondElementComparator(const std::pair<int32, int32>& first_pair,
 // Function to sort the lists in a vector of lists of pairs, by the first
 // element of the pair
 void SortSubmatLists(
-    // vector of list of location pairs
-    const std::vector<std::vector<std::pair<int32, int32> > > submat_lists,
-    // a copy of the input submat_lists where the lists are sorted
-    // (this will be used in the caller function for sort and find functions)
-    std::vector<std::vector<std::pair<int32, int32> > > * sorted_submat_lists,
-    // maximum size of the submat_lists
-    int32* max_submat_list_size
-    )
+  // vector of list of location pairs
+  const std::vector<std::vector<std::pair<int32, int32> > > submat_lists,
+  // a copy of the input submat_lists where the lists are sorted
+  // (this will be used in the caller function for sort and find functions)
+  std::vector<std::vector<std::pair<int32, int32> > > * sorted_submat_lists,
+  // maximum size of the submat_lists
+  int32* max_submat_list_size
+  )
 {
   *max_submat_list_size = 0;
   sorted_submat_lists->reserve(submat_lists.size());
@@ -102,7 +102,7 @@ void SortSubmatLists(
       *max_submat_list_size = submat_lists[i].size();
     sorted_submat_lists->push_back(submat_lists[i]);
     std::sort((*sorted_submat_lists)[i].begin(),
-              (*sorted_submat_lists)[i].end(),
+        (*sorted_submat_lists)[i].end(),
               FirstElementComparator());
   }
 }
@@ -111,16 +111,16 @@ void SortSubmatLists(
 // which is the first_element in the location pair, given vector of list of
 // location pairs
 void ComputeSubmatIndexHistogram(
-    // vector of list of pairs of location pairs where the lists are sorted
-    // by submat_indexes (.first element)
-    const std::vector<std::vector<std::pair<int32, int32> > >
-    sorted_submat_lists,
-    // a histogram of submat_indexes where
-    // the keys are submat_indexes and values are a vector of frequencies
-    // of first occurrence, second occurrence, etc. of a submat_index
-    // in a submat_list
-    unordered_map<int32, std::vector<int32> >* submat_histogram
-    ) {
+  // vector of list of pairs of location pairs where the lists are sorted
+  // by submat_indexes (.first element)
+  const std::vector<std::vector<std::pair<int32, int32> > >
+  sorted_submat_lists,
+  // a histogram of submat_indexes where
+  // the keys are submat_indexes and values are a vector of frequencies
+  // of first occurrence, second occurrence, etc. of a submat_index
+  // in a submat_list
+  unordered_map<int32, std::vector<int32> >* submat_histogram
+  ) {
   KALDI_ASSERT(sorted_submat_lists.size() > 0);
   // computing the submat_histogram
   // counting the occurrences of each element in the current submat_list;
@@ -129,7 +129,7 @@ void ComputeSubmatIndexHistogram(
   for (int32 i = 0; i < sorted_submat_lists.size(); i++) {
     int j = 0;
     unordered_map<int32, std::vector<int32> >::iterator histogram_iterator
-        = submat_histogram->end();
+      = submat_histogram->end();
     int32 repetition_count = 0;
     while (j < sorted_submat_lists[i].size()) {
       if ((histogram_iterator == submat_histogram->end()) ||
@@ -165,16 +165,16 @@ void ComputeSubmatIndexHistogram(
 // pointing to the position of the pair in the list or to the
 // end of the list (when the pair is not present)
 void FindSubmatIndexInSubmatLists(
-    // submat_index to search in the submat_lists
-    int32 submat_index,
-    // sorted_submat_lists is a pointer as we want non-const iterators in the
-    // output
-    std::vector<std::vector<std::pair<int32, int32> > > *sorted_submat_lists,
-    // a vector of iterators to store the location of the pairs
-    std::vector<std::vector<std::pair<int32, int32> >::iterator>
-    *output_iterator_list,
-    // the max size of the submat_lists if the found pairs have been removed
-    int32 *max_remaining_submat_list_size) {
+  // submat_index to search in the submat_lists
+  int32 submat_index,
+  // sorted_submat_lists is a pointer as we want non-const iterators in the
+  // output
+  std::vector<std::vector<std::pair<int32, int32> > > *sorted_submat_lists,
+  // a vector of iterators to store the location of the pairs
+  std::vector<std::vector<std::pair<int32, int32> >::iterator>
+  *output_iterator_list,
+  // the max size of the submat_lists if the found pairs have been removed
+  int32 *max_remaining_submat_list_size) {
 
   output_iterator_list->reserve(sorted_submat_lists->size());
   *max_remaining_submat_list_size = 0;
@@ -192,8 +192,8 @@ void FindSubmatIndexInSubmatLists(
       remaining_submat_list_size--;
     }
     *max_remaining_submat_list_size = remaining_submat_list_size
-                                      > *max_remaining_submat_list_size ? remaining_submat_list_size :
-                                      *max_remaining_submat_list_size;
+        > *max_remaining_submat_list_size ? remaining_submat_list_size :
+        *max_remaining_submat_list_size;
   }
 }
 
@@ -201,10 +201,10 @@ void FindSubmatIndexInSubmatLists(
 // from a vector of list of pairs, "to extract" means to copy into
 // a list and erase the original pair from the submat_lists
 void ExtractGivenPairsFromSubmatLists(
-    std::vector<std::vector<std::pair<int32, int32> >::iterator>
-    &input_iterator_list,
-    std::vector<std::vector<std::pair<int32, int32> > > *sorted_submat_lists,
-    std::vector<std::pair<int32, int32> > *list_of_pairs) {
+  std::vector<std::vector<std::pair<int32, int32> >::iterator>
+  &input_iterator_list,
+  std::vector<std::vector<std::pair<int32, int32> > > *sorted_submat_lists,
+  std::vector<std::pair<int32, int32> > *list_of_pairs) {
   list_of_pairs->reserve(sorted_submat_lists->size());
   for (int32 i = 0; i < input_iterator_list.size(); i++) {
     if (input_iterator_list[i] != (*sorted_submat_lists)[i].end()) {
@@ -222,8 +222,8 @@ void ExtractGivenPairsFromSubmatLists(
 // Function to extract the last pairs from a vector of list of pairs
 // a dummy is added when the list is empty
 static void ExtractLastPairFromSubmatLists(
-    std::vector<std::vector<std::pair<int32, int32> > > *sorted_submat_lists,
-    std::vector<std::pair<int32, int32> > *list_of_pairs) {
+  std::vector<std::vector<std::pair<int32, int32> > > *sorted_submat_lists,
+  std::vector<std::pair<int32, int32> > *list_of_pairs) {
   list_of_pairs->reserve(sorted_submat_lists->size());
   for (int32 i = 0; i < sorted_submat_lists->size(); i++) {
     if ((*sorted_submat_lists)[i].size() == 0)  {
@@ -241,16 +241,16 @@ static void ExtractLastPairFromSubmatLists(
 // sorted submat_lists and uses submat_histogram_vector.
 // See SplitLocations, below for the algorithm
 static void SplitLocationsUsingSubmatHistogram(
-    // maximum size of the lists in the sorted_submat_lists
-    int32 max_submat_list_size,
-    // a vector of list of pairs where each list is expected to be sorted
-    // this is a pointer as the lists will be modified
-    std::vector<std::vector<std::pair<int32, int32> > > *sorted_submat_lists,
-    // a vector of pairs to represent a histogram
-    // this is a pointer as the vector will be sorted
-    std::vector<std::pair<int32, int32> > *submat_histogram_vector,
-    // a vector of lists of pairs with rearranged pairs
-    std::vector<std::vector<std::pair<int32, int32> > > *split_lists)  {
+  // maximum size of the lists in the sorted_submat_lists
+  int32 max_submat_list_size,
+  // a vector of list of pairs where each list is expected to be sorted
+  // this is a pointer as the lists will be modified
+  std::vector<std::vector<std::pair<int32, int32> > > *sorted_submat_lists,
+  // a vector of pairs to represent a histogram
+  // this is a pointer as the vector will be sorted
+  std::vector<std::pair<int32, int32> > *submat_histogram_vector,
+  // a vector of lists of pairs with rearranged pairs
+  std::vector<std::vector<std::pair<int32, int32> > > *split_lists)  {
 
   // sort the submat_histogram_vector based on second element of pair
   // in descending order then first element of pair in descending order
@@ -260,11 +260,11 @@ static void SplitLocationsUsingSubmatHistogram(
   int32 prev_max_remaining_submat_list_size = max_submat_list_size;
   std::vector<std::pair<int32, int32> >::iterator iter;
   for (iter = submat_histogram_vector->begin();
-       iter != submat_histogram_vector->end();
-       ++iter)  {
+      iter != submat_histogram_vector->end();
+      ++iter)  {
     std::pair<int32, int32> submat_index_and_count = *iter;
     std::vector<std::vector<std::pair<int32, int32> >::iterator>
-        output_iterator_list;
+    output_iterator_list;
     int32 max_remaining_submat_list_size = 0;
     FindSubmatIndexInSubmatLists(submat_index_and_count.first,
                                  sorted_submat_lists,
@@ -335,8 +335,8 @@ static void SplitLocationsUsingSubmatHistogram(
 // number of kAddRows calls can accumulate compensating for the additional calls
 
 void SplitLocations(
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
 
   // a histogram of the submat_indexes in the submat_lists
   // each occurence in a given submat_list is considered unique so we maintain
@@ -349,7 +349,7 @@ void SplitLocations(
 
   // initializing a vector of list of pairs to store the sorted submat_lists
   std::vector<std::vector< std::pair<int32, int32> > >
-      sorted_submat_lists;
+  sorted_submat_lists;
   SortSubmatLists(submat_lists, &sorted_submat_lists, &max_submat_list_size);
   ComputeSubmatIndexHistogram(sorted_submat_lists, &submat_histogram);
   // the vector has same information as the submat_histogram, but it is
@@ -359,8 +359,8 @@ void SplitLocations(
   // copy the key, occurence_counts from submat_histogram to a vector
   unordered_map<int32, std::vector<int32> >::iterator hist_iter;
   for (hist_iter = submat_histogram.begin();
-       hist_iter != submat_histogram.end();
-       ++hist_iter) {
+      hist_iter != submat_histogram.end();
+      ++hist_iter) {
     for (int32 i = 0; i < (hist_iter->second).size(); i++)  {
       submat_histogram_vector.push_back(
           std::make_pair(hist_iter->first, (hist_iter->second)[i]));
@@ -375,9 +375,9 @@ void SplitLocations(
    .second elements into "second_values", and return true.  Otherwise return
    false and the outputs are don't-cares. */
 bool ConvertToIndexes(
-    const std::vector<std::pair<int32, int32> > &location_vector,
-    int32 *first_value,
-    std::vector<int32> *second_values)  {
+  const std::vector<std::pair<int32, int32> > &location_vector,
+  int32 *first_value,
+  std::vector<int32> *second_values)  {
   *first_value = -1;
   second_values->clear();
   second_values->reserve(location_vector.size());
@@ -399,8 +399,8 @@ bool ConvertToIndexes(
 
 // see declaration in header for documentation
 void EnsureContiguousProperty(
-    const std::vector<int32> &indexes,
-    std::vector<std::vector<int32> > *indexes_out) {
+  const std::vector<int32> &indexes,
+  std::vector<std::vector<int32> > *indexes_out) {
   indexes_out->clear();
   indexes_out->reserve(3);
   if (indexes.empty()) return;
@@ -463,12 +463,12 @@ void EnsureContiguousProperty(
                      repeats other than the pair (-1,-1), e.g. if the pair
                      (10,11) appears 4 times in 'list' and that is the most,
                      split_lists->size() == 4.
-*/
+ */
 void SplitPairList(std::vector<std::pair<int32, int32> >& list,
-                   std::vector<std::vector<std::pair<int32, int32> > >* split_lists) {
+    std::vector<std::vector<std::pair<int32, int32> > >* split_lists) {
   split_lists->clear();
   typedef unordered_map<std::pair<int32, int32>,
-                        int32, PairHasher<int32> > MapType;
+          int32, PairHasher<int32> > MapType;
   // this maps a pair not equal to -1,-1, to the number of times we've already seen it.
   MapType pair_to_count;
   int32 cur_num_lists = 0;
@@ -496,8 +496,8 @@ void SplitPairList(std::vector<std::pair<int32, int32> >& list,
 }
 
 void SplitLocationsBackward(
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
   std::vector<std::vector<std::pair<int32, int32> > > split_lists_intermediate;
   // Split the submat_lists
   SplitLocations(submat_lists, &split_lists_intermediate);
@@ -554,8 +554,8 @@ void SplitLocationsBackward(
 // so that indexes[j] == i for all j such that (*reverse_indexes)[i].first <= j
 // && j < (*reverse_indexes)[i].second.
 bool HasContiguousProperty(
-    const std::vector<int32> &indexes,
-    std::vector<std::pair<int32, int32> > *reverse_indexes) {
+  const std::vector<int32> &indexes,
+  std::vector<std::pair<int32, int32> > *reverse_indexes) {
   reverse_indexes->clear();
   int32 num_indexes = indexes.size();
   if (num_indexes == 0)
@@ -601,17 +601,17 @@ bool HasContiguousProperty(
 
 // see comment in header.
 void GetNxList(const std::vector<Index> &indexes,
-               std::vector<std::pair<int32, int32> > *pairs) {
+    std::vector<std::pair<int32, int32> > *pairs) {
   // set of (n,x) pairs
   std::unordered_set<std::pair<int32, int32>, PairHasher<int32> > n_x_set;
 
   for (std::vector<Index>::const_iterator iter = indexes.begin();
-       iter != indexes.end(); ++iter)
+      iter != indexes.end(); ++iter)
     n_x_set.insert(std::pair<int32, int32>(iter->n, iter->x));
   pairs->clear();
   pairs->reserve(n_x_set.size());
   for (std::unordered_set<std::pair<int32, int32>, PairHasher<int32> >::iterator
-           iter = n_x_set.begin(); iter != n_x_set.end(); ++iter)
+      iter = n_x_set.begin(); iter != n_x_set.end(); ++iter)
     pairs->push_back(*iter);
   std::sort(pairs->begin(), pairs->end());
 }
@@ -619,18 +619,18 @@ void GetNxList(const std::vector<Index> &indexes,
 
 // see comment in header.
 void GetTList(const std::vector<Index> &indexes,
-              std::vector<int32> *t_values) {
+    std::vector<int32> *t_values) {
   // set of t values
   std::unordered_set<int32> t_set;
 
   for (std::vector<Index>::const_iterator iter = indexes.begin();
-       iter != indexes.end(); ++iter)
+      iter != indexes.end(); ++iter)
     if (iter->t != kNoTime)
       t_set.insert(iter->t);
   t_values->clear();
   t_values->reserve(t_set.size());
   for (std::unordered_set<int32>::iterator iter = t_set.begin();
-       iter != t_set.end(); ++iter)
+      iter != t_set.end(); ++iter)
     t_values->push_back(*iter);
   std::sort(t_values->begin(), t_values->end());
 }

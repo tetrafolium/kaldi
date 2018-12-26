@@ -27,11 +27,11 @@
 #include "tree/cluster-utils.h"
 
 /*
-  This header provides the declarations for the class ContextDependency, which inherits
-  from the interface class "ContextDependencyInterface" in itf/context-dep-itf.h.
-  This is basically a wrapper around an EventMap.  The EventMap
-  (tree/event-map.h) declares most of the internals of the class, and the building routines are
-  in build-tree.h which uses build-tree-utils.h, which uses cluster-utils.h . */
+   This header provides the declarations for the class ContextDependency, which inherits
+   from the interface class "ContextDependencyInterface" in itf/context-dep-itf.h.
+   This is basically a wrapper around an EventMap.  The EventMap
+   (tree/event-map.h) declares most of the internals of the class, and the building routines are
+   in build-tree.h which uses build-tree-utils.h, which uses cluster-utils.h . */
 
 
 namespace kaldi {
@@ -57,7 +57,7 @@ static const EventKeyType kPdfClass = -1;  // The "name" to which we assign the
    of actually using them, we do not put any training code into the ContextDependency class.
  */
 class ContextDependency: public ContextDependencyInterface {
- public:
+public:
   virtual int32 ContextWidth() const { return N_; }
   virtual int32 CentralPosition() const { return P_; }
 
@@ -66,7 +66,7 @@ class ContextDependency: public ContextDependencyInterface {
   /// outside the sequence (due to end effects), put zero.  Naturally
   /// phoneseq[CentralPosition()] must be nonzero.
   virtual bool Compute(const std::vector<int32> &phoneseq,
-                       int32 pdf_class, int32 *pdf_id) const;
+      int32 pdf_class, int32 *pdf_id) const;
 
   virtual int32 NumPdfs() const {
     // this routine could be simplified to return to_pdf_->MaxResult()+1.  we're a
@@ -85,12 +85,12 @@ class ContextDependency: public ContextDependencyInterface {
 
   // Constructor with no arguments; will normally be called
   // prior to Read()
-  ContextDependency(): N_(0), P_(0), to_pdf_(NULL) { }
+  ContextDependency() : N_(0), P_(0), to_pdf_(NULL) { }
 
   // Constructor takes ownership of pointers.
   ContextDependency(int32 N, int32 P,
-                    EventMap *to_pdf):
-      N_(N), P_(P), to_pdf_(to_pdf) { }
+      EventMap *to_pdf) :
+    N_(N), P_(P), to_pdf_(to_pdf) { }
   void Write (std::ostream &os, bool binary) const;
 
   ~ContextDependency() { delete to_pdf_; }
@@ -104,10 +104,10 @@ class ContextDependency: public ContextDependencyInterface {
   /// only be called if the HmmTopology object's IsHmm() function call returns
   /// true.
   virtual void GetPdfInfo(
-      const std::vector<int32> &phones,  // list of phones
-      const std::vector<int32> &num_pdf_classes,  // indexed by phone,
-      std::vector<std::vector<std::pair<int32, int32> > > *pdf_info)
-      const;
+    const std::vector<int32> &phones,    // list of phones
+    const std::vector<int32> &num_pdf_classes,    // indexed by phone,
+    std::vector<std::vector<std::pair<int32, int32> > > *pdf_info)
+  const;
 
   /// This function outputs information about what possible pdf-ids can
   /// be generated for HMM-states; it covers the general case where
@@ -127,29 +127,29 @@ class ContextDependency: public ContextDependencyInterface {
   /// we can have.
   /// This is less efficient than the other version of GetPdfInfo().
   virtual void GetPdfInfo(
-      const std::vector<int32> &phones,
-      const std::vector<std::vector<std::pair<int32, int32> > > &pdf_class_pairs,
-      std::vector<std::vector<std::vector<std::pair<int32, int32> > > > *pdf_info)
-      const;
+    const std::vector<int32> &phones,
+    const std::vector<std::vector<std::pair<int32, int32> > > &pdf_class_pairs,
+    std::vector<std::vector<std::vector<std::pair<int32, int32> > > > *pdf_info)
+  const;
 
- private:
+private:
   int32 N_;  //
   int32 P_;
   EventMap *to_pdf_;  // owned here.
 
   // 'context' is the context-window of phones, of
-  // length N, with -1 for those positions where phones 
-  // that are currently unknown, treated as wildcards; at least 
-  // the central phone [position P] must be a real phone, i.e. 
-  // not -1. 
-  // This function inserts any allowed pairs (forward_pdf, self_loop_pdf) 
+  // length N, with -1 for those positions where phones
+  // that are currently unknown, treated as wildcards; at least
+  // the central phone [position P] must be a real phone, i.e.
+  // not -1.
+  // This function inserts any allowed pairs (forward_pdf, self_loop_pdf)
   // to the set "pairs".
   void EnumeratePairs(
-      const std::vector<int32> &phones,
-      int32 self_loop_pdf_class, int32 forward_pdf_class,
-      const std::vector<int32> &context,
-      unordered_set<std::pair<int32,int32>, PairHasher<int32> > *pairs)
-      const;
+    const std::vector<int32> &phones,
+    int32 self_loop_pdf_class, int32 forward_pdf_class,
+    const std::vector<int32> &context,
+    unordered_set<std::pair<int32,int32>, PairHasher<int32> > *pairs)
+  const;
 
   KALDI_DISALLOW_COPY_AND_ASSIGN(ContextDependency);
 };
@@ -163,15 +163,15 @@ class ContextDependency: public ContextDependencyInterface {
 ///          of pdf classes (e.g. states) for that phone.
 /// @return Returns the a context dependency object.
 ContextDependency *GenRandContextDependency(const std::vector<int32> &phones,
-                                            bool ensure_all_covered,
-                                            std::vector<int32> *num_pdf_classes);
+    bool ensure_all_covered,
+    std::vector<int32> *num_pdf_classes);
 
 /// GenRandContextDependencyLarge is like GenRandContextDependency but generates a larger tree
 /// with specified N and P for use in "one-time" larger-scale tests.
 ContextDependency *GenRandContextDependencyLarge(const std::vector<int32> &phones,
-                                                 int N, int P,
-                                                 bool ensure_all_covered,
-                                                 std::vector<int32> *num_pdf_classes);
+    int N, int P,
+    bool ensure_all_covered,
+    std::vector<int32> *num_pdf_classes);
 
 // MonophoneContextDependency() returns a new ContextDependency object that
 // corresponds to a monophone system.
@@ -181,14 +181,14 @@ ContextDependency *GenRandContextDependencyLarge(const std::vector<int32> &phone
 
 ContextDependency*
 MonophoneContextDependency(const std::vector<int32> phones,
-                           const std::vector<int32> phone2num_pdf_classes);
+    const std::vector<int32> phone2num_pdf_classes);
 
 // MonophoneContextDependencyShared is as MonophoneContextDependency but lets
 // you define classes of phones which share pdfs (e.g. different stress-markers of a single
 // phone.)  Each element of phone_classes is a set of phones that are in that class.
 ContextDependency*
 MonophoneContextDependencyShared(const std::vector<std::vector<int32> > phone_classes,
-                                 const std::vector<int32> phone2num_pdf_classes);
+    const std::vector<int32> phone2num_pdf_classes);
 
 
 // Important note:

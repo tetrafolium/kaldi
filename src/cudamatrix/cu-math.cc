@@ -78,8 +78,8 @@ void RegularizeL1(CuMatrixBase<Real> *weight, CuMatrixBase<Real> *grad, Real l1,
 
 template<typename Real>
 void Randomize(const CuMatrixBase<Real> &src,
-               const CuArray<int32> &copy_from_idx,
-               CuMatrixBase<Real> *tgt) {
+    const CuArray<int32> &copy_from_idx,
+    CuMatrixBase<Real> *tgt) {
 
   KALDI_ASSERT(src.NumCols() == tgt->NumCols());
   KALDI_ASSERT(src.NumRows() == tgt->NumRows());
@@ -90,10 +90,10 @@ void Randomize(const CuMatrixBase<Real> &src,
     CuTimer tim;
 
     /*
-    Note: default 16x16 block-size limits the --cachesize to matrix size 16*65535 x 16*65535
-    dim3 dimBlock(CU2DBLOCK, CU2DBLOCK);
-    dim3 dimGrid(n_blocks(tgt->NumCols(), CU2DBLOCK), n_blocks(copy_from_idx.Dim(), CU2DBLOCK));
-    */
+       Note: default 16x16 block-size limits the --cachesize to matrix size 16*65535 x 16*65535
+       dim3 dimBlock(CU2DBLOCK, CU2DBLOCK);
+       dim3 dimGrid(n_blocks(tgt->NumCols(), CU2DBLOCK), n_blocks(copy_from_idx.Dim(), CU2DBLOCK));
+     */
 
     /*
      * Let's use blocksize 4 x 128 (512 threads/block)
@@ -130,7 +130,7 @@ void Randomize(const CuMatrixBase<Real> &src,
 
 template<typename Real>
 void Splice(const CuMatrixBase<Real> &src, const CuArray<int32> &frame_offsets,
-            CuMatrixBase<Real> *tgt) {
+    CuMatrixBase<Real> *tgt) {
 
   KALDI_ASSERT(src.NumCols()*frame_offsets.Dim() == tgt->NumCols());
   KALDI_ASSERT(src.NumRows() == tgt->NumRows());
@@ -171,7 +171,7 @@ void Splice(const CuMatrixBase<Real> &src, const CuArray<int32> &frame_offsets,
 
 template<typename Real>
 void Copy(const CuMatrixBase<Real> &src, const CuArray<int32> &copy_from_indices,
-          CuMatrixBase<Real> *tgt) {
+    CuMatrixBase<Real> *tgt) {
 
   KALDI_ASSERT(copy_from_indices.Dim() == tgt->NumCols());
   KALDI_ASSERT(src.NumRows() == tgt->NumRows());
@@ -213,25 +213,25 @@ void RegularizeL1(CuMatrixBase<double> *weight, CuMatrixBase<double> *grad, doub
 
 template
 void Splice(const CuMatrixBase<float> &src, const CuArray<int32> &frame_offsets,
-            CuMatrixBase<float> *tgt);
+    CuMatrixBase<float> *tgt);
 template
 void Splice(const CuMatrixBase<double> &src, const CuArray<int32> &frame_offsets,
-            CuMatrixBase<double> *tgt);
+    CuMatrixBase<double> *tgt);
 template
 void Copy(const CuMatrixBase<float> &src, const CuArray<int32> &copy_from_indices,
-          CuMatrixBase<float> *tgt);
+    CuMatrixBase<float> *tgt);
 template
 void Copy(const CuMatrixBase<double> &src, const CuArray<int32> &copy_from_indices,
-          CuMatrixBase<double> *tgt);
+    CuMatrixBase<double> *tgt);
 
 template
 void Randomize(const CuMatrixBase<float> &src,
-               const CuArray<int32> &copy_from_idx,
-               CuMatrixBase<float> *tgt);
+    const CuArray<int32> &copy_from_idx,
+    CuMatrixBase<float> *tgt);
 template
 void Randomize(const CuMatrixBase<double> &src,
-               const CuArray<int32> &copy_from_idx,
-               CuMatrixBase<double> *tgt);
+    const CuArray<int32> &copy_from_idx,
+    CuMatrixBase<double> *tgt);
 
 // The output y_i = scale * x_i,
 // and we want to RMS value of the y_i to equal target_rms,
@@ -244,7 +244,7 @@ void Randomize(const CuMatrixBase<double> &src,
 // is an extra dimension of the output.
 template<typename Real>
 void NormalizePerRow(const CuMatrixBase<Real>& in, const Real target_rms,
-                     const bool add_log_stddev, CuMatrixBase<Real>* out) {
+    const bool add_log_stddev, CuMatrixBase<Real>* out) {
   const Real kSquaredNormFloor = 1.3552527156068805425e-20; // 2^-66
   if (add_log_stddev) {
     KALDI_ASSERT(in.NumRows() == out->NumRows());
@@ -285,10 +285,10 @@ void NormalizePerRow(const CuMatrixBase<Real>& in, const Real target_rms,
 
 template
 void NormalizePerRow(const CuMatrixBase<float>& in, const float target_rms,
-                     const bool add_log_stddev, CuMatrixBase<float>* out);
+    const bool add_log_stddev, CuMatrixBase<float>* out);
 template
 void NormalizePerRow(const CuMatrixBase<double>& in, const double target_rms,
-                     const bool add_log_stddev, CuMatrixBase<double>* out);
+    const bool add_log_stddev, CuMatrixBase<double>* out);
 
 
 // A note on the derivative of NormalizeComponent...
@@ -313,9 +313,9 @@ void NormalizePerRow(const CuMatrixBase<double>& in, const double target_rms,
 // dF/dx_i = dF/df . df/dx_i => df/dx_i = x_i/(x^T x)
 template<typename Real>
 void DiffNormalizePerRow(const CuMatrixBase<Real> &in_value,
-                         const CuMatrixBase<Real> &out_deriv,
-                         const Real target_rms, const bool add_log_stddev,
-                         CuMatrixBase<Real>* in_deriv) {
+    const CuMatrixBase<Real> &out_deriv,
+    const Real target_rms, const bool add_log_stddev,
+    CuMatrixBase<Real>* in_deriv) {
   const Real kSquaredNormFloor = 1.3552527156068805425e-20; // 2^-66
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
@@ -332,7 +332,7 @@ void DiffNormalizePerRow(const CuMatrixBase<Real> &in_value,
 #endif
   {
     const CuSubMatrix<Real> out_deriv_no_log(out_deriv, 0, out_deriv.NumRows(),
-                                             0, in_value.NumCols());
+        0, in_value.NumCols());
     CuVector<Real> dot_products(out_deriv.NumRows());
     dot_products.AddDiagMatMat(1.0, out_deriv_no_log, kNoTrans, in_value,
                                kTrans, 0.0);
@@ -375,14 +375,14 @@ void DiffNormalizePerRow(const CuMatrixBase<Real> &in_value,
 
 template
 void DiffNormalizePerRow(const CuMatrixBase<float> &in_value,
-                         const CuMatrixBase<float> &out_deriv,
-                         const float target_rms, const bool add_log_stddev,
-                         CuMatrixBase<float>* in_deriv);
+    const CuMatrixBase<float> &out_deriv,
+    const float target_rms, const bool add_log_stddev,
+    CuMatrixBase<float>* in_deriv);
 template
 void DiffNormalizePerRow(const CuMatrixBase<double> &in_value,
-                         const CuMatrixBase<double> &out_deriv,
-                         const double target_rms, const bool add_log_stddev,
-                         CuMatrixBase<double>* in_deriv);
+    const CuMatrixBase<double> &out_deriv,
+    const double target_rms, const bool add_log_stddev,
+    CuMatrixBase<double>* in_deriv);
 
 
 // not calling this Sigmoid to reduce the chance of future collisions.
@@ -409,11 +409,11 @@ static inline Real ScalarTanh(Real a) {
 
 template<typename Real>
 void CpuComputeLstmNonlinearity(const MatrixBase<Real> &input_mat,
-                                const MatrixBase<Real> &params_mat,
-                                MatrixBase<Real> *output) {
+    const MatrixBase<Real> &params_mat,
+    MatrixBase<Real> *output) {
   int32 num_rows = input_mat.NumRows(),
       input_cols = input_mat.NumCols(),
-        cell_dim = input_cols / 5;
+      cell_dim = input_cols / 5;
   KALDI_ASSERT(input_cols == (cell_dim * 5) || input_cols == (cell_dim * 5) + 3);
   KALDI_ASSERT(output->NumRows() == num_rows);
   KALDI_ASSERT(params_mat.NumRows() == 3);
@@ -426,9 +426,9 @@ void CpuComputeLstmNonlinearity(const MatrixBase<Real> &input_mat,
   for (int32 r = 0; r < num_rows; r++) {
     const Real *input_row = input_mat.RowData(r);
     // i_scale and f_scale relate to dropout, they will normally be 1.0.
-    Real i_scale = (input_cols == cell_dim*5 ? 1.0:input_row[cell_dim*5]),
-         f_scale = (input_cols == cell_dim*5 ? 1.0:input_row[cell_dim*5 + 1]),
-         o_scale = (input_cols == cell_dim*5 ? 1.0:input_row[cell_dim*5 + 2]);
+    Real i_scale = (input_cols == cell_dim*5 ? 1.0 : input_row[cell_dim*5]),
+        f_scale = (input_cols == cell_dim*5 ? 1.0 : input_row[cell_dim*5 + 1]),
+        o_scale = (input_cols == cell_dim*5 ? 1.0 : input_row[cell_dim*5 + 2]);
 
     Real *output_row = output_mat.RowData(r);
     for (int32 c = 0; c < cell_dim; c++) {
@@ -453,11 +453,11 @@ void CpuComputeLstmNonlinearity(const MatrixBase<Real> &input_mat,
 
 template<typename Real>
 void ComputeLstmNonlinearity(const CuMatrixBase<Real> &input,
-                             const CuMatrixBase<Real> &params,
-                             CuMatrixBase<Real> *output) {
+    const CuMatrixBase<Real> &params,
+    CuMatrixBase<Real> *output) {
   int32 num_rows = input.NumRows(),
       input_cols = input.NumCols(),
-        cell_dim = input_cols / 5;
+      cell_dim = input_cols / 5;
   KALDI_ASSERT(input_cols == (cell_dim * 5) || input_cols == (cell_dim * 5) + 3);
   KALDI_ASSERT(output->NumRows() == num_rows);
   KALDI_ASSERT(params.NumRows() == 3);
@@ -490,37 +490,37 @@ void ComputeLstmNonlinearity(const CuMatrixBase<Real> &input,
 
 template
 void CpuComputeLstmNonlinearity(const MatrixBase<float> &input_mat,
-                                const MatrixBase<float> &params_mat,
-                                MatrixBase<float> *output);
+    const MatrixBase<float> &params_mat,
+    MatrixBase<float> *output);
 template
 void CpuComputeLstmNonlinearity(const MatrixBase<double> &input_mat,
-                                const MatrixBase<double> &params_mat,
-                                MatrixBase<double> *output);
+    const MatrixBase<double> &params_mat,
+    MatrixBase<double> *output);
 template
 void ComputeLstmNonlinearity(const CuMatrixBase<float> &input,
-                             const CuMatrixBase<float> &params,
-                             CuMatrixBase<float> *output);
+    const CuMatrixBase<float> &params,
+    CuMatrixBase<float> *output);
 template
 void ComputeLstmNonlinearity(const CuMatrixBase<double> &input,
-                             const CuMatrixBase<double> &params,
-                             CuMatrixBase<double> *output);
+    const CuMatrixBase<double> &params,
+    CuMatrixBase<double> *output);
 
 template<typename Real>
 void CpuBackpropLstmNonlinearity(const MatrixBase<Real> &input,
-                                 const MatrixBase<Real> &params,
-                                 const MatrixBase<Real> &output_deriv,
-                                 const MatrixBase<double> &deriv_sum_in,
-                                 const VectorBase<Real> &self_repair_config,
-                                 double count_in,
-                                 MatrixBase<Real> *input_deriv,
-                                 MatrixBase<Real> *params_deriv,
-                                 MatrixBase<double> *value_sum_out,
-                                 MatrixBase<double> *deriv_sum_out,
-                                 MatrixBase<Real> *self_repair_sum_out) {
+    const MatrixBase<Real> &params,
+    const MatrixBase<Real> &output_deriv,
+    const MatrixBase<double> &deriv_sum_in,
+    const VectorBase<Real> &self_repair_config,
+    double count_in,
+    MatrixBase<Real> *input_deriv,
+    MatrixBase<Real> *params_deriv,
+    MatrixBase<double> *value_sum_out,
+    MatrixBase<double> *deriv_sum_out,
+    MatrixBase<Real> *self_repair_sum_out) {
   int32 num_rows = input.NumRows(),
       input_cols = input
-                   .NumCols(),
-        cell_dim = input.NumCols() / 5;
+      .NumCols(),
+      cell_dim = input.NumCols() / 5;
   // Check dimensions.
   KALDI_ASSERT(input_cols == (cell_dim * 5) || input_cols == (cell_dim * 5) + 3);
   KALDI_ASSERT(params.NumRows() == 3);
@@ -556,7 +556,7 @@ void CpuBackpropLstmNonlinearity(const MatrixBase<Real> &input,
   const MatrixBase<double> &deriv_sum_in_mat = deriv_sum_in;
   const VectorBase<Real> &sr_config = self_repair_config;
   MatrixBase<Real> *input_deriv_mat = (
-      input_deriv == NULL ? NULL : input_deriv);
+    input_deriv == NULL ? NULL : input_deriv);
   MatrixBase<Real> *params_deriv_mat = NULL;
   MatrixBase<Real> *self_repair_sum_out_mat = NULL;
   MatrixBase<double> *value_sum_out_mat = NULL;
@@ -586,15 +586,15 @@ void CpuBackpropLstmNonlinearity(const MatrixBase<Real> &input,
     //  Sigmoid(i_t_input), Sigmoid(f_t_input),
     //  Tanh(c_part), Sigmoid(o_t_input),  Tanh(c_t)
     Real i_t_self_repair = (
-        deriv_sum_in_mat(0, c) / count < sr_config(0) ? sr_config(5) : 0.0);
+      deriv_sum_in_mat(0, c) / count < sr_config(0) ? sr_config(5) : 0.0);
     Real f_t_self_repair = (
-        deriv_sum_in_mat(1, c) / count < sr_config(1) ? sr_config(6) : 0.0);
+      deriv_sum_in_mat(1, c) / count < sr_config(1) ? sr_config(6) : 0.0);
     Real c_part_self_repair = (
-        deriv_sum_in_mat(2, c) / count < sr_config(2) ? sr_config(7) : 0.0);
+      deriv_sum_in_mat(2, c) / count < sr_config(2) ? sr_config(7) : 0.0);
     Real o_t_self_repair = (
-        deriv_sum_in_mat(3, c) / count < sr_config(3) ? sr_config(8) : 0.0);
+      deriv_sum_in_mat(3, c) / count < sr_config(3) ? sr_config(8) : 0.0);
     Real c_t_self_repair = (
-        deriv_sum_in_mat(4, c) / count < sr_config(4) ? sr_config(9) : 0.0);
+      deriv_sum_in_mat(4, c) / count < sr_config(4) ? sr_config(9) : 0.0);
     // Note on how we add self-repair for sigmoids/tanh's.  If self-repair
     // is activated for this unit, then...
     // For sigmoids we'd add -self_repair_scale * (2 * sigmoid(x) - 1.0)
@@ -619,11 +619,11 @@ void CpuBackpropLstmNonlinearity(const MatrixBase<Real> &input,
           c_prev = input_mat(r, c + 4 * cell_dim);
 
       Real i_scale = (input_cols == cell_dim * 5 ? 1.0 :
-                      input_mat(r, cell_dim * 5)),
-           f_scale = (input_cols == cell_dim * 5 ? 1.0 :
-                      input_mat(r, cell_dim * 5 + 1)),
-           o_scale = (input_cols == cell_dim * 5 ? 1.0 :
-                      input_mat(r, cell_dim * 5 + 2));
+          input_mat(r, cell_dim * 5)),
+          f_scale = (input_cols == cell_dim * 5 ? 1.0 :
+          input_mat(r, cell_dim * 5 + 1)),
+          o_scale = (input_cols == cell_dim * 5 ? 1.0 :
+          input_mat(r, cell_dim * 5 + 2));
 
       // For greater clarity, we give some of the quantities in the
       // forward equations their own names.
@@ -673,10 +673,10 @@ void CpuBackpropLstmNonlinearity(const MatrixBase<Real> &input,
       Real dtanh_c_part = i_t * i_scale * dc_t;
       Real df_t = dc_t * f_scale * c_prev;
       Real df_t_input = ((df_t * f_t * (1.0F - f_t)
-                          - (2.0F * f_t - 1.0F) * f_t_self_repair));
+          - (2.0F * f_t - 1.0F) * f_t_self_repair));
       Real di_t = dc_t * i_scale * tanh_c_part;
       Real di_t_input = ((di_t * i_t * (1.0F - i_t)
-                          - (2.0F * i_t - 1.0F) * i_t_self_repair));
+          - (2.0F * i_t - 1.0F) * i_t_self_repair));
 
       w_ic_deriv_sum += c_prev * di_t_input;
       w_fc_deriv_sum += c_prev * df_t_input;
@@ -733,18 +733,18 @@ void CpuBackpropLstmNonlinearity(const MatrixBase<Real> &input,
 
 template<typename Real>
 void BackpropLstmNonlinearity(const CuMatrixBase<Real> &input,
-                              const CuMatrixBase<Real> &params,
-                              const CuMatrixBase<Real> &output_deriv,
-                              const CuMatrixBase<double> &deriv_sum_in,
-                              const CuVectorBase<Real> &self_repair_config,
-                              double count_in,
-                              CuMatrixBase<Real> *input_deriv,
-                              CuMatrixBase<Real> *params_deriv,
-                              CuMatrixBase<double> *value_sum_out,
-                              CuMatrixBase<double> *deriv_sum_out,
-                              CuMatrixBase<Real> *self_repair_sum_out) {
+    const CuMatrixBase<Real> &params,
+    const CuMatrixBase<Real> &output_deriv,
+    const CuMatrixBase<double> &deriv_sum_in,
+    const CuVectorBase<Real> &self_repair_config,
+    double count_in,
+    CuMatrixBase<Real> *input_deriv,
+    CuMatrixBase<Real> *params_deriv,
+    CuMatrixBase<double> *value_sum_out,
+    CuMatrixBase<double> *deriv_sum_out,
+    CuMatrixBase<Real> *self_repair_sum_out) {
   int32 num_rows = input.NumRows(),
-        cell_dim = input.NumCols() / 5,
+      cell_dim = input.NumCols() / 5,
       input_cols = input.NumCols();
   // Check dimensions.
   KALDI_ASSERT(input_cols == (cell_dim * 5) || input_cols == (cell_dim*5) + 3);
@@ -880,52 +880,52 @@ void BackpropLstmNonlinearity(const CuMatrixBase<Real> &input,
 
 template
 void CpuBackpropLstmNonlinearity(const MatrixBase<float> &input,
-                                 const MatrixBase<float> &params,
-                                 const MatrixBase<float> &output_deriv,
-                                 const MatrixBase<double> &deriv_sum_in,
-                                 const VectorBase<float> &self_repair_config,
-                                 double count_in,
-                                 MatrixBase<float> *input_deriv,
-                                 MatrixBase<float> *params_deriv,
-                                 MatrixBase<double> *value_sum_out,
-                                 MatrixBase<double> *deriv_sum_out,
-                                 MatrixBase<float> *self_repair_sum_out);
+    const MatrixBase<float> &params,
+    const MatrixBase<float> &output_deriv,
+    const MatrixBase<double> &deriv_sum_in,
+    const VectorBase<float> &self_repair_config,
+    double count_in,
+    MatrixBase<float> *input_deriv,
+    MatrixBase<float> *params_deriv,
+    MatrixBase<double> *value_sum_out,
+    MatrixBase<double> *deriv_sum_out,
+    MatrixBase<float> *self_repair_sum_out);
 template
 void CpuBackpropLstmNonlinearity(const MatrixBase<double> &input,
-                                 const MatrixBase<double> &params,
-                                 const MatrixBase<double> &output_deriv,
-                                 const MatrixBase<double> &deriv_sum_in,
-                                 const VectorBase<double> &self_repair_config,
-                                 double count_in,
-                                 MatrixBase<double> *input_deriv,
-                                 MatrixBase<double> *params_deriv,
-                                 MatrixBase<double> *value_sum_out,
-                                 MatrixBase<double> *deriv_sum_out,
-                                 MatrixBase<double> *self_repair_sum_out);
+    const MatrixBase<double> &params,
+    const MatrixBase<double> &output_deriv,
+    const MatrixBase<double> &deriv_sum_in,
+    const VectorBase<double> &self_repair_config,
+    double count_in,
+    MatrixBase<double> *input_deriv,
+    MatrixBase<double> *params_deriv,
+    MatrixBase<double> *value_sum_out,
+    MatrixBase<double> *deriv_sum_out,
+    MatrixBase<double> *self_repair_sum_out);
 template
 void BackpropLstmNonlinearity(const CuMatrixBase<float> &input,
-                              const CuMatrixBase<float> &params,
-                              const CuMatrixBase<float> &output_deriv,
-                              const CuMatrixBase<double> &deriv_sum_in,
-                              const CuVectorBase<float> &self_repair_config,
-                              double count_in,
-                              CuMatrixBase<float> *input_deriv,
-                              CuMatrixBase<float> *params_deriv,
-                              CuMatrixBase<double> *value_sum_out,
-                              CuMatrixBase<double> *deriv_sum_out,
-                              CuMatrixBase<float> *self_repair_sum_out);
+    const CuMatrixBase<float> &params,
+    const CuMatrixBase<float> &output_deriv,
+    const CuMatrixBase<double> &deriv_sum_in,
+    const CuVectorBase<float> &self_repair_config,
+    double count_in,
+    CuMatrixBase<float> *input_deriv,
+    CuMatrixBase<float> *params_deriv,
+    CuMatrixBase<double> *value_sum_out,
+    CuMatrixBase<double> *deriv_sum_out,
+    CuMatrixBase<float> *self_repair_sum_out);
 template
 void BackpropLstmNonlinearity(const CuMatrixBase<double> &input,
-                              const CuMatrixBase<double> &params,
-                              const CuMatrixBase<double> &output_deriv,
-                              const CuMatrixBase<double> &deriv_sum_in,
-                              const CuVectorBase<double> &self_repair_config,
-                              double count_in,
-                              CuMatrixBase<double> *input_deriv,
-                              CuMatrixBase<double> *params_deriv,
-                              CuMatrixBase<double> *value_sum_out,
-                              CuMatrixBase<double> *deriv_sum_out,
-                              CuMatrixBase<double> *self_repair_sum_out);
+    const CuMatrixBase<double> &params,
+    const CuMatrixBase<double> &output_deriv,
+    const CuMatrixBase<double> &deriv_sum_in,
+    const CuVectorBase<double> &self_repair_config,
+    double count_in,
+    CuMatrixBase<double> *input_deriv,
+    CuMatrixBase<double> *params_deriv,
+    CuMatrixBase<double> *value_sum_out,
+    CuMatrixBase<double> *deriv_sum_out,
+    CuMatrixBase<double> *self_repair_sum_out);
 
 
 

@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
         transition_accs.Read(inputs[i]->Stream(), b, true /* add values */);
         sgmm_accs.Read(inputs[i]->Stream(), b, true /* add values */);
         delete inputs[i];
-      }      
+      }
     } else {
       for (int i = 2, max = po.NumArgs(); i <= max; i++) {
         std::string stats_in_filename = po.GetArg(i);

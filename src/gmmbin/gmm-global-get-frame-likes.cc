@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
       const Matrix<BaseFloat> &mat = feature_reader.Value();
       int32 file_frames = mat.NumRows();
       Vector<BaseFloat> likes(file_frames);
-      
+
       if (gselect_rspecifier != "") {
         if (!gselect_reader.HasKey(key)) {
           KALDI_WARN << "No gselect information for utterance " << key;
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
           num_err++;
           continue;
         }
-        
+
         for (int32 i = 0; i < file_frames; i++) {
           SubVector<BaseFloat> data(mat, i);
           const std::vector<int32> &this_gselect = gselect[i];

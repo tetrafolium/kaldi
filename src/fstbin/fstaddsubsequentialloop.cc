@@ -30,9 +30,9 @@
 
 
 /* some test  examples:
- ( echo "0 0 0 0"; echo "0 0" ) | fstcompile | fstaddsubsequentialloop 1 | fstprint
- ( echo "0 1 0 0"; echo " 0 2 0 0"; echo "1 0"; echo "2 0"; ) | fstcompile | fstaddsubsequentialloop 1 | fstprint
-*/
+   ( echo "0 0 0 0"; echo "0 0" ) | fstcompile | fstaddsubsequentialloop 1 | fstprint
+   ( echo "0 1 0 0"; echo " 0 2 0 0"; echo "1 0"; echo "2 0"; ) | fstcompile | fstaddsubsequentialloop 1 | fstprint
+ */
 
 int main(int argc, char *argv[]) {
   try {

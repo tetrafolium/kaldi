@@ -43,15 +43,15 @@ using kaldi::LatticeWeight;
 using kaldi::LatticeArc;
 
 struct DecodeInfo {
- public:
+public:
   DecodeInfo(const kaldi::AmDiagGmm &am,
-             const kaldi::TransitionModel &tm, kaldi::FasterDecoder *decoder,
-             BaseFloat scale, bool allow_partial,
-             const kaldi::Int32VectorWriter &wwriter,
-             const kaldi::Int32VectorWriter &awriter, fst::SymbolTable *wsyms)
-      : acoustic_model(am), trans_model(tm), decoder(decoder),
-        acoustic_scale(scale), allow_partial(allow_partial), words_writer(wwriter),
-        alignment_writer(awriter), word_syms(wsyms) {}
+      const kaldi::TransitionModel &tm, kaldi::FasterDecoder *decoder,
+      BaseFloat scale, bool allow_partial,
+      const kaldi::Int32VectorWriter &wwriter,
+      const kaldi::Int32VectorWriter &awriter, fst::SymbolTable *wsyms)
+    : acoustic_model(am), trans_model(tm), decoder(decoder),
+    acoustic_scale(scale), allow_partial(allow_partial), words_writer(wwriter),
+    alignment_writer(awriter), word_syms(wsyms) {}
 
   const kaldi::AmDiagGmm &acoustic_model;
   const kaldi::TransitionModel &trans_model;
@@ -62,26 +62,26 @@ struct DecodeInfo {
   const kaldi::Int32VectorWriter &alignment_writer;
   fst::SymbolTable *word_syms;
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodeInfo);
 };
 
 bool DecodeUtterance(kaldi::FasterDecoder *decoder,
-                     kaldi::DecodableInterface *decodable,
-                     DecodeInfo *info,
-                     const string &uttid,
-                     int32 num_frames,
-                     BaseFloat *total_like) {
+    kaldi::DecodableInterface *decodable,
+    DecodeInfo *info,
+    const string &uttid,
+    int32 num_frames,
+    BaseFloat *total_like) {
   decoder->Decode(decodable);
   KALDI_LOG << "Length of file is " << num_frames;;
 
   VectorFst<LatticeArc> decoded;  // linear FST.
   if ( (info->allow_partial || decoder->ReachedFinal())
-       && decoder->GetBestPath(&decoded) ) {
+      && decoder->GetBestPath(&decoded) ) {
     if (!decoder->ReachedFinal())
       KALDI_WARN << "Decoder did not reach end-state, outputting partial "
-          "traceback.";
-    
+        "traceback.";
+
     vector<kaldi::int32> alignment, words;
     LatticeWeight weight;
     GetLinearSymbolSequence(decoded, &alignment, &words, &weight);
@@ -119,14 +119,14 @@ int main(int argc, char *argv[]) {
     typedef kaldi::int32 int32;
 
     const char *usage = "Decode features using GMM-based model.\n"
-              "Usage: gmm-decode-faster-regtree-mllr [options] model-in fst-in "
-              "regtree-in features-rspecifier transforms-rspecifier "
-              "words-wspecifier [alignments-wspecifier]\n";
+        "Usage: gmm-decode-faster-regtree-mllr [options] model-in fst-in "
+        "regtree-in features-rspecifier transforms-rspecifier "
+        "words-wspecifier [alignments-wspecifier]\n";
     ParseOptions po(usage);
     bool binary = true;
     bool allow_partial = true;
     BaseFloat acoustic_scale = 0.1;
-    
+
     std::string word_syms_filename, utt2spk_rspecifier;
     FasterDecoderOptions decoder_opts;
     decoder_opts.Register(&po, true);  // true == include obscure settings.
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
     }
 
     RandomAccessRegtreeMllrDiagGmmReaderMapped mllr_reader(xforms_rspecifier,
-                                                           utt2spk_rspecifier);
+        utt2spk_rspecifier);
 
     Int32VectorWriter words_writer(words_wspecifier);
 
@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
       word_syms = fst::SymbolTable::ReadText(word_syms_filename);
       if (!word_syms) {
         KALDI_ERR << "Could not read symbol table from file "
-            << word_syms_filename;
+                  << word_syms_filename;
       }
     }
 
@@ -196,8 +196,8 @@ int main(int argc, char *argv[]) {
     Timer timer;
 
     DecodeInfo decode_info(am_gmm, trans_model, &decoder, acoustic_scale,
-                           allow_partial, words_writer, alignment_writer,
-                           word_syms);
+        allow_partial, words_writer, alignment_writer,
+        word_syms);
 
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
     for (; !feature_reader.Done(); feature_reader.Next()) {
@@ -213,10 +213,10 @@ int main(int argc, char *argv[]) {
 
       if (!mllr_reader.HasKey(utt)) {  // Decode without MLLR if none found
         KALDI_WARN << "No MLLR transform for key " << utt <<
-            ", decoding without MLLR.";
+          ", decoding without MLLR.";
         kaldi::DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model,
-                                                      features,
-                                                      acoustic_scale);
+            features,
+            acoustic_scale);
         if (DecodeUtterance(&decoder, &gmm_decodable, &decode_info,
                             utt, features.NumRows(), &tot_like)) {
           frame_count += gmm_decodable.NumFramesReady();
@@ -230,9 +230,9 @@ int main(int argc, char *argv[]) {
       // If found, load the transforms for the current utterance.
       const RegtreeMllrDiagGmm &mllr = mllr_reader.Value(utt);
       kaldi::DecodableAmDiagGmmRegtreeMllr gmm_decodable(am_gmm, trans_model,
-                                                         features, mllr,
-                                                         regtree,
-                                                         acoustic_scale);
+          features, mllr,
+          regtree,
+          acoustic_scale);
       if (DecodeUtterance(&decoder, &gmm_decodable, &decode_info,
                           utt, features.NumRows(), &tot_like)) {
         frame_count += gmm_decodable.NumFramesReady();
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
     KALDI_LOG << "Overall log-likelihood per frame is "
               << (tot_like / frame_count) << " over " << frame_count
               << " frames.";
-    
+
     delete decode_fst;
     if (num_success != 0)
       return 0;

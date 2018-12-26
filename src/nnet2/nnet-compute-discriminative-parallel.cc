@@ -31,7 +31,7 @@ namespace nnet2 {
 /** This struct stores neural net training examples to be used in
     multi-threaded training.  */
 class DiscriminativeExamplesRepository {
- public:
+public:
   /// The following function is called by the code that reads in the examples.
   void AcceptExample(const DiscriminativeNnetExample &example);
 
@@ -46,10 +46,10 @@ class DiscriminativeExamplesRepository {
   /// ExamplesDone() has been called.
   DiscriminativeNnetExample *ProvideExample();
 
-  DiscriminativeExamplesRepository(): buffer_size_(4),
-                                      empty_semaphore_(buffer_size_),
-                                      done_(false) { }
- private:
+  DiscriminativeExamplesRepository() : buffer_size_(4),
+    empty_semaphore_(buffer_size_),
+    done_(false) { }
+private:
   int32 buffer_size_;
   Semaphore full_semaphore_;
   Semaphore empty_semaphore_;
@@ -62,7 +62,7 @@ class DiscriminativeExamplesRepository {
 
 
 void DiscriminativeExamplesRepository::AcceptExample(
-    const DiscriminativeNnetExample &example) {
+  const DiscriminativeNnetExample &example) {
   empty_semaphore_.Wait();
   examples_mutex_.lock();
   examples_.push_back(new DiscriminativeNnetExample(example));
@@ -101,32 +101,32 @@ DiscriminativeExamplesRepository::ProvideExample() {
 
 
 class DiscTrainParallelClass: public MultiThreadable {
- public:
+public:
   // This constructor is only called for a temporary object
   // that we pass to the RunMultiThreaded function.
   DiscTrainParallelClass(const AmNnet &am_nnet,
-                         const TransitionModel &tmodel,
-                         const NnetDiscriminativeUpdateOptions &opts,
-                         bool store_separate_gradients,
-                         DiscriminativeExamplesRepository *repository,
-                         Nnet *nnet_to_update,
-                         NnetDiscriminativeStats *stats):
-      am_nnet_(am_nnet), tmodel_(tmodel), opts_(opts),
-      store_separate_gradients_(store_separate_gradients),
-      repository_(repository),
-      nnet_to_update_(nnet_to_update),
-      nnet_to_update_orig_(nnet_to_update),
-      stats_ptr_(stats) { }
+      const TransitionModel &tmodel,
+      const NnetDiscriminativeUpdateOptions &opts,
+      bool store_separate_gradients,
+      DiscriminativeExamplesRepository *repository,
+      Nnet *nnet_to_update,
+      NnetDiscriminativeStats *stats) :
+    am_nnet_(am_nnet), tmodel_(tmodel), opts_(opts),
+    store_separate_gradients_(store_separate_gradients),
+    repository_(repository),
+    nnet_to_update_(nnet_to_update),
+    nnet_to_update_orig_(nnet_to_update),
+    stats_ptr_(stats) { }
 
   // The following constructor is called multiple times within
   // the RunMultiThreaded template function.
-  DiscTrainParallelClass(const DiscTrainParallelClass &other):
-  MultiThreadable(other),
-  am_nnet_(other.am_nnet_), tmodel_(other.tmodel_), opts_(other.opts_),
-  store_separate_gradients_(other.store_separate_gradients_),
-  repository_(other.repository_), nnet_to_update_(other.nnet_to_update_),
-  nnet_to_update_orig_(other.nnet_to_update_orig_),
-  stats_ptr_(other.stats_ptr_) {
+  DiscTrainParallelClass(const DiscTrainParallelClass &other) :
+    MultiThreadable(other),
+    am_nnet_(other.am_nnet_), tmodel_(other.tmodel_), opts_(other.opts_),
+    store_separate_gradients_(other.store_separate_gradients_),
+    repository_(other.repository_), nnet_to_update_(other.nnet_to_update_),
+    nnet_to_update_orig_(other.nnet_to_update_orig_),
+    stats_ptr_(other.stats_ptr_) {
     if (store_separate_gradients_) {
       // To ensure correctness, we work on separate copies of the gradient
       // object, which we'll sum at the end.  This is used for exact gradient
@@ -172,7 +172,7 @@ class DiscTrainParallelClass: public MultiThreadable {
     }
     stats_ptr_->Add(stats_);
   }
- private:
+private:
   const AmNnet &am_nnet_;
   const TransitionModel &tmodel_;
   const NnetDiscriminativeUpdateOptions &opts_;
@@ -187,21 +187,21 @@ class DiscTrainParallelClass: public MultiThreadable {
 
 
 void NnetDiscriminativeUpdateParallel(
-    const AmNnet &am_nnet,
-    const TransitionModel &tmodel,
-    const NnetDiscriminativeUpdateOptions &opts,
-    int32 num_threads,
-    SequentialDiscriminativeNnetExampleReader *example_reader,
-    Nnet *nnet_to_update,
-    NnetDiscriminativeStats *stats) {
+  const AmNnet &am_nnet,
+  const TransitionModel &tmodel,
+  const NnetDiscriminativeUpdateOptions &opts,
+  int32 num_threads,
+  SequentialDiscriminativeNnetExampleReader *example_reader,
+  Nnet *nnet_to_update,
+  NnetDiscriminativeStats *stats) {
 
   DiscriminativeExamplesRepository repository;
 
   const bool store_separate_gradients = (nnet_to_update != &(am_nnet.GetNnet()));
 
   DiscTrainParallelClass c(am_nnet, tmodel, opts,
-                           store_separate_gradients,
-                           &repository, nnet_to_update, stats);
+      store_separate_gradients,
+      &repository, nnet_to_update, stats);
 
   {
     // The initialization of the following class spawns the threads that

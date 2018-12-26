@@ -29,18 +29,18 @@ namespace kaldi {
 // the information about arc posteriors.
 
 class ArcPosteriorComputer {
- public:
+public:
   // Note: 'clat' must be topologically sorted.
   ArcPosteriorComputer(const CompactLattice &clat,
-                       BaseFloat min_post,
-                       bool print_alignment,
-                       const TransitionModel *trans_model = NULL):
-      clat_(clat), min_post_(min_post), print_alignment_(print_alignment),
-      trans_model_(trans_model) { }
+      BaseFloat min_post,
+      bool print_alignment,
+      const TransitionModel *trans_model = NULL) :
+    clat_(clat), min_post_(min_post), print_alignment_(print_alignment),
+    trans_model_(trans_model) { }
 
   // returns the number of arc posteriors that it output.
   int32 OutputPosteriors(const std::string &utterance,
-                         std::ostream &os) {
+      std::ostream &os) {
     int32 num_post = 0;
     if (!ComputeCompactLatticeAlphas(clat_, &alpha_))
       return num_post;
@@ -55,7 +55,7 @@ class ArcPosteriorComputer {
     int32 num_states = clat_.NumStates();
     for (int32 state = 0; state < num_states; state++) {
       for (fst::ArcIterator<CompactLattice> aiter(clat_, state);
-           !aiter.Done(); aiter.Next()) {
+          !aiter.Done(); aiter.Next()) {
         const CompactLatticeArc &arc = aiter.Value();
         double arc_loglike = -ConvertToCost(arc.weight) +
             alpha_[state] + beta_[arc.nextstate] - tot_like;
@@ -95,7 +95,7 @@ class ArcPosteriorComputer {
     }
     return num_post;
   }
- private:
+private:
   const CompactLattice &clat_;
   std::vector<double> alpha_;
   std::vector<double> beta_;
@@ -190,8 +190,8 @@ int main(int argc, char *argv[]) {
       kaldi::TopSortCompactLatticeIfNeeded(&clat);
 
       kaldi::ArcPosteriorComputer computer(
-          clat, min_post, print_alignment,
-          (po.NumArgs() == 3 ? &trans_model : NULL));
+        clat, min_post, print_alignment,
+        (po.NumArgs() == 3 ? &trans_model : NULL));
 
       int32 num_post = computer.OutputPosteriors(key, output.Stream());
       if (num_post != 0) {

@@ -22,12 +22,12 @@
 namespace kaldi {
 
 OnlineIvectorExtractionInfo::OnlineIvectorExtractionInfo(
-    const OnlineIvectorExtractionConfig &config) {
+  const OnlineIvectorExtractionConfig &config) {
   Init(config);
 }
 
 void OnlineIvectorExtractionInfo::Init(
-    const OnlineIvectorExtractionConfig &config) {
+  const OnlineIvectorExtractionConfig &config) {
   ivector_period = config.ivector_period;
   num_gselect = config.num_gselect;
   min_post = config.min_post;
@@ -86,18 +86,18 @@ void OnlineIvectorExtractionInfo::Check() const {
 }
 
 // The class constructed in this way should never be used.
-OnlineIvectorExtractionInfo::OnlineIvectorExtractionInfo():
-    ivector_period(0), num_gselect(0), min_post(0.0), posterior_scale(0.0),
-    use_most_recent_ivector(true), greedy_ivector_extractor(false),
-    max_remembered_frames(0) { }
+OnlineIvectorExtractionInfo::OnlineIvectorExtractionInfo() :
+  ivector_period(0), num_gselect(0), min_post(0.0), posterior_scale(0.0),
+  use_most_recent_ivector(true), greedy_ivector_extractor(false),
+  max_remembered_frames(0) { }
 
 OnlineIvectorExtractorAdaptationState::OnlineIvectorExtractorAdaptationState(
-    const OnlineIvectorExtractorAdaptationState &other):
-    cmvn_state(other.cmvn_state), ivector_stats(other.ivector_stats) { }
+  const OnlineIvectorExtractorAdaptationState &other) :
+  cmvn_state(other.cmvn_state), ivector_stats(other.ivector_stats) { }
 
 
 void OnlineIvectorExtractorAdaptationState::LimitFrames(
-    BaseFloat max_remembered_frames, BaseFloat posterior_scale) {
+  BaseFloat max_remembered_frames, BaseFloat posterior_scale) {
   KALDI_ASSERT(max_remembered_frames >= 0);
   KALDI_ASSERT(cmvn_state.frozen_state.NumRows() == 0);
   if (cmvn_state.speaker_cmvn_stats.NumRows() != 0) {
@@ -157,7 +157,7 @@ BaseFloat OnlineIvectorFeature::FrameShiftInSeconds() const {
 }
 
 void OnlineIvectorFeature::UpdateFrameWeights(
-    const std::vector<std::pair<int32, BaseFloat> > &delta_weights) {
+  const std::vector<std::pair<int32, BaseFloat> > &delta_weights) {
   // add the elements to delta_weights_, which is a priority queue.  The top
   // element of the priority queue is the lowest numbered frame (we ensured this
   // by making the comparison object std::greater instead of std::less).  Adding
@@ -175,10 +175,10 @@ void OnlineIvectorFeature::UpdateFrameWeights(
 }
 
 void OnlineIvectorFeature::UpdateStatsForFrame(int32 t,
-                                               BaseFloat weight) {
+    BaseFloat weight) {
   int32 feat_dim = lda_normalized_->Dim();
   Vector<BaseFloat> feat(feat_dim),  // features given to iVector extractor
-      log_likes(info_.diag_ubm.NumGauss());
+  log_likes(info_.diag_ubm.NumGauss());
   lda_normalized_->GetFrame(t, &feat);
   info_.diag_ubm.LogLikelihoods(feat, &log_likes);
   // "posterior" stores the pruned posteriors for Gaussians in the UBM.
@@ -218,7 +218,7 @@ void OnlineIvectorFeature::UpdateStatsUntilFrame(int32 frame) {
 void OnlineIvectorFeature::UpdateStatsUntilFrameWeighted(int32 frame) {
   KALDI_ASSERT(frame >= 0 && frame < this->NumFramesReady() &&
                delta_weights_provided_ &&
-               ! updated_with_no_delta_weights_ &&
+               !updated_with_no_delta_weights_ &&
                frame <= most_recent_frame_with_weight_);
   bool debug_weights = false;
 
@@ -230,7 +230,7 @@ void OnlineIvectorFeature::UpdateStatsUntilFrameWeighted(int32 frame) {
     // Instead of just updating frame t, we update all frames that need updating
     // with index <= 1, in case old frames were reclassified as silence/nonsilence.
     while (!delta_weights_.empty() &&
-           delta_weights_.top().first <= t) {
+        delta_weights_.top().first <= t) {
       std::pair<int32, BaseFloat> p = delta_weights_.top();
       delta_weights_.pop();
       int32 frame = p.first;
@@ -256,9 +256,9 @@ void OnlineIvectorFeature::UpdateStatsUntilFrameWeighted(int32 frame) {
 
 
 void OnlineIvectorFeature::GetFrame(int32 frame,
-                                    VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   int32 frame_to_update_until = (info_.greedy_ivector_extractor ?
-                                 lda_->NumFramesReady() - 1 : frame);
+      lda_->NumFramesReady() - 1 : frame);
   if (!delta_weights_provided_)  // No silence weighting.
     UpdateStatsUntilFrame(frame_to_update_until);
   else
@@ -319,7 +319,7 @@ OnlineIvectorFeature::~OnlineIvectorFeature() {
 }
 
 void OnlineIvectorFeature::GetAdaptationState(
-    OnlineIvectorExtractorAdaptationState *adaptation_state) const {
+  OnlineIvectorExtractorAdaptationState *adaptation_state) const {
   // Note: the following call will work even if cmvn_->NumFramesReady() == 0; in
   // that case it will return the unmodified adaptation state that cmvn_ was
   // initialized with.
@@ -332,15 +332,15 @@ void OnlineIvectorFeature::GetAdaptationState(
 
 
 OnlineIvectorFeature::OnlineIvectorFeature(
-    const OnlineIvectorExtractionInfo &info,
-    OnlineFeatureInterface *base_feature):
-    info_(info), base_(base_feature),
-    ivector_stats_(info_.extractor.IvectorDim(),
-                   info_.extractor.PriorOffset(),
-                   info_.max_count),
-    num_frames_stats_(0), delta_weights_provided_(false),
-    updated_with_no_delta_weights_(false),
-    most_recent_frame_with_weight_(-1), tot_ubm_loglike_(0.0) {
+  const OnlineIvectorExtractionInfo &info,
+  OnlineFeatureInterface *base_feature) :
+  info_(info), base_(base_feature),
+  ivector_stats_(info_.extractor.IvectorDim(),
+      info_.extractor.PriorOffset(),
+      info_.max_count),
+  num_frames_stats_(0), delta_weights_provided_(false),
+  updated_with_no_delta_weights_(false),
+  most_recent_frame_with_weight_(-1), tot_ubm_loglike_(0.0) {
   info.Check();
   KALDI_ASSERT(base_feature != NULL);
   splice_ = new OnlineSpliceFrames(info_.splice_opts, base_);
@@ -360,7 +360,7 @@ OnlineIvectorFeature::OnlineIvectorFeature(
 }
 
 void OnlineIvectorFeature::SetAdaptationState(
-    const OnlineIvectorExtractorAdaptationState &adaptation_state) {
+  const OnlineIvectorExtractorAdaptationState &adaptation_state) {
   KALDI_ASSERT(num_frames_stats_ == 0 &&
                "SetAdaptationState called after frames were processed.");
   KALDI_ASSERT(ivector_stats_.IvectorDim() ==
@@ -380,12 +380,12 @@ BaseFloat OnlineIvectorFeature::ObjfImprPerFrame() const {
 
 
 OnlineSilenceWeighting::OnlineSilenceWeighting(
-    const TransitionModel &trans_model,
-    const OnlineSilenceWeightingConfig &config,
-    int32 frame_subsampling_factor):
-    trans_model_(trans_model), config_(config),
-    frame_subsampling_factor_(frame_subsampling_factor),
-    num_frames_output_and_correct_(0) {
+  const TransitionModel &trans_model,
+  const OnlineSilenceWeightingConfig &config,
+  int32 frame_subsampling_factor) :
+  trans_model_(trans_model), config_(config),
+  frame_subsampling_factor_(frame_subsampling_factor),
+  num_frames_output_and_correct_(0) {
   KALDI_ASSERT(frame_subsampling_factor_ >= 1);
   std::vector<int32> silence_phones;
   SplitStringToIntegers(config.silence_phones_str, ":,", false,
@@ -396,7 +396,7 @@ OnlineSilenceWeighting::OnlineSilenceWeighting(
 
 
 void OnlineSilenceWeighting::ComputeCurrentTraceback(
-    const LatticeFasterOnlineDecoder &decoder) {
+  const LatticeFasterOnlineDecoder &decoder) {
   int32 num_frames_decoded = decoder.NumFramesDecoded(),
       num_frames_prev = frame_info_.size();
   // note, num_frames_prev is not the number of frames previously decoded,
@@ -466,13 +466,13 @@ int32 OnlineSilenceWeighting::GetBeginFrame() {
 
   // t_lower will be the first index in the run of equal transition-ids.
   for (t_lower = t_last_untouched;
-       t_lower > lower_search_bound &&
-           frame_info_[t_lower - 1].transition_id == transition_id; t_lower--);
+      t_lower > lower_search_bound &&
+      frame_info_[t_lower - 1].transition_id == transition_id; t_lower--);
 
   // t_lower will be the last index in the run of equal transition-ids.
   for (t_upper = t_last_untouched;
-       t_upper < upper_search_bound &&
-           frame_info_[t_upper + 1].transition_id == transition_id; t_upper++);
+      t_upper < upper_search_bound &&
+      frame_info_[t_upper + 1].transition_id == transition_id; t_upper++);
 
   int32 run_length = t_upper - t_lower + 1;
   if (run_length <= max_duration) {
@@ -497,14 +497,14 @@ int32 OnlineSilenceWeighting::GetBeginFrame() {
 }
 
 void OnlineSilenceWeighting::GetDeltaWeights(
-    int32 num_frames_ready_in,
-    std::vector<std::pair<int32, BaseFloat> > *delta_weights) {
+  int32 num_frames_ready_in,
+  std::vector<std::pair<int32, BaseFloat> > *delta_weights) {
   // num_frames_ready_in is at the feature frame-rate, most of the code
   // in this function is at the decoder frame-rate.
   // round up, so we are sure to get weights for at least the frame
   // 'num_frames_ready_in - 1', and maybe one or two frames afterward.
   int32 fs = frame_subsampling_factor_,
-  num_frames_ready = (num_frames_ready_in + fs - 1) / fs;
+      num_frames_ready = (num_frames_ready_in + fs - 1) / fs;
 
   const int32 max_state_duration = config_.max_state_duration;
   const BaseFloat silence_weight = config_.silence_weight;
@@ -536,7 +536,7 @@ void OnlineSilenceWeighting::GetDeltaWeights(
     // find the most recent weight that we output and apply the same weight to
     // all the new output; or output the silence weight, if nothing was output.
     BaseFloat weight = (begin_frame == 0 ? silence_weight :
-                        frame_info_[begin_frame - 1].current_weight);
+        frame_info_[begin_frame - 1].current_weight);
     for (int32 offset = 0; offset < frames_out; offset++)
       frame_weight[offset] = weight;
   } else {
@@ -557,14 +557,14 @@ void OnlineSilenceWeighting::GetDeltaWeights(
         // now deal with max-duration issues.
         if (max_state_duration > 0 &&
             (offset + 1 == frames_out ||
-             transition_id != frame_info_[frame + 1].transition_id)) {
+            transition_id != frame_info_[frame + 1].transition_id)) {
           // If this is the last frame of a run...
           int32 run_length = offset - current_run_start_offset + 1;
           if (run_length >= max_state_duration) {
             // treat runs of the same transition-id longer than the max, as
             // silence, even if they were not silence.
             for (int32 offset2 = current_run_start_offset;
-                 offset2 <= offset; offset2++)
+                offset2 <= offset; offset2++)
               frame_weight[offset2] = silence_weight;
           }
           if (offset + 1 < frames_out)
@@ -587,11 +587,11 @@ void OnlineSilenceWeighting::GetDeltaWeights(
     // some debugging/checking code.
     if (weight_diff != 0.0 || offset + 1 == frames_out) {
       for(int32 i = 0; i < frame_subsampling_factor_; i++) {
-	int32 input_frame = (frame * frame_subsampling_factor_) + i;
-	delta_weights->push_back(std::make_pair(input_frame, weight_diff));
+        int32 input_frame = (frame * frame_subsampling_factor_) + i;
+        delta_weights->push_back(std::make_pair(input_frame, weight_diff));
       }
     }
-  }  
+  }
 }
 
 }  // namespace kaldi

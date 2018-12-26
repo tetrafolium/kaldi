@@ -28,11 +28,11 @@ namespace kaldi {
 
 
 class CovarianceStats {
- public:
-  CovarianceStats(int32 dim): tot_covar_(dim),
-                              between_covar_(dim),
-                              num_spk_(0),
-                              num_utt_(0) { }
+public:
+  CovarianceStats(int32 dim) : tot_covar_(dim),
+    between_covar_(dim),
+    num_spk_(0),
+    num_utt_(0) { }
 
   /// get total covariance, normalized per number of frames.
   void GetTotalCovar(SpMatrix<double> *tot_covar) const {
@@ -71,7 +71,7 @@ class CovarianceStats {
     num_spk_ += other.num_spk_;
     num_utt_ += other.num_utt_;
   }
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(CovarianceStats);
   SpMatrix<double> tot_covar_;
   SpMatrix<double> between_covar_;
@@ -82,7 +82,7 @@ class CovarianceStats {
 
 template<class Real>
 void ComputeNormalizingTransform(const SpMatrix<Real> &covar,
-                                 MatrixBase<Real> *proj) {
+    MatrixBase<Real> *proj) {
   int32 dim = covar.NumRows();
   TpMatrix<Real> C(dim);  // Cholesky of covar, covar = C C^T
   C.Cholesky(covar);
@@ -92,10 +92,10 @@ void ComputeNormalizingTransform(const SpMatrix<Real> &covar,
 }
 
 void ComputeLdaTransform(
-    const std::map<std::string, Vector<BaseFloat> *> &utt2ivector,
-    const std::map<std::string, std::vector<std::string> > &spk2utt,
-    BaseFloat total_covariance_factor,
-    MatrixBase<BaseFloat> *lda_out) {
+  const std::map<std::string, Vector<BaseFloat> *> &utt2ivector,
+  const std::map<std::string, std::vector<std::string> > &spk2utt,
+  BaseFloat total_covariance_factor,
+  MatrixBase<BaseFloat> *lda_out) {
   KALDI_ASSERT(!utt2ivector.empty());
   int32 lda_dim = lda_out->NumRows(), dim = lda_out->NumCols();
   KALDI_ASSERT(dim == utt2ivector.begin()->second->Dim());
@@ -169,8 +169,8 @@ void ComputeLdaTransform(
 }
 
 void ComputeAndSubtractMean(
-    std::map<std::string, Vector<BaseFloat> *> utt2ivector,
-    Vector<BaseFloat> *mean_out) {
+  std::map<std::string, Vector<BaseFloat> *> utt2ivector,
+  Vector<BaseFloat> *mean_out) {
   int32 dim = utt2ivector.begin()->second->Dim();
   size_t num_ivectors = utt2ivector.size();
   Vector<double> mean(dim);

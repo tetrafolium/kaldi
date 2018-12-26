@@ -70,8 +70,8 @@ namespace nnet1 {
  *
  */
 class Convolutional2DComponent : public UpdatableComponent {
- public:
-  Convolutional2DComponent(int32 dim_in, int32 dim_out):
+public:
+  Convolutional2DComponent(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out),
     fmap_x_len_(0), fmap_y_len_(0),
     filt_x_len_(0), filt_y_len_(0),
@@ -93,21 +93,21 @@ class Convolutional2DComponent : public UpdatableComponent {
     while (is >> std::ws, !is.eof()) {
       ReadToken(is, false, &token);
       /**/ if (token == "<ParamStddev>") ReadBasicType(is, false, &param_stddev);
-      else if (token == "<BiasMean>")    ReadBasicType(is, false, &bias_mean);
-      else if (token == "<BiasRange>")   ReadBasicType(is, false, &bias_range);
-      else if (token == "<FmapXLen>")    ReadBasicType(is, false, &fmap_x_len_);
-      else if (token == "<FmapYLen>")    ReadBasicType(is, false, &fmap_y_len_);
-      else if (token == "<FiltXLen>")    ReadBasicType(is, false, &filt_x_len_);
-      else if (token == "<FiltYLen>")    ReadBasicType(is, false, &filt_y_len_);
-      else if (token == "<FiltXStep>")   ReadBasicType(is, false, &filt_x_step_);
-      else if (token == "<FiltYStep>")   ReadBasicType(is, false, &filt_y_step_);
+      else if (token == "<BiasMean>") ReadBasicType(is, false, &bias_mean);
+      else if (token == "<BiasRange>") ReadBasicType(is, false, &bias_range);
+      else if (token == "<FmapXLen>") ReadBasicType(is, false, &fmap_x_len_);
+      else if (token == "<FmapYLen>") ReadBasicType(is, false, &fmap_y_len_);
+      else if (token == "<FiltXLen>") ReadBasicType(is, false, &filt_x_len_);
+      else if (token == "<FiltYLen>") ReadBasicType(is, false, &filt_y_len_);
+      else if (token == "<FiltXStep>") ReadBasicType(is, false, &filt_x_step_);
+      else if (token == "<FiltYStep>") ReadBasicType(is, false, &filt_y_step_);
       else if (token == "<ConnectFmap>") ReadBasicType(is, false, &connect_fmap_);
       else if (token == "<LearnRateCoef>") ReadBasicType(is, false, &learn_rate_coef_);
       else if (token == "<BiasLearnRateCoef>") ReadBasicType(is, false, &bias_learn_rate_coef_);
       else KALDI_ERR << "Unknown token " << token << ", a typo in config? "
                      << "(ParamStddev|BiasMean|BiasRange|FmapXLen|FmapYLen|"
-                        "FiltXLen|FiltYLen|FiltXStep|FiltYStep|ConnectFmap|"
-                        "LearnRateCoef|BiasLearnRateCoef)";
+          "FiltXLen|FiltYLen|FiltXStep|FiltYStep|ConnectFmap|"
+          "LearnRateCoef|BiasLearnRateCoef)";
     }
 
     //
@@ -257,7 +257,7 @@ class Convolutional2DComponent : public UpdatableComponent {
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // useful dims
     int32 num_input_fmaps = input_dim_ / (fmap_x_len_ * fmap_y_len_);
     // int32 inp_fmap_size = fmap_x_len_ * fmap_y_len_;
@@ -286,30 +286,30 @@ class Convolutional2DComponent : public UpdatableComponent {
     int32 out_fmap_cnt = 0;
     for (int32 m = 0; m < fmap_x_len_-filt_x_len_+1; m = m+filt_x_step_) {
       for (int32 n = 0; n < fmap_y_len_-filt_y_len_+1; n = n+filt_y_step_) {
-    std::vector<int32> column_mask;
-    int32 st = 0;
-    if (connect_fmap_ == 1) {
-      st = (m * fmap_y_len_ + n) * num_input_fmaps;
-    } else {
-      st = m * fmap_y_len_ * num_input_fmaps + n;
-    }
-
-    for (int32 i = 0; i < filt_x_len_; i++) {
-      for (int32 j = 0; j < filt_y_len_*num_input_fmaps; j++) {
-        int32 c = 0;
+        std::vector<int32> column_mask;
+        int32 st = 0;
         if (connect_fmap_ == 1) {
-          c = st + i * (num_input_fmaps*fmap_y_len_) + j;
+          st = (m * fmap_y_len_ + n) * num_input_fmaps;
         } else {
-          c = st + i * (num_input_fmaps * fmap_y_len_)
-                     + (j / num_input_fmaps)
-                     + (j % num_input_fmaps) * fmap_y_len_;
+          st = m * fmap_y_len_ * num_input_fmaps + n;
         }
-        column_mask.push_back(c);
-      }
-    }
-    CuArray<int32> cu_column_mask(column_mask);
-    vectorized_feature_patches_[out_fmap_cnt].CopyCols(in, cu_column_mask);
-    out_fmap_cnt++;
+
+        for (int32 i = 0; i < filt_x_len_; i++) {
+          for (int32 j = 0; j < filt_y_len_*num_input_fmaps; j++) {
+            int32 c = 0;
+            if (connect_fmap_ == 1) {
+              c = st + i * (num_input_fmaps*fmap_y_len_) + j;
+            } else {
+              c = st + i * (num_input_fmaps * fmap_y_len_)
+                  + (j / num_input_fmaps)
+                  + (j % num_input_fmaps) * fmap_y_len_;
+            }
+            column_mask.push_back(c);
+          }
+        }
+        CuArray<int32> cu_column_mask(column_mask);
+        vectorized_feature_patches_[out_fmap_cnt].CopyCols(in, cu_column_mask);
+        out_fmap_cnt++;
       }
     }
 
@@ -322,9 +322,9 @@ class Convolutional2DComponent : public UpdatableComponent {
 
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // useful dims
     int32 num_input_fmaps = input_dim_ / (fmap_x_len_ * fmap_y_len_);
 
@@ -363,8 +363,8 @@ class Convolutional2DComponent : public UpdatableComponent {
                 c = st + i * (num_input_fmaps * fmap_y_len_) + j;
               } else {
                 c = st + i * (num_input_fmaps * fmap_y_len_)
-                       + (j / num_input_fmaps)
-                       + (j % num_input_fmaps) * fmap_y_len_;
+                    + (j / num_input_fmaps)
+                    + (j % num_input_fmaps) * fmap_y_len_;
               }
               // add 1.0
               in_diff_summands_.Range(c, 1).Add(1.0);
@@ -393,8 +393,8 @@ class Convolutional2DComponent : public UpdatableComponent {
               c = st + i *(num_input_fmaps*fmap_y_len_)+j;
             } else {
               c = st + i * (num_input_fmaps * fmap_y_len_)
-                     + (j / num_input_fmaps)
-                     + (j % num_input_fmaps) * fmap_y_len_;
+                  + (j / num_input_fmaps)
+                  + (j % num_input_fmaps) * fmap_y_len_;
             }
             // from which col?
             CuMatrix<BaseFloat>& diff_mat = feature_patch_diffs_[out_fmap_cnt];
@@ -413,7 +413,7 @@ class Convolutional2DComponent : public UpdatableComponent {
 
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     // useful dims,
     int32 out_fmap_x_len = (fmap_x_len_ - filt_x_len_)/filt_x_step_ + 1;
     int32 out_fmap_y_len = (fmap_y_len_ - filt_y_len_)/filt_y_step_ + 1;
@@ -450,7 +450,7 @@ class Convolutional2DComponent : public UpdatableComponent {
     bias_.AddVec(-lr * bias_learn_rate_coef_, bias_grad_);
   }
 
- private:
+private:
   /// feature maps dimensions (for input x_ is usually splice
   /// and y_ is num of fbanks) shift for 2nd dim of a patch
   /// (i.e. frame length before splicing),

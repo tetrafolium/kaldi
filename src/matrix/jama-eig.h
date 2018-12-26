@@ -1,6 +1,6 @@
 // matrix/jama-eig.h
 
-// Copyright 2009-2011 Microsoft Corporation 
+// Copyright 2009-2011 Microsoft Corporation
 
 // See ../../COPYING for clarification regarding multiple authors
 //
@@ -39,7 +39,7 @@ namespace kaldi {
 template<typename Real> class EigenvalueDecomposition {
   // This class is based on the EigenvalueDecomposition class from the JAMA
   // library (version 1.0.2).
- public:
+public:
   EigenvalueDecomposition(const MatrixBase<Real> &A);
 
   ~EigenvalueDecomposition();  // free memory.
@@ -47,7 +47,7 @@ template<typename Real> class EigenvalueDecomposition {
   void GetV(MatrixBase<Real> *V_out) {  // V is what we call P externally; it's the matrix of
     // eigenvectors.
     KALDI_ASSERT(V_out->NumRows() == static_cast<MatrixIndexT>(n_)
-                 && V_out->NumCols() == static_cast<MatrixIndexT>(n_));
+        && V_out->NumCols() == static_cast<MatrixIndexT>(n_));
     for (int i = 0; i < n_; i++)
       for (int j = 0; j < n_; j++)
         (*V_out)(i, j) = V(i, j);  // V(i, j) is member function.
@@ -64,7 +64,7 @@ template<typename Real> class EigenvalueDecomposition {
     for (int i = 0; i < n_; i++)
       (*i_out)(i) = e_[i];
   }
- private:
+private:
 
   inline Real &H(int r, int c) { return H_[r*n_ + c]; }
   inline Real &V(int r, int c) { return V_[r*n_ + c]; }
@@ -221,7 +221,7 @@ template<typename Real> void  EigenvalueDecomposition<Real>::Tred2() {
     V(n_-1, j) = 0.0;
   }
   V(n_-1, n_-1) = 1.0;
-   e_[0] = 0.0;
+  e_[0] = 0.0;
 }
 
 template<typename Real> void EigenvalueDecomposition<Real>::Tql2() {
@@ -231,9 +231,9 @@ template<typename Real> void EigenvalueDecomposition<Real>::Tql2() {
   //  Fortran subroutine in EISPACK.
 
   for (int i = 1; i < n_; i++) {
-     e_[i-1] = e_[i];
+    e_[i-1] = e_[i];
   }
-   e_[n_-1] = 0.0;
+  e_[n_-1] = 0.0;
 
   Real f = 0.0;
   Real tst1 = 0.0;
@@ -624,7 +624,7 @@ template<typename Real> void  EigenvalueDecomposition<Real>::Hqr2() {
         }
         if (std::abs(H(m, m-1)) * (std::abs(q) + std::abs(r)) <
             eps * (std::abs(p) * (std::abs(H(m-1, m-1)) + std::abs(z) +
-                                  std::abs(H(m+1, m+1))))) {
+            std::abs(H(m+1, m+1))))) {
           break;
         }
         m--;
@@ -820,7 +820,7 @@ template<typename Real> void  EigenvalueDecomposition<Real>::Hqr2() {
             vi = (d_[i] - p) * 2.0 * q;
             if (vr == 0.0 && vi == 0.0) {
               vr = eps * norm * (std::abs(w) + std::abs(q) +
-                                 std::abs(x) + std::abs(y) + std::abs(z));
+                  std::abs(x) + std::abs(y) + std::abs(z));
             }
             cdiv(x*r-z*ra+q*sa, x*s-z*sa-q*ra, vr, vi, &cdivr, &cdivi);
             H(i, n-1) = cdivr;

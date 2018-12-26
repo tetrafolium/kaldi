@@ -156,9 +156,9 @@ void WaveInfo::Read(std::istream &is) {
     reader.ReadUint16();  // Unused for PCM.
     reader.ReadUint32();  // Channel map: we do not care.
     uint32 guid1 = reader.ReadUint32(),
-           guid2 = reader.ReadUint32(),
-           guid3 = reader.ReadUint32(),
-           guid4 = reader.ReadUint32();
+        guid2 = reader.ReadUint32(),
+        guid3 = reader.ReadUint32(),
+        guid4 = reader.ReadUint32();
     fmt_chunk_read = 40;
 
     // Support only KSDATAFORMAT_SUBTYPE_PCM for now. Interesting formats:

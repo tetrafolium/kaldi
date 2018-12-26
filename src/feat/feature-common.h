@@ -43,7 +43,7 @@ struct ExampleFeatureComputerOptions {
 /// follow this interface.  This interface is intended for features such as
 /// MFCCs and PLPs which can be computed frame by frame.
 class ExampleFeatureComputer {
- public:
+public:
   typedef ExampleFeatureComputerOptions Options;
 
   /// Returns a reference to the frame-extraction options class, which
@@ -62,8 +62,8 @@ class ExampleFeatureComputer {
 
   /// constructor from options class; it should not store a reference or pointer
   /// to the options class but should copy it.
-  explicit ExampleFeatureComputer(const ExampleFeatureComputerOptions &opts):
-      opts_(opts) { }
+  explicit ExampleFeatureComputer(const ExampleFeatureComputerOptions &opts) :
+    opts_(opts) { }
 
   /// Copy constructor; all of these classes must have one.
   ExampleFeatureComputer(const ExampleFeatureComputer &other);
@@ -88,13 +88,13 @@ class ExampleFeatureComputer {
        vector as a workspace, which is why it's a non-const pointer.
      @param [out] feature  Pointer to a vector of size this->Dim(), to which
          the computed feature will be written.
-  */
+   */
   void Compute(BaseFloat signal_log_energy,
-               BaseFloat vtln_warp,
-               VectorBase<BaseFloat> *signal_frame,
-               VectorBase<BaseFloat> *feature);
+      BaseFloat vtln_warp,
+      VectorBase<BaseFloat> *signal_frame,
+      VectorBase<BaseFloat> *feature);
 
- private:
+private:
   // disallow assignment.
   ExampleFeatureComputer &operator = (const ExampleFeatureComputer &in);
   Options opts_;
@@ -109,29 +109,29 @@ class ExampleFeatureComputer {
 /// for the snip-edges=false option.
 template <class F>
 class OfflineFeatureTpl {
- public:
+public:
   typedef typename F::Options Options;
 
   // Note: feature_window_function_ is the windowing function, which initialized
   // using the options class, that we cache at this level.
-  OfflineFeatureTpl(const Options &opts):
-      computer_(opts),
-      feature_window_function_(computer_.GetFrameOptions()) { }
+  OfflineFeatureTpl(const Options &opts) :
+    computer_(opts),
+    feature_window_function_(computer_.GetFrameOptions()) { }
 
   // Internal (and back-compatibility) interface for computing features, which
   // requires that the user has already checked that the sampling frequency
   // of the waveform is equal to the sampling frequency specified in
   // the frame-extraction options.
   void Compute(const VectorBase<BaseFloat> &wave,
-               BaseFloat vtln_warp,
-               Matrix<BaseFloat> *output);
+      BaseFloat vtln_warp,
+      Matrix<BaseFloat> *output);
 
   // This const version of Compute() is a wrapper that
   // calls the non-const version on a temporary object.
   // It's less efficient than the non-const version.
   void Compute(const VectorBase<BaseFloat> &wave,
-               BaseFloat vtln_warp,
-               Matrix<BaseFloat> *output) const;
+      BaseFloat vtln_warp,
+      Matrix<BaseFloat> *output) const;
 
   /**
      Computes the features for one file (one sequence of features).
@@ -147,29 +147,29 @@ class OfflineFeatureTpl {
                             be 1.0)
      @param [out]  output  The matrix of features, where the row-index
                            is the frame index.
-  */
+   */
   void ComputeFeatures(const VectorBase<BaseFloat> &wave,
-                       BaseFloat sample_freq,
-                       BaseFloat vtln_warp,
-                       Matrix<BaseFloat> *output);
+      BaseFloat sample_freq,
+      BaseFloat vtln_warp,
+      Matrix<BaseFloat> *output);
   /**
      This const version of ComputeFeatures() is a wrapper that
      calls the non-const ComputeFeatures() on a temporary object
      that is a copy of *this.  It is not as efficient because of the
      overhead of copying *this.
-  */
+   */
   void ComputeFeatures(const VectorBase<BaseFloat> &wave,
-                       BaseFloat sample_freq,
-                       BaseFloat vtln_warp,
-                       Matrix<BaseFloat> *output) const;
+      BaseFloat sample_freq,
+      BaseFloat vtln_warp,
+      Matrix<BaseFloat> *output) const;
 
   int32 Dim() const { return computer_.Dim(); }
 
   // Copy constructor.
-  OfflineFeatureTpl(const OfflineFeatureTpl<F> &other):
-      computer_(other.computer_),
-      feature_window_function_(other.feature_window_function_) { }
-  private:
+  OfflineFeatureTpl(const OfflineFeatureTpl<F> &other) :
+    computer_(other.computer_),
+    feature_window_function_(other.feature_window_function_) { }
+private:
   // Disallow assignment.
   OfflineFeatureTpl<F> &operator =(const OfflineFeatureTpl<F> &other);
 

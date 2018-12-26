@@ -43,11 +43,11 @@ class DiagGmm {
   /// this makes it a little easier to modify the internals
   friend class DiagGmmNormal;
 
- public:
+public:
   /// Empty constructor.
   DiagGmm() : valid_gconsts_(false) { }
 
-  explicit DiagGmm(const DiagGmm &gmm): valid_gconsts_(false) {
+  explicit DiagGmm(const DiagGmm &gmm) : valid_gconsts_(false) {
     CopyFromDiagGmm(gmm);
   }
 
@@ -58,7 +58,7 @@ class DiagGmm {
   /// Copies from DiagGmmNormal; does not resize.
   void CopyFromNormal(const DiagGmmNormal &diag_gmm_normal);
 
-  DiagGmm(int32 nMix, int32 dim): valid_gconsts_(false) { Resize(nMix, dim); }
+  DiagGmm(int32 nMix, int32 dim) : valid_gconsts_(false) { Resize(nMix, dim); }
 
   /// Constructor that allows us to merge GMMs with weights.  Weights must sum
   /// to one, or this GMM will not be properly normalized (we don't check this).
@@ -83,13 +83,13 @@ class DiagGmm {
 
   /// Outputs the per-component log-likelihoods
   void LogLikelihoods(const VectorBase<BaseFloat> &data,
-                      Vector<BaseFloat> *loglikes) const;
+      Vector<BaseFloat> *loglikes) const;
 
   /// This version of the LogLikelihoods function operates on
   /// a sequence of frames simultaneously; the row index of both "data" and
   /// "loglikes" is the frame index.
   void LogLikelihoods(const MatrixBase<BaseFloat> &data,
-                      Matrix<BaseFloat> *loglikes) const;
+      Matrix<BaseFloat> *loglikes) const;
 
 
   /// Outputs the per-component log-likelihoods of a subset of mixture
@@ -97,42 +97,42 @@ class DiagGmm {
   /// loglikes[i] will correspond to the log-likelihood of the Gaussian
   /// indexed indices[i], including the mixture weight.
   void LogLikelihoodsPreselect(const VectorBase<BaseFloat> &data,
-                               const std::vector<int32> &indices,
-                               Vector<BaseFloat> *loglikes) const;
+      const std::vector<int32> &indices,
+      Vector<BaseFloat> *loglikes) const;
 
   /// Get gaussian selection information for one frame.  Returns og-like
   /// this frame.  Output is the best "num_gselect" indices, sorted from best to
   /// worst likelihood.  If "num_gselect" > NumGauss(), sets it to NumGauss().
   BaseFloat GaussianSelection(const VectorBase<BaseFloat> &data,
-                              int32 num_gselect,
-                              std::vector<int32> *output) const;
+      int32 num_gselect,
+      std::vector<int32> *output) const;
 
   /// This version of the Gaussian selection function works for a sequence
   /// of frames rather than just a single frame.  Returns sum of the log-likes
   /// over all frames.
   BaseFloat GaussianSelection(const MatrixBase<BaseFloat> &data,
-                              int32 num_gselect,
-                              std::vector<std::vector<int32> > *output) const;
+      int32 num_gselect,
+      std::vector<std::vector<int32> > *output) const;
 
   /// Get gaussian selection information for one frame.  Returns log-like for
   /// this frame.  Output is the best "num_gselect" indices that were
   /// preselected, sorted from best to worst likelihood.  If "num_gselect" >
   /// NumGauss(), sets it to NumGauss().
   BaseFloat GaussianSelectionPreselect(const VectorBase<BaseFloat> &data,
-                                       const std::vector<int32> &preselect,
-                                       int32 num_gselect,
-                                       std::vector<int32> *output) const;
+      const std::vector<int32> &preselect,
+      int32 num_gselect,
+      std::vector<int32> *output) const;
 
   /// Computes the posterior probabilities of all Gaussian components given
   /// a data point. Returns the log-likehood of the data given the GMM.
   BaseFloat ComponentPosteriors(const VectorBase<BaseFloat> &data,
-                                Vector<BaseFloat> *posteriors) const;
+      Vector<BaseFloat> *posteriors) const;
 
   /// Computes the log-likelihood of a data point given a single Gaussian
   /// component. NOTE: Currently we make no guarantees about what happens if
   /// one of the variances is zero.
   BaseFloat ComponentLogLikelihood(const VectorBase<BaseFloat> &data,
-                                   int32 comp_id) const;
+      int32 comp_id) const;
 
   /// Sets the gconsts.  Returns the number that are "invalid" e.g. because of
   /// zero weights or variances.
@@ -144,7 +144,7 @@ class DiagGmm {
   /// Split the components and remember the order in which the components were
   /// split
   void Split(int32 target_components, float perturb_factor,
-             std::vector<int32> *history = NULL);
+      std::vector<int32> *history = NULL);
 
   /// Perturbs the component means with a random vector multiplied by the
   /// pertrub factor.
@@ -157,18 +157,18 @@ class DiagGmm {
   // Merge the components to a specified target #components: this
   // version uses a different approach based on K-means.
   void MergeKmeans(int32 target_components,
-                   ClusterKMeansOptions cfg = ClusterKMeansOptions());
+      ClusterKMeansOptions cfg = ClusterKMeansOptions());
 
   void Write(std::ostream &os, bool binary) const;
   void Read(std::istream &in, bool binary);
 
   /// this = rho x source + (1-rho) x this
   void Interpolate(BaseFloat rho, const DiagGmm &source,
-                   GmmFlagsType flags = kGmmAll);
+      GmmFlagsType flags = kGmmAll);
 
   /// this = rho x source + (1-rho) x this
   void Interpolate(BaseFloat rho, const FullGmm &source,
-                   GmmFlagsType flags = kGmmAll);
+      GmmFlagsType flags = kGmmAll);
 
   /// Const accessors
   const Vector<BaseFloat> &gconsts() const {
@@ -196,7 +196,7 @@ class DiagGmm {
   /// Use SetInvVarsAndMeans if updating both means and (inverse) variances
   template<class Real>
   void SetInvVarsAndMeans(const MatrixBase<Real> &invvars,
-                          const MatrixBase<Real> &means);
+      const MatrixBase<Real> &means);
   /// Set the (inverse) variances and recompute means_invvars_
   template<class Real>
   void SetInvVars(const MatrixBase<Real> &v);
@@ -227,7 +227,7 @@ class DiagGmm {
   template<class Real>
   void GetComponentVariance(int32 gauss, VectorBase<Real> *out) const;
 
- private:
+private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   Vector<BaseFloat> gconsts_;
   bool valid_gconsts_;   ///< Recompute gconsts_ if false
@@ -239,12 +239,12 @@ class DiagGmm {
   // f1, f2 are first-order stats (normalized by zero-order stats)
   // s1, s2 are second-order stats (normalized by zero-order stats)
   BaseFloat merged_components_logdet(BaseFloat w1, BaseFloat w2,
-                                     const VectorBase<BaseFloat> &f1,
-                                     const VectorBase<BaseFloat> &f2,
-                                     const VectorBase<BaseFloat> &s1,
-                                     const VectorBase<BaseFloat> &s2) const;
+      const VectorBase<BaseFloat> &f1,
+      const VectorBase<BaseFloat> &f2,
+      const VectorBase<BaseFloat> &s1,
+      const VectorBase<BaseFloat> &s2) const;
 
- private:
+private:
   const DiagGmm &operator=(const DiagGmm &other);  // Disallow assignment
 };
 

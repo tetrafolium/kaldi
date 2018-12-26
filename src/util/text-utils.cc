@@ -28,9 +28,9 @@ namespace kaldi {
 
 template<class F>
 bool SplitStringToFloats(const std::string &full,
-                         const char *delim,
-                         bool omit_empty_strings,  // typically false
-                         std::vector<F> *out) {
+    const char *delim,
+    bool omit_empty_strings,                       // typically false
+    std::vector<F> *out) {
   KALDI_ASSERT(out != NULL);
   if (*(full.c_str()) == '\0') {
     out->clear();
@@ -51,18 +51,18 @@ bool SplitStringToFloats(const std::string &full,
 // Instantiate the template above for float and double.
 template
 bool SplitStringToFloats(const std::string &full,
-                         const char *delim,
-                         bool omit_empty_strings,
-                         std::vector<float> *out);
+    const char *delim,
+    bool omit_empty_strings,
+    std::vector<float> *out);
 template
 bool SplitStringToFloats(const std::string &full,
-                         const char *delim,
-                         bool omit_empty_strings,
-                         std::vector<double> *out);
+    const char *delim,
+    bool omit_empty_strings,
+    std::vector<double> *out);
 
 void SplitStringToVector(const std::string &full, const char *delim,
-                         bool omit_empty_strings,
-                         std::vector<std::string> *out) {
+    bool omit_empty_strings,
+    std::vector<std::string> *out) {
   size_t start = 0, found = 0, end = full.size();
   out->clear();
   while (found != std::string::npos) {
@@ -75,8 +75,8 @@ void SplitStringToVector(const std::string &full, const char *delim,
 }
 
 void JoinVectorToString(const std::vector<std::string> &vec_in,
-                        const char *delim, bool omit_empty_strings,
-                        std::string *str_out) {
+    const char *delim, bool omit_empty_strings,
+    std::string *str_out) {
   std::string tmp_str;
   for (size_t i = 0; i < vec_in.size(); i++) {
     if (!omit_empty_strings || !vec_in[i].empty()) {
@@ -118,8 +118,8 @@ bool IsToken(const std::string &token) {
 
 
 void SplitStringOnFirstSpace(const std::string &str,
-                             std::string *first,
-                             std::string *rest) {
+    std::string *first,
+    std::string *rest) {
   const char *white_chars = " \t\n\r\f\v";
   typedef std::string::size_type I;
   const I npos = std::string::npos;
@@ -164,7 +164,7 @@ bool IsLine(const std::string &line) {
 
 template <class T>
 class NumberIstream{
- public:
+public:
   explicit NumberIstream(std::istream &i) : in_(i) {}
 
   NumberIstream & operator >> (T &x) {
@@ -174,7 +174,7 @@ class NumberIstream{
     return ParseOnFail(&x);
   }
 
- private:
+private:
   std::istream &in_;
 
   bool RemainderIsOnlySpaces() {
@@ -208,18 +208,18 @@ class NumberIstream{
     // we'll keep just uppercase values.
     inf_nan_map["INF"] = std::numeric_limits<T>::infinity();
     inf_nan_map["+INF"] = std::numeric_limits<T>::infinity();
-    inf_nan_map["-INF"] = - std::numeric_limits<T>::infinity();
+    inf_nan_map["-INF"] = -std::numeric_limits<T>::infinity();
     inf_nan_map["INFINITY"] = std::numeric_limits<T>::infinity();
     inf_nan_map["+INFINITY"] = std::numeric_limits<T>::infinity();
-    inf_nan_map["-INFINITY"] = - std::numeric_limits<T>::infinity();
+    inf_nan_map["-INFINITY"] = -std::numeric_limits<T>::infinity();
     inf_nan_map["NAN"] = std::numeric_limits<T>::quiet_NaN();
     inf_nan_map["+NAN"] = std::numeric_limits<T>::quiet_NaN();
-    inf_nan_map["-NAN"] = - std::numeric_limits<T>::quiet_NaN();
+    inf_nan_map["-NAN"] = -std::numeric_limits<T>::quiet_NaN();
     // MSVC
     inf_nan_map["1.#INF"] = std::numeric_limits<T>::infinity();
-    inf_nan_map["-1.#INF"] = - std::numeric_limits<T>::infinity();
+    inf_nan_map["-1.#INF"] = -std::numeric_limits<T>::infinity();
     inf_nan_map["1.#QNAN"] = std::numeric_limits<T>::quiet_NaN();
-    inf_nan_map["-1.#QNAN"] = - std::numeric_limits<T>::quiet_NaN();
+    inf_nan_map["-1.#QNAN"] = -std::numeric_limits<T>::quiet_NaN();
 
     std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 
@@ -236,7 +236,7 @@ class NumberIstream{
 
 template <typename T>
 bool ConvertStringToReal(const std::string &str,
-                         T *out) {
+    T *out) {
   std::istringstream iss(str);
 
   NumberIstream<T> i(iss);
@@ -253,39 +253,39 @@ bool ConvertStringToReal(const std::string &str,
 
 template
 bool ConvertStringToReal(const std::string &str,
-                         float *out);
+    float *out);
 template
 bool ConvertStringToReal(const std::string &str,
-                         double *out);
+    double *out);
 
 
 
 /*
-  This function is a helper function of StringsApproxEqual.  It should be
-  thought of as a recursive function-- it was designed that way-- but rather
-  than actually recursing (which would cause problems with stack overflow), we
-  just set the args and return to the start.
+   This function is a helper function of StringsApproxEqual.  It should be
+   thought of as a recursive function-- it was designed that way-- but rather
+   than actually recursing (which would cause problems with stack overflow), we
+   just set the args and return to the start.
 
-  The 'decimal_places_tolerance' argument is just passed in from outside,
-  see the documentation for StringsApproxEqual in text-utils.h to see an
-  explanation.  The argument 'places_into_number' provides some information
-  about the strings 'a' and 'b' that precedes the current pointers.
-  For purposes of this comment, let's define the 'decimal' of a number
-  as the part that comes after the decimal point, e.g. in '99.123',
-  '123' would be the decimal.  If 'places_into_number' is -1, it means
-  we're not currently inside some place like that (i.e. it's not the
-  case that we're pointing to the '1' or the '2' or the '3').
-  If it's 0, then we'd be pointing to the first place after the decimal,
-  '1' in this case.  Note if one of the numbers is shorter than the
-  other, like '99.123' versus '99.1234' and 'a' points to the first '3'
-  while 'b' points to the second '4', 'places_into_number' referes to the
-  shorter of the two, i.e. it would be 2 in this example.
+   The 'decimal_places_tolerance' argument is just passed in from outside,
+   see the documentation for StringsApproxEqual in text-utils.h to see an
+   explanation.  The argument 'places_into_number' provides some information
+   about the strings 'a' and 'b' that precedes the current pointers.
+   For purposes of this comment, let's define the 'decimal' of a number
+   as the part that comes after the decimal point, e.g. in '99.123',
+   '123' would be the decimal.  If 'places_into_number' is -1, it means
+   we're not currently inside some place like that (i.e. it's not the
+   case that we're pointing to the '1' or the '2' or the '3').
+   If it's 0, then we'd be pointing to the first place after the decimal,
+   '1' in this case.  Note if one of the numbers is shorter than the
+   other, like '99.123' versus '99.1234' and 'a' points to the first '3'
+   while 'b' points to the second '4', 'places_into_number' referes to the
+   shorter of the two, i.e. it would be 2 in this example.
 
 
  */
 bool StringsApproxEqualInternal(const char *a, const char *b,
-                                int32 decimal_places_tolerance,
-                                int32 places_into_number) {
+    int32 decimal_places_tolerance,
+    int32 places_into_number) {
 start:
   char ca = *a, cb = *b;
   if (ca == cb) {
@@ -317,7 +317,7 @@ start:
       // we'll have advanced at least one of the two strings.
       goto start;
     } else if (places_into_number >= 0 &&
-               ((ca == '0' && !isdigit(cb)) || (cb == '0' && !isdigit(ca)))) {
+        ((ca == '0' && !isdigit(cb)) || (cb == '0' && !isdigit(ca)))) {
       // this clause is designed to ensure that, for example,
       // "0.1" would count the same as "0.100001".
       if (ca == '0') a++;
@@ -333,8 +333,8 @@ start:
 
 
 bool StringsApproxEqual(const std::string &a,
-                        const std::string &b,
-                        int32 decimal_places_tolerance) {
+    const std::string &b,
+    int32 decimal_places_tolerance) {
   return StringsApproxEqualInternal(a.c_str(), b.c_str(),
                                     decimal_places_tolerance, -1);
 }

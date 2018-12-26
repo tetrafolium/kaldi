@@ -36,17 +36,17 @@ namespace nnet3 {
    supervision objects to 'example_writer'.  Note: if normalization_fst is the
    empty FST (with no states), it skips the final stage of egs preparation and
    you should do it later with nnet3-chain-normalize-egs.
-*/
+ */
 
 static bool ProcessFile(const fst::StdVectorFst &normalization_fst,
-                        const GeneralMatrix &feats,
-                        const MatrixBase<BaseFloat> *ivector_feats,
-                        int32 ivector_period,
-                        const chain::Supervision &supervision,
-                        const std::string &utt_id,
-                        bool compress,
-                        UtteranceSplitter *utt_splitter,
-                        NnetChainExampleWriter *example_writer) {
+    const GeneralMatrix &feats,
+    const MatrixBase<BaseFloat> *ivector_feats,
+    int32 ivector_period,
+    const chain::Supervision &supervision,
+    const std::string &utt_id,
+    bool compress,
+    UtteranceSplitter *utt_splitter,
+    NnetChainExampleWriter *example_writer) {
   KALDI_ASSERT(supervision.num_sequences == 1);
   int32 num_input_frames = feats.NumRows(),
       num_output_frames = supervision.frames_per_sequence;
@@ -94,13 +94,13 @@ static bool ProcessFile(const fst::StdVectorFst &normalization_fst,
                             // that the supervised part starts from frame 0.
 
     SubVector<BaseFloat> output_weights(
-        &(chunk.output_weights[0]),
-        static_cast<int32>(chunk.output_weights.size()));
+      &(chunk.output_weights[0]),
+      static_cast<int32>(chunk.output_weights.size()));
 
     NnetChainSupervision nnet_supervision("output", supervision_part,
-                                          output_weights,
-                                          first_frame,
-                                          frame_subsampling_factor);
+        output_weights,
+        first_frame,
+        frame_subsampling_factor);
 
     NnetChainExample nnet_chain_eg;
     nnet_chain_eg.outputs.resize(1);
@@ -241,10 +241,10 @@ int main(int argc, char *argv[]) {
     // when selecting parts of matrices.
     SequentialGeneralMatrixReader feat_reader(feature_rspecifier);
     chain::RandomAccessSupervisionReader supervision_reader(
-        supervision_rspecifier);
+      supervision_rspecifier);
     NnetChainExampleWriter example_writer(examples_wspecifier);
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
 
     int32 num_err = 0;
 
@@ -270,8 +270,8 @@ int main(int argc, char *argv[]) {
         }
         if (online_ivector_feats != NULL &&
             (abs(feats.NumRows() - (online_ivector_feats->NumRows() *
-                                    online_ivector_period)) > length_tolerance
-             || online_ivector_feats->NumRows() == 0)) {
+            online_ivector_period)) > length_tolerance
+            || online_ivector_feats->NumRows() == 0)) {
           KALDI_WARN << "Length difference between feats " << feats.NumRows()
                      << " and iVectors " << online_ivector_feats->NumRows()
                      << "exceeds tolerance " << length_tolerance;
@@ -288,7 +288,7 @@ int main(int argc, char *argv[]) {
     }
     if (num_err > 0)
       KALDI_WARN << num_err << " utterances had errors and could "
-          "not be processed.";
+        "not be processed.";
     // utt_splitter prints stats in its destructor.
     return utt_splitter.ExitStatus();
   } catch(const std::exception &e) {

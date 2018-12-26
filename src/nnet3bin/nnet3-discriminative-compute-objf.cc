@@ -72,10 +72,10 @@ int main(int argc, char *argv[]) {
       am_nnet.Read(ki.Stream(), binary);
     }
 
-    NnetDiscriminativeComputeObjf discriminative_objf_computer(nnet_opts, 
-                                              discriminative_opts, 
-                                              tmodel, am_nnet.Priors(), 
-                                              am_nnet.GetNnet());
+    NnetDiscriminativeComputeObjf discriminative_objf_computer(nnet_opts,
+        discriminative_opts,
+        tmodel, am_nnet.Priors(),
+        am_nnet.GetNnet());
 
     SequentialNnetDiscriminativeExampleReader example_reader(examples_rspecifier);
 

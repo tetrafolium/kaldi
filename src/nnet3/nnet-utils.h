@@ -42,9 +42,9 @@ namespace nnet3 {
 /// request.outputs.
 /// It does this by executing some of the early stages of compilation.
 void EvaluateComputationRequest(
-    const Nnet &nnet,
-    const ComputationRequest &request,
-    std::vector<std::vector<bool> > *is_computable);
+  const Nnet &nnet,
+  const ComputationRequest &request,
+  std::vector<std::vector<bool> > *is_computable);
 
 
 /// returns the number of output nodes of this nnet.
@@ -56,28 +56,28 @@ int32 NumInputNodes(const Nnet &nnet);
 /// Calls PerturbParams (with the given stddev) on all updatable components of
 /// the nnet.
 void PerturbParams(BaseFloat stddev,
-                   Nnet *nnet);
+    Nnet *nnet);
 
 
 /// Returns dot product between two networks of the same structure (calls the
 /// DotProduct functions of the Updatable components and sums up the return
 /// values).
 BaseFloat DotProduct(const Nnet &nnet1,
-                     const Nnet &nnet2);
+    const Nnet &nnet2);
 
 /// Returns dot products between two networks of the same structure (calls the
 /// DotProduct functions of the Updatable components and fill in the output
 /// vector).
 void ComponentDotProducts(const Nnet &nnet1,
-                          const Nnet &nnet2,
-                          VectorBase<BaseFloat> *dot_prod);
+    const Nnet &nnet2,
+    VectorBase<BaseFloat> *dot_prod);
 
 /// This function is for printing, to a string, a vector with one element per
 /// updatable component of the nnet (e.g. the output of ComponentDotProducts),
 /// in a human readable way, as [ component-name1:number1
 /// component-name2:number2 ... ].
 std::string PrintVectorPerUpdatableComponent(const Nnet &nnet,
-                                             const VectorBase<BaseFloat> &vec);
+    const VectorBase<BaseFloat> &vec);
 
 /// This function returns true if the nnet has the following properties:
 ///  It has an output called "output" (other outputs are allowed but may be
@@ -101,15 +101,15 @@ void ZeroComponentStats(Nnet *nnet);
 /// of nnet.Modulus().   Then it returns the largest left context and the largest
 /// right context that it infers from any of these computation requests.
 void ComputeSimpleNnetContext(const Nnet &nnet,
-                              int32 *left_context,
-                              int32 *right_context);
+    int32 *left_context,
+    int32 *right_context);
 
 
 /// Sets the underlying learning rate for all the components in the nnet to this
 /// value.  this will get multiplied by the individual learning-rate-factors to
 /// produce the actual learning rates.
 void SetLearningRate(BaseFloat learning_rate,
-                     Nnet *nnet);
+    Nnet *nnet);
 
 /// Scales the nnet parameters and stats by this scale.
 void ScaleNnet(BaseFloat scale, Nnet *nnet);
@@ -126,7 +126,7 @@ void AddNnet(const Nnet &src, BaseFloat alpha, Nnet *dest);
 /// and *dest += scale * src for other components (affects stored stats).
 /// Here, alphas is a vector of size equal to the number of updatable components
 void AddNnetComponents(const Nnet &src, const Vector<BaseFloat> &alphas,
-                       BaseFloat scale, Nnet *dest);
+    BaseFloat scale, Nnet *dest);
 
 /// Returns true if 'nnet' has some kind of recurrency.
 bool NnetIsRecurrent(const Nnet &nnet);
@@ -138,13 +138,13 @@ int32 NumParameters(const Nnet &src);
 /// Copies the nnet parameters to *params, whose dimension must
 /// be equal to NumParameters(src).
 void VectorizeNnet(const Nnet &src,
-                   VectorBase<BaseFloat> *params);
+    VectorBase<BaseFloat> *params);
 
 
 /// Copies the parameters from params to *dest.  the dimension of params must
 /// be equal to NumParameters(*dest).
 void UnVectorizeNnet(const VectorBase<BaseFloat> &params,
-                     Nnet *dest);
+    Nnet *dest);
 
 /// Returns the number of updatable components in the nnet.
 int32 NumUpdatableComponents(const Nnet &dest);
@@ -198,12 +198,12 @@ void RecomputeStats(const std::vector<NnetExample> &egs, Nnet *nnet);
 void SetDropoutTestMode(bool test_mode, Nnet *nnet);
 
 /**
-  \brief  This function calls 'ResetGenerator()' on all components in 'nnet'
+   \brief  This function calls 'ResetGenerator()' on all components in 'nnet'
      that inherit from class RandomComponent.  It's used when you need
      to ensure consistency in things like dropout masks, across subsequent
      neural net evaluations.  You will likely want to call srand() before calling
      this.
-*/
+ */
 void ResetGenerators(Nnet *nnet);
 
 /// This function finds a list of components that are never used, and outputs
@@ -235,10 +235,10 @@ struct CollapseModelConfig {
   bool collapse_batchnorm;  // batchnorm then affine.
   bool collapse_affine;  // affine or fixed-affine then affine.
   bool collapse_scale;  // affine then fixed-scale.
-  CollapseModelConfig(): collapse_dropout(true),
-                         collapse_batchnorm(true),
-                         collapse_affine(true),
-                         collapse_scale(true) { }
+  CollapseModelConfig() : collapse_dropout(true),
+    collapse_batchnorm(true),
+    collapse_affine(true),
+    collapse_scale(true) { }
 };
 
 /**
@@ -249,7 +249,7 @@ struct CollapseModelConfig {
    speed.
  */
 void CollapseModel(const CollapseModelConfig &config,
-                   Nnet *nnet);
+    Nnet *nnet);
 
 
 /**
@@ -264,7 +264,7 @@ void CollapseModel(const CollapseModelConfig &config,
    UNIX globbing patterns where the only metacharacter is '*', representing zero
    or more characters.
 
-  \verbatim
+   \verbatim
     convert-to-fixed-affine [name=<name-pattern>]
       Converts the given affine components to FixedAffineComponent which is not updatable.
 
@@ -301,7 +301,7 @@ void CollapseModel(const CollapseModelConfig &config,
        Sets the dropout rates for any components of type DropoutComponent whose
        names match the given <name-pattern> (e.g. lstm*).  <name-pattern> defaults to "*".
    \endverbatim
-*/
+ */
 void ReadEditConfig(std::istream &config_file, Nnet *nnet);
 
 /**
@@ -352,14 +352,14 @@ void ReadEditConfig(std::istream &config_file, Nnet *nnet);
                    this the count for each per-component max-change.
    @param [out] num_max_change_global_applied  We to this the count for the
                    global max-change.
-*/
+ */
 bool UpdateNnetWithMaxChange(const Nnet &delta_nnet,
-                             BaseFloat max_param_change,
-                             BaseFloat max_change_scale,
-                             BaseFloat scale, Nnet *nnet,
-                             std::vector<int32> *
-                             num_max_change_per_component_applied,
-                             int32 *num_max_change_global_applied);
+    BaseFloat max_param_change,
+    BaseFloat max_change_scale,
+    BaseFloat scale, Nnet *nnet,
+    std::vector<int32> *
+    num_max_change_per_component_applied,
+    int32 *num_max_change_global_applied);
 
 
 /**
@@ -422,8 +422,8 @@ bool UpdateNnetWithMaxChange(const Nnet &delta_nnet,
                       values.  This is what this code adds to.
  */
 void ApplyL2Regularization(const Nnet &nnet,
-                           BaseFloat l2_regularize_scale,
-                           Nnet *delta_nnet);
+    BaseFloat l2_regularize_scale,
+    Nnet *delta_nnet);
 
 
 /** This utility function can be used to obtain the number of distinct 'n'
@@ -447,7 +447,7 @@ void ApplyL2Regularization(const Nnet &nnet,
                         'exhaustive=true'.
  */
 int32 GetNumNvalues(const std::vector<NnetIo> &io_vec,
-                    bool exhaustive);
+    bool exhaustive);
 
 
 } // namespace nnet3

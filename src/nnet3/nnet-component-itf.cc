@@ -38,20 +38,20 @@ namespace kaldi {
 namespace nnet3 {
 
 ComponentPrecomputedIndexes* ComponentPrecomputedIndexes::ReadNew(std::istream &is,
-                                                                  bool binary) {
+    bool binary) {
   std::string token;
   ReadToken(is, binary, &token); // e.g. "<DistributePrecomputedComponentIndexes>".
   token.erase(0, 1); // erase "<".
   token.erase(token.length()-1); // erase ">".
   ComponentPrecomputedIndexes *ans = NewComponentPrecomputedIndexesOfType(token);
   if (!ans)
-   KALDI_ERR << "Unknown ComponentPrecomputedIndexes type " << token;
+    KALDI_ERR << "Unknown ComponentPrecomputedIndexes type " << token;
   ans->Read(is, binary);
   return ans;
 }
 
 ComponentPrecomputedIndexes* ComponentPrecomputedIndexes::NewComponentPrecomputedIndexesOfType(
-                                           const std::string &cpi_type) {
+  const std::string &cpi_type) {
   ComponentPrecomputedIndexes *ans = NULL;
   if (cpi_type == "DistributeComponentPrecomputedIndexes") {
     ans = new DistributeComponentPrecomputedIndexes();
@@ -182,16 +182,16 @@ std::string Component::Info() const {
 }
 
 void Component::GetInputIndexes(const MiscComputationInfo &misc_info,
-                                const Index &output_index,
-                                std::vector<Index> *input_indexes) const {
+    const Index &output_index,
+    std::vector<Index> *input_indexes) const {
   input_indexes->resize(1);
   (*input_indexes)[0] = output_index;
 }
 
 bool Component::IsComputable(const MiscComputationInfo &misc_info,
-                             const Index &output_index,
-                             const IndexSet &input_index_set,
-                             std::vector<Index> *used_inputs) const {
+    const Index &output_index,
+    const IndexSet &input_index_set,
+    std::vector<Index> *used_inputs) const {
   // the default Component dependency is for an output index to map directly to
   // the same input index, which is required to compute the output.
   if (!input_index_set(output_index))
@@ -204,12 +204,12 @@ bool Component::IsComputable(const MiscComputationInfo &misc_info,
 }
 
 
-UpdatableComponent::UpdatableComponent(const UpdatableComponent &other):
-    learning_rate_(other.learning_rate_),
-    learning_rate_factor_(other.learning_rate_factor_),
-    is_gradient_(other.is_gradient_),
-    l2_regularize_(other.l2_regularize_),
-    max_change_(other.max_change_) { }
+UpdatableComponent::UpdatableComponent(const UpdatableComponent &other) :
+  learning_rate_(other.learning_rate_),
+  learning_rate_factor_(other.learning_rate_factor_),
+  is_gradient_(other.is_gradient_),
+  l2_regularize_(other.l2_regularize_),
+  max_change_(other.max_change_) { }
 
 // If these defaults are changed, the defaults in the constructor that
 // takes no arguments should be changed too.
@@ -229,7 +229,7 @@ void UpdatableComponent::InitLearningRatesFromConfig(ConfigLine *cfl) {
 
 
 std::string UpdatableComponent::ReadUpdatableCommon(std::istream &is,
-                                                    bool binary) {
+    bool binary) {
   std::ostringstream opening_tag;
   opening_tag << '<' << this->Type() << '>';
   std::string token;
@@ -272,7 +272,7 @@ std::string UpdatableComponent::ReadUpdatableCommon(std::istream &is,
 }
 
 void UpdatableComponent::WriteUpdatableCommon(std::ostream &os,
-                                              bool binary) const {
+    bool binary) const {
   std::ostringstream opening_tag;
   opening_tag << '<' << this->Type() << '>';
   std::string token;
@@ -315,8 +315,8 @@ std::string UpdatableComponent::Info() const {
 }
 
 void NonlinearComponent::StoreStatsInternal(
-    const CuMatrixBase<BaseFloat> &out_value,
-    const CuMatrixBase<BaseFloat> *deriv) {
+  const CuMatrixBase<BaseFloat> &out_value,
+  const CuMatrixBase<BaseFloat> *deriv) {
   KALDI_ASSERT(out_value.NumCols() == InputDim());
   // Check we have the correct dimensions.
   if (value_sum_.Dim() != InputDim() ||
@@ -370,7 +370,7 @@ std::string NonlinearComponent::Info() const {
            << std::setprecision(6);
     stream << ", self-repaired-proportion="
            << (num_dims_processed_ > 0 ?
-               num_dims_self_repaired_ / num_dims_processed_ : 0);
+    num_dims_self_repaired_ / num_dims_processed_ : 0);
     Vector<double> value_avg_dbl(value_sum_);
     Vector<BaseFloat> value_avg(value_avg_dbl);
     value_avg.Scale(1.0 / count_);
@@ -493,21 +493,21 @@ void NonlinearComponent::Write(std::ostream &os, bool binary) const {
   WriteToken(os, binary, ostr_end.str());
 }
 
-NonlinearComponent::NonlinearComponent():
-    dim_(-1), count_(0.0),
-    num_dims_self_repaired_(0.0), num_dims_processed_(0.0),
-    self_repair_lower_threshold_(kUnsetThreshold),
-    self_repair_upper_threshold_(kUnsetThreshold),
-    self_repair_scale_(0.0) { }
+NonlinearComponent::NonlinearComponent() :
+  dim_(-1), count_(0.0),
+  num_dims_self_repaired_(0.0), num_dims_processed_(0.0),
+  self_repair_lower_threshold_(kUnsetThreshold),
+  self_repair_upper_threshold_(kUnsetThreshold),
+  self_repair_scale_(0.0) { }
 
-NonlinearComponent::NonlinearComponent(const NonlinearComponent &other):
-    dim_(other.dim_), value_sum_(other.value_sum_), deriv_sum_(other.deriv_sum_),
-    count_(other.count_),
-    num_dims_self_repaired_(other.num_dims_self_repaired_),
-    num_dims_processed_(other.num_dims_processed_),
-    self_repair_lower_threshold_(other.self_repair_lower_threshold_),
-    self_repair_upper_threshold_(other.self_repair_upper_threshold_),
-    self_repair_scale_(other.self_repair_scale_) { }
+NonlinearComponent::NonlinearComponent(const NonlinearComponent &other) :
+  dim_(other.dim_), value_sum_(other.value_sum_), deriv_sum_(other.deriv_sum_),
+  count_(other.count_),
+  num_dims_self_repaired_(other.num_dims_self_repaired_),
+  num_dims_processed_(other.num_dims_processed_),
+  self_repair_lower_threshold_(other.self_repair_lower_threshold_),
+  self_repair_upper_threshold_(other.self_repair_upper_threshold_),
+  self_repair_scale_(other.self_repair_scale_) { }
 
 void NonlinearComponent::InitFromConfig(ConfigLine *cfl) {
   bool ok = cfl->GetValue("dim", &dim_);

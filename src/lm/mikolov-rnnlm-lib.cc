@@ -376,7 +376,7 @@ void CRnnLM::initNet() {
     }
 
   syn_d =
-    reinterpret_cast<direct_t *>(calloc(static_cast<long long>(direct_size),
+      reinterpret_cast<direct_t *>(calloc(static_cast<long long>(direct_size),
                                          sizeof(direct_t)));
 
   if (syn_d == NULL) {
@@ -473,7 +473,7 @@ void CRnnLM::initNet() {
       bptt_history[a] = -1;
     }
     bptt_hidden = reinterpret_cast<neuron *>(calloc(
-                        (bptt + bptt_block + 1) * layer1_size, sizeof(neuron)));
+          (bptt + bptt_block + 1) * layer1_size, sizeof(neuron)));
     for (a = 0; a < (bptt + bptt_block) * layer1_size; a++) {
       bptt_hidden[a].ac = 0;
       bptt_hidden[a].er = 0;
@@ -773,8 +773,8 @@ void CRnnLM::restoreNet() {   // will read whole network structure
       syn_d[aa] = fl;
 
       /*fread(&si, 2, 1, fi);
-        fl = si/(float)(4*256);
-        syn_d[aa] = fl;*/
+         fl = si/(float)(4*256);
+         syn_d[aa] = fl;*/
     }
   }
 
@@ -810,8 +810,8 @@ void CRnnLM::netReset() {  // cleans hidden layer activation + bptt history
 }
 
 void CRnnLM::matrixXvector(struct neuron *dest, struct neuron *srcvec,
-                           struct synapse *srcmatrix, int matrix_width,
-                           int from, int to, int from2, int to2, int type) {
+    struct synapse *srcmatrix, int matrix_width,
+    int from, int to, int from2, int to2, int type) {
   int a, b;
   real val1, val2, val3, val4;
   real val5, val6, val7, val8;
@@ -893,7 +893,7 @@ void CRnnLM::matrixXvector(struct neuron *dest, struct neuron *srcvec,
     for (a = a * 8; a < to2 - from2; a++) {
       for (b = from; b < to; b++) {
         dest[a + from2].er
-            += srcvec[b].er * srcmatrix[a + from2 + b * matrix_width].weight;
+          += srcvec[b].er * srcmatrix[a + from2 + b * matrix_width].weight;
       }
     }
 
@@ -907,20 +907,20 @@ void CRnnLM::matrixXvector(struct neuron *dest, struct neuron *srcvec,
   // this is normal implementation (about 3x slower):
 
   /*if (type == 0) {    //ac mod
-    for (b = from; b < to; b++) {
-    for (a = from2; a < to2; a++) {
-    dest[b].ac += srcvec[a].ac * srcmatrix[a+b*matrix_width].weight;
-    }
-    }
-    }
-    else     //er mod
-    if (type == 1) {
-    for (a = from2; a < to2; a++) {
-    for (b = from; b < to; b++) {
-    dest[a].er += srcvec[b].er * srcmatrix[a+b*matrix_width].weight;
-    }
-    }
-    }*/
+     for (b = from; b < to; b++) {
+     for (a = from2; a < to2; a++) {
+     dest[b].ac += srcvec[a].ac * srcmatrix[a+b*matrix_width].weight;
+     }
+     }
+     }
+     else     //er mod
+     if (type == 1) {
+     for (a = from2; a < to2; a++) {
+     for (b = from; b < to; b++) {
+     dest[a].er += srcvec[b].er * srcmatrix[a+b*matrix_width].weight;
+     }
+     }
+     }*/
 }
 
 void CRnnLM::computeNet(int last_word, int word) {
@@ -1061,38 +1061,38 @@ void CRnnLM::computeNet(int last_word, int word) {
 
   // apply direct connections to words
   if (word != -1) if (direct_size > 0) {
-    unsigned long long  hash[MAX_NGRAM_ORDER];
+      unsigned long long  hash[MAX_NGRAM_ORDER];
 
-    for (a = 0; a < direct_order; a++) {
-      hash[a] = 0;
-    }
-
-    for (a = 0; a < direct_order; a++) {
-      b = 0;
-      if (a > 0) if (history[a - 1] == -1) break;
-      hash[a] =
-          PRIMES[0] * PRIMES[1] *
-          static_cast<unsigned long long>(vocab[word].class_index + 1);
-
-      for (b = 1; b <= a; b++) {
-        hash[a] += PRIMES[(a * PRIMES[b] + b) % PRIMES_SIZE]
-            * static_cast<unsigned long long>(history[b - 1] + 1);
+      for (a = 0; a < direct_order; a++) {
+        hash[a] = 0;
       }
-      hash[a] = (hash[a] % (direct_size / 2)) + (direct_size) / 2;
-    }
 
-    for (c = 0; c < class_cn[vocab[word].class_index]; c++) {
-      a = class_words[vocab[word].class_index][c];
+      for (a = 0; a < direct_order; a++) {
+        b = 0;
+        if (a > 0) if (history[a - 1] == -1) break;
+        hash[a] =
+            PRIMES[0] * PRIMES[1] *
+            static_cast<unsigned long long>(vocab[word].class_index + 1);
 
-      for (b = 0; b < direct_order; b++) if (hash[b]) {
-        neu2[a].ac += syn_d[hash[b]];
-        hash[b]++;
-        hash[b] = hash[b] % direct_size;
-      } else {
-        break;
+        for (b = 1; b <= a; b++) {
+          hash[a] += PRIMES[(a * PRIMES[b] + b) % PRIMES_SIZE]
+              * static_cast<unsigned long long>(history[b - 1] + 1);
+        }
+        hash[a] = (hash[a] % (direct_size / 2)) + (direct_size) / 2;
+      }
+
+      for (c = 0; c < class_cn[vocab[word].class_index]; c++) {
+        a = class_words[vocab[word].class_index][c];
+
+        for (b = 0; b < direct_order; b++) if (hash[b]) {
+            neu2[a].ac += syn_d[hash[b]];
+            hash[b]++;
+            hash[b] = hash[b] % direct_size;
+          } else {
+            break;
+          }
       }
     }
-  }
 
   // activation 2   --softmax on words
   sum = 0;
@@ -1135,10 +1135,10 @@ void CRnnLM::saveContextToVector(std::vector <float> *context_out) {
 }
 
 float CRnnLM::computeConditionalLogprob(
-    std::string current_word,
-    const std::vector < std::string >  &history_words,
-    const std::vector < float >  &context_in,
-    std::vector < float >  *context_out) {
+  std::string current_word,
+  const std::vector < std::string >  &history_words,
+  const std::vector < float >  &context_in,
+  std::vector < float >  *context_out) {
   // We assume the network has been restored.
   netReset();
   restoreContextFromVector(context_in);

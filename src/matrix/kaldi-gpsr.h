@@ -137,8 +137,8 @@ inline void GpsrConfig::Register(OptionsItf *opts) {
 /// L_1 term.
 template<typename Real>
 Real Gpsr(const GpsrConfig &opts, const SpMatrix<Real> &H,
-          const Vector<Real> &g, Vector<Real> *x,
-          const char *debug_str = "[unknown]") {
+    const Vector<Real> &g, Vector<Real> *x,
+    const char *debug_str = "[unknown]") {
   if (opts.use_gpsr_bb)
     return GpsrBB(opts, H, g, x, debug_str);
   else
@@ -150,15 +150,15 @@ Real Gpsr(const GpsrConfig &opts, const SpMatrix<Real> &H,
 /// projection arc" in Bertsekas, Nonlinear Programming, 2nd ed. page 230.
 template<typename Real>
 Real GpsrBasic(const GpsrConfig &opts, const SpMatrix<Real> &H,
-               const Vector<Real> &g, Vector<Real> *x,
-               const char *debug_str = "[unknown]");
+    const Vector<Real> &g, Vector<Real> *x,
+    const char *debug_str = "[unknown]");
 
 /// This is the paper calls the Barzilai-Borwein variant. This is a constrained
 /// Netwon's method where the Hessian is approximated by scaled identity matrix
 template<typename Real>
 Real GpsrBB(const GpsrConfig &opts, const SpMatrix<Real> &H,
-            const Vector<Real> &g, Vector<Real> *x,
-            const char *debug_str = "[unknown]");
+    const Vector<Real> &g, Vector<Real> *x,
+    const char *debug_str = "[unknown]");
 
 
 }  // namespace kaldi

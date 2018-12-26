@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
 
         bool pad_input = true;
         DecodableAmNnet nnet_decodable(trans_model, am_nnet, features,
-                                       pad_input, acoustic_scale);
+            pad_input, acoustic_scale);
 
         AlignUtteranceWrapper(align_config, utt,
                               acoustic_scale, &decode_fst, &nnet_decodable,

@@ -51,8 +51,8 @@ struct DeltaFeaturesOptions {
   // the behavior at the edges is to replicate the first or last frame.
   // this is not configurable.
 
-  DeltaFeaturesOptions(int32 order = 2, int32 window = 2):
-      order(order), window(window) { }
+  DeltaFeaturesOptions(int32 order = 2, int32 window = 2) :
+    order(order), window(window) { }
   void Register(OptionsItf *opts) {
     opts->Register("delta-order", &order, "Order of delta computation");
     opts->Register("delta-window", &window,
@@ -62,7 +62,7 @@ struct DeltaFeaturesOptions {
 };
 
 class DeltaFeatures {
- public:
+public:
   // This class provides a low-level function to compute delta features.
   // The function takes as input a matrix of features and a frame index
   // that it should compute the deltas on.  It puts its output in an object
@@ -73,9 +73,9 @@ class DeltaFeatures {
   explicit DeltaFeatures(const DeltaFeaturesOptions &opts);
 
   void Process(const MatrixBase<BaseFloat> &input_feats,
-               int32 frame,
-               VectorBase<BaseFloat> *output_frame) const;
- private:
+      int32 frame,
+      VectorBase<BaseFloat> *output_frame) const;
+private:
   DeltaFeaturesOptions opts_;
   std::vector<Vector<BaseFloat> > scales_;  // a scaling window for each
   // of the orders, including zero: multiply the features for each
@@ -84,11 +84,11 @@ class DeltaFeatures {
 
 struct ShiftedDeltaFeaturesOptions {
   int32 window,           // The time delay and advance
-        num_blocks,
-        block_shift;      // Distance between consecutive blocks
+      num_blocks,
+      block_shift;        // Distance between consecutive blocks
 
-  ShiftedDeltaFeaturesOptions():
-      window(1), num_blocks(7), block_shift(3) { }
+  ShiftedDeltaFeaturesOptions() :
+    window(1), num_blocks(7), block_shift(3) { }
   void Register(OptionsItf *opts) {
     opts->Register("delta-window", &window, "Size of delta advance and delay.");
     opts->Register("num-blocks", &num_blocks, "Number of delta blocks in advance"
@@ -98,7 +98,7 @@ struct ShiftedDeltaFeaturesOptions {
 };
 
 class ShiftedDeltaFeatures {
- public:
+public:
   // This class provides a low-level function to compute shifted
   // delta cesptra (SDC).
   // The function takes as input a matrix of features and a frame index
@@ -108,9 +108,9 @@ class ShiftedDeltaFeatures {
   explicit ShiftedDeltaFeatures(const ShiftedDeltaFeaturesOptions &opts);
 
   void Process(const MatrixBase<BaseFloat> &input_feats,
-               int32 frame,
-               SubVector<BaseFloat> *output_frame) const;
- private:
+      int32 frame,
+      SubVector<BaseFloat> *output_frame) const;
+private:
   ShiftedDeltaFeaturesOptions opts_;
   Vector<BaseFloat> scales_;  // a scaling window for each
 
@@ -122,15 +122,15 @@ class ShiftedDeltaFeatures {
 // frame.  Later we will have to come up with a nice mechanism to do this for
 // features coming in.
 void ComputeDeltas(const DeltaFeaturesOptions &delta_opts,
-                   const MatrixBase<BaseFloat> &input_features,
-                   Matrix<BaseFloat> *output_features);
+    const MatrixBase<BaseFloat> &input_features,
+    Matrix<BaseFloat> *output_features);
 
 // ComputeShiftedDeltas computes deltas from a feature file by applying
 // ShiftedDeltaFeatures over the frames. This function is provided for
 // convenience, however, ShiftedDeltaFeatures can be used directly.
 void ComputeShiftedDeltas(const ShiftedDeltaFeaturesOptions &delta_opts,
-                   const MatrixBase<BaseFloat> &input_features,
-                   Matrix<BaseFloat> *output_features);
+    const MatrixBase<BaseFloat> &input_features,
+    Matrix<BaseFloat> *output_features);
 
 // SpliceFrames will normally be used together with LDA.
 // It splices frames together to make a window.  At the
@@ -141,13 +141,13 @@ void ComputeShiftedDeltas(const ShiftedDeltaFeaturesOptions &delta_opts,
 // these both represent a number of frames (e.g. 4, 4 is
 // a good choice).
 void SpliceFrames(const MatrixBase<BaseFloat> &input_features,
-                  int32 left_context,
-                  int32 right_context,
-                  Matrix<BaseFloat> *output_features);
+    int32 left_context,
+    int32 right_context,
+    Matrix<BaseFloat> *output_features);
 
 // ReverseFrames reverses the frames in time (used for backwards decoding)
 void ReverseFrames(const MatrixBase<BaseFloat> &input_features,
-                  Matrix<BaseFloat> *output_features);
+    Matrix<BaseFloat> *output_features);
 
 
 void InitIdftBases(int32 n_bases, int32 dimension, Matrix<BaseFloat> *mat_out);
@@ -161,11 +161,11 @@ struct SlidingWindowCmnOptions {
   bool normalize_variance;
   bool center;
 
-  SlidingWindowCmnOptions():
-      cmn_window(600),
-      min_window(100),
-      normalize_variance(false),
-      center(false) { }
+  SlidingWindowCmnOptions() :
+    cmn_window(600),
+    min_window(100),
+    normalize_variance(false),
+    center(false) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("cmn-window", &cmn_window, "Window in frames for running "
@@ -188,8 +188,8 @@ struct SlidingWindowCmnOptions {
 /// this works and what the options are.  input and output must have the same
 /// dimension.
 void SlidingWindowCmn(const SlidingWindowCmnOptions &opts,
-                      const MatrixBase<BaseFloat> &input,
-                      MatrixBase<BaseFloat> *output);
+    const MatrixBase<BaseFloat> &input,
+    MatrixBase<BaseFloat> *output);
 
 
 /// @} End of "addtogroup feat"

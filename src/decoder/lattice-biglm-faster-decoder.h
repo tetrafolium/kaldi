@@ -43,10 +43,10 @@ typedef LatticeFasterDecoderConfig LatticeBiglmFasterDecoderConfig;
     DeterministicOnDemandFst follows through the epsilons in G for you
     (assuming G is a standard backoff language model) and makes it look
     like a determinized FST.
-*/
+ */
 
 class LatticeBiglmFasterDecoder {
- public:
+public:
   typedef fst::StdArc Arc;
   typedef Arc::Label Label;
   typedef Arc::StateId StateId;
@@ -55,20 +55,20 @@ class LatticeBiglmFasterDecoder {
   typedef Arc::Weight Weight;
   // instantiate this class once for each thing you have to decode.
   LatticeBiglmFasterDecoder(
-      const fst::Fst<fst::StdArc> &fst,      
-      const LatticeBiglmFasterDecoderConfig &config,
-      fst::DeterministicOnDemandFst<fst::StdArc> *lm_diff_fst):
-      fst_(fst), lm_diff_fst_(lm_diff_fst), config_(config),
-      warned_noarc_(false), num_toks_(0) {
+    const fst::Fst<fst::StdArc> &fst,
+    const LatticeBiglmFasterDecoderConfig &config,
+    fst::DeterministicOnDemandFst<fst::StdArc> *lm_diff_fst) :
+    fst_(fst), lm_diff_fst_(lm_diff_fst), config_(config),
+    warned_noarc_(false), num_toks_(0) {
     config.Check();
     KALDI_ASSERT(fst.Start() != fst::kNoStateId &&
                  lm_diff_fst->Start() != fst::kNoStateId);
     toks_.SetSize(1000);  // just so on the first frame we do something reasonable.
   }
-  void SetOptions(const LatticeBiglmFasterDecoderConfig &config) { config_ = config; } 
-  LatticeBiglmFasterDecoderConfig GetOptions() { return config_; } 
+  void SetOptions(const LatticeBiglmFasterDecoderConfig &config) { config_ = config; }
+  LatticeBiglmFasterDecoderConfig GetOptions() { return config_; }
   ~LatticeBiglmFasterDecoder() {
-    DeleteElems(toks_.Clear());    
+    DeleteElems(toks_.Clear());
     ClearActiveTokens();
   }
 
@@ -89,7 +89,7 @@ class LatticeBiglmFasterDecoder {
     toks_.Insert(start_pair, start_tok);
     num_toks_++;
     ProcessNonemitting(0);
-    
+
     // We use 1-based indexing for frames in this decoder (if you view it in
     // terms of features), but note that the decodable object uses zero-based
     // numbering, which we have to correct for when we call it.
@@ -97,13 +97,13 @@ class LatticeBiglmFasterDecoder {
       active_toks_.resize(frame+1); // new column
 
       ProcessEmitting(decodable, frame);
-      
+
       ProcessNonemitting(frame);
 
       if (decodable->IsLastFrame(frame-1))
         PruneActiveTokensFinal(frame);
       else if (frame % config_.prune_interval == 0)
-        PruneActiveTokens(frame, config_.lattice_beam * 0.1); // use larger delta.        
+        PruneActiveTokens(frame, config_.lattice_beam * 0.1); // use larger delta.
     }
     // Returns true if we have any kind of traceback available (not necessarily
     // to the end state; query ReachedFinal() for that).
@@ -117,8 +117,8 @@ class LatticeBiglmFasterDecoder {
 
   // Outputs an FST corresponding to the single best path
   // through the lattice.
-  bool GetBestPath(fst::MutableFst<LatticeArc> *ofst, 
-                   bool use_final_probs = true) const {
+  bool GetBestPath(fst::MutableFst<LatticeArc> *ofst,
+      bool use_final_probs = true) const {
     fst::VectorFst<LatticeArc> fst;
     if (!GetRawLattice(&fst, use_final_probs)) return false;
     // std::cout << "Raw lattice is:\n";
@@ -131,7 +131,7 @@ class LatticeBiglmFasterDecoder {
   // Outputs an FST corresponding to the raw, state-level
   // tracebacks.
   bool GetRawLattice(fst::MutableFst<LatticeArc> *ofst,
-                     bool use_final_probs = true) const {
+      bool use_final_probs = true) const {
     typedef LatticeArc Arc;
     typedef Arc::StateId StateId;
     // A PairId will be constructed as: (StateId in fst) + (StateId in lm_diff_fst) << 32;
@@ -160,25 +160,25 @@ class LatticeBiglmFasterDecoder {
       if (f == 0 && ofst->NumStates() > 0)
         ofst->SetStart(ofst->NumStates()-1);
     }
-    KALDI_VLOG(3) << "init:" << num_toks_/2 + 3 << " buckets:" 
-                  << tok_map.bucket_count() << " load:" << tok_map.load_factor() 
+    KALDI_VLOG(3) << "init:" << num_toks_/2 + 3 << " buckets:"
+                  << tok_map.bucket_count() << " load:" << tok_map.load_factor()
                   << " max:" << tok_map.max_load_factor();
     // Now create all arcs.
     StateId cur_state = 0; // we rely on the fact that we numbered these
     // consecutively (AddState() returns the numbers in order..)
     for (int32 f = 0; f <= num_frames; f++) {
       for (Token *tok = active_toks_[f].toks; tok != NULL; tok = tok->next,
-               cur_state++) {
+          cur_state++) {
         for (ForwardLink *l = tok->links;
-             l != NULL;
-             l = l->next) {
+            l != NULL;
+            l = l->next) {
           unordered_map<Token*, StateId>::const_iterator iter =
               tok_map.find(l->next_tok);
           StateId nextstate = iter->second;
           KALDI_ASSERT(iter != tok_map.end());
           Arc arc(l->ilabel, l->olabel,
-                  Weight(l->graph_cost, l->acoustic_cost),
-                  nextstate);
+              Weight(l->graph_cost, l->acoustic_cost),
+              nextstate);
           ofst->AddArc(cur_state, arc);
         }
         if (f == num_frames) {
@@ -202,41 +202,41 @@ class LatticeBiglmFasterDecoder {
   // Outputs an FST corresponding to the lattice-determinized
   // lattice (one path per word sequence).
   bool GetLattice(fst::MutableFst<CompactLatticeArc> *ofst,
-                  bool use_final_probs = true) const {
+      bool use_final_probs = true) const {
     Lattice raw_fst;
     if (!GetRawLattice(&raw_fst, use_final_probs)) return false;
     Invert(&raw_fst); // make it so word labels are on the input.
     if (!TopSort(&raw_fst)) // topological sort makes lattice-determinization more efficient
       KALDI_WARN << "Topological sorting of state-level lattice failed "
-          "(probably your lexicon has empty words or your LM has epsilon cycles; this "
-          " is a bad idea.)";
+        "(probably your lexicon has empty words or your LM has epsilon cycles; this "
+        " is a bad idea.)";
     // (in phase where we get backward-costs).
     fst::ILabelCompare<LatticeArc> ilabel_comp;
     ArcSort(&raw_fst, ilabel_comp); // sort on ilabel; makes
     // lattice-determinization more efficient.
-    
+
     fst::DeterminizeLatticePrunedOptions lat_opts;
     lat_opts.max_mem = config_.det_opts.max_mem;
-    
+
     DeterminizeLatticePruned(raw_fst, config_.lattice_beam, ofst, lat_opts);
     raw_fst.DeleteStates(); // Free memory-- raw_fst no longer needed.
     Connect(ofst); // Remove unreachable states... there might be
     // a small number of these, in some cases.
     return true;
   }
-  
- private:
+
+private:
   inline PairId ConstructPair(StateId fst_state, StateId lm_state) {
     return static_cast<PairId>(fst_state) + (static_cast<PairId>(lm_state) << 32);
   }
-  
+
   static inline StateId PairToState(PairId state_pair) {
     return static_cast<StateId>(static_cast<uint32>(state_pair));
   }
   static inline StateId PairToLmState(PairId state_pair) {
     return static_cast<StateId>(static_cast<uint32>(state_pair >> 32));
   }
-  
+
   struct Token;
   // ForwardLinks are the links from a token to a token on the next frame.
   // or sometimes on the current frame (for input-epsilon links).
@@ -249,13 +249,13 @@ class LatticeBiglmFasterDecoder {
     ForwardLink *next; // next in singly-linked list of forward links from a
                        // token.
     inline ForwardLink(Token *next_tok, Label ilabel, Label olabel,
-                       BaseFloat graph_cost, BaseFloat acoustic_cost, 
-                       ForwardLink *next):
-        next_tok(next_tok), ilabel(ilabel), olabel(olabel),
-        graph_cost(graph_cost), acoustic_cost(acoustic_cost), 
-        next(next) { }
-  };  
-  
+        BaseFloat graph_cost, BaseFloat acoustic_cost,
+        ForwardLink *next) :
+      next_tok(next_tok), ilabel(ilabel), olabel(olabel),
+      graph_cost(graph_cost), acoustic_cost(acoustic_cost),
+      next(next) { }
+  };
+
   // Token is what's resident in a particular state at a particular time.
   // In this decoder a Token actually contains *forward* links.
   // When first created, a Token just has the (total) cost.    We add forward
@@ -268,16 +268,16 @@ class LatticeBiglmFasterDecoder {
     // that any of the currently active states at the decoding front may
     // eventually succeed (e.g. if you were to take the currently active states
     // one by one and compute this difference, and then take the minimum).
-    
+
     ForwardLink *links; // Head of singly linked list of ForwardLinks
-    
+
     Token *next; // Next in list of tokens for this frame.
-    
+
     inline Token(BaseFloat tot_cost, BaseFloat extra_cost, ForwardLink *links,
-                 Token *next): tot_cost(tot_cost), extra_cost(extra_cost),
-                 links(links), next(next) { }
+        Token *next) : tot_cost(tot_cost), extra_cost(extra_cost),
+      links(links), next(next) { }
     inline void DeleteForwardLinks() {
-      ForwardLink *l = links, *m; 
+      ForwardLink *l = links, *m;
       while (l != NULL) {
         m = l->next;
         delete l;
@@ -286,22 +286,22 @@ class LatticeBiglmFasterDecoder {
       links = NULL;
     }
   };
-  
+
   // head and tail of per-frame list of Tokens (list is in topological order),
   // and something saying whether we ever pruned it using PruneForwardLinks.
   struct TokenList {
     Token *toks;
     bool must_prune_forward_links;
     bool must_prune_tokens;
-    TokenList(): toks(NULL), must_prune_forward_links(true),
-                 must_prune_tokens(true) { }
+    TokenList() : toks(NULL), must_prune_forward_links(true),
+      must_prune_tokens(true) { }
   };
 
   typedef HashList<PairId, Token*>::Elem Elem;
-  
+
   void PossiblyResizeHash(size_t num_toks) {
     size_t new_sz = static_cast<size_t>(static_cast<BaseFloat>(num_toks)
-                                        * config_.hash_ratio);
+        * config_.hash_ratio);
     if (new_sz > toks_.Size()) {
       toks_.SetSize(new_sz);
     }
@@ -313,7 +313,7 @@ class LatticeBiglmFasterDecoder {
   // and also into the singly linked list of tokens active on this frame
   // (whose head is at active_toks_[frame]).
   inline Token *FindOrAddToken(PairId state_pair, int32 frame, BaseFloat tot_cost,
-                               bool emitting, bool *changed) {
+      bool emitting, bool *changed) {
     // Returns the Token pointer.  Sets "changed" (if non-NULL) to true
     // if the token was newly created or the cost changed.
     KALDI_ASSERT(frame < active_toks_.size());
@@ -349,13 +349,13 @@ class LatticeBiglmFasterDecoder {
       return tok;
     }
   }
-  
+
   // prunes outgoing links for all tokens in active_toks_[frame]
   // it's called by PruneActiveTokens
   // all links, that have link_extra_cost > lattice_beam are pruned
   void PruneForwardLinks(int32 frame, bool *extra_costs_changed,
-                         bool *links_pruned,
-                         BaseFloat delta) {
+      bool *links_pruned,
+      BaseFloat delta) {
     // delta is the amount by which the extra_costs must change
     // If delta is larger,  we'll tend to go back less far
     //    toward the beginning of the file.
@@ -368,11 +368,11 @@ class LatticeBiglmFasterDecoder {
     if (active_toks_[frame].toks == NULL ) { // empty list; should not happen.
       if (!warned_) {
         KALDI_WARN << "No tokens alive [doing pruning].. warning first "
-            "time only for each utterance\n";
+          "time only for each utterance\n";
         warned_ = true;
       }
     }
-    
+
     // We have to iterate until there is no more change, because the links
     // are not guaranteed to be in topological order.
     bool changed = true; // difference new minus old extra cost >= delta ?
@@ -388,7 +388,7 @@ class LatticeBiglmFasterDecoder {
           Token *next_tok = link->next_tok;
           BaseFloat link_extra_cost = next_tok->extra_cost +
               ((tok->tot_cost + link->acoustic_cost + link->graph_cost)
-               - next_tok->tot_cost); // difference in brackets is >= 0
+              - next_tok->tot_cost);  // difference in brackets is >= 0
           // link_exta_cost is the difference in score between the best paths
           // through link source state and through link destination state
           KALDI_ASSERT(link_extra_cost == link_extra_cost); // check for NaN
@@ -441,7 +441,7 @@ class LatticeBiglmFasterDecoder {
         best_cost_nofinal = infinity;
     unordered_map<Token*, BaseFloat> tok_to_final_cost;
     Elem *cur_toks = toks_.Clear(); // swapping prev_toks_ / cur_toks_
-    for (Elem *e = cur_toks, *e_tail; e != NULL;  e = e_tail) {
+    for (Elem *e = cur_toks, *e_tail; e != NULL; e = e_tail) {
       PairId state_pair = e->key;
       StateId state = PairToState(state_pair),
           lm_state = PairToLmState(state_pair);
@@ -455,7 +455,7 @@ class LatticeBiglmFasterDecoder {
       toks_.Delete(e);
     }
     final_active_ = (best_cost_final != infinity);
-    
+
     // Now go through tokens on this frame, pruning forward links...  may have
     // to iterate a few times until there is no more change, because the list is
     // not in topological order.
@@ -474,15 +474,15 @@ class LatticeBiglmFasterDecoder {
         if (final_active_) {
           BaseFloat final_cost = tok_to_final_cost[tok];
           tok_extra_cost = (tok->tot_cost + final_cost) - best_cost_final;
-        } else 
+        } else
           tok_extra_cost = tok->tot_cost - best_cost_nofinal;
-      
+
         for (link = tok->links; link != NULL; ) {
           // See if we need to excise this link...
           Token *next_tok = link->next_tok;
           BaseFloat link_extra_cost = next_tok->extra_cost +
               ((tok->tot_cost + link->acoustic_cost + link->graph_cost)
-               - next_tok->tot_cost);
+              - next_tok->tot_cost);
           if (link_extra_cost > config_.lattice_beam) { // excise link
             ForwardLink *next_link = link->next;
             if (prev_link != NULL) prev_link->next = next_link;
@@ -507,7 +507,7 @@ class LatticeBiglmFasterDecoder {
         // an extra component relating to the final-prob.
         if (tok_extra_cost > config_.lattice_beam)
           tok_extra_cost = infinity;
-          // to be pruned in PruneTokensForFrame
+        // to be pruned in PruneTokensForFrame
 
         if (!ApproxEqual(tok->extra_cost, tok_extra_cost, delta))
           changed = true;
@@ -517,11 +517,11 @@ class LatticeBiglmFasterDecoder {
 
     // Now put surviving Tokens in the final_costs_ hash, which is a class
     // member (unlike tok_to_final_costs).
-    for (Token *tok = active_toks_[frame].toks; tok != NULL; tok = tok->next) {    
+    for (Token *tok = active_toks_[frame].toks; tok != NULL; tok = tok->next) {
       if (tok->extra_cost != infinity) {
-        // If the token was not pruned away, 
+        // If the token was not pruned away,
         if (final_active_) {
-          BaseFloat final_cost = tok_to_final_cost[tok];         
+          BaseFloat final_cost = tok_to_final_cost[tok];
           if (final_cost != infinity)
             final_costs_[tok] = final_cost;
         } else {
@@ -530,7 +530,7 @@ class LatticeBiglmFasterDecoder {
       }
     }
   }
-  
+
   // Prune away any tokens on this frame that have no forward links.
   // [we don't do this in PruneForwardLinks because it would give us
   // a problem with dangling pointers].
@@ -555,7 +555,7 @@ class LatticeBiglmFasterDecoder {
       }
     }
   }
-  
+
   // Go backwards through still-alive tokens, pruning them.  note: cur_frame is
   // where hash toks_ are (so we do not want to mess with it because these tokens
   // don't yet have forward pointers), but we do all previous frames, unless we
@@ -580,7 +580,7 @@ class LatticeBiglmFasterDecoder {
         active_toks_[frame].must_prune_forward_links = false; // job done
       }
       if (frame+1 < cur_frame &&      // except for last frame (no forward links)
-         active_toks_[frame+1].must_prune_tokens) {
+          active_toks_[frame+1].must_prune_tokens) {
         PruneTokensForFrame(frame+1);
         active_toks_[frame+1].must_prune_tokens = false;
       }
@@ -607,14 +607,14 @@ class LatticeBiglmFasterDecoder {
       PruneForwardLinks(frame, &b1, &b2, dontcare);
       PruneTokensForFrame(frame+1);
     }
-    PruneTokensForFrame(0); 
+    PruneTokensForFrame(0);
     KALDI_VLOG(3) << "PruneActiveTokensFinal: pruned tokens from " << num_toks_begin
                   << " to " << num_toks_;
   }
-  
+
   /// Gets the weight cutoff.  Also counts the active tokens.
   BaseFloat GetCutoff(Elem *list_head, size_t *tok_count,
-                      BaseFloat *adaptive_beam, Elem **best_elem) {
+      BaseFloat *adaptive_beam, Elem **best_elem) {
     BaseFloat best_weight = std::numeric_limits<BaseFloat>::infinity();
     // positive == high cost == bad.
     size_t count = 0;
@@ -661,7 +661,7 @@ class LatticeBiglmFasterDecoder {
   }
 
   inline StateId PropagateLm(StateId lm_state,
-                             Arc *arc) { // returns new LM state.
+      Arc *arc) {                        // returns new LM state.
     if (arc->olabel == 0) {
       return lm_state; // no change in LM state if no word crossed.
     } else { // Propagate in the LM-diff FST.
@@ -671,7 +671,7 @@ class LatticeBiglmFasterDecoder {
         if (!warned_noarc_) {
           warned_noarc_ = true;
           KALDI_WARN << "No arc available in LM (unlikely to be correct "
-              "if a statistical language model); will not warn again";
+            "if a statistical language model); will not warn again";
         }
         arc->weight = Weight::Zero();
         return lm_state; // doesn't really matter what we return here; will
@@ -680,10 +680,10 @@ class LatticeBiglmFasterDecoder {
         arc->weight = Times(arc->weight, lm_arc.weight);
         arc->olabel = lm_arc.olabel; // probably will be the same.
         return lm_arc.nextstate; // return the new LM state.
-      }      
+      }
     }
   }
-  
+
   void ProcessEmitting(DecodableInterface *decodable, int32 frame) {
     // Processes emitting arcs for one frame.  Propagates from prev_toks_ to cur_toks_.
     Elem *last_toks = toks_.Clear(); // swapping prev_toks_ / cur_toks_
@@ -691,8 +691,8 @@ class LatticeBiglmFasterDecoder {
     BaseFloat adaptive_beam;
     size_t tok_cnt;
     BaseFloat cur_cutoff = GetCutoff(last_toks, &tok_cnt, &adaptive_beam, &best_elem);
-    PossiblyResizeHash(tok_cnt);  // This makes sure the hash is always big enough.    
-    
+    PossiblyResizeHash(tok_cnt);  // This makes sure the hash is always big enough.
+
     BaseFloat next_cutoff = std::numeric_limits<BaseFloat>::infinity();
     // pruning "online" before having seen all tokens
 
@@ -704,8 +704,8 @@ class LatticeBiglmFasterDecoder {
           lm_state = PairToLmState(state_pair);
       Token *tok = best_elem->val;
       for (fst::ArcIterator<fst::Fst<Arc> > aiter(fst_, state);
-           !aiter.Done();
-           aiter.Next()) {
+          !aiter.Done();
+          aiter.Next()) {
         Arc arc = aiter.Value();
         if (arc.ilabel != 0) {  // propagate..
           PropagateLm(lm_state, &arc); // may affect "arc.weight".
@@ -718,7 +718,7 @@ class LatticeBiglmFasterDecoder {
         }
       }
     }
-    
+
     // the tokens are now owned here, in last_toks, and the hash is empty.
     // 'owned' is a complex thing here; the point is we need to call DeleteElem
     // on each elem 'e' to let toks_ know we're done with them.
@@ -730,8 +730,8 @@ class LatticeBiglmFasterDecoder {
       Token *tok = e->val;
       if (tok->tot_cost <=  cur_cutoff) {
         for (fst::ArcIterator<fst::Fst<Arc> > aiter(fst_, state);
-             !aiter.Done();
-             aiter.Next()) {
+            !aiter.Done();
+            aiter.Next()) {
           const Arc &arc_ref = aiter.Value();
           if (arc_ref.ilabel != 0) {  // propagate..
             Arc arc(arc_ref);
@@ -746,9 +746,9 @@ class LatticeBiglmFasterDecoder {
             PairId next_pair = ConstructPair(arc.nextstate, next_lm_state);
             Token *next_tok = FindOrAddToken(next_pair, frame, tot_cost, true, NULL);
             // true: emitting, NULL: no change indicator needed
-          
+
             // Add ForwardLink from tok to next_tok (put on head of list tok->links)
-            tok->links = new ForwardLink(next_tok, arc.ilabel, arc.olabel, 
+            tok->links = new ForwardLink(next_tok, arc.ilabel, arc.olabel,
                                          graph_cost, ac_cost, tok->links);
           }
         } // for all arcs
@@ -760,7 +760,7 @@ class LatticeBiglmFasterDecoder {
 
   void ProcessNonemitting(int32 frame) {
     // note: "frame" is the same as emitting states just processed.
-    
+
     // Processes nonemitting arcs for one frame.  Propagates within toks_.
     // Note-- this queue structure is is not very optimal as
     // it may cause us to process states unnecessarily (e.g. more than once),
@@ -769,7 +769,7 @@ class LatticeBiglmFasterDecoder {
 
     KALDI_ASSERT(queue_.empty());
     BaseFloat best_cost = std::numeric_limits<BaseFloat>::infinity();
-    for (const Elem *e = toks_.GetList(); e != NULL;  e = e->tail) {
+    for (const Elem *e = toks_.GetList(); e != NULL; e = e->tail) {
       queue_.push_back(e->key);
       // for pruning with current best token
       best_cost = std::min(best_cost, static_cast<BaseFloat>(e->val->tot_cost));
@@ -782,7 +782,7 @@ class LatticeBiglmFasterDecoder {
       }
     }
     BaseFloat cutoff = best_cost + config_.beam;
-    
+
     while (!queue_.empty()) {
       PairId state_pair = queue_.back();
       queue_.pop_back();
@@ -806,7 +806,7 @@ class LatticeBiglmFasterDecoder {
         const Arc &arc_ref = aiter.Value();
         if (arc_ref.ilabel == 0) {  // propagate nonemitting only...
           Arc arc(arc_ref);
-          StateId next_lm_state = PropagateLm(lm_state, &arc);          
+          StateId next_lm_state = PropagateLm(lm_state, &arc);
           BaseFloat graph_cost = arc.weight.Value(),
               tot_cost = cur_cost + graph_cost;
           if (tot_cost < cutoff) {
@@ -814,10 +814,10 @@ class LatticeBiglmFasterDecoder {
             PairId next_pair = ConstructPair(arc.nextstate, next_lm_state);
             Token *new_tok = FindOrAddToken(next_pair, frame, tot_cost,
                                             false, &changed); // false: non-emit
-            
+
             tok->links = new ForwardLink(new_tok, 0, arc.olabel,
                                          graph_cost, 0, tok->links);
-            
+
             // "changed" tells us whether the new token has a different
             // cost from before, or is new [if so, add into queue].
             if (changed) queue_.push_back(next_pair);
@@ -839,16 +839,16 @@ class LatticeBiglmFasterDecoder {
   std::vector<BaseFloat> tmp_array_;  // used in GetCutoff.
   // make it class member to avoid internal new/delete.
   const fst::Fst<fst::StdArc> &fst_;
-  fst::DeterministicOnDemandFst<fst::StdArc> *lm_diff_fst_;  
+  fst::DeterministicOnDemandFst<fst::StdArc> *lm_diff_fst_;
   LatticeBiglmFasterDecoderConfig config_;
-  bool warned_noarc_;  
+  bool warned_noarc_;
   int32 num_toks_; // current total #toks allocated...
   bool warned_;
   bool final_active_; // use this to say whether we found active final tokens
   // on the last frame.
   std::map<Token*, BaseFloat> final_costs_; // A cache of final-costs
   // of tokens on the last frame-- it's just convenient to store it this way.
-  
+
   // It might seem unclear why we call DeleteElems(toks_.Clear()).
   // There are two separate cleanup tasks we need to do at when we start a new file.
   // one is to delete the Token objects in the list; the other is to delete
@@ -862,7 +862,7 @@ class LatticeBiglmFasterDecoder {
     }
     toks_.Clear();
   }
-  
+
   void ClearActiveTokens() { // a cleanup routine, at utt end/begin
     for (size_t i = 0; i < active_toks_.size(); i++) {
       // Delete all tokens alive on this frame, and any forward

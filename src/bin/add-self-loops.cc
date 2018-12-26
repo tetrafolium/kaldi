@@ -28,7 +28,7 @@
 #include "fstext/context-fst.h"
 
 /** @brief Add self-loops and transition probabilities to transducer, expanding to transition-ids.
-*/
+ */
 int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
       if (disambig_in_filename == "-") disambig_in_filename = "";
       if (!ReadIntegerVectorSimple(disambig_in_filename, &disambig_syms_in))
         KALDI_ERR << "add-self-loops: could not read disambig symbols from "
-                   <<(disambig_in_filename == "" ?
-                      "standard input" : disambig_in_filename);
+                  <<(disambig_in_filename == "" ?
+        "standard input" : disambig_in_filename);
     }
 
     TransitionModel trans_model;
@@ -105,10 +105,10 @@ int main(int argc, char *argv[]) {
                  reorder,
                  fst);
 
-    if (! fst->Write(fst_out_filename) )
+    if (!fst->Write(fst_out_filename) )
       KALDI_ERR << "add-self-loops: error writing FST to "
-                 << (fst_out_filename == "" ?
-                     "standard output" : fst_out_filename);
+                << (fst_out_filename == "" ?
+      "standard output" : fst_out_filename);
 
     delete fst;
     return 0;

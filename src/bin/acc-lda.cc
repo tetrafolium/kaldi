@@ -26,9 +26,9 @@
 #include "transform/lda-estimate.h"
 
 /** @brief Accumulate LDA statistics based on pdf-ids. Inputs are the
-source models, that serve as the input (and may potentially contain
-the current transformation), the un-transformed features and state
-posterior probabilities */
+   source models, that serve as the input (and may potentially contain
+   the current transformation), the un-transformed features and state
+   posterior probabilities */
 int main(int argc, char *argv[]) {
   using namespace kaldi;
   typedef kaldi::int32 int32;
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     RandomAccessPosteriorReader posterior_reader(posteriors_rspecifier);
 
     int32 num_done = 0, num_fail = 0;
-    for (;!feature_reader.Done(); feature_reader.Next()) {
+    for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string utt = feature_reader.Key();
       if (!posterior_reader.HasKey(utt)) {
         KALDI_WARN << "No posteriors for utterance " << utt;

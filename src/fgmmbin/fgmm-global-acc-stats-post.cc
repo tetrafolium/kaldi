@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     int32 num_components = atoi(po.GetArg(2).c_str());
 
     AccumFullGmm fgmm_accs;
-    
+
     double tot_like = 0.0, tot_weight = 0.0;
 
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
@@ -84,20 +84,20 @@ int main(int argc, char *argv[]) {
         continue;
       }
 
-      Posterior post = post_reader.Value(key);     
+      Posterior post = post_reader.Value(key);
       // Initialize the FGMM accs before processing the first utt.
       if (num_done == 0) {
-        fgmm_accs.Resize(num_components, mat.NumCols(), 
+        fgmm_accs.Resize(num_components, mat.NumCols(),
           StringToGmmFlags(update_flags_str));
       }
 
       BaseFloat file_like = 0.0,
-          file_weight = 0.0; // total of weights of frames (will each be 
+          file_weight = 0.0; // total of weights of frames (will each be
                              // 1 unless --weights option supplied.
       Vector<BaseFloat> weights;
       if (weights_rspecifier != "") { // We have per-frame weighting.
         if (!weights_reader.HasKey(key)) {
-          KALDI_WARN << "No per-frame weights available for utterance " 
+          KALDI_WARN << "No per-frame weights available for utterance "
                      << key;
           num_err++;
           continue;
@@ -113,12 +113,12 @@ int main(int argc, char *argv[]) {
 
       if (post.size() != static_cast<size_t>(file_frames)) {
         KALDI_WARN << "posterior information for utterance " << key
-                  << " has wrong size " << post.size() << " vs. "
-                  << file_frames;
+                   << " has wrong size " << post.size() << " vs. "
+                   << file_frames;
         num_err++;
         continue;
       }
-        
+
       for (int32 i = 0; i < file_frames; i++) {
         BaseFloat weight = (weights.Dim() != 0) ? weights(i) : 1.0;
         if (weight == 0.0) continue;
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
         ScalePosterior(weight, &post);
         file_like += TotalPosterior(post);
         for (int32 j = 0; j < post[i].size(); j++)
-          fgmm_accs.AccumulateForComponent(data, post[i][j].first, 
+          fgmm_accs.AccumulateForComponent(data, post[i][j].first,
             post[i][j].second);
       }
 
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
     KALDI_LOG << "Done " << num_done << " files; "
               << num_err << " with errors.";
     KALDI_LOG << "Overall likelihood per "
-              << "frame = " << (tot_like/tot_weight) << " over " 
+              << "frame = " << (tot_like/tot_weight) << " over "
               << tot_weight << " (weighted) frames.";
 
     WriteKaldiObject(fgmm_accs, accs_wxfilename, binary);

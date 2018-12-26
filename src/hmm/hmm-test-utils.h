@@ -47,7 +47,7 @@ HmmTopology GetDefaultTopology(const std::vector<int32> &phones);
 /// longer than the length of the 'phones' vector, which for example lacks the
 /// zero index and may have gaps).
 HmmTopology GenRandTopology(const std::vector<int32> &phones,
-                            const std::vector<int32> &num_pdf_classes);
+    const std::vector<int32> &num_pdf_classes);
 
 /// This version of GenRandTopology() generates the phone list and number of pdf
 /// classes randomly.
@@ -60,18 +60,18 @@ HmmTopology GenRandTopology();
 /// the 'reorder' option is as described in the documentation; if true, the
 /// self-loops from a state are reordered to come after the forward-transition.
 void GeneratePathThroughHmm(const HmmTopology &topology,
-                            bool reorder,
-                            int32 phone,
-                            std::vector<std::pair<int32, int32> > *path);
+    bool reorder,
+    int32 phone,
+    std::vector<std::pair<int32, int32> > *path);
 
 
 /// For use in test code, this function generates an alignment (a sequence of
 /// transition-ids) corresponding to a given phone sequence.
 void GenerateRandomAlignment(const ContextDependencyInterface &ctx_dep,
-                             const TransitionModel &trans_model,
-                             bool reorder,
-                             const std::vector<int32> &phone_sequence,
-                             std::vector<int32> *alignment);
+    const TransitionModel &trans_model,
+    bool reorder,
+    const std::vector<int32> &phone_sequence,
+    std::vector<int32> *alignment);
 
 
 

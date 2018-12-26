@@ -214,9 +214,9 @@ namespace attention {
       (*C)(i, j) = alpha * VecVec(A.Row(i), B.Row(i + j * row_shift))
  */
 void GetAttentionDotProducts(BaseFloat alpha,
-                             const CuMatrixBase<BaseFloat> &A,
-                             const CuMatrixBase<BaseFloat> &B,
-                             CuMatrixBase<BaseFloat> *C);
+    const CuMatrixBase<BaseFloat> &A,
+    const CuMatrixBase<BaseFloat> &B,
+    CuMatrixBase<BaseFloat> *C);
 
 
 /**
@@ -234,9 +234,9 @@ void GetAttentionDotProducts(BaseFloat alpha,
      A->Row(i) += \sum_j alpha * C(i, j) * B.Row(i + j * row_shift).
  */
 void ApplyScalesToOutput(BaseFloat alpha,
-                         const CuMatrixBase<BaseFloat> &B,
-                         const CuMatrixBase<BaseFloat> &C,
-                         CuMatrixBase<BaseFloat> *A);
+    const CuMatrixBase<BaseFloat> &B,
+    const CuMatrixBase<BaseFloat> &C,
+    CuMatrixBase<BaseFloat> *A);
 
 
 /**
@@ -253,9 +253,9 @@ void ApplyScalesToOutput(BaseFloat alpha,
      B->Row(i + j * row_shift) += alpha * C(i, j) * A.Row(i).
  */
 void ApplyScalesToInput(BaseFloat alpha,
-                        const CuMatrixBase<BaseFloat> &A,
-                        const CuMatrixBase<BaseFloat> &C,
-                        CuMatrixBase<BaseFloat> *B);
+    const CuMatrixBase<BaseFloat> &A,
+    const CuMatrixBase<BaseFloat> &C,
+    CuMatrixBase<BaseFloat> *B);
 
 
 
@@ -293,11 +293,11 @@ void ApplyScalesToInput(BaseFloat alpha,
                             'output'.
  */
 void AttentionForward(BaseFloat key_scale,
-                      const CuMatrixBase<BaseFloat> &keys,
-                      const CuMatrixBase<BaseFloat> &queries,
-                      const CuMatrixBase<BaseFloat> &values,
-                      CuMatrixBase<BaseFloat> *c,
-                      CuMatrixBase<BaseFloat> *output);
+    const CuMatrixBase<BaseFloat> &keys,
+    const CuMatrixBase<BaseFloat> &queries,
+    const CuMatrixBase<BaseFloat> &values,
+    CuMatrixBase<BaseFloat> *c,
+    CuMatrixBase<BaseFloat> *output);
 
 /** Performs the backward pass corresponding to 'AttentionForward',
     propagating the derivative back to the keys, queries and values.
@@ -305,17 +305,17 @@ void AttentionForward(BaseFloat key_scale,
     The interface should be easy to understand with reference
     to AttentionForward(), so we won't document it, except to note
     that 'keys_deriv', 'queries_deriv' and 'values_deriv' are
-    *added to*, not set, by this function.
+ * added to*, not set, by this function.
  */
 void AttentionBackward(BaseFloat key_scale,
-                       const CuMatrixBase<BaseFloat> &keys,
-                       const CuMatrixBase<BaseFloat> &queries,
-                       const CuMatrixBase<BaseFloat> &values,
-                       const CuMatrixBase<BaseFloat> &c,
-                       const CuMatrixBase<BaseFloat> &output_deriv,
-                       CuMatrixBase<BaseFloat> *keys_deriv,
-                       CuMatrixBase<BaseFloat> *queries_deriv,
-                       CuMatrixBase<BaseFloat> *values_deriv);
+    const CuMatrixBase<BaseFloat> &keys,
+    const CuMatrixBase<BaseFloat> &queries,
+    const CuMatrixBase<BaseFloat> &values,
+    const CuMatrixBase<BaseFloat> &c,
+    const CuMatrixBase<BaseFloat> &output_deriv,
+    CuMatrixBase<BaseFloat> *keys_deriv,
+    CuMatrixBase<BaseFloat> *queries_deriv,
+    CuMatrixBase<BaseFloat> *values_deriv);
 
 
 

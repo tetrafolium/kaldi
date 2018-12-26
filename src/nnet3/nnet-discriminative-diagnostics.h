@@ -32,12 +32,12 @@
 namespace kaldi {
 namespace nnet3 {
 
-/** This class is for computing objective-function values in a nnet3 
+/** This class is for computing objective-function values in a nnet3
     discriminative training, for diagnostics.  It also supports computing model
     derivatives.
  */
 class NnetDiscriminativeComputeObjf {
- public:
+public:
   // does not store a reference to 'config' but does store one to 'nnet'.
   NnetDiscriminativeComputeObjf(const NnetComputeProbOptions &nnet_config,
       const discriminative::DiscriminativeOptions &discriminative_config,
@@ -57,16 +57,16 @@ class NnetDiscriminativeComputeObjf {
   // returns the objective-function info for this output name (e.g. "output"),
   // or NULL if there is no such info.
   const discriminative::DiscriminativeObjectiveInfo *GetObjective(
-      const std::string &output_name) const;
+    const std::string &output_name) const;
 
   // if config.compute_deriv == true, returns a reference to the
   // computed derivative.  Otherwise crashes.
   const Nnet &GetDeriv() const;
-  
+
   ~NnetDiscriminativeComputeObjf();
- private:
+private:
   void ProcessOutputs(const NnetDiscriminativeExample &eg,
-                      NnetComputer *computer);
+      NnetComputer *computer);
 
   NnetComputeProbOptions nnet_config_;
 

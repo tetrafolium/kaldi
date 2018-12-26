@@ -55,34 +55,34 @@ typename Arc::StateId NumArcs(const ExpandedFst<Arc> &fst);
 /// list.
 template<class Arc, class I>
 void GetInputSymbols(const Fst<Arc> &fst,
-                     bool include_eps,
-                     vector<I> *symbols);
+    bool include_eps,
+    vector<I> *symbols);
 
 /// GetOutputSymbols gets the list of symbols on the output of fst
 /// (including epsilon, if include_eps == true)
 template<class Arc, class I>
 void GetOutputSymbols(const Fst<Arc> &fst,
-                      bool include_eps,
-                      vector<I> *symbols);
+    bool include_eps,
+    vector<I> *symbols);
 
 /// ClearSymbols sets all the symbols on the input and/or
 /// output side of the FST to zero, as specified.
 /// It does not alter the symbol tables.
 template<class Arc>
 void ClearSymbols(bool clear_input,
-                  bool clear_output,
-                  MutableFst<Arc> *fst);
+    bool clear_output,
+    MutableFst<Arc> *fst);
 
 template<class I>
 void GetSymbols(const SymbolTable &symtab,
-                bool include_eps,
-                vector<I> *syms_out);
+    bool include_eps,
+    vector<I> *syms_out);
 
 
 
 inline
 void DeterminizeStarInLog(VectorFst<StdArc> *fst, float delta = kDelta, bool *debug_ptr = NULL,
-                          int max_states = -1);
+    int max_states = -1);
 
 
 // e.g. of using this function: PushInLog<REWEIGHT_TO_INITIAL>(fst, kPushWeights|kPushLabels);
@@ -131,9 +131,9 @@ void MinimizeEncoded(VectorFst<Arc> *fst, float delta = kDelta) {
 /// create that output.
 template<class Arc, class I>
 bool GetLinearSymbolSequence(const Fst<Arc> &fst,
-                             vector<I> *isymbols_out,
-                             vector<I> *osymbols_out,
-                             typename Arc::Weight *tot_weight_out);
+    vector<I> *isymbols_out,
+    vector<I> *osymbols_out,
+    typename Arc::Weight *tot_weight_out);
 
 
 /// This function converts an FST with a special structure, which is
@@ -143,7 +143,7 @@ bool GetLinearSymbolSequence(const Fst<Arc> &fst,
 /// start state.  fsts_out is resized to the appropriate size.
 template<class Arc>
 void ConvertNbestToVector(const Fst<Arc> &fst,
-                          vector<VectorFst<Arc> > *fsts_out);
+    vector<VectorFst<Arc> > *fsts_out);
 
 
 /// Takes the n-shortest-paths (using ShortestPath), but outputs
@@ -152,8 +152,8 @@ void ConvertNbestToVector(const Fst<Arc> &fst,
 /// (which will not exceed n).  n must be >= 1.
 template<class Arc>
 void NbestAsFsts(const Fst<Arc> &fst,
-                 size_t n,
-                 vector<VectorFst<Arc> > *fsts_out);
+    size_t n,
+    vector<VectorFst<Arc> > *fsts_out);
 
 
 
@@ -169,7 +169,7 @@ void MakeLinearAcceptor(const vector<I> &labels, MutableFst<Arc> *ofst);
 /// Each position in "labels" must have at least one alternative.
 template<class Arc, class I>
 void MakeLinearAcceptorWithAlternatives(const vector<vector<I> > &labels,
-                                        MutableFst<Arc> *ofst);
+    MutableFst<Arc> *ofst);
 
 
 /// Does PreDeterminize and DeterminizeStar and then removes the disambiguation symbols.
@@ -199,14 +199,14 @@ void SafeDeterminizeMinimizeWrapperInLog(VectorFst<StdArc> *ifst, VectorFst<StdA
 /// the input side of the FST, replacing them with epsilon.
 template<class Arc, class I>
 void RemoveSomeInputSymbols(const vector<I> &to_remove,
-                            MutableFst<Arc> *fst);
+    MutableFst<Arc> *fst);
 
 // MapInputSymbols will replace any input symbol i that is between 0 and
 // symbol_map.size()-1, with symbol_map[i].  It removes the input symbol
 // table of the FST.
 template<class Arc, class I>
 void MapInputSymbols(const vector<I> &symbol_map,
-                     MutableFst<Arc> *fst);
+    MutableFst<Arc> *fst);
 
 
 template<class Arc>
@@ -331,7 +331,7 @@ void ApplyProbabilityScale(float scale, MutableFst<Arc> *fst);
 /// The input fst "ifst" must be connected or this may enter an infinite loop.
 template<class Arc>
 bool EqualAlign(const Fst<Arc> &ifst, typename Arc::StateId length,
-                int rand_seed, MutableFst<Arc> *ofst, int num_retries = 10);
+    int rand_seed, MutableFst<Arc> *ofst, int num_retries = 10);
 
 
 
@@ -355,9 +355,9 @@ void RemoveUselessArcs(MutableFst<Arc> *fst);
 // have a match for the requested symbol.
 template<class Arc>
 void PhiCompose(const Fst<Arc> &fst1,
-                const Fst<Arc> &fst2,
-                typename Arc::Label phi_label,
-                MutableFst<Arc> *fst);
+    const Fst<Arc> &fst2,
+    typename Arc::Label phi_label,
+    MutableFst<Arc> *fst);
 
 // PropagateFinal propagates final-probs through
 // "phi" transitions (note that here, phi_label may
@@ -379,7 +379,7 @@ void PhiCompose(const Fst<Arc> &fst1,
 
 template<class Arc>
 void PropagateFinal(typename Arc::Label phi_label,
-                    MutableFst<Arc> *fst);
+    MutableFst<Arc> *fst);
 
 // PhiCompose is a version of composition where
 // the right hand FST (fst2) has speciall "rho transitions"
@@ -388,9 +388,9 @@ void PropagateFinal(typename Arc::Label phi_label,
 // the first FST.
 template<class Arc>
 void RhoCompose(const Fst<Arc> &fst1,
-                const Fst<Arc> &fst2,
-                typename Arc::Label rho_label,
-                MutableFst<Arc> *fst);
+    const Fst<Arc> &fst2,
+    typename Arc::Label rho_label,
+    MutableFst<Arc> *fst);
 
 
 
@@ -403,22 +403,22 @@ void RhoCompose(const Fst<Arc> &fst1,
     @param min_sum [out] if non, NULL, contents will be set to the minimum sum of weights.
     @param max_sum [out] if non, NULL, contents will be set to the maximum sum of weights.
     @return Returns true if the FST is stochastic, and false otherwise.
-*/
+ */
 
 template<class Arc>
 bool IsStochasticFst(const Fst<Arc> &fst,
-                     float delta = kDelta,  // kDelta = 1.0/1024.0 by default.
-                     typename Arc::Weight *min_sum = NULL,
-                     typename Arc::Weight *max_sum = NULL);
+    float delta = kDelta,                   // kDelta = 1.0/1024.0 by default.
+    typename Arc::Weight *min_sum = NULL,
+    typename Arc::Weight *max_sum = NULL);
 
 
 
 
 // IsStochasticFstInLog makes sure it's stochastic after casting to log.
 inline bool IsStochasticFstInLog(const Fst<StdArc> &fst,
-                                 float delta = kDelta,  // kDelta = 1.0/1024.0 by default.
-                                 StdArc::Weight *min_sum = NULL,
-                                 StdArc::Weight *max_sum = NULL);
+    float delta = kDelta,                               // kDelta = 1.0/1024.0 by default.
+    StdArc::Weight *min_sum = NULL,
+    StdArc::Weight *max_sum = NULL);
 
 
 } // end namespace fst

@@ -37,7 +37,7 @@ namespace nnet1 {
 struct MatrixBufferOptions {
   int32 matrix_buffer_size;
 
-  MatrixBufferOptions():
+  MatrixBufferOptions() :
     matrix_buffer_size(3 * 1024)  // 3 x 1GB,
   { }
 
@@ -59,8 +59,8 @@ struct MatrixBufferOptions {
  * data than 50% of 'matrix_buffer_size'.
  */
 class MatrixBuffer {
- public:
-  MatrixBuffer():
+public:
+  MatrixBuffer() :
     reader_(NULL),
     current_(NULL),
     preferred_length_(0)
@@ -70,7 +70,7 @@ class MatrixBuffer {
   { }
 
   void Init(SequentialBaseFloatMatrixReader* reader,
-            MatrixBufferOptions opts = MatrixBufferOptions()) {
+      MatrixBufferOptions opts = MatrixBufferOptions()) {
     KALDI_ASSERT(SizeInBytes() == 0);
     reader_ = reader;
     opts_ = opts;
@@ -104,7 +104,7 @@ class MatrixBuffer {
   /// Total number of (key,matrix) pairs in the buffer,
   size_t NumPairs() const;
 
- private:
+private:
 
   void Read();  ///< fills the buffer,
   void DisposeValue();  ///< removes 'current_' from data structure,
@@ -191,7 +191,7 @@ void MatrixBuffer::Read() {
     KALDI_LOG << "Read() started... Buffer size in MB: "
               << SizeInMegaBytes() << ", max " << opts_.matrix_buffer_size
               << ", having " << NumPairs() << " utterances.";
-  for ( ; !reader_->Done(); reader_->Next()) {
+  for (; !reader_->Done(); reader_->Next()) {
     // see if we are full,
     if (SizeInMegaBytes() > opts_.matrix_buffer_size) {
       KALDI_LOG << "Read() finished... Buffer size in MB: "

@@ -43,9 +43,9 @@ void Index::Read(std::istream &is, bool binary) {
 
 
 static void WriteIndexVectorElementBinary(
-    std::ostream &os,
-    const std::vector<Index> &vec,
-    int32 i) {
+  std::ostream &os,
+  const std::vector<Index> &vec,
+  int32 i) {
   bool binary = true;
   const Index &index = vec[i];
   if (i == 0) {
@@ -85,9 +85,9 @@ static void WriteIndexVectorElementBinary(
 
 
 static void ReadIndexVectorElementBinary(
-    std::istream &is,
-    int32 i,
-    std::vector<Index> *vec) {
+  std::istream &is,
+  int32 i,
+  std::vector<Index> *vec) {
   bool binary = true;
   Index &index = (*vec)[i];
   if (!is.good())
@@ -124,7 +124,7 @@ static void ReadIndexVectorElementBinary(
 }
 
 void WriteIndexVector(std::ostream &os, bool binary,
-                      const std::vector<Index> &vec) {
+    const std::vector<Index> &vec) {
   // This token will make it easier to write back-compatible code if we later
   // change the format.
   WriteToken(os, binary, "<I1V>");
@@ -141,7 +141,7 @@ void WriteIndexVector(std::ostream &os, bool binary,
 
 
 void ReadIndexVector(std::istream &is, bool binary,
-                     std::vector<Index> *vec) {
+    std::vector<Index> *vec) {
   ExpectToken(is, binary, "<I1V>");
   int32 size;
   ReadBasicType(is, binary, &size);
@@ -160,9 +160,9 @@ void ReadIndexVector(std::istream &is, bool binary,
 }
 
 static void WriteCindexVectorElementBinary(
-    std::ostream &os,
-    const std::vector<Cindex> &vec,
-    int32 i) {
+  std::ostream &os,
+  const std::vector<Cindex> &vec,
+  int32 i) {
   bool binary = true;
   int32 node_index = vec[i].first;
   const Index &index = vec[i].second;
@@ -186,7 +186,7 @@ static void WriteCindexVectorElementBinary(
       // handle this common case in one character.
       os.put(static_cast<signed char>(index.t));
     } else if (index.t == 0 && index.x == 0 &&
-               (index.n == 0 || index.n == 1)) {
+        (index.n == 0 || index.n == 1)) {
       // handle this common case in one character.
       os.put(static_cast<signed char>(index.n + 125));
     } else {  // handle the general case less efficiently.
@@ -208,7 +208,7 @@ static void WriteCindexVectorElementBinary(
       // note: we have to reserve character 124 ('|') for when 'n' or 'x'
       // changes.
     } else if (index.t == last_index.t && index.x == last_index.x &&
-              (index.n == last_index.n || index.n == last_index.n + 1)) {
+        (index.n == last_index.n || index.n == last_index.n + 1)) {
       os.put(125 + index.n - last_index.n);
     } else {  // handle the general case less efficiently.
       os.put(127);
@@ -222,9 +222,9 @@ static void WriteCindexVectorElementBinary(
 }
 
 static void ReadCindexVectorElementBinary(
-    std::istream &is,
-    int32 i,
-    std::vector<Cindex> *vec) {
+  std::istream &is,
+  int32 i,
+  std::vector<Cindex> *vec) {
   bool binary = true;
   Index &index = (*vec)[i].second;
   if (!is.good())
@@ -280,7 +280,7 @@ static void ReadCindexVectorElementBinary(
 // into ranges that each have all the same node name, like:
 // [node_1: index_1 index_2] [node_2: index_3 index_4]
 void WriteCindexVector(std::ostream &os, bool binary,
-                       const std::vector<Cindex> &vec) {
+    const std::vector<Cindex> &vec) {
   // This token will make it easier to write back-compatible code if we later
   // change the format.
   WriteToken(os, binary, "<I1V>");
@@ -307,7 +307,7 @@ void WriteCindexVector(std::ostream &os, bool binary,
 }
 
 void ReadCindexVector(std::istream &is, bool binary,
-                      std::vector<Cindex> *vec) {
+    std::vector<Cindex> *vec) {
   ExpectToken(is, binary, "<I1V>");
   int32 size;
   ReadBasicType(is, binary, &size);
@@ -360,21 +360,21 @@ void ReadCindexVector(std::istream &is, bool binary,
 size_t IndexHasher::operator () (const Index &index) const noexcept {
   // The numbers that appear below were chosen arbitrarily from a list of primes
   return index.n +
-      1619 * index.t +
-      15649 * index.x;
+         1619 * index.t +
+         15649 * index.x;
 }
 
 size_t CindexHasher::operator () (const Cindex &cindex) const noexcept {
   // The numbers that appear below were chosen arbitrarily from a list of primes
   return cindex.first +
-       1619 * cindex.second.n +
-      15649 * cindex.second.t +
-      89809 * cindex.second.x;
+         1619 * cindex.second.n +
+         15649 * cindex.second.t +
+         89809 * cindex.second.x;
 
 }
 
 size_t CindexVectorHasher::operator () (
-    const std::vector<Cindex> &cindex_vector) const noexcept {
+  const std::vector<Cindex> &cindex_vector) const noexcept {
   // this is an arbitrarily chosen prime.
   size_t kPrime = 23539, ans = 0;
   std::vector<Cindex>::const_iterator iter = cindex_vector.begin(),
@@ -386,7 +386,7 @@ size_t CindexVectorHasher::operator () (
 }
 
 size_t IndexVectorHasher::operator () (
-    const std::vector<Index> &index_vector) const noexcept {
+  const std::vector<Index> &index_vector) const noexcept {
   size_t n1 = 15, n2 = 10;  // n1 and n2 are used to extract only a subset of
                             // elements to hash; this makes the hasher faster by
                             // skipping over more elements.  Setting n1 large or
@@ -425,7 +425,7 @@ std::ostream &operator << (std::ostream &ostream, const Cindex &cindex) {
 }
 
 void PrintCindex(std::ostream &os, const Cindex &cindex,
-                 const std::vector<std::string> &node_names) {
+    const std::vector<std::string> &node_names) {
   KALDI_ASSERT(static_cast<size_t>(cindex.first) < node_names.size());
   os << node_names[cindex.first] << "(" << cindex.second.n << ","
      << cindex.second.t;
@@ -435,7 +435,7 @@ void PrintCindex(std::ostream &os, const Cindex &cindex,
 }
 
 void PrintIndexes(std::ostream &os,
-                  const std::vector<Index> &indexes) {
+    const std::vector<Index> &indexes) {
   if (indexes.empty()) {
     os << "[ ]";
     return;
@@ -449,8 +449,8 @@ void PrintIndexes(std::ostream &os,
     const Index &index = indexes[i];
     if (i > cur_start &&
         (index.t != indexes[i-1].t + 1 ||
-         index.n != indexes[i-1].n ||
-         index.x != indexes[i-1].x)) {
+        index.n != indexes[i-1].n ||
+        index.x != indexes[i-1].x)) {
       range_starts.push_back(cur_start);
       cur_start = i;
     }
@@ -477,8 +477,8 @@ void PrintIndexes(std::ostream &os,
 }
 
 void PrintCindexes(std::ostream &ostream,
-                   const std::vector<Cindex> &cindexes,
-                   const std::vector<std::string> &node_names) {
+    const std::vector<Cindex> &cindexes,
+    const std::vector<std::string> &node_names) {
   int32 num_cindexes = cindexes.size();
   if (num_cindexes == 0) {
     ostream << "[ ]";
@@ -490,7 +490,7 @@ void PrintCindexes(std::ostream &ostream,
   while (cur_offset < num_cindexes) {
     int32 cur_node_index = cindexes[cur_offset].first;
     while (cur_offset < num_cindexes &&
-           cindexes[cur_offset].first == cur_node_index) {
+        cindexes[cur_offset].first == cur_node_index) {
       indexes.push_back(cindexes[cur_offset].second);
       cur_offset++;
     }
@@ -504,7 +504,7 @@ void PrintCindexes(std::ostream &ostream,
 
 
 void PrintIntegerVector(std::ostream &os,
-                        const std::vector<int32> &ints) {
+    const std::vector<int32> &ints) {
   if (ints.empty()) {
     os << "[ ]";
     return;
@@ -521,9 +521,9 @@ void PrintIntegerVector(std::ostream &os,
           cur_val = ints[i];
       // if we have reached the end of a range...
       if (!((range_start_plus_one_val == range_start_val &&
-             cur_val == range_start_val) ||
-            (range_start_plus_one_val == range_start_val + 1 &&
-             cur_val == range_start_val + i - cur_start))) {
+          cur_val == range_start_val) ||
+          (range_start_plus_one_val == range_start_val + 1 &&
+          cur_val == range_start_val + i - cur_start))) {
         range_starts.push_back(cur_start);
         cur_start = i;
       }

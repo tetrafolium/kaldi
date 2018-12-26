@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
         "lists shorter (e.g. the --n=10 limits to the 10 best indices\n"
         "See also gmm-gselect, fgmm-gselect\n"
         "Usage: copy-gselect [options] <gselect-rspecifier> <gselect-wspecifier>\n";
-    
+
     ParseOptions po(usage);
     int32 num_gselect = 0;
     std::string likelihood_wspecifier;

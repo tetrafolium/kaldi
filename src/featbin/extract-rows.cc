@@ -41,11 +41,11 @@ int main(int argc, char *argv[]) {
         "Usage: extract-rows [options] <segments-file> <features-rspecifier> <features-wspecifier>\n"
         "  e.g. extract-rows --frame-shift=0.01 segments ark:feats-in.ark ark:feats-out.ark\n"
         "See also: select-feats, subset-feats, subsample-feats\n";
-    
+
     ParseOptions po(usage);
 
     float frame_shift = 0;
-    
+
     po.Register("frame-shift", &frame_shift,
                 "Frame shift in sec (e.g. 0.01), if segment files contains times "
                 "instead of frames");
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 
     /* read each line from segments file */
     while (std::getline(ki.Stream(), line)) {
-      
+
       vector<string> split_line;
       SplitStringToVector(line, " \t\r", true, &split_line);
       if (split_line.size() != 4) {
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 
       if (reader.HasKey(recording)) {
         const Matrix<BaseFloat> &feats = reader.Value(recording);
-        
+
         if (feats.NumRows() < end) {
           if (feats.NumRows() > start) {
             KALDI_WARN << "Truncating end time of segment " << utt << " from "
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
             KALDI_WARN << "Segment " << utt << " is outside of input range: "
                        << "input num-rows " << feats.NumRows() << " vs. "
                        << line;
-            num_err++;            
+            num_err++;
             continue;
           }
         }
@@ -157,12 +157,12 @@ int main(int argc, char *argv[]) {
 }
 
 /*
-testing:
-cat <<EOF | extract-rows 'echo bar foo 0 2 |' ark:- ark,t:-
-foo [ 1; 2; 3; 4 ]
-EOF
-# gives:  
-bar  [
-  1 
-  2 ]
+   testing:
+   cat <<EOF | extract-rows 'echo bar foo 0 2 |' ark:- ark,t:-
+   foo [ 1; 2; 3; 4 ]
+   EOF
+ # gives:
+   bar  [
+   1
+   2 ]
  */

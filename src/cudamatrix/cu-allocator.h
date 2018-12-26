@@ -53,8 +53,8 @@ struct CuAllocatorOptions {
   // is a constant overhead proportional to the number of buckets.
   BaseFloat delete_factor;
 
-  CuAllocatorOptions(): memory_factor(1.5),
-                        delete_factor(0.001) { }
+  CuAllocatorOptions() : memory_factor(1.5),
+    delete_factor(0.001) { }
 
   void Check() {
     KALDI_ASSERT(delete_factor < memory_factor - 1.0 && delete_factor > 0.0);
@@ -68,7 +68,7 @@ struct CuAllocatorOptions {
 // malloc and free routines are very slow).
 // This is a member of the CuDevice class.
 class CuMemoryAllocator {
- public:
+public:
   void* Malloc(size_t size);
 
   void* MallocPitch(size_t row_bytes, size_t num_rows, size_t *pitch);
@@ -89,7 +89,7 @@ class CuMemoryAllocator {
   void PrintMemoryUsage() const;
 
   CuMemoryAllocator(CuAllocatorOptions opts);
- private:
+private:
 
   void FreeSomeCachedMemory(size_t bytes_to_free);
 
@@ -103,8 +103,8 @@ class CuMemoryAllocator {
     size_t t;       // time value when we put this in the cache.
     size_t pitch;   // pitch of this memory region (c.f. cudaMallocPitch()).
     CachedMemoryElement() { }
-    CachedMemoryElement(void *pointer, size_t t, size_t pitch):
-        pointer(pointer), t(t), pitch(pitch) { }
+    CachedMemoryElement(void *pointer, size_t t, size_t pitch) :
+      pointer(pointer), t(t), pitch(pitch) { }
   };
 
   // This class caches a map from MemoryRequest to a list of CachedMemoryElements,
@@ -115,7 +115,7 @@ class CuMemoryAllocator {
   // the item for which the (time-since-used * size-in-bytes) is approximately
   // greatest.
   class MruCache {
-   public:
+public:
     size_t LeastRecentTime() const;  // t value of least recent CachedMemoryElement (0
                                      // if empty).
 
@@ -128,13 +128,13 @@ class CuMemoryAllocator {
     // 'request'.  If available, removes it from the cache and puts it to
     // 'output', and returns true.  Otherwise returns false.
     bool Lookup(const MemoryRequest &request,
-                CachedMemoryElement *output);
+        CachedMemoryElement *output);
 
     // Inserts this CachedMemoryElement to the list of CachedMemoryElements for this
     // MemoryRequest.  The time in the CachedMemoryElement is expected to be greater
     // than times in previously supplied CachedMemoryElements.
     void Insert(const MemoryRequest &request,
-                const CachedMemoryElement &element);
+        const CachedMemoryElement &element);
 
     struct MemoryRequestHasher {
       // input is interpreted as (row_bytes, num_rows).  row_bytes will always
@@ -153,12 +153,12 @@ class CuMemoryAllocator {
     // the vector of caches after initializing it.
     MruCache &operator = (const MruCache &other);
     MruCache(const MruCache &other);
-   private:
+private:
     typedef std::list<MemoryRequest> ListType;
     typedef std::list<MemoryRequest>::iterator ListIterType;
     typedef std::deque<std::pair<CachedMemoryElement, ListIterType> > MapValueType;
     typedef unordered_map<MemoryRequest, MapValueType,
-                          MemoryRequestHasher> MapType;
+            MemoryRequestHasher> MapType;
     // 'list_' contains MemoryRequests with the most recent on the back (where they are added),
     // and least recent on the front (where they are removed by RemoveLeastRecentlyUsed, although
     // they are also removed from random parts of the list by Lookup().
@@ -201,8 +201,8 @@ class CuMemoryAllocator {
     size_t num_rows;
     size_t pitch;
     UsedMemoryElement() { }
-    UsedMemoryElement(size_t row_bytes, size_t num_rows, size_t pitch):
-        row_bytes(row_bytes), num_rows(num_rows), pitch(pitch)  { }
+    UsedMemoryElement(size_t row_bytes, size_t num_rows, size_t pitch) :
+      row_bytes(row_bytes), num_rows(num_rows), pitch(pitch)  { }
   };
 
   struct PointerHasher {

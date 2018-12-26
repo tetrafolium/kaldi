@@ -31,7 +31,7 @@ namespace fst {
 
 template<class Arc, class I>
 void RemoveArcsWithSomeInputSymbols(const std::vector<I> &symbols_in,
-                                    VectorFst<Arc> *fst) {
+    VectorFst<Arc> *fst) {
   typedef typename Arc::StateId StateId;
 
   kaldi::ConstIntegerSet<I> symbol_set(symbols_in);
@@ -40,7 +40,7 @@ void RemoveArcsWithSomeInputSymbols(const std::vector<I> &symbols_in,
   StateId dead_state = fst->AddState();
   for (StateId s = 0; s < num_states; s++) {
     for (MutableArcIterator<VectorFst<Arc> > iter(fst, s);
-         !iter.Done(); iter.Next()) {
+        !iter.Done(); iter.Next()) {
       if (symbol_set.count(iter.Value().ilabel) != 0) {
         Arc arc = iter.Value();
         arc.nextstate = dead_state;
@@ -56,8 +56,8 @@ void RemoveArcsWithSomeInputSymbols(const std::vector<I> &symbols_in,
 
 template<class Arc, class I>
 void PenalizeArcsWithSomeInputSymbols(const std::vector<I> &symbols_in,
-                                      float penalty,
-                                      VectorFst<Arc> *fst) {
+    float penalty,
+    VectorFst<Arc> *fst) {
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Label Label;
   typedef typename Arc::Weight Weight;
@@ -69,7 +69,7 @@ void PenalizeArcsWithSomeInputSymbols(const std::vector<I> &symbols_in,
   StateId num_states = fst->NumStates();
   for (StateId s = 0; s < num_states; s++) {
     for (MutableArcIterator<VectorFst<Arc> > iter(fst, s);
-         !iter.Done(); iter.Next()) {
+        !iter.Done(); iter.Next()) {
       if (symbol_set.count(iter.Value().ilabel) != 0) {
         Arc arc = iter.Value();
         arc.weight = Times(arc.weight, penalty_weight);
@@ -166,28 +166,28 @@ int main(int argc, char *argv[]) {
 
 /* some test examples:
 
- ( echo "0 0 1 1"; echo " 0 0 3 2"; echo "0 0"; ) | fstcompile | fstrmsymbols "echo 3; echo  4|" | fstprint
+   ( echo "0 0 1 1"; echo " 0 0 3 2"; echo "0 0"; ) | fstcompile | fstrmsymbols "echo 3; echo  4|" | fstprint
  # should produce:
  # 0   0   1   1
  # 0   0   0   2
  # 0
 
- ( echo "0 0 1 1"; echo " 0 0 3 2"; echo "0 0"; ) | fstcompile | fstrmsymbols --apply-to-output=true "echo 2; echo 3|" | fstprint
+   ( echo "0 0 1 1"; echo " 0 0 3 2"; echo "0 0"; ) | fstcompile | fstrmsymbols --apply-to-output=true "echo 2; echo 3|" | fstprint
  # should produce:
  # 0   0   1   1
  # 0   0   3   0
  # 0
 
 
- ( echo "0 0 1 1"; echo " 0 0 3 2"; echo "0 0"; ) | fstcompile | fstrmsymbols --remove-arcs=true  "echo 3; echo  4|" | fstprint
+   ( echo "0 0 1 1"; echo " 0 0 3 2"; echo "0 0"; ) | fstcompile | fstrmsymbols --remove-arcs=true  "echo 3; echo  4|" | fstprint
  # should produce:
  # 0   0   1   1
  # 0
 
- ( echo "0 0 1 1"; echo " 0 0 3 2"; echo "0 0"; ) | fstcompile | fstrmsymbols --penalty=2 "echo 3; echo 4; echo 5|" | fstprint
-# should produce:
+   ( echo "0 0 1 1"; echo " 0 0 3 2"; echo "0 0"; ) | fstcompile | fstrmsymbols --penalty=2 "echo 3; echo 4; echo 5|" | fstprint
+ # should produce:
  # 0   0   1   1
  # 0   0   3   2   2
  # 0
 
-*/
+ */

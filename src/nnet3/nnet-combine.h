@@ -32,7 +32,7 @@ namespace nnet3 {
 
 /** Configuration class that controls neural net combination, where we combine a
     number of neural nets.
-*/
+ */
 struct NnetCombineConfig {
   int32 num_iters; // The dimension of the space we are optimizing in is fairly
                    // small (equal to the number of components times the number
@@ -50,14 +50,14 @@ struct NnetCombineConfig {
   bool enforce_sum_to_one;
   BaseFloat sum_to_one_penalty;
   bool separate_weights_per_component;
-  NnetCombineConfig(): num_iters(60),
-                       initial_impr(0.01),
-                       max_effective_inputs(15),
-                       test_gradient(false),
-                       enforce_positive_weights(false),
-                       enforce_sum_to_one(false),
-                       sum_to_one_penalty(0.0),
-                       separate_weights_per_component(true) { }
+  NnetCombineConfig() : num_iters(60),
+    initial_impr(0.01),
+    max_effective_inputs(15),
+    test_gradient(false),
+    enforce_positive_weights(false),
+    enforce_sum_to_one(false),
+    sum_to_one_penalty(0.0),
+    separate_weights_per_component(true) { }
 
   void Register(OptionsItf *po) {
     po->Register("num-iters", &num_iters, "Maximum number of function "
@@ -88,7 +88,7 @@ struct NnetCombineConfig {
 
 
 /*
-  You should use this class as follows:
+   You should use this class as follows:
     - Call the constructor, giving it the egs and the first nnet.
     - Call AcceptNnet to provide all the other nnets.  (the nnets will
       be stored in a matrix in CPU memory, to avoid filing up GPU memory).
@@ -96,13 +96,13 @@ struct NnetCombineConfig {
     - Get the resultant nnet with GetNnet().
  */
 class NnetCombiner {
- public:
+public:
   /// Caution: this object retains a const reference to the "egs", so don't
   /// delete them until it goes out of scope.
   NnetCombiner(const NnetCombineConfig &config,
-               int32 num_nnets,
-               const std::vector<NnetExample> &egs,
-               const Nnet &first_nnet);
+      int32 num_nnets,
+      const std::vector<NnetExample> &egs,
+      const Nnet &first_nnet);
   /// You should call this function num_nnets-1 times after calling
   /// the constructor, to provide the remaining nnets.
   void AcceptNnet(const Nnet &nnet);
@@ -110,7 +110,7 @@ class NnetCombiner {
   const Nnet &GetNnet() const { return nnet_; }
 
   ~NnetCombiner() { delete prob_computer_; }
- private:
+private:
   NnetCombineConfig config_;
 
   const std::vector<NnetExample> &egs_;
@@ -174,21 +174,21 @@ class NnetCombiner {
   // i.e. the combination weights; not the nnet parameters.  This function calls most of the
   // functions below.
   double ComputeObjfAndDerivFromParameters(
-      VectorBase<double> &params,
-      VectorBase<double> *params_deriv);
+    VectorBase<double> &params,
+    VectorBase<double> *params_deriv);
 
 
   // Computes the weights from the parameters in a config-dependent way.  The
   // weight dimension is always (the number of updatable components times
   // nnet_params_.NumRows()).
   void GetWeights(const VectorBase<double> &params,
-                  VectorBase<double> *weights) const;
+      VectorBase<double> *weights) const;
 
   // Given the raw weights: if config_.enforce_sum_to_one, then compute weights
   // with sum-to-one constrint per component included; else just copy input to
   // output.
   void GetNormalizedWeights(const VectorBase<double> &unnorm_weights,
-                            VectorBase<double> *norm_weights) const;
+      VectorBase<double> *norm_weights) const;
 
   // if config_.sum_to_one_penalty is 0.0, returns 0.0 and sets
   // weights_penalty_deriv to 0.0; else it computes, for each
@@ -201,26 +201,26 @@ class NnetCombiner {
   // normalized and unnormalized weights here (since normalization would be a
   // no-op).
   double GetSumToOnePenalty(const VectorBase<double> &weights,
-                            VectorBase<double> *weights_penalty_deriv,
-                            bool print_weights = false) const;
+      VectorBase<double> *weights_penalty_deriv,
+      bool print_weights = false) const;
 
 
   // Computes the nnet-parameter vector from the normalized weights and
   // nnet_params_, as a vector.  (See the functions Vectorize() and
   // UnVectorize() for how they relate to the nnet's components' parameters).
   void GetNnetParameters(const Vector<double> &normalized_weights,
-                         VectorBase<BaseFloat> *nnet_params) const;
+      VectorBase<BaseFloat> *nnet_params) const;
 
   // This function computes the objective function (and its derivative, if the objective
   // function is finite) at the given value of nnet parameters.  This involves the
   // nnet computation.
   double ComputeObjfAndDerivFromNnet(VectorBase<BaseFloat> &nnet_params,
-                                     VectorBase<BaseFloat> *nnet_params_deriv);
+      VectorBase<BaseFloat> *nnet_params_deriv);
 
   // Given an objective-function derivative with respect to the nnet parameters,
   // computes the derivative with respect to the (normalized) weights.
   void GetWeightsDeriv(const VectorBase<BaseFloat> &nnet_params_deriv,
-                       VectorBase<double> *normalized_weights_deriv);
+      VectorBase<double> *normalized_weights_deriv);
 
 
   // Computes the derivative w.r.t. the unnormalized weights, by propagating
@@ -228,15 +228,15 @@ class NnetCombiner {
   // If config_.enforce_sum_to_one == false, just copies norm_weights_deriv to
   // unnorm_weights_deriv.
   void GetUnnormalizedWeightsDeriv(const VectorBase<double> &unnorm_weights,
-                                   const VectorBase<double> &norm_weights_deriv,
-                                   VectorBase<double> *unnorm_weights_deriv);
+      const VectorBase<double> &norm_weights_deriv,
+      VectorBase<double> *unnorm_weights_deriv);
 
 
   // Given a derivative w.r.t. the weights, outputs a derivative w.r.t.
   // the params
   void GetParamsDeriv(const VectorBase<double> &weights,
-                      const VectorBase<double> &weight_deriv,
-                      VectorBase<double> *param_deriv);
+      const VectorBase<double> &weight_deriv,
+      VectorBase<double> *param_deriv);
 
   void ComputeUpdatableComponentDims();
   void FinishPreprocessingInput();

@@ -27,7 +27,7 @@ namespace kaldi {
 
 
 BaseFloat DecodableAmDiagGmmRegtreeFmllr::LogLikelihoodZeroBased(int32 frame,
-                                                          int32 state) {
+    int32 state) {
   KALDI_ASSERT(frame < NumFramesReady() && frame >= 0);
   KALDI_ASSERT(state < NumIndices() && state >= 0);
 
@@ -47,11 +47,11 @@ BaseFloat DecodableAmDiagGmmRegtreeFmllr::LogLikelihoodZeroBased(int32 frame,
   // check if everything is in order
   if (pdf.Dim() != data.Dim()) {
     KALDI_ERR << "Dim mismatch: data dim = "  << data.Dim()
-        << " vs. model dim = " << pdf.Dim();
+              << " vs. model dim = " << pdf.Dim();
   }
   if (!pdf.valid_gconsts()) {
     KALDI_ERR << "State "  << (state)  << ": Must call ComputeGconsts() "
-        "before computing likelihood.";
+      "before computing likelihood.";
   }
 
   if (frame != previous_frame_) {  // cache the transformed & squared stats.
@@ -110,9 +110,9 @@ void DecodableAmDiagGmmRegtreeMllr::InitCache() {
 // This is almost the same code as DiagGmm::ComputeGconsts, except that
 // means are used instead of means * inv(vars). This saves some computation.
 static void ComputeGconsts(const VectorBase<BaseFloat> &weights,
-                           const MatrixBase<BaseFloat> &means,
-                           const MatrixBase<BaseFloat> &inv_vars,
-                           VectorBase<BaseFloat> *gconsts_out) {
+    const MatrixBase<BaseFloat> &means,
+    const MatrixBase<BaseFloat> &inv_vars,
+    VectorBase<BaseFloat> *gconsts_out) {
   int32 num_gauss = weights.Dim();
   int32 dim = means.NumCols();
   KALDI_ASSERT(means.NumRows() == num_gauss
@@ -127,7 +127,7 @@ static void ComputeGconsts(const VectorBase<BaseFloat> &weights,
     BaseFloat gc = Log(weights(gauss)) + offset;  // May be -inf if weights == 0
     for (int32 d = 0; d < dim; d++) {
       gc += 0.5 * Log(inv_vars(gauss, d)) - 0.5 * means(gauss, d)
-        * means(gauss, d) * inv_vars(gauss, d);  // diff from DiagGmm version.
+          * means(gauss, d) * inv_vars(gauss, d); // diff from DiagGmm version.
     }
 
     if (KALDI_ISNAN(gc)) {  // negative infinity is OK but NaN is not acceptable
@@ -149,7 +149,7 @@ static void ComputeGconsts(const VectorBase<BaseFloat> &weights,
 
 
 const Matrix<BaseFloat>& DecodableAmDiagGmmRegtreeMllr::GetXformedMeanInvVars(
-    int32 state) {
+  int32 state) {
   if (is_cached_[state]) {  // found in cache
     KALDI_ASSERT(xformed_mean_invvars_[state] != NULL);
     KALDI_VLOG(3) << "For PDF index " << state << ": transformed means "
@@ -178,7 +178,7 @@ const Matrix<BaseFloat>& DecodableAmDiagGmmRegtreeMllr::GetXformedMeanInvVars(
 }
 
 const Vector<BaseFloat>& DecodableAmDiagGmmRegtreeMllr::GetXformedGconsts(
-    int32 state) {
+  int32 state) {
   if (!is_cached_[state]) {
     KALDI_ERR << "GConsts not cached for state: " << state << ". Must call "
               << "GetXformedMeanInvVars() first.";
@@ -188,7 +188,7 @@ const Vector<BaseFloat>& DecodableAmDiagGmmRegtreeMllr::GetXformedGconsts(
 }
 
 BaseFloat DecodableAmDiagGmmRegtreeMllr::LogLikelihoodZeroBased(int32 frame,
-                                                                int32 state) {
+    int32 state) {
 //  KALDI_ERR << "Function not completely implemented yet.";
   KALDI_ASSERT(frame < NumFramesReady() && frame >= 0);
   KALDI_ASSERT(state < NumIndices() && state >= 0);
@@ -203,7 +203,7 @@ BaseFloat DecodableAmDiagGmmRegtreeMllr::LogLikelihoodZeroBased(int32 frame,
   // check if everything is in order
   if (pdf.Dim() != data.Dim()) {
     KALDI_ERR << "Dim mismatch: data dim = "  << data.Dim()
-        << " vs. model dim = " << pdf.Dim();
+              << " vs. model dim = " << pdf.Dim();
   }
 
   if (frame != previous_frame_) {  // cache the squared stats.

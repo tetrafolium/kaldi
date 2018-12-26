@@ -42,7 +42,7 @@ typename Arc::Label HighestNumberedOutputSymbol(const Fst<Arc> &fst) {
   typename Arc::Label ans = 0;
   for (StateIterator<Fst<Arc> > siter(fst); !siter.Done(); siter.Next()) {
     typename Arc::StateId s = siter.Value();
-    for (ArcIterator<Fst<Arc> > aiter(fst, s); !aiter.Done();  aiter.Next()) {
+    for (ArcIterator<Fst<Arc> > aiter(fst, s); !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       ans = std::max(ans, arc.olabel);
     }
@@ -55,7 +55,7 @@ typename Arc::Label HighestNumberedInputSymbol(const Fst<Arc> &fst) {
   typename Arc::Label ans = 0;
   for (StateIterator<Fst<Arc> > siter(fst); !siter.Done(); siter.Next()) {
     typename Arc::StateId s = siter.Value();
-    for (ArcIterator<Fst<Arc> > aiter(fst, s); !aiter.Done();  aiter.Next()) {
+    for (ArcIterator<Fst<Arc> > aiter(fst, s); !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       ans = std::max(ans, arc.ilabel);
     }
@@ -74,13 +74,13 @@ typename Arc::StateId NumArcs(const ExpandedFst<Arc> &fst) {
 
 template<class Arc, class I>
 void GetOutputSymbols(const Fst<Arc> &fst,
-                      bool include_eps,
-                      vector<I> *symbols) {
+    bool include_eps,
+    vector<I> *symbols) {
   KALDI_ASSERT_IS_INTEGER_TYPE(I);
   std::set<I> all_syms;
   for (StateIterator<Fst<Arc> > siter(fst); !siter.Done(); siter.Next()) {
     typename Arc::StateId s = siter.Value();
-    for (ArcIterator<Fst<Arc> > aiter(fst, s); !aiter.Done();  aiter.Next()) {
+    for (ArcIterator<Fst<Arc> > aiter(fst, s); !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       all_syms.insert(arc.olabel);
     }
@@ -95,13 +95,13 @@ void GetOutputSymbols(const Fst<Arc> &fst,
 
 template<class Arc, class I>
 void GetInputSymbols(const Fst<Arc> &fst,
-                     bool include_eps,
-                     vector<I> *symbols) {
+    bool include_eps,
+    vector<I> *symbols) {
   KALDI_ASSERT_IS_INTEGER_TYPE(I);
   unordered_set<I> all_syms;
   for (StateIterator<Fst<Arc> > siter(fst); !siter.Done(); siter.Next()) {
     typename Arc::StateId s = siter.Value();
-    for (ArcIterator<Fst<Arc> > aiter(fst, s); !aiter.Done();  aiter.Next()) {
+    for (ArcIterator<Fst<Arc> > aiter(fst, s); !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       all_syms.insert(arc.ilabel);
     }
@@ -117,7 +117,7 @@ void GetInputSymbols(const Fst<Arc> &fst,
 
 template<class Arc, class I>
 void RemoveSomeInputSymbols(const vector<I> &to_remove,
-                            MutableFst<Arc> *fst) {
+    MutableFst<Arc> *fst) {
   KALDI_ASSERT_IS_INTEGER_TYPE(I);
   RemoveSomeInputSymbolsMapper<Arc, I> mapper(to_remove);
   Map(fst, mapper);
@@ -125,11 +125,11 @@ void RemoveSomeInputSymbols(const vector<I> &to_remove,
 
 template<class Arc, class I>
 class MapInputSymbolsMapper {
- public:
+public:
   Arc operator ()(const Arc &arc_in) {
     Arc ans = arc_in;
     if (ans.ilabel > 0 &&
-       ans.ilabel < static_cast<typename Arc::Label>((*symbol_mapping_).size()))
+        ans.ilabel < static_cast<typename Arc::Label>((*symbol_mapping_).size()))
       ans.ilabel = (*symbol_mapping_)[ans.ilabel];
     return ans;
   }
@@ -139,7 +139,7 @@ class MapInputSymbolsMapper {
   uint64 Properties(uint64 props) const {  // Not tested.
     bool remove_epsilons = (symbol_mapping_->size() > 0 && (*symbol_mapping_)[0] != 0);
     bool add_epsilons = (symbol_mapping_->size() > 1 &&
-                         *std::min_element(symbol_mapping_->begin()+1, symbol_mapping_->end()) == 0);
+        *std::min_element(symbol_mapping_->begin()+1, symbol_mapping_->end()) == 0);
 
     // remove the following as we don't know now if any of them are true.
     uint64 props_to_remove = kAcceptor|kNotAcceptor|kIDeterministic|kNonIDeterministic|
@@ -159,14 +159,14 @@ class MapInputSymbolsMapper {
     owned = copy;
   }
   ~MapInputSymbolsMapper() { if (owned && symbol_mapping_ != NULL) delete symbol_mapping_; }
- private:
+private:
   bool owned;
   const vector<I> *symbol_mapping_;
 };
 
 template<class Arc, class I>
 void MapInputSymbols(const vector<I> &symbol_mapping,
-                     MutableFst<Arc> *fst) {
+    MutableFst<Arc> *fst) {
   KALDI_ASSERT_IS_INTEGER_TYPE(I);
   // false == don't copy the "symbol_mapping", retain pointer--
   // safe since short-lived object.
@@ -176,9 +176,9 @@ void MapInputSymbols(const vector<I> &symbol_mapping,
 
 template<class Arc, class I>
 bool GetLinearSymbolSequence(const Fst<Arc> &fst,
-                             vector<I> *isymbols_out,
-                             vector<I> *osymbols_out,
-                             typename Arc::Weight *tot_weight_out) {
+    vector<I> *isymbols_out,
+    vector<I> *osymbols_out,
+    typename Arc::Weight *tot_weight_out) {
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Weight Weight;
 
@@ -219,7 +219,7 @@ bool GetLinearSymbolSequence(const Fst<Arc> &fst,
 // see fstext-utils.sh for comment.
 template<class Arc>
 void ConvertNbestToVector(const Fst<Arc> &fst,
-                          vector<VectorFst<Arc> > *fsts_out) {
+    vector<VectorFst<Arc> > *fsts_out) {
   typedef typename Arc::Weight Weight;
   typedef typename Arc::StateId StateId;
   fsts_out->clear();
@@ -236,8 +236,8 @@ void ConvertNbestToVector(const Fst<Arc> &fst,
   }
 
   for (ArcIterator<Fst<Arc> > start_aiter(fst, start_state);
-       !start_aiter.Done();
-       start_aiter.Next()) {
+      !start_aiter.Done();
+      start_aiter.Next()) {
     fsts_out->resize(fsts_out->size() + 1);
     VectorFst<Arc> &ofst = fsts_out->back();
     const Arc &first_arc = start_aiter.Value();
@@ -277,8 +277,8 @@ void ConvertNbestToVector(const Fst<Arc> &fst,
 // see fstext-utils.sh for comment.
 template<class Arc>
 void NbestAsFsts(const Fst<Arc> &fst,
-                 size_t n,
-                 vector<VectorFst<Arc> > *fsts_out) {
+    size_t n,
+    vector<VectorFst<Arc> > *fsts_out) {
   KALDI_ASSERT(n > 0);
   KALDI_ASSERT(fsts_out != NULL);
   VectorFst<Arc> nbest_fst;
@@ -288,7 +288,7 @@ void NbestAsFsts(const Fst<Arc> &fst,
 
 template<class Arc, class I>
 void MakeLinearAcceptorWithAlternatives(const vector<vector<I> > &labels,
-                                        MutableFst<Arc> *ofst) {
+    MutableFst<Arc> *ofst) {
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Weight Weight;
 
@@ -327,8 +327,8 @@ void MakeLinearAcceptor(const vector<I> &labels, MutableFst<Arc> *ofst) {
 
 template<class I>
 void GetSymbols(const SymbolTable &symtab,
-                bool include_eps,
-                vector<I> *syms_out) {
+    bool include_eps,
+    vector<I> *syms_out) {
   KALDI_ASSERT(syms_out != NULL);
   syms_out->clear();
   for (SymbolTableIterator iter(symtab);
@@ -346,7 +346,7 @@ void SafeDeterminizeWrapper(MutableFst<Arc> *ifst, MutableFst<Arc> *ofst, float 
   typename Arc::Label highest_sym = HighestNumberedInputSymbol(*ifst);
   vector<typename Arc::Label> extra_syms;
   PreDeterminize(ifst,
-                 (typename Arc::Label)(highest_sym+1),
+      (typename Arc::Label)(highest_sym+1),
                  &extra_syms);
   DeterminizeStar(*ifst, ofst, delta);
   RemoveSomeInputSymbols(extra_syms, ofst);  // remove the extra symbols.
@@ -358,7 +358,7 @@ void SafeDeterminizeMinimizeWrapper(MutableFst<Arc> *ifst, VectorFst<Arc> *ofst,
   typename Arc::Label highest_sym = HighestNumberedInputSymbol(*ifst);
   vector<typename Arc::Label> extra_syms;
   PreDeterminize(ifst,
-                 (typename Arc::Label)(highest_sym+1),
+      (typename Arc::Label)(highest_sym+1),
                  &extra_syms);
   DeterminizeStar(*ifst, ofst, delta);
   RemoveSomeInputSymbols(extra_syms, ofst);  // remove the extra symbols.
@@ -486,8 +486,8 @@ bool PrecedingInputSymbolsAreSameClass(bool start_is_epsilon, const Fst<Arc> &fs
       if (classes[arc.nextstate] == noClass)
         classes[arc.nextstate] = f(arc.ilabel);
       else
-        if (classes[arc.nextstate] != f(arc.ilabel))
-          return false;
+      if (classes[arc.nextstate] != f(arc.ilabel))
+        return false;
     }
   }
   return true;
@@ -514,11 +514,11 @@ bool FollowingInputSymbolsAreSameClass(bool end_is_epsilon, const Fst<Arc> &fst,
       if (c == noClass)
         c = f(arc.ilabel);
       else
-        if (c != f(arc.ilabel))
-          return false;
+      if (c != f(arc.ilabel))
+        return false;
     }
     if (end_is_epsilon && c != noClass &&
-       c != epsClass && fst.Final(s) != Weight::Zero())
+        c != epsClass && fst.Final(s) != Weight::Zero())
       return false;
   }
   return true;
@@ -557,8 +557,8 @@ void MakePrecedingInputSymbolsSameClass(bool start_is_epsilon, MutableFst<Arc> *
       if (classes[arc.nextstate] == noClass)
         classes[arc.nextstate] = f(arc.ilabel);
       else
-        if (classes[arc.nextstate] != f(arc.ilabel))
-          bad_states.insert(arc.nextstate);
+      if (classes[arc.nextstate] != f(arc.ilabel))
+        bad_states.insert(arc.nextstate);
     }
   }
   if (bad_states.empty()) return;  // Nothing to do.
@@ -573,7 +573,7 @@ void MakePrecedingInputSymbolsSameClass(bool start_is_epsilon, MutableFst<Arc> *
     for (ArcIterator<Fst<Arc> > aiter(*fst, s); !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       if (arc.ilabel != 0 &&
-         bad_states_ciset.count(arc.nextstate) != 0)
+          bad_states_ciset.count(arc.nextstate) != 0)
         arcs_to_change.push_back(std::make_pair(s, aiter.Position()));
     }
   }
@@ -629,13 +629,13 @@ void MakeFollowingInputSymbolsSameClass(bool end_is_epsilon, MutableFst<Arc> *fs
       if (c == noClass)
         c = f(arc.ilabel);
       else
-        if (c != f(arc.ilabel)) {
-          bad = true;
-          break;
-        }
+      if (c != f(arc.ilabel)) {
+        bad = true;
+        break;
+      }
     }
     if (end_is_epsilon && c != noClass &&
-       c != epsClass && fst->Final(s) != Weight::Zero())
+        c != epsClass && fst->Final(s) != Weight::Zero())
       bad = true;
     if (bad)
       bad_states.push_back(s);
@@ -740,15 +740,15 @@ VectorFst<Arc>* MakeLoopFst(const vector<const ExpandedFst<Arc> *> &fsts) {
 
 template<class Arc>
 void ClearSymbols(bool clear_input,
-                  bool clear_output,
-                  MutableFst<Arc> *fst) {
+    bool clear_output,
+    MutableFst<Arc> *fst) {
   for (StateIterator<MutableFst<Arc> > siter(*fst);
-       !siter.Done();
-       siter.Next()) {
+      !siter.Done();
+      siter.Next()) {
     typename Arc::StateId s = siter.Value();
     for (MutableArcIterator<MutableFst<Arc> > aiter(fst, s);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       Arc arc = aiter.Value();
       bool change = false;
       if (clear_input && arc.ilabel != 0) {
@@ -772,8 +772,8 @@ void ApplyProbabilityScale(float scale, MutableFst<Arc> *fst) {
   typedef typename Arc::Weight Weight;
   typedef typename Arc::StateId StateId;
   for (StateIterator<MutableFst<Arc> > siter(*fst);
-       !siter.Done();
-       siter.Next()) {
+      !siter.Done();
+      siter.Next()) {
     StateId s = siter.Value();
     for (MutableArcIterator<MutableFst<Arc> > aiter(fst, s);
         !aiter.Done();
@@ -794,17 +794,17 @@ template<class Arc>
 ssize_t FindSelfLoopWithILabel(const Fst<Arc> &fst, typename Arc::StateId s) {
   for (ArcIterator<Fst<Arc> > aiter(fst, s); !aiter.Done(); aiter.Next())
     if (aiter.Value().nextstate == s
-       && aiter.Value().ilabel != 0) return static_cast<ssize_t>(aiter.Position());
+        && aiter.Value().ilabel != 0) return static_cast<ssize_t>(aiter.Position());
   return static_cast<ssize_t>(-1);
 }
 
 
 template<class Arc>
 bool EqualAlign(const Fst<Arc> &ifst,
-                typename Arc::StateId length,
-                int rand_seed,
-                MutableFst<Arc> *ofst,
-                int num_retries) {
+    typename Arc::StateId length,
+    int rand_seed,
+    MutableFst<Arc> *ofst,
+    int num_retries) {
   srand(rand_seed);
   KALDI_ASSERT(ofst->NumStates() == 0);  // make sure ofst empty.
   // make sure all states can reach final-state (or this algorithm may enter
@@ -883,7 +883,7 @@ bool EqualAlign(const Fst<Arc> &ifst,
   vector<ssize_t> self_loop_offsets(path.size());
   for (size_t i = 0; i < path.size(); i++)
     if ( (self_loop_offsets[i] = FindSelfLoopWithILabel(ifst, path[i]))
-         != static_cast<ssize_t>(-1) )
+        != static_cast<ssize_t>(-1) )
       num_self_loops++;
 
   if (num_self_loops == 0
@@ -915,7 +915,7 @@ bool EqualAlign(const Fst<Arc> &ifst,
       aiter.Seek(self_loop_offsets[i]);
       Arc arc = aiter.Value();
       KALDI_ASSERT(arc.nextstate == path[i]
-             && arc.ilabel != 0);  // make sure self-loop with ilabel.
+          && arc.ilabel != 0);     // make sure self-loop with ilabel.
       StateId next_state = ofst->AddState();
       ofst->AddArc(cur_state, Arc(arc.ilabel, arc.olabel, arc.weight, next_state));
       cur_state = next_state;
@@ -1019,9 +1019,9 @@ void RemoveUselessArcs(MutableFst<Arc> *fst) {
 
 template<class Arc>
 void PhiCompose(const Fst<Arc> &fst1,
-                const Fst<Arc> &fst2,
-                typename Arc::Label phi_label,
-                MutableFst<Arc> *ofst) {
+    const Fst<Arc> &fst2,
+    typename Arc::Label phi_label,
+    MutableFst<Arc> *ofst) {
   KALDI_ASSERT(phi_label != kNoLabel); // just use regular compose in this case.
   typedef Fst<Arc> F;
   typedef PhiMatcher<SortedMatcher<F> > PM;
@@ -1049,9 +1049,9 @@ void PhiCompose(const Fst<Arc> &fst1,
 
 template<class Arc>
 void PropagateFinalInternal(
-    typename Arc::Label phi_label,
-    typename Arc::StateId s,
-    MutableFst<Arc> *fst) {
+  typename Arc::Label phi_label,
+  typename Arc::StateId s,
+  MutableFst<Arc> *fst) {
   typedef typename Arc::Weight Weight;
   if (fst->Final(s) == Weight::Zero()) {
     // search for phi transition.  We assume there
@@ -1059,7 +1059,7 @@ void PropagateFinalInternal(
     // anyway.
     int num_phis = 0;
     for (ArcIterator<Fst<Arc> > aiter(*fst, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       if (arc.ilabel == phi_label) {
         num_phis++;
@@ -1082,11 +1082,11 @@ void PropagateFinalInternal(
 
 template<class Arc>
 void PropagateFinal(typename Arc::Label phi_label,
-                    MutableFst<Arc> *fst) {
+    MutableFst<Arc> *fst) {
   typedef typename Arc::StateId StateId;
   if (fst->Properties(kIEpsilons, true)) // just warn.
     KALDI_WARN << "PropagateFinal: this may not work as desired "
-        "since your FST has input epsilons.";
+      "since your FST has input epsilons.";
   StateId num_states = fst->NumStates();
   for (StateId s = 0; s < num_states; s++)
     PropagateFinalInternal(phi_label, s, fst);
@@ -1094,9 +1094,9 @@ void PropagateFinal(typename Arc::Label phi_label,
 
 template<class Arc>
 void RhoCompose(const Fst<Arc> &fst1,
-                const Fst<Arc> &fst2,
-                typename Arc::Label rho_label,
-                MutableFst<Arc> *ofst) {
+    const Fst<Arc> &fst2,
+    typename Arc::Label rho_label,
+    MutableFst<Arc> *ofst) {
   KALDI_ASSERT(rho_label != kNoLabel); // just use regular compose in this case.
   typedef Fst<Arc> F;
   typedef RhoMatcher<SortedMatcher<F> > RM;
@@ -1126,16 +1126,16 @@ void RhoCompose(const Fst<Arc> &fst1,
 // Declare an override of the template below.
 template<>
 inline bool IsStochasticFst(const Fst<LogArc> &fst,
-                            float delta,
-                            LogArc::Weight *min_sum,
-                            LogArc::Weight *max_sum);
+    float delta,
+    LogArc::Weight *min_sum,
+    LogArc::Weight *max_sum);
 
 // Will override this for LogArc where NaturalLess will not work.
 template<class Arc>
 bool IsStochasticFst(const Fst<Arc> &fst,
-                     float delta,
-                     typename Arc::Weight *min_sum,
-                     typename Arc::Weight *max_sum) {
+    float delta,
+    typename Arc::Weight *min_sum,
+    typename Arc::Weight *max_sum) {
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Weight Weight;
   NaturalLess<Weight> nl;
@@ -1169,9 +1169,9 @@ bool IsStochasticFst(const Fst<Arc> &fst,
 // Overriding template for LogArc as NaturalLess does not work there.
 template<>
 bool IsStochasticFst(const Fst<LogArc> &fst,
-                     float delta,
-                     LogArc::Weight *min_sum,
-                     LogArc::Weight *max_sum) {
+    float delta,
+    LogArc::Weight *min_sum,
+    LogArc::Weight *max_sum) {
   typedef LogArc Arc;
   typedef Arc::StateId StateId;
   typedef Arc::Weight Weight;
@@ -1209,9 +1209,9 @@ bool IsStochasticFst(const Fst<LogArc> &fst,
 // This version currently supports ConstFst<StdArc> or VectorFst<StdArc>.
 // Otherwise, it will be died with an error.
 bool IsStochasticFstInLog(const Fst<StdArc> &fst,
-                          float delta,
-                          StdArc::Weight *min_sum,
-                          StdArc::Weight *max_sum) {
+    float delta,
+    StdArc::Weight *min_sum,
+    StdArc::Weight *max_sum) {
   bool ans = false;
   LogArc::Weight log_min, log_max;
   if (fst.Type() == "const") {

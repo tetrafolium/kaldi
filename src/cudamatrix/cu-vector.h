@@ -46,7 +46,7 @@ Real VecVec(const CuVectorBase<Real> &v1, const CuVectorBase<OtherReal> &v2);
  */
 template<typename Real>
 class CuVectorBase {
- public:
+public:
   friend class CuVectorBase<float>;
   friend class CuVectorBase<double>;
   friend class CuMatrixBase<Real>;
@@ -57,10 +57,10 @@ class CuVectorBase {
 
   template <typename OtherReal>
   friend OtherReal VecVec(const CuVectorBase<OtherReal> &v1,
-                          const CuVectorBase<OtherReal> &v2);
+      const CuVectorBase<OtherReal> &v2);
   friend void cu::Splice<Real>(const CuMatrixBase<Real> &src,
-                               const CuArray<int32> &frame_offsets,
-                               CuMatrixBase<Real> *tgt);
+      const CuArray<int32> &frame_offsets,
+      CuMatrixBase<Real> *tgt);
   friend class CuRand<Real>;
 
   /// Dimensions
@@ -108,8 +108,8 @@ class CuVectorBase {
   /// Add triangular matrix times vector: this <-- beta*this + alpha*M*v.
   /// Works even if rv == *this.
   void AddTpVec(const Real alpha, const CuTpMatrix<Real>&M,
-                const MatrixTransposeType trans, const CuVectorBase<Real> &v,
-                const Real beta);  // **beta previously defaulted to 0.0**
+      const MatrixTransposeType trans, const CuVectorBase<Real> &v,
+      const Real beta);            // **beta previously defaulted to 0.0**
 
   /// Multiplies this vector by lower-triangular marix:  *this <-- *this *M
   void MulTp(const CuTpMatrix<Real> &M, const MatrixTransposeType trans);
@@ -134,7 +134,7 @@ class CuVectorBase {
   }
 
   const CuSubVector<Real> Range(const MatrixIndexT o,
-                                const MatrixIndexT l) const {
+      const MatrixIndexT l) const {
     return CuSubVector<Real>(*this, o, l);
   }
 
@@ -144,26 +144,26 @@ class CuVectorBase {
   void CopyColFromMat(const CuMatrixBase<OtherReal> &mat, MatrixIndexT col);
 
   void AddMatVec(const Real alpha, const CuMatrixBase<Real> &M,
-                 MatrixTransposeType trans, const CuVectorBase<Real> &v,
-                 const Real beta);
+      MatrixTransposeType trans, const CuVectorBase<Real> &v,
+      const Real beta);
   void AddVecVec(Real alpha, const CuVectorBase<Real> &v,
-                 const CuVectorBase<Real> &r, Real beta);
+      const CuVectorBase<Real> &r, Real beta);
 
   void AddSpVec(const Real alpha, const CuSpMatrix<Real> &S,
-                const CuVectorBase<Real> &v, const Real beta);
+      const CuVectorBase<Real> &v, const Real beta);
 
   /// Add the diagonal of a matrix times itself:
   /// *this = diag(M M^T) +  beta * *this (if trans == kNoTrans), or
   /// *this = diag(M^T M) +  beta * *this (if trans == kTrans).
   void AddDiagMat2(Real alpha, const CuMatrixBase<Real> &M,
-                   MatrixTransposeType trans, Real beta);
+      MatrixTransposeType trans, Real beta);
 
   /// Add the diagonal of a matrix product: *this = diag(M N), assuming the
   /// "trans" arguments are both kNoTrans; for transpose arguments, it behaves
   /// as you would expect.
   void AddDiagMatMat(Real alpha, const CuMatrixBase<Real> &M, MatrixTransposeType transM,
-                     const CuMatrixBase<Real> &N, MatrixTransposeType transN,
-                     Real beta = 1.0);
+      const CuMatrixBase<Real> &N, MatrixTransposeType transN,
+      Real beta = 1.0);
 
   inline CuValue<Real> operator() (MatrixIndexT i) {
     KALDI_PARANOID_ASSERT(static_cast<UnsignedMatrixIndexT>(i) <
@@ -206,17 +206,18 @@ class CuVectorBase {
     return *(reinterpret_cast<VectorBase<Real>* >(this));
   }
 
- protected:
+protected:
 
   /// Default constructor: make it protected so the user cannot
   /// instantiate this class.
-  CuVectorBase<Real>(): data_(NULL), dim_(0) { }
+  CuVectorBase<Real>() : data_(NULL), dim_(0) {
+  }
 
   Real *data_; ///< GPU data pointer (or regular data pointer
-               ///< if CUDA is not compiled in or we have no GPU).
+  ///< if CUDA is not compiled in or we have no GPU).
   MatrixIndexT dim_; ///< dimension of the vector
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(CuVectorBase);
 };
 
@@ -229,7 +230,7 @@ class CuVector: public CuVectorBase<Real> {
   friend class CuSpMatrix<Real>;
   friend class CuTpMatrix<Real>;
 
- public:
+public:
   CuVector() { }
   CuVector(MatrixIndexT dim, MatrixResizeType t = kSetZero) { Resize(dim, t); }
 
@@ -282,16 +283,16 @@ class CuVector: public CuVectorBase<Real> {
 
   void Swap(Vector<Real> *vec);
 
- private:
+private:
   void Destroy();
 };
 
 // We'll fill out the following class if it's needed.
 template<typename Real>
 class CuSubVector: public CuVectorBase<Real> {
- public:
+public:
   CuSubVector(const CuVectorBase<Real> &t, const MatrixIndexT origin,
-              const MatrixIndexT length) : CuVectorBase<Real>() {
+      const MatrixIndexT length) : CuVectorBase<Real>() {
     KALDI_ASSERT(static_cast<UnsignedMatrixIndexT>(origin)+
                  static_cast<UnsignedMatrixIndexT>(length) <=
                  static_cast<UnsignedMatrixIndexT>(t.Dim()));
@@ -328,13 +329,13 @@ std::ostream &operator << (std::ostream &out, const CuVectorBase<Real> &vec);
 
 template<typename Real>
 bool ApproxEqual(const CuVectorBase<Real> &a,
-                 const CuVectorBase<Real> &b, Real tol = 0.01) {
+    const CuVectorBase<Real> &b, Real tol = 0.01) {
   return a.ApproxEqual(b, tol);
 }
 
 template<typename Real>
 inline void AssertEqual(const CuVectorBase<Real> &a,
-                        const CuVectorBase<Real> &b, Real tol = 0.01) {
+    const CuVectorBase<Real> &b, Real tol = 0.01) {
   KALDI_ASSERT(a.ApproxEqual(b, tol));
 }
 

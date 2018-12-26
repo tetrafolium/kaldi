@@ -51,7 +51,7 @@ void TpMatrix<Real>::Invert() {
   // format, so we temporarily put in non-packed format.
   Matrix<Real> tmp(*this);
   int rows = static_cast<int>(this->num_rows_);
-  
+
   // ATLAS call.  It's really row-major ordering and a lower triangular matrix,
   // but there is some weirdness with Fortran-style indexing that we need to
   // take account of, so everything gets swapped.
@@ -102,13 +102,13 @@ void TpMatrix<Real>::Cholesky(const SpMatrix<Real> &orig) {
     }
     // d = orig(j, j) - d;
     d = orig_jdata[j] - d;
-    
+
     if (d >= 0.0) {
       // (*this)(j, j) = std::sqrt(d);
       jdata[j] = std::sqrt(d);
     } else {
       KALDI_WARN << "Cholesky decomposition failed. Maybe matrix "
-          "is not positive definite. Throwing error";
+        "is not positive definite. Throwing error";
       throw std::runtime_error("Cholesky decomposition failed.");
     }
   }
@@ -116,7 +116,7 @@ void TpMatrix<Real>::Cholesky(const SpMatrix<Real> &orig) {
 
 template<typename Real>
 void TpMatrix<Real>::CopyFromMat(const MatrixBase<Real> &M,
-                                 MatrixTransposeType Trans) {
+    MatrixTransposeType Trans) {
   if (Trans == kNoTrans) {
     KALDI_ASSERT(this->NumRows() == M.NumRows() && M.NumRows() == M.NumCols());
     MatrixIndexT D = this->NumRows();

@@ -33,9 +33,9 @@ int main(int argc, char *argv[]) {
     using fst::VectorFst;
     using fst::StdArc;
     using namespace kaldi;
-  
+
     const char *usage =
-        "Do forward-backward and collect frame level MPE posteriors over\n" 
+        "Do forward-backward and collect frame level MPE posteriors over\n"
         "lattices, which can be fed into gmm-acc-stats2 to do MPE traning.\n"
         "Caution: this is not really MPE, this is MPFE (minimum phone frame\n"
         "error).  The posteriors may be positive or negative.\n"
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
- 
+
     std::vector<int32> silence_phones;
     if (!kaldi::SplitStringToIntegers(silence_phones_str, ":", false, &silence_phones))
       KALDI_ERR << "Invalid silence-phones string " << silence_phones_str;
@@ -73,8 +73,8 @@ int main(int argc, char *argv[]) {
     if (acoustic_scale == 0.0)
       KALDI_ERR << "Do not use a zero acoustic scale (cannot be inverted)";
 
-    std::string model_filename = po.GetArg(1), 
-        alignments_rspecifier = po.GetArg(2),  
+    std::string model_filename = po.GetArg(1),
+        alignments_rspecifier = po.GetArg(2),
         lats_rspecifier = po.GetArg(3),
         posteriors_wspecifier = po.GetArg(4);
 
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
                  << "not posteriors.  Remove ali-to-post from your scripts.";
     }
     RandomAccessInt32VectorReader alignments_reader(alignments_rspecifier);
-    
+
     TransitionModel trans_model;
     {
       bool binary;
@@ -104,13 +104,13 @@ int main(int argc, char *argv[]) {
       lattice_reader.FreeCurrent();
       if (acoustic_scale != 1.0 || lm_scale != 1.0)
         fst::ScaleLattice(fst::LatticeScale(lm_scale, acoustic_scale), &lat);
-      
+
       kaldi::uint64 props = lat.Properties(fst::kFstProperties, false);
       if (!(props & fst::kTopSorted)) {
         if (fst::TopSort(&lat) == false)
           KALDI_ERR << "Cycles detected in lattice.";
       }
-      
+
       if (!alignments_reader.HasKey(key)) {
         KALDI_WARN << "No alignment for utterance " << key;
         num_err++;
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
                       << " arcs. Average frame accuracies = " << (lat_frame_acc/lat_time)
                       << " over " << lat_time << " frames.";
         posterior_writer.Write(key, post);
-        num_done++; 
+        num_done++;
       }
     }
 

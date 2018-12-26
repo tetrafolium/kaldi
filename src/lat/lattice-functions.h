@@ -50,9 +50,9 @@ namespace kaldi {
    preceding input symbol, or the following input symbol for input-epsilons
    encountered prior to any input symbol.  If 'nbest' has no input symbols,
    'per_frame_loglikes' will be set to the empty vector.
-**/
+ **/
 void GetPerFrameAcousticCosts(const Lattice &nbest,
-                              Vector<BaseFloat> *per_frame_loglikes);
+    Vector<BaseFloat> *per_frame_loglikes);
 
 /// This function iterates over the states of a topologically sorted lattice and
 /// counts the time instance corresponding to each state. The times are returned
@@ -66,7 +66,7 @@ int32 LatticeStateTimes(const Lattice &lat, std::vector<int32> *times);
 /// might not be the same as the maximum time in the lattice, due to frames
 /// in the final-prob.
 int32 CompactLatticeStateTimes(const CompactLattice &clat,
-                               std::vector<int32> *times);
+    std::vector<int32> *times);
 
 /// This function does the forward-backward over lattices and computes the
 /// posterior probabilities of the arcs. It returns the total log-probability
@@ -78,19 +78,19 @@ int32 CompactLatticeStateTimes(const CompactLattice &clat,
 /// This is used in combination with other quantities to work out
 /// the objective function in MMI discriminative training.
 BaseFloat LatticeForwardBackward(const Lattice &lat,
-                                 Posterior *arc_post,
-                                 double *acoustic_like_sum = NULL);
+    Posterior *arc_post,
+    double *acoustic_like_sum = NULL);
 
 // This function is something similar to LatticeForwardBackward(), but it is on
 // the CompactLattice lattice format. Also we only need the alpha in the forward
 // path, not the posteriors.
 bool ComputeCompactLatticeAlphas(const CompactLattice &lat,
-                                 std::vector<double> *alpha);
+    std::vector<double> *alpha);
 
 // A sibling of the function CompactLatticeAlphas()... We compute the beta from
 // the backward path here.
 bool ComputeCompactLatticeBetas(const CompactLattice &lat,
-                                std::vector<double> *beta);
+    std::vector<double> *beta);
 
 
 // Computes (normal or Viterbi) alphas and betas; returns (total-prob, or
@@ -99,9 +99,9 @@ bool ComputeCompactLatticeBetas(const CompactLattice &lat,
 // will work for either CompactLattice or Latice.
 template<typename LatticeType>
 double ComputeLatticeAlphasAndBetas(const LatticeType &lat,
-                                    bool viterbi,
-                                    std::vector<double> *alpha,
-                                    std::vector<double> *beta);
+    bool viterbi,
+    std::vector<double> *alpha,
+    std::vector<double> *beta);
 
 
 /// Topologically sort the compact lattice if not already topologically sorted.
@@ -117,12 +117,12 @@ void TopSortLatticeIfNeeded(Lattice *clat);
 /// final-prob strings) crossing any given frame.  Returns 1 for empty lattices.
 /// Requires that clat is topologically sorted!
 BaseFloat CompactLatticeDepth(const CompactLattice &clat,
-                              int32 *num_frames = NULL);
+    int32 *num_frames = NULL);
 
 /// This function returns, for each frame, the number of arcs crossing that
 /// frame.
 void CompactLatticeDepthPerFrame(const CompactLattice &clat,
-                                 std::vector<int32> *depth_per_frame);
+    std::vector<int32> *depth_per_frame);
 
 
 /// This function limits the depth of the lattice, per frame: that means, it
@@ -130,7 +130,7 @@ void CompactLatticeDepthPerFrame(const CompactLattice &clat,
 /// frame.  This can be used to reduce the size of the "very deep" portions of
 /// the lattice.
 void CompactLatticeLimitDepth(int32 max_arcs_per_frame,
-                              CompactLattice *clat);
+    CompactLattice *clat);
 
 
 /// Given a lattice, and a transition model to map pdf-ids to phones,
@@ -138,8 +138,8 @@ void CompactLatticeLimitDepth(int32 max_arcs_per_frame,
 /// sil_phones (which must be sorted and uniq) is nonempty, it excludes
 /// phones in this list.
 void LatticeActivePhones(const Lattice &lat, const TransitionModel &trans,
-                         const std::vector<int32> &sil_phones,
-                         std::vector<std::set<int32> > *active_phones);
+    const std::vector<int32> &sil_phones,
+    std::vector<std::set<int32> > *active_phones);
 
 /// Given a lattice, and a transition model to map pdf-ids to phones,
 /// replace the output symbols (presumably words), with phones; we
@@ -152,7 +152,7 @@ void LatticeActivePhones(const Lattice &lat, const TransitionModel &trans,
 /// we do reorder).
 /// Also see PhoneAlignLattice, in phone-align-lattice.h.
 void ConvertLatticeToPhones(const TransitionModel &trans_model,
-                            Lattice *lat);
+    Lattice *lat);
 
 /// Prunes a lattice or compact lattice.  Returns true on success, false if
 /// there was some kind of failure.
@@ -165,7 +165,7 @@ bool PruneLattice(BaseFloat beam, LatticeType *lat);
 /// Note that this is different from ConvertLatticeToPhones, in that
 /// we replace the transition-ids not the words.
 void ConvertCompactLatticeToPhones(const TransitionModel &trans_model,
-                                   CompactLattice *clat);
+    CompactLattice *clat);
 
 /// Boosts LM probabilities by b * [number of frame errors]; equivalently, adds
 /// -b*[number of frame errors] to the graph-component of the cost of each arc/path.
@@ -180,11 +180,11 @@ void ConvertCompactLatticeToPhones(const TransitionModel &trans_model,
 /// Returns true on success, false if there was some kind of mismatch.
 /// At input, silence_phones must be sorted and unique.
 bool LatticeBoost(const TransitionModel &trans,
-                  const std::vector<int32> &alignment,
-                  const std::vector<int32> &silence_phones,
-                  BaseFloat b,
-                  BaseFloat max_silence_error,
-                  Lattice *lat);
+    const std::vector<int32> &alignment,
+    const std::vector<int32> &silence_phones,
+    BaseFloat b,
+    BaseFloat max_silence_error,
+    Lattice *lat);
 
 
 /**
@@ -196,23 +196,23 @@ bool LatticeBoost(const TransitionModel &trans,
 
    @param [in] trans    The transition model. Used to map the
                         transition-ids to phones or pdfs.
-   @param [in] silence_phones   A list of integer ids of silence phones. The 
+   @param [in] silence_phones   A list of integer ids of silence phones. The
                         silence frames i.e. the frames where num_ali
                         corresponds to a silence phones are treated specially.
                         The behavior is determined by 'one_silence_class'
                         being false (traditional behavior) or true.
-                        Usually in our setup, several phones including 
-                        the silence, vocalized noise, non-spoken noise 
+                        Usually in our setup, several phones including
+                        the silence, vocalized noise, non-spoken noise
                         and unk are treated as "silence phones"
    @param [in] lat      The denominator lattice
    @param [in] num_ali  The numerator alignment
    @param [in] criterion    The objective function. Must be "mpfe" or "smbr"
-                        for MPFE (minimum phone frame error) or sMBR 
+                        for MPFE (minimum phone frame error) or sMBR
                         (state minimum bayes risk) training.
    @param [in] one_silence_class   Determines how the silence frames are treated.
                         Setting this to false gives the old traditional behavior,
-                        where the silence frames (according to num_ali) are 
-                        treated as incorrect. However, this means that the 
+                        where the silence frames (according to num_ali) are
+                        treated as incorrect. However, this means that the
                         insertions are not penalized by the objective.
                         Setting this to true gives the new behaviour, where we
                         treat silence as any other phone, except that all pdfs
@@ -221,18 +221,18 @@ bool LatticeBoost(const TransitionModel &trans,
                         the insertions in the trained model. This is closer to
                         the WER metric that we actually care about, since WER is
                         generally computed after filtering out noises, but
-                        does penalize insertions. 
+                        does penalize insertions.
     @param [out] post   The "MBR posteriors" i.e. derivatives w.r.t to the
                         pseudo log-likelihoods of states at each frame.
-*/
+ */
 BaseFloat LatticeForwardBackwardMpeVariants(
-    const TransitionModel &trans,
-    const std::vector<int32> &silence_phones,
-    const Lattice &lat,
-    const std::vector<int32> &num_ali,
-    std::string criterion,
-    bool one_silence_class,
-    Posterior *post);
+  const TransitionModel &trans,
+  const std::vector<int32> &silence_phones,
+  const Lattice &lat,
+  const std::vector<int32> &num_ali,
+  std::string criterion,
+  bool one_silence_class,
+  Posterior *post);
 
 /**
    This function can be used to compute posteriors for MMI, with a positive contribution
@@ -254,20 +254,20 @@ BaseFloat LatticeForwardBackwardMpeVariants(
    @param [in] cancel   If "cancel" is true, it will cancel out any positive and
                         negative parts from the same transition-id (or pdf-id,
                         if convert_to_pdf_ids == true).
-   @param [out] arc_post   The output MMI posteriors of transition-ids (or 
+   @param [out] arc_post   The output MMI posteriors of transition-ids (or
                         pdf-ids if convert_to_pdf_ids == true) at each frame
                         i.e. the difference between the numerator
                         and denominator posteriors.
-   
+
    It returns the forward-backward likelihood of the lattice. */
 BaseFloat LatticeForwardBackwardMmi(
-    const TransitionModel &trans,
-    const Lattice &lat,
-    const std::vector<int32> &num_ali,
-    bool drop_frames,
-    bool convert_to_pdf_ids,
-    bool cancel,
-    Posterior *arc_post);
+  const TransitionModel &trans,
+  const Lattice &lat,
+  const std::vector<int32> &num_ali,
+  bool drop_frames,
+  bool convert_to_pdf_ids,
+  bool cancel,
+  Posterior *arc_post);
 
 
 /// This function takes a CompactLattice that should only contain a single
@@ -282,9 +282,9 @@ BaseFloat LatticeForwardBackwardMmi(
 /// did not have the correct format (e.g. if it is empty or it is not
 /// linear).
 bool CompactLatticeToWordAlignment(const CompactLattice &clat,
-                                   std::vector<int32> *words,
-                                   std::vector<int32> *begin_times,
-                                   std::vector<int32> *lengths);
+    std::vector<int32> *words,
+    std::vector<int32> *begin_times,
+    std::vector<int32> *lengths);
 
 /// This function takes a CompactLattice that should only contain a single
 /// linear sequence (e.g. derived from lattice-1best), and that should have been
@@ -298,31 +298,31 @@ bool CompactLatticeToWordAlignment(const CompactLattice &clat,
 /// did not have the correct format (e.g. if it is empty or it is not
 /// linear).
 bool CompactLatticeToWordProns(
-    const TransitionModel &tmodel,
-    const CompactLattice &clat,
-    std::vector<int32> *words,
-    std::vector<int32> *begin_times,
-    std::vector<int32> *lengths,
-    std::vector<std::vector<int32> > *prons,
-    std::vector<std::vector<int32> > *phone_lengths);
+  const TransitionModel &tmodel,
+  const CompactLattice &clat,
+  std::vector<int32> *words,
+  std::vector<int32> *begin_times,
+  std::vector<int32> *lengths,
+  std::vector<std::vector<int32> > *prons,
+  std::vector<std::vector<int32> > *phone_lengths);
 
 
 /// A form of the shortest-path/best-path algorithm that's specially coded for
 /// CompactLattice.  Requires that clat be acyclic.
 void CompactLatticeShortestPath(const CompactLattice &clat,
-                                CompactLattice *shortest_path);
+    CompactLattice *shortest_path);
 
 /// This function add the word insertion penalty to graph score of each word
 /// in the compact lattice
 void AddWordInsPenToCompactLattice(BaseFloat word_ins_penalty,
-                                   CompactLattice *clat);
+    CompactLattice *clat);
 
 /// This function *adds* the negated scores obtained from the Decodable object,
 /// to the acoustic scores on the arcs.  If you want to replace them, you should
 /// use ScaleCompactLattice to first set the acoustic scores to zero.  Returns
 /// true on success, false on error (typically some kind of mismatched inputs).
 bool RescoreCompactLattice(DecodableInterface *decodable,
-                           CompactLattice *clat);
+    CompactLattice *clat);
 
 
 /// This function returns the number of words in the longest sentence in a
@@ -350,10 +350,10 @@ int32 LongestSentenceLength(const CompactLattice &lat);
 /// speedup_factor; otherwise we set them to zero.  This gives the right
 /// expected probability so our corpus-level diagnostics will be about right.
 bool RescoreCompactLatticeSpeedup(
-    const TransitionModel &tmodel,
-    BaseFloat speedup_factor,
-    DecodableInterface *decodable,
-    CompactLattice *clat);
+  const TransitionModel &tmodel,
+  BaseFloat speedup_factor,
+  DecodableInterface *decodable,
+  CompactLattice *clat);
 
 
 /// This function *adds* the negated scores obtained from the Decodable object,
@@ -363,7 +363,7 @@ bool RescoreCompactLatticeSpeedup(
 /// The input labels, if nonzero, are interpreted as transition-ids or whatever
 /// other index the Decodable object expects.
 bool RescoreLattice(DecodableInterface *decodable,
-                    Lattice *lat);
+    Lattice *lat);
 
 /// This function Composes a CompactLattice format lattice with a
 /// DeterministicOnDemandFst<fst::StdFst> format fst, and outputs another
@@ -373,9 +373,9 @@ bool RescoreLattice(DecodableInterface *decodable,
 /// Note that the DeterministicOnDemandFst interface is not "const", therefore
 /// we cannot use "const" for <det_fst>.
 void ComposeCompactLatticeDeterministic(
-    const CompactLattice& clat,
-    fst::DeterministicOnDemandFst<fst::StdArc>* det_fst,
-    CompactLattice* composed_clat);
+  const CompactLattice& clat,
+  fst::DeterministicOnDemandFst<fst::StdArc>* det_fst,
+  CompactLattice* composed_clat);
 
 }  // namespace kaldi
 

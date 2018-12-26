@@ -51,7 +51,7 @@ void PhoneTopology::Write(std::ostream &os, bool binary) const{
   WriteBasicType(os, binary, num_phones);
   if (!binary) os << "\n";
   std::vector<fst::VectorFst<StdArc> >::iterator fiter = fsts_.begin(),
-        fend = fsts_.end();
+      fend = fsts_.end();
   for (++fiter; fiter != fend; ++fiter)
     WriteFstKaldi(os, binary, *fiter);
   WriteToken(os, binary, "</PhoneTopology>");
@@ -64,7 +64,7 @@ void PhoneTopology::Read(std::istream &is, bool binary) const{
   ReadBasicType(is, binary, &num_phones);
   fsts_.resize(num_phones + 1);
   std::vector<fst::VectorFst<StdArc> >::iterator fiter = fsts_.begin(),
-        fend = fsts_.end();
+      fend = fsts_.end();
   for (++fiter; fiter != fend; ++fiter)
     ReadFstKaldi(os, binary, fiter);
   ExpectToken(is, binary, "</PhoneTopology>");
@@ -72,7 +72,7 @@ void PhoneTopology::Read(std::istream &is, bool binary) const{
 
 bool PhonoTopology::IsAlignable() {
   std::vector<fst::VectorFst<StdArc> >::iterator fiter = fsts_.begin(),
-        fend = fsts_.end();
+      fend = fsts_.end();
   for (++fiter; fiter != fend; ++fiter) {
     // Get start state symbles
     unordered_set<int> syms;

@@ -105,8 +105,8 @@ namespace fst {
    representation" and hence the "minimal representation" will be the same.  We
    can use this to reduce compute.  Note that if two initial representations are
    different, this does not preclude the other representations from being the same.
-   
-*/   
+
+ */
 
 
 struct DeterminizeLatticePrunedOptions {
@@ -118,12 +118,12 @@ struct DeterminizeLatticePrunedOptions {
   int max_states;
   int max_arcs;
   float retry_cutoff;
-  DeterminizeLatticePrunedOptions(): delta(kDelta),
-                                     max_mem(-1),
-                                     max_loop(-1),
-                                     max_states(-1),
-                                     max_arcs(-1),
-                                     retry_cutoff(0.5) { }
+  DeterminizeLatticePrunedOptions() : delta(kDelta),
+    max_mem(-1),
+    max_loop(-1),
+    max_states(-1),
+    max_arcs(-1),
+    retry_cutoff(0.5) { }
   void Register (kaldi::OptionsItf *opts) {
     opts->Register("delta", &delta, "Tolerance used in determinization");
     opts->Register("max-mem", &max_mem, "Maximum approximate memory usage in "
@@ -155,11 +155,11 @@ struct DeterminizeLatticePhonePrunedOptions {
   bool word_determinize;
   // minimize: if true, push and minimize after determinization.
   bool minimize;
-  DeterminizeLatticePhonePrunedOptions(): delta(kDelta),
-                                          max_mem(50000000),
-                                          phone_determinize(true),
-                                          word_determinize(true),
-                                          minimize(false) {}
+  DeterminizeLatticePhonePrunedOptions() : delta(kDelta),
+    max_mem(50000000),
+    phone_determinize(true),
+    word_determinize(true),
+    minimize(false) {}
   void Register (kaldi::OptionsItf *opts) {
     opts->Register("delta", &delta, "Tolerance used in determinization");
     opts->Register("max-mem", &max_mem, "Maximum approximate memory usage in "
@@ -185,13 +185,13 @@ struct DeterminizeLatticePhonePrunedOptions {
     earlier than specified by the "prune" beam-- that is, if it terminated because
     of the max_mem, max_loop or max_arcs constraints in the options.
     CAUTION: you may want to use the version below which outputs to CompactLattice.
-*/
+ */
 template<class Weight>
 bool DeterminizeLatticePruned(
-    const ExpandedFst<ArcTpl<Weight> > &ifst,
-    double prune,
-    MutableFst<ArcTpl<Weight> > *ofst, 
-    DeterminizeLatticePrunedOptions opts = DeterminizeLatticePrunedOptions());
+  const ExpandedFst<ArcTpl<Weight> > &ifst,
+  double prune,
+  MutableFst<ArcTpl<Weight> > *ofst,
+  DeterminizeLatticePrunedOptions opts = DeterminizeLatticePrunedOptions());
 
 
 /*  This is a version of DeterminizeLattice with a slightly more "natural" output format,
@@ -204,13 +204,13 @@ bool DeterminizeLatticePruned(
     of the max_mem, max_loop or max_arcs constraints in the options.
     CAUTION: if Lattice is the input, you need to Invert() before calling this,
     so words are on the input side.
-*/
+ */
 template<class Weight, class IntType>
 bool DeterminizeLatticePruned(
-    const ExpandedFst<ArcTpl<Weight> >&ifst,
-    double prune,
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
-    DeterminizeLatticePrunedOptions opts = DeterminizeLatticePrunedOptions());
+  const ExpandedFst<ArcTpl<Weight> >&ifst,
+  double prune,
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
+  DeterminizeLatticePrunedOptions opts = DeterminizeLatticePrunedOptions());
 
 /** This function takes in lattices and inserts phones at phone boundaries. It
     uses the transition model to work out the transition_id to phone map. The
@@ -219,22 +219,22 @@ bool DeterminizeLatticePruned(
     mapped to (returning_value + original_phone_label) in the new lattice. The
     returning value will be used by DeterminizeLatticeDeletePhones() where it
     works out the phones according to this value.
-*/
+ */
 template<class Weight>
 typename ArcTpl<Weight>::Label DeterminizeLatticeInsertPhones(
-    const kaldi::TransitionModel &trans_model,
-    MutableFst<ArcTpl<Weight> > *fst);
+  const kaldi::TransitionModel &trans_model,
+  MutableFst<ArcTpl<Weight> > *fst);
 
 /** This function takes in lattices and deletes "phones" from them. The "phones"
     here are actually any label that is larger than first_phone_label because
     when we insert phones into the lattice, we map the original phone label to
     (first_phone_label + original_phone_label). It is supposed to be used
     together with DeterminizeLatticeInsertPhones()
-*/
+ */
 template<class Weight>
 void DeterminizeLatticeDeletePhones(
-    typename ArcTpl<Weight>::Label first_phone_label,
-    MutableFst<ArcTpl<Weight> > *fst);
+  typename ArcTpl<Weight>::Label first_phone_label,
+  MutableFst<ArcTpl<Weight> > *fst);
 
 /** This function is a wrapper of DeterminizeLatticePhonePrunedFirstPass() and
     DeterminizeLatticePruned(). If --phone-determinize is set to true, it first
@@ -250,27 +250,27 @@ void DeterminizeLatticeDeletePhones(
     due to the max-mem constraint.  The result should be the same as word-level
     determinization in general, but for deeper lattices it is a bit faster,
     despite the fact that we now have two passes of determinization by default.
-*/
+ */
 template<class Weight, class IntType>
 bool DeterminizeLatticePhonePruned(
-    const kaldi::TransitionModel &trans_model,
-    const ExpandedFst<ArcTpl<Weight> > &ifst,
-    double prune,
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
-    DeterminizeLatticePhonePrunedOptions opts
-      = DeterminizeLatticePhonePrunedOptions());
+  const kaldi::TransitionModel &trans_model,
+  const ExpandedFst<ArcTpl<Weight> > &ifst,
+  double prune,
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
+  DeterminizeLatticePhonePrunedOptions opts
+    = DeterminizeLatticePhonePrunedOptions());
 
 /** "Destructive" version of DeterminizeLatticePhonePruned() where the input
-    lattice might be changed. 
-*/
+    lattice might be changed.
+ */
 template<class Weight, class IntType>
 bool DeterminizeLatticePhonePruned(
-    const kaldi::TransitionModel &trans_model,
-    MutableFst<ArcTpl<Weight> > *ifst,
-    double prune,
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
-    DeterminizeLatticePhonePrunedOptions opts
-      = DeterminizeLatticePhonePrunedOptions());
+  const kaldi::TransitionModel &trans_model,
+  MutableFst<ArcTpl<Weight> > *ifst,
+  double prune,
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
+  DeterminizeLatticePhonePrunedOptions opts
+    = DeterminizeLatticePhonePrunedOptions());
 
 /** This function is a wrapper of DeterminizeLatticePhonePruned() that works for
     Lattice type FSTs.  It simplifies the calling process by calling
@@ -280,14 +280,14 @@ bool DeterminizeLatticePhonePruned(
     output side.
     This function can be used as the top-level interface to all the determinization
     code.
-*/
+ */
 bool DeterminizeLatticePhonePrunedWrapper(
-    const kaldi::TransitionModel &trans_model,
-    MutableFst<kaldi::LatticeArc> *ifst,
-    double prune,
-    MutableFst<kaldi::CompactLatticeArc> *ofst,
-    DeterminizeLatticePhonePrunedOptions opts
-      = DeterminizeLatticePhonePrunedOptions());
+  const kaldi::TransitionModel &trans_model,
+  MutableFst<kaldi::LatticeArc> *ifst,
+  double prune,
+  MutableFst<kaldi::CompactLatticeArc> *ofst,
+  DeterminizeLatticePhonePrunedOptions opts
+    = DeterminizeLatticePhonePrunedOptions());
 
 /// @} end "addtogroup fst_extensions"
 

@@ -35,21 +35,21 @@ namespace nnet1 {
 
 
 class LossItf {
- public:
+public:
   LossItf() { }
   virtual ~LossItf() { }
 
   /// Evaluate cross entropy using target-matrix (supports soft labels),
   virtual void Eval(const VectorBase<BaseFloat> &frame_weights,
-            const CuMatrixBase<BaseFloat> &net_out,
-            const CuMatrixBase<BaseFloat> &target,
-            CuMatrix<BaseFloat> *diff) = 0;
+      const CuMatrixBase<BaseFloat> &net_out,
+      const CuMatrixBase<BaseFloat> &target,
+      CuMatrix<BaseFloat> *diff) = 0;
 
   /// Evaluate cross entropy using target-posteriors (supports soft labels),
   virtual void Eval(const VectorBase<BaseFloat> &frame_weights,
-            const CuMatrixBase<BaseFloat> &net_out,
-            const Posterior &target,
-            CuMatrix<BaseFloat> *diff) = 0;
+      const CuMatrixBase<BaseFloat> &net_out,
+      const Posterior &target,
+      CuMatrix<BaseFloat> *diff) = 0;
 
   /// Generate string with error report,
   virtual std::string Report() = 0;
@@ -60,8 +60,8 @@ class LossItf {
 
 
 class Xent : public LossItf {
- public:
-  Xent():
+public:
+  Xent() :
     frames_progress_(0.0),
     xentropy_progress_(0.0),
     entropy_progress_(0.0)
@@ -72,15 +72,15 @@ class Xent : public LossItf {
 
   /// Evaluate cross entropy using target-matrix (supports soft labels),
   void Eval(const VectorBase<BaseFloat> &frame_weights,
-            const CuMatrixBase<BaseFloat> &net_out,
-            const CuMatrixBase<BaseFloat> &target,
-            CuMatrix<BaseFloat> *diff);
+      const CuMatrixBase<BaseFloat> &net_out,
+      const CuMatrixBase<BaseFloat> &target,
+      CuMatrix<BaseFloat> *diff);
 
   /// Evaluate cross entropy using target-posteriors (supports soft labels),
   void Eval(const VectorBase<BaseFloat> &frame_weights,
-            const CuMatrixBase<BaseFloat> &net_out,
-            const Posterior &target,
-            CuMatrix<BaseFloat> *diff);
+      const CuMatrixBase<BaseFloat> &net_out,
+      const Posterior &target,
+      CuMatrix<BaseFloat> *diff);
 
   /// Generate string with error report,
   std::string Report();
@@ -94,7 +94,7 @@ class Xent : public LossItf {
     return (xentropy_.Sum() - entropy_.Sum()) / frames_.Sum();
   }
 
- private:
+private:
   // main stats collected per target-class,
   CuVector<double> frames_;
   Vector<double> correct_;
@@ -124,8 +124,8 @@ class Xent : public LossItf {
 
 
 class Mse : public LossItf {
- public:
-  Mse():
+public:
+  Mse() :
     frames_(0.0),
     loss_(0.0),
     frames_progress_(0.0),
@@ -137,15 +137,15 @@ class Mse : public LossItf {
 
   /// Evaluate mean square error using target-matrix,
   void Eval(const VectorBase<BaseFloat> &frame_weights,
-            const CuMatrixBase<BaseFloat>& net_out,
-            const CuMatrixBase<BaseFloat>& target,
-            CuMatrix<BaseFloat>* diff);
+      const CuMatrixBase<BaseFloat>& net_out,
+      const CuMatrixBase<BaseFloat>& target,
+      CuMatrix<BaseFloat>* diff);
 
   /// Evaluate mean square error using target-posteior,
   void Eval(const VectorBase<BaseFloat> &frame_weights,
-            const CuMatrixBase<BaseFloat>& net_out,
-            const Posterior& target,
-            CuMatrix<BaseFloat>* diff);
+      const CuMatrixBase<BaseFloat>& net_out,
+      const Posterior& target,
+      CuMatrix<BaseFloat>* diff);
 
   /// Generate string with error report
   std::string Report();
@@ -156,7 +156,7 @@ class Mse : public LossItf {
     return loss_ / frames_;
   }
 
- private:
+private:
   double frames_;
   double loss_;
 
@@ -171,7 +171,7 @@ class Mse : public LossItf {
 
 
 class MultiTaskLoss : public LossItf {
- public:
+public:
   MultiTaskLoss()
   { }
 
@@ -191,17 +191,17 @@ class MultiTaskLoss : public LossItf {
 
   /// Evaluate mean square error using target-matrix,
   void Eval(const VectorBase<BaseFloat> &frame_weights,
-            const CuMatrixBase<BaseFloat>& net_out,
-            const CuMatrixBase<BaseFloat>& target,
-            CuMatrix<BaseFloat>* diff) {
+      const CuMatrixBase<BaseFloat>& net_out,
+      const CuMatrixBase<BaseFloat>& target,
+      CuMatrix<BaseFloat>* diff) {
     KALDI_ERR << "This is not supposed to be called!";
   }
 
   /// Evaluate mean square error using target-posteior,
   void Eval(const VectorBase<BaseFloat> &frame_weights,
-            const CuMatrixBase<BaseFloat>& net_out,
-            const Posterior& target,
-            CuMatrix<BaseFloat>* diff);
+      const CuMatrixBase<BaseFloat>& net_out,
+      const Posterior& target,
+      CuMatrix<BaseFloat>* diff);
 
   /// Generate string with error report
   std::string Report();
@@ -209,7 +209,7 @@ class MultiTaskLoss : public LossItf {
   /// Get loss value (frame average),
   BaseFloat AvgLoss();
 
- private:
+private:
   std::vector<LossItf*>  loss_vec_;
   std::vector<int32>     loss_dim_;
   std::vector<BaseFloat> loss_weights_;

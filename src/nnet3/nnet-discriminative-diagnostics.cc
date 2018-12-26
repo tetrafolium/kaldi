@@ -26,19 +26,19 @@ namespace kaldi {
 namespace nnet3 {
 
 NnetDiscriminativeComputeObjf::NnetDiscriminativeComputeObjf(
-    const NnetComputeProbOptions &nnet_config,
-    const discriminative::DiscriminativeOptions &discriminative_config,
-    const TransitionModel &tmodel,
-    const VectorBase<BaseFloat> &priors,
-    const Nnet &nnet):
-    nnet_config_(nnet_config),
-    discriminative_config_(discriminative_config),
-    tmodel_(tmodel),
-    log_priors_(priors),
-    nnet_(nnet),
-    compiler_(nnet, nnet_config_.optimize_config),
-    deriv_nnet_(NULL),
-    num_minibatches_processed_(0) {
+  const NnetComputeProbOptions &nnet_config,
+  const discriminative::DiscriminativeOptions &discriminative_config,
+  const TransitionModel &tmodel,
+  const VectorBase<BaseFloat> &priors,
+  const Nnet &nnet) :
+  nnet_config_(nnet_config),
+  discriminative_config_(discriminative_config),
+  tmodel_(tmodel),
+  log_priors_(priors),
+  nnet_(nnet),
+  compiler_(nnet, nnet_config_.optimize_config),
+  deriv_nnet_(NULL),
+  num_minibatches_processed_(0) {
   log_priors_.ApplyLog();
   if (nnet_config_.compute_deriv) {
     deriv_nnet_ = new Nnet(nnet_);
@@ -80,7 +80,7 @@ void NnetDiscriminativeComputeObjf::Compute(const NnetDiscriminativeExample &eg)
                                       &request);
   const NnetComputation *computation = compiler_.Compile(request);
   NnetComputer computer(nnet_config_.compute_config, *computation,
-                        nnet_, deriv_nnet_);
+      nnet_, deriv_nnet_);
   // give the inputs to the computer object.
   computer.AcceptInputs(nnet_, eg.inputs);
   computer.Run();
@@ -90,8 +90,8 @@ void NnetDiscriminativeComputeObjf::Compute(const NnetDiscriminativeExample &eg)
 }
 
 void NnetDiscriminativeComputeObjf::ProcessOutputs(
-                                    const NnetDiscriminativeExample &eg,
-                                    NnetComputer *computer) {
+  const NnetDiscriminativeExample &eg,
+  NnetComputer *computer) {
   // There will normally be just one output here, named 'output',
   // but the code is more general than this.
   std::vector<NnetDiscriminativeSupervision>::const_iterator iter = eg.outputs.begin(),
@@ -127,9 +127,9 @@ void NnetDiscriminativeComputeObjf::ProcessOutputs(
                                                       tmodel_, log_priors_,
                                                       sup.supervision, nnet_output,
                                                       stats,
-                                                      (nnet_config_.compute_deriv ?
-                                                       &nnet_output_deriv : NULL),
-                                                      (use_xent ? &xent_deriv : NULL));
+        (nnet_config_.compute_deriv ?
+        &nnet_output_deriv : NULL),
+        (use_xent ? &xent_deriv : NULL));
 
     if (nnet_config_.compute_deriv)
       computer->AcceptInput(sup.name, &nnet_output_deriv);
@@ -195,7 +195,7 @@ bool NnetDiscriminativeComputeObjf::PrintTotalStats() const {
 }
 
 const discriminative::DiscriminativeObjectiveInfo* NnetDiscriminativeComputeObjf::GetObjective(
-    const std::string &output_name) const {
+  const std::string &output_name) const {
   unordered_map<std::string, discriminative::DiscriminativeObjectiveInfo, StringHasher>::const_iterator
       iter = objf_info_.find(output_name);
   if (iter != objf_info_.end())

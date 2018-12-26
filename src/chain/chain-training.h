@@ -61,9 +61,9 @@ struct ChainTrainingOptions {
   // should have a softmax as its final nonlinearity.
   BaseFloat xent_regularize;
 
-  ChainTrainingOptions(): l2_regularize(0.0), leaky_hmm_coefficient(1.0e-05),
-                          xent_regularize(0.0) { }
-  
+  ChainTrainingOptions() : l2_regularize(0.0), leaky_hmm_coefficient(1.0e-05),
+    xent_regularize(0.0) { }
+
   void Register(OptionsItf *opts) {
     opts->Register("l2-regularize", &l2_regularize, "l2 regularization "
                    "constant for 'chain' training, applied to the output "
@@ -111,17 +111,17 @@ struct ChainTrainingOptions {
                            scaled by the supervision weight) is written to here.  This will
                            be used in the cross-entropy regularization code.  This value
                            is also used in computing the cross-entropy objective value.
-*/
+ */
 void ComputeChainObjfAndDeriv(const ChainTrainingOptions &opts,
-                              const DenominatorGraph &den_graph,
-                              const Supervision &supervision,
-                              const CuMatrixBase<BaseFloat> &nnet_output,
-                              BaseFloat *objf,
-                              BaseFloat *l2_term,
-                              BaseFloat *weight,
-                              CuMatrixBase<BaseFloat> *nnet_output_deriv,
-                              CuMatrixBase<BaseFloat> *xent_output_deriv = NULL);
-                              
+    const DenominatorGraph &den_graph,
+    const Supervision &supervision,
+    const CuMatrixBase<BaseFloat> &nnet_output,
+    BaseFloat *objf,
+    BaseFloat *l2_term,
+    BaseFloat *weight,
+    CuMatrixBase<BaseFloat> *nnet_output_deriv,
+    CuMatrixBase<BaseFloat> *xent_output_deriv = NULL);
+
 
 
 }  // namespace chain

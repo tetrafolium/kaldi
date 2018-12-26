@@ -57,7 +57,7 @@ typedef std::vector<std::vector<std::pair<int32, Vector<BaseFloat> > > > GaussPo
 // This is used for storing posteriors of transition id's for an
 // utterance.
 class PosteriorHolder {
- public:
+public:
   typedef Posterior T;
 
   PosteriorHolder() { }
@@ -83,7 +83,7 @@ class PosteriorHolder {
     KALDI_ERR << "ExtractRange is not defined for this type of holder.";
     return false;
   }
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(PosteriorHolder);
   T t_;
 };
@@ -101,7 +101,7 @@ void ReadPosterior(std::istream &os, bool binary, Posterior *post);
 // This is used for storing posteriors of transition id's for an
 // utterance.
 class GaussPostHolder {
- public:
+public:
   typedef GaussPost T;
 
   GaussPostHolder() { }
@@ -127,7 +127,7 @@ class GaussPostHolder {
     KALDI_ERR << "ExtractRange is not defined for this type of holder.";
     return false;
   }
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(GaussPostHolder);
   T t_;
 };
@@ -155,8 +155,8 @@ BaseFloat TotalPosterior(const Posterior &post);
 
 /// Returns true if the two lists of pairs have no common .first element.
 bool PosteriorEntriesAreDisjoint(
-    const std::vector<std::pair<int32, BaseFloat> > &post_elem1,
-    const std::vector<std::pair<int32, BaseFloat> > &post_elem2);
+  const std::vector<std::pair<int32, BaseFloat> > &post_elem1,
+  const std::vector<std::pair<int32, BaseFloat> > &post_elem2);
 
 
 /// Merge two sets of posteriors, which must have the same length.  If "merge"
@@ -167,10 +167,10 @@ bool PosteriorEntriesAreDisjoint(
 /// 2013).  Returns the number of frames for which the two posteriors were
 /// disjoint (i.e. no common transition-ids or whatever index we are using).
 int32 MergePosteriors(const Posterior &post1,
-                      const Posterior &post2,
-                      bool merge,
-                      bool drop_frames,
-                      Posterior *post);
+    const Posterior &post2,
+    bool merge,
+    bool drop_frames,
+    Posterior *post);
 
 // comparator object that can be used to sort from greatest to
 // least posterior.
@@ -179,7 +179,7 @@ struct CompareReverseSecond {
   // a ">" operator on the .second field of the pair because we want the
   // sort to be in reverse order (greatest to least) on posterior.
   bool operator() (const std::pair<int32, BaseFloat> &a,
-                   const std::pair<int32, BaseFloat> &b) {
+      const std::pair<int32, BaseFloat> &b) {
     return (a.second > b.second);
   }
 };
@@ -193,42 +193,42 @@ struct CompareReverseSecond {
 /// Returns the total log-likelihood (the output of calling ApplySoftMax()
 /// on a copy of log_likes).
 BaseFloat VectorToPosteriorEntry(
-    const VectorBase<BaseFloat> &log_likes,
-    int32 num_gselect,
-    BaseFloat min_post,
-    std::vector<std::pair<int32, BaseFloat> > *post_entry);
+  const VectorBase<BaseFloat> &log_likes,
+  int32 num_gselect,
+  BaseFloat min_post,
+  std::vector<std::pair<int32, BaseFloat> > *post_entry);
 
 /// Convert an alignment to a posterior (with a scale of 1.0 on
 /// each entry).
 void AlignmentToPosterior(const std::vector<int32> &ali,
-                          Posterior *post);
+    Posterior *post);
 
 /// Sorts posterior entries so that transition-ids with same pdf-id are next to
 /// each other.
 void SortPosteriorByPdfs(const TransitionModel &tmodel,
-                         Posterior *post);
+    Posterior *post);
 
 
 /// Converts a posterior over transition-ids to be a posterior
 /// over pdf-ids.
 void ConvertPosteriorToPdfs(const TransitionModel &tmodel,
-                            const Posterior &post_in,
-                            Posterior *post_out);
+    const Posterior &post_in,
+    Posterior *post_out);
 
 /// Converts a posterior over transition-ids to be a posterior
 /// over phones.
 void ConvertPosteriorToPhones(const TransitionModel &tmodel,
-                              const Posterior &post_in,
-                              Posterior *post_out);
+    const Posterior &post_in,
+    Posterior *post_out);
 
 /// Weight any silence phones in the posterior (i.e. any phones
 /// in the set "silence_set" by scale "silence_scale".
 /// The interface was changed in Feb 2014 to do the modification
 /// "in-place" rather than having separate input and output.
 void WeightSilencePost(const TransitionModel &trans_model,
-                       const ConstIntegerSet<int32> &silence_set,
-                       BaseFloat silence_scale,
-                       Posterior *post);
+    const ConstIntegerSet<int32> &silence_set,
+    BaseFloat silence_scale,
+    Posterior *post);
 
 /// This is similar to WeightSilencePost, except that on each frame it
 /// works out the amount by which the overall posterior would be reduced,
@@ -237,16 +237,16 @@ void WeightSilencePost(const TransitionModel &trans_model,
 /// The interface was changed in Feb 2014 to do the modification
 /// "in-place" rather than having separate input and output.
 void WeightSilencePostDistributed(const TransitionModel &trans_model,
-                                  const ConstIntegerSet<int32> &silence_set,
-                                  BaseFloat silence_scale,
-                                  Posterior *post);
+    const ConstIntegerSet<int32> &silence_set,
+    BaseFloat silence_scale,
+    Posterior *post);
 
 /// This converts a Posterior to a Matrix. The number of matrix-rows is the same
 /// as the 'post.size()', the number of matrix-columns is defined by 'post_dim'.
 /// The elements which are not specified in 'Posterior' are equal to zero.
 template <typename Real>
 void PosteriorToMatrix(const Posterior &post,
-                       const int32 post_dim, Matrix<Real> *mat);
+    const int32 post_dim, Matrix<Real> *mat);
 
 /// This converts a Posterior to a Matrix. The number of matrix-rows is the same
 /// as the 'post.size()', the number of matrix-columns is defined by 'NumPdfs'
@@ -254,8 +254,8 @@ void PosteriorToMatrix(const Posterior &post,
 /// The elements which are not specified in 'Posterior' are equal to zero.
 template <typename Real>
 void PosteriorToPdfMatrix(const Posterior &post,
-                          const TransitionModel &model,
-                          Matrix<Real> *mat);
+    const TransitionModel &model,
+    Matrix<Real> *mat);
 
 /// @} end "addtogroup posterior_group"
 

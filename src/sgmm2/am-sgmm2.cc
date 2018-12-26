@@ -48,7 +48,7 @@ void Sgmm2LikelihoodCache::NextFrame() {
 }
 
 void AmSgmm2::ComputeGammaI(const Vector<BaseFloat> &state_occupancies,
-                            Vector<BaseFloat> *gamma_i) const {
+    Vector<BaseFloat> *gamma_i) const {
   KALDI_ASSERT(state_occupancies.Dim() == NumPdfs());
   Vector<BaseFloat> w_jm(NumGauss());
   gamma_i->Resize(NumGauss());
@@ -72,7 +72,7 @@ void AmSgmm2::ComputeGammaI(const Vector<BaseFloat> &state_occupancies,
 void AmSgmm2::ComputePdfMappings() {
   if (pdf2group_.empty()) {
     KALDI_WARN << "ComputePdfMappings(): no pdf2group_ map, assuming you "
-        "are reading in old model.";
+      "are reading in old model.";
     KALDI_ASSERT(v_.size() != 0);
     pdf2group_.resize(v_.size());
     for (int32 j2 = 0; j2 < static_cast<int32>(pdf2group_.size()); j2++)
@@ -201,8 +201,8 @@ int32 AmSgmm2::Pdf2Group(int32 j2) const {
 
 
 void AmSgmm2::Write(std::ostream &out_stream,
-                   bool binary,
-                   SgmmWriteFlagsType write_params) const {
+    bool binary,
+    SgmmWriteFlagsType write_params) const {
   int32 num_pdfs = NumPdfs(),
       feat_dim = FeatureDim(),
       num_gauss = NumGauss();
@@ -288,7 +288,7 @@ void AmSgmm2::Check(bool show_properties) {
               << ", phone-space dim =" << phn_dim
               << ", speaker-space dim =" << spk_dim;
   KALDI_ASSERT(J1 > 0 && num_gauss > 0 && feat_dim > 0 && phn_dim > 0
-               && J2 > 0 && J2 >= J1);
+      && J2 > 0 && J2 >= J1);
 
   std::ostringstream debug_str;
 
@@ -379,11 +379,11 @@ void AmSgmm2::Check(bool show_properties) {
 }
 
 void AmSgmm2::InitializeFromFullGmm(const FullGmm &full_gmm,
-                                    const std::vector<int32> &pdf2group,
-                                    int32 phn_subspace_dim,
-                                    int32 spk_subspace_dim,
-                                    bool speaker_dependent_weights,
-                                    BaseFloat self_weight) {
+    const std::vector<int32> &pdf2group,
+    int32 phn_subspace_dim,
+    int32 spk_subspace_dim,
+    bool speaker_dependent_weights,
+    BaseFloat self_weight) {
   pdf2group_ = pdf2group;
   ComputePdfMappings();
   full_ubm_.CopyFromFullGmm(full_gmm);
@@ -413,8 +413,8 @@ void AmSgmm2::InitializeFromFullGmm(const FullGmm &full_gmm,
 }
 
 void AmSgmm2::CopyFromSgmm2(const AmSgmm2 &other,
-                          bool copy_normalizers,
-                          bool copy_weights) {
+    bool copy_normalizers,
+    bool copy_weights) {
   KALDI_LOG << "Copying AmSgmm2";
   pdf2group_ = other.pdf2group_;
   group2pdf_ = other.group2pdf_;
@@ -440,9 +440,9 @@ void AmSgmm2::CopyFromSgmm2(const AmSgmm2 &other,
 }
 
 void AmSgmm2::ComputePerFrameVars(const VectorBase<BaseFloat> &data,
-                                 const std::vector<int32> &gselect,
-                                 const Sgmm2PerSpkDerivedVars &spk_vars,
-                                 Sgmm2PerFrameDerivedVars *per_frame_vars) const {
+    const std::vector<int32> &gselect,
+    const Sgmm2PerSpkDerivedVars &spk_vars,
+    Sgmm2PerFrameDerivedVars *per_frame_vars) const {
   KALDI_ASSERT(!n_.empty() && "ComputeNormalizers() must be called.");
 
   per_frame_vars->Resize(gselect.size(), FeatureDim(), PhoneSpaceDim());
@@ -474,9 +474,9 @@ void AmSgmm2::ComputePerFrameVars(const VectorBase<BaseFloat> &data,
 
 // inline
 void AmSgmm2::ComponentLogLikes(const Sgmm2PerFrameDerivedVars &per_frame_vars,
-                               int32 j1,
-                               Sgmm2PerSpkDerivedVars *spk_vars,
-                               Matrix<BaseFloat> *loglikes) const {
+    int32 j1,
+    Sgmm2PerSpkDerivedVars *spk_vars,
+    Matrix<BaseFloat> *loglikes) const {
   const vector<int32> &gselect = per_frame_vars.gselect;
   int32 num_gselect = gselect.size(), num_substates = v_[j1].NumRows();
 
@@ -492,7 +492,7 @@ void AmSgmm2::ComponentLogLikes(const Sgmm2PerFrameDerivedVars &per_frame_vars,
     KALDI_ASSERT(static_cast<int32>(w_jmi_.size()) == NumGroups() ||
                  "You need to call ComputeWeights().");
   }
-  for (int32 ki = 0;  ki < num_gselect; ki++) {
+  for (int32 ki = 0; ki < num_gselect; ki++) {
     SubVector<BaseFloat> logp_xi(*loglikes, ki);
     int32 i = gselect[ki];
     // for all substates, compute z_{i}^T v_{jm}
@@ -515,10 +515,10 @@ void AmSgmm2::ComponentLogLikes(const Sgmm2PerFrameDerivedVars &per_frame_vars,
 
 
 BaseFloat AmSgmm2::LogLikelihood(const Sgmm2PerFrameDerivedVars &per_frame_vars,
-                                int32 j2,
-                                Sgmm2LikelihoodCache *cache,
-                                Sgmm2PerSpkDerivedVars *spk_vars,
-                                BaseFloat log_prune) const {
+    int32 j2,
+    Sgmm2LikelihoodCache *cache,
+    Sgmm2PerSpkDerivedVars *spk_vars,
+    BaseFloat log_prune) const {
   int32 t = cache->t; // not a real time; used to uniquely identify frames.
   // Forgo asserts here, as this is frequently called.
   // We'll probably get a segfault if an error is made.
@@ -572,9 +572,9 @@ BaseFloat AmSgmm2::LogLikelihood(const Sgmm2PerFrameDerivedVars &per_frame_vars,
 
 BaseFloat
 AmSgmm2::ComponentPosteriors(const Sgmm2PerFrameDerivedVars &per_frame_vars,
-                            int32 j2,
-                            Sgmm2PerSpkDerivedVars *spk_vars,
-                            Matrix<BaseFloat> *post) const {
+    int32 j2,
+    Sgmm2PerSpkDerivedVars *spk_vars,
+    Matrix<BaseFloat> *post) const {
   KALDI_ASSERT(j2 < NumPdfs() && post != NULL);
   int32 j1 = pdf2group_[j2];
   ComponentLogLikes(per_frame_vars, j1, spk_vars, post); // now
@@ -597,10 +597,10 @@ AmSgmm2::ComponentPosteriors(const Sgmm2PerFrameDerivedVars &per_frame_vars,
 }
 
 void AmSgmm2::SplitSubstatesInGroup(const Vector<BaseFloat> &pdf_occupancies,
-                                    const Sgmm2SplitSubstatesConfig &opts,
-                                    const SpMatrix<BaseFloat> &sqrt_H_sm,
-                                    int32 j1,
-                                    int32 tgt_M) {
+    const Sgmm2SplitSubstatesConfig &opts,
+    const SpMatrix<BaseFloat> &sqrt_H_sm,
+    int32 j1,
+    int32 tgt_M) {
   const std::vector<int32> &pdfs = group2pdf_[j1];
   int32 phn_dim = PhoneSpaceDim(), cur_M = NumSubstatesForGroup(j1),
       num_pdfs_for_group = pdfs.size();
@@ -655,7 +655,7 @@ void AmSgmm2::SplitSubstatesInGroup(const Vector<BaseFloat> &pdf_occupancies,
 
 
 void AmSgmm2::SplitSubstates(const Vector<BaseFloat> &pdf_occupancies,
-                             const Sgmm2SplitSubstatesConfig &opts) {
+    const Sgmm2SplitSubstatesConfig &opts) {
   KALDI_ASSERT(pdf_occupancies.Dim() == NumPdfs());
   int32 J1 = NumGroups(), J2 = NumPdfs();
   Vector<BaseFloat> group_occupancies(J1);
@@ -697,7 +697,7 @@ void AmSgmm2::SplitSubstates(const Vector<BaseFloat> &pdf_occupancies,
 }
 
 void AmSgmm2::IncreasePhoneSpaceDim(int32 target_dim,
-                                   const Matrix<BaseFloat> &norm_xform) {
+    const Matrix<BaseFloat> &norm_xform) {
   KALDI_ASSERT(!M_.empty());
   int32 initial_dim = PhoneSpaceDim(),
       feat_dim = FeatureDim();
@@ -736,17 +736,17 @@ void AmSgmm2::IncreasePhoneSpaceDim(int32 target_dim,
           tmp_v_j);
     }
     KALDI_LOG << "Phone subspace dimensionality increased from " <<
-        initial_dim << " to " << target_dim;
+      initial_dim << " to " << target_dim;
   } else {
     KALDI_LOG << "Phone subspace dimensionality unchanged, since target " <<
-        "dimension (" << target_dim << ") <= initial dimansion (" <<
-        initial_dim << ")";
+      "dimension (" << target_dim << ") <= initial dimansion (" <<
+      initial_dim << ")";
   }
 }
 
 void AmSgmm2::IncreaseSpkSpaceDim(int32 target_dim,
-                                 const Matrix<BaseFloat> &norm_xform,
-                                 bool speaker_dependent_weights) {
+    const Matrix<BaseFloat> &norm_xform,
+    bool speaker_dependent_weights) {
   int32 initial_dim = SpkSpaceDim(),
       feat_dim = FeatureDim();
   KALDI_ASSERT(norm_xform.NumRows() == feat_dim);
@@ -768,7 +768,7 @@ void AmSgmm2::IncreaseSpkSpaceDim(int32 target_dim,
   if (initial_dim < target_dim) {
     int32 dim_change = target_dim - initial_dim;
     Matrix<BaseFloat> tmp_N((initial_dim != 0) ? feat_dim : 0,
-                            initial_dim);
+        initial_dim);
     for (int32 i = 0; i < NumGauss(); i++) {
       if (initial_dim != 0) tmp_N.CopyFromMat(N_[i]);
       N_[i].Resize(feat_dim, target_dim);
@@ -783,13 +783,13 @@ void AmSgmm2::IncreaseSpkSpaceDim(int32 target_dim,
     if (u_.NumRows() != 0 || (initial_dim == 0 && speaker_dependent_weights))
       u_.Resize(NumGauss(), target_dim, kCopyData); // extend dim of u_i's
     KALDI_LOG << "Speaker subspace dimensionality increased from " <<
-        initial_dim << " to " << target_dim;
+      initial_dim << " to " << target_dim;
     if (initial_dim == 0 && speaker_dependent_weights)
       KALDI_LOG << "Added parameters u for speaker-dependent weights.";
   } else {
     KALDI_LOG << "Speaker subspace dimensionality unchanged, since target " <<
-        "dimension (" << target_dim << ") <= initial dimansion (" <<
-        initial_dim << ")";
+      "dimension (" << target_dim << ") <= initial dimansion (" <<
+      initial_dim << ")";
   }
 }
 
@@ -818,19 +818,19 @@ void AmSgmm2::ComputeDerivedVars() {
 }
 
 class ComputeNormalizersClass: public MultiThreadable { // For multi-threaded.
- public:
+public:
   ComputeNormalizersClass(AmSgmm2 *am_sgmm,
-                          int32 *entropy_count_ptr,
-                          double *entropy_sum_ptr):
-      am_sgmm_(am_sgmm), entropy_count_ptr_(entropy_count_ptr),
-      entropy_sum_ptr_(entropy_sum_ptr), entropy_count_(0),
-      entropy_sum_(0.0) { }
+      int32 *entropy_count_ptr,
+      double *entropy_sum_ptr) :
+    am_sgmm_(am_sgmm), entropy_count_ptr_(entropy_count_ptr),
+    entropy_sum_ptr_(entropy_sum_ptr), entropy_count_(0),
+    entropy_sum_(0.0) { }
 
-  ComputeNormalizersClass(const ComputeNormalizersClass &other):
-      MultiThreadable(other),
-      am_sgmm_(other.am_sgmm_), entropy_count_ptr_(other.entropy_count_ptr_),
-      entropy_sum_ptr_(other.entropy_sum_ptr_), entropy_count_(0),
-      entropy_sum_(0.0) { }
+  ComputeNormalizersClass(const ComputeNormalizersClass &other) :
+    MultiThreadable(other),
+    am_sgmm_(other.am_sgmm_), entropy_count_ptr_(other.entropy_count_ptr_),
+    entropy_sum_ptr_(other.entropy_sum_ptr_), entropy_count_(0),
+    entropy_sum_(0.0) { }
 
   ~ComputeNormalizersClass() {
     *entropy_count_ptr_ += entropy_count_;
@@ -844,7 +844,7 @@ class ComputeNormalizersClass: public MultiThreadable { // For multi-threaded.
                                          &entropy_count_,
                                          &entropy_sum_);
   }
- private:
+private:
   ComputeNormalizersClass() { } // Disallow empty constructor.
   AmSgmm2 *am_sgmm_;
   int32 *entropy_count_ptr_;
@@ -871,15 +871,15 @@ void AmSgmm2::ComputeNormalizers() {
 
 
 void AmSgmm2::ComputeNormalizersInternal(int32 num_threads, int32 thread,
-                                         int32 *entropy_count,
-                                         double *entropy_sum) {
+    int32 *entropy_count,
+    double *entropy_sum) {
 
   BaseFloat DLog2pi = FeatureDim() * Log(2 * M_PI);
   Vector<BaseFloat> log_det_Sigma(NumGauss());
 
   for (int32 i = 0; i < NumGauss(); i++) {
     try {
-      log_det_Sigma(i) = - SigmaInv_[i].LogPosDefDet();
+      log_det_Sigma(i) = -SigmaInv_[i].LogPosDefDet();
     } catch(...) {
       if (thread == 0) // just for one thread, print errors [else, duplicates]
         KALDI_WARN << "Covariance is not positive definite, setting to unit";
@@ -946,7 +946,7 @@ void AmSgmm2::ComputeNormalizersInternal(int32 num_threads, int32 thread,
 }
 
 BaseFloat AmSgmm2::GetDjms(int32 j1, int32 m,
-                          Sgmm2PerSpkDerivedVars *spk_vars) const {
+    Sgmm2PerSpkDerivedVars *spk_vars) const {
   // This relates to SSGMMs (speaker-dependent weights).
   if (spk_vars->log_d_jms.empty()) return -1; // this would be
   // because we don't have speaker-dependent weights ("u" not set up).
@@ -963,9 +963,9 @@ BaseFloat AmSgmm2::GetDjms(int32 j1, int32 m,
 
 
 void AmSgmm2::ComputeFmllrPreXform(const Vector<BaseFloat> &state_occs,
-                                  Matrix<BaseFloat> *xform,
-                                   Matrix<BaseFloat> *inv_xform,
-                                  Vector<BaseFloat> *diag_mean_scatter) const {
+    Matrix<BaseFloat> *xform,
+    Matrix<BaseFloat> *inv_xform,
+    Vector<BaseFloat> *diag_mean_scatter) const {
   int32 num_pdfs = NumPdfs(),
       num_gauss = NumGauss(),
       dim = FeatureDim();
@@ -1123,7 +1123,7 @@ void AmSgmm2::ComputeH(std::vector< SpMatrix<double> > *H_i) const;
 
 // Initializes the matrices M_{i} and w_i
 void AmSgmm2::InitializeMw(int32 phn_subspace_dim,
-                           const Matrix<BaseFloat> &norm_xform) {
+    const Matrix<BaseFloat> &norm_xform) {
   int32 ddim = full_ubm_.Dim();
   KALDI_ASSERT(phn_subspace_dim <= ddim + 1);
   KALDI_ASSERT(phn_subspace_dim <= norm_xform.NumCols() + 1);
@@ -1152,8 +1152,8 @@ void AmSgmm2::InitializeMw(int32 phn_subspace_dim,
 
 // Initializes the matrices N_i, and [if speaker_dependent_weights==true] u_i.
 void AmSgmm2::InitializeNu(int32 spk_subspace_dim,
-                          const Matrix<BaseFloat> &norm_xform,
-                          bool speaker_dependent_weights) {
+    const Matrix<BaseFloat> &norm_xform,
+    bool speaker_dependent_weights) {
   int32 ddim = full_ubm_.Dim();
 
   int32 num_gauss = full_ubm_.NumGauss();
@@ -1166,7 +1166,7 @@ void AmSgmm2::InitializeNu(int32 spk_subspace_dim,
         random_dim = spk_subspace_dim - nonrandom_dim;
 
     N_[i].Range(0, ddim, 0, nonrandom_dim).
-        CopyFromMat(norm_xform.Range(0, ddim, 0, nonrandom_dim), kNoTrans);
+    CopyFromMat(norm_xform.Range(0, ddim, 0, nonrandom_dim), kNoTrans);
     // The following extension to the original paper allows us to
     // initialize the model with a larger dimension of speaker-subspace vector.
     if (random_dim > 0)
@@ -1180,8 +1180,8 @@ void AmSgmm2::InitializeNu(int32 spk_subspace_dim,
 }
 
 void AmSgmm2::CopyGlobalsInitVecs(const AmSgmm2 &other,
-                                  const std::vector<int32> &pdf2group,
-                                  BaseFloat self_weight) {
+    const std::vector<int32> &pdf2group,
+    BaseFloat self_weight) {
   KALDI_LOG << "Initializing model";
   pdf2group_ = pdf2group;
   ComputePdfMappings();
@@ -1257,10 +1257,10 @@ void AmSgmm2::InitializeCovars() {
 
 // Compute the "smoothing" matrix H^{(sm)} from expected counts given the model.
 void AmSgmm2::ComputeHsmFromModel(
-    const std::vector< SpMatrix<BaseFloat> > &H,
-    const Vector<BaseFloat> &state_occupancies,
-    SpMatrix<BaseFloat> *H_sm,
-    BaseFloat max_cond) const {
+  const std::vector< SpMatrix<BaseFloat> > &H,
+  const Vector<BaseFloat> &state_occupancies,
+  SpMatrix<BaseFloat> *H_sm,
+  BaseFloat max_cond) const {
   int32 num_gauss = NumGauss();
   BaseFloat tot_sum = 0.0;
   KALDI_ASSERT(state_occupancies.Dim() == NumPdfs());
@@ -1318,7 +1318,7 @@ void ComputeFeatureNormalizingTransform(const FullGmm &gmm, Matrix<BaseFloat> *x
     KALDI_ASSERT(total_weight > 0);
     if (fabs(total_weight - 1.0) > 0.001) {
       KALDI_WARN << "Total weight across the GMMs is " << (total_weight)
-          << ", renormalizing.";
+                 << ", renormalizing.";
       global_mean.Scale(1.0 / total_weight);
       within_class_covar.Scale(1.0 / total_weight);
       between_class_covar.Scale(1.0 / total_weight);
@@ -1373,7 +1373,7 @@ void AmSgmm2::ComputePerSpkDerivedVars(Sgmm2PerSpkDerivedVars *vars) const {
     int32 num_gauss = NumGauss();
     // first compute the o_i^{(s)} quantities.
     for (int32 i = 0; i < num_gauss; i++) {
-       // Eqn. (32): o_i^{(s)} = N_i v^{(s)}
+      // Eqn. (32): o_i^{(s)} = N_i v^{(s)}
       vars->o_s.Row(i).AddMatVec(1.0, N_[i], kNoTrans, vars->v_s, 0.0);
     }
     // the rest relates to the SSGMM.  We only need to to this
@@ -1403,8 +1403,8 @@ void AmSgmm2::ComputePerSpkDerivedVars(Sgmm2PerSpkDerivedVars *vars) const {
 }
 
 BaseFloat AmSgmm2::GaussianSelection(const Sgmm2GselectConfig &config,
-                                    const VectorBase<BaseFloat> &data,
-                                    std::vector<int32> *gselect) const {
+    const VectorBase<BaseFloat> &data,
+    std::vector<int32> *gselect) const {
   KALDI_ASSERT(diag_ubm_.NumGauss() != 0 &&
                diag_ubm_.NumGauss() == full_ubm_.NumGauss() &&
                diag_ubm_.Dim() == data.Dim());
@@ -1414,16 +1414,15 @@ BaseFloat AmSgmm2::GaussianSelection(const Sgmm2GselectConfig &config,
 
   std::vector< std::pair<BaseFloat, int32> > pruned_pairs;
   if (config.diag_gmm_nbest < num_gauss) {    Vector<BaseFloat> loglikes(num_gauss);
-    diag_ubm_.LogLikelihoods(data, &loglikes);
-    Vector<BaseFloat> loglikes_copy(loglikes);
-    BaseFloat *ptr = loglikes_copy.Data();
-    std::nth_element(ptr, ptr+num_gauss-config.diag_gmm_nbest, ptr+num_gauss);
-    BaseFloat thresh = ptr[num_gauss-config.diag_gmm_nbest];
-    for (int32 g = 0; g < num_gauss; g++)
-      if (loglikes(g) >= thresh)  // met threshold for diagonal phase.
-        pruned_pairs.push_back(
-            std::make_pair(full_ubm_.ComponentLogLikelihood(data, g), g));
-  } else {
+                                              diag_ubm_.LogLikelihoods(data, &loglikes);
+                                              Vector<BaseFloat> loglikes_copy(loglikes);
+                                              BaseFloat *ptr = loglikes_copy.Data();
+                                              std::nth_element(ptr, ptr+num_gauss-config.diag_gmm_nbest, ptr+num_gauss);
+                                              BaseFloat thresh = ptr[num_gauss-config.diag_gmm_nbest];
+                                              for (int32 g = 0; g < num_gauss; g++)
+                                                if (loglikes(g) >= thresh) // met threshold for diagonal phase.
+                                                  pruned_pairs.push_back(
+            std::make_pair(full_ubm_.ComponentLogLikelihood(data, g), g)); } else {
     Vector<BaseFloat> loglikes(num_gauss);
     full_ubm_.LogLikelihoods(data, &loglikes);
     for (int32 g = 0; g < num_gauss; g++)

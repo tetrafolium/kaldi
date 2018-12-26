@@ -35,25 +35,25 @@ namespace nnet2 {
     layer is different.
  */
 static void GiveNnetCorrectTopology(Nnet *nnet,
-                                    AffineComponent **affine_component,
-                                    SoftmaxComponent **softmax_component,
-                                    SumGroupComponent **sum_group_component) {
+    AffineComponent **affine_component,
+    SoftmaxComponent **softmax_component,
+    SumGroupComponent **sum_group_component) {
   int32 nc = nnet->NumComponents();
   KALDI_ASSERT(nc > 0);
   Component* component = &(nnet->GetComponent(nc - 1));
   if ((*sum_group_component =
-       dynamic_cast<SumGroupComponent*>(component)) == NULL) {
+      dynamic_cast<SumGroupComponent*>(component)) == NULL) {
     KALDI_LOG << "Adding SumGroupComponent to neural net.";
     int32 dim = component->OutputDim();
     // Give it the same learning rate as the first updatable layer we have.
     std::vector<int32> sizes(dim, 1); // a vector of all ones, of dimension "dim".
-  
+
     *sum_group_component = new SumGroupComponent();
     (*sum_group_component)->Init(sizes);
     nnet->Append(*sum_group_component);
     nc++;
   }
-  component = &(nnet->GetComponent(nc - 2));    
+  component = &(nnet->GetComponent(nc - 2));
   if ((*softmax_component = dynamic_cast<SoftmaxComponent*>(component)) == NULL)
     KALDI_ERR << "Neural net has wrong topology: expected second-to-last "
               << "component to be SoftmaxComponent, type is "
@@ -84,7 +84,7 @@ static void GiveNnetCorrectTopology(Nnet *nnet,
 
 
 void MixupNnet(const NnetMixupConfig &mixup_config,
-               Nnet *nnet) {
+    Nnet *nnet) {
   AffineComponent *affine_component = NULL;
   SoftmaxComponent *softmax_component = NULL;
   SumGroupComponent *sum_group_component = NULL;
@@ -92,7 +92,7 @@ void MixupNnet(const NnetMixupConfig &mixup_config,
                           &affine_component,
                           &softmax_component,
                           &sum_group_component); // Adds a SumGroupComponent if needed.
-  
+
   softmax_component->MixUp(mixup_config.num_mixtures,
                            mixup_config.power,
                            mixup_config.min_count,
@@ -105,11 +105,11 @@ void MixupNnet(const NnetMixupConfig &mixup_config,
 
 /// Allocate mixtures to states via a power rule, and add any new mixtures.
 void SoftmaxComponent::MixUp(int32 num_mixtures,
-                             BaseFloat power,
-                             BaseFloat min_count,
-                             BaseFloat perturb_stddev,
-                             AffineComponent *ac,
-                             SumGroupComponent *sc) {
+    BaseFloat power,
+    BaseFloat min_count,
+    BaseFloat perturb_stddev,
+    AffineComponent *ac,
+    SumGroupComponent *sc) {
   // "counts" is derived from this->counts_ by summing.
   std::vector<int32> old_sizes;
   sc->GetSizes(&old_sizes);
@@ -141,11 +141,11 @@ void SoftmaxComponent::MixUp(int32 num_mixtures,
       affine_input_dim = ac->InputDim();
   KALDI_ASSERT(new_dim >= old_dim);
   sc->Init(new_sizes);
-  
+
   // bias and linear terms from affine component:
   Vector<BaseFloat> old_bias_term(ac->bias_params_);
   Matrix<BaseFloat> old_linear_term(ac->linear_params_);
-  
+
   Vector<BaseFloat> new_bias_term(new_dim);
   Matrix<BaseFloat> new_linear_term(new_dim, affine_input_dim);
   Vector<BaseFloat> new_counts(new_dim);
@@ -157,30 +157,30 @@ void SoftmaxComponent::MixUp(int32 num_mixtures,
   Vector<BaseFloat> old_counts(this->value_sum_);
   for (size_t i = 0; i < old_sizes.size(); i++) {
     int32 this_old_dim = old_sizes[i],
-          this_new_dim = new_sizes[i],
-          this_cur_dim = this_old_dim; // this_cur_dim is loop variable.
-    
+        this_new_dim = new_sizes[i],
+        this_cur_dim = this_old_dim;   // this_cur_dim is loop variable.
+
     SubMatrix<BaseFloat> this_old_linear_term(old_linear_term,
-                                              old_offset, this_old_dim,
-                                              0, affine_input_dim),
-        this_new_linear_term(new_linear_term,
+        old_offset, this_old_dim,
+        0, affine_input_dim),
+    this_new_linear_term(new_linear_term,
                              new_offset, this_new_dim,
                              0, affine_input_dim);
     SubVector<BaseFloat> this_old_bias_term(old_bias_term,
-                                            old_offset, this_old_dim),
-        this_new_bias_term(new_bias_term, new_offset, this_new_dim),
-        this_old_counts(old_counts,
+        old_offset, this_old_dim),
+    this_new_bias_term(new_bias_term, new_offset, this_new_dim),
+    this_old_counts(old_counts,
                         old_offset, this_old_dim),
-        this_new_counts(new_counts,
+    this_new_counts(new_counts,
                         new_offset, this_new_dim);
-    
+
     // Copy the same-dimensional part of the parameters and counts.
     this_new_linear_term.Range(0, this_old_dim, 0, affine_input_dim).
-        CopyFromMat(this_old_linear_term);
+    CopyFromMat(this_old_linear_term);
     this_new_bias_term.Range(0, this_old_dim).
-        CopyFromVec(this_old_bias_term);
+    CopyFromVec(this_old_bias_term);
     this_new_counts.Range(0, this_old_dim).
-        CopyFromVec(this_old_counts);
+    CopyFromVec(this_old_counts);
     // this_new_params is the mixture weights.
     // Add the new components...
     for (; this_cur_dim < this_new_dim; this_cur_dim++) {
@@ -193,7 +193,7 @@ void SoftmaxComponent::MixUp(int32 num_mixtures,
       int32 max_index = static_cast<int32>(count_max - count_begin),
           new_index = this_cur_dim;
       SubVector<BaseFloat> cur_vec(this_new_linear_term, max_index),
-          new_vec(this_new_linear_term, new_index);
+      new_vec(this_new_linear_term, new_index);
       new_vec.CopyFromVec(cur_vec);
       Vector<BaseFloat> rand(affine_input_dim);
       rand.SetRandn();
@@ -217,6 +217,6 @@ void SoftmaxComponent::MixUp(int32 num_mixtures,
 
 
 
-  
+
 } // namespace nnet2
 } // namespace kaldi

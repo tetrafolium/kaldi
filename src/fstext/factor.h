@@ -29,7 +29,7 @@
    symbols].  It ensures that the original symbols all have the same
    number as a corresponding "new" symbol representing a sequence of length
    one; this enables certain optimizations later on.
-*/
+ */
 
 
 #include <fst/fstlib.h>
@@ -50,7 +50,7 @@ namespace fst {
    As a side effect it also sorts the FST in depth-first order.  Factor will
    usually do the best job when the olabels have been pushed to the left,
    i.e. if you make a call like
-   
+
      Push<Arc, REWEIGHT_TO_INITIAL>(fsta, &fstb, kPushLabels);
 
    This is because it only creates a chain with olabels on the first arc of the
@@ -59,18 +59,18 @@ namespace fst {
    with the result of calling CreateFactorFst(*symbols) should be equivalent to
    fst.  Alternatively, calling ExpandInputSequences with ofst and *symbols
    would produce something equivalent to fst.
-*/
+ */
 
 template<class Arc, class I>
 void Factor(const Fst<Arc> &fst, MutableFst<Arc> *ofst,
-            vector<vector<I> > *symbols);
+    vector<vector<I> > *symbols);
 
 
 /// This is a more conventional interface of Factor that outputs
 /// the result as two FSTs.
 template<class Arc>
 void Factor(const Fst<Arc> &fst, MutableFst<Arc> *ofst1,
-            MutableFst<Arc> *ofst2);
+    MutableFst<Arc> *ofst2);
 
 
 
@@ -81,7 +81,7 @@ void Factor(const Fst<Arc> &fst, MutableFst<Arc> *ofst1,
 /// leaves any weight and output symbols on the first arc of the chain.
 template<class Arc, class I>
 void ExpandInputSequences(const vector<vector<I> > &sequences,
-                          MutableFst<Arc> *fst);
+    MutableFst<Arc> *fst);
 
 
 /// The function CreateFactorFst will create an FST that expands out the
@@ -95,8 +95,8 @@ void ExpandInputSequences(const vector<vector<I> > &sequences,
 /// same as calling "ExpandInputSequences".  Use TableCompose (see table-matcher.h)
 /// for efficiency.
 template<class Arc, class I>
-void CreateFactorFst(const vector<vector<I> > &sequences,  
-                     MutableFst<Arc> *fst);
+void CreateFactorFst(const vector<vector<I> > &sequences,
+    MutableFst<Arc> *fst);
 
 
 /// CreateMapFst will create an FST representing this symbol_map.  The
@@ -106,7 +106,7 @@ void CreateFactorFst(const vector<vector<I> > &sequences,
 /// Must have symbol_map[0] == 0.
 template<class Arc, class I>
 void CreateMapFst(const vector<I> &symbol_map,
-                  MutableFst<Arc> *fst);
+    MutableFst<Arc> *fst);
 
 
 enum  StatePropertiesEnum
@@ -117,7 +117,7 @@ enum  StatePropertiesEnum
   kStateArcsOut = 0x10,
   kStateMultipleArcsOut = 0x20,
   kStateOlabelsOut = 0x40,
-  kStateIlabelsOut = 0x80 }; 
+  kStateIlabelsOut = 0x80 };
 
 typedef unsigned char StatePropertiesType;
 
@@ -126,8 +126,8 @@ typedef unsigned char StatePropertiesType;
    FST, using the bit properties defined in StatePropertiesEnum. */
 template<class Arc>
 void GetStateProperties(const Fst<Arc> &fst,
-                        typename Arc::StateId max_state,
-                        vector<StatePropertiesType> *props);
+    typename Arc::StateId max_state,
+    vector<StatePropertiesType> *props);
 
 
 
@@ -136,8 +136,8 @@ class DfsOrderVisitor {
   // visitor class that gives the user the dfs order,
   // c.f. dfs-visit.h.  Used in factor-fst-impl.h
   typedef typename Arc::StateId StateId;
- public:
-  DfsOrderVisitor(vector<StateId> *order): order_(order) { order->clear(); }
+public:
+  DfsOrderVisitor(vector<StateId> *order) : order_(order) { order->clear(); }
   void InitVisit(const Fst<Arc> &fst) {}
   bool InitState(StateId s, StateId) { order_->push_back(s); return true; }
   bool TreeArc(StateId, const Arc&) { return true; }
@@ -145,7 +145,7 @@ class DfsOrderVisitor {
   bool ForwardOrCrossArc(StateId, const Arc&) { return true; }
   void FinishState(StateId, StateId, const Arc *) { }
   void FinishVisit() { }
- private:
+private:
   vector<StateId> *order_;
 };
 

@@ -70,7 +70,7 @@ class MultiThreadable {
   // instances), and finally implement the operator() that does part of the job
   // based on thread_id_ and num_threads_ variables.
   // Note: example implementations are in util/kaldi-thread-test.cc
- public:
+public:
   virtual void operator() () = 0;
   // Does the main function of the class
   //  Subclasses have to redefine this
@@ -78,18 +78,18 @@ class MultiThreadable {
   // Optional destructor.  Note: the destructor of the object passed by the user
   // will also be called, so watch out.
 
- public:
+public:
   // Do not redeclare thread_id_ and num_threads_ in derived classes.
   int32 thread_id_;  // 0 <= thread_id_ < num_threads_
   int32 num_threads_;
 
- private:
+private:
   // Have additional member variables as needed.
 };
 
 
 class ExampleClass: public MultiThreadable {
- public:
+public:
   ExampleClass(int32 *foo); // Typically there will be an initializer that
   // takes arguments.
 
@@ -107,14 +107,14 @@ class ExampleClass: public MultiThreadable {
     // for example summing up of certain quantities.  See code
     // that uses RunMultiThreaded for examples.
   }
- private:
+private:
   // Have additional member variables as needed.
 };
 
 
 template<class C>
 class MultiThreader {
- public:
+public:
   MultiThreader(int32 num_threads, const C &c_in) :
     threads_(std::max<int32>(1, num_threads)),
     cvec_(std::max<int32>(1, num_threads), c_in) {
@@ -138,7 +138,7 @@ class MultiThreader {
       if (threads_[i].joinable())
         threads_[i].join();
   }
- private:
+private:
   std::vector<std::thread> threads_;
   std::vector<C> cvec_;
 };
@@ -155,7 +155,7 @@ template<class C> void RunMultiThreaded(const C &c_in) {
 struct TaskSequencerConfig {
   int32 num_threads;
   int32 num_threads_total;
-  TaskSequencerConfig(): num_threads(1), num_threads_total(0)  { }
+  TaskSequencerConfig() : num_threads(1), num_threads_total(0)  { }
   void Register(OptionsItf *opts) {
     opts->Register("num-threads", &num_threads, "Number of actively processing "
                    "threads to run in parallel");
@@ -172,14 +172,14 @@ struct TaskSequencerConfig {
 // destructors will be run sequentially in the same order Run as called.
 template<class C>
 class TaskSequencer {
- public:
-  TaskSequencer(const TaskSequencerConfig &config):
-      threads_avail_(config.num_threads),
-      tot_threads_avail_(config.num_threads_total > 0 ? config.num_threads_total :
-                         config.num_threads + 20),
-      thread_list_(NULL) {
+public:
+  TaskSequencer(const TaskSequencerConfig &config) :
+    threads_avail_(config.num_threads),
+    tot_threads_avail_(config.num_threads_total > 0 ? config.num_threads_total :
+        config.num_threads + 20),
+    thread_list_(NULL) {
     KALDI_ASSERT((config.num_threads_total <= 0 ||
-                  config.num_threads_total >= config.num_threads) &&
+        config.num_threads_total >= config.num_threads) &&
                  "num-threads-total, if specified, must be >= num-threads");
   }
 
@@ -212,14 +212,14 @@ class TaskSequencer {
   ~TaskSequencer() {
     Wait();
   }
- private:
+private:
   struct RunTaskArgsList {
     TaskSequencer *me; // Think of this as a "this" pointer.
     C *c; // Clist element of the task we're expected
     std::thread thread;
     RunTaskArgsList *tail;
-    RunTaskArgsList(TaskSequencer *me, C *c, RunTaskArgsList *tail):
-        me(me), c(c), tail(tail) {}
+    RunTaskArgsList(TaskSequencer *me, C *c, RunTaskArgsList *tail) :
+      me(me), c(c), tail(tail) {}
   };
   // This static function gets run in the threads that we create.
   static void RunTask(RunTaskArgsList *args) {

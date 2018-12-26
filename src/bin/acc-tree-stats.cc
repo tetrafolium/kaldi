@@ -26,11 +26,11 @@
 #include "hmm/tree-accu.h"
 
 /** @brief Accumulate tree statistics for decision tree training. The
-program reads in a feature archive, and the corresponding alignments,
-and generates the sufficient statistics for the decision tree
-creation. Context width and central phone position are used to
-identify the contexts.Transition model is used as an input to identify
-the PDF's and the phones.  */
+   program reads in a feature archive, and the corresponding alignments,
+   and generates the sufficient statistics for the decision tree
+   creation. Context width and central phone position are used to
+   identify the contexts.Transition model is used as an input to identify
+   the PDF's and the phones.  */
 int main(int argc, char *argv[]) {
   using namespace kaldi;
   typedef kaldi::int32 int32;
@@ -105,8 +105,8 @@ int main(int argc, char *argv[]) {
     BuildTreeStatsType stats;  // vectorized form.
 
     for (std::map<EventType, GaussClusterable*>::const_iterator iter = tree_stats.begin();
-         iter != tree_stats.end();
-         ++iter) {
+        iter != tree_stats.end();
+        ++iter) {
       stats.push_back(std::make_pair(iter->first, iter->second));
     }
     tree_stats.clear();

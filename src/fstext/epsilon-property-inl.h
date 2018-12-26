@@ -26,7 +26,7 @@ namespace fst {
 
 template<class Arc>
 void ComputeStateInfo(const VectorFst<Arc> &fst,
-                      std::vector<char> *epsilon_info) {
+    std::vector<char> *epsilon_info) {
   typedef typename Arc::StateId StateId;
   typedef VectorFst<Arc> Fst;
   epsilon_info->clear();
@@ -58,7 +58,7 @@ void EnsureEpsilonProperty(VectorFst<Arc> *fst) {
   StateId num_states_old = fst->NumStates();
   StateId non_coaccessible_state = fst->AddState();
 
-  /// new_state_vec is for those states that have both epsilon and 
+  /// new_state_vec is for those states that have both epsilon and
   /// non-epsilon arcs entering.  For these states, we'll create a new
   /// state for the non-epsilon arcs to enter and put it in this array,
   /// and we'll put an epsilon transition from the new state to the old state.
@@ -78,13 +78,13 @@ void EnsureEpsilonProperty(VectorFst<Arc> *fst) {
   /// necessary.
   for (StateId s = 0; s < num_states_old; s++) {
     for (MutableArcIterator<Fst> aiter(fst, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       Arc arc = aiter.Value();
       if (arc.ilabel != 0 || arc.olabel != 0) { // non-epsilon arc
         StateId replacement_state;
         if (arc.nextstate >= 0 && arc.nextstate < num_states_old &&
             (replacement_state = new_state_vec[arc.nextstate]) !=
-             kNoStateId) {
+            kNoStateId) {
           arc.nextstate = replacement_state;
           aiter.SetValue(arc);
         }
@@ -102,12 +102,12 @@ void EnsureEpsilonProperty(VectorFst<Arc> *fst) {
       // from there instead.
       StateId new_state = fst->AddState();
       for (MutableArcIterator<Fst> aiter(fst, s); !aiter.Done();
-           aiter.Next()) {
+          aiter.Next()) {
         Arc arc = aiter.Value();
         if (arc.ilabel != 0 || arc.olabel != 0) { // non-epsilon arc.
           assert(arc.nextstate != s); // we don't handle cyclic FSTs.
           // move this arc to leave from the new state:
-          fst->AddArc(new_state, arc); 
+          fst->AddArc(new_state, arc);
           arc.nextstate = non_coaccessible_state;
           aiter.SetValue(arc); // invalidate the arc, Connect() will remove it.
         }

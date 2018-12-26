@@ -26,9 +26,9 @@ namespace kaldi {
 
 
 void MfccComputer::Compute(BaseFloat signal_log_energy,
-                           BaseFloat vtln_warp,
-                           VectorBase<BaseFloat> *signal_frame,
-                           VectorBase<BaseFloat> *feature) {
+    BaseFloat vtln_warp,
+    VectorBase<BaseFloat> *signal_frame,
+    VectorBase<BaseFloat> *feature) {
   KALDI_ASSERT(signal_frame->Dim() == opts_.frame_opts.PaddedWindowSize() &&
                feature->Dim() == this->Dim());
 
@@ -46,7 +46,7 @@ void MfccComputer::Compute(BaseFloat signal_log_energy,
   // Convert the FFT into a power spectrum.
   ComputePowerSpectrum(signal_frame);
   SubVector<BaseFloat> power_spectrum(*signal_frame, 0,
-                                      signal_frame->Dim() / 2 + 1);
+      signal_frame->Dim() / 2 + 1);
 
   mel_banks.Compute(power_spectrum, &mel_energies_);
 
@@ -79,9 +79,9 @@ void MfccComputer::Compute(BaseFloat signal_log_energy,
   }
 }
 
-MfccComputer::MfccComputer(const MfccOptions &opts):
-    opts_(opts), srfft_(NULL),
-    mel_energies_(opts.mel_opts.num_bins) {
+MfccComputer::MfccComputer(const MfccOptions &opts) :
+  opts_(opts), srfft_(NULL),
+  mel_energies_(opts.mel_opts.num_bins) {
   int32 num_bins = opts.mel_opts.num_bins;
   Matrix<BaseFloat> dct_matrix(num_bins, num_bins);
   ComputeDctMatrix(&dct_matrix);
@@ -107,15 +107,15 @@ MfccComputer::MfccComputer(const MfccOptions &opts):
   GetMelBanks(1.0);
 }
 
-MfccComputer::MfccComputer(const MfccComputer &other):
-    opts_(other.opts_), lifter_coeffs_(other.lifter_coeffs_),
-    dct_matrix_(other.dct_matrix_),
-    log_energy_floor_(other.log_energy_floor_),
-    mel_banks_(other.mel_banks_),
-    srfft_(NULL),
-    mel_energies_(other.mel_energies_.Dim(), kUndefined) {
+MfccComputer::MfccComputer(const MfccComputer &other) :
+  opts_(other.opts_), lifter_coeffs_(other.lifter_coeffs_),
+  dct_matrix_(other.dct_matrix_),
+  log_energy_floor_(other.log_energy_floor_),
+  mel_banks_(other.mel_banks_),
+  srfft_(NULL),
+  mel_energies_(other.mel_energies_.Dim(), kUndefined) {
   for (std::map<BaseFloat, MelBanks*>::iterator iter = mel_banks_.begin();
-       iter != mel_banks_.end(); ++iter)
+      iter != mel_banks_.end(); ++iter)
     iter->second = new MelBanks(*(iter->second));
   if (other.srfft_ != NULL)
     srfft_ = new SplitRadixRealFft<BaseFloat>(*(other.srfft_));

@@ -25,19 +25,19 @@ namespace kaldi {
 namespace nnet2 {
 
 /*
-  This class does the forward and possibly backward computation for (typically)
-  a whole utterance of contiguous features.  You'll instantiate one of
-  these classes each time you want to do this computation.
-*/
+   This class does the forward and possibly backward computation for (typically)
+   a whole utterance of contiguous features.  You'll instantiate one of
+   these classes each time you want to do this computation.
+ */
 class NnetDiscriminativeUpdater {
- public:
+public:
 
   NnetDiscriminativeUpdater(const AmNnet &am_nnet,
-                            const TransitionModel &tmodel,
-                            const NnetDiscriminativeUpdateOptions &opts,
-                            const DiscriminativeNnetExample &eg,
-                            Nnet *nnet_to_update,
-                            NnetDiscriminativeStats *stats);
+      const TransitionModel &tmodel,
+      const NnetDiscriminativeUpdateOptions &opts,
+      const DiscriminativeNnetExample &eg,
+      Nnet *nnet_to_update,
+      NnetDiscriminativeStats *stats);
 
   void Update() {
     Propagate();
@@ -45,14 +45,14 @@ class NnetDiscriminativeUpdater {
     if (nnet_to_update_ != NULL)
       Backprop();
   }
-  
+
   /// The forward-through-the-layers part of the computation.
-  void Propagate();  
+  void Propagate();
 
   /// Does the parts between Propagate() and Backprop(), that
   /// involve forward-backward over the lattice.
   void LatticeComputations();
-  
+
   void Backprop();
 
   /// Assuming the lattice already has the correct scores in
@@ -62,9 +62,9 @@ class NnetDiscriminativeUpdater {
   /// It returns, for MPFE/SMBR, the objective function, or
   /// for MMI, the negative of the denominator-lattice log-likelihood.
   double GetDiscriminativePosteriors(Posterior *post);
-  
+
   SubMatrix<BaseFloat> GetInputFeatures() const;
-  
+
   CuMatrixBase<BaseFloat> &GetOutput() { return forward_data_.back(); }
 
   static inline Int32Pair MakePair(int32 first, int32 second) {
@@ -73,12 +73,12 @@ class NnetDiscriminativeUpdater {
     ans.second = second;
     return ans;
   }
-  
- private:
+
+private:
   typedef LatticeArc Arc;
   typedef Arc::StateId StateId;
 
-  
+
   const AmNnet &am_nnet_;
   const TransitionModel &tmodel_;
   const NnetDiscriminativeUpdateOptions &opts_;
@@ -87,10 +87,10 @@ class NnetDiscriminativeUpdater {
                          // another Nnet, in gradient-computation case, or
                          // NULL if we just need the objective function.
   NnetDiscriminativeStats *stats_; // the objective function, etc.
-  std::vector<ChunkInfo> chunk_info_out_; 
+  std::vector<ChunkInfo> chunk_info_out_;
   // forward_data_[i] is the input of the i'th component and (if i > 0)
   // the output of the i-1'th component.
-  std::vector<CuMatrix<BaseFloat> > forward_data_; 
+  std::vector<CuMatrix<BaseFloat> > forward_data_;
   Lattice lat_; // we convert the CompactLattice in the eg, into Lattice form.
   CuMatrix<BaseFloat> backward_data_;
   std::vector<int32> silence_phones_; // derived from opts_.silence_phones_str
@@ -99,14 +99,14 @@ class NnetDiscriminativeUpdater {
 
 
 NnetDiscriminativeUpdater::NnetDiscriminativeUpdater(
-    const AmNnet &am_nnet,
-    const TransitionModel &tmodel,
-    const NnetDiscriminativeUpdateOptions &opts,
-    const DiscriminativeNnetExample &eg,
-    Nnet *nnet_to_update,
-    NnetDiscriminativeStats *stats):
-    am_nnet_(am_nnet), tmodel_(tmodel), opts_(opts), eg_(eg),
-    nnet_to_update_(nnet_to_update), stats_(stats) {
+  const AmNnet &am_nnet,
+  const TransitionModel &tmodel,
+  const NnetDiscriminativeUpdateOptions &opts,
+  const DiscriminativeNnetExample &eg,
+  Nnet *nnet_to_update,
+  NnetDiscriminativeStats *stats) :
+  am_nnet_(am_nnet), tmodel_(tmodel), opts_(opts), eg_(eg),
+  nnet_to_update_(nnet_to_update), stats_(stats) {
   if (!SplitStringToIntegers(opts_.silence_phones_str, ":", false,
                              &silence_phones_)) {
     KALDI_ERR << "Bad value for --silence-phones option: "
@@ -135,14 +135,14 @@ SubMatrix<BaseFloat> NnetDiscriminativeUpdater::GetInputFeatures() const {
       num_output_frames =
       num_frames_output + nnet.LeftContext() + nnet.RightContext();
   SubMatrix<BaseFloat> ans(eg_.input_frames, offset, num_output_frames,
-                           0, eg_.input_frames.NumCols());
+      0, eg_.input_frames.NumCols());
   return ans;
 }
 
 void NnetDiscriminativeUpdater::Propagate() {
   const Nnet &nnet = am_nnet_.GetNnet();
   forward_data_.resize(nnet.NumComponents() + 1);
-  
+
   SubMatrix<BaseFloat> input_feats = GetInputFeatures();
   int32 spk_dim = eg_.spk_info.Dim();
   if (spk_dim == 0) {
@@ -160,14 +160,14 @@ void NnetDiscriminativeUpdater::Propagate() {
   for (int32 c = 0; c < nnet.NumComponents(); c++) {
     const Component &component = nnet.GetComponent(c);
     CuMatrix<BaseFloat> &input = forward_data_[c],
-        &output = forward_data_[c+1];
-    component.Propagate(chunk_info_out_[c] , chunk_info_out_[c+1], input, &output);
+    &output = forward_data_[c+1];
+    component.Propagate(chunk_info_out_[c], chunk_info_out_[c+1], input, &output);
     const Component *prev_component = (c == 0 ? NULL :
-                                       &(nnet.GetComponent(c-1)));
+        &(nnet.GetComponent(c-1)));
     bool will_do_backprop = (nnet_to_update_ != NULL),
         keep_last_output = will_do_backprop &&
         ((c>0 && prev_component->BackpropNeedsOutput()) ||
-         component.BackpropNeedsInput());
+        component.BackpropNeedsInput());
     if (!keep_last_output)
       forward_data_[c].Resize(0, 0); // We won't need this data; save memory.
   }
@@ -184,19 +184,19 @@ void NnetDiscriminativeUpdater::LatticeComputations() {
     LatticeBoost(tmodel_, eg_.num_ali, silence_phones_,
                  opts_.boost, max_silence_error, &lat_);
   }
-  
+
   int32 num_frames = static_cast<int32>(eg_.num_ali.size());
 
   stats_->tot_t += num_frames;
   stats_->tot_t_weighted += num_frames * eg_.weight;
-  
+
   const VectorBase<BaseFloat> &priors = am_nnet_.Priors();
   const CuMatrix<BaseFloat> &posteriors = forward_data_.back();
 
   KALDI_ASSERT(posteriors.NumRows() == num_frames);
   int32 num_pdfs = posteriors.NumCols();
   KALDI_ASSERT(num_pdfs == priors.Dim());
-  
+
   // We need to look up the posteriors of some pdf-ids in the matrix
   // "posteriors".  Rather than looking them all up using operator (), which is
   // very slow because each lookup involves a separate CUDA call with
@@ -205,7 +205,7 @@ void NnetDiscriminativeUpdater::LatticeComputations() {
   // Note: regardless of the criterion, we evaluate the likelihoods in
   // the numerator alignment.  Even though they may be irrelevant to
   // the optimization, they will affect the value of the objective function.
-  
+
   std::vector<Int32Pair> requested_indexes;
   BaseFloat wiggle_room = 1.3; // value not critical.. it's just 'reserve'
   requested_indexes.reserve(num_frames + wiggle_room * lat_.NumStates());
@@ -221,7 +221,7 @@ void NnetDiscriminativeUpdater::LatticeComputations() {
   std::vector<int32> state_times;
   int32 T = LatticeStateTimes(lat_, &state_times);
   KALDI_ASSERT(T == num_frames);
-  
+
   StateId num_states = lat_.NumStates();
   for (StateId s = 0; s < num_states; s++) {
     StateId t = state_times[s];
@@ -260,9 +260,9 @@ void NnetDiscriminativeUpdater::LatticeComputations() {
   if (num_floored > 0) {
     KALDI_WARN << "Floored " << num_floored << " probabilities from nnet.";
   }
-  
+
   index = 0;
-  
+
   if (opts_.criterion == "mmi") {
     double tot_num_like = 0.0;
     for (; index < eg_.num_ali.size(); index++)
@@ -273,7 +273,7 @@ void NnetDiscriminativeUpdater::LatticeComputations() {
   // Now put the (scaled) acoustic log-likelihoods in the lattice.
   for (StateId s = 0; s < num_states; s++) {
     for (fst::MutableArcIterator<Lattice> aiter(&lat_, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       Arc arc = aiter.Value();
       if (arc.ilabel != 0) { // input-side has transition-ids, output-side empty
         arc.weight.SetValue2(-answers[index]);
@@ -288,7 +288,7 @@ void NnetDiscriminativeUpdater::LatticeComputations() {
     }
   }
   KALDI_ASSERT(index == answers.size());
-  
+
   // Get the MPE or MMI posteriors.
   Posterior post;
   stats_->tot_den_objf += eg_.weight * GetDiscriminativePosteriors(&post);
@@ -312,7 +312,7 @@ void NnetDiscriminativeUpdater::LatticeComputations() {
   int32 num_components = am_nnet_.GetNnet().NumComponents();
   const CuMatrix<BaseFloat> &output(forward_data_[num_components]);
   backward_data_.Resize(output.NumRows(), output.NumCols()); // zeroes it.
-  
+
   { // We don't actually need tot_objf and tot_weight; we have already
     // computed the objective function.
     BaseFloat tot_objf, tot_weight;
@@ -352,8 +352,8 @@ void NnetDiscriminativeUpdater::Backprop() {
     const Component &component = nnet.GetComponent(c);
     Component *component_to_update = &(nnet_to_update_->GetComponent(c));
     const CuMatrix<BaseFloat>  &input = forward_data_[c],
-                            &output = forward_data_[c+1],
-                      &output_deriv = backward_data_;
+    &output = forward_data_[c+1],
+    &output_deriv = backward_data_;
     CuMatrix<BaseFloat> input_deriv;
     component.Backprop(chunk_info_out_[c], chunk_info_out_[c+1], input, output, output_deriv,
                        component_to_update, &input_deriv);
@@ -363,13 +363,13 @@ void NnetDiscriminativeUpdater::Backprop() {
 
 
 void NnetDiscriminativeUpdate(const AmNnet &am_nnet,
-                              const TransitionModel &tmodel,
-                              const NnetDiscriminativeUpdateOptions &opts,
-                              const DiscriminativeNnetExample &eg,
-                              Nnet *nnet_to_update,
-                              NnetDiscriminativeStats *stats) {
+    const TransitionModel &tmodel,
+    const NnetDiscriminativeUpdateOptions &opts,
+    const DiscriminativeNnetExample &eg,
+    Nnet *nnet_to_update,
+    NnetDiscriminativeStats *stats) {
   NnetDiscriminativeUpdater updater(am_nnet, tmodel, opts, eg,
-                                    nnet_to_update, stats);
+      nnet_to_update, stats);
   updater.Update();
 }
 
@@ -390,7 +390,7 @@ void NnetDiscriminativeStats::Print(std::string criterion) {
             << " (weighted: " << tot_t_weighted
             << "), average (num or den) posterior per frame is "
             << avg_post_per_frame;
-  
+
   if (criterion == "mmi") {
     double num_objf = tot_num_objf / tot_t_weighted,
         den_objf = tot_den_objf / tot_t_weighted,

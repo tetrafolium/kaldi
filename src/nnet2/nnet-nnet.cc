@@ -63,8 +63,8 @@ int32 Nnet::RightContext() const {
 }
 
 void Nnet::ComputeChunkInfo(int32 input_chunk_size,
-                            int32 num_chunks,
-                            std::vector<ChunkInfo> *chunk_info_out) const {
+    int32 num_chunks,
+    std::vector<ChunkInfo> *chunk_info_out) const {
   // First compute the output-chunk indices for the last component in the
   // network. we assume that the numbering of the input starts from zero.
   int32 output_chunk_size = input_chunk_size - LeftContext() - RightContext();
@@ -120,15 +120,15 @@ void Nnet::ComputeChunkInfo(int32 input_chunk_size,
   // Ensuring that all components until the first component capable of data
   // rearrangement (e.g. SpliceComponent|SpliceMaxComponent) operate on
   // contiguous chunks at the input
-  for (size_t i = 0 ; i < NumComponents() ; i++) {
-      (*chunk_info_out)[i].MakeOffsetsContiguous();
-      // Check if the current component is present in the set of components
-      // capable of data rearrangement.
-      if (std::find(data_rearrange_components.begin(),
+  for (size_t i = 0; i < NumComponents(); i++) {
+    (*chunk_info_out)[i].MakeOffsetsContiguous();
+    // Check if the current component is present in the set of components
+    // capable of data rearrangement.
+    if (std::find(data_rearrange_components.begin(),
                     data_rearrange_components.end(),
                     components_[i]->Type())
-          != data_rearrange_components.end())
-          break;
+        != data_rearrange_components.end())
+      break;
   }
 
   // sanity testing for chunk_info_out vector
@@ -205,14 +205,14 @@ void Nnet::Destroy() {
 }
 
 void Nnet::ComponentDotProducts(
-    const Nnet &other,
-    VectorBase<BaseFloat> *dot_prod) const {
+  const Nnet &other,
+  VectorBase<BaseFloat> *dot_prod) const {
   KALDI_ASSERT(dot_prod->Dim() == NumUpdatableComponents());
   int32 index = 0;
   for (size_t i = 0; i < components_.size(); i++) {
     UpdatableComponent *uc1 = dynamic_cast<UpdatableComponent*>(components_[i]);
     const UpdatableComponent *uc2 = dynamic_cast<const UpdatableComponent*>(
-        &(other.GetComponent(i)));
+      &(other.GetComponent(i)));
     KALDI_ASSERT((uc1 != NULL) == (uc2 != NULL));
     if (uc1 != NULL) {
       (*dot_prod)(index) = uc1->DotProduct(*uc2);
@@ -223,7 +223,7 @@ void Nnet::ComponentDotProducts(
 }
 
 
-Nnet::Nnet(const Nnet &other): components_(other.components_.size()) {
+Nnet::Nnet(const Nnet &other) : components_(other.components_.size()) {
   for (size_t i = 0; i < other.components_.size(); i++)
     components_[i] = other.components_[i]->Copy();
   SetIndexes();
@@ -272,7 +272,7 @@ void Nnet::Check() const {
   for (size_t i = 0; i + 1 < components_.size(); i++) {
     KALDI_ASSERT(components_[i] != NULL);
     int32 output_dim = components_[i]->OutputDim(),
-      next_input_dim = components_[i+1]->InputDim();
+        next_input_dim = components_[i+1]->InputDim();
     KALDI_ASSERT(output_dim == next_input_dim);
     KALDI_ASSERT(components_[i]->Index() == static_cast<int32>(i));
   }
@@ -286,9 +286,9 @@ void Nnet::Init(std::istream &is) {
      Imagine the input dim is 13, and the speaker dim is 40, so (13 x 9) + 40 =  527.
      The config file might be as follows; the lines beginning with # are comments.
 
-     # layer-type layer-options
+   # layer-type layer-options
      AffineLayer 0.01 0.001 527 1000 0.04356
-  */
+   */
   components_.clear();
   while (getline(is, line)) {
     std::istringstream line_is(line);
@@ -331,7 +331,7 @@ void Nnet::ScaleLearningRates(std::map<std::string, BaseFloat> scale_factors) {
     if (uc != NULL) {  // Updatable component...
       // check if scaling factor was specified for a component of this type
       std::map<std::string, BaseFloat>::const_iterator lr_iterator =
-        scale_factors.find(uc->Type());
+          scale_factors.find(uc->Type());
       if (lr_iterator != scale_factors.end())  {
         uc->SetLearningRate(uc->LearningRate() * lr_iterator->second);
         ostr << uc->LearningRate() << " ";
@@ -377,7 +377,7 @@ void Nnet::ResizeOutputLayer(int32 new_num_pdfs) {
   int32 softmax_component_index = nc - 1;
   FixedScaleComponent *fsc =
       dynamic_cast<FixedScaleComponent*>(
-          components_[final_affine_component_index]);
+    components_[final_affine_component_index]);
   if (fsc != NULL)  {
     has_fixed_scale_component = true;
     fixed_scale_component_index = nc - 2;
@@ -385,7 +385,7 @@ void Nnet::ResizeOutputLayer(int32 new_num_pdfs) {
   }
   // note: it could be child class of AffineComponent.
   AffineComponent *ac = dynamic_cast<AffineComponent*>(
-      components_[final_affine_component_index]);
+    components_[final_affine_component_index]);
   if (ac == NULL)
     KALDI_ERR << "Network doesn't have expected structure (didn't find final "
               << "AffineComponent).";
@@ -536,7 +536,7 @@ void Nnet::RemovePreconditioning() {
       delete components_[i];
       components_[i] = ac;
     } else if (dynamic_cast<AffineComponentPreconditionedOnline*>(
-        components_[i]) != NULL) {
+          components_[i]) != NULL) {
       AffineComponent *ac = new AffineComponent(
           *(dynamic_cast<AffineComponent*>(components_[i])));
       delete components_[i];
@@ -549,9 +549,9 @@ void Nnet::RemovePreconditioning() {
 
 
 void Nnet::SwitchToOnlinePreconditioning(int32 rank_in, int32 rank_out,
-                                         int32 update_period,
-                                         BaseFloat num_samples_history,
-                                         BaseFloat alpha) {
+    int32 update_period,
+    BaseFloat num_samples_history,
+    BaseFloat alpha) {
   int32 switched = 0;
   for (size_t i = 0; i < components_.size(); i++) {
     if (dynamic_cast<AffineComponent*>(components_[i]) != NULL) {
@@ -574,7 +574,7 @@ void Nnet::SwitchToOnlinePreconditioning(int32 rank_in, int32 rank_out,
 
 
 void Nnet::AddNnet(const VectorBase<BaseFloat> &scale_params,
-                   const Nnet &other) {
+    const Nnet &other) {
   KALDI_ASSERT(scale_params.Dim() == this->NumUpdatableComponents());
   int32 i = 0;
   for (int32 j = 0; j < NumComponents(); j++) {
@@ -593,7 +593,7 @@ void Nnet::AddNnet(const VectorBase<BaseFloat> &scale_params,
 }
 
 void Nnet::AddNnet(BaseFloat alpha,
-                   const Nnet &other) {
+    const Nnet &other) {
   for (int32 i = 0; i < NumComponents(); i++) {
     UpdatableComponent *uc =
         dynamic_cast<UpdatableComponent*>(&(GetComponent(i)));
@@ -615,8 +615,8 @@ void Nnet::AddNnet(BaseFloat alpha,
 }
 
 void Nnet::AddNnet(BaseFloat alpha,
-                   Nnet *other,
-                   BaseFloat beta) {
+    Nnet *other,
+    BaseFloat beta) {
   for (int32 i = 0; i < NumComponents(); i++) {
     UpdatableComponent *uc =
         dynamic_cast<UpdatableComponent*>(&(GetComponent(i)));
@@ -658,7 +658,7 @@ int32 Nnet::GetParameterDim() const {
   int32 ans = 0;
   for (int32 c = 0; c < NumComponents(); c++) {
     const UpdatableComponent *uc = dynamic_cast<const UpdatableComponent*>(
-        &(GetComponent(c)));
+      &(GetComponent(c)));
     if (uc != NULL)
       ans += uc->GetParameterDim();
   }
@@ -669,7 +669,7 @@ void Nnet::Vectorize(VectorBase<BaseFloat> *params) const {
   int32 offset = 0;
   for (int32 c = 0; c < NumComponents(); c++) {
     const UpdatableComponent *uc = dynamic_cast<const UpdatableComponent*>(
-        &(GetComponent(c)));
+      &(GetComponent(c)));
     if (uc != NULL) {
       int32 size = uc->GetParameterDim();
       SubVector<BaseFloat> temp(*params, offset, size);
@@ -685,7 +685,7 @@ void Nnet::ResetGenerators() {
   // components.
   for (int32 c = 0; c < NumComponents(); c++) {
     RandomComponent *rc = dynamic_cast<RandomComponent*>(
-        &(GetComponent(c)));
+      &(GetComponent(c)));
     if (rc != NULL)
       rc->ResetGenerator();
   }
@@ -695,7 +695,7 @@ void Nnet::UnVectorize(const VectorBase<BaseFloat> &params) {
   int32 offset = 0;
   for (int32 c = 0; c < NumComponents(); c++) {
     UpdatableComponent *uc = dynamic_cast<UpdatableComponent*>(
-        &(GetComponent(c)));
+      &(GetComponent(c)));
     if (uc != NULL) {
       int32 size = uc->GetParameterDim();
       uc->UnVectorize(params.Range(offset, size));
@@ -736,7 +736,7 @@ void Nnet::Collapse(bool match_updatableness) {
       AffineComponent *a1 = dynamic_cast<AffineComponent*>(components_[i]),
           *a2 = dynamic_cast<AffineComponent*>(components_[i + 1]);
       FixedAffineComponent
-          *f1 = dynamic_cast<FixedAffineComponent*>(components_[i]),
+      *f1 = dynamic_cast<FixedAffineComponent*>(components_[i]),
           *f2 = dynamic_cast<FixedAffineComponent*>(components_[i + 1]);
       Component *c = NULL;
       if (a1 != NULL && a2 != NULL) {
@@ -766,11 +766,11 @@ void Nnet::Collapse(bool match_updatableness) {
   this->Check();
   KALDI_LOG << "Collapsed " << num_collapsed << " components."
             << (num_collapsed == 0 && match_updatableness == true ?
-                "  Try --match-updatableness=false." : "");
+  "  Try --match-updatableness=false." : "");
 }
 
 Nnet *GenRandomNnet(int32 input_dim,
-                    int32 output_dim) {
+    int32 output_dim) {
   std::vector<Component*> components;
   int32 cur_dim = input_dim;
   // have up to 10 layers before the final one.

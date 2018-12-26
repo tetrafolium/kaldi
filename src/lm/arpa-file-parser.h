@@ -32,8 +32,8 @@
 namespace kaldi {
 
 /**
-  Options that control ArpaFileParser
-*/
+   Options that control ArpaFileParser
+ */
 struct ArpaParseOptions {
   enum OovHandling {
     kRaiseError,     ///< Abort on OOV words
@@ -43,8 +43,8 @@ struct ArpaParseOptions {
   };
 
   ArpaParseOptions()
-      : bos_symbol(-1), eos_symbol(-1), unk_symbol(-1),
-        oov_handling(kRaiseError), max_warnings(30) { }
+    : bos_symbol(-1), eos_symbol(-1), unk_symbol(-1),
+    oov_handling(kRaiseError), max_warnings(30) { }
 
   void Register(OptionsItf *opts) {
     // Registering only the max_warnings count, since other options are
@@ -64,7 +64,7 @@ struct ArpaParseOptions {
 
 /**
    A parsed n-gram from ARPA LM file.
-*/
+ */
 struct NGram {
   NGram() : logprob(0.0), backoff(0.0) { }
   std::vector<int32> words;  ///< Symbols in LTR order.
@@ -76,9 +76,9 @@ struct NGram {
     ArpaFileParser is an abstract base class for ARPA LM file conversion.
 
     See ConstArpaLmBuilder and ArpaLmCompiler for usage examples.
-*/
+ */
 class ArpaFileParser {
- public:
+public:
   /// Constructs the parser with the given options and optional symbol table.
   /// If symbol table is provided, then the file should contain text n-grams,
   /// and the words are mapped to symbols through it. bos_symbol and
@@ -98,7 +98,7 @@ class ArpaFileParser {
   /// Parser options.
   const ArpaParseOptions& Options() const { return options_; }
 
- protected:
+protected:
   /// Override called before reading starts. This is the point to prepare
   /// any state in the derived class.
   virtual void ReadStarted() { }
@@ -132,7 +132,7 @@ class ArpaFileParser {
   /// N-gram counts. Valid in and after a call to HeaderAvailable().
   const std::vector<int32>& NgramCounts() const { return ngram_counts_; }
 
- private:
+private:
   ArpaParseOptions options_;
   fst::SymbolTable* symbols_;  // Not owned.
   int32 line_number_;

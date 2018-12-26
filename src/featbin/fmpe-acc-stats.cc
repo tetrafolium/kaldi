@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
         feat_diff_rspecifier = po.GetArg(3),
         gselect_rspecifier = po.GetArg(4),
         stats_wxfilename = po.GetArg(5);
-    
+
     Fmpe fmpe;
     ReadKaldiObject(fmpe_rxfilename, &fmpe);
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     FmpeStats fmpe_stats(fmpe);
 
     int32 num_done = 0, num_err = 0;
-    
+
     for (; !feat_reader.Done(); feat_reader.Next()) {
       std::string key = feat_reader.Key();
       const Matrix<BaseFloat> feat_in(feat_reader.Value());
@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
         fmpe.AccStats(feat_in, gselect, feat_deriv, NULL, &fmpe_stats);
       } else if (feat_deriv.NumCols() == feat_in.NumCols() * 2) { // +indirect.
         SubMatrix<BaseFloat> direct_deriv(feat_deriv, 0, feat_deriv.NumRows(),
-                                          0, feat_in.NumCols()),
-            indirect_deriv(feat_deriv, 0, feat_deriv.NumRows(),
+            0, feat_in.NumCols()),
+        indirect_deriv(feat_deriv, 0, feat_deriv.NumRows(),
                            feat_in.NumCols(), feat_in.NumCols());
         fmpe.AccStats(feat_in, gselect, direct_deriv, &indirect_deriv, &fmpe_stats);
       } else {
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
               << " had errors.";
 
     WriteKaldiObject(fmpe_stats, stats_wxfilename, binary);
-    
+
     return (num_done != 0 ? 0 : 1);
   } catch(const std::exception &e) {
     std::cerr << e.what();

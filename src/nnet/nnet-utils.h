@@ -162,7 +162,7 @@ Real ComputeStdDev(const CuMatrixBase<Real> &mat) {
  */
 template <typename Real>
 void RandGauss(BaseFloat mu, BaseFloat sigma, CuMatrixBase<Real>* mat,
-               struct RandomState* state = NULL) {
+    struct RandomState* state = NULL) {
   // fill temporary matrix with 'Normal' samples,
   Matrix<Real> m(mat->NumRows(), mat->NumCols(), kUndefined);
   for (int32 r = 0; r < m.NumRows(); r++) {
@@ -186,7 +186,7 @@ void RandGauss(BaseFloat mu, BaseFloat sigma, CuMatrixBase<Real>* mat,
  */
 template <typename Real>
 void RandUniform(BaseFloat mu, BaseFloat range, CuMatrixBase<Real>* mat,
-                 struct RandomState* state = NULL) {
+    struct RandomState* state = NULL) {
   // fill temporary matrix with '0..1' samples,
   Matrix<Real> m(mat->NumRows(), mat->NumCols(), kUndefined);
   for (int32 r = 0; r < m.NumRows(); r++) {
@@ -210,7 +210,7 @@ void RandUniform(BaseFloat mu, BaseFloat range, CuMatrixBase<Real>* mat,
  */
 template <typename Real>
 void RandUniform(BaseFloat mu, BaseFloat range, CuVectorBase<Real>* vec,
-                 struct RandomState* state = NULL) {
+    struct RandomState* state = NULL) {
   // fill temporary vector with '0..1' samples,
   Vector<Real> v(vec->Dim(), kUndefined);
   for (int32 i = 0; i < v.Dim(); i++) {
@@ -237,7 +237,7 @@ void RandUniform(BaseFloat mu, BaseFloat range, CuVectorBase<Real>* vec,
  * The 'step' has to be positive.
  */
 inline void BuildIntegerVector(const std::vector<std::vector<int32> >& in,
-                               std::vector<int32>* out) {
+    std::vector<int32>* out) {
   // start with empty vector,
   out->clear();
   // loop over records,
@@ -245,24 +245,24 @@ inline void BuildIntegerVector(const std::vector<std::vector<int32> >& in,
     // process i'th record,
     int32 beg = 0, end = 0, step = 1;
     switch (in[i].size()) {
-      case 1:
-        beg  = in[i][0];
-        end  = in[i][0];
-        step = 1;
-        break;
-      case 2:
-        beg  = in[i][0];
-        end  = in[i][1];
-        step = 1;
-        break;
-      case 3:
-        beg  = in[i][0];
-        end  = in[i][2];
-        step = in[i][1];
-        break;
-      default:
-        KALDI_ERR << "Something is wrong! (should be 1-3) : "
-                  << in[i].size();
+    case 1:
+      beg  = in[i][0];
+      end  = in[i][0];
+      step = 1;
+      break;
+    case 2:
+      beg  = in[i][0];
+      end  = in[i][1];
+      step = 1;
+      break;
+    case 3:
+      beg  = in[i][0];
+      end  = in[i][2];
+      step = in[i][1];
+      break;
+    default:
+      KALDI_ERR << "Something is wrong! (should be 1-3) : "
+                << in[i].size();
     }
     // check the inputs,
     KALDI_ASSERT(beg <= end);
@@ -278,7 +278,7 @@ inline void BuildIntegerVector(const std::vector<std::vector<int32> >& in,
  * Wrapper with 'CuArray<int32>' output.
  */
 inline void BuildIntegerVector(const std::vector<std::vector<int32> >& in,
-                               CuArray<int32>* out) {
+    CuArray<int32>* out) {
   std::vector<int32> v;
   BuildIntegerVector(in, &v);
   (*out) = v;
@@ -290,7 +290,7 @@ inline void BuildIntegerVector(const std::vector<std::vector<int32> >& in,
  */
 template <typename Real>
 void PosteriorToMatrix(const Posterior &post,
-                       const int32 post_dim, CuMatrix<Real> *mat) {
+    const int32 post_dim, CuMatrix<Real> *mat) {
   Matrix<Real> m;
   PosteriorToMatrix(post, post_dim, &m);
   (*mat) = m;
@@ -302,8 +302,8 @@ void PosteriorToMatrix(const Posterior &post,
  */
 template <typename Real>
 void PosteriorToPdfMatrix(const Posterior &post,
-                          const TransitionModel &model,
-                          CuMatrix<Real> *mat) {
+    const TransitionModel &model,
+    CuMatrix<Real> *mat) {
   Matrix<BaseFloat> m;
   PosteriorToPdfMatrix(post, model, &m);
   // Copy to output GPU matrix,

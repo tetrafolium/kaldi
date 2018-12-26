@@ -51,7 +51,7 @@ void ComputePowerSpectrum(VectorBase<BaseFloat> *waveform) {
 }
 
 
-DeltaFeatures::DeltaFeatures(const DeltaFeaturesOptions &opts): opts_(opts) {
+DeltaFeatures::DeltaFeatures(const DeltaFeaturesOptions &opts) : opts_(opts) {
   KALDI_ASSERT(opts.order >= 0 && opts.order < 1000);  // just make sure we don't get binary junk.
   // opts will normally be 2 or 3.
   KALDI_ASSERT(opts.window > 0 && opts.window < 1000);  // again, basic sanity check.
@@ -63,7 +63,7 @@ DeltaFeatures::DeltaFeatures(const DeltaFeaturesOptions &opts): opts_(opts) {
 
   for (int32 i = 1; i <= opts.order; i++) {
     Vector<BaseFloat> &prev_scales = scales_[i-1],
-        &cur_scales = scales_[i];
+    &cur_scales = scales_[i];
     int32 window = opts.window;  // this code is designed to still
     // work if instead we later make it an array and do opts.window[i-1],
     // or something like that. "window" is a parameter specifying delta-window
@@ -86,8 +86,8 @@ DeltaFeatures::DeltaFeatures(const DeltaFeaturesOptions &opts): opts_(opts) {
 }
 
 void DeltaFeatures::Process(const MatrixBase<BaseFloat> &input_feats,
-                            int32 frame,
-                            VectorBase<BaseFloat> *output_frame) const {
+    int32 frame,
+    VectorBase<BaseFloat> *output_frame) const {
   KALDI_ASSERT(frame < input_feats.NumRows());
   int32 num_frames = input_feats.NumRows(),
       feat_dim = input_feats.NumCols();
@@ -111,7 +111,7 @@ void DeltaFeatures::Process(const MatrixBase<BaseFloat> &input_feats,
 }
 
 ShiftedDeltaFeatures::ShiftedDeltaFeatures(
-  const ShiftedDeltaFeaturesOptions &opts): opts_(opts) {
+  const ShiftedDeltaFeaturesOptions &opts) : opts_(opts) {
   KALDI_ASSERT(opts.window > 0 && opts.window < 1000);
 
   // Default window is 1.
@@ -127,8 +127,8 @@ ShiftedDeltaFeatures::ShiftedDeltaFeatures(
 }
 
 void ShiftedDeltaFeatures::Process(const MatrixBase<BaseFloat> &input_feats,
-                            int32 frame,
-                            SubVector<BaseFloat> *output_frame) const {
+    int32 frame,
+    SubVector<BaseFloat> *output_frame) const {
   KALDI_ASSERT(frame < input_feats.NumRows());
   int32 num_frames = input_feats.NumRows(),
       feat_dim = input_feats.NumCols();
@@ -158,8 +158,8 @@ void ShiftedDeltaFeatures::Process(const MatrixBase<BaseFloat> &input_feats,
 }
 
 void ComputeDeltas(const DeltaFeaturesOptions &delta_opts,
-                   const MatrixBase<BaseFloat> &input_features,
-                   Matrix<BaseFloat> *output_features) {
+    const MatrixBase<BaseFloat> &input_features,
+    Matrix<BaseFloat> *output_features) {
   output_features->Resize(input_features.NumRows(),
                           input_features.NumCols()
                           *(delta_opts.order + 1));
@@ -171,8 +171,8 @@ void ComputeDeltas(const DeltaFeaturesOptions &delta_opts,
 }
 
 void ComputeShiftedDeltas(const ShiftedDeltaFeaturesOptions &delta_opts,
-                   const MatrixBase<BaseFloat> &input_features,
-                   Matrix<BaseFloat> *output_features) {
+    const MatrixBase<BaseFloat> &input_features,
+    Matrix<BaseFloat> *output_features) {
   output_features->Resize(input_features.NumRows(),
                           input_features.NumCols()
                           * (delta_opts.num_blocks + 1));
@@ -198,14 +198,14 @@ void InitIdftBases(int32 n_bases, int32 dimension, Matrix<BaseFloat> *mat_out) {
     }
 
     (*mat_out)(i, dimension -1)
-        = scale * cos(angle * i_fl * static_cast<BaseFloat>(dimension-1));
+      = scale * cos(angle * i_fl * static_cast<BaseFloat>(dimension-1));
   }
 }
 
 void SpliceFrames(const MatrixBase<BaseFloat> &input_features,
-                  int32 left_context,
-                  int32 right_context,
-                  Matrix<BaseFloat> *output_features) {
+    int32 left_context,
+    int32 right_context,
+    Matrix<BaseFloat> *output_features) {
   int32 T = input_features.NumRows(), D = input_features.NumCols();
   if (T == 0 || D == 0)
     KALDI_ERR << "SpliceFrames: empty input";
@@ -219,14 +219,14 @@ void SpliceFrames(const MatrixBase<BaseFloat> &input_features,
       if (t2 < 0) t2 = 0;
       if (t2 >= T) t2 = T-1;
       SubVector<BaseFloat> dst(dst_row, j*D, D),
-          src(input_features, t2);
+      src(input_features, t2);
       dst.CopyFromVec(src);
     }
   }
 }
 
 void ReverseFrames(const MatrixBase<BaseFloat> &input_features,
-                   Matrix<BaseFloat> *output_features) {
+    Matrix<BaseFloat> *output_features) {
   int32 T = input_features.NumRows(), D = input_features.NumCols();
   if (T == 0 || D == 0)
     KALDI_ERR << "ReverseFrames: empty input";
@@ -248,8 +248,8 @@ void SlidingWindowCmnOptions::Check() const {
 
 // Internal version of SlidingWindowCmn with double-precision arguments.
 void SlidingWindowCmnInternal(const SlidingWindowCmnOptions &opts,
-                              const MatrixBase<double> &input,
-                              MatrixBase<double> *output) {
+    const MatrixBase<double> &input,
+    MatrixBase<double> *output) {
   opts.Check();
   int32 num_frames = input.NumRows(), dim = input.NumCols();
 
@@ -281,9 +281,9 @@ void SlidingWindowCmnInternal(const SlidingWindowCmnOptions &opts,
     }
     if (last_window_start == -1) {
       SubMatrix<double> input_part(input,
-                                      window_start, window_end - window_start,
-                                      0, dim);
-      cur_sum.AddRowSumMat(1.0, input_part , 0.0);
+          window_start, window_end - window_start,
+          0, dim);
+      cur_sum.AddRowSumMat(1.0, input_part, 0.0);
       if (opts.normalize_variance)
         cur_sumsq.AddDiagMat2(1.0, input_part, kTrans, 0.0);
     } else {
@@ -308,7 +308,7 @@ void SlidingWindowCmnInternal(const SlidingWindowCmnOptions &opts,
 
     KALDI_ASSERT(window_frames > 0);
     SubVector<double> input_frame(input, t),
-        output_frame(*output, t);
+    output_frame(*output, t);
     output_frame.CopyFromVec(input_frame);
     output_frame.AddVec(-1.0 / window_frames, cur_sum);
 
@@ -335,8 +335,8 @@ void SlidingWindowCmnInternal(const SlidingWindowCmnOptions &opts,
 
 
 void SlidingWindowCmn(const SlidingWindowCmnOptions &opts,
-                      const MatrixBase<BaseFloat> &input,
-                      MatrixBase<BaseFloat> *output) {
+    const MatrixBase<BaseFloat> &input,
+    MatrixBase<BaseFloat> *output) {
   KALDI_ASSERT(SameDim(input, *output) && input.NumRows() > 0);
   Matrix<double> input_dbl(input), output_dbl(input.NumRows(), input.NumCols());
   // calll double-precision version

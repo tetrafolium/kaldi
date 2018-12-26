@@ -106,8 +106,8 @@ void EnsureClusterableVectorNotNull(std::vector<Clusterable*> *stats) {
 }
 
 void AddToClusters(const std::vector<Clusterable*> &stats,
-                   const std::vector<int32> &assignments,
-                   std::vector<Clusterable*> *clusters) {
+    const std::vector<int32> &assignments,
+    std::vector<Clusterable*> *clusters) {
   KALDI_ASSERT(assignments.size() == stats.size());
   int32 size = stats.size();
   if (size == 0) return;  // Nothing to do.
@@ -121,16 +121,16 @@ void AddToClusters(const std::vector<Clusterable*> &stats,
       if ((*clusters)[assignments[i]] == NULL)
         (*clusters)[assignments[i]] = stats[i]->Copy();
       else
-        (*clusters)[assignments[i]]->Add(*(stats[i]));
+        (*clusters)[assignments[i]] -> Add(*(stats[i]));
     }
   }
 }
 
 
 void AddToClustersOptimized(const std::vector<Clusterable*> &stats,
-                            const std::vector<int32> &assignments,
-                            const Clusterable &total,
-                            std::vector<Clusterable*> *clusters) {
+const std::vector<int32> &assignments,
+const Clusterable &total,
+std::vector<Clusterable*> *clusters) {
 #ifdef KALDI_PARANOID
   // Make sure "total" is actually the sum of stats in "stats".
   {
@@ -145,7 +145,7 @@ void AddToClustersOptimized(const std::vector<Clusterable*> &stats,
   if (size == 0) return;  // Nothing to do.
   KALDI_ASSERT(clusters != NULL);
   int32 num_clust = 1 + *std::max_element(assignments.begin(),
-                                          assignments.end());
+      assignments.end());
   if (static_cast<int32> (clusters->size()) < num_clust)
     clusters->resize(num_clust, NULL);  // extend with NULLs.
   std::vector<int32> num_stats_for_cluster(num_clust, 0);
@@ -166,7 +166,7 @@ void AddToClustersOptimized(const std::vector<Clusterable*> &stats,
       if ((*clusters)[c] == NULL)
         (*clusters)[c] = total.Copy();
       else
-        (*clusters)[c]->Add(total);
+        (*clusters)[c] -> Add(total);
       break;
     }
   }
@@ -176,12 +176,12 @@ void AddToClustersOptimized(const std::vector<Clusterable*> &stats,
       int32 assignment = assignments[i];
       if (assignment != (int32) subtract_index) {
         if ((*clusters)[assignment] == NULL)
-          (*clusters)[assignment] = stats[i]->Copy();
+          (*clusters)[assignment] = stats[i] -> Copy();
         else
-          (*clusters)[assignment]->Add(*(stats[i]));
+          (*clusters)[assignment] -> Add(*(stats[i]));
       }
       if (subtract_index != -1 && assignment != subtract_index)
-        (*clusters)[subtract_index]->Sub(*(stats[i]));
+        (*clusters)[subtract_index] -> Sub(*(stats[i]));
     }
   }
 }
@@ -191,16 +191,16 @@ void AddToClustersOptimized(const std::vector<Clusterable*> &stats,
 // ============================================================================
 
 class BottomUpClusterer {
- public:
+public:
   BottomUpClusterer(const std::vector<Clusterable*> &points,
-                    BaseFloat max_merge_thresh,
-                    int32 min_clust,
-                    std::vector<Clusterable*> *clusters_out,
-                    std::vector<int32> *assignments_out)
-      : ans_(0.0), points_(points), max_merge_thresh_(max_merge_thresh),
-        min_clust_(min_clust), clusters_(clusters_out != NULL? clusters_out
-            : &tmp_clusters_), assignments_(assignments_out != NULL ?
-                assignments_out : &tmp_assignments_) {
+      BaseFloat max_merge_thresh,
+      int32 min_clust,
+      std::vector<Clusterable*> *clusters_out,
+      std::vector<int32> *assignments_out)
+    : ans_(0.0), points_(points), max_merge_thresh_(max_merge_thresh),
+    min_clust_(min_clust), clusters_(clusters_out != NULL? clusters_out
+        : &tmp_clusters_), assignments_(assignments_out != NULL ?
+        assignments_out : &tmp_assignments_) {
     nclusters_ = npoints_ = points.size();
     dist_vec_.resize((npoints_ * (npoints_ - 1)) / 2);
   }
@@ -208,7 +208,7 @@ class BottomUpClusterer {
   BaseFloat Cluster();
   ~BottomUpClusterer() { DeletePointers(&tmp_clusters_); }
 
- private:
+private:
   void Renumber();
   void InitializeAssignments();
   void SetInitialDistances();  ///< Sets up distances and queue.
@@ -242,7 +242,7 @@ class BottomUpClusterer {
   typedef std::pair<BaseFloat, std::pair<uint_smaller, uint_smaller> > QueueElement;
   // Priority queue using greater (lowest distances are highest priority).
   typedef std::priority_queue<QueueElement, std::vector<QueueElement>,
-      std::greater<QueueElement>  > QueueType;
+          std::greater<QueueElement>  > QueueType;
   QueueType queue_;
 };
 
@@ -273,7 +273,7 @@ void BottomUpClusterer::Renumber() {
   }
 
 // Commented the following out since it was causing the process to take up too
-// much memory with larger models. While the swap() method of STL types swaps 
+// much memory with larger models. While the swap() method of STL types swaps
 // the data pointers, std::swap() creates a temporary copy. -Arnab
 //  KALDI_VLOG(2) << "Freeing up the queue";
 //   // first free up memory by getting rid of queue.  this is a special trick
@@ -317,7 +317,7 @@ void BottomUpClusterer::InitializeAssignments() {
   clusters_->resize(npoints_);
   assignments_->resize(npoints_);
   for (int32 i = 0; i < npoints_; i++) {  // initialize as 1-1 mapping.
-    (*clusters_)[i] = points_[i]->Copy();
+    (*clusters_)[i] = points_[i] -> Copy();
     (*assignments_)[i] = i;
   }
 }
@@ -325,11 +325,11 @@ void BottomUpClusterer::InitializeAssignments() {
 void BottomUpClusterer::SetInitialDistances() {
   for (int32 i = 0; i < npoints_; i++) {
     for (int32 j = 0; j < i; j++) {
-      BaseFloat dist = (*clusters_)[i]->Distance(*((*clusters_)[j]));
+      BaseFloat dist = (*clusters_)[i] -> Distance(*((*clusters_)[j]));
       dist_vec_[(i * (i - 1)) / 2 + j] = dist;
       if (dist <= max_merge_thresh_)
         queue_.push(std::make_pair(dist, std::make_pair(static_cast<uint_smaller>(i),
-            static_cast<uint_smaller>(j))));
+        static_cast<uint_smaller>(j))));
     }
   }
 }
@@ -344,7 +344,7 @@ bool BottomUpClusterer::CanMerge(int32 i, int32 j, BaseFloat dist) {
 
 void BottomUpClusterer::MergeClusters(int32 i, int32 j) {
   KALDI_ASSERT(i != j && i < npoints_ && j < npoints_);
-  (*clusters_)[i]->Add(*((*clusters_)[j]));
+  (*clusters_)[i] -> Add(*((*clusters_)[j]));
   delete (*clusters_)[j];
   (*clusters_)[j] = NULL;
   // note that we may have to follow the chain within "assignment_" to get
@@ -388,8 +388,8 @@ void BottomUpClusterer::ReconstructQueue() {
 
 void BottomUpClusterer::SetDistance(int32 i, int32 j) {
   KALDI_ASSERT(i < npoints_ && j < i && (*clusters_)[i] != NULL
-         && (*clusters_)[j] != NULL);
-  BaseFloat dist = (*clusters_)[i]->Distance(*((*clusters_)[j]));
+      && (*clusters_)[j] != NULL);
+  BaseFloat dist = (*clusters_)[i] -> Distance(*((*clusters_)[j]));
   dist_vec_[(i * (i - 1)) / 2 + j] = dist;  // set the distance in the array.
   if (dist < max_merge_thresh_) {
     queue_.push(std::make_pair(dist, std::make_pair(static_cast<uint_smaller>(i),
@@ -405,10 +405,10 @@ void BottomUpClusterer::SetDistance(int32 i, int32 j) {
 
 
 BaseFloat ClusterBottomUp(const std::vector<Clusterable*> &points,
-                          BaseFloat max_merge_thresh,
-                          int32 min_clust,
-                          std::vector<Clusterable*> *clusters_out,
-                          std::vector<int32> *assignments_out) {
+    BaseFloat max_merge_thresh,
+    int32 min_clust,
+    std::vector<Clusterable*> *clusters_out,
+    std::vector<int32> *assignments_out) {
   KALDI_ASSERT(max_merge_thresh >= 0.0 && min_clust >= 0);
   KALDI_ASSERT(!ContainsNullPointers(points));
   int32 npoints = points.size();
@@ -432,7 +432,7 @@ struct CompBotClustElem {
   BaseFloat dist;
   int32 compartment, point1, point2;
   CompBotClustElem(BaseFloat d, int32 comp, int32 i, int32 j)
-      : dist(d), compartment(comp), point1(i), point2(j) {}
+    : dist(d), compartment(comp), point1(i), point2(j) {}
 };
 
 bool operator > (const CompBotClustElem &a, const CompBotClustElem &b) {
@@ -440,12 +440,12 @@ bool operator > (const CompBotClustElem &a, const CompBotClustElem &b) {
 }
 
 class CompartmentalizedBottomUpClusterer {
- public:
+public:
   CompartmentalizedBottomUpClusterer(
-      const vector< vector<Clusterable*> > &points, BaseFloat max_merge_thresh,
-      int32 min_clust)
-      : points_(points), max_merge_thresh_(max_merge_thresh),
-        min_clust_(min_clust) {
+    const vector< vector<Clusterable*> > &points, BaseFloat max_merge_thresh,
+    int32 min_clust)
+    : points_(points), max_merge_thresh_(max_merge_thresh),
+    min_clust_(min_clust) {
     ncompartments_ = points.size();
     nclusters_ = 0;
     npoints_.resize(ncompartments_);
@@ -455,14 +455,14 @@ class CompartmentalizedBottomUpClusterer {
     }
   }
   BaseFloat Cluster(vector< vector<Clusterable*> > *clusters_out,
-                    vector< vector<int32> > *assignments_out);
+      vector< vector<int32> > *assignments_out);
   ~CompartmentalizedBottomUpClusterer() {
     for (vector< vector<Clusterable*> >::iterator itr = clusters_.begin(),
-         end = clusters_.end(); itr != end; ++itr)
+        end = clusters_.end(); itr != end; ++itr)
       DeletePointers(&(*itr));
   }
 
- private:
+private:
   // Renumbers to make clusters contiguously numbered. Called after clustering.
   // Also processes assignments_ to remove chains of references.
   void Renumber(int32 compartment);
@@ -488,13 +488,13 @@ class CompartmentalizedBottomUpClusterer {
   vector<int32> npoints_;
   // Priority queue using greater (lowest distances are highest priority).
   typedef std::priority_queue< CompBotClustElem, std::vector<CompBotClustElem>,
-      std::greater<CompBotClustElem> > QueueType;
+          std::greater<CompBotClustElem> > QueueType;
   QueueType queue_;
 };
 
 BaseFloat CompartmentalizedBottomUpClusterer::Cluster(
-    vector< vector<Clusterable*> > *clusters_out,
-    vector< vector<int32> > *assignments_out) {
+  vector< vector<Clusterable*> > *clusters_out,
+  vector< vector<int32> > *assignments_out) {
   InitializeAssignments();
   SetInitialDistances();
   BaseFloat total_obj_change = 0;
@@ -508,7 +508,7 @@ BaseFloat CompartmentalizedBottomUpClusterer::Cluster(
   }
   for (int32 comp = 0; comp < ncompartments_; comp++)
     Renumber(comp);
-  if (clusters_out != NULL) clusters_out->swap(clusters_); 
+  if (clusters_out != NULL) clusters_out->swap(clusters_);
   if (assignments_out != NULL) assignments_out->swap(assignments_);
   return total_obj_change;
 }
@@ -565,7 +565,7 @@ void CompartmentalizedBottomUpClusterer::InitializeAssignments() {
     clusters_[comp].resize(npoints_[comp]);
     assignments_[comp].resize(npoints_[comp]);
     for (int32 i = 0; i < npoints_[comp]; i++) {  // initialize as 1-1 mapping.
-      clusters_[comp][i] = points_[comp][i]->Copy();
+      clusters_[comp][i] = points_[comp][i] -> Copy();
       assignments_[comp][i] = i;
     }
   }
@@ -582,7 +582,7 @@ void CompartmentalizedBottomUpClusterer::SetInitialDistances() {
 }
 
 bool CompartmentalizedBottomUpClusterer::CanMerge(int32 comp, int32 i, int32 j,
-                                                  BaseFloat dist) {
+BaseFloat dist) {
   KALDI_ASSERT(comp < ncompartments_ && i < npoints_[comp] && j < i);
   if (clusters_[comp][i] == NULL || clusters_[comp][j] == NULL)
     return false;
@@ -591,9 +591,9 @@ bool CompartmentalizedBottomUpClusterer::CanMerge(int32 comp, int32 i, int32 j,
 }
 
 BaseFloat CompartmentalizedBottomUpClusterer::MergeClusters(int32 comp, int32 i,
-                                                            int32 j) {
+int32 j) {
   KALDI_ASSERT(comp < ncompartments_ && i < npoints_[comp] && j < i);
-  clusters_[comp][i]->Add(*(clusters_[comp][j]));
+  clusters_[comp][i] -> Add(*(clusters_[comp][j]));
   delete clusters_[comp][j];
   clusters_[comp][j] = NULL;
   // note that we may have to follow the chain within "assignment_" to get
@@ -637,10 +637,10 @@ void CompartmentalizedBottomUpClusterer::ReconstructQueue() {
 }
 
 void CompartmentalizedBottomUpClusterer::SetDistance(int32 comp,
-                                                     int32 i, int32 j) {
+    int32 i, int32 j) {
   KALDI_ASSERT(comp < ncompartments_ && i < npoints_[comp] && j < i);
   KALDI_ASSERT(clusters_[comp][i] != NULL && clusters_[comp][j] != NULL);
-  BaseFloat dist = clusters_[comp][i]->Distance(*(clusters_[comp][j]));
+  BaseFloat dist = clusters_[comp][i] -> Distance(*(clusters_[comp][j]));
   dist_vec_[comp][(i * (i - 1)) / 2 + j] = dist;
   if (dist < max_merge_thresh_) {
     queue_.push(CompBotClustElem(dist, comp, static_cast<uint_smaller>(i),
@@ -651,14 +651,14 @@ void CompartmentalizedBottomUpClusterer::SetDistance(int32 comp,
 
 
 BaseFloat ClusterBottomUpCompartmentalized(
-    const std::vector< std::vector<Clusterable*> > &points, BaseFloat thresh,
-    int32 min_clust, std::vector< std::vector<Clusterable*> > *clusters_out,
-    std::vector< std::vector<int32> > *assignments_out) {
+  const std::vector< std::vector<Clusterable*> > &points, BaseFloat thresh,
+  int32 min_clust, std::vector< std::vector<Clusterable*> > *clusters_out,
+  std::vector< std::vector<int32> > *assignments_out) {
   KALDI_ASSERT(thresh >= 0.0 && min_clust >= 0);
   KALDI_ASSERT(min_clust >= points.size());  // Code does not merge compartments.
   int32 npoints = 0;
   for (vector< vector<Clusterable*> >::const_iterator itr = points.begin(),
-           end = points.end(); itr != end; ++itr) {
+      end = points.end(); itr != end; ++itr) {
     KALDI_ASSERT(!ContainsNullPointers(*itr));
     npoints += itr->size();
   }
@@ -670,7 +670,7 @@ BaseFloat ClusterBottomUpCompartmentalized(
   BaseFloat ans = bc.Cluster(clusters_out, assignments_out);
   if (clusters_out) {
     for (vector< vector<Clusterable*> >::iterator itr = clusters_out->begin(),
-             end = clusters_out->end(); itr != end; ++itr) {
+        end = clusters_out->end(); itr != end; ++itr) {
       KALDI_ASSERT(!ContainsNullPointers(*itr));
     }
   }
@@ -684,7 +684,7 @@ BaseFloat ClusterBottomUpCompartmentalized(
 
 class RefineClusterer {
 
- public:
+public:
   // size used in point_info structure (we store a lot of these so don't want
   // to just make it int32). Also used as a time-id (cannot have more moves of
   // points, than can fit in this time). Must be big enough to store num-clust.
@@ -692,11 +692,11 @@ class RefineClusterer {
   typedef uint_smaller ClustIndexInt;
 
   RefineClusterer(const std::vector<Clusterable*> &points,
-                  std::vector<Clusterable*> *clusters,
-                  std::vector<int32> *assignments,
-                  RefineClustersOptions cfg)
-      : points_(points), clusters_(clusters), assignments_(assignments),
-        cfg_(cfg) {
+      std::vector<Clusterable*> *clusters,
+      std::vector<int32> *assignments,
+      RefineClustersOptions cfg)
+    : points_(points), clusters_(clusters), assignments_(assignments),
+    cfg_(cfg) {
     KALDI_ASSERT(cfg_.top_n >= 2);
     num_points_ = points_.size();
     num_clust_ = static_cast<int32> (clusters->size());
@@ -711,7 +711,7 @@ class RefineClusterer {
     clust_time_.resize(num_clust_, 0);
     clust_objf_.resize(num_clust_);
     for (int32 i = 0; i < num_clust_; i++)
-      clust_objf_[i] = (*clusters_)[i]->Objf();
+      clust_objf_[i] = (*clusters_)[i] -> Objf();
     info_.resize(num_points_ * cfg_.top_n);
     ans_ = 0;
     InitPoints();
@@ -723,7 +723,7 @@ class RefineClusterer {
     return ans_;
   }
   // at some point check cfg_.top_n > 1 after maxing to num_clust_.
- private:
+private:
   void InitPoint(int32 point) {
     // Find closest clusters to this point.
     // distances are really negated objf changes, ignoring terms that don't vary with the "other" cluster.
@@ -733,12 +733,12 @@ class RefineClusterer {
     int32 my_clust = (*assignments_)[point];
     Clusterable *point_cl = points_[point];
 
-    for (int32 clust = 0;clust < num_clust_;clust++) {
+    for (int32 clust = 0; clust < num_clust_; clust++) {
       if (clust != my_clust) {
-        Clusterable *tmp = (*clusters_)[clust]->Copy();
+        Clusterable *tmp = (*clusters_)[clust] -> Copy();
         tmp->Add(*point_cl);
         BaseFloat other_clust_objf = clust_objf_[clust];
-        BaseFloat other_clust_plus_me_objf = (*clusters_)[clust]->ObjfPlus(* (points_[point]));
+        BaseFloat other_clust_plus_me_objf = (*clusters_)[clust] -> ObjfPlus(* (points_[point]));
 
         BaseFloat distance = other_clust_objf-other_clust_plus_me_objf;  // negated delta-objf, with only "varying" terms.
         distances.push_back(std::make_pair(distance, (LocalInt)clust));
@@ -751,7 +751,7 @@ class RefineClusterer {
     // top_n-1 is the # of elements we want to retain.  -1 because we need the iterator
     // that points to the end of that range (i.e. not potentially off the end of the array).
 
-    for (int32 index = 0;index < cfg_.top_n-1;index++) {
+    for (int32 index = 0; index < cfg_.top_n-1; index++) {
       point_info &info = GetInfo(point, index);
       int32 clust = distances[index].second;
       info.clust = clust;
@@ -765,23 +765,23 @@ class RefineClusterer {
     point_info &info = GetInfo(point, cfg_.top_n-1);
     info.clust = my_clust;
     info.time = 0;
-    info.objf = (*clusters_)[my_clust]->ObjfMinus(*(points_[point]));
+    info.objf = (*clusters_)[my_clust] -> ObjfMinus(*(points_[point]));
     my_clust_index_[point] = cfg_.top_n-1;
   }
   void InitPoints() {
     // finds, for each point, the closest cfg_.top_n clusters (including its own cluster).
     // this may be the most time-consuming step of the algorithm.
-    for (int32 p = 0;p < num_points_;p++) InitPoint(p);
+    for (int32 p = 0; p < num_points_; p++) InitPoint(p);
   }
   void Iterate() {
     int32 iter, num_iters = cfg_.num_iters;
-    for (iter = 0;iter < num_iters;iter++) {
+    for (iter = 0; iter < num_iters; iter++) {
       int32 cur_t = t_;
-      for (int32 point = 0;point < num_points_;point++) {
+      for (int32 point = 0; point < num_points_; point++) {
         if (t_+1 == 0) {
           KALDI_WARN << "Stopping iterating at int32 moves";
           return;  // once we use up all time points, must return-- this
-                  // should rarely happen as int32 is large.
+                   // should rarely happen as int32 is large.
         }
         ProcessPoint(point);
       }
@@ -795,20 +795,20 @@ class RefineClusterer {
     // array corresponding to current cluster.
     KALDI_ASSERT(new_index < cfg_.top_n  && new_index != old_index);
     point_info &old_info = GetInfo(point, old_index),
-        &new_info = GetInfo(point, new_index);
+    &new_info = GetInfo(point, new_index);
     my_clust_index_[point] = new_index;  // update to new index.
 
     int32 old_clust = old_info.clust, new_clust = new_info.clust;
     KALDI_ASSERT( (*assignments_)[point] == old_clust);
     (*assignments_)[point] = new_clust;
-    (*clusters_)[old_clust]->Sub( *(points_[point]) );
-    (*clusters_)[new_clust]->Add( *(points_[point]) );
+    (*clusters_)[old_clust] -> Sub( *(points_[point]) );
+    (*clusters_)[new_clust] -> Add( *(points_[point]) );
     UpdateClust(old_clust);
     UpdateClust(new_clust);
   }
   void UpdateClust(int32 clust) {
     KALDI_ASSERT(clust < num_clust_);
-    clust_objf_[clust] = (*clusters_)[clust]->Objf();
+    clust_objf_[clust] = (*clusters_)[clust] -> Objf();
     clust_time_[clust] = t_;
   }
   void ProcessPoint(int32 point) {
@@ -825,7 +825,7 @@ class RefineClusterer {
     float own_clust_objf = clust_objf_[self_clust];
     float own_clust_minus_me_objf = self_info.objf;  // objf of own cluster minus self.
     // Now check the other "close" clusters and see if we want to move there.
-           for (int32 index = 0;index < cfg_.top_n;index++) {
+    for (int32 index = 0; index < cfg_.top_n; index++) {
       if (index != self_index) {
         UpdateInfo(point, index);
         point_info &other_info = GetInfo(point, index);
@@ -846,7 +846,7 @@ class RefineClusterer {
   void UpdateInfo(int32 point, int32 idx) {
     point_info &pinfo = GetInfo(point, idx);
     if (pinfo.time < clust_time_[pinfo.clust]) {  // it's not up-to-date...
-      Clusterable *tmp_cl = (*clusters_)[pinfo.clust]->Copy();
+      Clusterable *tmp_cl = (*clusters_)[pinfo.clust] -> Copy();
       if (idx == my_clust_index_[point]) {
         tmp_cl->Sub( *(points_[point]) );
       } else{
@@ -877,7 +877,7 @@ class RefineClusterer {
 
   std::vector<point_info> info_;  // size is [num_points_ * cfg_.top_n].
   std::vector<ClustIndexInt> my_clust_index_;  // says for each point, which index 0...cfg_.top_n-1 currently
-                                            // corresponds to its own cluster.
+                                               // corresponds to its own cluster.
 
   std::vector<LocalInt> clust_time_;  // Modification time of cluster.
   std::vector<BaseFloat> clust_objf_;  // [clust], objf for cluster.
@@ -892,9 +892,9 @@ class RefineClusterer {
 
 
 BaseFloat RefineClusters(const std::vector<Clusterable*> &points,
-                         std::vector<Clusterable*> *clusters,
-                         std::vector<int32> *assignments,
-                         RefineClustersOptions cfg) {
+    std::vector<Clusterable*> *clusters,
+    std::vector<int32> *assignments,
+    RefineClustersOptions cfg) {
 #ifndef KALDI_PARANOID // don't do this check in "paranoid" mode as we want to expose bugs.
   if (cfg.num_iters <= 0) { return 0.0; } // nothing to do.
 #endif
@@ -915,10 +915,10 @@ BaseFloat RefineClusters(const std::vector<Clusterable*> &points,
 /// function improvement versus everything being in one cluster.
 
 BaseFloat ClusterKMeansOnce(const std::vector<Clusterable*> &points,
-                            int32 num_clust,
-                            std::vector<Clusterable*> *clusters_out,
-                            std::vector<int32> *assignments_out,
-                            ClusterKMeansOptions &cfg) {
+    int32 num_clust,
+    std::vector<Clusterable*> *clusters_out,
+    std::vector<int32> *assignments_out,
+    ClusterKMeansOptions &cfg) {
   std::vector<int32> my_assignments;
   int32 num_points = points.size();
   KALDI_ASSERT(clusters_out != NULL);
@@ -945,12 +945,12 @@ BaseFloat ClusterKMeansOnce(const std::vector<Clusterable*> &points,
       }
     }
     int32 i, j, count = 0;
-    for (i = 0, j = 0; count != num_points;i = (i+skip)%num_points, j = (j+1)%num_clust, count++) {
+    for (i = 0, j = 0; count != num_points; i = (i+skip)%num_points, j = (j+1)%num_clust, count++) {
       // i cycles pseudo-randomly through all points; j skips ahead by 1 each time
       // modulo num_points.
       // assign point i to cluster j.
       if ((*clusters_out)[j] == NULL) (*clusters_out)[j] = points[i]->Copy();
-      else (*clusters_out)[j]->Add(*(points[i]));
+      else (*clusters_out)[j] -> Add(*(points[i]));
       (*assignments_out)[i] = j;
     }
   }
@@ -967,7 +967,7 @@ BaseFloat ClusterKMeansOnce(const std::vector<Clusterable*> &points,
     }
     delete all_stats;
   }
-  for (int32 iter = 0;iter < cfg.num_iters;iter++) {
+  for (int32 iter = 0; iter < cfg.num_iters; iter++) {
     // Keep refining clusters by reassigning points.
     BaseFloat objf_before;
     if (cfg.verbose) objf_before =SumClusterableObjf(*clusters_out);
@@ -983,10 +983,10 @@ BaseFloat ClusterKMeansOnce(const std::vector<Clusterable*> &points,
 }
 
 BaseFloat ClusterKMeans(const std::vector<Clusterable*> &points,
-                        int32 num_clust,
-                        std::vector<Clusterable*> *clusters_out,
-                        std::vector<int32> *assignments_out,
-                        ClusterKMeansOptions cfg) {
+int32 num_clust,
+std::vector<Clusterable*> *clusters_out,
+std::vector<int32> *assignments_out,
+ClusterKMeansOptions cfg) {
   if (points.size() == 0) {
     if (clusters_out) KALDI_ASSERT(clusters_out->empty());  // or we wouldn't know whether to free the pointers.
     if (assignments_out) assignments_out->clear();
@@ -996,13 +996,13 @@ BaseFloat ClusterKMeans(const std::vector<Clusterable*> &points,
   if (clusters_out) KALDI_ASSERT(clusters_out->empty());  // or we wouldn't know whether to deallocate.
   if (cfg.num_tries == 1) {
     std::vector<int32> assignments;
-    return ClusterKMeansOnce(points, num_clust, clusters_out, (assignments_out != NULL?assignments_out:&assignments), cfg);
+    return ClusterKMeansOnce(points, num_clust, clusters_out, (assignments_out != NULL? assignments_out:&assignments), cfg);
   } else {  // multiple tries.
     if (clusters_out) {
       KALDI_ASSERT(clusters_out->empty());  // we don't know the ownership of any pointers in there, otherwise.
     }
     BaseFloat best_ans = 0.0;
-    for (int32 i = 0;i < cfg.num_tries;i++) {
+    for (int32 i = 0; i < cfg.num_tries; i++) {
       std::vector<Clusterable*> clusters_tmp;
       std::vector<int32> assignments_tmp;
       BaseFloat ans = ClusterKMeansOnce(points, num_clust, &clusters_tmp, &assignments_tmp, cfg);
@@ -1029,19 +1029,19 @@ BaseFloat ClusterKMeans(const std::vector<Clusterable*> &points,
 // ============================================================================
 
 class TreeClusterer {
- public:
+public:
   TreeClusterer(const std::vector<Clusterable*> &points,
-                int32 max_clust,
-                TreeClusterOptions cfg):
-      points_(points), max_clust_(max_clust), ans_(0.0), cfg_(cfg)
+      int32 max_clust,
+      TreeClusterOptions cfg) :
+    points_(points), max_clust_(max_clust), ans_(0.0), cfg_(cfg)
   {
     KALDI_ASSERT(cfg_.branch_factor > 1);
     Init();
   }
   BaseFloat Cluster(std::vector<Clusterable*> *clusters_out,
-                    std::vector<int32> *assignments_out,
-                    std::vector<int32> *clust_assignments_out,
-                    int32 *num_leaves_out) {
+      std::vector<int32> *assignments_out,
+      std::vector<int32> *clust_assignments_out,
+      int32 *num_leaves_out) {
     while (static_cast<int32>(leaf_nodes_.size()) < max_clust_ && !queue_.empty()) {
       std::pair<BaseFloat, Node*> pr = queue_.top();
       queue_.pop();
@@ -1054,7 +1054,7 @@ class TreeClusterer {
   }
 
   ~TreeClusterer() {
-    for (int32 leaf = 0; leaf < static_cast<int32>(leaf_nodes_.size());leaf++) {
+    for (int32 leaf = 0; leaf < static_cast<int32>(leaf_nodes_.size()); leaf++) {
       delete leaf_nodes_[leaf]->node_total;
       DeletePointers(&(leaf_nodes_[leaf]->leaf.clusters));
       delete leaf_nodes_[leaf];
@@ -1066,7 +1066,7 @@ class TreeClusterer {
   }
 
 
- private:
+private:
   struct Node {
     bool is_leaf;
     int32 index;  // index into leaf_nodes or nonleaf_nodes as applicable.
@@ -1085,10 +1085,10 @@ class TreeClusterer {
 
 
   void CreateOutput(std::vector<Clusterable*> *clusters_out,
-                    std::vector<int32> *assignments_out,
-                    std::vector<int32> *clust_assignments_out,
-                    int32 *num_leaves_out) {
-   if (num_leaves_out) *num_leaves_out = leaf_nodes_.size();
+      std::vector<int32> *assignments_out,
+      std::vector<int32> *clust_assignments_out,
+      int32 *num_leaves_out) {
+    if (num_leaves_out) *num_leaves_out = leaf_nodes_.size();
     if (assignments_out)
       CreateAssignmentsOutput(assignments_out);
     if (clust_assignments_out)
@@ -1114,7 +1114,7 @@ class TreeClusterer {
       }
     }
 #ifdef KALDI_PARANOID
-    for (size_t i = 0;i<assignments_out->size();i++) KALDI_ASSERT((*assignments_out)[i] != (int32)(-1));
+    for (size_t i = 0; i<assignments_out->size(); i++) KALDI_ASSERT((*assignments_out)[i] != (int32)(-1));
 #endif
   }
   void CreateClustAssignmentsOutput(std::vector<int32> *clust_assignments_out) {
@@ -1135,7 +1135,7 @@ class TreeClusterer {
       int32 parent_index;
       if (nonleaf_nodes_[nonleaf]->parent == NULL) parent_index = index;  // top node.  make it own parent.
       else {
-        KALDI_ASSERT(! nonleaf_nodes_[nonleaf]->parent->is_leaf);  // parent is nonleaf since child is nonleaf.
+        KALDI_ASSERT(!nonleaf_nodes_[nonleaf]->parent->is_leaf);   // parent is nonleaf since child is nonleaf.
         parent_index = NonleafOutputIndex(nonleaf_nodes_[nonleaf]->parent->index);
       }
       (*clust_assignments_out)[index] = parent_index;
@@ -1157,7 +1157,7 @@ class TreeClusterer {
     KALDI_ASSERT(node->is_leaf && node->leaf.best_split > cfg_.thresh*0.999);  // 0.999 is to avoid potential floating-point weirdness under compiler optimizations.
     KALDI_ASSERT(node->children.size() == 0);
     node->children.resize(cfg_.branch_factor);
-    for (int32 i = 0;i < cfg_.branch_factor;i++) {
+    for (int32 i = 0; i < cfg_.branch_factor; i++) {
       Node *child = new Node;
       node->children[i] = child;
       child->is_leaf = true;
@@ -1187,7 +1187,7 @@ class TreeClusterer {
     node->is_leaf = false;
     node->index = nonleaf_nodes_.size();  // new index at end of nonleaf_nodes_.
     nonleaf_nodes_.push_back(node);
-    for (int32 i = 0;i < static_cast<int32>(cfg_.branch_factor);i++)
+    for (int32 i = 0; i < static_cast<int32>(cfg_.branch_factor); i++)
       FindBestSplit(node->children[i]);
   }
   void FindBestSplit(Node *node) {
@@ -1219,7 +1219,7 @@ class TreeClusterer {
     top_node->leaf.points = points_;
     top_node->node_total = SumClusterable(points_);
     top_node->leaf.point_indices.resize(points_.size());
-    for (size_t i = 0;i<points_.size();i++) top_node->leaf.point_indices[i] = i;
+    for (size_t i = 0; i<points_.size(); i++) top_node->leaf.point_indices[i] = i;
     FindBestSplit(top_node);  // this should always be called when new node is created.
   }
 
@@ -1237,12 +1237,12 @@ class TreeClusterer {
 
 
 BaseFloat TreeCluster(const std::vector<Clusterable*> &points,
-                      int32 max_clust,  // this is a max only.
-                      std::vector<Clusterable*> *clusters_out,
-                      std::vector<int32> *assignments_out,
-                      std::vector<int32> *clust_assignments_out,
-                      int32 *num_leaves_out,
-                      TreeClusterOptions cfg) {
+    int32 max_clust,                    // this is a max only.
+    std::vector<Clusterable*> *clusters_out,
+    std::vector<int32> *assignments_out,
+    std::vector<int32> *clust_assignments_out,
+    int32 *num_leaves_out,
+    TreeClusterOptions cfg) {
   if (points.size() == 0) {
     if (clusters_out) clusters_out->clear();
     if (assignments_out) assignments_out->clear();
@@ -1258,14 +1258,14 @@ BaseFloat TreeCluster(const std::vector<Clusterable*> &points,
 
 
 BaseFloat ClusterTopDown(const std::vector<Clusterable*> &points,
-                         int32 max_clust,  // max # of clusters.
-                         std::vector<Clusterable*> *clusters_out,
-                         std::vector<int32> *assignments_out,
-                         TreeClusterOptions cfg) {
+    int32 max_clust,                       // max # of clusters.
+    std::vector<Clusterable*> *clusters_out,
+    std::vector<int32> *assignments_out,
+    TreeClusterOptions cfg) {
   int32 num_leaves = 0;
   BaseFloat ans = TreeCluster(points, max_clust, clusters_out, assignments_out, NULL, &num_leaves, cfg);
   if (clusters_out != NULL) {
-    for (size_t j = num_leaves;j<clusters_out->size();j++) delete (*clusters_out)[j];
+    for (size_t j = num_leaves; j<clusters_out->size(); j++) delete (*clusters_out)[j];
     clusters_out->resize(num_leaves);  // number of leaf-level clusters in tree.
   }
   return ans;

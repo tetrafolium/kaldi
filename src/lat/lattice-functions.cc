@@ -63,7 +63,7 @@ void GetPerFrameAcousticCosts(const Lattice &nbest, Vector<BaseFloat> *per_frame
         }
         loglikes.push_back(acwt);
         prev_frame++;
-      } else if (acwt == acwt){
+      } else if (acwt == acwt) {
         if (prev_frame > -1) {
           loglikes[prev_frame] += acwt;
         } else {
@@ -134,7 +134,7 @@ int32 CompactLatticeStateTimes(const CompactLattice &lat, vector<int32> *times) 
       else {
         if (this_utt_len != utt_len) {
           KALDI_WARN << "Utterance does not "
-              "seem to have a consistent length.";
+            "seem to have a consistent length.";
           utt_len = std::max(utt_len, this_utt_len);
         }
       }
@@ -148,7 +148,7 @@ int32 CompactLatticeStateTimes(const CompactLattice &lat, vector<int32> *times) 
 }
 
 bool ComputeCompactLatticeAlphas(const CompactLattice &clat,
-                                 vector<double> *alpha) {
+    vector<double> *alpha) {
   using namespace fst;
 
   // typedef the arc, weight types
@@ -186,7 +186,7 @@ bool ComputeCompactLatticeAlphas(const CompactLattice &clat,
 }
 
 bool ComputeCompactLatticeBetas(const CompactLattice &clat,
-                                vector<double> *beta) {
+    vector<double> *beta) {
   using namespace fst;
 
   // typedef the arc, weight types
@@ -244,7 +244,7 @@ bool PruneLattice(BaseFloat beam, LatType *lat) {
   int32 num_states = lat->NumStates();
   if (num_states == 0) return false;
   std::vector<double> forward_cost(num_states,
-                                   std::numeric_limits<double>::infinity());  // viterbi forward.
+      std::numeric_limits<double>::infinity());                               // viterbi forward.
   forward_cost[start] = 0.0; // lattice can't have cycles so couldn't be
   // less than this.
   double best_final_cost = std::numeric_limits<double>::infinity();
@@ -253,8 +253,8 @@ bool PruneLattice(BaseFloat beam, LatType *lat) {
   for (int32 state = 0; state < num_states; state++) {
     double this_forward_cost = forward_cost[state];
     for (fst::ArcIterator<LatType> aiter(*lat, state);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       const Arc &arc(aiter.Value());
       StateId nextstate = arc.nextstate;
       KALDI_ASSERT(nextstate > state && nextstate < num_states);
@@ -285,8 +285,8 @@ bool PruneLattice(BaseFloat beam, LatType *lat) {
         && this_backward_cost != std::numeric_limits<double>::infinity())
       lat->SetFinal(state, Weight::Zero());
     for (fst::MutableArcIterator<LatType> aiter(lat, state);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       Arc arc(aiter.Value());
       StateId nextstate = arc.nextstate;
       KALDI_ASSERT(nextstate > state && nextstate < num_states);
@@ -312,7 +312,7 @@ template bool PruneLattice(BaseFloat beam, CompactLattice *lat);
 
 
 BaseFloat LatticeForwardBackward(const Lattice &lat, Posterior *post,
-                                 double *acoustic_like_sum) {
+    double *acoustic_like_sum) {
   // Note, Posterior is defined as follows:  Indexed [frame], then a list
   // of (transition-id, posterior-probability) pairs.
   // typedef std::vector<std::vector<std::pair<int32, BaseFloat> > > Posterior;
@@ -378,7 +378,7 @@ BaseFloat LatticeForwardBackward(const Lattice &lat, Posterior *post,
       }
     }
     if (acoustic_like_sum != NULL && f != Weight::Zero()) {
-      double final_logprob = - ConvertToCost(f),
+      double final_logprob = -ConvertToCost(f),
           posterior = Exp(alpha[s] + final_logprob - tot_forward_prob);
       *acoustic_like_sum -= posterior * f.Value2();
     }
@@ -387,7 +387,7 @@ BaseFloat LatticeForwardBackward(const Lattice &lat, Posterior *post,
   double tot_backward_prob = beta[0];
   if (!ApproxEqual(tot_forward_prob, tot_backward_prob, 1e-8)) {
     KALDI_WARN << "Total forward probability over lattice = " << tot_forward_prob
-              << ", while total backward probability = " << tot_backward_prob;
+               << ", while total backward probability = " << tot_backward_prob;
   }
   // Now combine any posteriors with the same transition-id.
   for (int32 t = 0; t < max_time; t++)
@@ -397,8 +397,8 @@ BaseFloat LatticeForwardBackward(const Lattice &lat, Posterior *post,
 
 
 void LatticeActivePhones(const Lattice &lat, const TransitionModel &trans,
-                         const vector<int32> &silence_phones,
-                         vector< std::set<int32> > *active_phones) {
+    const vector<int32> &silence_phones,
+    vector< std::set<int32> > *active_phones) {
   KALDI_ASSERT(IsSortedAndUniq(silence_phones));
   vector<int32> state_times;
   int32 num_states = lat.NumStates();
@@ -421,7 +421,7 @@ void LatticeActivePhones(const Lattice &lat, const TransitionModel &trans,
 }
 
 void ConvertLatticeToPhones(const TransitionModel &trans,
-                            Lattice *lat) {
+    Lattice *lat) {
   typedef LatticeArc Arc;
   int32 num_states = lat->NumStates();
   for (int32 state = 0; state < num_states; state++) {
@@ -432,7 +432,7 @@ void ConvertLatticeToPhones(const TransitionModel &trans,
       if ((arc.ilabel != 0) // has a transition-id on input..
           && (trans.TransitionIdToHmmState(arc.ilabel) == 0)
           && (!trans.IsSelfLoop(arc.ilabel)))
-         // && trans.IsFinal(arc.ilabel)) // there is one of these per phone...
+        // && trans.IsFinal(arc.ilabel)) // there is one of these per phone...
         arc.olabel = trans.TransitionIdToPhone(arc.ilabel);
       aiter.SetValue(arc);
     }  // end looping over arcs
@@ -449,9 +449,9 @@ static inline double LogAddOrMax(bool viterbi, double a, double b) {
 
 template<typename LatticeType>
 double ComputeLatticeAlphasAndBetas(const LatticeType &lat,
-                                    bool viterbi,
-                                    vector<double> *alpha,
-                                    vector<double> *beta) {
+    bool viterbi,
+    vector<double> *alpha,
+    vector<double> *beta) {
   typedef typename LatticeType::Arc Arc;
   typedef typename Arc::Weight Weight;
   typedef typename Arc::StateId StateId;
@@ -468,7 +468,7 @@ double ComputeLatticeAlphasAndBetas(const LatticeType &lat,
   for (StateId s = 0; s < num_states; s++) {
     double this_alpha = (*alpha)[s];
     for (fst::ArcIterator<LatticeType> aiter(lat, s); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       const Arc &arc = aiter.Value();
       double arc_like = -ConvertToCost(arc.weight);
       (*alpha)[arc.nextstate] = LogAddOrMax(viterbi, (*alpha)[arc.nextstate],
@@ -483,7 +483,7 @@ double ComputeLatticeAlphasAndBetas(const LatticeType &lat,
   for (StateId s = num_states-1; s >= 0; s--) { // it's guaranteed signed.
     double this_beta = -ConvertToCost(lat.Final(s));
     for (fst::ArcIterator<LatticeType> aiter(lat, s); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       const Arc &arc = aiter.Value();
       double arc_like = -ConvertToCost(arc.weight),
           arc_beta = (*beta)[arc.nextstate] + arc_like;
@@ -503,15 +503,15 @@ double ComputeLatticeAlphasAndBetas(const LatticeType &lat,
 // instantiate the template for Lattice and CompactLattice
 template
 double ComputeLatticeAlphasAndBetas(const Lattice &lat,
-                                    bool viterbi,
-                                    vector<double> *alpha,
-                                    vector<double> *beta);
+    bool viterbi,
+    vector<double> *alpha,
+    vector<double> *beta);
 
 template
 double ComputeLatticeAlphasAndBetas(const CompactLattice &lat,
-                                    bool viterbi,
-                                    vector<double> *alpha,
-                                    vector<double> *beta);
+    bool viterbi,
+    vector<double> *alpha,
+    vector<double> *beta);
 
 
 
@@ -527,7 +527,7 @@ struct LatticeArcRecord {
 };
 
 void CompactLatticeLimitDepth(int32 max_depth_per_frame,
-                              CompactLattice *clat) {
+    CompactLattice *clat) {
   typedef CompactLatticeArc Arc;
   typedef Arc::Weight Weight;
   typedef Arc::StateId StateId;
@@ -556,14 +556,14 @@ void CompactLatticeLimitDepth(int32 max_depth_per_frame,
   StateId num_states = clat->NumStates();
   for (StateId s = 0; s < num_states; s++) {
     for (fst::ArcIterator<CompactLattice> aiter(*clat, s); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       const Arc &arc = aiter.Value();
       LatticeArcRecord arc_record;
       arc_record.state = s;
       arc_record.arc = aiter.Position();
       arc_record.logprob =
           (alpha[s] + beta[arc.nextstate] - ConvertToCost(arc.weight))
-           - best_prob;
+          - best_prob;
       KALDI_ASSERT(arc_record.logprob < 0.1); // Should be zero or negative.
       int32 num_frames = arc.weight.String().size(), start_t = state_times[s];
       for (int32 t = start_t; t < start_t + num_frames; t++) {
@@ -623,7 +623,7 @@ void TopSortLatticeIfNeeded(Lattice *lat) {
 /// arcs crossing any given frame.  Returns 1 for empty lattices.
 /// Requires that input is topologically sorted.
 BaseFloat CompactLatticeDepth(const CompactLattice &clat,
-                              int32 *num_frames) {
+    int32 *num_frames) {
   typedef CompactLattice::Arc::StateId StateId;
   if (clat.Properties(fst::kTopSorted, true) == 0) {
     KALDI_ERR << "Lattice input to CompactLatticeDepth was not topologically "
@@ -643,7 +643,7 @@ BaseFloat CompactLatticeDepth(const CompactLattice &clat,
     *num_frames = t;
   for (StateId s = 0; s < clat.NumStates(); s++) {
     for (fst::ArcIterator<CompactLattice> aiter(clat, s); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       const CompactLatticeArc &arc = aiter.Value();
       num_arc_frames += arc.weight.String().size();
     }
@@ -654,7 +654,7 @@ BaseFloat CompactLatticeDepth(const CompactLattice &clat,
 
 
 void CompactLatticeDepthPerFrame(const CompactLattice &clat,
-                                 std::vector<int32> *depth_per_frame) {
+    std::vector<int32> *depth_per_frame) {
   typedef CompactLattice::Arc::StateId StateId;
   if (clat.Properties(fst::kTopSorted, true) == 0) {
     KALDI_ERR << "Lattice input to CompactLatticeDepthPerFrame was not "
@@ -675,7 +675,7 @@ void CompactLatticeDepthPerFrame(const CompactLattice &clat,
     for (StateId s = 0; s < clat.NumStates(); s++) {
       int32 start_time = state_times[s];
       for (fst::ArcIterator<CompactLattice> aiter(clat, s); !aiter.Done();
-           aiter.Next()) {
+          aiter.Next()) {
         const CompactLatticeArc &arc = aiter.Value();
         int32 len = arc.weight.String().size();
         for (int32 t = start_time; t < start_time + len; t++) {
@@ -695,20 +695,20 @@ void CompactLatticeDepthPerFrame(const CompactLattice &clat,
 
 
 void ConvertCompactLatticeToPhones(const TransitionModel &trans,
-                                   CompactLattice *clat) {
+    CompactLattice *clat) {
   typedef CompactLatticeArc Arc;
   typedef Arc::Weight Weight;
   int32 num_states = clat->NumStates();
   for (int32 state = 0; state < num_states; state++) {
     for (fst::MutableArcIterator<CompactLattice> aiter(clat, state);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       Arc arc(aiter.Value());
       std::vector<int32> phone_seq;
       const std::vector<int32> &tid_seq = arc.weight.String();
       for (std::vector<int32>::const_iterator iter = tid_seq.begin();
-           iter != tid_seq.end(); ++iter) {
-        if (trans.IsFinal(*iter))// note: there is one of these per phone...
+          iter != tid_seq.end(); ++iter) {
+        if (trans.IsFinal(*iter)) // note: there is one of these per phone...
           phone_seq.push_back(trans.TransitionIdToPhone(*iter));
       }
       arc.weight.SetString(phone_seq);
@@ -719,8 +719,8 @@ void ConvertCompactLatticeToPhones(const TransitionModel &trans,
       std::vector<int32> phone_seq;
       const std::vector<int32> &tid_seq = f.String();
       for (std::vector<int32>::const_iterator iter = tid_seq.begin();
-           iter != tid_seq.end(); ++iter) {
-        if (trans.IsFinal(*iter))// note: there is one of these per phone...
+          iter != tid_seq.end(); ++iter) {
+        if (trans.IsFinal(*iter)) // note: there is one of these per phone...
           phone_seq.push_back(trans.TransitionIdToPhone(*iter));
       }
       f.SetString(phone_seq);
@@ -730,11 +730,11 @@ void ConvertCompactLatticeToPhones(const TransitionModel &trans,
 }
 
 bool LatticeBoost(const TransitionModel &trans,
-                  const std::vector<int32> &alignment,
-                  const std::vector<int32> &silence_phones,
-                  BaseFloat b,
-                  BaseFloat max_silence_error,
-                  Lattice *lat) {
+    const std::vector<int32> &alignment,
+    const std::vector<int32> &silence_phones,
+    BaseFloat b,
+    BaseFloat max_silence_error,
+    Lattice *lat) {
   TopSortLatticeIfNeeded(lat);
 
   // get all stored properties (test==false means don't test if not known).
@@ -750,7 +750,7 @@ bool LatticeBoost(const TransitionModel &trans,
   for (int32 state = 0; state < num_states; state++) {
     int32 cur_time = state_times[state];
     for (fst::MutableArcIterator<Lattice> aiter(lat, state); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       LatticeArc arc = aiter.Value();
       if (arc.ilabel != 0) {  // Non-epsilon arc
         if (arc.ilabel < 0 || arc.ilabel > trans.NumTransitionIds()) {
@@ -789,13 +789,13 @@ bool LatticeBoost(const TransitionModel &trans,
 
 
 BaseFloat LatticeForwardBackwardMpeVariants(
-    const TransitionModel &trans,
-    const std::vector<int32> &silence_phones,
-    const Lattice &lat,
-    const std::vector<int32> &num_ali,
-    std::string criterion,
-    bool one_silence_class,
-    Posterior *post) {
+  const TransitionModel &trans,
+  const std::vector<int32> &silence_phones,
+  const Lattice &lat,
+  const std::vector<int32> &num_ali,
+  std::string criterion,
+  bool one_silence_class,
+  Posterior *post) {
   using namespace fst;
   typedef Lattice::Arc Arc;
   typedef Arc::Weight Weight;
@@ -813,9 +813,9 @@ BaseFloat LatticeForwardBackwardMpeVariants(
   int32 max_time = LatticeStateTimes(lat, &state_times);
   KALDI_ASSERT(max_time == static_cast<int32>(num_ali.size()));
   std::vector<double> alpha(num_states, kLogZeroDouble),
-      alpha_smbr(num_states, 0), //forward variable for sMBR
-      beta(num_states, kLogZeroDouble),
-      beta_smbr(num_states, 0); //backward variable for sMBR
+  alpha_smbr(num_states, 0),     //forward variable for sMBR
+  beta(num_states, kLogZeroDouble),
+  beta_smbr(num_states, 0);     //backward variable for sMBR
 
   double tot_forward_prob = kLogZeroDouble;
   double tot_forward_score = 0;
@@ -947,7 +947,7 @@ BaseFloat LatticeForwardBackwardMpeVariants(
       if (transition_id != 0) { // Arc has a transition-id on it [not epsilon]
         double posterior = Exp(alpha[s] + arc_beta - tot_forward_prob);
         double acc_diff = alpha_smbr[s] + frame_acc + beta_smbr[arc.nextstate]
-                               - tot_forward_score;
+            - tot_forward_score;
         double posterior_smbr = posterior * acc_diff;
         (*post)[state_times[s]].push_back(std::make_pair(transition_id,
                                                          static_cast<BaseFloat>(posterior_smbr)));
@@ -970,9 +970,9 @@ BaseFloat LatticeForwardBackwardMpeVariants(
 }
 
 bool CompactLatticeToWordAlignment(const CompactLattice &clat,
-                                   std::vector<int32> *words,
-                                   std::vector<int32> *begin_times,
-                                   std::vector<int32> *lengths) {
+    std::vector<int32> *words,
+    std::vector<int32> *begin_times,
+    std::vector<int32> *lengths) {
   words->clear();
   begin_times->clear();
   lengths->clear();
@@ -995,9 +995,9 @@ bool CompactLatticeToWordAlignment(const CompactLattice &clat,
         KALDI_WARN << "Lattice is not linear.";
         return false;
       }
-      if (! final.String().empty()) {
+      if (!final.String().empty()) {
         KALDI_WARN << "Lattice has alignments on final-weight: probably "
-            "was not word-aligned (alignments will be approximate)";
+          "was not word-aligned (alignments will be approximate)";
       }
       return true;
     } else {
@@ -1021,13 +1021,13 @@ bool CompactLatticeToWordAlignment(const CompactLattice &clat,
 
 
 bool CompactLatticeToWordProns(
-    const TransitionModel &tmodel,
-    const CompactLattice &clat,
-    std::vector<int32> *words,
-    std::vector<int32> *begin_times,
-    std::vector<int32> *lengths,
-    std::vector<std::vector<int32> > *prons,
-    std::vector<std::vector<int32> > *phone_lengths) {
+  const TransitionModel &tmodel,
+  const CompactLattice &clat,
+  std::vector<int32> *words,
+  std::vector<int32> *begin_times,
+  std::vector<int32> *lengths,
+  std::vector<std::vector<int32> > *prons,
+  std::vector<std::vector<int32> > *phone_lengths) {
   words->clear();
   begin_times->clear();
   lengths->clear();
@@ -1052,9 +1052,9 @@ bool CompactLatticeToWordProns(
         KALDI_WARN << "Lattice is not linear.";
         return false;
       }
-      if (! final.String().empty()) {
+      if (!final.String().empty()) {
         KALDI_WARN << "Lattice has alignments on final-weight: probably "
-            "was not word-aligned (alignments will be approximate)";
+          "was not word-aligned (alignments will be approximate)";
       }
       return true;
     } else {
@@ -1092,7 +1092,7 @@ bool CompactLatticeToWordProns(
 
 
 void CompactLatticeShortestPath(const CompactLattice &clat,
-                                CompactLattice *shortest_path) {
+    CompactLattice *shortest_path) {
   using namespace fst;
   if (clat.Properties(fst::kTopSorted, true) == 0) {
     CompactLattice clat_copy(clat);
@@ -1118,8 +1118,8 @@ void CompactLatticeShortestPath(const CompactLattice &clat,
   for (StateId s = 0; s < clat.NumStates(); s++) {
     double my_cost = best_cost_and_pred[s].first;
     for (ArcIterator<CompactLattice> aiter(clat, s);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       const Arc &arc = aiter.Value();
       double arc_cost = ConvertToCost(arc.weight),
           next_cost = my_cost + arc_cost;
@@ -1156,8 +1156,8 @@ void CompactLatticeShortestPath(const CompactLattice &clat,
       bool have_arc = false;
       Arc cur_arc;
       for (ArcIterator<CompactLattice> aiter(clat, states[s]);
-           !aiter.Done();
-           aiter.Next()) {
+          !aiter.Done();
+          aiter.Next()) {
         const Arc &arc = aiter.Value();
         if (arc.nextstate == states[s+1]) {
           if (!have_arc ||
@@ -1177,14 +1177,14 @@ void CompactLatticeShortestPath(const CompactLattice &clat,
 }
 
 void AddWordInsPenToCompactLattice(BaseFloat word_ins_penalty,
-                                   CompactLattice *clat) {
+    CompactLattice *clat) {
   typedef CompactLatticeArc Arc;
   int32 num_states = clat->NumStates();
 
   //scan the lattice
   for (int32 state = 0; state < num_states; state++) {
     for (fst::MutableArcIterator<CompactLattice> aiter(clat, state);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
 
       Arc arc(aiter.Value());
 
@@ -1200,8 +1200,8 @@ void AddWordInsPenToCompactLattice(BaseFloat word_ins_penalty,
 }
 
 struct ClatRescoreTuple {
-  ClatRescoreTuple(int32 state, int32 arc, int32 tid):
-      state_id(state), arc_id(arc), tid(tid) { }
+  ClatRescoreTuple(int32 state, int32 arc, int32 tid) :
+    state_id(state), arc_id(arc), tid(tid) { }
   int32 state_id;
   int32 arc_id;
   int32 tid;
@@ -1212,10 +1212,10 @@ struct ClatRescoreTuple {
     RescoreCompactLattice, "tmodel" will be NULL and speedup_factor will be 1.0.
  */
 bool RescoreCompactLatticeInternal(
-    const TransitionModel *tmodel,
-    BaseFloat speedup_factor,
-    DecodableInterface *decodable,
-    CompactLattice *clat) {
+  const TransitionModel *tmodel,
+  BaseFloat speedup_factor,
+  DecodableInterface *decodable,
+  CompactLattice *clat) {
   KALDI_ASSERT(speedup_factor >= 1.0);
   if (clat->NumStates() == 0) {
     KALDI_WARN << "Rescoring empty lattice";
@@ -1239,7 +1239,7 @@ bool RescoreCompactLatticeInternal(
     int32 t = state_times[state];
     int32 arc_id = 0;
     for (fst::MutableArcIterator<CompactLattice> aiter(clat, state);
-         !aiter.Done(); aiter.Next(), arc_id++) {
+        !aiter.Done(); aiter.Next(), arc_id++) {
       CompactLatticeArc arc = aiter.Value();
       std::vector<int32> arc_string = arc.weight.String();
 
@@ -1342,21 +1342,21 @@ bool RescoreCompactLatticeInternal(
 
 
 bool RescoreCompactLatticeSpeedup(
-    const TransitionModel &tmodel,
-    BaseFloat speedup_factor,
-    DecodableInterface *decodable,
-    CompactLattice *clat) {
+  const TransitionModel &tmodel,
+  BaseFloat speedup_factor,
+  DecodableInterface *decodable,
+  CompactLattice *clat) {
   return RescoreCompactLatticeInternal(&tmodel, speedup_factor, decodable, clat);
 }
 
 bool RescoreCompactLattice(DecodableInterface *decodable,
-                           CompactLattice *clat) {
+    CompactLattice *clat) {
   return RescoreCompactLatticeInternal(NULL, 1.0, decodable, clat);
 }
 
 
 bool RescoreLattice(DecodableInterface *decodable,
-                    Lattice *lat) {
+    Lattice *lat) {
   if (lat->NumStates() == 0) {
     KALDI_WARN << "Rescoring empty lattice";
     return false;
@@ -1391,7 +1391,7 @@ bool RescoreLattice(DecodableInterface *decodable,
     for (size_t i = 0; i < time_to_state[t].size(); i++) {
       int32 state = time_to_state[t][i];
       for (fst::MutableArcIterator<Lattice> aiter(lat, state);
-           !aiter.Done(); aiter.Next()) {
+          !aiter.Done(); aiter.Next()) {
         LatticeArc arc = aiter.Value();
         if (arc.ilabel != 0) {
           int32 trans_id = arc.ilabel; // Note: it doesn't necessarily
@@ -1410,13 +1410,13 @@ bool RescoreLattice(DecodableInterface *decodable,
 
 
 BaseFloat LatticeForwardBackwardMmi(
-    const TransitionModel &tmodel,
-    const Lattice &lat,
-    const std::vector<int32> &num_ali,
-    bool drop_frames,
-    bool convert_to_pdf_ids,
-    bool cancel,
-    Posterior *post) {
+  const TransitionModel &tmodel,
+  const Lattice &lat,
+  const std::vector<int32> &num_ali,
+  bool drop_frames,
+  bool convert_to_pdf_ids,
+  bool cancel,
+  Posterior *post) {
   // First compute the MMI posteriors.
 
   Posterior den_post;
@@ -1500,7 +1500,7 @@ int32 LongestSentenceLength(const CompactLattice &clat) {
   for (StateId s = 0; s < clat.NumStates(); s++) {
     int32 this_max_length = max_length[s];
     for (fst::ArcIterator<CompactLattice> aiter(clat, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       bool arc_has_word = (arc.ilabel != 0); // note: olabel == ilabel.
       // also note: for normal CompactLattice, e.g. as produced by
@@ -1524,9 +1524,9 @@ int32 LongestSentenceLength(const CompactLattice &clat) {
 }
 
 void ComposeCompactLatticeDeterministic(
-    const CompactLattice& clat,
-    fst::DeterministicOnDemandFst<fst::StdArc>* det_fst,
-    CompactLattice* composed_clat) {
+  const CompactLattice& clat,
+  fst::DeterministicOnDemandFst<fst::StdArc>* det_fst,
+  CompactLattice* composed_clat) {
   // StdFst::Arc and CompactLatticeArc has the same StateId type.
   typedef fst::StdArc::StateId StateId;
   typedef fst::StdArc::Weight Weight1;
@@ -1574,7 +1574,7 @@ void ComposeCompactLatticeDeterministic(
         Weight2 final_weight(LatticeWeight(clat_final.Weight().Value1() +
                                            det_fst_final.Value(),
                                            clat_final.Weight().Value2()),
-                             clat_final.String());
+            clat_final.String());
         // we can assume final_weight is not Zero(), since neither of
         // the sources was zero.
         KALDI_ASSERT(state_map.find(s) != state_map.end());
@@ -1584,7 +1584,7 @@ void ComposeCompactLatticeDeterministic(
 
     // Loops over pair of edges at s1 and s2.
     for (fst::ArcIterator<CompactLattice> aiter(clat, s1);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       const CompactLatticeArc& arc1 = aiter.Value();
       fst::StdArc arc2;
       StateId next_state1 = arc1.nextstate, next_state2;
@@ -1615,7 +1615,7 @@ void ComposeCompactLatticeDeterministic(
           // If the composed state has not been created yet, create it.
           next_state = composed_clat->AddState();
           std::pair<const StatePair, StateId> next_state_map(next_state_pair,
-                                                             next_state);
+              next_state);
           std::pair<IterType, bool> result = state_map.insert(next_state_map);
           KALDI_ASSERT(result.second);
           state_queue.push(next_state_pair);
@@ -1632,10 +1632,10 @@ void ComposeCompactLatticeDeterministic(
                                                   arc1.weight, next_state));
         } else {
           Weight2 composed_weight(
-              LatticeWeight(arc1.weight.Weight().Value1() +
+            LatticeWeight(arc1.weight.Weight().Value1() +
                             arc2.weight.Value(),
                             arc1.weight.Weight().Value2()),
-              arc1.weight.String());
+            arc1.weight.String());
           composed_clat->AddArc(state_map[s],
                                 CompactLatticeArc(arc1.ilabel, arc2.olabel,
                                                   composed_weight, next_state));

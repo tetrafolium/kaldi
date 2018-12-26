@@ -85,10 +85,10 @@ struct MapDiagGmmOptions {
   /// Tau value for the weights-- this tau value is applied
   /// per state, not per Gaussian.
   BaseFloat weight_tau;
-  
-  MapDiagGmmOptions(): mean_tau(10.0),
-                             variance_tau(50.0),
-                             weight_tau(10.0) { }
+
+  MapDiagGmmOptions() : mean_tau(10.0),
+    variance_tau(50.0),
+    weight_tau(10.0) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("mean-tau", &mean_tau,
@@ -104,8 +104,8 @@ struct MapDiagGmmOptions {
 
 
 class AccumDiagGmm {
- public:
-  AccumDiagGmm(): dim_(0), num_comp_(0), flags_(0) { }
+public:
+  AccumDiagGmm() : dim_(0), num_comp_(0), flags_(0) { }
   explicit AccumDiagGmm(const DiagGmm &gmm, GmmFlagsType flags) {
     Resize(gmm, flags);
   }
@@ -130,39 +130,39 @@ class AccumDiagGmm {
 
   /// Accumulate for a single component, given the posterior
   void AccumulateForComponent(const VectorBase<BaseFloat> &data,
-                              int32 comp_index, BaseFloat weight);
+      int32 comp_index, BaseFloat weight);
 
   /// Accumulate for all components, given the posteriors.
   void AccumulateFromPosteriors(const VectorBase<BaseFloat> &data,
-                                const VectorBase<BaseFloat> &gauss_posteriors);
+      const VectorBase<BaseFloat> &gauss_posteriors);
 
   /// Accumulate for all components given a diagonal-covariance GMM.
   /// Computes posteriors and returns log-likelihood
   BaseFloat AccumulateFromDiag(const DiagGmm &gmm,
-                               const VectorBase<BaseFloat> &data,
-                               BaseFloat frame_posterior);
+      const VectorBase<BaseFloat> &data,
+      BaseFloat frame_posterior);
 
   /// This does the same job as AccumulateFromDiag, but using
   /// multiple threads.  Returns sum of (log-likelihood times
   /// frame weight) over all frames.
   BaseFloat AccumulateFromDiagMultiThreaded(
-      const DiagGmm &gmm,
-      const MatrixBase<BaseFloat> &data,
-      const VectorBase<BaseFloat> &frame_weights,
-      int32 num_threads);
-  
-  
+    const DiagGmm &gmm,
+    const MatrixBase<BaseFloat> &data,
+    const VectorBase<BaseFloat> &frame_weights,
+    int32 num_threads);
+
+
   /// Increment the stats for this component by the specified amount
   /// (not all parts may be taken, depending on flags).
   /// Note: x_stats and x2_stats are assumed to already be multiplied by "occ"
   void AddStatsForComponent(int32 comp_id,
-                            double occ,
-                            const VectorBase<double> &x_stats,
-                            const VectorBase<double> &x2_stats);
+      double occ,
+      const VectorBase<double> &x_stats,
+      const VectorBase<double> &x2_stats);
 
   /// Increment with stats from this other accumulator (times scale)
   void Add(double scale, const AccumDiagGmm &acc);
-  
+
   /// Smooths the accumulated counts by adding 'tau' extra frames. An example
   /// use for this is I-smoothing for MMIE.   Calls SmoothWithAccum.
   void SmoothStats(BaseFloat tau);
@@ -185,8 +185,8 @@ class AccumDiagGmm {
   const MatrixBase<double> &variance_accumulator() const { return variance_accumulator_; }
 
   // used in testing.
-  void AssertEqual(const AccumDiagGmm &other); 
- private:
+  void AssertEqual(const AccumDiagGmm &other);
+private:
   int32 dim_;
   int32 num_comp_;
   /// Flags corresponding to the accumulators that are stored.
@@ -212,26 +212,26 @@ inline void AccumDiagGmm::Resize(const DiagGmm &gmm, GmmFlagsType flags) {
 /// Update using the DiagGmm: exponential form.  Sets, does not increment,
 /// objf_change_out, floored_elements_out and floored_gauss_out.
 void MleDiagGmmUpdate(const MleDiagGmmOptions &config,
-                      const AccumDiagGmm &diag_gmm_acc,
-                      GmmFlagsType flags,
-                      DiagGmm *gmm,
-                      BaseFloat *obj_change_out,
-                      BaseFloat *count_out,
-                      int32 *floored_elements_out = NULL,
-                      int32 *floored_gauss_out = NULL,
-                      int32 *removed_gauss_out = NULL);
+    const AccumDiagGmm &diag_gmm_acc,
+    GmmFlagsType flags,
+    DiagGmm *gmm,
+    BaseFloat *obj_change_out,
+    BaseFloat *count_out,
+    int32 *floored_elements_out = NULL,
+    int32 *floored_gauss_out = NULL,
+    int32 *removed_gauss_out = NULL);
 
 /// Maximum A Posteriori estimation of the model.
 void MapDiagGmmUpdate(const MapDiagGmmOptions &config,
-                      const AccumDiagGmm &diag_gmm_acc,
-                      GmmFlagsType flags,
-                      DiagGmm *gmm,
-                      BaseFloat *obj_change_out,
-                      BaseFloat *count_out);
+    const AccumDiagGmm &diag_gmm_acc,
+    GmmFlagsType flags,
+    DiagGmm *gmm,
+    BaseFloat *obj_change_out,
+    BaseFloat *count_out);
 
 /// Calc using the DiagGMM exponential form
 BaseFloat MlObjective(const DiagGmm &gmm,
-                      const AccumDiagGmm &diaggmm_acc);
+    const AccumDiagGmm &diaggmm_acc);
 
 }  // End namespace kaldi
 

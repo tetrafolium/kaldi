@@ -35,12 +35,12 @@ struct TrainingGraphCompilerOptions {
   bool reorder;  // (Dan-style graphs)
 
   explicit TrainingGraphCompilerOptions(BaseFloat transition_scale = 1.0,
-                                        BaseFloat self_loop_scale = 1.0,
-                                        bool b = true) :
-      transition_scale(transition_scale),
-      self_loop_scale(self_loop_scale),
-      rm_eps(false),
-      reorder(b) { }
+      BaseFloat self_loop_scale = 1.0,
+      bool b = true) :
+    transition_scale(transition_scale),
+    self_loop_scale(self_loop_scale),
+    rm_eps(false),
+    reorder(b) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("transition-scale", &transition_scale, "Scale of transition "
@@ -55,14 +55,14 @@ struct TrainingGraphCompilerOptions {
 
 
 class TrainingGraphCompiler {
- public:
+public:
   TrainingGraphCompiler(const TransitionModel &trans_model,  // Maintains reference to this object.
-                        const ContextDependency &ctx_dep,  // And this.
-                        fst::VectorFst<fst::StdArc> *lex_fst,  // Takes ownership of this object.
-                        // It should not contain disambiguation symbols or subsequential symbol,
-                        // but it should contain optional silence.
-                        const std::vector<int32> &disambig_syms, // disambig symbols in phone symbol table.
-                        const TrainingGraphCompilerOptions &opts);
+      const ContextDependency &ctx_dep,                    // And this.
+      fst::VectorFst<fst::StdArc> *lex_fst,                    // Takes ownership of this object.
+      // It should not contain disambiguation symbols or subsequential symbol,
+      // but it should contain optional silence.
+      const std::vector<int32> &disambig_syms,                   // disambig symbols in phone symbol table.
+      const TrainingGraphCompilerOptions &opts);
 
 
   /// CompileGraph compiles a single training graph its input is a
@@ -71,26 +71,26 @@ class TrainingGraphCompiler {
   // This function is not const for technical reasons involving the cache.
   // if not for "table_compose" we could make it const.
   bool CompileGraph(const fst::VectorFst<fst::StdArc> &word_grammar,
-                    fst::VectorFst<fst::StdArc> *out_fst);
-  
+      fst::VectorFst<fst::StdArc> *out_fst);
+
   // CompileGraphs allows you to compile a number of graphs at the same
   // time.  This consumes more memory but is faster.
   bool CompileGraphs(
-      const std::vector<const fst::VectorFst<fst::StdArc> *> &word_fsts,
-      std::vector<fst::VectorFst<fst::StdArc> *> *out_fsts);
+    const std::vector<const fst::VectorFst<fst::StdArc> *> &word_fsts,
+    std::vector<fst::VectorFst<fst::StdArc> *> *out_fsts);
 
   // This version creates an FST from the text and calls CompileGraph.
   bool CompileGraphFromText(const std::vector<int32> &transcript,
-                            fst::VectorFst<fst::StdArc> *out_fst);
+      fst::VectorFst<fst::StdArc> *out_fst);
 
   // This function creates FSTs from the text and calls CompileGraphs.
   bool CompileGraphsFromText(
-      const std::vector<std::vector<int32> >  &word_grammar,
-      std::vector<fst::VectorFst<fst::StdArc> *> *out_fsts);
-  
-  
+    const std::vector<std::vector<int32> >  &word_grammar,
+    std::vector<fst::VectorFst<fst::StdArc> *> *out_fsts);
+
+
   ~TrainingGraphCompiler() { delete lex_fst_; }
- private:
+private:
   const TransitionModel &trans_model_;
   const ContextDependency &ctx_dep_;
   fst::VectorFst<fst::StdArc> *lex_fst_; // lexicon FST (an input; we take

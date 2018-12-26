@@ -90,9 +90,9 @@ struct MleTransitionUpdateConfig {
   BaseFloat mincount;
   bool share_for_pdfs; // If true, share all transition parameters that have the same pdf.
   MleTransitionUpdateConfig(BaseFloat floor = 0.01,
-                            BaseFloat mincount = 5.0,
-                            bool share_for_pdfs = false):
-      floor(floor), mincount(mincount), share_for_pdfs(share_for_pdfs) {}
+      BaseFloat mincount = 5.0,
+      bool share_for_pdfs = false) :
+    floor(floor), mincount(mincount), share_for_pdfs(share_for_pdfs) {}
 
   void Register (OptionsItf *opts) {
     opts->Register("transition-floor", &floor,
@@ -108,7 +108,7 @@ struct MleTransitionUpdateConfig {
 struct MapTransitionUpdateConfig {
   BaseFloat tau;
   bool share_for_pdfs; // If true, share all transition parameters that have the same pdf.
-  MapTransitionUpdateConfig(): tau(5.0), share_for_pdfs(false) { }
+  MapTransitionUpdateConfig() : tau(5.0), share_for_pdfs(false) { }
 
   void Register (OptionsItf *opts) {
     opts->Register("transition-tau", &tau, "Tau value for MAP estimation of transition "
@@ -121,12 +121,12 @@ struct MapTransitionUpdateConfig {
 
 class TransitionModel {
 
- public:
+public:
   /// Initialize the object [e.g. at the start of training].
   /// The class keeps a copy of the HmmTopology object, but not
   /// the ContextDependency object.
   TransitionModel(const ContextDependencyInterface &ctx_dep,
-                  const HmmTopology &hmm_topo);
+      const HmmTopology &hmm_topo);
 
 
   /// Constructor that takes no arguments: typically used prior to calling Read.
@@ -215,22 +215,22 @@ class TransitionModel {
   /// Does Maximum Likelihood estimation.  The stats are counts/weights, indexed
   /// by transition-id.  This was previously called Update().
   void MleUpdate(const Vector<double> &stats,
-                 const MleTransitionUpdateConfig &cfg,
-                 BaseFloat *objf_impr_out,
-                 BaseFloat *count_out);
+      const MleTransitionUpdateConfig &cfg,
+      BaseFloat *objf_impr_out,
+      BaseFloat *count_out);
 
   /// Does Maximum A Posteriori (MAP) estimation.  The stats are counts/weights,
   /// indexed by transition-id.
   void MapUpdate(const Vector<double> &stats,
-                 const MapTransitionUpdateConfig &cfg,
-                 BaseFloat *objf_impr_out,
-                 BaseFloat *count_out);
+      const MapTransitionUpdateConfig &cfg,
+      BaseFloat *objf_impr_out,
+      BaseFloat *count_out);
 
   /// Print will print the transition model in a human-readable way, for purposes of human
   /// inspection.  The "occs" are optional (they are indexed by pdf-id).
   void Print(std::ostream &os,
-             const std::vector<std::string> &phone_names,
-             const Vector<double> *occs = NULL);
+      const std::vector<std::string> &phone_names,
+      const Vector<double> *occs = NULL);
 
 
   void InitStats(Vector<double> *stats) const { stats->Resize(NumTransitionIds()+1); }
@@ -246,13 +246,13 @@ class TransitionModel {
   /// compare the transition probabilities.
   bool Compatible(const TransitionModel &other) const;
 
- private:
+private:
   void MleUpdateShared(const Vector<double> &stats,
-                       const MleTransitionUpdateConfig &cfg,
-                       BaseFloat *objf_impr_out, BaseFloat *count_out);
+      const MleTransitionUpdateConfig &cfg,
+      BaseFloat *objf_impr_out, BaseFloat *count_out);
   void MapUpdateShared(const Vector<double> &stats,
-                       const MapTransitionUpdateConfig &cfg,
-                       BaseFloat *objf_impr_out, BaseFloat *count_out);
+      const MapTransitionUpdateConfig &cfg,
+      BaseFloat *objf_impr_out, BaseFloat *count_out);
   void ComputeTuples(const ContextDependencyInterface &ctx_dep);  // called from constructor.  initializes tuples_.
   void ComputeTuplesIsHmm(const ContextDependencyInterface &ctx_dep);
   void ComputeTuplesNotHmm(const ContextDependencyInterface &ctx_dep);
@@ -269,7 +269,7 @@ class TransitionModel {
     int32 forward_pdf;
     int32 self_loop_pdf;
     Tuple() { }
-    Tuple(int32 phone, int32 hmm_state, int32 forward_pdf, int32 self_loop_pdf):
+    Tuple(int32 phone, int32 hmm_state, int32 forward_pdf, int32 self_loop_pdf) :
       phone(phone), hmm_state(hmm_state), forward_pdf(forward_pdf), self_loop_pdf(self_loop_pdf) { }
     bool operator < (const Tuple &other) const {
       if (phone < other.phone) return true;
@@ -282,7 +282,7 @@ class TransitionModel {
     }
     bool operator == (const Tuple &other) const {
       return (phone == other.phone && hmm_state == other.hmm_state
-              && forward_pdf == other.forward_pdf && self_loop_pdf == other.self_loop_pdf);
+             && forward_pdf == other.forward_pdf && self_loop_pdf == other.self_loop_pdf);
     }
   };
 
@@ -337,14 +337,14 @@ inline int32 TransitionModel::TransitionIdToPdf(int32 trans_id) const {
 /// @return  Returns true if all of the pdfs output to "pdfs" correspond to phones from
 ///          just this set (false if they may be shared with phones outside this set).
 bool GetPdfsForPhones(const TransitionModel &trans_model,
-                      const std::vector<int32> &phones,
-                      std::vector<int32> *pdfs);
+    const std::vector<int32> &phones,
+    std::vector<int32> *pdfs);
 
 /// Works out which phones might correspond to the given pdfs. Similar to the
 /// above GetPdfsForPhones(, ,)
 bool GetPhonesForPdfs(const TransitionModel &trans_model,
-                      const std::vector<int32> &pdfs,
-                      std::vector<int32> *phones);
+    const std::vector<int32> &pdfs,
+    std::vector<int32> *phones);
 /// @}
 
 

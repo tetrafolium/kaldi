@@ -1,7 +1,7 @@
 // gmm/mle-full-gmm.h
 
 // Copyright 2009-2011  Jan Silovsky;  Saarland University;
-//                      Microsoft Corporation; 
+//                      Microsoft Corporation;
 //                      Univ. Erlangen Nuremberg, Korbinian Riedhammer
 
 // See ../../COPYING for clarification regarding multiple authors
@@ -72,10 +72,10 @@ struct MleFullGmmOptions {
  *  a Gaussian mixture model.
  */
 class AccumFullGmm {
- public:
-  AccumFullGmm(): dim_(0), num_comp_(0), flags_(0) { }
-  AccumFullGmm(int32 num_comp, int32 dim, GmmFlagsType flags):
-      dim_(0), num_comp_(0), flags_(0) {
+public:
+  AccumFullGmm() : dim_(0), num_comp_(0), flags_(0) { }
+  AccumFullGmm(int32 num_comp, int32 dim, GmmFlagsType flags) :
+    dim_(0), num_comp_(0), flags_(0) {
     Resize(num_comp, dim, flags);
   }
   explicit AccumFullGmm(const FullGmm &gmm, GmmFlagsType flags) {
@@ -91,7 +91,7 @@ class AccumFullGmm {
   void Resize(int32 num_components, int32 dim, GmmFlagsType flags);
   /// Calls Resize with arguments based on gmm_ptr_
   void Resize(const FullGmm &gmm, GmmFlagsType flags);
-  
+
   void ResizeVarAccumulator(int32 num_comp, int32 dim);
   /// Returns the number of mixture components
   int32 NumGauss() const { return num_comp_; }
@@ -104,31 +104,31 @@ class AccumFullGmm {
 
   /// Accumulate for a single component, given the posterior
   void AccumulateForComponent(const VectorBase<BaseFloat> &data,
-                              int32 comp_index, BaseFloat weight);
+      int32 comp_index, BaseFloat weight);
 
   /// Accumulate for all components, given the posteriors.
   void AccumulateFromPosteriors(const VectorBase<BaseFloat> &data,
-                                const VectorBase<BaseFloat> &gauss_posteriors);
+      const VectorBase<BaseFloat> &gauss_posteriors);
 
   /// Accumulate for all components given a full-covariance GMM.
   /// Computes posteriors and returns log-likelihood
   BaseFloat AccumulateFromFull(const FullGmm &gmm,
-                               const VectorBase<BaseFloat> &data,
-                               BaseFloat frame_posterior);
+      const VectorBase<BaseFloat> &data,
+      BaseFloat frame_posterior);
 
   /// Accumulate for all components given a diagonal-covariance GMM.
   /// Computes posteriors and returns log-likelihood
   BaseFloat AccumulateFromDiag(const DiagGmm &gmm,
-                               const VectorBase<BaseFloat> &data,
-                               BaseFloat frame_posterior);
+      const VectorBase<BaseFloat> &data,
+      BaseFloat frame_posterior);
 
-  /// Accessors  
+  /// Accessors
   const GmmFlagsType Flags() const { return flags_; }
   const Vector<double> &occupancy() const { return occupancy_; }
   const Matrix<double> &mean_accumulator() const { return mean_accumulator_; }
   const std::vector<SpMatrix<double> > &covariance_accumulator() const { return covariance_accumulator_; }
 
- private:
+private:
   int32 dim_;
   int32 num_comp_;
   GmmFlagsType flags_;
@@ -145,15 +145,15 @@ inline void AccumFullGmm::Resize(const FullGmm &gmm, GmmFlagsType flags) {
 /// for computing the maximum-likelihood estimates of the parameters of a
 /// Gaussian mixture model.  Update using the FullGmm exponential form
 void MleFullGmmUpdate(const MleFullGmmOptions &config,
-            const AccumFullGmm &fullgmm_acc,
-            GmmFlagsType flags,
-            FullGmm *gmm,
-            BaseFloat *obj_change_out,
-            BaseFloat *count_out);
+    const AccumFullGmm &fullgmm_acc,
+    GmmFlagsType flags,
+    FullGmm *gmm,
+    BaseFloat *obj_change_out,
+    BaseFloat *count_out);
 
 /// Calc using the DiagGMM exponential form
 BaseFloat MlObjective(const FullGmm &gmm,
-                      const AccumFullGmm &fullgmm_acc);
+    const AccumFullGmm &fullgmm_acc);
 
 }  // End namespace kaldi
 

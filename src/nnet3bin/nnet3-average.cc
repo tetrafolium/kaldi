@@ -26,8 +26,8 @@
 namespace kaldi {
 
 void GetWeights(const std::string &weights_str,
-                int32 num_inputs,
-                std::vector<BaseFloat> *weights) {
+    int32 num_inputs,
+    std::vector<BaseFloat> *weights) {
   KALDI_ASSERT(num_inputs >= 1);
   if (!weights_str.empty()) {
     SplitStringToFloats(weights_str, ":", true, weights);

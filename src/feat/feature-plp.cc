@@ -23,12 +23,12 @@
 
 namespace kaldi {
 
-PlpComputer::PlpComputer(const PlpOptions &opts):
-    opts_(opts), srfft_(NULL),
-    mel_energies_duplicated_(opts_.mel_opts.num_bins + 2, kUndefined),
-    autocorr_coeffs_(opts_.lpc_order + 1, kUndefined),
-    lpc_coeffs_(opts_.lpc_order, kUndefined),
-    raw_cepstrum_(opts_.lpc_order, kUndefined) {
+PlpComputer::PlpComputer(const PlpOptions &opts) :
+  opts_(opts), srfft_(NULL),
+  mel_energies_duplicated_(opts_.mel_opts.num_bins + 2, kUndefined),
+  autocorr_coeffs_(opts_.lpc_order + 1, kUndefined),
+  lpc_coeffs_(opts_.lpc_order, kUndefined),
+  raw_cepstrum_(opts_.lpc_order, kUndefined) {
 
   if (opts.cepstral_lifter != 0.0) {
     lifter_coeffs_.Resize(opts.num_ceps);
@@ -49,21 +49,21 @@ PlpComputer::PlpComputer(const PlpOptions &opts):
   GetMelBanks(1.0);
 }
 
-PlpComputer::PlpComputer(const PlpComputer &other):
-    opts_(other.opts_), lifter_coeffs_(other.lifter_coeffs_),
-    idft_bases_(other.idft_bases_), log_energy_floor_(other.log_energy_floor_),
-    mel_banks_(other.mel_banks_), equal_loudness_(other.equal_loudness_),
-    srfft_(NULL),
-    mel_energies_duplicated_(opts_.mel_opts.num_bins + 2, kUndefined),
-    autocorr_coeffs_(opts_.lpc_order + 1, kUndefined),
-    lpc_coeffs_(opts_.lpc_order, kUndefined),
-    raw_cepstrum_(opts_.lpc_order, kUndefined) {
+PlpComputer::PlpComputer(const PlpComputer &other) :
+  opts_(other.opts_), lifter_coeffs_(other.lifter_coeffs_),
+  idft_bases_(other.idft_bases_), log_energy_floor_(other.log_energy_floor_),
+  mel_banks_(other.mel_banks_), equal_loudness_(other.equal_loudness_),
+  srfft_(NULL),
+  mel_energies_duplicated_(opts_.mel_opts.num_bins + 2, kUndefined),
+  autocorr_coeffs_(opts_.lpc_order + 1, kUndefined),
+  lpc_coeffs_(opts_.lpc_order, kUndefined),
+  raw_cepstrum_(opts_.lpc_order, kUndefined) {
   for (std::map<BaseFloat, MelBanks*>::iterator iter = mel_banks_.begin();
-       iter != mel_banks_.end(); ++iter)
+      iter != mel_banks_.end(); ++iter)
     iter->second = new MelBanks(*(iter->second));
   for (std::map<BaseFloat, Vector<BaseFloat>*>::iterator
-           iter = equal_loudness_.begin();
-       iter != equal_loudness_.end(); ++iter)
+      iter = equal_loudness_.begin();
+      iter != equal_loudness_.end(); ++iter)
     iter->second = new Vector<BaseFloat>(*(iter->second));
   if (other.srfft_ != NULL)
     srfft_ = new SplitRadixRealFft<BaseFloat>(*(other.srfft_));
@@ -74,8 +74,8 @@ PlpComputer::~PlpComputer() {
       iter != mel_banks_.end(); ++iter)
     delete iter->second;
   for (std::map<BaseFloat, Vector<BaseFloat>* >::iterator
-           iter = equal_loudness_.begin();
-       iter != equal_loudness_.end(); ++iter)
+      iter = equal_loudness_.begin();
+      iter != equal_loudness_.end(); ++iter)
     delete iter->second;
   delete srfft_;
 }
@@ -98,7 +98,7 @@ const Vector<BaseFloat> *PlpComputer::GetEqualLoudness(BaseFloat vtln_warp) {
   const MelBanks *this_mel_banks = GetMelBanks(vtln_warp);
   Vector<BaseFloat> *ans = NULL;
   std::map<BaseFloat, Vector<BaseFloat>*>::iterator iter
-      = equal_loudness_.find(vtln_warp);
+    = equal_loudness_.find(vtln_warp);
   if (iter == equal_loudness_.end()) {
     ans = new Vector<BaseFloat>;
     GetEqualLoudnessVector(*this_mel_banks, ans);
@@ -110,9 +110,9 @@ const Vector<BaseFloat> *PlpComputer::GetEqualLoudness(BaseFloat vtln_warp) {
 }
 
 void PlpComputer::Compute(BaseFloat signal_log_energy,
-                          BaseFloat vtln_warp,
-                          VectorBase<BaseFloat> *signal_frame,
-                          VectorBase<BaseFloat> *feature) {
+    BaseFloat vtln_warp,
+    VectorBase<BaseFloat> *signal_frame,
+    VectorBase<BaseFloat> *feature) {
   KALDI_ASSERT(signal_frame->Dim() == opts_.frame_opts.PaddedWindowSize() &&
                feature->Dim() == this->Dim());
 
@@ -136,7 +136,7 @@ void PlpComputer::Compute(BaseFloat signal_log_energy,
   ComputePowerSpectrum(signal_frame);  // elements 0 ... signal_frame->Dim()/2
 
   SubVector<BaseFloat> power_spectrum(*signal_frame,
-                                      0, signal_frame->Dim() / 2 + 1);
+      0, signal_frame->Dim() / 2 + 1);
 
   int32 num_mel_bins = opts_.mel_opts.num_bins;
 

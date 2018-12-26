@@ -44,39 +44,41 @@ class CuTpMatrix : public CuPackedMatrix<Real> {
   friend class CuRand<Real>;
   friend class CuTpMatrix<float>;
   friend class CuTpMatrix<double>;
- public:
+public:
   CuTpMatrix() : CuPackedMatrix<Real>() {}
   explicit CuTpMatrix(MatrixIndexT r, MatrixResizeType resize_type = kSetZero)
-      : CuPackedMatrix<Real>(r, resize_type) {}
-  
+    : CuPackedMatrix<Real>(r, resize_type) {}
+
   explicit CuTpMatrix<Real>(const TpMatrix<Real> &orig)
-      : CuPackedMatrix<Real>(orig) {}
+  : CuPackedMatrix<Real>(orig) {
+  }
   // This constructor lacks the "explicit" keyword so that
   // we can include this class in std::vector.
   CuTpMatrix<Real>(const CuTpMatrix<Real> &orig)
-      : CuPackedMatrix<Real>(orig) {}
-  
-  explicit CuTpMatrix<Real>(const CuMatrixBase<Real> &orig,
-                            MatrixTransposeType trans = kNoTrans);
+  : CuPackedMatrix<Real>(orig) {
+  }
 
-  
+  explicit CuTpMatrix<Real>(const CuMatrixBase<Real> &orig,
+  MatrixTransposeType trans = kNoTrans);
+
+
   ~CuTpMatrix() {}
 
   void CopyFromMat(const CuMatrixBase<Real> &M,
-                   MatrixTransposeType Trans = kNoTrans);
+      MatrixTransposeType Trans = kNoTrans);
 
   void CopyFromTp(const CuTpMatrix<Real> &other) {
     CuPackedMatrix<Real>::CopyFromPacked(other);
   }
   void CopyFromTp(const TpMatrix<Real> &other) {
     CuPackedMatrix<Real>::CopyFromPacked(other);
-  }  
+  }
   void Cholesky(const CuSpMatrix<Real>& Orig);
   void Invert();
 
   CuTpMatrix<Real> &operator = (const CuTpMatrix<Real> &in);
-  
- protected:
+
+protected:
   inline const TpMatrix<Real> &Mat() const {
     return *(reinterpret_cast<const TpMatrix<Real>* >(this));
   }

@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
         "Note: options --drop-frames and --criterion should be matched with the\n"
         "command line of nnet-get-egs-discriminative used to get the examples\n"
         "nnet-compare-hash-discriminative --drop-frames=true --criterion=mmi ark:1.degs ark:2.degs\n";
-    
+
     std::string criterion = "smbr";
     bool drop_frames = false;
     bool one_silence_class = false;
@@ -60,10 +60,10 @@ int main(int argc, char *argv[]) {
                  "behavior which will tend to reduce insertions.");
     po.Register("threshold", &threshold, "Threshold for equality testing "
                 "(relative)");
-    
+
     po.Read(argc, argv);
 
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
@@ -78,16 +78,16 @@ int main(int argc, char *argv[]) {
 
     TransitionModel tmodel;
     ReadKaldiObject(model_rxfilename, &tmodel);
-    
+
     Matrix<double> hash1, hash2;
 
     // some additional diagnostics:
     double num_weight1 = 0.0, den_weight1 = 0.0, tot_t1 = 0.0;
     double num_weight2 = 0.0, den_weight2 = 0.0, tot_t2 = 0.0;
-    
+
     SequentialDiscriminativeNnetExampleReader
         example_reader1(examples_rspecifier1),
-        example_reader2(examples_rspecifier2);
+    example_reader2(examples_rspecifier2);
 
     KALDI_LOG << "Computing first hash function";
     for (; !example_reader1.Done(); example_reader1.Next(), num_done1++) {
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
                  &num_weight2, &den_weight2, &tot_t2);
     }
     KALDI_LOG << "Processed " << num_done2 << " examples.";
-    
+
     double prod1 = TraceMatMat(hash1, hash1, kTrans),
         prod2 = TraceMatMat(hash2, hash2, kTrans),
         cross_prod = TraceMatMat(hash1, hash2, kTrans);
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
               << den_weight1 << ", tot_t1 = " << tot_t1;
     KALDI_LOG << "Num-weight2 = " << num_weight2 << ", den-weight2 = "
               << den_weight2 << ", tot_t2 = " << tot_t2;
-        
+
     KALDI_ASSERT(ApproxEqual(prod1, prod2, threshold) &&
                  ApproxEqual(prod2, cross_prod, threshold));
     KALDI_ASSERT(prod1 > 0.0);

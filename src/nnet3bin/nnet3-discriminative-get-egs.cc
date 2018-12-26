@@ -37,15 +37,15 @@ namespace nnet3 {
 // returns true if we got as far as calling GetChunksForUtterance()
 // [in which case stats will be accumulated by class UtteranceSplitter]
 static bool ProcessFile(const discriminative::SplitDiscriminativeSupervisionOptions &config,
-                        const TransitionModel &tmodel,
-                        const MatrixBase<BaseFloat> &feats,
-                        const MatrixBase<BaseFloat> *ivector_feats,
-                        int32 ivector_period,
-                        const discriminative::DiscriminativeSupervision &supervision,
-                        const std::string &utt_id,
-                        bool compress,
-                        UtteranceSplitter *utt_splitter,
-                        NnetDiscriminativeExampleWriter *example_writer) {
+    const TransitionModel &tmodel,
+    const MatrixBase<BaseFloat> &feats,
+    const MatrixBase<BaseFloat> *ivector_feats,
+    int32 ivector_period,
+    const discriminative::DiscriminativeSupervision &supervision,
+    const std::string &utt_id,
+    bool compress,
+    UtteranceSplitter *utt_splitter,
+    NnetDiscriminativeExampleWriter *example_writer) {
   KALDI_ASSERT(supervision.num_sequences == 1);
   int32 num_input_frames = feats.NumRows(),
       num_output_frames = supervision.frames_per_sequence;
@@ -66,7 +66,7 @@ static bool ProcessFile(const discriminative::SplitDiscriminativeSupervisionOpti
   int32 frame_subsampling_factor = utt_splitter->Config().frame_subsampling_factor;
 
   discriminative::DiscriminativeSupervisionSplitter splitter(config, tmodel,
-                                                             supervision);
+      supervision);
 
   for (size_t c = 0; c < chunks.size(); c++) {
     ChunkTimeInfo &chunk = chunks[c];
@@ -81,19 +81,19 @@ static bool ProcessFile(const discriminative::SplitDiscriminativeSupervisionOpti
 
     splitter.GetFrameRange(start_frame_subsampled,
                            num_frames_subsampled,
-                           (c == 0 ? false : true),
+        (c == 0 ? false : true),
                            &supervision_part);
 
     SubVector<BaseFloat> output_weights(
-        &(chunk.output_weights[0]),
-        static_cast<int32>(chunk.output_weights.size()));
+      &(chunk.output_weights[0]),
+      static_cast<int32>(chunk.output_weights.size()));
 
     int32 first_frame = 0;  // we shift the time-indexes of all these parts so
                             // that the supervised part starts from frame 0.
     NnetDiscriminativeSupervision nnet_supervision("output", supervision_part,
-                                                   output_weights,
-                                                   first_frame,
-                                                   frame_subsampling_factor);
+        output_weights,
+        first_frame,
+        frame_subsampling_factor);
     nnet_discriminative_eg.outputs[0].Swap(&nnet_supervision);
 
     nnet_discriminative_eg.inputs.resize(ivector_feats != NULL ? 2 : 1);
@@ -103,7 +103,7 @@ static bool ProcessFile(const discriminative::SplitDiscriminativeSupervisionOpti
         chunk.right_context;
 
     Matrix<BaseFloat> input_frames(tot_input_frames, feats.NumCols(),
-                                   kUndefined);
+        kUndefined);
 
     int32 start_frame = chunk.first_frame - chunk.left_context;
     for (int32 t = start_frame; t < start_frame + tot_input_frames; t++) {
@@ -112,7 +112,7 @@ static bool ProcessFile(const discriminative::SplitDiscriminativeSupervisionOpti
       if (t2 >= num_input_frames) t2 = num_input_frames - 1;
       int32 j = t - start_frame;
       SubVector<BaseFloat> src(feats, t2),
-          dest(input_frames, j);
+      dest(input_frames, j);
       dest.CopyFromVec(src);
     }
 
@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
     RandomAccessInt32VectorReader ali_reader(num_ali_rspecifier);
     NnetDiscriminativeExampleWriter example_writer(examples_wspecifier);
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
 
     int32 num_err = 0;
 
@@ -264,8 +264,8 @@ int main(int argc, char *argv[]) {
         }
         if (online_ivector_feats != NULL &&
             (abs(feats.NumRows() - (online_ivector_feats->NumRows() *
-                                    online_ivector_period)) > length_tolerance
-             || online_ivector_feats->NumRows() == 0)) {
+            online_ivector_period)) > length_tolerance
+            || online_ivector_feats->NumRows() == 0)) {
           KALDI_WARN << "Length difference between feats " << feats.NumRows()
                      << " and iVectors " << online_ivector_feats->NumRows()
                      << "exceeds tolerance " << length_tolerance;
@@ -281,7 +281,7 @@ int main(int argc, char *argv[]) {
     }
     if (num_err > 0)
       KALDI_WARN << num_err << " utterances had errors and could "
-          "not be processed.";
+        "not be processed.";
     // utt_splitter prints diagnostics.
     return utt_splitter.ExitStatus();
   } catch(const std::exception &e) {

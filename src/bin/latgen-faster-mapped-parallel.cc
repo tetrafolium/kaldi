@@ -80,10 +80,10 @@ int main(int argc, char *argv[]) {
     bool determinize = config.determinize_lattice;
     CompactLatticeWriter compact_lattice_writer;
     LatticeWriter lattice_writer;
-    if (! (determinize ? compact_lattice_writer.Open(lattice_wspecifier)
-           : lattice_writer.Open(lattice_wspecifier)))
+    if (!(determinize ? compact_lattice_writer.Open(lattice_wspecifier)
+        : lattice_writer.Open(lattice_wspecifier)))
       KALDI_ERR << "Could not open table for writing lattices: "
-                 << lattice_wspecifier;
+                << lattice_wspecifier;
 
     Int32VectorWriter words_writer(words_wspecifier);
 
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     if (word_syms_filename != "")
       if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
         KALDI_ERR << "Could not read symbol table from file "
-                   << word_syms_filename;
+                  << word_syms_filename;
 
     double tot_like = 0.0;
     kaldi::int64 frame_count = 0;
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
         for (; !loglike_reader.Done(); loglike_reader.Next()) {
           std::string utt = loglike_reader.Key();
           Matrix<BaseFloat> *loglikes =
-            new Matrix<BaseFloat>(loglike_reader.Value());
+              new Matrix<BaseFloat>(loglike_reader.Value());
           loglike_reader.FreeCurrent();
           if (loglikes->NumRows() == 0) {
             KALDI_WARN << "Zero-length utterance: " << utt;
@@ -147,17 +147,17 @@ int main(int argc, char *argv[]) {
           continue;
         }
         const Matrix<BaseFloat> *loglikes =
-          new Matrix<BaseFloat>(loglike_reader.Value(utt));
+            new Matrix<BaseFloat>(loglike_reader.Value(utt));
         if (loglikes->NumRows() == 0) {
           KALDI_WARN << "Zero-length utterance: " << utt;
           num_fail++;
           delete loglikes;
           continue;
         }
-        fst::VectorFst<StdArc> *fst = 
-          new fst::VectorFst<StdArc>(fst_reader.Value());
+        fst::VectorFst<StdArc> *fst =
+            new fst::VectorFst<StdArc>(fst_reader.Value());
         LatticeFasterDecoder *decoder =
-          new LatticeFasterDecoder(config, fst);
+            new LatticeFasterDecoder(config, fst);
         DecodableMatrixScaledMapped *decodable = new
             DecodableMatrixScaledMapped(trans_model, acoustic_scale, loglikes);
         DecodeUtteranceLatticeFasterClass *task =

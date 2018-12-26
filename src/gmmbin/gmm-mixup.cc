@@ -36,14 +36,14 @@ int main(int argc, char *argv[]) {
         " gmm-mixup --mix-up=4000 1.mdl 1.occs 2.mdl\n"
         "e.g. of merging:\n"
         " gmm-mixup --merge=2000 1.mdl 1.occs 2.mdl\n";
-        
+
     bool binary_write = true;
     int32 mixup = 0;
     int32 mixdown = 0;
     BaseFloat perturb_factor = 0.01;
     BaseFloat power = 0.2;
     BaseFloat min_count = 20.0;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("mix-up", &mixup, "Increase number of mixture components to "
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
       ReadKaldiObject(occs_in_filename, &occs);
       if (occs.Dim() != am_gmm.NumPdfs())
         KALDI_ERR << "Dimension of state occupancies " << occs.Dim()
-                   << " does not match num-pdfs " << am_gmm.NumPdfs();
+                  << " does not match num-pdfs " << am_gmm.NumPdfs();
 
       if (mixdown != 0)
         am_gmm.MergeByCount(occs, mixdown, power, min_count);

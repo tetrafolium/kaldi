@@ -83,13 +83,13 @@ bool GstBufferSource::Read(Vector<BaseFloat> *data) {
     }
     uint32 nbytes_from_current =
         std::min(nsamples_req * sizeof(SampleType) - nbytes_transferred,
-                 (gst_buffer_get_size(current_buffer_) - pos_in_current_buf_));
+            (gst_buffer_get_size(current_buffer_) - pos_in_current_buf_));
     uint32 nbytes_extracted =
         gst_buffer_extract(current_buffer_, pos_in_current_buf_,
-                           (reinterpret_cast<char *>(buf)) + nbytes_transferred,
+            (reinterpret_cast<char *>(buf)) + nbytes_transferred,
                            nbytes_from_current);
     KALDI_ASSERT(nbytes_extracted == nbytes_from_current
-                 && "Unexpected number of bytes extracted from Gst buffer");
+        && "Unexpected number of bytes extracted from Gst buffer");
 
     nbytes_transferred += nbytes_from_current;
     pos_in_current_buf_ += nbytes_from_current;
@@ -102,7 +102,7 @@ bool GstBufferSource::Read(Vector<BaseFloat> *data) {
   }
 
   uint32 nsamples_received = nbytes_transferred / sizeof(SampleType);
-  for (int i = 0; i < nsamples_received ; ++i) {
+  for (int i = 0; i < nsamples_received; ++i) {
     (*data)(i) = static_cast<BaseFloat>(buf[i]);
   }
 
@@ -110,7 +110,7 @@ bool GstBufferSource::Read(Vector<BaseFloat> *data) {
     data->Resize(nsamples_received, kCopyData);
   }
   return !((g_async_queue_length(buf_queue_) < sizeof(SampleType))
-      && ended_
-      && (current_buffer_ == NULL));
+         && ended_
+         && (current_buffer_ == NULL));
 }
 }

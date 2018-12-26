@@ -24,7 +24,7 @@ namespace kaldi {
 
 
 OnlineFeaturePipelineConfig::OnlineFeaturePipelineConfig(
-    const OnlineFeaturePipelineCommandLineConfig &config) {
+  const OnlineFeaturePipelineCommandLineConfig &config) {
   if (config.feature_type == "mfcc" || config.feature_type == "plp" ||
       config.feature_type == "fbank") {
     feature_type = config.feature_type;
@@ -102,17 +102,17 @@ OnlineFeaturePipelineConfig::OnlineFeaturePipelineConfig(
 
 
 OnlineFeaturePipeline::OnlineFeaturePipeline(
-    const OnlineFeaturePipelineConfig &config,
-    const Matrix<BaseFloat> &lda_mat,
-    const Matrix<BaseFloat> &global_cmvn_stats):
-    config_(config), lda_mat_(lda_mat), global_cmvn_stats_(global_cmvn_stats) {
+  const OnlineFeaturePipelineConfig &config,
+  const Matrix<BaseFloat> &lda_mat,
+  const Matrix<BaseFloat> &global_cmvn_stats) :
+  config_(config), lda_mat_(lda_mat), global_cmvn_stats_(global_cmvn_stats) {
   Init();
 }
 
 
 OnlineFeaturePipeline::OnlineFeaturePipeline(
-    const OnlineFeaturePipelineConfig &config):
-    config_(config) {
+  const OnlineFeaturePipelineConfig &config) :
+  config_(config) {
   if (config.lda_rxfilename != "")
     ReadKaldiObject(config.lda_rxfilename, &lda_mat_);
   if (config.global_cmvn_stats_rxfilename != "")
@@ -211,8 +211,8 @@ void OnlineFeaturePipeline::Init() {
 
   if (lda_mat_.NumRows() != 0) {
     lda_ = new OnlineTransform(lda_mat_,
-                               (splice_or_delta_ != NULL ?
-                                splice_or_delta_ : feature_));
+            (splice_or_delta_ != NULL ?
+            splice_or_delta_ : feature_));
   } else {
     lda_ = NULL;
   }
@@ -221,7 +221,7 @@ void OnlineFeaturePipeline::Init() {
 }
 
 void OnlineFeaturePipeline::SetTransform(
-    const MatrixBase<BaseFloat> &transform) {
+  const MatrixBase<BaseFloat> &transform) {
   if (fmllr_ != NULL) {  // we already had a transform;  delete this
     // object.
     delete fmllr_;
@@ -249,7 +249,7 @@ int32 OnlineFeaturePipeline::NumFramesReady() const {
 }
 
 void OnlineFeaturePipeline::GetFrame(int32 frame,
-                                     VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   AdaptedFeature()->GetFrame(frame, feat);
 }
 
@@ -270,8 +270,8 @@ OnlineFeaturePipeline::~OnlineFeaturePipeline() {
 }
 
 void OnlineFeaturePipeline::AcceptWaveform(
-    BaseFloat sampling_rate,
-    const VectorBase<BaseFloat> &waveform) {
+  BaseFloat sampling_rate,
+  const VectorBase<BaseFloat> &waveform) {
   base_feature_->AcceptWaveform(sampling_rate, waveform);
   if (pitch_)
     pitch_->AcceptWaveform(sampling_rate, waveform);

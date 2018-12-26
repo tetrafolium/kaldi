@@ -48,7 +48,7 @@ void ConstIntegerSet<I>::InitInternal() {
       if (range < slow_set_.size() * 8 * sizeof(I)) {
         // (assuming 1 bit per element)...
         quick_set_.resize(range, false);
-        for (size_t i = 0;i < slow_set_.size();i++)
+        for (size_t i = 0; i < slow_set_.size(); i++)
           quick_set_[slow_set_[i] - lowest_member_] = true;
         quick_ = true;
       } else {

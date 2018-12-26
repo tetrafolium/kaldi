@@ -36,7 +36,7 @@ namespace kaldi {
 /// to the given file, in text format.
 /// returns true if succeeded.
 bool WriteIntegerVectorSimple(std::string wxfilename,
-                              const std::vector<int32> &v);
+    const std::vector<int32> &v);
 
 /// ReadFromList attempts to read this list of integers, one per line,
 /// from the given file, in text format.
@@ -50,10 +50,10 @@ bool ReadIntegerVectorSimple(std::string rxfilename, std::vector<int32> *v);
 // 4 5 6
 // etc.
 bool WriteIntegerVectorVectorSimple(std::string wxfilename,
-                                    const std::vector<std::vector<int32> > &v);
+    const std::vector<std::vector<int32> > &v);
 
 bool ReadIntegerVectorVectorSimple(std::string rxfilename,
-                                   std::vector<std::vector<int32> > *v);
+    std::vector<std::vector<int32> > *v);
 
 
 }  // end namespace kaldi.

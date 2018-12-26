@@ -47,16 +47,16 @@ struct BiglmFasterDecoderOptions: public FasterDecoderOptions {
     G's together; one has negated likelihoods and works by removing the
     LM probabilities that you made HCLG with, and one is the language model
     you want to use.
-*/
+ */
 class BiglmFasterDecoder {
- public:
+public:
   typedef fst::StdArc Arc;
   typedef Arc::Label Label;
   typedef Arc::StateId StateId;
   // A PairId will be constructed as: (StateId in fst) + (StateId in lm_diff_fst) << 32;
   typedef uint64 PairId;
   typedef Arc::Weight Weight;
-  
+
   // This constructor is the same as for FasterDecoder, except the second
   // argument (lm_diff_fst) is new; it's an FST (actually, a
   // DeterministicOnDemandFst) that represents the difference in LM scores
@@ -68,16 +68,16 @@ class BiglmFasterDecoder {
   // Whenever we cross a word, we need to propagate the state within
   // lm_diff_fst.
   BiglmFasterDecoder(const fst::Fst<fst::StdArc> &fst,
-                     const BiglmFasterDecoderOptions &opts,
-                     fst::DeterministicOnDemandFst<fst::StdArc> *lm_diff_fst):
-      fst_(fst), lm_diff_fst_(lm_diff_fst), opts_(opts), warned_noarc_(false) {
+      const BiglmFasterDecoderOptions &opts,
+      fst::DeterministicOnDemandFst<fst::StdArc> *lm_diff_fst) :
+    fst_(fst), lm_diff_fst_(lm_diff_fst), opts_(opts), warned_noarc_(false) {
     KALDI_ASSERT(opts_.hash_ratio >= 1.0);  // less doesn't make much sense.
     KALDI_ASSERT(opts_.max_active > 1);
     KALDI_ASSERT(fst.Start() != fst::kNoStateId &&
                  lm_diff_fst->Start() != fst::kNoStateId);
     toks_.SetSize(1000);  // just so on the first frame we do something reasonable.
   }
-  
+
   void SetOptions(const BiglmFasterDecoderOptions &opts) { opts_ = opts; }
 
   ~BiglmFasterDecoder() {
@@ -113,7 +113,7 @@ class BiglmFasterDecoder {
   }
 
   bool GetBestPath(fst::MutableFst<LatticeArc> *fst_out,
-                   bool use_final_probs = true) {
+      bool use_final_probs = true) {
     // GetBestPath gets the decoding output.  If "use_final_probs" is true
     // AND we reached a final state, it limits itself to final states;
     // otherwise it gets the most likely token not taking into
@@ -134,10 +134,10 @@ class BiglmFasterDecoder {
       for (const Elem *e = toks_.GetList(); e != NULL; e = e->tail) {
         Weight fst_final = fst_.Final(PairToState(e->key)),
             lm_final = lm_diff_fst_->Final(PairToLmState(e->key)),
-            final = Times(fst_final, lm_final);
+        final = Times(fst_final, lm_final);
         Weight this_weight = Times(e->val->weight_, final);
         if (this_weight != Weight::Zero() &&
-           this_weight.Value() < best_weight.Value()) {
+            this_weight.Value() < best_weight.Value()) {
           best_weight = this_weight;
           best_final = final;
           best_tok = e->val;
@@ -154,14 +154,14 @@ class BiglmFasterDecoder {
           graph_cost = tok->arc_.weight.Value(),
           ac_cost = tot_cost - graph_cost;
       LatticeArc l_arc(tok->arc_.ilabel,
-                       tok->arc_.olabel,
-                       LatticeWeight(graph_cost, ac_cost),
-                       tok->arc_.nextstate);
+          tok->arc_.olabel,
+          LatticeWeight(graph_cost, ac_cost),
+          tok->arc_.nextstate);
       arcs_reverse.push_back(l_arc);
     }
     KALDI_ASSERT(arcs_reverse.back().nextstate == fst_.Start());
     arcs_reverse.pop_back();  // that was a "fake" token... gives no info.
-    
+
     StateId cur_state = fst_out->AddState();
     fst_out->SetStart(cur_state);
     for (ssize_t i = static_cast<ssize_t>(arcs_reverse.size())-1; i >= 0; i--) {
@@ -179,11 +179,11 @@ class BiglmFasterDecoder {
     return true;
   }
 
- private:
+private:
   inline PairId ConstructPair(StateId fst_state, StateId lm_state) {
     return static_cast<PairId>(fst_state) + (static_cast<PairId>(lm_state) << 32);
   }
-  
+
   static inline StateId PairToState(PairId state_pair) {
     return static_cast<StateId>(static_cast<uint32>(state_pair));
   }
@@ -192,7 +192,7 @@ class BiglmFasterDecoder {
   }
 
   class Token {
-   public:
+public:
     Arc arc_; // contains only the graph part of the cost,
     // including the part in "fst" (== HCLG) plus lm_diff_fst.
     // We can work out the acoustic part from difference between
@@ -200,8 +200,8 @@ class BiglmFasterDecoder {
     Token *prev_;
     int32 ref_count_;
     Weight weight_; // weight up to current point.
-    inline Token(const Arc &arc, Weight &ac_weight, Token *prev):
-        arc_(arc), prev_(prev), ref_count_(1) {
+    inline Token(const Arc &arc, Weight &ac_weight, Token *prev) :
+      arc_(arc), prev_(prev), ref_count_(1) {
       if (prev) {
         prev->ref_count_++;
         weight_ = Times(Times(prev->weight_, arc.weight), ac_weight);
@@ -209,8 +209,8 @@ class BiglmFasterDecoder {
         weight_ = Times(arc.weight, ac_weight);
       }
     }
-    inline Token(const Arc &arc, Token *prev):
-        arc_(arc), prev_(prev), ref_count_(1) {
+    inline Token(const Arc &arc, Token *prev) :
+      arc_(arc), prev_(prev), ref_count_(1) {
       if (prev) {
         prev->ref_count_++;
         weight_ = Times(prev->weight_, arc.weight);
@@ -228,7 +228,7 @@ class BiglmFasterDecoder {
       if (prev_ != NULL) TokenDelete(prev_);
     }
     inline static void TokenDelete(Token *tok) {
-      if (tok->ref_count_ == 1) { 
+      if (tok->ref_count_ == 1) {
         delete tok;
       } else {
         tok->ref_count_--;
@@ -240,7 +240,7 @@ class BiglmFasterDecoder {
 
   /// Gets the weight cutoff.  Also counts the active tokens.
   BaseFloat GetCutoff(Elem *list_head, size_t *tok_count,
-                      BaseFloat *adaptive_beam, Elem **best_elem) {
+      BaseFloat *adaptive_beam, Elem **best_elem) {
     BaseFloat best_weight = 1.0e+10;  // positive == high cost == bad.
     size_t count = 0;
     if (opts_.max_active == std::numeric_limits<int32>::max() &&
@@ -268,8 +268,8 @@ class BiglmFasterDecoder {
       if (tok_count != NULL) *tok_count = count;
 
       BaseFloat beam_cutoff = best_weight + opts_.beam,
-        min_active_cutoff = std::numeric_limits<BaseFloat>::infinity(),
-        max_active_cutoff = std::numeric_limits<BaseFloat>::infinity();
+          min_active_cutoff = std::numeric_limits<BaseFloat>::infinity(),
+          max_active_cutoff = std::numeric_limits<BaseFloat>::infinity();
 
       if (tmp_array_.size() > static_cast<size_t>(opts_.max_active)) {
         std::nth_element(tmp_array_.begin(),
@@ -306,14 +306,14 @@ class BiglmFasterDecoder {
 
   void PossiblyResizeHash(size_t num_toks) {
     size_t new_sz = static_cast<size_t>(static_cast<BaseFloat>(num_toks)
-                                        * opts_.hash_ratio);
+        * opts_.hash_ratio);
     if (new_sz > toks_.Size()) {
       toks_.SetSize(new_sz);
     }
   }
 
   inline StateId PropagateLm(StateId lm_state,
-                             Arc *arc) { // returns new LM state.
+      Arc *arc) {                        // returns new LM state.
     if (arc->olabel == 0) {
       return lm_state; // no change in LM state if no word crossed.
     } else { // Propagate in the LM-diff FST.
@@ -323,7 +323,7 @@ class BiglmFasterDecoder {
         if (!warned_noarc_) {
           warned_noarc_ = true;
           KALDI_WARN << "No arc available in LM (unlikely to be correct "
-              "if a statistical language model); will not warn again";
+            "if a statistical language model); will not warn again";
         }
         arc->weight = Weight::Zero();
         return lm_state; // doesn't really matter what we return here; will
@@ -332,7 +332,7 @@ class BiglmFasterDecoder {
         arc->weight = Times(arc->weight, lm_arc.weight);
         arc->olabel = lm_arc.olabel; // probably will be the same.
         return lm_arc.nextstate; // return the new LM state.
-      }      
+      }
     }
   }
 
@@ -345,7 +345,7 @@ class BiglmFasterDecoder {
     BaseFloat weight_cutoff = GetCutoff(last_toks, &tok_cnt,
                                         &adaptive_beam, &best_elem);
     PossiblyResizeHash(tok_cnt);  // This makes sure the hash is always big enough.
-    
+
     // This is the cutoff we use after adding in the log-likes (i.e.
     // for the next frame).  This is a bound on the cutoff we will use
     // on the next frame.
@@ -359,13 +359,13 @@ class BiglmFasterDecoder {
           lm_state = PairToLmState(state_pair);
       Token *tok = best_elem->val;
       for (fst::ArcIterator<fst::Fst<Arc> > aiter(fst_, state);
-           !aiter.Done();
-           aiter.Next()) {
-        Arc arc = aiter.Value();        
+          !aiter.Done();
+          aiter.Next()) {
+        Arc arc = aiter.Value();
         if (arc.ilabel != 0) {  // we'd propagate..
           PropagateLm(lm_state, &arc); // may affect "arc.weight".
           // We don't need the return value (the new LM state).
-          BaseFloat ac_cost = - decodable->LogLikelihood(frame, arc.ilabel),
+          BaseFloat ac_cost = -decodable->LogLikelihood(frame, arc.ilabel),
               new_weight = arc.weight.Value() + tok->weight_.Value() + ac_cost;
           if (new_weight + adaptive_beam < next_weight_cutoff)
             next_weight_cutoff = new_weight + adaptive_beam;
@@ -422,9 +422,9 @@ class BiglmFasterDecoder {
 
   // TODO: first time we go through this, could avoid using the queue.
   void ProcessNonemitting(BaseFloat cutoff) {
-    // Processes nonemitting arcs for one frame. 
+    // Processes nonemitting arcs for one frame.
     KALDI_ASSERT(queue_.empty());
-    for (const Elem *e = toks_.GetList(); e != NULL;  e = e->tail)
+    for (const Elem *e = toks_.GetList(); e != NULL; e = e->tail)
       queue_.push_back(e->key);
     while (!queue_.empty()) {
       PairId state_pair = queue_.back();
@@ -438,8 +438,8 @@ class BiglmFasterDecoder {
       StateId state = PairToState(state_pair),
           lm_state = PairToLmState(state_pair);
       for (fst::ArcIterator<fst::Fst<Arc> > aiter(fst_, state);
-           !aiter.Done();
-           aiter.Next()) {
+          !aiter.Done();
+          aiter.Next()) {
         const Arc &arc_ref = aiter.Value();
         if (arc_ref.ilabel == 0) {  // propagate nonemitting only...
           Arc arc(arc_ref);

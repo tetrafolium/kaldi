@@ -55,7 +55,7 @@ namespace kaldi {
    changed feature (the NVidia docs were never super-clear regarding device
    initialization).  But regardless, changing to this new mechanism should be
    harmless even if the problem was specific to the CLSP grid.
-*/
+ */
 
 static bool GetCudaContext(int32 num_gpus, std::string *debug_str) {
   std::ostringstream debug_stream;
@@ -155,7 +155,7 @@ void CuDevice::SelectGpuId(std::string use_gpu) {
   } else {
     int32 num_times = 0;
     BaseFloat wait_time = 0.0;
-    while (! got_context) {
+    while (!got_context) {
       int32 sec_sleep = 5;
       if (num_times == 0)
         KALDI_WARN << "Will try again indefinitely every " << sec_sleep
@@ -254,24 +254,24 @@ bool CuDevice::IsComputeExclusive() {
   }
   // find out whether compute exclusive mode is used
   switch (gpu_prop.computeMode) {
-    case cudaComputeModeExclusive :
-      KALDI_LOG << "CUDA setup operating under Compute Exclusive Mode.";
-      return true;
-      break;
+  case cudaComputeModeExclusive:
+    KALDI_LOG << "CUDA setup operating under Compute Exclusive Mode.";
+    return true;
+    break;
 #if (CUDA_VERSION >= 4000)
-    case cudaComputeModeExclusiveProcess :
-      KALDI_LOG << "CUDA setup operating under Compute Exclusive Process Mode.";
-      return true;
-      break;
+  case cudaComputeModeExclusiveProcess:
+    KALDI_LOG << "CUDA setup operating under Compute Exclusive Process Mode.";
+    return true;
+    break;
 #endif
-    default :
-      // The computation mode is not compute-exclusive,
-      // in this case we release the GPU context...
-      e = cudaThreadExit(); // deprecated, but for legacy reason not cudaDeviceReset
-      if (e != cudaSuccess) {
-        KALDI_CUDA_ERR(e, "Failed to release CUDA context on a GPU");
-      }
-      return false;
+  default:
+    // The computation mode is not compute-exclusive,
+    // in this case we release the GPU context...
+    e = cudaThreadExit();   // deprecated, but for legacy reason not cudaDeviceReset
+    if (e != cudaSuccess) {
+      KALDI_CUDA_ERR(e, "Failed to release CUDA context on a GPU");
+    }
+    return false;
   }
 }
 
@@ -301,47 +301,47 @@ bool CuDevice::SelectGpuIdAuto() {
   for(int32 n = 0; n < num_gpus; n++) {
     int32 ret = cudaSetDevice(n);
     switch(ret) {
-      case cudaSuccess : {
-        // create the CUDA context for the thread
-        cudaThreadSynchronize(); // deprecated, but for legacy not cudaDeviceSynchronize
-        // get GPU name
-        char name[128];
-        DeviceGetName(name,128,n);
-        // get GPU memory stats
-        int64 free, total;
-        std::string mem_stats;
-        mem_stats = GetFreeMemory(&free, &total);
-        // log
-        KALDI_LOG << "cudaSetDevice(" << n << "): "
-                  << name << "\t" << mem_stats;
+    case cudaSuccess: {
+      // create the CUDA context for the thread
+      cudaThreadSynchronize();   // deprecated, but for legacy not cudaDeviceSynchronize
+      // get GPU name
+      char name[128];
+      DeviceGetName(name,128,n);
+      // get GPU memory stats
+      int64 free, total;
+      std::string mem_stats;
+      mem_stats = GetFreeMemory(&free, &total);
+      // log
+      KALDI_LOG << "cudaSetDevice(" << n << "): "
+                << name << "\t" << mem_stats;
 
-        // We have seen that in some cases GetFreeMemory returns zero
-        // That will produce nan after division, which might confuse
-        // the sorting routine. Or maybe not, but let's keep it clean
-        if (total <= 0) {
-          KALDI_LOG << "Total memory reported for device " << n << " is zero (or less).";
-        }
-        float mem_ratio = total > 0 ? free/(float)total : 0;
-        free_mem_ratio[n] = std::make_pair(n, mem_ratio);
+      // We have seen that in some cases GetFreeMemory returns zero
+      // That will produce nan after division, which might confuse
+      // the sorting routine. Or maybe not, but let's keep it clean
+      if (total <= 0) {
+        KALDI_LOG << "Total memory reported for device " << n << " is zero (or less).";
+      }
+      float mem_ratio = total > 0 ? free/(float)total : 0;
+      free_mem_ratio[n] = std::make_pair(n, mem_ratio);
 
-        // destroy the CUDA context for the thread
-        cudaThreadExit(); // deprecated, but for legacy reason not cudaDeviceReset
-      } break;
+      // destroy the CUDA context for the thread
+      cudaThreadExit();   // deprecated, but for legacy reason not cudaDeviceReset
+    } break;
 
 #if (CUDA_VERSION > 3020)
-      case cudaErrorDeviceAlreadyInUse :
-        KALDI_LOG << "cudaSetDevice(" << n << "): "
-                  << "Device cannot be accessed, used EXCLUSIVE-THREAD mode...";
-        break;
+    case cudaErrorDeviceAlreadyInUse:
+      KALDI_LOG << "cudaSetDevice(" << n << "): "
+                << "Device cannot be accessed, used EXCLUSIVE-THREAD mode...";
+      break;
 #endif
-      case cudaErrorInvalidDevice :
-        KALDI_LOG << "cudaSetDevice(" << n << "): "
-                  << "Device cannot be accessed, not a VALID CUDA device!";
-        break;
-      default :
-        KALDI_LOG << "cudaSetDevice(" << n << "): "
-                  << "returned " << ret << ", "
-                  << cudaGetErrorString((cudaError_t)ret);
+    case cudaErrorInvalidDevice:
+      KALDI_LOG << "cudaSetDevice(" << n << "): "
+                << "Device cannot be accessed, not a VALID CUDA device!";
+      break;
+    default:
+      KALDI_LOG << "cudaSetDevice(" << n << "): "
+                << "returned " << ret << ", "
+                << cudaGetErrorString((cudaError_t)ret);
     }
   }
   // find GPU with max free memory
@@ -386,7 +386,7 @@ bool CuDevice::SelectGpuIdAuto() {
 
 
 void CuDevice::AccuProfile(const char *function_name,
-                           const CuTimer &timer) {
+    const CuTimer &timer) {
   if (GetVerboseLevel() >= 1) {
     std::string key(function_name);
     cudaDeviceSynchronize();
@@ -426,7 +426,7 @@ void CuDevice::PrintProfile() {
     // times at the end.
     std::sort(pairs.begin(), pairs.end());
     size_t max_print = 15, start_pos = (pairs.size() <= max_print ?
-                                        0 : pairs.size() - max_print);
+        0 : pairs.size() - max_print);
     for (size_t i = start_pos; i < pairs.size(); i++)
       os << pairs[i].second << "\t" << pairs[i].first << "s\n";
     os << "Total GPU time:\t" << total_time << "s (may involve some double-counting)\n";
@@ -524,7 +524,7 @@ void CuDevice::CheckGpuHealth() {
   CuTimer t;
   // prepare small matrices for a quick test
   Matrix<BaseFloat> a(50, 100);
-  Matrix<BaseFloat> b(100 ,50);
+  Matrix<BaseFloat> b(100,50);
   a.SetRandn();
   b.SetRandUniform();
   // multiply 2 small matrices in CPU:
@@ -541,37 +541,37 @@ void CuDevice::CheckGpuHealth() {
 
 
 /*
-  void CuDevice::Free(void *ptr) {
-  CU_SAFE_CALL(cudaFree(ptr));
-  }
+   void CuDevice::Free(void *ptr) {
+   CU_SAFE_CALL(cudaFree(ptr));
+   }
 
-  void* CuDevice::MallocPitch(size_t row_bytes, size_t num_rows, size_t *pitch) {
-  void *ans = NULL;
-  cudaError_t e = cudaMallocPitch(&ans, pitch, row_bytes, num_rows);
-  if (e != cudaSuccess) {
-  PrintMemoryUsage();
-  KALDI_ERR << "CuDevice::MallocPitch: cannot allocate the requested memory ("
-  << row_bytes << " x " << num_rows << " = "
-  << row_bytes * num_rows << " bytes )";
-  }
-  return ans;
-  }
+   void* CuDevice::MallocPitch(size_t row_bytes, size_t num_rows, size_t *pitch) {
+   void *ans = NULL;
+   cudaError_t e = cudaMallocPitch(&ans, pitch, row_bytes, num_rows);
+   if (e != cudaSuccess) {
+   PrintMemoryUsage();
+   KALDI_ERR << "CuDevice::MallocPitch: cannot allocate the requested memory ("
+   << row_bytes << " x " << num_rows << " = "
+   << row_bytes * num_rows << " bytes )";
+   }
+   return ans;
+   }
 
-  void* CuDevice::Malloc(size_t size) {
-  void *ans = NULL;
-  cudaError_t e = cudaMalloc(&ans, size);
-  if (e != cudaSuccess) {
-  PrintMemoryUsage();
-  KALDI_ERR << "CuDevice::Malloc: cannot allocate the requested memory"
-  << " (" << size << " bytes )";
-  }
-  return ans;
-  }
-*/
+   void* CuDevice::Malloc(size_t size) {
+   void *ans = NULL;
+   cudaError_t e = cudaMalloc(&ans, size);
+   if (e != cudaSuccess) {
+   PrintMemoryUsage();
+   KALDI_ERR << "CuDevice::Malloc: cannot allocate the requested memory"
+   << " (" << size << " bytes )";
+   }
+   return ans;
+   }
+ */
 
 CuDevice::CuDevice() :
-    active_gpu_id_(-1), debug_stride_mode_(false),
-    num_debug_stride_allocations_(0), allocator_(CuAllocatorOptions()) {
+  active_gpu_id_(-1), debug_stride_mode_(false),
+  num_debug_stride_allocations_(0), allocator_(CuAllocatorOptions()) {
 }
 
 

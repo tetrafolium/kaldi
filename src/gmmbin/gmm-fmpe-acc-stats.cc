@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
         "<gselect-rspecifier> <posteriors-rspecifier> <fmpe-stats-out>\n"
         "e.g.: \n"
         " gmm-fmpe-acc-stats --model-derivative 1.accs 1.mdl 1.fmpe \"$feats\" ark:1.gselect ark:1.post 1.fmpe_stats\n";
-        
+
     ParseOptions po(usage);
     bool binary = true;
     std::string model_derivative_rxfilename;
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
         gselect_rspecifier = po.GetArg(4),
         posteriors_rspecifier = po.GetArg(5),
         stats_wxfilename = po.GetArg(6);
-    
+
     AmDiagGmm am_gmm;
     TransitionModel trans_model;
     {
@@ -76,9 +76,9 @@ int main(int argc, char *argv[]) {
     AccumAmDiagGmm model_derivative;
     if (have_indirect)
       ReadKaldiObject(model_derivative_rxfilename, &model_derivative);
-    
+
     FmpeStats fmpe_stats(fmpe);
-    
+
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
     RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier);
     RandomAccessPosteriorReader posteriors_reader(posteriors_rspecifier);
@@ -86,20 +86,20 @@ int main(int argc, char *argv[]) {
     BaseFloat tot_like = 0.0; // tot like weighted by posterior.
     int32 num_frames = 0;
     int32 num_done = 0, num_err = 0;
-    
+
     for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string key = feature_reader.Key();
       if (!posteriors_reader.HasKey(key)) {
         num_err++;
         KALDI_WARN << "No posteriors for utterance " << key;
         continue;
-      } 
+      }
       const Matrix<BaseFloat> &feat_in = feature_reader.Value();
       const Posterior &posterior = posteriors_reader.Value(key);
 
       if (static_cast<int32>(posterior.size()) != feat_in.NumRows()) {
         KALDI_WARN << "Posterior vector has wrong size " <<
-            (posterior.size()) << " vs. "<< (feat_in.NumRows());
+        (posterior.size()) << " vs. "<< (feat_in.NumRows());
         num_err++;
         continue;
       }
@@ -116,23 +116,23 @@ int main(int argc, char *argv[]) {
         num_err++;
         continue;
       }
-      
+
       num_done++;
       Matrix<BaseFloat> fmpe_feat(feat_in.NumRows(), feat_in.NumCols());
       fmpe.ComputeFeatures(feat_in, gselect, &fmpe_feat);
       fmpe_feat.AddMat(1.0, feat_in);
-      
+
       Matrix<BaseFloat> direct_deriv, indirect_deriv;
 
       tot_like += ComputeAmGmmFeatureDeriv(am_gmm, trans_model, posterior,
                                            fmpe_feat, &direct_deriv,
-                                           (have_indirect ? &model_derivative : NULL),
-                                           (have_indirect ? &indirect_deriv : NULL));
+              (have_indirect ? &model_derivative : NULL),
+              (have_indirect ? &indirect_deriv : NULL));
       num_frames += feat_in.NumRows();
 
       fmpe.AccStats(feat_in, gselect, direct_deriv,
-                    (have_indirect ? &indirect_deriv : NULL), &fmpe_stats);
-      
+          (have_indirect ? &indirect_deriv : NULL), &fmpe_stats);
+
       if (num_done % 100 == 0)
         KALDI_LOG << "Processed " << num_done << " utterances.";
     }
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
 
     Output ko(stats_wxfilename, binary);
     fmpe_stats.Write(ko.Stream(), binary);
-    
+
     return (num_done != 0 ? 0 : 1);
   } catch(const std::exception &e) {
     std::cerr << e.what();

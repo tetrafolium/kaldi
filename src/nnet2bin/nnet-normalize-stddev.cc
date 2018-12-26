@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
       kaldi::nnet2::Component *component = &(am_nnet.GetNnet().GetComponent(c));
       AffineComponent *ac = dynamic_cast<AffineComponent*>(component);
       BlockAffineComponent *bac =
-        dynamic_cast<BlockAffineComponent*>(component);
+          dynamic_cast<BlockAffineComponent*>(component);
       if (ac == NULL && bac == NULL)
         continue;
 
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
       if (nc == NULL && pwc == NULL)
         continue;
       if (pwc != NULL) {  // verify it's PowerComponent followed by
-                         // NormalizeComponent.
+                          // NormalizeComponent.
         if (c + 3 >= am_nnet.GetNnet().NumComponents())
           continue;
         component = &(am_nnet.GetNnet().GetComponent(c + 3));

@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
         "[<lattice-wspecifier>]";
     ParseOptions po(usage);
     Timer timer;
-    bool allow_partial = true; 
+    bool allow_partial = true;
     BaseFloat acoustic_scale = 0.1;
 
     std::string word_syms_filename;
@@ -95,10 +95,10 @@ int main(int argc, char *argv[]) {
     CompactLatticeWriter clat_writer(lattice_wspecifier);
 
     fst::SymbolTable *word_syms = NULL;
-    if (word_syms_filename != "") 
+    if (word_syms_filename != "")
       if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
         KALDI_ERR << "Could not read symbol table from file "
-                   << word_syms_filename;
+                  << word_syms_filename;
 
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
 
@@ -118,13 +118,13 @@ int main(int argc, char *argv[]) {
       }
 
       DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model, features,
-                                             acoustic_scale);
+          acoustic_scale);
       decoder.Decode(&gmm_decodable);
 
       VectorFst<LatticeArc> decoded;  // linear FST.
 
       if ( (allow_partial || decoder.ReachedFinal())
-           && decoder.GetBestPath(&decoded) ) {
+          && decoder.GetBestPath(&decoded) ) {
         if (!decoder.ReachedFinal())
           KALDI_WARN << "Decoder did not reach end-state, "
                      << "outputting partial traceback since --allow-partial=true";

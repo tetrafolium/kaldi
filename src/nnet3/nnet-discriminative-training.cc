@@ -25,14 +25,14 @@ namespace kaldi {
 namespace nnet3 {
 
 NnetDiscriminativeTrainer::NnetDiscriminativeTrainer(
-                                   const NnetDiscriminativeOptions &opts,
-                                   const TransitionModel &tmodel,
-                                   const VectorBase<BaseFloat> &priors,
-                                   Nnet *nnet):
-    opts_(opts), tmodel_(tmodel), log_priors_(priors),
-    nnet_(nnet),
-    compiler_(*nnet, opts_.nnet_config.optimize_config),
-    num_minibatches_processed_(0) {
+  const NnetDiscriminativeOptions &opts,
+  const TransitionModel &tmodel,
+  const VectorBase<BaseFloat> &priors,
+  Nnet *nnet) :
+  opts_(opts), tmodel_(tmodel), log_priors_(priors),
+  nnet_(nnet),
+  compiler_(*nnet, opts_.nnet_config.optimize_config),
+  num_minibatches_processed_(0) {
   if (opts.nnet_config.zero_component_stats)
     ZeroComponentStats(nnet);
   if (opts.nnet_config.momentum == 0.0 &&
@@ -53,7 +53,7 @@ NnetDiscriminativeTrainer::NnetDiscriminativeTrainer(
                 << opts.nnet_config.read_cache;
     } else {
       KALDI_WARN << "Could not open cached computation. "
-                    "Probably this is the first training iteration.";
+        "Probably this is the first training iteration.";
     }
   }
   log_priors_.ApplyLog();
@@ -73,8 +73,8 @@ void NnetDiscriminativeTrainer::Train(const NnetDiscriminativeExample &eg) {
   const NnetComputation *computation = compiler_.Compile(request);
 
   NnetComputer computer(nnet_config.compute_config, *computation,
-                        *nnet_,
-                        (delta_nnet_ == NULL ? nnet_ : delta_nnet_));
+      *nnet_,
+      (delta_nnet_ == NULL ? nnet_ : delta_nnet_));
   // give the inputs to the computer object.
   computer.AcceptInputs(*nnet_, eg.inputs);
   computer.Run();
@@ -107,7 +107,7 @@ void NnetDiscriminativeTrainer::Train(const NnetDiscriminativeExample &eg) {
 
 
 void NnetDiscriminativeTrainer::ProcessOutputs(const NnetDiscriminativeExample &eg,
-                                               NnetComputer *computer) {
+    NnetComputer *computer) {
   // normally the eg will have just one output named 'output', but
   // we don't assume this.
   std::vector<NnetDiscriminativeSupervision>::const_iterator iter = eg.outputs.begin(),
@@ -122,8 +122,8 @@ void NnetDiscriminativeTrainer::ProcessOutputs(const NnetDiscriminativeExample &
     const CuMatrixBase<BaseFloat> &nnet_output = computer->GetOutput(sup.name);
 
     CuMatrix<BaseFloat> nnet_output_deriv(nnet_output.NumRows(),
-                                          nnet_output.NumCols(),
-                                          kUndefined);
+        nnet_output.NumCols(),
+        kUndefined);
 
     bool use_xent = (opts_.discriminative_config.xent_regularize != 0.0);
     std::string xent_name = sup.name + "-xent";  // typically "output-xent".
@@ -144,7 +144,7 @@ void NnetDiscriminativeTrainer::ProcessOutputs(const NnetDiscriminativeExample &
                                       sup.supervision, nnet_output,
                                       &stats,
                                       &nnet_output_deriv,
-                                      (use_xent ? &xent_deriv : NULL));
+        (use_xent ? &xent_deriv : NULL));
 
     if (use_xent) {
       // this block computes the cross-entropy objective.
@@ -190,7 +190,7 @@ void NnetDiscriminativeTrainer::ProcessOutputs(const NnetDiscriminativeExample &
 
 bool NnetDiscriminativeTrainer::PrintTotalStats() const {
   unordered_map<std::string, DiscriminativeObjectiveFunctionInfo,
-    StringHasher>::const_iterator
+      StringHasher>::const_iterator
       iter = objf_info_.begin(),
       end = objf_info_.end();
   bool ans = false;
@@ -206,11 +206,11 @@ bool NnetDiscriminativeTrainer::PrintTotalStats() const {
 
 
 void DiscriminativeObjectiveFunctionInfo::UpdateStats(
-    const std::string &output_name,
-    const std::string &criterion,
-    int32 minibatches_per_phase,
-    int32 minibatch_counter,
-    discriminative::DiscriminativeObjectiveInfo this_minibatch_stats) {
+  const std::string &output_name,
+  const std::string &criterion,
+  int32 minibatches_per_phase,
+  int32 minibatch_counter,
+  discriminative::DiscriminativeObjectiveInfo this_minibatch_stats) {
   int32 phase = minibatch_counter / minibatches_per_phase;
   if (phase != current_phase) {
     KALDI_ASSERT(phase == current_phase + 1); // or doesn't really make sense.
@@ -223,9 +223,9 @@ void DiscriminativeObjectiveFunctionInfo::UpdateStats(
 }
 
 void DiscriminativeObjectiveFunctionInfo::PrintStatsForThisPhase(
-    const std::string &output_name,
-    const std::string &criterion,
-    int32 minibatches_per_phase) const {
+  const std::string &output_name,
+  const std::string &criterion,
+  int32 minibatches_per_phase) const {
   int32 start_minibatch = current_phase * minibatches_per_phase,
       end_minibatch = start_minibatch + minibatches_per_phase - 1;
 
@@ -237,14 +237,14 @@ void DiscriminativeObjectiveFunctionInfo::PrintStatsForThisPhase(
 }
 
 bool DiscriminativeObjectiveFunctionInfo::PrintTotalStats(const std::string &name,
-                const std::string &criterion) const {
+    const std::string &criterion) const {
   BaseFloat objf = stats.TotalObjf(criterion) /stats.tot_t_weighted;
 
   double avg_gradients = (stats.tot_num_count + stats.tot_den_count) /
-                         stats.tot_t_weighted;
+      stats.tot_t_weighted;
   KALDI_LOG << "Average num+den count of stats is " << avg_gradients
-              << " per frame, over "
-              << stats.tot_t_weighted << " frames.";
+            << " per frame, over "
+            << stats.tot_t_weighted << " frames.";
   if (stats.tot_l2_term != 0.0) {
     KALDI_LOG << "Average l2 norm of output per frame is "
               << (stats.tot_l2_term / stats.tot_t_weighted) << " over "

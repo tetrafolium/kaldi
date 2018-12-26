@@ -24,7 +24,7 @@ namespace kaldi {
 
 template<>
 void WriteBasicType<bool>(std::ostream &os, bool binary, bool b) {
-  os << (b ? "T":"F");
+  os << (b ? "T" : "F");
   if (!binary) os << " ";
   if (os.fail())
     KALDI_ERR << "Write failure in WriteBasicType<bool>";
@@ -36,11 +36,11 @@ void ReadBasicType<bool>(std::istream &is, bool binary, bool *b) {
   if (!binary) is >> std::ws;  // eat up whitespace.
   char c = is.peek();
   if (c == 'T') {
-      *b = true;
-      is.get();
+    *b = true;
+    is.get();
   } else if (c == 'F') {
-      *b = false;
-      is.get();
+    *b = false;
+    is.get();
   } else {
     KALDI_ERR << "Read failure in ReadBasicType<bool>, file position is "
               << is.tellg() << ", next char is " << CharToString(c);

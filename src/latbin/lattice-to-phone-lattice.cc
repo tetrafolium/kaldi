@@ -46,13 +46,13 @@ int main(int argc, char *argv[]) {
         "Usage: lattice-to-phone-lattice [options] model lattice-rspecifier lattice-wspecifier\n"
         " e.g.: lattice-to-phone-lattice 1.mdl ark:1.lats ark:phones.lats\n"
         "See also: lattice-align-words, lattice-align-phones\n";
-      
+
     ParseOptions po(usage);
     bool replace_words = true;
     po.Register("replace-words", &replace_words,
                 "If true, replace words with phones; otherwise replace "
                 "transition-ids with phones.");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 3) {
@@ -63,13 +63,13 @@ int main(int argc, char *argv[]) {
     std::string model_rxfilename = po.GetArg(1),
         lats_rspecifier = po.GetArg(2),
         lats_wspecifier = po.GetArg(3);
-    
+
     int32 n_done = 0;
 
     TransitionModel trans_model;
-    
+
     ReadKaldiObject(model_rxfilename, &trans_model);
-    
+
     SequentialCompactLatticeReader clat_reader(lats_rspecifier);
     CompactLatticeWriter clat_writer(lats_wspecifier); // write as compact.
     for (; !clat_reader.Done(); clat_reader.Next()) {

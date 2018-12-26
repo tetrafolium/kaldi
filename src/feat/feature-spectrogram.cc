@@ -25,7 +25,7 @@
 namespace kaldi {
 
 SpectrogramComputer::SpectrogramComputer(const SpectrogramOptions &opts)
-    : opts_(opts), srfft_(NULL) {
+  : opts_(opts), srfft_(NULL) {
   if (opts.energy_floor > 0.0)
     log_energy_floor_ = Log(opts.energy_floor);
 
@@ -34,8 +34,8 @@ SpectrogramComputer::SpectrogramComputer(const SpectrogramOptions &opts)
     srfft_ = new SplitRadixRealFft<BaseFloat>(padded_window_size);
 }
 
-SpectrogramComputer::SpectrogramComputer(const SpectrogramComputer &other):
-    opts_(other.opts_), log_energy_floor_(other.log_energy_floor_), srfft_(NULL) {
+SpectrogramComputer::SpectrogramComputer(const SpectrogramComputer &other) :
+  opts_(other.opts_), log_energy_floor_(other.log_energy_floor_), srfft_(NULL) {
   if (other.srfft_ != NULL)
     srfft_ = new SplitRadixRealFft<BaseFloat>(*other.srfft_);
 }
@@ -45,9 +45,9 @@ SpectrogramComputer::~SpectrogramComputer() {
 }
 
 void SpectrogramComputer::Compute(BaseFloat signal_log_energy,
-                                  BaseFloat vtln_warp,
-                                  VectorBase<BaseFloat> *signal_frame,
-                                  VectorBase<BaseFloat> *feature) {
+    BaseFloat vtln_warp,
+    VectorBase<BaseFloat> *signal_frame,
+    VectorBase<BaseFloat> *feature) {
   KALDI_ASSERT(signal_frame->Dim() == opts_.frame_opts.PaddedWindowSize() &&
                feature->Dim() == this->Dim());
 
@@ -65,7 +65,7 @@ void SpectrogramComputer::Compute(BaseFloat signal_log_energy,
   // Convert the FFT into a power spectrum.
   ComputePowerSpectrum(signal_frame);
   SubVector<BaseFloat> power_spectrum(*signal_frame,
-                                      0, signal_frame->Dim() / 2 + 1);
+      0, signal_frame->Dim() / 2 + 1);
 
   power_spectrum.ApplyFloor(std::numeric_limits<BaseFloat>::epsilon());
   power_spectrum.ApplyLog();

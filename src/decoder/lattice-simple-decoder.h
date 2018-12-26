@@ -47,12 +47,12 @@ struct LatticeSimpleDecoderConfig {
                            // algorithm that prunes the tokens as we go.
   fst::DeterminizeLatticePhonePrunedOptions det_opts;
 
-  LatticeSimpleDecoderConfig(): beam(16.0),
-                                lattice_beam(10.0),
-                                prune_interval(25),
-                                determinize_lattice(true),
-                                beam_ratio(0.9),
-                                prune_scale(0.1) { }
+  LatticeSimpleDecoderConfig() : beam(16.0),
+    lattice_beam(10.0),
+    prune_interval(25),
+    determinize_lattice(true),
+    beam_ratio(0.9),
+    prune_scale(0.1) { }
   void Register(OptionsItf *opts) {
     det_opts.Register(opts);
     opts->Register("beam", &beam, "Decoding beam.");
@@ -74,16 +74,16 @@ struct LatticeSimpleDecoderConfig {
     for more information.
  */
 class LatticeSimpleDecoder {
- public:
+public:
   typedef fst::StdArc Arc;
   typedef Arc::Label Label;
   typedef Arc::StateId StateId;
   typedef Arc::Weight Weight;
   // instantiate this class onece for each thing you have to decode.
   LatticeSimpleDecoder(const fst::Fst<fst::StdArc> &fst,
-                       const LatticeSimpleDecoderConfig &config):
-      fst_(fst), config_(config), num_toks_(0) { config.Check(); }
-  
+      const LatticeSimpleDecoderConfig &config) :
+    fst_(fst), config_(config), num_toks_(0) { config.Check(); }
+
   ~LatticeSimpleDecoder() { ClearActiveTokens(); }
 
   const LatticeSimpleDecoderConfig &GetOptions() const {
@@ -100,7 +100,7 @@ class LatticeSimpleDecoder {
   bool ReachedFinal() const {
     return FinalRelativeCost() != std::numeric_limits<BaseFloat>::infinity();
   }
-  
+
   /// InitDecoding initializes the decoding, and should only be used if you
   /// intend to call AdvanceDecoding().  If you call Decode(), you don't need
   /// to call this.  You can call InitDecoding if you have already decoded an
@@ -130,7 +130,7 @@ class LatticeSimpleDecoder {
   /// take it as a good indication that we reached the final-state with
   /// reasonable likelihood.
   BaseFloat FinalRelativeCost() const;
-  
+
   // Outputs an FST corresponding to the single best path
   // through the lattice.  Returns true if result is nonempty
   // (using the return status is deprecated, it will become void).
@@ -138,7 +138,7 @@ class LatticeSimpleDecoder {
   // of the graph then it will include those as final-probs, else
   // it will treat all final-probs as one.
   bool GetBestPath(Lattice *lat,
-                   bool use_final_probs = true) const;
+      bool use_final_probs = true) const;
 
   // Outputs an FST corresponding to the raw, state-level
   // tracebacks.  Returns true if result is nonempty
@@ -147,7 +147,7 @@ class LatticeSimpleDecoder {
   // of the graph then it will include those as final-probs, else
   // it will treat all final-probs as one.
   bool GetRawLattice(Lattice *lat,
-                     bool use_final_probs = true) const;
+      bool use_final_probs = true) const;
 
   // This function is now deprecated, since now we do determinization from
   // outside the LatticeTrackingDecoder class.
@@ -155,10 +155,10 @@ class LatticeSimpleDecoder {
   // lattice (one path per word sequence).  [will become deprecated,
   // users should determinize themselves.]
   bool GetLattice(CompactLattice *clat,
-                  bool use_final_probs = true) const;
-  
-  inline int32 NumFramesDecoded() const { return active_toks_.size() - 1; }  
- private:
+      bool use_final_probs = true) const;
+
+  inline int32 NumFramesDecoded() const { return active_toks_.size() - 1; }
+private:
   struct Token;
   // ForwardLinks are the links from a token to a token on the next frame.
   // or sometimes on the current frame (for input-epsilon links).
@@ -171,13 +171,13 @@ class LatticeSimpleDecoder {
     ForwardLink *next; // next in singly-linked list of forward links from a
                        // token.
     ForwardLink(Token *next_tok, Label ilabel, Label olabel,
-                BaseFloat graph_cost, BaseFloat acoustic_cost, 
-                ForwardLink *next):
-        next_tok(next_tok), ilabel(ilabel), olabel(olabel),
-        graph_cost(graph_cost), acoustic_cost(acoustic_cost), 
-        next(next) { }
-  };  
-  
+        BaseFloat graph_cost, BaseFloat acoustic_cost,
+        ForwardLink *next) :
+      next_tok(next_tok), ilabel(ilabel), olabel(olabel),
+      graph_cost(graph_cost), acoustic_cost(acoustic_cost),
+      next(next) { }
+  };
+
   // Token is what's resident in a particular state at a particular time.
   // In this decoder a Token actually contains *forward* links.
   // When first created, a Token just has the (total) cost.    We add forward
@@ -190,17 +190,17 @@ class LatticeSimpleDecoder {
     // that any of the currently active states at the decoding front may
     // eventually succeed (e.g. if you were to take the currently active states
     // one by one and compute this difference, and then take the minimum).
-    
+
     ForwardLink *links; // Head of singly linked list of ForwardLinks
-    
+
     Token *next; // Next in list of tokens for this frame.
-    
+
     Token(BaseFloat tot_cost, BaseFloat extra_cost, ForwardLink *links,
-          Token *next): tot_cost(tot_cost), extra_cost(extra_cost), links(links),
-                        next(next) { }
+        Token *next) : tot_cost(tot_cost), extra_cost(extra_cost), links(links),
+      next(next) { }
     Token() {}
     void DeleteForwardLinks() {
-      ForwardLink *l = links, *m; 
+      ForwardLink *l = links, *m;
       while (l != NULL) {
         m = l->next;
         delete l;
@@ -209,17 +209,17 @@ class LatticeSimpleDecoder {
       links = NULL;
     }
   };
-  
+
   // head and tail of per-frame list of Tokens (list is in topological order),
   // and something saying whether we ever pruned it using PruneForwardLinks.
   struct TokenList {
     Token *toks;
     bool must_prune_forward_links;
     bool must_prune_tokens;
-    TokenList(): toks(NULL), must_prune_forward_links(true),
-                 must_prune_tokens(true) { }
+    TokenList() : toks(NULL), must_prune_forward_links(true),
+      must_prune_tokens(true) { }
   };
-  
+
 
   // FindOrAddToken either locates a token in cur_toks_, or if necessary inserts a new,
   // empty token (i.e. with no forward links) for the current frame.  [note: it's
@@ -229,25 +229,25 @@ class LatticeSimpleDecoder {
   // Returns the Token pointer.  Sets "changed" (if non-NULL) to true
   // if the token was newly created or the cost changed.
   inline Token *FindOrAddToken(StateId state, int32 frame_plus_one,
-                               BaseFloat tot_cost, bool emitting, bool *changed);
-  
+      BaseFloat tot_cost, bool emitting, bool *changed);
+
   // delta is the amount by which the extra_costs must
   // change before it sets "extra_costs_changed" to true.  If delta is larger,
   // we'll tend to go back less far toward the beginning of the file.
   void PruneForwardLinks(int32 frame, bool *extra_costs_changed,
-                         bool *links_pruned,
-                         BaseFloat delta);
+      bool *links_pruned,
+      BaseFloat delta);
 
   // PruneForwardLinksFinal is a version of PruneForwardLinks that we call
   // on the final frame.  If there are final tokens active, it uses the final-probs
   // for pruning, otherwise it treats all tokens as final.
   void PruneForwardLinksFinal();
-  
+
   // Prune away any tokens on this frame that have no forward links. [we don't do
   // this in PruneForwardLinks because it would give us a problem with dangling
   // pointers].
   void PruneTokensForFrame(int32 frame);
-  
+
   // Go backwards through still-alive tokens, pruning them if the
   // forward+backward cost is more than lat_beam away from the best path.  It's
   // possible to prove that this is "correct" in the sense that we won't lose
@@ -277,15 +277,15 @@ class LatticeSimpleDecoder {
   // You cannot call this after FinalizeDecoding() has been called; in that
   // case you should get the answer from class-member variables.
   void ComputeFinalCosts(unordered_map<Token*, BaseFloat> *final_costs,
-                         BaseFloat *final_relative_cost,
-                         BaseFloat *final_best_cost) const;
-  
+      BaseFloat *final_relative_cost,
+      BaseFloat *final_best_cost) const;
+
 
   // PruneCurrentTokens deletes the tokens from the "toks" map, but not
   // from the active_toks_ list, which could cause dangling forward pointers
   // (will delete it during regular pruning operation).
   void PruneCurrentTokens(BaseFloat beam, unordered_map<StateId, Token*> *toks);
-  
+
   unordered_map<StateId, Token*> cur_toks_;
   unordered_map<StateId, Token*> prev_toks_;
   std::vector<TokenList> active_toks_; // Lists of tokens, indexed by
@@ -308,7 +308,7 @@ class LatticeSimpleDecoder {
   /// decoding_finalized_ above., and ComputeFinalCosts().
   unordered_map<Token*, BaseFloat> final_costs_;
   BaseFloat final_relative_cost_;
-  BaseFloat final_best_cost_;  
+  BaseFloat final_best_cost_;
 };
 
 

@@ -26,7 +26,7 @@ namespace nnet3 {
 
 
 void ModifyNnetIvectorPeriod(int32 ivector_period,
-                             Nnet *nnet) {
+    Nnet *nnet) {
   KALDI_ASSERT(ivector_period > 0);
   std::vector<std::string> config_lines;
   nnet->GetConfigLines(false, &config_lines);
@@ -68,8 +68,8 @@ void ModifyNnetIvectorPeriod(int32 ivector_period,
 
 
 int32 GetChunkSize(const Nnet &nnet,
-                   int32 frame_subsampling_factor,
-                   int32 advised_chunk_size) {
+    int32 frame_subsampling_factor,
+    int32 advised_chunk_size) {
   int32 modulus = nnet.Modulus();
   KALDI_ASSERT(modulus > 0 && frame_subsampling_factor > 0 &&
                advised_chunk_size > 0);
@@ -100,12 +100,12 @@ template<class I> I  Mod(I m, I n) {
 
 
 static void CreateComputationRequestInternal(
-    int32 begin_input_t, int32 end_input_t,
-    int32 begin_output_t, int32 end_output_t,
-    int32 num_sequences,
-    int32 frame_subsampling_factor,
-    const std::set<int32> &ivector_times,
-    ComputationRequest *request) {
+  int32 begin_input_t, int32 end_input_t,
+  int32 begin_output_t, int32 end_output_t,
+  int32 num_sequences,
+  int32 frame_subsampling_factor,
+  const std::set<int32> &ivector_times,
+  ComputationRequest *request) {
   request->inputs.reserve(2);
   request->inputs.clear();
   request->inputs.resize(1 + (ivector_times.empty() ? 0 : 1));
@@ -130,8 +130,8 @@ static void CreateComputationRequestInternal(
       request->inputs[0].indexes.push_back(Index(n, t, x));
     }
     for (int32 t = begin_output_t;
-         t < end_output_t;
-         t += frame_subsampling_factor)
+        t < end_output_t;
+        t += frame_subsampling_factor)
       request->outputs[0].indexes.push_back(Index(n, t, x));
   }
   if (!ivector_times.empty()) {
@@ -141,7 +141,7 @@ static void CreateComputationRequestInternal(
     for (int32 n = 0; n < num_sequences; n++) {
       // note: std::sets store things in sorted order.
       for (std::set<int32>::const_iterator iter = ivector_times.begin();
-           iter != ivector_times.end(); ++iter) {
+          iter != ivector_times.end(); ++iter) {
         int32 t = *iter, x = 0;
         request->inputs[1].indexes.push_back(Index(n, t, x));
       }
@@ -151,15 +151,15 @@ static void CreateComputationRequestInternal(
 
 
 void CreateLoopedComputationRequestSimple(const Nnet &nnet,
-                                          int32 chunk_size,
-                                          int32 frame_subsampling_factor,
-                                          int32 ivector_period,
-                                          int32 extra_left_context_begin,
-                                          int32 extra_right_context,
-                                          int32 num_sequences,
-                                          ComputationRequest *request1,
-                                          ComputationRequest *request2,
-                                          ComputationRequest *request3) {
+    int32 chunk_size,
+    int32 frame_subsampling_factor,
+    int32 ivector_period,
+    int32 extra_left_context_begin,
+    int32 extra_right_context,
+    int32 num_sequences,
+    ComputationRequest *request1,
+    ComputationRequest *request2,
+    ComputationRequest *request3) {
   bool has_ivector = (nnet.InputDim("ivector") > 0);
   int32 left_context, right_context;
   ComputeSimpleNnetContext(nnet, &left_context, &right_context);
@@ -168,7 +168,7 @@ void CreateLoopedComputationRequestSimple(const Nnet &nnet,
                chunk_size % ivector_period == 0);
   KALDI_ASSERT(extra_left_context_begin >= 0 && extra_right_context >= 0);
   // note, 'end' is one past the last one.
-  int32 chunk1_input_begin_t = - left_context - extra_left_context_begin,
+  int32 chunk1_input_begin_t = -left_context - extra_left_context_begin,
       chunk1_input_end_t = chunk_size + right_context + extra_right_context,
       chunk2_input_begin_t = chunk1_input_end_t,
       chunk2_input_end_t = chunk2_input_begin_t + chunk_size,
@@ -186,14 +186,14 @@ void CreateLoopedComputationRequestSimple(const Nnet &nnet,
     for (int32 t = chunk2_input_begin_t; t < chunk2_input_end_t; t++) {
       int32 ivector_t = t - Mod(t, ivector_period);
       if (ivector_times2.count(ivector_t) == 0 &&
-	  ivector_times1.count(ivector_t) == 0)
+          ivector_times1.count(ivector_t) == 0)
         ivector_times2.insert(ivector_t);
     }
     for (int32 t = chunk3_input_begin_t; t < chunk3_input_end_t; t++) {
       int32 ivector_t = t - Mod(t, ivector_period);
       if (ivector_times3.count(ivector_t) == 0 &&
           ivector_times2.count(ivector_t) == 0 &&
-	  ivector_times1.count(ivector_t) == 0)
+          ivector_times1.count(ivector_t) == 0)
         ivector_times3.insert(ivector_t);
     }
   }
@@ -224,7 +224,7 @@ void CreateLoopedComputationRequestSimple(const Nnet &nnet,
 
 
 void AddTimeOffsetToComputationRequest(int32 t_offset,
-                                       ComputationRequest *request) {
+    ComputationRequest *request) {
   for (size_t i = 0; i < request->inputs.size(); i++) {
     size_t size = request->inputs[i].indexes.size();
     for (size_t j = 0; j < size; j++)
@@ -240,9 +240,9 @@ void AddTimeOffsetToComputationRequest(int32 t_offset,
 
 
 static bool ExtrapolateComputationRequest(
-    const ComputationRequest &request1,
-    const ComputationRequest &request2,
-    ComputationRequest *request3) {
+  const ComputationRequest &request1,
+  const ComputationRequest &request2,
+  ComputationRequest *request3) {
   // accepts two computation requests 'request1' and 'request2' that
   // must be identical except for a time offset, and creates 'request3'
   // that is the extrapolation of the next term in sequence.
@@ -273,13 +273,13 @@ static bool ExtrapolateComputationRequest(
    with a higher value of num_requests.
  */
 static bool CompileLoopedInternal(
-    const Nnet &nnet,
-    NnetOptimizeOptions optimize_opts,
-    const ComputationRequest &request1,
-    const ComputationRequest &request2,
-    const ComputationRequest &request3,
-    int32 num_requests,
-    NnetComputation *computation) {
+  const Nnet &nnet,
+  NnetOptimizeOptions optimize_opts,
+  const ComputationRequest &request1,
+  const ComputationRequest &request2,
+  const ComputationRequest &request3,
+  int32 num_requests,
+  NnetComputation *computation) {
 
   KALDI_ASSERT(num_requests >= 3);
   std::vector<ComputationRequest> extra_requests(num_requests - 3);
@@ -314,22 +314,22 @@ static bool CompileLoopedInternal(
            dont_really_care, computation);
 
   return computation->commands.size() != 0 &&
-      computation->commands.back().command_type == kGotoLabel;
+         computation->commands.back().command_type == kGotoLabel;
 }
 
 void CompileLooped(const Nnet &nnet,
-                   const NnetOptimizeOptions &optimize_opts,
-                   const ComputationRequest &request1,
-                   const ComputationRequest &request2,
-                   const ComputationRequest &request3,
-                   NnetComputation *computation) {
+    const NnetOptimizeOptions &optimize_opts,
+    const ComputationRequest &request1,
+    const ComputationRequest &request2,
+    const ComputationRequest &request3,
+    NnetComputation *computation) {
   int32 num_requests1 = 5, factor = 2, max_requests = 100,
       num_requests;
 
   Timer timer;
 
   for (num_requests = num_requests1; num_requests <= max_requests;
-       num_requests *= factor) {
+      num_requests *= factor) {
     if (CompileLoopedInternal(nnet, optimize_opts,
                              request1, request2, request3,
                              num_requests, computation)) {

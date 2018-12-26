@@ -40,15 +40,15 @@ SplitRadixComplexFft<Real>::SplitRadixComplexFft(MatrixIndexT N) {
   logn_ = 0;
   while (N > 1) {
     N >>= 1;
-    logn_ ++;
+    logn_++;
   }
   ComputeTables();
 }
 
 template <typename Real>
 SplitRadixComplexFft<Real>::SplitRadixComplexFft(
-    const SplitRadixComplexFft<Real> &other):
-    N_(other.N_), logn_(other.logn_) {
+  const SplitRadixComplexFft<Real> &other) :
+  N_(other.N_), logn_(other.logn_) {
   // This code duplicates tables from a previously computed object.
   // Compare with the code in ComputeTables().
   MatrixIndexT lg2 = logn_ >> 1;
@@ -61,7 +61,7 @@ SplitRadixComplexFft<Real>::SplitRadixComplexFft(
     tab_ = NULL;
   } else {
     tab_ = new Real*[logn_ - 3];
-    for (MatrixIndexT i = logn_; i >= 4 ; i--) {
+    for (MatrixIndexT i = logn_; i >= 4; i--) {
       MatrixIndexT m = 1 << i, m2 = m / 2, m4 = m2 / 2;
       MatrixIndexT this_array_size = 6 * (m4 - 2);
       tab_[i-4] = new Real[this_array_size];
@@ -95,7 +95,7 @@ void SplitRadixComplexFft<Real>::ComputeTables() {
     tab_ = NULL;
   } else {
     tab_ = new Real* [logn_-3];
-    for (i = logn_; i>=4 ; i--) {
+    for (i = logn_; i>=4; i--) {
       /* Compute a few constants */
       m = 1 << i; m2 = m / 2; m4 = m2 / 2; m8 = m4 /2;
 
@@ -113,10 +113,10 @@ void SplitRadixComplexFft<Real>::ComputeTables() {
         if (n == m8) continue;
         ang = n * M_2PI / m;
         c = std::cos(ang); s = std::sin(ang);
-        *cn++ = c; *spcn++ = - (s + c); *smcn++ = s - c;
+        *cn++ = c; *spcn++ = -(s + c); *smcn++ = s - c;
         ang = 3 * n * M_2PI / m;
         c = std::cos(ang); s = std::sin(ang);
-        *c3n++ = c; *spc3n++ = - (s + c); *smc3n++ = s - c;
+        *c3n++ = c; *spc3n++ = -(s + c); *smc3n++ = s - c;
       }
     }
   }
@@ -148,7 +148,7 @@ void SplitRadixComplexFft<Real>::Compute(Real *xr, Real *xi, bool forward) const
 
 template<typename Real>
 void SplitRadixComplexFft<Real>::Compute(Real *x, bool forward,
-                                         std::vector<Real> *temp_buffer) const {
+    std::vector<Real> *temp_buffer) const {
   KALDI_ASSERT(temp_buffer != NULL);
   if (temp_buffer->size() != N_)
     temp_buffer->resize(N_);
@@ -326,13 +326,13 @@ void SplitRadixComplexFft<Real>::ComputeRecursive(Real *xr, Real *xi, MatrixInde
       *xi2 = -sqhalf * (*xr2 + *xi2);
       *xr2 =  tmp2;
     } else {
-      tmp2 = *cn++ * (*xr1 + *xi1);
-      tmp1 = *spcn++ * *xr1 + tmp2;
-      *xr1 = *smcn++ * *xi1 + tmp2;
+      tmp2 = *cn++ *(*xr1 + *xi1);
+      tmp1 = *spcn++ **xr1 + tmp2;
+      *xr1 = *smcn++ **xi1 + tmp2;
       *xi1 = tmp1;
-      tmp2 = *c3n++ * (*xr2 + *xi2);
-      tmp1 = *spc3n++ * *xr2 + tmp2;
-      *xr2 = *smc3n++ * *xi2 + tmp2;
+      tmp2 = *c3n++ *(*xr2 + *xi2);
+      tmp1 = *spc3n++ **xr2 + tmp2;
+      *xr2 = *smc3n++ **xi2 + tmp2;
       *xi2 = tmp1;
     }
     xr1++; xr2++; xi1++; xi2++;
@@ -361,7 +361,7 @@ void SplitRadixRealFft<Real>::Compute(Real *data, bool forward) {
 // possible to replace it with more efficient code from Rico's book.
 template<typename Real>
 void SplitRadixRealFft<Real>::Compute(Real *data, bool forward,
-                                      std::vector<Real> *temp_buffer) const {
+    std::vector<Real> *temp_buffer) const {
   MatrixIndexT N = N_, N2 = N/2;
   KALDI_ASSERT(N%2 == 0);
   if (forward) // call to base class

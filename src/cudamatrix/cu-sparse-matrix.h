@@ -40,12 +40,12 @@ namespace kaldi {
 
 template <typename Real>
 Real TraceMatSmat(const CuMatrixBase<Real> &A,
-                  const CuSparseMatrix<Real> &B,
-                  MatrixTransposeType trans = kNoTrans);
+    const CuSparseMatrix<Real> &B,
+    MatrixTransposeType trans = kNoTrans);
 
 template <class Real>
 class CuSparseMatrix {
- public:
+public:
   friend class CuMatrixBase<float>;
   friend class CuMatrixBase<double>;
   friend class CuMatrixBase<Real>;
@@ -54,8 +54,8 @@ class CuSparseMatrix {
   friend class CuVectorBase<Real>;
 
   friend Real TraceMatSmat<Real>(const CuMatrixBase<Real> &A,
-                                 const CuSparseMatrix<Real> &B,
-                                 MatrixTransposeType trans);
+      const CuSparseMatrix<Real> &B,
+      MatrixTransposeType trans);
 
   MatrixIndexT NumRows() const { return num_rows_; }
 
@@ -65,7 +65,7 @@ class CuSparseMatrix {
 
   template <typename OtherReal>
   void CopyToMat(CuMatrixBase<OtherReal> *dest,
-                 MatrixTransposeType trans = kNoTrans) const;
+      MatrixTransposeType trans = kNoTrans) const;
 
   Real Sum() const;
 
@@ -121,7 +121,7 @@ class CuSparseMatrix {
 
   ~CuSparseMatrix() { }
 
- protected:
+protected:
   // The following two functions should only be called if we did not compile
   // with CUDA or could not get a CUDA card; in that case the contents are
   // interpreted the same as a regular sparse matrix.
@@ -132,7 +132,7 @@ class CuSparseMatrix {
     return *(reinterpret_cast<SparseMatrix<Real>* >(this));
   }
 
- private:
+private:
   // This member is only used if we did not compile for the GPU, or if the GPU
   // is not enabled.  It needs to be first because we reinterpret_cast this
   std::vector<SparseVector<Real> > cpu_rows_;

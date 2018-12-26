@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
     typedef kaldi::int32 int32;
 
     const char *usage =
-      "Sets learning rate coefficient inside of 'nnet1' model\n"
-      "Usage: nnet-set-learnrate --components=<csl> --coef=<float> <nnet-in> <nnet-out>\n"
-      "e.g.: nnet-set-learnrate --components=1:3:5 --coef=0.5 --bias-coef=0.1 nnet-in nnet-out\n";
+        "Sets learning rate coefficient inside of 'nnet1' model\n"
+        "Usage: nnet-set-learnrate --components=<csl> --coef=<float> <nnet-in> <nnet-out>\n"
+        "e.g.: nnet-set-learnrate --components=1:3:5 --coef=0.5 --bias-coef=0.1 nnet-in nnet-out\n";
 
     ParseOptions po(usage);
     bool binary = true;
@@ -45,8 +45,8 @@ int main(int argc, char *argv[]) {
         "'nnet-info' output, (example 1:3:5)");
 
     float coef = 1.0,
-          weight_coef = 1.0,
-          bias_coef = 1.0;
+        weight_coef = 1.0,
+        bias_coef = 1.0;
 
     po.Register("coef", &coef,
         "Learn-rate coefficient for both weight matrices and biases.");
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string nnet_in_filename = po.GetArg(1),
-      nnet_out_filename = po.GetArg(2);
+        nnet_out_filename = po.GetArg(2);
 
     Nnet nnet;
     nnet.Read(nnet_in_filename);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     for (int32 i = 0; i < components.size(); i++) {
       if (nnet.GetComponent(components[i]-1).IsUpdatable()) {
         UpdatableComponent& comp =
-          dynamic_cast<UpdatableComponent&>(nnet.GetComponent(components[i]-1));
+            dynamic_cast<UpdatableComponent&>(nnet.GetComponent(components[i]-1));
         comp.SetLearnRateCoef(coef * weight_coef);  // weight matrices, etc.,
         comp.SetBiasLearnRateCoef(coef * bias_coef);  // biases,
       }

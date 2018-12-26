@@ -24,15 +24,15 @@
 /* Do not include this file directly.  It is an implementation file included by PreDeterminize.h */
 
 /*
-  Predeterminization
+   Predeterminization
 
     This is a function that makes an FST compactly determinizable by inserting symbols on the input
-  side as necessary for disambiguation.  Note that we do not treat epsilon as a real symbol
-  when measuring determinizability in this sense.   The extra symbols are added to the vocabulary,
-  on the input side; these are of the form (prefix)1, (prefix)2, and so on without limit, where
-  (prefix) is some prefix the user provides, e.g. '#' (the function checks that this will not
-  lead to conflicts with symbols already in the FST).  The function tells us how many such
-  symbols it created.
+   side as necessary for disambiguation.  Note that we do not treat epsilon as a real symbol
+   when measuring determinizability in this sense.   The extra symbols are added to the vocabulary,
+   on the input side; these are of the form (prefix)1, (prefix)2, and so on without limit, where
+   (prefix) is some prefix the user provides, e.g. '#' (the function checks that this will not
+   lead to conflicts with symbols already in the FST).  The function tells us how many such
+   symbols it created.
 
    Note that there is a paper "Generalized optimization algorithm for speech recognition
    transducers" by Allauzen and Mohri, that deals with a similar issue, but this is a very
@@ -220,7 +220,7 @@
                 Change n[a] to h(n[a], m(a)).
 
 
-*/
+ */
 namespace fst {
 
 namespace pre_determinize_helpers {
@@ -241,7 +241,7 @@ inline bool HasBannedPrefixPlusDigits(SymbolTable *symTable, std::string prefix,
       if (isdigit(sym[prefix_len])) {  // we don't allow prefix followed by a digit, as a symbol.
         // Has at least one digit.
         size_t pos;
-        for (pos = prefix_len;sym[pos] != '\0'; pos++)
+        for (pos = prefix_len; sym[pos] != '\0'; pos++)
           if (!isdigit(sym[pos])) break;
         if (sym[pos] == '\0') {  // All remaining characters were digits.
           if (bad_sym != NULL) *bad_sym = (std::string) sym;
@@ -260,7 +260,7 @@ template<class T> void CopySetToVector(const std::set<T> s, vector<T> *v) {
   v->resize(s.size());
   typename std::set<T>::const_iterator siter = s.begin();
   typename vector<T>::iterator viter = v->begin();
-  for (;  siter != s.end(); ++siter, ++viter) {
+  for (; siter != s.end(); ++siter, ++viter) {
     assert(viter != v->end());
     *viter = *siter;
   }
@@ -289,14 +289,14 @@ vector<T>* InsertMember(const vector<T> m, vector<vector<T>*> *S) {
 // not problematic.  We assume that the fst is sorted on input label (so epsilon arcs first)
 // The algorithm is described in section (C) above.  We use the same variable for S and T.
 template<class Arc> void Closure(MutableFst<Arc> *fst, std::set<typename Arc::StateId> *S,
-                                 const vector<bool> &pVec) {
+    const vector<bool> &pVec) {
   typedef typename Arc::StateId StateId;
   vector<StateId> Q;
   CopySetToVector(*S, &Q);
   while (Q.size() != 0) {
     StateId s = Q.back();
     Q.pop_back();
-    for (ArcIterator<MutableFst<Arc> > aiter(*fst, s); ! aiter.Done(); aiter.Next()) {
+    for (ArcIterator<MutableFst<Arc> > aiter(*fst, s); !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       if (arc.ilabel != 0) break;  // Break from the loop: due to sorting there will be no
       // more transitions with epsilons as input labels.
@@ -315,8 +315,8 @@ template<class Arc> void Closure(MutableFst<Arc> *fst, std::set<typename Arc::St
 
 template<class Arc, class Int>
 void PreDeterminize(MutableFst<Arc> *fst,
-                    typename Arc::Label first_new_sym,
-                    vector<Int> *symsOut) {
+    typename Arc::Label first_new_sym,
+    vector<Int> *symsOut) {
   typedef typename Arc::Label Label;
   typedef typename Arc::StateId StateId;
   typedef size_t ArcId;  // Our own typedef, not standard OpenFst.  Use size_t
@@ -348,7 +348,7 @@ void PreDeterminize(MutableFst<Arc> *fst,
 
   StateId n_states = 0, max_state = 0;  // Compute n_states, max_state = highest-numbered state.
   {  // compute nStates, maxStates.
-    for (StateIterator<MutableFst<Arc> > iter(*fst); ! iter.Done(); iter.Next()) {
+    for (StateIterator<MutableFst<Arc> > iter(*fst); !iter.Done(); iter.Next()) {
       StateId state = iter.Value();
       assert(state>=0);
       n_states++;
@@ -363,8 +363,8 @@ void PreDeterminize(MutableFst<Arc> *fst,
     vector<bool> seen_vec(max_state+1, false);  // rather than counting incoming transitions we just have a bool that says we saw at least one.
 
     seen_vec[fst->Start()] = true;
-    for (StateIterator<MutableFst<Arc> > siter(*fst); ! siter.Done(); siter.Next()) {
-      for (ArcIterator<MutableFst<Arc> > aiter(*fst, siter.Value()); ! aiter.Done(); aiter.Next()) {
+    for (StateIterator<MutableFst<Arc> > siter(*fst); !siter.Done(); siter.Next()) {
+      for (ArcIterator<MutableFst<Arc> > aiter(*fst, siter.Value()); !aiter.Done(); aiter.Next()) {
         const Arc &arc = aiter.Value();
         assert(arc.nextstate>=0&&arc.nextstate<max_state+1);
         if (seen_vec[arc.nextstate])
@@ -382,7 +382,7 @@ void PreDeterminize(MutableFst<Arc> *fst,
   // WARNING: we should be sure to clean up this memory before exiting.  Do not return
   // or throw an exception from this function, later than this point, without cleaning up!
   // Note that the vectors are shared between Q and S (they "belong to" S.
-  vector<vector<StateId>* > S(max_state+1, (vector<StateId>*)(void*)0);
+  vector<vector<StateId>* > S(max_state+1, (vector<StateId>*)(void*) 0);
   vector<pair<vector<StateId>*, size_t> > Q;
 
   // D(iv): initialize S and Q.
@@ -390,10 +390,10 @@ void PreDeterminize(MutableFst<Arc> *fst,
     vector<StateId> all_seed_states;  // all "problematic" states, plus initial state (if not problematic).
     if (!p_vec[fst->Start()])
       all_seed_states.push_back(fst->Start());
-    for (StateId s = 0;s<=max_state; s++)
+    for (StateId s = 0; s<=max_state; s++)
       if (p_vec[s]) all_seed_states.push_back(s);
 
-    for (size_t idx = 0;idx < all_seed_states.size(); idx++) {
+    for (size_t idx = 0; idx < all_seed_states.size(); idx++) {
       StateId s = all_seed_states[idx];
       std::set<StateId> closure_s;
       closure_s.insert(s);  // insert "seed" state.
@@ -423,7 +423,7 @@ void PreDeterminize(MutableFst<Arc> *fst,
     size_t n =cur_pair.second;  // next special symbol to add.
 
     // (D)(v)(b)
-    for (size_t idx = 0;idx < A.size(); idx++) {
+    for (size_t idx = 0; idx < A.size(); idx++) {
       assert(d_vec[A[idx]] == false && "This state has been seen before.  Algorithm error.");
       d_vec[A[idx]] = true;
     }
@@ -439,15 +439,15 @@ void PreDeterminize(MutableFst<Arc> *fst,
 
 
     {  // This block sets up arc_hash
-      for (size_t idx = 0;idx < A.size(); idx++) {
+      for (size_t idx = 0; idx < A.size(); idx++) {
         StateId s = A[idx];
         assert(s>=0 && s<=max_state);
         ArcId arc_id = 0;
-        for (ArcIterator<MutableFst<Arc> > aiter(*fst, s); ! aiter.Done(); aiter.Next(), ++arc_id) {
+        for (ArcIterator<MutableFst<Arc> > aiter(*fst, s); !aiter.Done(); aiter.Next(), ++arc_id) {
           const Arc &arc = aiter.Value();
 
           pair<pair<StateId, ArcId>, StateId>
-              this_pair(pair<StateId, ArcId>(s, arc_id), arc.nextstate);
+          this_pair(pair<StateId, ArcId>(s, arc_id), arc.nextstate);
           bool inserted = (arc_hash[arc.ilabel].insert(this_pair)).second;
           assert(inserted);  // Otherwise we had a duplicate.
         }
@@ -513,7 +513,7 @@ void PreDeterminize(MutableFst<Arc> *fst,
 
 
   {  // (D)(vi): Check that for each state in the FST, d(s) = true.
-    for (StateIterator<MutableFst<Arc> > siter(*fst); ! siter.Done(); siter.Next()) {
+    for (StateIterator<MutableFst<Arc> > siter(*fst); !siter.Done(); siter.Next()) {
       StateId val = siter.Value();
       assert(d_vec[val] == true);
     }
@@ -529,7 +529,7 @@ void PreDeterminize(MutableFst<Arc> *fst,
     }
     // At this point n is the highest symbol-id (type size_t) of symbols we must add.
     n++;  // This is now the number of symbols we must add.
-    for (size_t i = 0;static_cast<int64>(i)<n;i++) symsOut->push_back(first_new_sym + i);
+    for (size_t i = 0; static_cast<int64>(i)<n; i++) symsOut->push_back(first_new_sym + i);
   }
 
   // (D)(viii): set up hash.
@@ -573,18 +573,18 @@ void PreDeterminize(MutableFst<Arc> *fst,
 
   }
   // Now free up memory.
-  for (size_t i = 0;i < S.size();i++)
+  for (size_t i = 0; i < S.size(); i++)
     delete S[i];
 } // end function PreDeterminize
 
 
 template<class Label> void CreateNewSymbols(SymbolTable *input_sym_table, int nSym,
-                                            std::string prefix, vector<Label> *symsOut) {
+    std::string prefix, vector<Label> *symsOut) {
   // Creates nSym new symbols named (prefix)0, (prefix)1 and so on.
   // Crashes if it cannot create them because one or more of them were in the symbol
   // table already.
   assert(symsOut && symsOut->size() == 0);
-  for (int i = 0;i < nSym;i++) {
+  for (int i = 0; i < nSym; i++) {
     std::stringstream ss; ss << prefix << i;
     std::string str = ss.str();
     if (input_sym_table->Find(str) != -1) {  // should not be present.
@@ -597,7 +597,7 @@ template<class Label> void CreateNewSymbols(SymbolTable *input_sym_table, int nS
 
 // see pre-determinize.h for documentation.
 template<class Arc> void AddSelfLoops(MutableFst<Arc> *fst, vector<typename Arc::Label> &isyms,
-                                      vector<typename Arc::Label> &osyms) {
+    vector<typename Arc::Label> &osyms) {
   assert(fst != NULL);
   assert(isyms.size() == osyms.size());
   typedef typename Arc::Label Label;
@@ -610,11 +610,11 @@ template<class Arc> void AddSelfLoops(MutableFst<Arc> *fst, vector<typename Arc:
   // the following declarations and statements are for quick detection of these
   // symbols, which is purely for debugging/checking purposes.
   Label  isyms_min = *std::min_element(isyms.begin(), isyms.end()),
-         isyms_max = *std::max_element(isyms.begin(), isyms.end()),
-         osyms_min = *std::min_element(osyms.begin(), osyms.end()),
-         osyms_max = *std::max_element(osyms.begin(), osyms.end());
+      isyms_max = *std::max_element(isyms.begin(), isyms.end()),
+      osyms_min = *std::min_element(osyms.begin(), osyms.end()),
+      osyms_max = *std::max_element(osyms.begin(), osyms.end());
   std::set<Label> isyms_set, osyms_set;
-  for (size_t i = 0;i < isyms.size();i++) {
+  for (size_t i = 0; i < isyms.size(); i++) {
     assert(isyms[i] > 0 && osyms[i] > 0);  // should not have epsilon or invalid symbols.
     isyms_set.insert(isyms[i]);
     osyms_set.insert(osyms[i]);
@@ -622,10 +622,10 @@ template<class Arc> void AddSelfLoops(MutableFst<Arc> *fst, vector<typename Arc:
   assert(isyms_set.size() == n && osyms_set.size() == n);
   // } end block.
 
-  for (StateIterator<MutableFst<Arc> > siter(*fst); ! siter.Done(); siter.Next()) {
+  for (StateIterator<MutableFst<Arc> > siter(*fst); !siter.Done(); siter.Next()) {
     StateId state = siter.Value();
     bool this_state_needs_self_loops = (fst->Final(state) != Weight::Zero());
-    for (ArcIterator<MutableFst<Arc> > aiter(*fst, state); ! aiter.Done(); aiter.Next()) {
+    for (ArcIterator<MutableFst<Arc> > aiter(*fst, state); !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       // If one of the following asserts fails, it means that the input FST already had the symbols
       // we are inserting.  This is contrary to the preconditions of this algorithm.
@@ -635,7 +635,7 @@ template<class Arc> void AddSelfLoops(MutableFst<Arc> *fst, vector<typename Arc:
         this_state_needs_self_loops = true;
     }
     if (this_state_needs_self_loops) {
-      for (size_t i = 0;i < n;i++) {
+      for (size_t i = 0; i < n; i++) {
         Arc arc;
         arc.ilabel = isyms[i];
         arc.olabel = osyms[i];
@@ -659,16 +659,16 @@ int64 DeleteISymbols(MutableFst<Arc> *fst, vector<typename Arc::Label> isyms) {
 
   if (isyms.size() == 0) return 0;
   Label  isyms_min = *std::min_element(isyms.begin(), isyms.end()),
-         isyms_max = *std::max_element(isyms.begin(), isyms.end());
+      isyms_max = *std::max_element(isyms.begin(), isyms.end());
   bool isyms_consecutive = (isyms_max+1-isyms_min == static_cast<Label>(isyms.size()));
   std::set<Label> isyms_set;
   if (!isyms_consecutive)
-    for (size_t i = 0;i < isyms.size();i++)
+    for (size_t i = 0; i < isyms.size(); i++)
       isyms_set.insert(isyms[i]);
 
-  for (StateIterator<MutableFst<Arc> > siter(*fst); ! siter.Done(); siter.Next()) {
+  for (StateIterator<MutableFst<Arc> > siter(*fst); !siter.Done(); siter.Next()) {
     StateId state = siter.Value();
-    for (MutableArcIterator<MutableFst<Arc> > aiter(fst, state); ! aiter.Done(); aiter.Next()) {
+    for (MutableArcIterator<MutableFst<Arc> > aiter(fst, state); !aiter.Done(); aiter.Next()) {
       const Arc &arc = aiter.Value();
       if (arc.ilabel >= isyms_min && arc.ilabel <= isyms_max) {
         if (isyms_consecutive || isyms_set.count(arc.ilabel) != 0) {
@@ -710,7 +710,7 @@ typename Arc::StateId CreateSuperFinal(MutableFst<Arc> *fst) {
 
   StateId final_state = fst->AddState();
   fst->SetFinal(final_state, Weight::One());
-  for (size_t idx = 0;idx < final_states.size(); idx++) {
+  for (size_t idx = 0; idx < final_states.size(); idx++) {
     StateId s = final_states[idx];
     Weight weight = fst->Final(s);
     fst->SetFinal(s, Weight::Zero());

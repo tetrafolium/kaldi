@@ -39,16 +39,16 @@ int main(int argc, char *argv[]) {
         "e.g. apply-cmvn-online 'matrix-sum scp:data/train/cmvn.scp -|' data/train/split8/1/feats.scp ark:-\n"
         "or: apply-cmvn-online --spk2utt=ark:data/train/split8/1/spk2utt 'matrix-sum scp:data/train/cmvn.scp -|' "
         " data/train/split8/1/feats.scp ark:-\n";
-    
+
     ParseOptions po(usage);
 
     OnlineCmvnOptions cmvn_opts;
-    
+
     std::string spk2utt_rspecifier;
     po.Register("spk2utt", &spk2utt_rspecifier, "rspecifier for speaker to "
                 "utterance-list map");
     cmvn_opts.Register(&po);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 3) {
@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
     Matrix<double> global_cmvn_stats;
     ReadKaldiObject(global_stats_rxfilename, &global_cmvn_stats);
 
-    
-    
+
+
     BaseFloatMatrixWriter feature_writer(feature_wspecifier);
     int32 num_done = 0, num_err = 0;
     int64 tot_t = 0;
@@ -86,21 +86,21 @@ int main(int argc, char *argv[]) {
             continue;
           }
           const Matrix<BaseFloat> &feats = feature_reader.Value(utt);
-          
+
           Matrix<BaseFloat> normalized_feats(feats.NumRows(), feats.NumCols(),
-                                             kUndefined);
+              kUndefined);
 
           OnlineMatrixFeature online_matrix(feats);
           OnlineCmvn online_cmvn(cmvn_opts,
-                                 cmvn_state,
-                                 &online_matrix);
+              cmvn_state,
+              &online_matrix);
 
           for (int32 t = 0; t < feats.NumRows(); t++) {
             SubVector<BaseFloat> row(normalized_feats, t);
             online_cmvn.GetFrame(t, &row);
           }
           online_cmvn.GetState(feats.NumRows() - 1, &cmvn_state);
-          
+
           num_done++;
           tot_t += feats.NumRows();
           feature_writer.Write(utt, normalized_feats);
@@ -114,11 +114,11 @@ int main(int argc, char *argv[]) {
         OnlineCmvnState cmvn_state(global_cmvn_stats);
 
         Matrix<BaseFloat> normalized_feats(feats.NumRows(), feats.NumCols(),
-                                           kUndefined);
+            kUndefined);
         OnlineMatrixFeature online_matrix(feats);
         OnlineCmvn online_cmvn(cmvn_opts,
-                               cmvn_state,
-                               &online_matrix);
+            cmvn_state,
+            &online_matrix);
 
         for (int32 t = 0; t < feats.NumRows(); t++) {
           SubVector<BaseFloat> row(normalized_feats, t);
@@ -127,11 +127,11 @@ int main(int argc, char *argv[]) {
         num_done++;
         tot_t += feats.NumRows();
         feature_writer.Write(utt, normalized_feats);
-        
+
         num_done++;
       }
     }
-    
+
     KALDI_LOG << "Applied online CMVN to " << num_done << " files, or "
               << tot_t << " frames.";
     return (num_done != 0 ? 0 : 1);

@@ -82,7 +82,7 @@ bool ConfigLine::ParseLine(const std::string &line) {
         return false;
       } else {
         std::string value(line, next_equals_sign + 2,
-                          next_quote - next_equals_sign - 2);
+            next_quote - next_equals_sign - 2);
         data_.insert(std::make_pair(key, std::make_pair(value, false)));
         pos = next_quote + 1;
         continue;
@@ -104,7 +104,7 @@ bool ConfigLine::ParseLine(const std::string &line) {
         terminating_space--;
 
       std::string value(line, next_equals_sign + 1,
-                        terminating_space - (next_equals_sign + 1));
+          terminating_space - (next_equals_sign + 1));
       data_.insert(std::make_pair(key, std::make_pair(value, false)));
       pos = terminating_space;
     }
@@ -177,16 +177,16 @@ bool ConfigLine::GetValue(const std::string &key, bool *value) {
     if (it->first == key) {
       if ((it->second).first.size() == 0) return false;
       switch (((it->second).first)[0]) {
-        case 'F':
-        case 'f':
-          *value = false;
-          break;
-        case 'T':
-        case 't':
-          *value = true;
-          break;
-        default:
-          return false;
+      case 'F':
+      case 'f':
+        *value = false;
+        break;
+      case 'T':
+      case 't':
+        *value = true;
+        break;
+      default:
+        return false;
       }
       (it->second).second = true;
       return true;
@@ -222,8 +222,8 @@ std::string ConfigLine::UnusedValues() const {
 // This is useful in Read functions where the first token
 // may already have been consumed.
 void ExpectOneOrTwoTokens(std::istream &is, bool binary,
-                          const std::string &token1,
-                          const std::string &token2) {
+    const std::string &token1,
+    const std::string &token2) {
   KALDI_ASSERT(token1 != token2);
   std::string temp;
   ReadToken(is, binary, &temp);
@@ -239,7 +239,7 @@ void ExpectOneOrTwoTokens(std::istream &is, bool binary,
 
 // static
 bool ParseFromString(const std::string &name, std::string *string,
-                     int32 *param) {
+    int32 *param) {
   std::vector<std::string> split_string;
   SplitStringToVector(*string, " \t", true,
                       &split_string);
@@ -265,7 +265,7 @@ bool ParseFromString(const std::string &name, std::string *string,
 }
 
 bool ParseFromString(const std::string &name, std::string *string,
-                     bool *param) {
+    bool *param) {
   std::vector<std::string> split_string;
   SplitStringToVector(*string, " \t", true,
                       &split_string);
@@ -296,7 +296,7 @@ bool ParseFromString(const std::string &name, std::string *string,
 }
 
 bool ParseFromString(const std::string &name, std::string *string,
-                     BaseFloat *param) {
+    BaseFloat *param) {
   std::vector<std::string> split_string;
   SplitStringToVector(*string, " \t", true,
                       &split_string);
@@ -322,7 +322,7 @@ bool ParseFromString(const std::string &name, std::string *string,
 }
 
 bool ParseFromString(const std::string &name, std::string *string,
-                     std::string *param) {
+    std::string *param) {
   std::vector<std::string> split_string;
   SplitStringToVector(*string, " \t", true,
                       &split_string);
@@ -348,7 +348,7 @@ bool ParseFromString(const std::string &name, std::string *string,
 }
 
 bool ParseFromString(const std::string &name, std::string *string,
-                     std::vector<int32> *param) {
+    std::vector<int32> *param) {
   std::vector<std::string> split_string;
   SplitStringToVector(*string, " \t", true,
                       &split_string);
@@ -375,7 +375,7 @@ bool ParseFromString(const std::string &name, std::string *string,
 }
 
 bool DescriptorTokenize(const std::string &input,
-                        std::vector<std::string> *tokens) {
+    std::vector<std::string> *tokens) {
   KALDI_ASSERT(tokens != NULL);
   size_t start = input.find_first_not_of(" \t"), size = input.size();
   tokens->clear();
@@ -434,7 +434,7 @@ bool IsValidName(const std::string &name) {
 }
 
 void ReadConfigLines(std::istream &is,
-                    std::vector<std::string> *lines) {
+    std::vector<std::string> *lines) {
   KALDI_ASSERT(lines != NULL);
   std::string line;
   while (std::getline(is, line)) {
@@ -466,11 +466,11 @@ std::string ErrorContext(const std::string &str) {
 
 static void PrintFloatSuccinctly(std::ostream &os, BaseFloat f) {
   if (fabs(f) < 10000.0 && fabs(f) >= 10.0) {
-    os  << std::fixed << std::setprecision(0) << f;
+    os << std::fixed << std::setprecision(0) << f;
   } else if (fabs(f) >= 0.995) {
-    os  << std::fixed << std::setprecision(1) << f;
+    os << std::fixed << std::setprecision(1) << f;
   } else if (fabs(f) >= 0.01) {
-    os  << std::fixed << std::setprecision(2) << f;
+    os << std::fixed << std::setprecision(2) << f;
   } else {
     os << std::setprecision(1) << f;
   }
@@ -518,9 +518,9 @@ std::string SummarizeVector(const Vector<BaseFloat> &vec) {
 }
 
 void PrintParameterStats(std::ostringstream &os,
-                         const std::string &name,
-                         const CuVectorBase<BaseFloat> &params,
-                         bool include_mean) {
+    const std::string &name,
+    const CuVectorBase<BaseFloat> &params,
+    bool include_mean) {
   os << std::setprecision(4);
   os << ", " << name << '-';
   if (include_mean) {
@@ -535,9 +535,9 @@ void PrintParameterStats(std::ostringstream &os,
 }
 
 void PrintParameterStats(std::ostringstream &os,
-                         const std::string &name,
-                         const CuMatrix<BaseFloat> &params,
-                         bool include_mean) {
+    const std::string &name,
+    const CuMatrix<BaseFloat> &params,
+    bool include_mean) {
   os << std::setprecision(4);
   os << ", " << name << '-';
   int32 dim = params.NumRows() * params.NumCols();
@@ -555,7 +555,7 @@ void PrintParameterStats(std::ostringstream &os,
 
 
 void ParseConfigLines(const std::vector<std::string> &lines,
-                      std::vector<ConfigLine> *config_lines) {
+    std::vector<ConfigLine> *config_lines) {
   config_lines->resize(lines.size());
   for (size_t i = 0; i < lines.size(); i++) {
     bool ret = (*config_lines)[i].ParseLine(lines[i]);
@@ -568,7 +568,7 @@ void ParseConfigLines(const std::vector<std::string> &lines,
 bool NameMatchesPattern(const char *name, const char *pattern) {
   if (*pattern == '*') {
     return NameMatchesPattern(name, pattern + 1) ||
-        (*name != '\0' && NameMatchesPattern(name + 1, pattern));
+           (*name != '\0' && NameMatchesPattern(name + 1, pattern));
   } else if (*name == *pattern) {
     return (*name == '\0' || NameMatchesPattern(name + 1, pattern + 1));
   } else {

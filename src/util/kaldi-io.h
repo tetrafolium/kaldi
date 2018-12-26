@@ -122,13 +122,13 @@ InputType ClassifyRxfilename(const std::string &rxfilename);
 
 
 class Output {
- public:
+public:
   // The normal constructor, provided for convenience.
   // Equivalent to calling with default constructor then Open()
   // with these arguments.
   Output(const std::string &filename, bool binary, bool write_header = true);
 
-  Output(): impl_(NULL) {}
+  Output() : impl_(NULL) {}
 
   /// This opens the stream, with the given mode (binary or text).  It returns
   /// true on success and false on failure.  However, it will throw if something
@@ -156,7 +156,7 @@ class Output {
   // call Close()).
   ~Output();
 
- private:
+private:
   OutputImplBase *impl_;  // non-NULL if open.
   std::string filename_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(Output);
@@ -188,14 +188,14 @@ class Output {
 
 
 class Input {
- public:
+public:
   /// The normal constructor.  Opens the stream in binary mode.
   /// Equivalent to calling the default constructor followed by Open(); then, if
   /// binary != NULL, it calls ReadHeader(), putting the output in "binary"; it
   /// throws on error.
   Input(const std::string &rxfilename, bool *contents_binary = NULL);
 
-  Input(): impl_(NULL) {}
+  Input() : impl_(NULL) {}
 
   // Open opens the stream for reading (the mode, where relevant, is binary; use
   // OpenTextMode for text-mode, we made this a separate function rather than a
@@ -229,15 +229,15 @@ class Input {
   // Destructor does not throw: input streams may legitimately fail so we
   // don't worry about the status when we close them.
   ~Input();
- private:
+private:
   bool OpenInternal(const std::string &rxfilename, bool file_binary,
-                    bool *contents_binary);
+      bool *contents_binary);
   InputImplBase *impl_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(Input);
 };
 
 template <class C> void ReadKaldiObject(const std::string &filename,
-                                        C *c) {
+    C *c) {
   bool binary_in;
   Input ki(filename, &binary_in);
   c->Read(ki.Stream(), binary_in);
@@ -246,17 +246,17 @@ template <class C> void ReadKaldiObject(const std::string &filename,
 // Specialize the template for reading matrices, because we want to be able to
 // support reading 'ranges' (row and column ranges), like foo.mat[10:20].
 template <> void ReadKaldiObject(const std::string &filename,
-                                 Matrix<float> *m);
+    Matrix<float> *m);
 
 
 template <> void ReadKaldiObject(const std::string &filename,
-                                 Matrix<double> *m);
+    Matrix<double> *m);
 
 
 
 template <class C> inline void WriteKaldiObject(const C &c,
-                                                const std::string &filename,
-                                                bool binary) {
+    const std::string &filename,
+    bool binary) {
   Output ko(filename, binary);
   c.Write(ko.Stream(), binary);
 }

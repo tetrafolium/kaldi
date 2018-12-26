@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     }
 
     max_silence_frames = 0.5 +
-            max_silence_frames / static_cast<float>(frame_subsampling_factor);
+        max_silence_frames / static_cast<float>(frame_subsampling_factor);
     std::string usymtab_rspecifier = po.GetOptArg(1),
         lats_rspecifier = po.GetArg(2),
         index_wspecifier = po.GetArg(3);
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
     SequentialCompactLatticeReader clat_reader(lats_rspecifier);
 
     TableWriter< fst::VectorFstTplHolder<KwsLexicographicArc> >
-                                                index_writer(index_wspecifier);
+    index_writer(index_wspecifier);
 
     int32 n_done = 0;
     int32 n_fail = 0;
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
 
       if (max_states_scale > 0) {
         max_states = static_cast<int32>(
-            max_states_scale * static_cast<BaseFloat>(clat.NumStates()));
+          max_states_scale * static_cast<BaseFloat>(clat.NumStates()));
       }
 
       // Check if we have the corresponding utterance id.

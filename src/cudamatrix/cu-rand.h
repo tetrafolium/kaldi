@@ -32,7 +32,7 @@ namespace kaldi {
 
 template<typename Real>
 class CuRand {
- public:
+public:
   CuRand() {
   #if HAVE_CUDA == 1
     if (CuDevice::Instantiate().Enabled()) {
@@ -89,7 +89,7 @@ class CuRand {
   /// add gaussian noise to each element,
   void AddGaussNoise(CuMatrix<Real> *tgt, Real gscale = 1.0);
 
- private:
+private:
   #if HAVE_CUDA == 1
   curandGenerator_t gen_;
   #endif

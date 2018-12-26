@@ -25,12 +25,12 @@
 #include "matrix/kaldi-matrix.h"
 
 /** @brief This is a program for extracting segments from feature files/archives
- - usage : 
+   - usage :
      - extract-feature-segments [options ..]  <scriptfile/archive> <segments-file> <features-written-specifier>
      - "segments-file" should have the information of the segments that needs to be extracted from the feature files
      - the format of the segments file : speaker_name filename start_time(in secs) end_time(in secs)
      - "features-written-specifier" is the output segment format
-*/
+ */
 int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
       // end time, except if end time is -1
       if (start < 0 || end <= 0 || start >= end) {
         KALDI_WARN << "Invalid line in segments file "
-            "[empty or invalid segment]: "
+          "[empty or invalid segment]: "
                    << line;
         continue;
       }
@@ -144,9 +144,9 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      /* check whether a segment start time and end time exists in utterance 
+      /* check whether a segment start time and end time exists in utterance
        * if fails , skips the segment.
-       */ 
+       */
       if (!feat_reader.HasKey(utterance)) {
         KALDI_WARN << "Did not find features for utterance " << utterance
                    << ", skipping segment " << segment;
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
       int32 num_chan = feats.NumCols();
       // Convert start & end times of the segment to corresponding sample number
       int32 start_samp = static_cast<int32>(round(
-          (start * 1000.0 / frame_shift)));
+            (start * 1000.0 / frame_shift)));
       int32 end_samp = static_cast<int32>(round(end * 1000.0 / frame_shift));
 
       if (snip_edges) {
@@ -167,27 +167,27 @@ int main(int argc, char *argv[]) {
         end_samp -= snip_length;
       }
 
-      /* start sample must be less than total number of samples 
+      /* start sample must be less than total number of samples
        * otherwise skip the segment
        */
       if (start_samp < 0 || start_samp >= num_samp) {
         KALDI_WARN << "Start sample out of range " << start_samp
-            << " [length:] " << num_samp << "x" << num_chan
-            << ", skipping segment " << segment;
+                   << " [length:] " << num_samp << "x" << num_chan
+                   << ", skipping segment " << segment;
         continue;
       }
 
-      /* end sample must be less than total number samples 
+      /* end sample must be less than total number samples
        * otherwise skip the segment
        */
       if (end_samp > num_samp) {
         if (end_samp >= num_samp
-                + static_cast<int32>(
-                    round(max_overshoot * 1000.0 / frame_shift))) {
+            + static_cast<int32>(
+              round(max_overshoot * 1000.0 / frame_shift))) {
           KALDI_WARN<< "End sample too far out of range " << end_samp
-              << " [length:] " << num_samp << "x" << num_chan
-              << ", skipping segment "
-              << segment;
+                    << " [length:] " << num_samp << "x" << num_chan
+                    << ", skipping segment "
+                    << segment;
           continue;
         }
         end_samp = num_samp;  // for small differences, just truncate.
@@ -198,8 +198,8 @@ int main(int argc, char *argv[]) {
        */
       if (end_samp
           <= start_samp
-              + static_cast<int32>(round(
-                  (min_segment_length * 1000.0 / frame_shift)))) {
+          + static_cast<int32>(round(
+            (min_segment_length * 1000.0 / frame_shift)))) {
         KALDI_WARN<< "Segment " << segment << " too short, skipping it.";
         continue;
       }

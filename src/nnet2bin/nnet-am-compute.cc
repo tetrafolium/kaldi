@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
     SequentialBaseFloatMatrixReader feature_reader(features_rspecifier);
     BaseFloatMatrixWriter writer(features_or_loglikes_wspecifier);
 
-    for (; !feature_reader.Done();  feature_reader.Next()) {
+    for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string utt = feature_reader.Key();
       const Matrix<BaseFloat> &feats  = feature_reader.Value();
 

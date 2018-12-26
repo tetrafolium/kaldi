@@ -39,10 +39,10 @@ int main(int argc, char *argv[]) {
     using fst::StdArc;
 
     const char *usage =
-      "Replace the acoustic scores on a lattice using a new model.\n"
-      "Usage: sgmm2-rescore-lattice [options] <model-in> <lattice-rspecifier> "
-      "<feature-rspecifier> <lattice-wspecifier>\n"
-      " e.g.: sgmm2-rescore-lattice 1.mdl ark:1.lats scp:trn.scp ark:2.lats\n";
+        "Replace the acoustic scores on a lattice using a new model.\n"
+        "Usage: sgmm2-rescore-lattice [options] <model-in> <lattice-rspecifier> "
+        "<feature-rspecifier> <lattice-wspecifier>\n"
+        " e.g.: sgmm2-rescore-lattice 1.mdl ark:1.lats scp:trn.scp ark:2.lats\n";
 
     kaldi::BaseFloat old_acoustic_scale = 0.0;
     bool speedup = false;
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
                 "by only sometimes (randomly) computing the probabilities, and "
                 "then scaling them up to preserve corpus-level diagnostics.");
 
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 4) {
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 
     RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier);
     RandomAccessBaseFloatVectorReaderMapped spkvecs_reader(spkvecs_rspecifier,
-                                                           utt2spk_rspecifier);
+        utt2spk_rspecifier);
     RandomAccessBaseFloatMatrixReader feature_reader(feature_rspecifier);
     // Read as compact lattice
     SequentialCompactLatticeReader compact_lattice_reader(lats_rspecifier);
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
           gselect_reader.Value(utt);
 
       DecodableAmSgmm2 sgmm2_decodable(am_sgmm, trans_model, feats,
-                                       gselect, log_prune, &spk_vars);
+          gselect, log_prune, &spk_vars);
 
       if (!speedup) {
         if (kaldi::RescoreCompactLattice(&sgmm2_decodable, &clat)) {
@@ -146,14 +146,14 @@ int main(int argc, char *argv[]) {
           num_done++;
         } else num_err++;
       } else {
-        BaseFloat speedup_factor = 100.0; 
+        BaseFloat speedup_factor = 100.0;
         if (kaldi::RescoreCompactLatticeSpeedup(trans_model, speedup_factor,
                                                 &sgmm2_decodable,
                                                 &clat)) {
           compact_lattice_writer.Write(utt, clat);
           num_done++;
         } else num_err++;
-      }        
+      }
     }
 
     KALDI_LOG << "Done " << num_done << " lattices, errors on "

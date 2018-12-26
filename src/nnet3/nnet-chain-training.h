@@ -36,7 +36,7 @@ struct NnetChainTrainingOptions {
   NnetTrainerOptions nnet_config;
   chain::ChainTrainingOptions chain_config;
   bool apply_deriv_weights;
-  NnetChainTrainingOptions(): apply_deriv_weights(true) { }
+  NnetChainTrainingOptions() : apply_deriv_weights(true) { }
 
   void Register(OptionsItf *opts) {
     nnet_config.Register(opts);
@@ -51,12 +51,12 @@ struct NnetChainTrainingOptions {
 /**
    This class is for single-threaded training of neural nets using the 'chain'
    model.
-*/
+ */
 class NnetChainTrainer {
- public:
+public:
   NnetChainTrainer(const NnetChainTrainingOptions &config,
-                   const fst::StdVectorFst &den_fst,
-                   Nnet *nnet);
+      const fst::StdVectorFst &den_fst,
+      Nnet *nnet);
 
   // train on one minibatch.
   void Train(const NnetChainExample &eg);
@@ -69,20 +69,20 @@ class NnetChainTrainer {
   void PrintMaxChangeStats() const;
 
   ~NnetChainTrainer();
- private:
+private:
   // The internal function for doing one step of conventional SGD training.
   void TrainInternal(const NnetChainExample &eg,
-                     const NnetComputation &computation);
+      const NnetComputation &computation);
 
   // The internal function for doing one step of backstitch training. Depending
   // on whether is_backstitch_step1 is true, It could be either the first
   // (backward) step, or the second (forward) step of backstitch.
   void TrainInternalBackstitch(const NnetChainExample &eg,
-                               const NnetComputation &computation,
-                               bool is_backstitch_step1);
+      const NnetComputation &computation,
+      bool is_backstitch_step1);
 
   void ProcessOutputs(bool is_backstitch_step2, const NnetChainExample &eg,
-                      NnetComputer *computer);
+      NnetComputer *computer);
 
   const NnetChainTrainingOptions opts_;
 

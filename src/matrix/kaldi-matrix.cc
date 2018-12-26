@@ -31,7 +31,7 @@ namespace kaldi {
 
 template<typename Real>
 void MatrixBase<Real>::Invert(Real *log_det, Real *det_sign,
-                              bool inverse_needed) {
+    bool inverse_needed) {
   KALDI_ASSERT(num_rows_ == num_cols_);
   if (num_rows_ == 0) {
     if (det_sign) *det_sign = 1;
@@ -48,7 +48,7 @@ void MatrixBase<Real>::Invert(Real *log_det, Real *det_sign,
   Real *p_work;
   void *temp;
   if ((p_work = static_cast<Real*>(
-          KALDI_MEMALIGN(16, sizeof(Real)*l_work, &temp))) == NULL) {
+        KALDI_MEMALIGN(16, sizeof(Real)*l_work, &temp))) == NULL) {
     delete[] pivot;
     throw std::bad_alloc();
   }
@@ -112,8 +112,8 @@ void MatrixBase<Real>::Invert(Real *log_det, Real *det_sign,
 template<>
 template<>
 void MatrixBase<float>::AddVecVec(const float alpha,
-                                  const VectorBase<float> &a,
-                                  const VectorBase<float> &rb) {
+    const VectorBase<float> &a,
+    const VectorBase<float> &rb) {
   KALDI_ASSERT(a.Dim() == num_rows_ && rb.Dim() == num_cols_);
   cblas_Xger(a.Dim(), rb.Dim(), alpha, a.Data(), 1, rb.Data(),
              1, data_, stride_);
@@ -122,8 +122,8 @@ void MatrixBase<float>::AddVecVec(const float alpha,
 template<typename Real>
 template<typename OtherReal>
 void MatrixBase<Real>::AddVecVec(const Real alpha,
-                                 const VectorBase<OtherReal> &a,
-                                 const VectorBase<OtherReal> &b) {
+    const VectorBase<OtherReal> &a,
+    const VectorBase<OtherReal> &b) {
   KALDI_ASSERT(a.Dim() == num_rows_ && b.Dim() == num_cols_);
   if (num_rows_ * num_cols_ > 100) { // It's probably worth it to allocate
     // temporary vectors of the right type and use BLAS.
@@ -144,18 +144,18 @@ void MatrixBase<Real>::AddVecVec(const Real alpha,
 // instantiate the template above.
 template
 void MatrixBase<float>::AddVecVec(const float alpha,
-                                  const VectorBase<double> &a,
-                                  const VectorBase<double> &b);
+    const VectorBase<double> &a,
+    const VectorBase<double> &b);
 template
 void MatrixBase<double>::AddVecVec(const double alpha,
-                                   const VectorBase<float> &a,
-                                   const VectorBase<float> &b);
+    const VectorBase<float> &a,
+    const VectorBase<float> &b);
 
 template<>
 template<>
 void MatrixBase<double>::AddVecVec(const double alpha,
-                                   const VectorBase<double> &a,
-                                   const VectorBase<double> &rb) {
+    const VectorBase<double> &a,
+    const VectorBase<double> &rb) {
   KALDI_ASSERT(a.Dim() == num_rows_ && rb.Dim() == num_cols_);
   if (num_rows_ == 0) return;
   cblas_Xger(a.Dim(), rb.Dim(), alpha, a.Data(), 1, rb.Data(),
@@ -164,15 +164,15 @@ void MatrixBase<double>::AddVecVec(const double alpha,
 
 template<typename Real>
 void MatrixBase<Real>::AddMatMat(const Real alpha,
-                                  const MatrixBase<Real>& A,
-                                  MatrixTransposeType transA,
-                                  const MatrixBase<Real>& B,
-                                  MatrixTransposeType transB,
-                                  const Real beta) {
+    const MatrixBase<Real>& A,
+    MatrixTransposeType transA,
+    const MatrixBase<Real>& B,
+    MatrixTransposeType transB,
+    const Real beta) {
   KALDI_ASSERT((transA == kNoTrans && transB == kNoTrans && A.num_cols_ == B.num_rows_ && A.num_rows_ == num_rows_ && B.num_cols_ == num_cols_)
-               || (transA == kTrans && transB == kNoTrans && A.num_rows_ == B.num_rows_ && A.num_cols_ == num_rows_ && B.num_cols_ == num_cols_)
-               || (transA == kNoTrans && transB == kTrans && A.num_cols_ == B.num_cols_ && A.num_rows_ == num_rows_ && B.num_rows_ == num_cols_)
-               || (transA == kTrans && transB == kTrans && A.num_rows_ == B.num_cols_ && A.num_cols_ == num_rows_ && B.num_rows_ == num_cols_));
+      || (transA == kTrans && transB == kNoTrans && A.num_rows_ == B.num_rows_ && A.num_cols_ == num_rows_ && B.num_cols_ == num_cols_)
+      || (transA == kNoTrans && transB == kTrans && A.num_cols_ == B.num_cols_ && A.num_rows_ == num_rows_ && B.num_rows_ == num_cols_)
+      || (transA == kTrans && transB == kTrans && A.num_rows_ == B.num_cols_ && A.num_cols_ == num_rows_ && B.num_rows_ == num_cols_));
   KALDI_ASSERT(&A !=  this && &B != this);
   if (num_rows_ == 0) return;
   cblas_Xgemm(alpha, transA, A.data_, A.num_rows_, A.num_cols_, A.stride_,
@@ -182,8 +182,8 @@ void MatrixBase<Real>::AddMatMat(const Real alpha,
 
 template<typename Real>
 void MatrixBase<Real>::SetMatMatDivMat(const MatrixBase<Real>& A,
-                                       const MatrixBase<Real>& B,
-                                       const MatrixBase<Real>& C) {
+    const MatrixBase<Real>& B,
+    const MatrixBase<Real>& C) {
   KALDI_ASSERT(A.NumRows() == B.NumRows() && A.NumCols() == B.NumCols());
   KALDI_ASSERT(A.NumRows() == C.NumRows() && A.NumCols() == C.NumCols());
   for (int32 r = 0; r < A.NumRows(); r++) { // each frame...
@@ -226,12 +226,12 @@ void MatrixBase<Real>::CopyUpperToLower() {
 
 template<typename Real>
 void MatrixBase<Real>::SymAddMat2(const Real alpha,
-                                  const MatrixBase<Real> &A,
-                                  MatrixTransposeType transA,
-                                  Real beta) {
+    const MatrixBase<Real> &A,
+    MatrixTransposeType transA,
+    Real beta) {
   KALDI_ASSERT(num_rows_ == num_cols_ &&
-               ((transA == kNoTrans && A.num_rows_ == num_rows_) ||
-                (transA == kTrans && A.num_cols_ == num_cols_)));
+      ((transA == kNoTrans && A.num_rows_ == num_rows_) ||
+      (transA == kTrans && A.num_cols_ == num_cols_)));
   KALDI_ASSERT(A.data_ != data_);
   if (num_rows_ == 0) return;
 
@@ -260,15 +260,15 @@ void MatrixBase<Real>::SymAddMat2(const Real alpha,
 
 template<typename Real>
 void MatrixBase<Real>::AddMatSmat(const Real alpha,
-                                  const MatrixBase<Real> &A,
-                                  MatrixTransposeType transA,
-                                  const MatrixBase<Real> &B,
-                                  MatrixTransposeType transB,
-                                  const Real beta) {
+    const MatrixBase<Real> &A,
+    MatrixTransposeType transA,
+    const MatrixBase<Real> &B,
+    MatrixTransposeType transB,
+    const Real beta) {
   KALDI_ASSERT((transA == kNoTrans && transB == kNoTrans && A.num_cols_ == B.num_rows_ && A.num_rows_ == num_rows_ && B.num_cols_ == num_cols_)
-               || (transA == kTrans && transB == kNoTrans && A.num_rows_ == B.num_rows_ && A.num_cols_ == num_rows_ && B.num_cols_ == num_cols_)
-               || (transA == kNoTrans && transB == kTrans && A.num_cols_ == B.num_cols_ && A.num_rows_ == num_rows_ && B.num_rows_ == num_cols_)
-               || (transA == kTrans && transB == kTrans && A.num_rows_ == B.num_cols_ && A.num_cols_ == num_rows_ && B.num_rows_ == num_cols_));
+      || (transA == kTrans && transB == kNoTrans && A.num_rows_ == B.num_rows_ && A.num_cols_ == num_rows_ && B.num_cols_ == num_cols_)
+      || (transA == kNoTrans && transB == kTrans && A.num_cols_ == B.num_cols_ && A.num_rows_ == num_rows_ && B.num_rows_ == num_cols_)
+      || (transA == kTrans && transB == kTrans && A.num_rows_ == B.num_cols_ && A.num_cols_ == num_rows_ && B.num_rows_ == num_cols_));
   KALDI_ASSERT(&A !=  this && &B != this);
 
   // We iterate over the columns of B.
@@ -298,15 +298,15 @@ void MatrixBase<Real>::AddMatSmat(const Real alpha,
 
 template<typename Real>
 void MatrixBase<Real>::AddSmatMat(const Real alpha,
-                                  const MatrixBase<Real> &A,
-                                  MatrixTransposeType transA,
-                                  const MatrixBase<Real> &B,
-                                  MatrixTransposeType transB,
-                                  const Real beta) {
+    const MatrixBase<Real> &A,
+    MatrixTransposeType transA,
+    const MatrixBase<Real> &B,
+    MatrixTransposeType transB,
+    const Real beta) {
   KALDI_ASSERT((transA == kNoTrans && transB == kNoTrans && A.num_cols_ == B.num_rows_ && A.num_rows_ == num_rows_ && B.num_cols_ == num_cols_)
-               || (transA == kTrans && transB == kNoTrans && A.num_rows_ == B.num_rows_ && A.num_cols_ == num_rows_ && B.num_cols_ == num_cols_)
-               || (transA == kNoTrans && transB == kTrans && A.num_cols_ == B.num_cols_ && A.num_rows_ == num_rows_ && B.num_rows_ == num_cols_)
-               || (transA == kTrans && transB == kTrans && A.num_rows_ == B.num_cols_ && A.num_cols_ == num_rows_ && B.num_rows_ == num_cols_));
+      || (transA == kTrans && transB == kNoTrans && A.num_rows_ == B.num_rows_ && A.num_cols_ == num_rows_ && B.num_cols_ == num_cols_)
+      || (transA == kNoTrans && transB == kTrans && A.num_cols_ == B.num_cols_ && A.num_rows_ == num_rows_ && B.num_rows_ == num_cols_)
+      || (transA == kTrans && transB == kTrans && A.num_rows_ == B.num_cols_ && A.num_cols_ == num_rows_ && B.num_rows_ == num_cols_));
   KALDI_ASSERT(&A !=  this && &B != this);
 
   MatrixIndexT Astride = A.stride_, Bstride = B.stride_, stride = this->stride_,
@@ -335,7 +335,7 @@ void MatrixBase<Real>::AddSmatMat(const Real alpha,
 
 template<typename Real>
 void MatrixBase<Real>::AddSpSp(const Real alpha, const SpMatrix<Real> &A_in,
-                                const SpMatrix<Real> &B_in, const Real beta) {
+    const SpMatrix<Real> &B_in, const Real beta) {
   MatrixIndexT sz = num_rows_;
   KALDI_ASSERT(sz == num_cols_ && sz == A_in.NumRows() && sz == B_in.NumRows());
 
@@ -349,7 +349,7 @@ void MatrixBase<Real>::AddSpSp(const Real alpha, const SpMatrix<Real> &A_in,
 
 template<typename Real>
 void MatrixBase<Real>::AddMat(const Real alpha, const MatrixBase<Real>& A,
-                               MatrixTransposeType transA) {
+    MatrixTransposeType transA) {
   if (&A == this) {
     if (transA == kNoTrans) {
       Scale(alpha + 1.0);
@@ -360,7 +360,7 @@ void MatrixBase<Real>::AddMat(const Real alpha, const MatrixBase<Real>& A,
         for (MatrixIndexT row = 0; row < num_rows_; row++) {
           for (MatrixIndexT col = 0; col < row; col++) {
             Real *lower = data + (row * stride_) + col, *upper = data + (col
-                                                                          * stride_) + row;
+                * stride_) + row;
             Real sum = *lower + *upper;
             *lower = *upper = sum;
           }
@@ -370,7 +370,7 @@ void MatrixBase<Real>::AddMat(const Real alpha, const MatrixBase<Real>& A,
         for (MatrixIndexT row = 0; row < num_rows_; row++) {
           for (MatrixIndexT col = 0; col < row; col++) {
             Real *lower = data + (row * stride_) + col, *upper = data + (col
-                                                                          * stride_) + row;
+                * stride_) + row;
             Real lower_tmp = *lower;
             *lower += alpha * *upper;
             *upper += alpha * lower_tmp;
@@ -386,7 +386,7 @@ void MatrixBase<Real>::AddMat(const Real alpha, const MatrixBase<Real>& A,
       KALDI_ASSERT(A.num_rows_ == num_rows_ && A.num_cols_ == num_cols_);
       if (num_rows_ == 0) return;
       for (MatrixIndexT row = 0; row < num_rows_; row++, adata += aStride,
-               data += stride) {
+          data += stride) {
         cblas_Xaxpy(num_cols_, alpha, adata, 1, data, 1);
       }
     } else {
@@ -426,10 +426,10 @@ void MatrixBase<double>::AddSp(const double alpha, const SpMatrix<float> &S);
 
 template<typename Real>
 void MatrixBase<Real>::AddDiagVecMat(
-    const Real alpha, const VectorBase<Real> &v,
-    const MatrixBase<Real> &M,
-    MatrixTransposeType transM,
-    Real beta) {
+  const Real alpha, const VectorBase<Real> &v,
+  const MatrixBase<Real> &M,
+  MatrixTransposeType transM,
+  Real beta) {
   if (beta != 1.0) this->Scale(beta);
 
   if (transM == kNoTrans) {
@@ -451,10 +451,10 @@ void MatrixBase<Real>::AddDiagVecMat(
 
 template<typename Real>
 void MatrixBase<Real>::AddMatDiagVec(
-    const Real alpha,
-    const MatrixBase<Real> &M, MatrixTransposeType transM,
-    VectorBase<Real> &v,
-    Real beta) {
+  const Real alpha,
+  const MatrixBase<Real> &M, MatrixTransposeType transM,
+  VectorBase<Real> &v,
+  Real beta) {
 
   if (beta != 1.0) this->Scale(beta);
 
@@ -466,10 +466,10 @@ void MatrixBase<Real>::AddMatDiagVec(
   KALDI_ASSERT(v.Dim() == this->NumCols());
 
   MatrixIndexT M_row_stride = M.Stride(),
-               M_col_stride = 1,
-               stride = stride_,
-               num_rows = num_rows_,
-               num_cols = num_cols_;
+      M_col_stride = 1,
+      stride = stride_,
+      num_rows = num_rows_,
+      num_cols = num_cols_;
 
   if (transM == kTrans)
     std::swap(M_row_stride, M_col_stride);
@@ -477,32 +477,32 @@ void MatrixBase<Real>::AddMatDiagVec(
   Real *data = data_;
   const Real *Mdata = M.Data(), *vdata = v.Data();
   if (num_rows_ == 0) return;
-  for (MatrixIndexT i = 0; i < num_rows; i++){
-      for(MatrixIndexT j = 0; j < num_cols; j ++ ){
-          data[i*stride + j] += alpha * vdata[j] * Mdata[i*M_row_stride + j*M_col_stride];
-      }
+  for (MatrixIndexT i = 0; i < num_rows; i++) {
+    for(MatrixIndexT j = 0; j < num_cols; j++ ) {
+      data[i*stride + j] += alpha * vdata[j] * Mdata[i*M_row_stride + j*M_col_stride];
+    }
   }
 }
 
 template<typename Real>
 void MatrixBase<Real>::AddMatMatElements(const Real alpha,
-                                         const MatrixBase<Real>& A,
-                                         const MatrixBase<Real>& B,
-                                         const Real beta) {
-    KALDI_ASSERT(A.NumRows() == B.NumRows() && A.NumCols() == B.NumCols());
-    KALDI_ASSERT(A.NumRows() == NumRows() && A.NumCols() == NumCols());
-    Real *data = data_;
-    const Real *dataA = A.Data();
-    const Real *dataB = B.Data();
+    const MatrixBase<Real>& A,
+    const MatrixBase<Real>& B,
+    const Real beta) {
+  KALDI_ASSERT(A.NumRows() == B.NumRows() && A.NumCols() == B.NumCols());
+  KALDI_ASSERT(A.NumRows() == NumRows() && A.NumCols() == NumCols());
+  Real *data = data_;
+  const Real *dataA = A.Data();
+  const Real *dataB = B.Data();
 
-    for (MatrixIndexT i = 0; i < num_rows_; i++) {
-        for (MatrixIndexT j = 0; j < num_cols_; j++) {
-            data[j] = beta*data[j] + alpha*dataA[j]*dataB[j];
-        }
-        data += Stride();
-        dataA += A.Stride();
-        dataB += B.Stride();
+  for (MatrixIndexT i = 0; i < num_rows_; i++) {
+    for (MatrixIndexT j = 0; j < num_cols_; j++) {
+      data[j] = beta*data[j] + alpha*dataA[j]*dataB[j];
     }
+    data += Stride();
+    dataA += A.Stride();
+    dataB += B.Stride();
+  }
 }
 
 #if !defined(HAVE_ATLAS) && !defined(USE_KALDI_SVD)
@@ -510,7 +510,7 @@ void MatrixBase<Real>::AddMatMatElements(const Real alpha,
 // ****************************************************************************
 template<typename Real>
 void MatrixBase<Real>::LapackGesvd(VectorBase<Real> *s, MatrixBase<Real> *U_in,
-                                   MatrixBase<Real> *V_in) {
+    MatrixBase<Real> *V_in) {
   KALDI_ASSERT(s != NULL && U_in != this && V_in != this);
 
   Matrix<Real> tmpU, tmpV;
@@ -565,7 +565,7 @@ void MatrixBase<Real>::LapackGesvd(VectorBase<Real> *s, MatrixBase<Real> *U_in,
   Real *p_work;
   void *temp;
   if ((p_work = static_cast<Real*>(
-          KALDI_MEMALIGN(16, sizeof(Real)*l_work, &temp))) == NULL)
+        KALDI_MEMALIGN(16, sizeof(Real)*l_work, &temp))) == NULL)
     throw std::bad_alloc();
 
   // perform svd
@@ -590,8 +590,8 @@ void MatrixBase<Real>::LapackGesvd(VectorBase<Real> *s, MatrixBase<Real> *U_in,
 // Copy constructor.  Copies data to newly allocated memory.
 template<typename Real>
 Matrix<Real>::Matrix (const MatrixBase<Real> & M,
-                      MatrixTransposeType trans/*=kNoTrans*/)
-    : MatrixBase<Real>() {
+    MatrixTransposeType trans /*=kNoTrans*/)
+  : MatrixBase<Real>() {
   if (trans == kNoTrans) {
     Resize(M.num_rows_, M.num_cols_);
     this->CopyFromMat(M);
@@ -603,8 +603,8 @@ Matrix<Real>::Matrix (const MatrixBase<Real> & M,
 
 // Copy constructor.  Copies data to newly allocated memory.
 template<typename Real>
-Matrix<Real>::Matrix (const Matrix<Real> & M):
-    MatrixBase<Real>() {
+Matrix<Real>::Matrix (const Matrix<Real> & M) :
+  MatrixBase<Real>() {
   Resize(M.num_rows_, M.num_cols_);
   this->CopyFromMat(M);
 }
@@ -613,7 +613,7 @@ Matrix<Real>::Matrix (const Matrix<Real> & M):
 template<typename Real>
 template<typename OtherReal>
 Matrix<Real>::Matrix(const MatrixBase<OtherReal> & M,
-                     MatrixTransposeType trans) : MatrixBase<Real>() {
+    MatrixTransposeType trans) : MatrixBase<Real>() {
   if (trans == kNoTrans) {
     Resize(M.NumRows(), M.NumCols());
     this->CopyFromMat(M);
@@ -626,15 +626,15 @@ Matrix<Real>::Matrix(const MatrixBase<OtherReal> & M,
 // Instantiate this constructor for float->double and double->float.
 template
 Matrix<float>::Matrix(const MatrixBase<double> & M,
-                      MatrixTransposeType trans);
+    MatrixTransposeType trans);
 template
 Matrix<double>::Matrix(const MatrixBase<float> & M,
-                       MatrixTransposeType trans);
+    MatrixTransposeType trans);
 
 template<typename Real>
 inline void Matrix<Real>::Init(const MatrixIndexT rows,
-                               const MatrixIndexT cols,
-                               const MatrixStrideType stride_type) {
+    const MatrixIndexT cols,
+    const MatrixStrideType stride_type) {
   if (rows * cols == 0) {
     KALDI_ASSERT(rows == 0 && cols == 0);
     this->num_rows_ = 0;
@@ -669,9 +669,9 @@ inline void Matrix<Real>::Init(const MatrixIndexT rows,
 
 template<typename Real>
 void Matrix<Real>::Resize(const MatrixIndexT rows,
-                          const MatrixIndexT cols,
-                          MatrixResizeType resize_type,
-                          MatrixStrideType stride_type) {
+    const MatrixIndexT cols,
+    MatrixResizeType resize_type,
+    MatrixStrideType stride_type) {
   // the next block uses recursion to handle what we have to do if
   // resize_type == kCopyData.
   if (resize_type == kCopyData) {
@@ -686,7 +686,7 @@ void Matrix<Real>::Resize(const MatrixIndexT rows,
       MatrixIndexT rows_min = std::min(rows, this->num_rows_),
           cols_min = std::min(cols, this->num_cols_);
       tmp.Range(0, rows_min, 0, cols_min).
-          CopyFromMat(this->Range(0, rows_min, 0, cols_min));
+      CopyFromMat(this->Range(0, rows_min, 0, cols_min));
       tmp.Swap(this);
       // and now let tmp go out of scope, deleting what was in *this.
       return;
@@ -711,7 +711,7 @@ void Matrix<Real>::Resize(const MatrixIndexT rows,
 template<typename Real>
 template<typename OtherReal>
 void MatrixBase<Real>::CopyFromMat(const MatrixBase<OtherReal> &M,
-                                   MatrixTransposeType Trans) {
+    MatrixTransposeType Trans) {
   if (sizeof(Real) == sizeof(OtherReal) &&
       static_cast<const void*>(M.Data()) ==
       static_cast<const void*>(this->Data())) {
@@ -738,16 +738,16 @@ void MatrixBase<Real>::CopyFromMat(const MatrixBase<OtherReal> &M,
 // template instantiations.
 template
 void MatrixBase<float>::CopyFromMat(const MatrixBase<double> & M,
-                                    MatrixTransposeType Trans);
+    MatrixTransposeType Trans);
 template
 void MatrixBase<double>::CopyFromMat(const MatrixBase<float> & M,
-                                     MatrixTransposeType Trans);
+    MatrixTransposeType Trans);
 template
 void MatrixBase<float>::CopyFromMat(const MatrixBase<float> & M,
-                                    MatrixTransposeType Trans);
+    MatrixTransposeType Trans);
 template
 void MatrixBase<double>::CopyFromMat(const MatrixBase<double> & M,
-                                     MatrixTransposeType Trans);
+    MatrixTransposeType Trans);
 
 // Specialize the template for CopyFromSp for float, float.
 template<>
@@ -807,7 +807,7 @@ void MatrixBase<double>::CopyFromSp(const SpMatrix<float> & M);
 template<typename Real>
 template<typename OtherReal>
 void MatrixBase<Real>::CopyFromTp(const TpMatrix<OtherReal> & M,
-                                  MatrixTransposeType Trans) {
+    MatrixTransposeType Trans) {
   if (Trans == kNoTrans) {
     KALDI_ASSERT(num_rows_ == M.NumRows() && num_cols_ == num_rows_);
     SetZero();
@@ -823,7 +823,7 @@ void MatrixBase<Real>::CopyFromTp(const TpMatrix<OtherReal> & M,
     MatrixIndexT stride = stride_;
     Real *out_i = data_;
     const OtherReal *in_i = M.Data();
-    for (MatrixIndexT i = 0; i < num_rows_; i++, out_i ++, in_i += i) {
+    for (MatrixIndexT i = 0; i < num_rows_; i++, out_i++, in_i += i) {
       for (MatrixIndexT j = 0; j <= i; j++)
         out_i[j*stride] = in_i[j];
     }
@@ -832,16 +832,16 @@ void MatrixBase<Real>::CopyFromTp(const TpMatrix<OtherReal> & M,
 
 template
 void MatrixBase<float>::CopyFromTp(const TpMatrix<float> & M,
-                                   MatrixTransposeType trans);
+    MatrixTransposeType trans);
 template
 void MatrixBase<float>::CopyFromTp(const TpMatrix<double> & M,
-                                   MatrixTransposeType trans);
+    MatrixTransposeType trans);
 template
 void MatrixBase<double>::CopyFromTp(const TpMatrix<float> & M,
-                                    MatrixTransposeType trans);
+    MatrixTransposeType trans);
 template
 void MatrixBase<double>::CopyFromTp(const TpMatrix<double> & M,
-                                    MatrixTransposeType trans);
+    MatrixTransposeType trans);
 
 
 template<typename Real>
@@ -911,7 +911,7 @@ void MatrixBase<Real>::CopyColsFromVec(const VectorBase<Real> &rv) {
         m_inc_data[r * stride_] = v_inc_data[r];
       }
       v_inc_data += num_rows_;
-      m_inc_data ++;
+      m_inc_data++;
     }
   } else if (rv.Dim() == num_rows_) {
     const Real *v_inc_data = rv.Data();
@@ -951,7 +951,7 @@ void MatrixBase<Real>::CopyDiagFromVec(const VectorBase<Real> &rv) {
 
 template<typename Real>
 void MatrixBase<Real>::CopyColFromVec(const VectorBase<Real> &rv,
-                                      const MatrixIndexT col) {
+    const MatrixIndexT col) {
   KALDI_ASSERT(rv.Dim() == num_rows_ &&
                static_cast<UnsignedMatrixIndexT>(col) <
                static_cast<UnsignedMatrixIndexT>(num_cols_));
@@ -969,7 +969,7 @@ template<typename Real>
 void Matrix<Real>::RemoveRow(MatrixIndexT i) {
   KALDI_ASSERT(static_cast<UnsignedMatrixIndexT>(i) <
                static_cast<UnsignedMatrixIndexT>(MatrixBase<Real>::num_rows_)
-               && "Access out of matrix");
+      && "Access out of matrix");
   for (MatrixIndexT j = i + 1; j <  MatrixBase<Real>::num_rows_; j++)
     MatrixBase<Real>::Row(j-1).CopyFromVec( MatrixBase<Real>::Row(j));
   MatrixBase<Real>::num_rows_--;
@@ -982,7 +982,7 @@ void Matrix<Real>::Destroy() {
     KALDI_MEMALIGN_FREE( MatrixBase<Real>::data_);
   MatrixBase<Real>::data_ = NULL;
   MatrixBase<Real>::num_rows_ = MatrixBase<Real>::num_cols_
-      = MatrixBase<Real>::stride_ = 0;
+        = MatrixBase<Real>::stride_ = 0;
 }
 
 
@@ -1104,14 +1104,14 @@ void MatrixBase<Real>::MulRowsGroupMat(const MatrixBase<Real> &src) {
 
 template<typename Real>
 void MatrixBase<Real>::GroupPnormDeriv(const MatrixBase<Real> &input,
-                                       const MatrixBase<Real> &output,
-                                       Real power) {
+    const MatrixBase<Real> &output,
+    Real power) {
   KALDI_ASSERT(input.NumCols() == this->NumCols() && input.NumRows() == this->NumRows());
   KALDI_ASSERT(this->NumCols() % output.NumCols() == 0 &&
                this->NumRows() == output.NumRows());
 
   int group_size = this->NumCols() / output.NumCols(),
-    num_rows = this->NumRows(), num_cols = this->NumCols();
+      num_rows = this->NumRows(), num_cols = this->NumCols();
 
   if (power == 1.0) {
     for (MatrixIndexT i = 0; i < num_rows; i++) {
@@ -1135,12 +1135,12 @@ void MatrixBase<Real>::GroupPnormDeriv(const MatrixBase<Real> &input,
     for (MatrixIndexT i = 0; i < num_rows; i++) {
       for (MatrixIndexT j = 0; j < num_cols; j++) {
         Real output_val = output(i, j / group_size),
-          input_val = input(i, j);
+            input_val = input(i, j);
         if (output_val == 0)
           (*this)(i, j) = 0;
-         else
-            (*this)(i, j) = pow(std::abs(input_val), power - 1) *
-              pow(output_val, 1 - power) * (input_val >= 0 ? 1 : -1) ;
+        else
+          (*this)(i, j) = pow(std::abs(input_val), power - 1) *
+              pow(output_val, 1 - power) * (input_val >= 0 ? 1 : -1);
       }
     }
   }
@@ -1148,7 +1148,7 @@ void MatrixBase<Real>::GroupPnormDeriv(const MatrixBase<Real> &input,
 
 template<typename Real>
 void MatrixBase<Real>::GroupMaxDeriv(const MatrixBase<Real> &input,
-                                     const MatrixBase<Real> &output) {
+    const MatrixBase<Real> &output) {
   KALDI_ASSERT(input.NumCols() == this->NumCols() &&
               input.NumRows() == this->NumRows());
   KALDI_ASSERT(this->NumCols() % output.NumCols() == 0 &&
@@ -1453,7 +1453,7 @@ void Matrix<Real>::Read(std::istream & is, bool binary, bool add) {
     }
     // Note, we never leave the while () loop before this
     // line (we return from it.)
- cleanup: // We only reach here in case of error in the while loop above.
+cleanup:  // We only reach here in case of error in the while loop above.
     if(cur_row != NULL)
       delete cur_row;
     for (size_t i = 0; i < data.size(); i++)
@@ -1473,10 +1473,10 @@ bad:
 // would not allow its contents to be changed.
 template<typename Real>
 SubMatrix<Real>::SubMatrix(const MatrixBase<Real> &M,
-                           const MatrixIndexT ro,
-                           const MatrixIndexT r,
-                           const MatrixIndexT co,
-                           const MatrixIndexT c) {
+    const MatrixIndexT ro,
+    const MatrixIndexT r,
+    const MatrixIndexT co,
+    const MatrixIndexT c) {
   if (r == 0 || c == 0) {
     // we support the empty sub-matrix as a special case.
     KALDI_ASSERT(c == 0 && r == 0);
@@ -1506,10 +1506,10 @@ SubMatrix<Real>::SubMatrix(const MatrixBase<Real> &M,
 
 template<typename Real>
 SubMatrix<Real>::SubMatrix(Real *data,
-                           MatrixIndexT num_rows,
-                           MatrixIndexT num_cols,
-                           MatrixIndexT stride):
-    MatrixBase<Real>(data, num_cols, num_rows, stride) { // caution: reversed order!
+    MatrixIndexT num_rows,
+    MatrixIndexT num_cols,
+    MatrixIndexT stride) :
+  MatrixBase<Real>(data, num_cols, num_rows, stride) {   // caution: reversed order!
   if (data == NULL) {
     KALDI_ASSERT(num_rows * num_cols == 0);
     this->num_rows_ = 0;
@@ -1546,7 +1546,7 @@ Real MatrixBase<Real>::Cond() const {
   Vector<Real> singular_values(std::min(num_rows_, num_cols_));
   Svd(&singular_values);  // Get singular values...
   Real min = singular_values(0), max = singular_values(0);  // both absolute values...
-  for (MatrixIndexT i = 1;i < singular_values.Dim();i++) {
+  for (MatrixIndexT i = 1; i < singular_values.Dim(); i++) {
     min = std::min((Real)std::abs(singular_values(i)), min); max = std::max((Real)std::abs(singular_values(i)), max);
   }
   if (min > 0) return max/min;
@@ -1557,7 +1557,7 @@ template<typename Real>
 Real MatrixBase<Real>::Trace(bool check_square) const  {
   KALDI_ASSERT(!check_square || num_rows_ == num_cols_);
   Real ans = 0.0;
-  for (MatrixIndexT r = 0;r < std::min(num_rows_, num_cols_);r++) ans += data_ [r + stride_*r];
+  for (MatrixIndexT r = 0; r < std::min(num_rows_, num_cols_); r++) ans += data_ [r + stride_*r];
   return ans;
 }
 
@@ -1587,10 +1587,10 @@ Real MatrixBase<Real>::Min() const {
 
 template <typename Real>
 void MatrixBase<Real>::AddMatMatMat(Real alpha,
-                                    const MatrixBase<Real> &A, MatrixTransposeType transA,
-                                    const MatrixBase<Real> &B, MatrixTransposeType transB,
-                                    const MatrixBase<Real> &C, MatrixTransposeType transC,
-                                    Real beta) {
+    const MatrixBase<Real> &A, MatrixTransposeType transA,
+    const MatrixBase<Real> &B, MatrixTransposeType transB,
+    const MatrixBase<Real> &C, MatrixTransposeType transC,
+    Real beta) {
   // Note on time taken with different orders of computation.  Assume not transposed in this /
   // discussion. Firstly, normalize expressions using A.NumCols == B.NumRows and B.NumCols == C.NumRows, prefer
   // rows where there is a choice.
@@ -1697,8 +1697,8 @@ bool MatrixBase<Real>::IsSymmetric(Real cutoff) const {
   MatrixIndexT R = num_rows_, C = num_cols_;
   if (R != C) return false;
   Real bad_sum = 0.0, good_sum = 0.0;
-  for (MatrixIndexT i = 0;i < R;i++) {
-    for (MatrixIndexT j = 0;j < i;j++) {
+  for (MatrixIndexT i = 0; i < R; i++) {
+    for (MatrixIndexT j = 0; j < i; j++) {
       Real a = (*this)(i, j), b = (*this)(j, i), avg = 0.5*(a+b), diff = 0.5*(a-b);
       good_sum += std::abs(avg); bad_sum += std::abs(diff);
     }
@@ -1712,8 +1712,8 @@ template<typename Real>
 bool MatrixBase<Real>::IsDiagonal(Real cutoff) const{
   MatrixIndexT R = num_rows_, C = num_cols_;
   Real bad_sum = 0.0, good_sum = 0.0;
-  for (MatrixIndexT i = 0;i < R;i++) {
-    for (MatrixIndexT j = 0;j < C;j++) {
+  for (MatrixIndexT i = 0; i < R; i++) {
+    for (MatrixIndexT j = 0; j < C; j++) {
       if (i == j) good_sum += std::abs((*this)(i, j));
       else bad_sum += std::abs((*this)(i, j));
     }
@@ -1738,18 +1738,18 @@ template<typename Real>
 bool MatrixBase<Real>::IsUnit(Real cutoff) const {
   MatrixIndexT R = num_rows_, C = num_cols_;
   Real bad_max = 0.0;
-  for (MatrixIndexT i = 0; i < R;i++)
-    for (MatrixIndexT j = 0; j < C;j++)
-      bad_max = std::max(bad_max, static_cast<Real>(std::abs( (*this)(i, j) - (i == j?1.0:0.0))));
+  for (MatrixIndexT i = 0; i < R; i++)
+    for (MatrixIndexT j = 0; j < C; j++)
+      bad_max = std::max(bad_max, static_cast<Real>(std::abs( (*this)(i, j) - (i == j ? 1.0 : 0.0))));
   return (bad_max <= cutoff);
 }
 
 template<typename Real>
-bool MatrixBase<Real>::IsZero(Real cutoff)const {
+bool MatrixBase<Real>::IsZero(Real cutoff) const {
   MatrixIndexT R = num_rows_, C = num_cols_;
   Real bad_max = 0.0;
-  for (MatrixIndexT i = 0;i < R;i++)
-    for (MatrixIndexT j = 0;j < C;j++)
+  for (MatrixIndexT i = 0; i < R; i++)
+    for (MatrixIndexT j = 0; j < C; j++)
       bad_max = std::max(bad_max, static_cast<Real>(std::abs( (*this)(i, j) )));
   return (bad_max <= cutoff);
 }
@@ -1766,7 +1766,7 @@ bool MatrixBase<Real>::ApproxEqual(const MatrixBase<Real> &other, float tol) con
   Matrix<Real> tmp(*this);
   tmp.AddMat(-1.0, other);
   return (tmp.FrobeniusNorm() <= static_cast<Real>(tol) *
-          this->FrobeniusNorm());
+         this->FrobeniusNorm());
 }
 
 template<typename Real>
@@ -1785,8 +1785,8 @@ template<typename Real>
 Real MatrixBase<Real>::LargestAbsElem() const{
   MatrixIndexT R = num_rows_, C = num_cols_;
   Real largest = 0.0;
-  for (MatrixIndexT i = 0;i < R;i++)
-    for (MatrixIndexT j = 0;j < C;j++)
+  for (MatrixIndexT i = 0; i < R; i++)
+    for (MatrixIndexT j = 0; j < C; j++)
       largest = std::max(largest, (Real)std::abs((*this)(i, j)));
   return largest;
 }
@@ -1854,9 +1854,9 @@ void MatrixBase<Real>::SymPosSemiDefEig(VectorBase<Real> *rs, MatrixBase<Real> *
 
   // First just zero any singular values if the column of U and V do not have +ve dot product--
   // this may mean we have small negative eigenvalues, and if we zero them the result will be closer to correct.
-  for (MatrixIndexT i = 0;i < D;i++) {
+  for (MatrixIndexT i = 0; i < D; i++) {
     Real sum = 0.0;
-    for (MatrixIndexT j = 0;j < D;j++) sum += (*rU)(j, i) * Vt(i, j);
+    for (MatrixIndexT j = 0; j < D; j++) sum += (*rU)(j, i) * Vt(i, j);
     if (sum < 0.0) (*rs)(i) = 0.0;
   }
 
@@ -1892,7 +1892,7 @@ Real MatrixBase<Real>::LogDet(Real *det_sign) const {
 
 template<typename Real>
 void MatrixBase<Real>::InvertDouble(Real *log_det, Real *det_sign,
-                                    bool inverse_needed) {
+    bool inverse_needed) {
   double log_det_tmp, det_sign_tmp;
   Matrix<double> dmat(*this);
   dmat.Invert(&log_det_tmp, &det_sign_tmp, inverse_needed);
@@ -1907,7 +1907,7 @@ void MatrixBase<Real>::CopyFromMat(const CompressedMatrix &mat) {
 }
 
 template<class Real>
-Matrix<Real>::Matrix(const CompressedMatrix &M): MatrixBase<Real>() {
+Matrix<Real>::Matrix(const CompressedMatrix &M) : MatrixBase<Real>() {
   Resize(M.NumRows(), M.NumCols(), kUndefined);
   M.CopyToMat(this);
 }
@@ -1927,8 +1927,8 @@ template<typename Real>
 void MatrixBase<Real>::Transpose() {
   KALDI_ASSERT(num_rows_ == num_cols_);
   MatrixIndexT M = num_rows_;
-  for (MatrixIndexT i = 0;i < M;i++)
-    for (MatrixIndexT j = 0;j < i;j++) {
+  for (MatrixIndexT i = 0; i < M; i++)
+    for (MatrixIndexT j = 0; j < i; j++) {
       Real &a = (*this)(i, j), &b = (*this)(j, i);
       std::swap(a, b);
     }
@@ -2011,7 +2011,7 @@ void MatrixBase<Real>::Heaviside(const MatrixBase<Real> &src) {
   Real *row_data = data_;
   const Real *src_row_data = src.Data();
   for (MatrixIndexT row = 0; row < num_rows;
-       row++,row_data += stride_, src_row_data += src.stride_) {
+      row++,row_data += stride_, src_row_data += src.stride_) {
     for (MatrixIndexT col = 0; col < num_cols; col++)
       row_data[col] = (src_row_data[col] > 0 ? 1.0 : 0.0);
   }
@@ -2068,8 +2068,8 @@ void Matrix<Real>::Swap(Matrix<Real> *other) {
 // with 2x2 blocks.
 template<typename Real>
 void MatrixBase<Real>::Eig(MatrixBase<Real> *P,
-                           VectorBase<Real> *r,
-                           VectorBase<Real> *i) const {
+    VectorBase<Real> *r,
+    VectorBase<Real> *i) const {
   EigenvalueDecomposition<Real>  eig(*this);
   if (P) eig.GetV(P);
   if (r) eig.GetRealEigenvalues(r);
@@ -2114,7 +2114,8 @@ bool ReadHtk(std::istream &is, Matrix<Real> *M_ptr, HtkHeader *header_ptr)
     // See HParm.h in HTK code for sources of these things.
     enum BaseParmKind{
       Waveform, Lpc, Lprefc, Lpcepstra, Lpdelcep,
-      Irefc, Mfcc, Fbank, Melspec, User, Discrete, Plp, Anon };
+      Irefc, Mfcc, Fbank, Melspec, User, Discrete, Plp, Anon
+    };
 
     const int32 IsCompressed = 02000, HasChecksum = 010000, HasVq = 040000,
         Problem = IsCompressed | HasVq;
@@ -2124,10 +2125,10 @@ bool ReadHtk(std::istream &is, Matrix<Real> *M_ptr, HtkHeader *header_ptr)
                                          // checksum so turn it off.
     if (htk_hdr.mSampleKind & Problem)
       KALDI_ERR << "Code to read HTK features does not support compressed "
-          "features, or features with VQ.";
+        "features, or features with VQ.";
     if (base_parm == Waveform || base_parm == Irefc || base_parm == Discrete)
       KALDI_ERR << "Attempting to read HTK features from unsupported type "
-          "(e.g. waveform or discrete features.";
+        "(e.g. waveform or discrete features.";
   }
 
   KALDI_VLOG(3) << "HTK header: Num Samples: " << htk_hdr.mNSamples
@@ -2202,7 +2203,7 @@ bool WriteHtk(std::ostream &os, const MatrixBase<Real> &M, HtkHeader htk_hdr) //
   KALDI_SWAP2(htk_hdr.mSampleKind);
 
   os.write((char*)&htk_hdr, sizeof(htk_hdr));
-  if (os.fail())  goto bad;
+  if (os.fail()) goto bad;
 
   MatrixIndexT i;
   MatrixIndexT j;
@@ -2216,10 +2217,10 @@ bool WriteHtk(std::ostream &os, const MatrixBase<Real> &M, HtkHeader htk_hdr) //
 
     for (i = 0; i < M.NumRows(); i++) {
       const Real *rowData = M.RowData(i);
-      for (j = 0;j < M.NumCols();j++)
+      for (j = 0; j < M.NumCols(); j++)
         pmem[j] =  static_cast<float> ( rowData[j] );
       if (MachineIsLittleEndian())
-        for (j = 0;j < M.NumCols();j++)
+        for (j = 0; j < M.NumCols(); j++)
           KALDI_SWAP4(pmem[j]);
       os.write((char*)pmem, sizeof(float)*M.NumCols());
       if (os.fail()) {
@@ -2249,7 +2250,7 @@ bool WriteSphinx(std::ostream &os, const MatrixBase<Real> &M)
 
   int size = M.NumRows() * M.NumCols();
   os.write((char*)&size, sizeof(int));
-  if (os.fail())  goto bad;
+  if (os.fail()) goto bad;
 
   MatrixIndexT i;
   MatrixIndexT j;
@@ -2263,10 +2264,10 @@ bool WriteSphinx(std::ostream &os, const MatrixBase<Real> &M)
 
     for (i = 0; i < M.NumRows(); i++) {
       const Real *rowData = M.RowData(i);
-      for (j = 0;j < M.NumCols();j++)
+      for (j = 0; j < M.NumCols(); j++)
         pmem[j] =  static_cast<float> ( rowData[j] );
       if (!MachineIsLittleEndian())
-        for (j = 0;j < M.NumCols();j++)
+        for (j = 0; j < M.NumCols(); j++)
           KALDI_SWAP4(pmem[j]);
       os.write((char*)pmem, sizeof(float)*M.NumCols());
       if (os.fail()) {
@@ -2290,8 +2291,8 @@ bool WriteSphinx(std::ostream &os, const MatrixBase<double> &M);
 
 template <typename Real>
 Real TraceMatMatMat(const MatrixBase<Real> &A, MatrixTransposeType transA,
-                    const MatrixBase<Real> &B, MatrixTransposeType transB,
-                    const MatrixBase<Real> &C, MatrixTransposeType transC) {
+    const MatrixBase<Real> &B, MatrixTransposeType transB,
+    const MatrixBase<Real> &C, MatrixTransposeType transC) {
   MatrixIndexT ARows = A.NumRows(), ACols = A.NumCols(), BRows = B.NumRows(), BCols = B.NumCols(),
       CRows = C.NumRows(), CCols = C.NumCols();
   if (transA == kTrans) std::swap(ARows, ACols);
@@ -2315,20 +2316,20 @@ Real TraceMatMatMat(const MatrixBase<Real> &A, MatrixTransposeType transA,
 
 template
 float TraceMatMatMat(const MatrixBase<float> &A, MatrixTransposeType transA,
-                     const MatrixBase<float> &B, MatrixTransposeType transB,
-                     const MatrixBase<float> &C, MatrixTransposeType transC);
+    const MatrixBase<float> &B, MatrixTransposeType transB,
+    const MatrixBase<float> &C, MatrixTransposeType transC);
 
 template
 double TraceMatMatMat(const MatrixBase<double> &A, MatrixTransposeType transA,
-                      const MatrixBase<double> &B, MatrixTransposeType transB,
-                      const MatrixBase<double> &C, MatrixTransposeType transC);
+    const MatrixBase<double> &B, MatrixTransposeType transB,
+    const MatrixBase<double> &C, MatrixTransposeType transC);
 
 
 template <typename Real>
 Real TraceMatMatMatMat(const MatrixBase<Real> &A, MatrixTransposeType transA,
-                       const MatrixBase<Real> &B, MatrixTransposeType transB,
-                       const MatrixBase<Real> &C, MatrixTransposeType transC,
-                       const MatrixBase<Real> &D, MatrixTransposeType transD) {
+    const MatrixBase<Real> &B, MatrixTransposeType transB,
+    const MatrixBase<Real> &C, MatrixTransposeType transC,
+    const MatrixBase<Real> &D, MatrixTransposeType transD) {
   MatrixIndexT ARows = A.NumRows(), ACols = A.NumCols(), BRows = B.NumRows(), BCols = B.NumCols(),
       CRows = C.NumRows(), CCols = C.NumCols(), DRows = D.NumRows(), DCols = D.NumCols();
   if (transA == kTrans) std::swap(ARows, ACols);
@@ -2357,18 +2358,18 @@ Real TraceMatMatMatMat(const MatrixBase<Real> &A, MatrixTransposeType transA,
 
 template
 float TraceMatMatMatMat(const MatrixBase<float> &A, MatrixTransposeType transA,
-                        const MatrixBase<float> &B, MatrixTransposeType transB,
-                        const MatrixBase<float> &C, MatrixTransposeType transC,
-                        const MatrixBase<float> &D, MatrixTransposeType transD);
+    const MatrixBase<float> &B, MatrixTransposeType transB,
+    const MatrixBase<float> &C, MatrixTransposeType transC,
+    const MatrixBase<float> &D, MatrixTransposeType transD);
 
 template
 double TraceMatMatMatMat(const MatrixBase<double> &A, MatrixTransposeType transA,
-                         const MatrixBase<double> &B, MatrixTransposeType transB,
-                         const MatrixBase<double> &C, MatrixTransposeType transC,
-                         const MatrixBase<double> &D, MatrixTransposeType transD);
+    const MatrixBase<double> &B, MatrixTransposeType transB,
+    const MatrixBase<double> &C, MatrixTransposeType transC,
+    const MatrixBase<double> &D, MatrixTransposeType transD);
 
 template<typename Real> void  SortSvd(VectorBase<Real> *s, MatrixBase<Real> *U,
-                                   MatrixBase<Real> *Vt, bool sort_on_absolute_value) {
+    MatrixBase<Real> *Vt, bool sort_on_absolute_value) {
   /// Makes sure the Svd is sorted (from greatest to least absolute value).
   MatrixIndexT num_singval = s->Dim();
   KALDI_ASSERT(U == NULL || U->NumCols() == num_singval);
@@ -2403,15 +2404,15 @@ template<typename Real> void  SortSvd(VectorBase<Real> *s, MatrixBase<Real> *U,
 
 template
 void SortSvd(VectorBase<float> *s, MatrixBase<float> *U,
-             MatrixBase<float> *Vt, bool);
+    MatrixBase<float> *Vt, bool);
 
 template
 void SortSvd(VectorBase<double> *s, MatrixBase<double> *U,
-             MatrixBase<double> *Vt, bool);
+    MatrixBase<double> *Vt, bool);
 
 template<typename Real>
 void CreateEigenvalueMatrix(const VectorBase<Real> &re, const VectorBase<Real> &im,
-                            MatrixBase<Real> *D) {
+    MatrixBase<Real> *D) {
   MatrixIndexT n = re.Dim();
   KALDI_ASSERT(im.Dim() == n && D->NumRows() == n && D->NumCols() == n);
 
@@ -2423,7 +2424,7 @@ void CreateEigenvalueMatrix(const VectorBase<Real> &re, const VectorBase<Real> &
       j++;
     } else {  // First of a complex pair
       KALDI_ASSERT(j+1 < n && ApproxEqual(im(j+1), -im(j))
-                   && ApproxEqual(re(j+1), re(j)));
+          && ApproxEqual(re(j+1), re(j)));
       /// if (im(j) < 0.0) KALDI_WARN << "Negative first im part of pair";  // TEMP
       Real lambda = re(j), mu = im(j);
       // create 2x2 block [lambda, mu; -mu, lambda]
@@ -2438,10 +2439,10 @@ void CreateEigenvalueMatrix(const VectorBase<Real> &re, const VectorBase<Real> &
 
 template
 void CreateEigenvalueMatrix(const VectorBase<float> &re, const VectorBase<float> &im,
-                            MatrixBase<float> *D);
+    MatrixBase<float> *D);
 template
 void CreateEigenvalueMatrix(const VectorBase<double> &re, const VectorBase<double> &im,
-                            MatrixBase<double> *D);
+    MatrixBase<double> *D);
 
 
 
@@ -2480,15 +2481,15 @@ bool AttemptComplexPower(double *x_re, double *x_im, double power);
 
 template <typename Real>
 Real TraceMatMat(const MatrixBase<Real> &A,
-                  const MatrixBase<Real> &B,
-                  MatrixTransposeType trans) {  // tr(A B), equivalent to sum of each element of A times same element in B'
+    const MatrixBase<Real> &B,
+    MatrixTransposeType trans) {                // tr(A B), equivalent to sum of each element of A times same element in B'
   MatrixIndexT aStride = A.stride_, bStride = B.stride_;
   if (trans == kNoTrans) {
     KALDI_ASSERT(A.NumRows() == B.NumCols() && A.NumCols() == B.NumRows());
     Real ans = 0.0;
     Real *adata = A.data_, *bdata = B.data_;
     MatrixIndexT arows = A.NumRows(), acols = A.NumCols();
-    for (MatrixIndexT row = 0;row < arows;row++, adata+=aStride, bdata++)
+    for (MatrixIndexT row = 0; row < arows; row++, adata+=aStride, bdata++)
       ans += cblas_Xdot(acols, adata, 1, bdata, bStride);
     return ans;
   } else {
@@ -2496,7 +2497,7 @@ Real TraceMatMat(const MatrixBase<Real> &A,
     Real ans = 0.0;
     Real *adata = A.data_, *bdata = B.data_;
     MatrixIndexT arows = A.NumRows(), acols = A.NumCols();
-    for (MatrixIndexT row = 0;row < arows;row++, adata+=aStride, bdata+=bStride)
+    for (MatrixIndexT row = 0; row < arows; row++, adata+=aStride, bdata+=bStride)
       ans += cblas_Xdot(acols, adata, 1, bdata, 1);
     return ans;
   }
@@ -2506,12 +2507,12 @@ Real TraceMatMat(const MatrixBase<Real> &A,
 // Instantiate the template above for float and double.
 template
 float TraceMatMat(const MatrixBase<float> &A,
-                  const MatrixBase<float> &B,
-                  MatrixTransposeType trans);
+    const MatrixBase<float> &B,
+    MatrixTransposeType trans);
 template
 double TraceMatMat(const MatrixBase<double> &A,
-                  const MatrixBase<double> &B,
-                  MatrixTransposeType trans);
+    const MatrixBase<double> &B,
+    MatrixTransposeType trans);
 
 
 template<typename Real>
@@ -2554,7 +2555,7 @@ void MatrixBase<Real>::Tanh(const MatrixBase<Real> &src) {
 
   if (num_cols_ == stride_ && src.num_cols_ == src.stride_) {
     SubVector<Real> src_vec(src.data_, num_rows_ * num_cols_),
-        dst_vec(this->data_, num_rows_ * num_cols_);
+    dst_vec(this->data_, num_rows_ * num_cols_);
     dst_vec.Tanh(src_vec);
   } else {
     for (MatrixIndexT r = 0; r < num_rows_; r++) {
@@ -2586,7 +2587,7 @@ void MatrixBase<Real>::GroupPnorm(const MatrixBase<Real> &src, Real power) {
   KALDI_ASSERT(src.NumCols() % this->NumCols() == 0 &&
                src.NumRows() == this->NumRows());
   int group_size = src.NumCols() / this->NumCols(),
-    num_rows = this->NumRows(), num_cols = this->NumCols();
+      num_rows = this->NumRows(), num_cols = this->NumCols();
   for (MatrixIndexT i = 0; i < num_rows; i++)
     for (MatrixIndexT j = 0; j < num_cols; j++)
       (*this)(i, j) = src.Row(i).Range(j * group_size,  group_size).Norm(power);
@@ -2614,7 +2615,7 @@ void MatrixBase<Real>::GroupMax(const MatrixBase<Real> &src) {
 
 template<typename Real>
 void MatrixBase<Real>::CopyCols(const MatrixBase<Real> &src,
-                                const MatrixIndexT *indices) {
+    const MatrixIndexT *indices) {
   KALDI_ASSERT(NumRows() == src.NumRows());
   MatrixIndexT num_rows = num_rows_, num_cols = num_cols_,
       this_stride = stride_, src_stride = src.stride_;
@@ -2640,7 +2641,7 @@ void MatrixBase<Real>::CopyCols(const MatrixBase<Real> &src,
 
 template<typename Real>
 void MatrixBase<Real>::AddCols(const MatrixBase<Real> &src,
-                               const MatrixIndexT *indices) {
+    const MatrixIndexT *indices) {
   KALDI_ASSERT(NumRows() == src.NumRows());
   MatrixIndexT num_rows = num_rows_, num_cols = num_cols_,
       this_stride = stride_, src_stride = src.stride_;
@@ -2665,7 +2666,7 @@ void MatrixBase<Real>::AddCols(const MatrixBase<Real> &src,
 
 template<typename Real>
 void MatrixBase<Real>::CopyRows(const MatrixBase<Real> &src,
-                                const MatrixIndexT *indices) {
+    const MatrixIndexT *indices) {
   KALDI_ASSERT(NumCols() == src.NumCols());
   MatrixIndexT num_rows = num_rows_, num_cols = num_cols_,
       this_stride = stride_;
@@ -2706,8 +2707,8 @@ void MatrixBase<Real>::CopyToRows(Real *const *dst) const {
 
 template<typename Real>
 void MatrixBase<Real>::AddRows(Real alpha,
-                               const MatrixBase<Real> &src,
-                               const MatrixIndexT *indexes) {
+    const MatrixBase<Real> &src,
+    const MatrixIndexT *indexes) {
   KALDI_ASSERT(NumCols() == src.NumCols());
   MatrixIndexT num_rows = num_rows_,
       num_cols = num_cols_, this_stride = stride_;
@@ -2753,7 +2754,7 @@ void MatrixBase<Real>::Sigmoid(const MatrixBase<Real> &src) {
 
   if (num_cols_ == stride_ && src.num_cols_ == src.stride_) {
     SubVector<Real> src_vec(src.data_, num_rows_ * num_cols_),
-        dst_vec(this->data_, num_rows_ * num_cols_);
+    dst_vec(this->data_, num_rows_ * num_cols_);
     dst_vec.Sigmoid(src_vec);
   } else {
     for (MatrixIndexT r = 0; r < num_rows_; r++) {
@@ -2765,7 +2766,7 @@ void MatrixBase<Real>::Sigmoid(const MatrixBase<Real> &src) {
 
 template<typename Real>
 void MatrixBase<Real>::DiffSigmoid(const MatrixBase<Real> &value,
-                                   const MatrixBase<Real> &diff) {
+    const MatrixBase<Real> &diff) {
   KALDI_ASSERT(SameDim(*this, value) && SameDim(*this, diff));
   MatrixIndexT num_rows = num_rows_, num_cols = num_cols_,
       stride = stride_, value_stride = value.stride_, diff_stride = diff.stride_;
@@ -2782,7 +2783,7 @@ void MatrixBase<Real>::DiffSigmoid(const MatrixBase<Real> &value,
 
 template<typename Real>
 void MatrixBase<Real>::DiffTanh(const MatrixBase<Real> &value,
-                                   const MatrixBase<Real> &diff) {
+    const MatrixBase<Real> &diff) {
   KALDI_ASSERT(SameDim(*this, value) && SameDim(*this, diff));
   MatrixIndexT num_rows = num_rows_, num_cols = num_cols_,
       stride = stride_, value_stride = value.stride_, diff_stride = diff.stride_;
@@ -2816,17 +2817,17 @@ void MatrixBase<Real>::AddVecToRows(const Real alpha, const VectorBase<OtherReal
     Vector<OtherReal> ones(num_rows);
     ones.Set(1.0);
     this->AddVecVec(alpha, ones, v);
-   }
+  }
 }
 
 template void MatrixBase<float>::AddVecToRows(const float alpha,
-                                              const VectorBase<float> &v);
+    const VectorBase<float> &v);
 template void MatrixBase<float>::AddVecToRows(const float alpha,
-                                              const VectorBase<double> &v);
+    const VectorBase<double> &v);
 template void MatrixBase<double>::AddVecToRows(const double alpha,
-                                               const VectorBase<float> &v);
+    const VectorBase<float> &v);
 template void MatrixBase<double>::AddVecToRows(const double alpha,
-                                               const VectorBase<double> &v);
+    const VectorBase<double> &v);
 
 
 template<typename Real>
@@ -2853,13 +2854,13 @@ void MatrixBase<Real>::AddVecToCols(const Real alpha, const VectorBase<OtherReal
 }
 
 template void MatrixBase<float>::AddVecToCols(const float alpha,
-                                              const VectorBase<float> &v);
+    const VectorBase<float> &v);
 template void MatrixBase<float>::AddVecToCols(const float alpha,
-                                              const VectorBase<double> &v);
+    const VectorBase<double> &v);
 template void MatrixBase<double>::AddVecToCols(const double alpha,
-                                               const VectorBase<float> &v);
+    const VectorBase<float> &v);
 template void MatrixBase<double>::AddVecToCols(const double alpha,
-                                               const VectorBase<double> &v);
+    const VectorBase<double> &v);
 
 //Explicit instantiation of the classes
 //Apparently, it seems to be necessary that the instantiation

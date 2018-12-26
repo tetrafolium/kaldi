@@ -38,11 +38,11 @@ int32 GetCount(double expected_count) {
 }
 
 void FilterExample(const NnetChainExample &eg,
-                   int32 min_input_t,
-                   int32 max_input_t,
-                   int32 min_output_t,
-                   int32 max_output_t,
-                   NnetChainExample *eg_out) {
+    int32 min_input_t,
+    int32 max_input_t,
+    int32 min_output_t,
+    int32 max_output_t,
+    NnetChainExample *eg_out) {
   eg_out->inputs.clear();
   eg_out->inputs.resize(eg.inputs.size());
   eg_out->outputs.clear();
@@ -73,7 +73,7 @@ void FilterExample(const NnetChainExample &eg,
       KALDI_ASSERT(io_in.features.NumRows() == num_indexes);
       std::vector<bool> keep(num_indexes, false);
       std::vector<Index>::const_iterator iter_in = indexes_in.begin(),
-                                          end_in = indexes_in.end();
+          end_in = indexes_in.end();
       std::vector<bool>::iterator iter_out = keep.begin();
       for (; iter_in != end_in; ++iter_in, ++iter_out) {
         int32 t = iter_in->t;
@@ -108,17 +108,17 @@ void FilterExample(const NnetChainExample &eg,
 }
 
 bool ContainsSingleExample(const NnetChainExample &eg,
-                           int32 *min_input_t,
-                           int32 *max_input_t,
-                           int32 *min_output_t,
-                           int32 *max_output_t) {
+    int32 *min_input_t,
+    int32 *max_input_t,
+    int32 *min_output_t,
+    int32 *max_output_t) {
   bool done_input = false, done_output = false;
   int32 num_indexes_input = eg.inputs.size();
   int32 num_indexes_output = eg.outputs.size();
   for (int32 i = 0; i < num_indexes_input; i++) {
     const NnetIo &input = eg.inputs[i];
     std::vector<Index>::const_iterator iter = input.indexes.begin(),
-                                        end = input.indexes.end();
+        end = input.indexes.end();
     // Should not have an empty input/output type.
     KALDI_ASSERT(!input.indexes.empty());
     if (input.name == "input") {
@@ -150,7 +150,7 @@ bool ContainsSingleExample(const NnetChainExample &eg,
   for (int32 i = 0; i < num_indexes_output; i++) {
     const NnetChainSupervision &outputs = eg.outputs[i];
     std::vector<Index>::const_iterator iter = outputs.indexes.begin(),
-                                        end = outputs.indexes.end();
+        end = outputs.indexes.end();
     // Should not have an empty input/output type.
     KALDI_ASSERT(!outputs.indexes.empty());
     if (outputs.name == "output") {
@@ -191,19 +191,19 @@ bool ContainsSingleExample(const NnetChainExample &eg,
 
 // calculate the frame_subsampling_factor
 void CalculateFrameSubsamplingFactor(const NnetChainExample &eg,
-                                     int32 *frame_subsampling_factor) {
+    int32 *frame_subsampling_factor) {
   *frame_subsampling_factor = eg.outputs[0].indexes[1].t
-                              - eg.outputs[0].indexes[0].t;
+      - eg.outputs[0].indexes[0].t;
 }
 
 void ModifyChainExampleContext(const NnetChainExample &eg,
-                               int32 left_context,
-                               int32 right_context,
-                               const int32 frame_subsampling_factor,
-                               NnetChainExample *eg_out) {
+    int32 left_context,
+    int32 right_context,
+    const int32 frame_subsampling_factor,
+    NnetChainExample *eg_out) {
   static bool warned_left = false, warned_right = false;
   int32 min_input_t, max_input_t,
-        min_output_t, max_output_t;
+      min_output_t, max_output_t;
   if (!ContainsSingleExample(eg, &min_input_t, &max_input_t,
                              &min_output_t, &max_output_t))
     KALDI_ERR << "Too late to perform frame selection/context reduction on "
@@ -216,7 +216,7 @@ void ModifyChainExampleContext(const NnetChainExample &eg,
                  << ", but example only has left-context of "
                  <<  observed_left_context
                  << " (will warn only once; this may be harmless if "
-          "using any --*left-context-initial options)";
+        "using any --*left-context-initial options)";
     }
     min_input_t = std::max(min_input_t, min_output_t - left_context);
   }
@@ -227,10 +227,10 @@ void ModifyChainExampleContext(const NnetChainExample &eg,
       if (!warned_right && observed_right_context < right_context) {
         warned_right = true;
         KALDI_WARN << "You requested --right-context=" << right_context
-                  << ", but example only has right-context of "
-                  << observed_right_context
-                 << " (will warn only once; this may be harmless if "
-            "using any --*right-context-final options.";
+                   << ", but example only has right-context of "
+                   << observed_right_context
+                   << " (will warn only once; this may be harmless if "
+          "using any --*right-context-final options.";
       }
       max_input_t = std::min(max_input_t, max_output_t + right_context);
     }
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
       example_writers[i] = new NnetChainExampleWriter(po.GetArg(i+2));
 
     std::vector<std::string> exclude_names;  // names we never shift times of;
-                                            // not configurable for now.
+                                             // not configurable for now.
     exclude_names.push_back(std::string("ivector"));
 
     int64 num_read = 0, num_written = 0;

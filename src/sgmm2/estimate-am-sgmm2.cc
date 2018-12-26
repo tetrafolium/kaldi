@@ -120,7 +120,7 @@ void MleAmSgmm2Accs::Write(std::ostream &out_stream, bool binary) const {
 }
 
 void MleAmSgmm2Accs::Read(std::istream &in_stream, bool binary,
-                         bool add) {
+    bool add) {
   ExpectToken(in_stream, binary, "<SGMMACCS>");
   ExpectToken(in_stream, binary, "<NUMPDFS>");
   ReadBasicType(in_stream, binary, &num_pdfs_);
@@ -211,7 +211,7 @@ void MleAmSgmm2Accs::Read(std::istream &in_stream, bool binary,
 }
 
 void MleAmSgmm2Accs::Check(const AmSgmm2 &model,
-                          bool show_properties) const {
+    bool show_properties) const {
   if (show_properties)
     KALDI_LOG << "Sgmm2PdfModel: J1 = " << num_groups_ << ", J2 = "
               << num_pdfs_ << ", D = " << feature_dim_ << ", S = "
@@ -363,8 +363,8 @@ void MleAmSgmm2Accs::Check(const AmSgmm2 &model,
 }
 
 void MleAmSgmm2Accs::ResizeAccumulators(const AmSgmm2 &model,
-                                        SgmmUpdateFlagsType flags,
-                                        bool have_spk_vecs) {
+    SgmmUpdateFlagsType flags,
+    bool have_spk_vecs) {
   num_pdfs_ = model.NumPdfs();
   num_groups_ = model.NumGroups();
   num_gaussians_ = model.NumGauss();
@@ -414,7 +414,7 @@ void MleAmSgmm2Accs::ResizeAccumulators(const AmSgmm2 &model,
   }
 
   if (flags & (kSgmmPhoneVectors | kSgmmPhoneWeightProjections |
-               kSgmmCovarianceMatrix | kSgmmPhoneProjections)) {
+      kSgmmCovarianceMatrix | kSgmmPhoneProjections)) {
     gamma_.resize(num_groups_);
     for (int32 j1 = 0; j1 < num_groups_; j1++) {
       gamma_[j1].Resize(model.NumSubstatesForGroup(j1), num_gaussians_);
@@ -469,10 +469,10 @@ void MleAmSgmm2Accs::ResizeAccumulators(const AmSgmm2 &model,
 }
 
 BaseFloat MleAmSgmm2Accs::Accumulate(const AmSgmm2 &model,
-                                    const Sgmm2PerFrameDerivedVars &frame_vars,
-                                    int32 j2,
-                                    BaseFloat weight,
-                                    Sgmm2PerSpkDerivedVars *spk_vars) {
+    const Sgmm2PerFrameDerivedVars &frame_vars,
+    int32 j2,
+    BaseFloat weight,
+    Sgmm2PerSpkDerivedVars *spk_vars) {
   // Calculate Gaussian posteriors and collect statistics
   Matrix<BaseFloat> posteriors;
   BaseFloat log_like = model.ComponentPosteriors(frame_vars, j2, spk_vars, &posteriors);
@@ -485,18 +485,18 @@ BaseFloat MleAmSgmm2Accs::Accumulate(const AmSgmm2 &model,
 }
 
 BaseFloat MleAmSgmm2Accs::AccumulateFromPosteriors(
-    const AmSgmm2 &model,
-    const Sgmm2PerFrameDerivedVars &frame_vars,
-    const Matrix<BaseFloat> &posteriors,
-    int32 j2,
-    Sgmm2PerSpkDerivedVars *spk_vars) {
+  const AmSgmm2 &model,
+  const Sgmm2PerFrameDerivedVars &frame_vars,
+  const Matrix<BaseFloat> &posteriors,
+  int32 j2,
+  Sgmm2PerSpkDerivedVars *spk_vars) {
   double tot_count = 0.0;
   const vector<int32> &gselect = frame_vars.gselect;
   // Intermediate variables
   Vector<BaseFloat> gammat(gselect.size()), // sum of gammas over mix-weight.
-      a_is_part(gselect.size()); //
+  a_is_part(gselect.size());     //
   Vector<BaseFloat> xt_jmi(feature_dim_), mu_jmi(feature_dim_),
-      zt_jmi(spk_space_dim_);
+  zt_jmi(spk_space_dim_);
 
   int32 j1 = model.Pdf2Group(j2);
   int32 num_substates = model.NumSubstatesForGroup(j1);
@@ -578,7 +578,7 @@ BaseFloat MleAmSgmm2Accs::AccumulateFromPosteriors(
 }
 
 void MleAmSgmm2Accs::CommitStatsForSpk(const AmSgmm2 &model,
-                                       const Sgmm2PerSpkDerivedVars &spk_vars) {
+    const Sgmm2PerSpkDerivedVars &spk_vars) {
   const VectorBase<BaseFloat> &v_s = spk_vars.v_s;
   if (v_s.Dim() != 0 && !v_s.IsZero() && !R_.empty()) {
     for (int32 i = 0; i < num_gaussians_; i++)
@@ -610,8 +610,8 @@ void MleAmSgmm2Accs::GetStateOccupancies(Vector<BaseFloat> *occs) const {
 }
 
 void MleAmSgmm2Updater::Update(const MleAmSgmm2Accs &accs,
-                               AmSgmm2 *model,
-                               SgmmUpdateFlagsType flags) {
+    AmSgmm2 *model,
+    SgmmUpdateFlagsType flags) {
   // Q_{i}, quadratic term for phonetic subspace estimation. Dim is [I][S][S]
   std::vector< SpMatrix<double> > Q;
 
@@ -684,8 +684,8 @@ void MleAmSgmm2Updater::Update(const MleAmSgmm2Accs &accs,
 
 // Compute the Q_{i} (Eq. 64)
 void MleAmSgmm2Updater::ComputeQ(const MleAmSgmm2Accs &accs,
-                                const AmSgmm2 &model,
-                                std::vector< SpMatrix<double> > *Q) {
+    const AmSgmm2 &model,
+    std::vector< SpMatrix<double> > *Q) {
   Q->resize(accs.num_gaussians_);
   for (int32 i = 0; i < accs.num_gaussians_; i++) {
     (*Q)[i].Resize(accs.phn_space_dim_);
@@ -704,8 +704,8 @@ void MleAmSgmm2Updater::ComputeQ(const MleAmSgmm2Accs &accs,
 // Note: we seem to have also included in this variable
 // the term - (Y_i M_I^T + M_i Y_i^T).
 void MleAmSgmm2Updater::ComputeSMeans(const MleAmSgmm2Accs &accs,
-                                     const AmSgmm2 &model,
-                                     std::vector< SpMatrix<double> > *S_means) {
+    const AmSgmm2 &model,
+    std::vector< SpMatrix<double> > *S_means) {
   S_means->resize(accs.num_gaussians_);
   Matrix<double> YM_MY(accs.feature_dim_, accs.feature_dim_);
   Vector<BaseFloat> mu_jmi(accs.feature_dim_);
@@ -736,22 +736,22 @@ void MleAmSgmm2Updater::ComputeSMeans(const MleAmSgmm2Accs &accs,
 
 
 class UpdatePhoneVectorsClass: public MultiThreadable { // For multi-threaded.
- public:
+public:
   UpdatePhoneVectorsClass(const MleAmSgmm2Updater &updater,
-                          const MleAmSgmm2Accs &accs,
-                          const std::vector<SpMatrix<double> > &H,
-                          const std::vector<Matrix<double> > &log_a,
-                          AmSgmm2 *model,
-                          double *auxf_impr):
-      updater_(updater), accs_(accs), model_(model),
-      H_(H), log_a_(log_a), auxf_impr_ptr_(auxf_impr),
-      auxf_impr_(0.0) { }
+      const MleAmSgmm2Accs &accs,
+      const std::vector<SpMatrix<double> > &H,
+      const std::vector<Matrix<double> > &log_a,
+      AmSgmm2 *model,
+      double *auxf_impr) :
+    updater_(updater), accs_(accs), model_(model),
+    H_(H), log_a_(log_a), auxf_impr_ptr_(auxf_impr),
+    auxf_impr_(0.0) { }
 
   UpdatePhoneVectorsClass(const UpdatePhoneVectorsClass &other) :
-      MultiThreadable(other),
-      updater_(other.updater_), accs_(other.accs_), model_(other.model_),
-      H_(other.H_), log_a_(other.log_a_), auxf_impr_ptr_(other.auxf_impr_ptr_),
-      auxf_impr_(0.0) { }
+    MultiThreadable(other),
+    updater_(other.updater_), accs_(other.accs_), model_(other.model_),
+    H_(other.H_), log_a_(other.log_a_), auxf_impr_ptr_(other.auxf_impr_ptr_),
+    auxf_impr_(0.0) { }
 
   ~UpdatePhoneVectorsClass() {
     *auxf_impr_ptr_ += auxf_impr_;
@@ -763,7 +763,7 @@ class UpdatePhoneVectorsClass: public MultiThreadable { // For multi-threaded.
     updater_.UpdatePhoneVectorsInternal(accs_, H_, log_a_, model_,
                                         &auxf_impr_, num_threads_, thread_id_);
   }
- private:
+private:
   const MleAmSgmm2Updater &updater_;
   const MleAmSgmm2Accs &accs_;
   AmSgmm2 *model_;
@@ -780,10 +780,10 @@ class UpdatePhoneVectorsClass: public MultiThreadable { // For multi-threaded.
    guaranteed). */
 
 double MleAmSgmm2Updater::UpdatePhoneVectors(
-    const MleAmSgmm2Accs &accs,
-    const vector< SpMatrix<double> > &H,
-    const vector< Matrix<double> > &log_a,
-    AmSgmm2 *model) const {
+  const MleAmSgmm2Accs &accs,
+  const vector< SpMatrix<double> > &H,
+  const vector< Matrix<double> > &log_a,
+  AmSgmm2 *model) const {
 
   KALDI_LOG << "Updating phone vectors";
 
@@ -804,7 +804,7 @@ double MleAmSgmm2Updater::UpdatePhoneVectors(
 
 //static
 void MleAmSgmm2Updater::ComputeLogA(const MleAmSgmm2Accs &accs,
-                                    std::vector<Matrix<double> > *log_a) {
+    std::vector<Matrix<double> > *log_a) {
   // This computes the logarithm of the statistics a_{jmi} defined
   // in Eq. 40 of the SSGMM techreport.  Although the log of a_{jmi} never
   // explicitly appears in the techreport, it happens to be more convenient
@@ -836,13 +836,13 @@ void MleAmSgmm2Updater::ComputeLogA(const MleAmSgmm2Accs &accs,
 }
 
 void MleAmSgmm2Updater::UpdatePhoneVectorsInternal(
-    const MleAmSgmm2Accs &accs,
-    const vector< SpMatrix<double> > &H,
-    const vector< Matrix<double> > &log_a,
-    AmSgmm2 *model,
-    double *auxf_impr_ptr,
-    int32 num_threads,
-    int32 thread_id) const {
+  const MleAmSgmm2Accs &accs,
+  const vector< SpMatrix<double> > &H,
+  const vector< Matrix<double> > &log_a,
+  AmSgmm2 *model,
+  double *auxf_impr_ptr,
+  int32 num_threads,
+  int32 thread_id) const {
 
   int32 J1 = accs.num_groups_, block_size = (J1 + (num_threads-1)) / num_threads,
       j1_start = block_size * thread_id,
@@ -862,7 +862,7 @@ void MleAmSgmm2Updater::UpdatePhoneVectorsInternal(
       }
 
       Vector<double> v_jm_orig(model->v_[j1].Row(m)),
-          v_jm(v_jm_orig);
+      v_jm(v_jm_orig);
 
       double exact_auxf_start = 0.0, exact_auxf = 0.0, approx_auxf_impr = 0.0;
       int32 backtrack_iter, max_backtrack = 10;
@@ -942,9 +942,9 @@ void MleAmSgmm2Updater::UpdatePhoneVectorsInternal(
 
 
 void MleAmSgmm2Updater::RenormalizeV(const MleAmSgmm2Accs &accs,
-                                    AmSgmm2 *model,
-                                    const Vector<double> &gamma_i,
-                                    const vector<SpMatrix<double> > &H) {
+    AmSgmm2 *model,
+    const Vector<double> &gamma_i,
+    const vector<SpMatrix<double> > &H) {
   // Compute H^{(sm)}, the "smoothing" matrix-- average of H's.
   SpMatrix<double> H_sm(accs.phn_space_dim_);
   for (int32 i = 0; i < accs.num_gaussians_; i++)
@@ -1038,9 +1038,9 @@ void MleAmSgmm2Updater::RenormalizeV(const MleAmSgmm2Accs &accs,
 }
 
 double MleAmSgmm2Updater::UpdateM(const MleAmSgmm2Accs &accs,
-                                 const std::vector< SpMatrix<double> > &Q,
-                                 const Vector<double> &gamma_i,
-                                 AmSgmm2 *model) {
+    const std::vector< SpMatrix<double> > &Q,
+    const Vector<double> &gamma_i,
+    AmSgmm2 *model) {
   double tot_count = 0.0, tot_like_impr = 0.0;
   for (int32 i = 0; i < accs.num_gaussians_; i++) {
     if (gamma_i(i) < accs.feature_dim_) {
@@ -1115,8 +1115,8 @@ void MleAmSgmm2Updater::ComputeMPrior(AmSgmm2 *model) {
     for (int32 iter = 0; iter < options_.map_M_prior_iters; iter++) {
       { // diagnostic block.
         double prior_like = -0.5 * nGaussians * (Ddim * Sdim * Log(2 * M_PI)
-                + Sdim * (-model->row_cov_inv_.LogPosDefDet())
-                + Ddim * (-model->col_cov_inv_.LogPosDefDet()));
+            + Sdim * (-model->row_cov_inv_.LogPosDefDet())
+            + Ddim * (-model->col_cov_inv_.LogPosDefDet()));
         for (int32 i = 0; i < nGaussians; i++) {
           MDiff.CopyFromMat(Matrix<double>(model->M_prior_[i]));
           MDiff.AddMat(-1.0, avg_M);  // MDiff = M_{i} - avg(M)
@@ -1127,8 +1127,8 @@ void MleAmSgmm2Updater::ComputeMPrior(AmSgmm2 *model) {
           prior_like -= 0.5 * TraceSpSp(tmp, SpMatrix<double>(model->col_cov_inv_));
         }
         KALDI_LOG << "Before iteration " << iter
-            << " of updating prior over M, log like per dimension modeled is "
-            << prior_like / (nGaussians * Ddim * Sdim);
+                  << " of updating prior over M, log like per dimension modeled is "
+                  << prior_like / (nGaussians * Ddim * Sdim);
       }
 
       // First estimate the column covariances (\Omega_r in paper)
@@ -1181,9 +1181,9 @@ void MleAmSgmm2Updater::ComputeMPrior(AmSgmm2 *model) {
 
 // MAP adaptation of M with a matrix-variate Gaussian prior
 double MleAmSgmm2Updater::MapUpdateM(const MleAmSgmm2Accs &accs,
-                                     const std::vector< SpMatrix<double> > &Q,
-                                     const Vector<double> &gamma_i,
-                                     AmSgmm2 *model) {
+    const std::vector< SpMatrix<double> > &Q,
+    const Vector<double> &gamma_i,
+    AmSgmm2 *model) {
   int32 Ddim = model->FeatureDim();
   int32 Sdim = model->PhoneSpaceDim();
   int32 nGaussians = model->NumGauss();
@@ -1256,14 +1256,14 @@ double MleAmSgmm2Updater::MapUpdateM(const MleAmSgmm2Accs &accs,
 
 // static
 void MleAmSgmm2Updater::UpdateWGetStats(const MleAmSgmm2Accs &accs,
-                                        const AmSgmm2 &model,
-                                        const Matrix<double> &w,
-                                        const std::vector<Matrix<double> > &log_a,
-                                        Matrix<double> *F_i,
-                                        Matrix<double> *g_i,
-                                        double *tot_like,
-                                        int32 num_threads,
-                                        int32 thread_id) {
+    const AmSgmm2 &model,
+    const Matrix<double> &w,
+    const std::vector<Matrix<double> > &log_a,
+    Matrix<double> *F_i,
+    Matrix<double> *g_i,
+    double *tot_like,
+    int32 num_threads,
+    int32 thread_id) {
 
   // Accumulate stats from a block of states (this gets called in parallel).
   int32 block_size = (accs.num_groups_ + (num_threads-1)) / num_threads,
@@ -1285,7 +1285,7 @@ void MleAmSgmm2Updater::UpdateWGetStats(const MleAmSgmm2Accs &accs,
     Matrix<double> linear_term(num_substates, accs.num_gaussians_);
     Matrix<double> quadratic_term(num_substates, accs.num_gaussians_);
     Matrix<double> v_vT_m(num_substates,
-                          (accs.phn_space_dim_*(accs.phn_space_dim_+1))/2);
+        (accs.phn_space_dim_*(accs.phn_space_dim_+1))/2);
 
     // w_jm = softmax([w_{k1}^T ... w_{kD}^T] * v_{jkm})  eq.(7)
     Matrix<double> v_j_double(model.v_[j1]);
@@ -1319,9 +1319,9 @@ void MleAmSgmm2Updater::UpdateWGetStats(const MleAmSgmm2Accs &accs,
 
 // The parallel weight update, in the paper.
 double MleAmSgmm2Updater::UpdateW(const MleAmSgmm2Accs &accs,
-                                  const std::vector<Matrix<double> > &log_a,
-                                  const Vector<double> &gamma_i,
-                                  AmSgmm2 *model) {
+    const std::vector<Matrix<double> > &log_a,
+    const Vector<double> &gamma_i,
+    AmSgmm2 *model) {
   KALDI_LOG << "Updating weight projections";
 
   // tot_like_{after, before} are totals over multiple iterations,
@@ -1332,7 +1332,7 @@ double MleAmSgmm2Updater::UpdateW(const MleAmSgmm2Accs &accs,
   Matrix<double> g_i(accs.num_gaussians_, accs.phn_space_dim_);
   // View F_i as a vector of SpMatrix.
   Matrix<double> F_i(accs.num_gaussians_,
-                     (accs.phn_space_dim_*(accs.phn_space_dim_+1))/2);
+      (accs.phn_space_dim_*(accs.phn_space_dim_+1))/2);
 
   Matrix<double> w(model->w_);
   double tot_count = gamma_i.Sum();
@@ -1437,8 +1437,8 @@ double MleAmSgmm2Updater::UpdateW(const MleAmSgmm2Accs &accs,
 }
 
 double MleAmSgmm2Updater::UpdateU(const MleAmSgmm2Accs &accs,
-                                 const Vector<double> &gamma_i,
-                                 AmSgmm2 *model) {
+    const Vector<double> &gamma_i,
+    AmSgmm2 *model) {
   double tot_impr = 0.0;
   SolverOptions opts;
   opts.name = "u";
@@ -1484,8 +1484,8 @@ double MleAmSgmm2Updater::UpdateU(const MleAmSgmm2Accs &accs,
 }
 
 double MleAmSgmm2Updater::UpdateN(const MleAmSgmm2Accs &accs,
-                                 const Vector<double>  &gamma_i,
-                                 AmSgmm2 *model) {
+    const Vector<double>  &gamma_i,
+    AmSgmm2 *model) {
   double tot_count = 0.0, tot_like_impr = 0.0;
   if (accs.spk_space_dim_ == 0 || accs.R_.size() == 0 || accs.Z_.size() == 0) {
     KALDI_ERR << "Speaker subspace dim is zero or no stats accumulated";
@@ -1523,8 +1523,8 @@ double MleAmSgmm2Updater::UpdateN(const MleAmSgmm2Accs &accs,
 }
 
 void MleAmSgmm2Updater::RenormalizeN(const MleAmSgmm2Accs &accs,
-                                    const Vector<double> &gamma_i,
-                                    AmSgmm2 *model) {
+    const Vector<double> &gamma_i,
+    AmSgmm2 *model) {
   KALDI_ASSERT(accs.R_.size() != 0);
   double tot_count = gamma_i.Sum();
   if (tot_count == 0) {
@@ -1564,9 +1564,9 @@ void MleAmSgmm2Updater::RenormalizeN(const MleAmSgmm2Accs &accs,
 
 
 double MleAmSgmm2Updater::UpdateVars(const MleAmSgmm2Accs &accs,
-                                    const std::vector< SpMatrix<double> > &S_means,
-                                    const Vector<double> &gamma_i,
-                                    AmSgmm2 *model) {
+    const std::vector< SpMatrix<double> > &S_means,
+    const Vector<double> &gamma_i,
+    AmSgmm2 *model) {
   KALDI_ASSERT(S_means.size() == static_cast<size_t>(accs.num_gaussians_));
 
   SpMatrix<double> Sigma_i(accs.feature_dim_), Sigma_i_ml(accs.feature_dim_);
@@ -1660,7 +1660,7 @@ double MleAmSgmm2Updater::UpdateVars(const MleAmSgmm2Accs &accs,
         tot_t += gamma_i(i);
         if (i < 5) {
           KALDI_VLOG(2) << "objf impr from variance update =" << objf_improv(i)
-              / (gamma_i(i) + 1.0e-20) << " over " << (gamma_i(i))
+            / (gamma_i(i) + 1.0e-20) << " over " << (gamma_i(i))
                         << " frames for i = " << (i);
         }
       } catch(...) {
@@ -1680,7 +1680,7 @@ double MleAmSgmm2Updater::UpdateVars(const MleAmSgmm2Accs &accs,
 
 
 double MleAmSgmm2Updater::UpdateSubstateWeights(
-    const MleAmSgmm2Accs &accs, AmSgmm2 *model) {
+  const MleAmSgmm2Accs &accs, AmSgmm2 *model) {
   KALDI_LOG << "Updating substate mixture weights";
   // Also set the vector gamma_j which is a cache of the state occupancies.
 
@@ -1711,8 +1711,8 @@ double MleAmSgmm2Updater::UpdateSubstateWeights(
 
 
 MleSgmm2SpeakerAccs::MleSgmm2SpeakerAccs(const AmSgmm2 &model,
-                                         BaseFloat prune)
-    : rand_prune_(prune) {
+    BaseFloat prune)
+  : rand_prune_(prune) {
   KALDI_ASSERT(model.SpkSpaceDim() != 0);
   H_spk_.resize(model.NumGauss());
   for (int32 i = 0; i < model.NumGauss(); i++) {
@@ -1738,10 +1738,10 @@ void MleSgmm2SpeakerAccs::Clear() {
 
 BaseFloat
 MleSgmm2SpeakerAccs::Accumulate(const AmSgmm2 &model,
-                               const Sgmm2PerFrameDerivedVars &frame_vars,
-                               int32 j2,
-                               BaseFloat weight,
-                               Sgmm2PerSpkDerivedVars *spk_vars) {
+    const Sgmm2PerFrameDerivedVars &frame_vars,
+    int32 j2,
+    BaseFloat weight,
+    Sgmm2PerSpkDerivedVars *spk_vars) {
   // Calculate Gaussian posteriors and collect statistics
   Matrix<BaseFloat> posteriors;
   BaseFloat log_like = model.ComponentPosteriors(frame_vars, j2, spk_vars,
@@ -1753,10 +1753,10 @@ MleSgmm2SpeakerAccs::Accumulate(const AmSgmm2 &model,
 
 BaseFloat
 MleSgmm2SpeakerAccs::AccumulateFromPosteriors(const AmSgmm2 &model,
-                                             const Sgmm2PerFrameDerivedVars &frame_vars,
-                                             const Matrix<BaseFloat> &posteriors,
-                                             int32 j2,
-                                             Sgmm2PerSpkDerivedVars *spk_vars) {
+    const Sgmm2PerFrameDerivedVars &frame_vars,
+    const Matrix<BaseFloat> &posteriors,
+    int32 j2,
+    Sgmm2PerSpkDerivedVars *spk_vars) {
   double tot_count = 0.0;
   int32 feature_dim = model.FeatureDim(),
       spk_space_dim = model.SpkSpaceDim();
@@ -1765,7 +1765,7 @@ MleSgmm2SpeakerAccs::AccumulateFromPosteriors(const AmSgmm2 &model,
 
   // Intermediate variables
   Vector<double> xt_jmi(feature_dim), mu_jmi(feature_dim),
-      zt_jmi(spk_space_dim);
+  zt_jmi(spk_space_dim);
   int32 num_substates = model.NumSubstatesForPdf(j2),
       j1 = model.Pdf2Group(j2);
   bool have_spk_dep_weights = (a_s_.Dim() != 0);
@@ -1803,10 +1803,10 @@ MleSgmm2SpeakerAccs::AccumulateFromPosteriors(const AmSgmm2 &model,
 }
 
 void MleSgmm2SpeakerAccs::Update(const AmSgmm2 &model,
-                                BaseFloat min_count,
-                                Vector<BaseFloat> *v_s,
-                                BaseFloat *objf_impr_out,
-                                BaseFloat *count_out) {
+    BaseFloat min_count,
+    Vector<BaseFloat> *v_s,
+    BaseFloat *objf_impr_out,
+    BaseFloat *count_out) {
   double tot_gamma = gamma_s_.Sum();
   if (tot_gamma < min_count) {
     KALDI_WARN << "Updating speaker vectors, count is " << tot_gamma
@@ -1824,8 +1824,8 @@ void MleSgmm2SpeakerAccs::Update(const AmSgmm2 &model,
 
 // Basic update, no SSGMM.
 void MleSgmm2SpeakerAccs::UpdateNoU(Vector<BaseFloat> *v_s,
-                                BaseFloat *objf_impr_out,
-                                BaseFloat *count_out) {
+    BaseFloat *objf_impr_out,
+    BaseFloat *count_out) {
   double tot_gamma = gamma_s_.Sum();
   KALDI_ASSERT(y_s_.Dim() != 0);
   int32 T = y_s_.Dim();  // speaker-subspace dim.
@@ -1856,9 +1856,9 @@ void MleSgmm2SpeakerAccs::UpdateNoU(Vector<BaseFloat> *v_s,
 
 // Basic update, no SSGMM.
 void MleSgmm2SpeakerAccs::UpdateWithU(const AmSgmm2 &model,
-                                     Vector<BaseFloat> *v_s_ptr,
-                                     BaseFloat *objf_impr_out,
-                                     BaseFloat *count_out) {
+    Vector<BaseFloat> *v_s_ptr,
+    BaseFloat *objf_impr_out,
+    BaseFloat *count_out) {
   double tot_gamma = gamma_s_.Sum();
   KALDI_ASSERT(y_s_.Dim() != 0);
   int32 T = y_s_.Dim();  // speaker-subspace dim.
@@ -1945,7 +1945,7 @@ void MleSgmm2SpeakerAccs::UpdateWithU(const AmSgmm2 &model,
 MleAmSgmm2Accs::~MleAmSgmm2Accs() {
   if (gamma_s_.Sum() != 0.0)
     KALDI_ERR << "In destructor of MleAmSgmm2Accs: detected that you forgot to "
-        "call CommitStatsForSpk()";
+      "call CommitStatsForSpk()";
 }
 
 

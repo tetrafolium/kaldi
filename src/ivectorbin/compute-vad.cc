@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     int32 num_unvoiced = 0;
     double tot_length = 0.0, tot_decision = 0.0;
 
-    for (;!feat_reader.Done(); feat_reader.Next()) {
+    for (; !feat_reader.Done(); feat_reader.Next()) {
       std::string utt = feat_reader.Key();
       Matrix<BaseFloat> feat(feat_reader.Value());
       if (feat.NumRows() == 0) {

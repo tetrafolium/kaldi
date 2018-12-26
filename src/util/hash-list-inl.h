@@ -76,8 +76,8 @@ inline typename HashList<I, T>::Elem* HashList<I, T>::Find(I key) {
     return NULL;  // empty bucket.
   } else {
     Elem *head = (bucket.prev_bucket == static_cast<size_t>(-1) ?
-                  list_head_ :
-                  buckets_[bucket.prev_bucket].last_elem->tail),
+        list_head_ :
+        buckets_[bucket.prev_bucket].last_elem->tail),
         *tail = bucket.last_elem->tail;
     for (Elem *e = head; e != tail; e = e->tail)
       if (e->key == key) return e;
@@ -170,7 +170,7 @@ void HashList<I, T>::InsertMore(I key, T val) {
     return;
   }
   Elem *e = (bucket.prev_bucket == static_cast<size_t>(-1) ?
-             list_head_ : buckets_[bucket.prev_bucket].last_elem->tail);
+      list_head_ : buckets_[bucket.prev_bucket].last_elem->tail);
   // find place to insert in linked list
   while (e != bucket.last_elem->tail && e->key != key) e = e->tail;
   KALDI_ASSERT(e->key == key);  // not found? - should not happen

@@ -24,12 +24,12 @@
 namespace kaldi {
 
 DecodableDiagGmmScaledOnline::DecodableDiagGmmScaledOnline(
-    const AmDiagGmm &am, const TransitionModel &trans_model,
-    const BaseFloat scale, OnlineFeatureInterface *input_feats):  
-      features_(input_feats), ac_model_(am),
-      ac_scale_(scale), trans_model_(trans_model),
-      feat_dim_(input_feats->Dim()), cur_feats_(feat_dim_),
-      cur_frame_(-1) {
+  const AmDiagGmm &am, const TransitionModel &trans_model,
+  const BaseFloat scale, OnlineFeatureInterface *input_feats) :
+  features_(input_feats), ac_model_(am),
+  ac_scale_(scale), trans_model_(trans_model),
+  feat_dim_(input_feats->Dim()), cur_feats_(feat_dim_),
+  cur_frame_(-1) {
   int32 num_pdfs = trans_model_.NumPdfs();
   cache_.resize(num_pdfs, std::pair<int32,BaseFloat>(-1, 0.0f));
 }

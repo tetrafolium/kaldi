@@ -114,7 +114,7 @@ struct WspecifierOptions {
   bool binary;
   bool flush;
   bool permissive;  // will ignore absent scp entries.
-  WspecifierOptions(): binary(true), flush(false), permissive(false) { }
+  WspecifierOptions() : binary(true), flush(false), permissive(false) { }
 };
 
 // ClassifyWspecifier returns the type of the wspecifier string,
@@ -122,9 +122,9 @@ struct WspecifierOptions {
 // about the options, and the script and archive
 // filenames.
 WspecifierType ClassifyWspecifier(const std::string &wspecifier,
-                                  std::string *archive_wxfilename,
-                                  std::string *script_wxfilename,
-                                  WspecifierOptions *opts);
+    std::string *archive_wxfilename,
+    std::string *script_wxfilename,
+    WspecifierOptions *opts);
 
 // ReadScriptFile reads an .scp file in its entirety, and appends it
 // (in order as it was in the scp file) in script_out_, which contains
@@ -137,15 +137,15 @@ WspecifierType ClassifyWspecifier(const std::string &wspecifier,
 // If 'print_warnings', it will print out warning messages that explain what
 // kind of error there was.
 bool ReadScriptFile(const std::string &rxfilename,
-                    bool print_warnings,
-                    std::vector<std::pair<std::string, std::string> >
-                    *script_out);
+    bool print_warnings,
+    std::vector<std::pair<std::string, std::string> >
+    *script_out);
 
 // This version of ReadScriptFile works from an istream.
 bool ReadScriptFile(std::istream &is,
-                    bool print_warnings,
-                    std::vector<std::pair<std::string, std::string> >
-                    *script_out);
+    bool print_warnings,
+    std::vector<std::pair<std::string, std::string> >
+    *script_out);
 
 // Writes, for each entry in script, the first element, then ' ', then the
 // second element then '\n'.  Checks that the keys (first elements of pairs) are
@@ -153,13 +153,13 @@ bool ReadScriptFile(std::istream &is,
 // pairs) are newline-free and contain no leading or trailing space.  Returns
 // true on success.
 bool WriteScriptFile(const std::string &wxfilename,
-                     const std::vector<std::pair<std::string, std::string> >
-                     &script);
+    const std::vector<std::pair<std::string, std::string> >
+    &script);
 
 // This version writes to an ostream.
 bool WriteScriptFile(std::ostream &os,
-                     const std::vector<std::pair<std::string, std::string> >
-                     &script);
+    const std::vector<std::pair<std::string, std::string> >
+    &script);
 
 // Documentation for "rspecifier"
 // "rspecifier" describes how we read a set of objects indexed by keys.
@@ -211,9 +211,9 @@ struct  RspecifierOptions {
   bool background;  // For sequential readers, if the background option ("bg")
                     // is provided, it will read ahead to the next object in a
                     // background thread.
-  RspecifierOptions(): once(false), sorted(false),
-                       called_sorted(false), permissive(false),
-                       background(false) { }
+  RspecifierOptions() : once(false), sorted(false),
+    called_sorted(false), permissive(false),
+    background(false) { }
 };
 
 enum RspecifierType  {
@@ -223,18 +223,18 @@ enum RspecifierType  {
 };
 
 RspecifierType ClassifyRspecifier(const std::string &rspecifier,
-                                  std::string *rxfilename,
-                                  RspecifierOptions *opts);
+    std::string *rxfilename,
+    RspecifierOptions *opts);
 
 
 /// Allows random access to a collection
 /// of objects in an archive or script file; see \ref io_sec_tables.
 template<class Holder>
 class RandomAccessTableReader {
- public:
+public:
   typedef typename Holder::T T;
 
-  RandomAccessTableReader(): impl_(NULL) { }
+  RandomAccessTableReader() : impl_(NULL) { }
 
   // This constructor equivalent to default constructor + "open", but
   // throws on error.
@@ -269,9 +269,9 @@ class RandomAccessTableReader {
   // Allow copy-constructor only for non-opened readers (needed for inclusion in
   // stl vector)
   RandomAccessTableReader(const RandomAccessTableReader<Holder>
-                          &other):
-      impl_(NULL) { KALDI_ASSERT(other.impl_ == NULL); }
- private:
+      &other) :
+    impl_(NULL) { KALDI_ASSERT(other.impl_ == NULL); }
+private:
   // Disallow assignment.
   RandomAccessTableReader &operator=(const RandomAccessTableReader<Holder>&);
   void CheckImpl() const;  // Checks that impl_ is non-NULL; prints an error
@@ -285,10 +285,10 @@ class RandomAccessTableReader {
 /// file; see \ref io_sec_tables.
 template<class Holder>
 class SequentialTableReader {
- public:
+public:
   typedef typename Holder::T T;
 
-  SequentialTableReader(): impl_(NULL) { }
+  SequentialTableReader() : impl_(NULL) { }
 
   // This constructor equivalent to default constructor + "open", but
   // throws on error.
@@ -349,9 +349,9 @@ class SequentialTableReader {
 
   // Allow copy-constructor only for non-opened readers (needed for inclusion in
   // stl vector)
-  SequentialTableReader(const SequentialTableReader<Holder> &other):
-      impl_(NULL) { KALDI_ASSERT(other.impl_ == NULL); }
- private:
+  SequentialTableReader(const SequentialTableReader<Holder> &other) :
+    impl_(NULL) { KALDI_ASSERT(other.impl_ == NULL); }
+private:
   // Disallow assignment.
   SequentialTableReader &operator = (const SequentialTableReader<Holder>&);
   void CheckImpl() const;  // Checks that impl_ is non-NULL; prints an error
@@ -364,10 +364,10 @@ class SequentialTableReader {
 /// archive or script file; see \ref io_sec_tables.
 template<class Holder>
 class TableWriter {
- public:
+public:
   typedef typename Holder::T T;
 
-  TableWriter(): impl_(NULL) { }
+  TableWriter() : impl_(NULL) { }
 
   // This constructor equivalent to default constructor
   // + "open", but throws on error.  See docs for
@@ -402,10 +402,10 @@ class TableWriter {
 
   // Allow copy-constructor only for non-opened writers (needed for inclusion in
   // stl vector)
-  TableWriter(const TableWriter &other): impl_(NULL) {
+  TableWriter(const TableWriter &other) : impl_(NULL) {
     KALDI_ASSERT(other.impl_ == NULL);
   }
- private:
+private:
   TableWriter &operator = (const TableWriter&);  // Disallow assignment.
 
   void CheckImpl() const;  // Checks that impl_ is non-NULL; prints an error
@@ -429,19 +429,19 @@ class TableWriter {
 
 template<class Holder>
 class RandomAccessTableReaderMapped {
- public:
+public:
   typedef typename Holder::T T;
   /// Note: "utt2spk_rxfilename" will in the normal case be an rxfilename
   /// for an utterance to speaker map, but this code is general; it accepts
   /// a generic map.
   RandomAccessTableReaderMapped(const std::string &table_rxfilename,
-                                const std::string &utt2spk_rxfilename);
+      const std::string &utt2spk_rxfilename);
 
   RandomAccessTableReaderMapped() {}
 
   /// Note: when calling Open, utt2spk_rxfilename may be empty.
   bool Open(const std::string &table_rxfilename,
-            const std::string &utt2spk_rxfilename);
+      const std::string &utt2spk_rxfilename);
 
   bool HasKey(const std::string &key);
   const T &Value(const std::string &key);
@@ -452,7 +452,7 @@ class RandomAccessTableReaderMapped {
 
   // The default copy-constructor will do what we want: it will crash for
   // already-opened readers, by calling the member-variable copy-constructors.
- private:
+private:
   // Disallow assignment.
   RandomAccessTableReaderMapped &operator =
     (const RandomAccessTableReaderMapped<Holder>&);

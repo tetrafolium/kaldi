@@ -31,8 +31,8 @@ namespace kaldi {
 namespace nnet1 {
 
 class LinearTransform : public UpdatableComponent {
- public:
-  LinearTransform(int32 dim_in, int32 dim_out):
+public:
+  LinearTransform(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out),
     linearity_(dim_out, dim_in),
     linearity_corr_(dim_out, dim_in)
@@ -91,13 +91,13 @@ class LinearTransform : public UpdatableComponent {
     while ('<' == Peek(is, binary)) {
       int first_char = PeekToken(is, binary);
       switch (first_char) {
-        case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
-          ReadBasicType(is, binary, &learn_rate_coef_);
-          break;
-        default:
-          std::string token;
-          ReadToken(is, false, &token);
-          KALDI_ERR << "Unknown token: " << token;
+      case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
+        ReadBasicType(is, binary, &learn_rate_coef_);
+        break;
+      default:
+        std::string token;
+        ReadToken(is, false, &token);
+        KALDI_ERR << "Unknown token: " << token;
       }
     }
     // Read the data (data follow the tokens),
@@ -143,32 +143,32 @@ class LinearTransform : public UpdatableComponent {
 
   std::string Info() const {
     return std::string("\n  linearity") +
-      MomentStatistics(linearity_) +
-      ", lr-coef " + ToString(learn_rate_coef_);
+           MomentStatistics(linearity_) +
+           ", lr-coef " + ToString(learn_rate_coef_);
   }
   std::string InfoGradient() const {
     return std::string("\n  linearity_grad") +
-      MomentStatistics(linearity_corr_) +
-      ", lr-coef " + ToString(learn_rate_coef_);
+           MomentStatistics(linearity_corr_) +
+           ", lr-coef " + ToString(learn_rate_coef_);
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // multiply by weights^t
     out->AddMatMat(1.0, in, kNoTrans, linearity_, kTrans, 0.0);
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // multiply error derivative by weights
     in_diff->AddMatMat(1.0, out_diff, kNoTrans, linearity_, kNoTrans, 0.0);
   }
 
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     // we use following hyperparameters from the option class
     const BaseFloat lr = opts_.learn_rate;
     const BaseFloat mmt = opts_.momentum;
@@ -201,7 +201,7 @@ class LinearTransform : public UpdatableComponent {
 
   const CuMatrixBase<BaseFloat>& GetLinearityCorr() { return linearity_corr_; }
 
- private:
+private:
   CuMatrix<BaseFloat> linearity_;
   CuMatrix<BaseFloat> linearity_corr_;
 };

@@ -37,10 +37,10 @@
 // we can tell the compiler that the function must-not produce
 // exceptions (true), or may produce exceptions (false):
 #if _MSC_VER >= 1900 || (!defined(_MSC_VER) && __cplusplus >= 201103L)
-#define KALDI_NOEXCEPT(Predicate) noexcept((Predicate))
+#define KALDI_NOEXCEPT(Predicate) noexcept ((Predicate))
 #elif defined(__GXX_EXPERIMENTAL_CXX0X__) && \
-      (__GNUC__ >= 4 && __GNUC_MINOR__ >= 6)
-#define KALDI_NOEXCEPT(Predicate) noexcept((Predicate))
+  (__GNUC__ >= 4 && __GNUC_MINOR__ >= 6)
+#define KALDI_NOEXCEPT(Predicate) noexcept ((Predicate))
 #else
 #define KALDI_NOEXCEPT(Predicate)
 #endif
@@ -102,9 +102,9 @@ class MessageLogger {
 public:
   /// Constructor stores the info,
   MessageLogger(LogMessageEnvelope::Severity severity,
-                const char *func,
-                const char *file,
-                int32 line);
+      const char *func,
+      const char *file,
+      int32 line);
 
   /// Destructor, calls 'HandleMessage' which prints the message,
   /// (since C++11 a 'throwing' destructor must be declared 'noexcept(false)')
@@ -134,14 +134,14 @@ private:
   ::kaldi::MessageLogger(::kaldi::LogMessageEnvelope::kInfo, \
                          __func__, __FILE__, __LINE__).stream()
 #define KALDI_VLOG(v) if ((v) <= ::kaldi::g_kaldi_verbose_level)     \
-  ::kaldi::MessageLogger((::kaldi::LogMessageEnvelope::Severity)(v), \
+    ::kaldi::MessageLogger((::kaldi::LogMessageEnvelope::Severity)(v), \
                          __func__, __FILE__, __LINE__).stream()
 
 
 /***** KALDI ASSERTS *****/
 
 void KaldiAssertFailure_(const char *func, const char *file,
-                         int32 line, const char *cond_str);
+    int32 line, const char *cond_str);
 
 // Note on KALDI_ASSERT and KALDI_PARANOID_ASSERT
 // The original (simple) version of the code was this
@@ -167,7 +167,7 @@ void KaldiAssertFailure_(const char *func, const char *file,
 // is always false).
 #ifndef NDEBUG
 #define KALDI_ASSERT(cond) do { if (cond) (void)0; else \
-  ::kaldi::KaldiAssertFailure_(__func__, __FILE__, __LINE__, #cond); } while(0)
+                                  ::kaldi::KaldiAssertFailure_(__func__, __FILE__, __LINE__, #cond); } while(0)
 #else
 #define KALDI_ASSERT(cond) (void)0
 #endif
@@ -177,7 +177,7 @@ void KaldiAssertFailure_(const char *func, const char *file,
 // some more expensive asserts only checked if this defined
 #ifdef KALDI_PARANOID
 #define KALDI_PARANOID_ASSERT(cond) do { if (cond) (void)0; else \
-  ::kaldi::KaldiAssertFailure_(__func__, __FILE__, __LINE__, #cond); } while(0)
+                                           ::kaldi::KaldiAssertFailure_(__func__, __FILE__, __LINE__, #cond); } while(0)
 #else
 #define KALDI_PARANOID_ASSERT(cond) (void)0
 #endif
@@ -187,7 +187,7 @@ void KaldiAssertFailure_(const char *func, const char *file,
 
 /// Type of third-party logging function,
 typedef void (*LogHandler)(const LogMessageEnvelope &envelope,
-                           const char *message);
+    const char *message);
 
 /// Set logging handler. If called with a non-NULL function pointer, the
 /// function pointed by it is called to send messages to a caller-provided

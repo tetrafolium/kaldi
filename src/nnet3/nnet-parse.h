@@ -46,7 +46,7 @@ namespace nnet3 {
    Key values may contain -_a-zA-Z0-9, but must begin with a-zA-Z_.
  */
 class ConfigLine {
- public:
+public:
   // Tries to parse the line as a config-file line.  Returns false
   // if it could not for some reason, e.g. parsing failure.  In most cases
   // prints no warnings; the user should do this.  Does not expect comments.
@@ -72,7 +72,7 @@ class ConfigLine {
 
   const std::string WholeLine() { return whole_line_; }
   // use default assignment operator and copy constructor.
- private:
+private:
   std::string whole_line_;
   // the first token of the line, e.g. if line is
   // foo-bar baz=bing
@@ -96,33 +96,33 @@ class ConfigLine {
 /// field like foo=12, this function will set "param" to 12 and remove that
 /// element from "string".  It returns true if the parameter was read.
 bool ParseFromString(const std::string &name, std::string *string,
-                     int32 *param);
+    int32 *param);
 
 /// This version of ParseFromString is for parameters of type BaseFloat.
 bool ParseFromString(const std::string &name, std::string *string,
-                     BaseFloat *param);
+    BaseFloat *param);
 
 /// This version of ParseFromString is for parameters of type bool, which can
 /// appear as any string beginning with f, F, t or T.
 bool ParseFromString(const std::string &name, std::string *string,
-                     bool *param);
+    bool *param);
 
 /// This version of ParseFromString is for parsing strings.  (these
 /// should not contain space).
 bool ParseFromString(const std::string &name, std::string *string,
-                     std::string *param);
+    std::string *param);
 
 /// This version of ParseFromString handles colon-separated or comma-separated
 /// lists of integers.
 bool ParseFromString(const std::string &name, std::string *string,
-                     std::vector<int32> *param);
+    std::vector<int32> *param);
 
 /// This function is like ExpectToken but for two tokens, and it will either
 /// accept token1 and then token2, or just token2.  This is useful in Read
 /// functions where the first token may already have been consumed.
 void ExpectOneOrTwoTokens(std::istream &is, bool binary,
-                          const std::string &token1,
-                          const std::string &token2);
+    const std::string &token1,
+    const std::string &token2);
 
 /**
    This function tokenizes input when parsing Descriptor configuration
@@ -140,7 +140,7 @@ void ExpectOneOrTwoTokens(std::istream &is, bool binary,
    context if it can't tokenize the input.
  */
 bool DescriptorTokenize(const std::string &input,
-                        std::vector<std::string> *tokens);
+    std::vector<std::string> *tokens);
 
 /// Returns true if 'name' would be a valid name for a component or node in a
 /// Nnet.  This is a nonempty string beginning with A-Za-z_, and containing only
@@ -154,7 +154,7 @@ bool IsValidName(const std::string &name);
    stripping out any lines that contain only whitespace after comment removal.
  */
 void ReadConfigLines(std::istream &is,
-                     std::vector<std::string> *lines);
+    std::vector<std::string> *lines);
 
 
 /**
@@ -167,24 +167,24 @@ void ReadConfigLines(std::istream &is,
    This function will die if there was a parsing failure.
  */
 void ParseConfigLines(const std::vector<std::string> &lines,
-                      std::vector<ConfigLine> *config_lines);
+    std::vector<ConfigLine> *config_lines);
 
 /*
-  Returns true if name 'name' matches pattern 'pattern'.  The pattern
-  format is: everything is literal, except '*' matches zero or more
-  characters.  (Like filename globbing in UNIX).
+   Returns true if name 'name' matches pattern 'pattern'.  The pattern
+   format is: everything is literal, except '*' matches zero or more
+   characters.  (Like filename globbing in UNIX).
  */
 bool NameMatchesPattern(const char *name,
-                        const char *pattern);
+    const char *pattern);
 
 
 /**
-  Return a string used in error messages.  Here, "is" will be from an
-  istringstream derived from a single line or part of a line.
-  If "is" is at EOF or in error state, this should just say "end of line",
-  else if the contents of "is" before EOF is <20 characters it should return
-  it all, else it should return the first 20 characters followed by "...".
-*/
+   Return a string used in error messages.  Here, "is" will be from an
+   istringstream derived from a single line or part of a line.
+   If "is" is at EOF or in error state, this should just say "end of line",
+   else if the contents of "is" before EOF is <20 characters it should return
+   it all, else it should return the first 20 characters followed by "...".
+ */
 std::string ErrorContext(std::istream &is);
 
 std::string ErrorContext(const std::string &str);
@@ -203,9 +203,9 @@ std::string SummarizeVector(const Vector<BaseFloat> &vec);
      ", bias-rms=0.2416", and this represents and uncentered standard deviation.
  */
 void PrintParameterStats(std::ostringstream &os,
-                         const std::string &name,
-                         const CuVectorBase<BaseFloat> &params,
-                         bool include_mean = false);
+    const std::string &name,
+    const CuVectorBase<BaseFloat> &params,
+    bool include_mean = false);
 
 /** Print to 'os' some information about the mean and standard deviation of
     some parameters, used in Info() functions in nnet-simple-component.cc.
@@ -217,9 +217,9 @@ void PrintParameterStats(std::ostringstream &os,
     ", linear-params-{mean-stddev}=0.103,0.183".
  */
 void PrintParameterStats(std::ostringstream &os,
-                         const std::string &name,
-                         const CuMatrix<BaseFloat> &params,
-                         bool include_mean = false);
+    const std::string &name,
+    const CuMatrix<BaseFloat> &params,
+    bool include_mean = false);
 
 
 } // namespace nnet3

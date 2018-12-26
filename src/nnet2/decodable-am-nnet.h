@@ -35,20 +35,20 @@ namespace nnet2 {
 /// with a neural net acoustic model of type AmNnet.
 
 class DecodableAmNnet: public DecodableInterface {
- public:
+public:
   DecodableAmNnet(const TransitionModel &trans_model,
-                  const AmNnet &am_nnet,
-                  const CuMatrixBase<BaseFloat> &feats,
-                  bool pad_input = true, // if !pad_input, the NumIndices()
+      const AmNnet &am_nnet,
+      const CuMatrixBase<BaseFloat> &feats,
+      bool pad_input = true,             // if !pad_input, the NumIndices()
                                          // will be < feats.NumRows().
-                  BaseFloat prob_scale = 1.0):
-      trans_model_(trans_model) {
+      BaseFloat prob_scale = 1.0) :
+    trans_model_(trans_model) {
     // Note: we could make this more memory-efficient by doing the
     // computation in smaller chunks than the whole utterance, and not
     // storing the whole thing.  We'll leave this for later.
     int32 num_rows = feats.NumRows() -
         (pad_input ? 0 : am_nnet.GetNnet().LeftContext() +
-                         am_nnet.GetNnet().RightContext());
+        am_nnet.GetNnet().RightContext());
     if (num_rows <= 0) {
       KALDI_WARN << "Input with " << feats.NumRows()  << " rows will produce "
                  << "empty output.";
@@ -80,16 +80,16 @@ class DecodableAmNnet: public DecodableInterface {
   }
 
   virtual int32 NumFramesReady() const { return log_probs_.NumRows(); }
-  
+
   // Indices are one-based!  This is for compatibility with OpenFst.
   virtual int32 NumIndices() const { return trans_model_.NumTransitionIds(); }
-  
+
   virtual bool IsLastFrame(int32 frame) const {
     KALDI_ASSERT(frame < NumFramesReady());
     return (frame == NumFramesReady() - 1);
   }
 
- protected:
+protected:
   const TransitionModel &trans_model_;
   Matrix<BaseFloat> log_probs_; // actually not really probabilities, since we divide
   // by the prior -> they won't sum to one.
@@ -103,15 +103,15 @@ class DecodableAmNnet: public DecodableInterface {
 /// initializer gets called in the main thread of the program.
 
 class DecodableAmNnetParallel: public DecodableInterface {
- public:
+public:
   DecodableAmNnetParallel(
-      const TransitionModel &trans_model,
-      const AmNnet &am_nnet,
-      const CuMatrix<BaseFloat> *feats,
-      bool pad_input = true,
-      BaseFloat prob_scale = 1.0):
-      trans_model_(trans_model), am_nnet_(am_nnet), feats_(feats),
-      pad_input_(pad_input), prob_scale_(prob_scale) {
+    const TransitionModel &trans_model,
+    const AmNnet &am_nnet,
+    const CuMatrix<BaseFloat> *feats,
+    bool pad_input = true,
+    BaseFloat prob_scale = 1.0) :
+    trans_model_(trans_model), am_nnet_(am_nnet), feats_(feats),
+    pad_input_(pad_input), prob_scale_(prob_scale) {
     KALDI_ASSERT(feats_ != NULL);
   }
 
@@ -155,10 +155,10 @@ class DecodableAmNnetParallel: public DecodableInterface {
       return log_probs_.NumRows();
     }
   }
-  
+
   // Indices are one-based!  This is for compatibility with OpenFst.
   virtual int32 NumIndices() const { return trans_model_.NumTransitionIds(); }
-  
+
   virtual bool IsLastFrame(int32 frame) const {
     KALDI_ASSERT(frame < NumFramesReady());
     return (frame == NumFramesReady() - 1);
@@ -166,7 +166,7 @@ class DecodableAmNnetParallel: public DecodableInterface {
   ~DecodableAmNnetParallel() {
     delete feats_;
   }
- protected:
+protected:
   const TransitionModel &trans_model_;
   const AmNnet &am_nnet_;
   CuMatrix<BaseFloat> log_probs_; // actually not really probabilities, since we divide
@@ -180,7 +180,7 @@ class DecodableAmNnetParallel: public DecodableInterface {
 
 
 
-  
+
 } // namespace nnet2
 } // namespace kaldi
 

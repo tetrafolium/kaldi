@@ -88,8 +88,8 @@ struct OnlineNnet2FeaturePipelineConfig {
   // play with it in test time.
   OnlineSilenceWeightingConfig silence_weighting_config;
 
-  OnlineNnet2FeaturePipelineConfig():
-      feature_type("mfcc"), add_pitch(false) { }
+  OnlineNnet2FeaturePipelineConfig() :
+    feature_type("mfcc"), add_pitch(false) { }
 
 
   void Register(OptionsItf *opts) {
@@ -123,11 +123,11 @@ struct OnlineNnet2FeaturePipelineConfig {
 /// it this way is to make it easier to configure from code as well as from the
 /// command line, as well as for easiter multithreaded operation.
 struct OnlineNnet2FeaturePipelineInfo {
-  OnlineNnet2FeaturePipelineInfo():
-      feature_type("mfcc"), add_pitch(false) { }
+  OnlineNnet2FeaturePipelineInfo() :
+    feature_type("mfcc"), add_pitch(false) { }
 
   OnlineNnet2FeaturePipelineInfo(
-      const OnlineNnet2FeaturePipelineConfig &config);
+    const OnlineNnet2FeaturePipelineConfig &config);
 
   BaseFloat FrameShiftInSeconds() const;
 
@@ -158,7 +158,7 @@ struct OnlineNnet2FeaturePipelineInfo {
   OnlineSilenceWeightingConfig silence_weighting_config;
 
   int32 IvectorDim() { return ivector_extractor_info.extractor.IvectorDim(); }
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(OnlineNnet2FeaturePipelineInfo);
 };
 
@@ -177,12 +177,12 @@ struct OnlineNnet2FeaturePipelineInfo {
 /// Probably our strategy for nnet1 network conversion would be to convert to nnet2
 /// and just add layers to do the splicing.
 class OnlineNnet2FeaturePipeline: public OnlineFeatureInterface {
- public:
+public:
   /// Constructor from the "info" object.  After calling this for a
   /// non-initial utterance of a speaker, you may want to call
   /// SetAdaptationState().
   explicit OnlineNnet2FeaturePipeline(
-      const OnlineNnet2FeaturePipelineInfo &info);
+    const OnlineNnet2FeaturePipelineInfo &info);
 
   /// Member functions from OnlineFeatureInterface:
 
@@ -200,7 +200,7 @@ class OnlineNnet2FeaturePipeline: public OnlineFeatureInterface {
   /// utterances of the same speaker; this will generally be called after
   /// Copy().
   void SetAdaptationState(
-      const OnlineIvectorExtractorAdaptationState &adaptation_state);
+    const OnlineIvectorExtractorAdaptationState &adaptation_state);
 
 
   /// Get the adaptation state; you may want to call this before destroying this
@@ -209,7 +209,7 @@ class OnlineNnet2FeaturePipeline: public OnlineFeatureInterface {
   /// if you have reason to believe that something went wrong in the recognition
   /// (e.g., low confidence).
   void GetAdaptationState(
-      OnlineIvectorExtractorAdaptationState *adaptation_state) const;
+    OnlineIvectorExtractorAdaptationState *adaptation_state) const;
 
 
   /// Accept more data to process.  It won't actually process it until you call
@@ -217,7 +217,7 @@ class OnlineNnet2FeaturePipeline: public OnlineFeatureInterface {
   /// call this function it will just copy it).  sampling_rate is necessary just
   /// to assert it equals what's in the config.
   void AcceptWaveform(BaseFloat sampling_rate,
-                      const VectorBase<BaseFloat> &waveform);
+      const VectorBase<BaseFloat> &waveform);
 
   BaseFloat FrameShiftInSeconds() const { return info_.FrameShiftInSeconds(); }
 
@@ -239,12 +239,12 @@ class OnlineNnet2FeaturePipeline: public OnlineFeatureInterface {
   // This function returns the part of the feature pipeline that would be given
   // as the primary (non-iVector) input to the neural network in nnet3
   // applications.
- OnlineFeatureInterface *InputFeature() {
+  OnlineFeatureInterface *InputFeature() {
     return feature_plus_optional_pitch_;
   }
 
   virtual ~OnlineNnet2FeaturePipeline();
- private:
+private:
 
   const OnlineNnet2FeaturePipelineInfo &info_;
 

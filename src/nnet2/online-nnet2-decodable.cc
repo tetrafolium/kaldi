@@ -23,19 +23,19 @@ namespace kaldi {
 namespace nnet2 {
 
 DecodableNnet2Online::DecodableNnet2Online(
-    const AmNnet &nnet,
-    const TransitionModel &trans_model,
-    const DecodableNnet2OnlineOptions &opts,
-    OnlineFeatureInterface *input_feats):
-    features_(input_feats),
-    nnet_(nnet),
-    trans_model_(trans_model),
-    opts_(opts),
-    feat_dim_(input_feats->Dim()),
-    left_context_(nnet.GetNnet().LeftContext()),
-    right_context_(nnet.GetNnet().RightContext()),
-    num_pdfs_(nnet.GetNnet().OutputDim()),
-    begin_frame_(-1) {
+  const AmNnet &nnet,
+  const TransitionModel &trans_model,
+  const DecodableNnet2OnlineOptions &opts,
+  OnlineFeatureInterface *input_feats) :
+  features_(input_feats),
+  nnet_(nnet),
+  trans_model_(trans_model),
+  opts_(opts),
+  feat_dim_(input_feats->Dim()),
+  left_context_(nnet.GetNnet().LeftContext()),
+  right_context_(nnet.GetNnet().RightContext()),
+  num_pdfs_(nnet.GetNnet().OutputDim()),
+  begin_frame_(-1) {
   KALDI_ASSERT(opts_.max_nnet_batch_size > 0);
   log_priors_ = nnet_.Priors();
   KALDI_ASSERT(log_priors_.Dim() == trans_model_.NumPdfs() &&
@@ -101,7 +101,7 @@ void DecodableNnet2Online::ComputeForFrame(int32 frame) {
                                           opts_.max_nnet_batch_size);
   KALDI_ASSERT(input_frame_end > input_frame_begin);
   Matrix<BaseFloat> features(input_frame_end - input_frame_begin,
-                             feat_dim_);
+      feat_dim_);
   for (int32 t = input_frame_begin; t < input_frame_end; t++) {
     SubVector<BaseFloat> row(features, t - input_frame_begin);
     int32 t_modified = t;

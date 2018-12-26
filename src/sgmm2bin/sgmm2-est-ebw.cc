@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     string write_flags_str = "gsnu";
     EbwAmSgmm2Options opts;
 
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("update-flags", &update_flags_str, "Which SGMM parameters to "
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
         num_stats_filename = po.GetArg(2),
         den_stats_filename = po.GetArg(3),
         model_out_filename = po.GetArg(4);
-    
+
     SgmmUpdateFlagsType update_flags = StringToSgmmUpdateFlags(update_flags_str);
     SgmmWriteFlagsType write_flags = StringToSgmmWriteFlags(write_flags_str);
 
@@ -90,9 +90,9 @@ int main(int argc, char *argv[]) {
       transition_accs.Read(ki.Stream(), binary);
       sgmm_den_accs.Read(ki.Stream(), binary, false);  // false == add; doesn't matter.
     }
-    
+
     sgmm_num_accs.Check(am_sgmm, true); // Will check consistency and print some diagnostics.
-    sgmm_den_accs.Check(am_sgmm, true); // Will check consistency and print some diagnostics.    
+    sgmm_den_accs.Check(am_sgmm, true); // Will check consistency and print some diagnostics.
 
     {  // Update SGMM.
       BaseFloat auxf_impr, count;
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
       trans_model.Write(ko.Stream(), binary_write);
       am_sgmm.Write(ko.Stream(), binary_write, write_flags);
     }
-    
+
     KALDI_LOG << "Wrote model to " << model_out_filename;
     return 0;
   } catch(const std::exception &e) {

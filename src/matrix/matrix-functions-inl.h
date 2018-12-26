@@ -29,15 +29,15 @@ namespace kaldi {
 
 //! ComplexMul implements, inline, the complex multiplication b *= a.
 template<typename Real> inline void ComplexMul(const Real &a_re, const Real &a_im,
-                                            Real *b_re, Real *b_im) {
+    Real *b_re, Real *b_im) {
   Real tmp_re = (*b_re * a_re) - (*b_im * a_im);
   *b_im = *b_re * a_im + *b_im * a_re;
   *b_re = tmp_re;
 }
 
 template<typename Real> inline void ComplexAddProduct(const Real &a_re, const Real &a_im,
-                                                   const Real &b_re, const Real &b_im,
-                                                   Real *c_re, Real *c_im) {
+    const Real &b_re, const Real &b_im,
+    Real *c_re, Real *c_im) {
   *c_re += b_re*a_re - b_im*a_im;
   *c_im += b_re*a_im + b_im*a_re;
 }

@@ -59,23 +59,23 @@ template<class Arc> VectorFst<Arc>* RandFst(RandFstOptions opts = RandFstOptions
 
   VectorFst<Arc> *fst = new VectorFst<Arc>();
 
- start:
+start:
 
   // Create states.
   vector<StateId> all_states;
-  for (size_t i = 0;i < (size_t)opts.n_states;i++) {
+  for (size_t i = 0; i < (size_t)opts.n_states; i++) {
     StateId this_state = fst->AddState();
     if (i == 0) fst->SetStart(i);
     all_states.push_back(this_state);
   }
   // Set final states.
-  for (size_t j = 0;j < (size_t)opts.n_final;j++) {
+  for (size_t j = 0; j < (size_t)opts.n_final; j++) {
     StateId id = all_states[kaldi::Rand() % opts.n_states];
     Weight weight = (Weight)(opts.weight_multiplier*(kaldi::Rand() % 5));
     fst->SetFinal(id, weight);
   }
   // Create arcs.
-  for (size_t i = 0;i < (size_t)opts.n_arcs;i++) {
+  for (size_t i = 0; i < (size_t)opts.n_arcs; i++) {
     Arc a;
     StateId start_state;
     if(!opts.acyclic) { // no restriction on arcs.
@@ -88,7 +88,7 @@ template<class Arc> VectorFst<Arc>* RandFst(RandFstOptions opts = RandFstOptions
     a.ilabel = kaldi::Rand() % opts.n_syms;
     a.olabel = kaldi::Rand() % opts.n_syms;  // same input+output vocab.
     a.weight = (Weight) (opts.weight_multiplier*(kaldi::Rand() % 4));
-    
+
     fst->AddArc(start_state, a);
   }
 
@@ -111,23 +111,23 @@ template<class Arc> VectorFst<Arc>* RandPairFst(RandFstOptions opts = RandFstOpt
 
   VectorFst<Arc> *fst = new VectorFst<Arc>();
 
- start:
+start:
 
   // Create states.
   vector<StateId> all_states;
-  for (size_t i = 0;i < (size_t)opts.n_states;i++) {
+  for (size_t i = 0; i < (size_t)opts.n_states; i++) {
     StateId this_state = fst->AddState();
     if (i == 0) fst->SetStart(i);
     all_states.push_back(this_state);
   }
   // Set final states.
-  for (size_t j = 0; j < (size_t)opts.n_final;j++) {
+  for (size_t j = 0; j < (size_t)opts.n_final; j++) {
     StateId id = all_states[kaldi::Rand() % opts.n_states];
     Weight weight (opts.weight_multiplier*(kaldi::Rand() % 5), opts.weight_multiplier*(kaldi::Rand() % 5));
     fst->SetFinal(id, weight);
   }
   // Create arcs.
-  for (size_t i = 0;i < (size_t)opts.n_arcs;i++) {
+  for (size_t i = 0; i < (size_t)opts.n_arcs; i++) {
     Arc a;
     StateId start_state;
     if(!opts.acyclic) { // no restriction on arcs.
@@ -140,7 +140,7 @@ template<class Arc> VectorFst<Arc>* RandPairFst(RandFstOptions opts = RandFstOpt
     a.ilabel = kaldi::Rand() % opts.n_syms;
     a.olabel = kaldi::Rand() % opts.n_syms;  // same input+output vocab.
     a.weight = Weight (opts.weight_multiplier*(kaldi::Rand() % 4), opts.weight_multiplier*(kaldi::Rand() % 4));
-    
+
     fst->AddArc(start_state, a);
   }
 

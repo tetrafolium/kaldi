@@ -32,9 +32,9 @@ int main(int argc, char *argv[]) {
     const char *usage =
         "Print information about decision tree (mainly the number of pdfs), to stdout\n"
         "Usage:  tree-info <tree-in>\n";
-        
+
     ParseOptions po(usage);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 1) {
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     std::cout << "num-pdfs " << ctx_dep.NumPdfs() << std::endl;
     std::cout << "context-width " << ctx_dep.ContextWidth() << std::endl;
     std::cout << "central-position " << ctx_dep.CentralPosition() << std::endl;
-    
+
   } catch(const std::exception &e) {
     std::cerr << e.what();
     return -1;

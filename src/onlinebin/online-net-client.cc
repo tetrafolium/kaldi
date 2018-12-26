@@ -89,8 +89,8 @@ int main(int argc, char *argv[]) {
     OnlinePaSource au_src(kTimeout, kSampleFreq, kPaRingSize, kPaReportInt);
     Mfcc mfcc(mfcc_opts);
     FeInput fe_input(&au_src, &mfcc,
-                     frame_length * (kSampleFreq / 1000),
-                     frame_shift * (kSampleFreq / 1000));
+        frame_length * (kSampleFreq / 1000),
+        frame_shift * (kSampleFreq / 1000));
     std::cerr << std::endl << "Sending features to " << server_addr_str
               << ':' << server_port_str << " ... " << std::endl;
     char buf[65535];

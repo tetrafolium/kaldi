@@ -32,8 +32,8 @@ namespace kaldi {
 namespace nnet1 {
 
 class ParametricRelu : public UpdatableComponent {
- public:
-  ParametricRelu(int32 dim_in, int32 dim_out):
+public:
+  ParametricRelu(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out),
     alpha_(dim_out),
     beta_(dim_out),
@@ -62,7 +62,7 @@ class ParametricRelu : public UpdatableComponent {
       else if (token == "<AlphaLearnRateCoef>") ReadBasicType(is, false, &alpha_learn_rate_coef_);
       else if (token == "<BetaLearnRateCoef>") ReadBasicType(is, false, &beta_learn_rate_coef_);
       else KALDI_ERR << "Unknown token " << token << ", a typo in config?"
-                  << " (Alpha|Beta|AlphaLearnRateCoef|BetaLearnRateCoef)";
+                     << " (Alpha|Beta|AlphaLearnRateCoef|BetaLearnRateCoef)";
     }
 
     // Initialize trainable parameters,
@@ -75,16 +75,16 @@ class ParametricRelu : public UpdatableComponent {
     while ('<' == Peek(is, binary)) {
       int first_char = PeekToken(is, binary);
       switch (first_char) {
-        case 'A': ExpectToken(is, binary, "<AlphaLearnRateCoef>");
-          ReadBasicType(is, binary, &alpha_learn_rate_coef_);
-          break;
-        case 'B': ExpectToken(is, binary, "<BetaLearnRateCoef>");
-          ReadBasicType(is, binary, &beta_learn_rate_coef_);
-          break;
-        default:
-          std::string token;
-          ReadToken(is, false, &token);
-          KALDI_ERR << "Unknown token: " << token;
+      case 'A': ExpectToken(is, binary, "<AlphaLearnRateCoef>");
+        ReadBasicType(is, binary, &alpha_learn_rate_coef_);
+        break;
+      case 'B': ExpectToken(is, binary, "<BetaLearnRateCoef>");
+        ReadBasicType(is, binary, &beta_learn_rate_coef_);
+        break;
+      default:
+        std::string token;
+        ReadToken(is, false, &token);
+        KALDI_ERR << "Unknown token: " << token;
       }
     }
     // ParametricRelu scaling parameters
@@ -136,60 +136,60 @@ class ParametricRelu : public UpdatableComponent {
 
   std::string Info() const {
     return std::string("\n  alpha") +
-      MomentStatistics(alpha_) +
-      ", alpha-lr-coef " + ToString(alpha_learn_rate_coef_) +
-      "\n  beta" + MomentStatistics(beta_) +
-      ", beta-lr-coef " + ToString(beta_learn_rate_coef_);
+           MomentStatistics(alpha_) +
+           ", alpha-lr-coef " + ToString(alpha_learn_rate_coef_) +
+           "\n  beta" + MomentStatistics(beta_) +
+           ", beta-lr-coef " + ToString(beta_learn_rate_coef_);
   }
   std::string InfoGradient() const {
     return std::string("\n  alpha_grad") +
-      MomentStatistics(alpha_corr_) +
-      ", alpha-lr-coef " + ToString(alpha_learn_rate_coef_) +
-      "\n  beta_grad" + MomentStatistics(beta_corr_) +
-      ", beta-lr-coef " + ToString(beta_learn_rate_coef_);
+           MomentStatistics(alpha_corr_) +
+           ", alpha-lr-coef " + ToString(alpha_learn_rate_coef_) +
+           "\n  beta_grad" + MomentStatistics(beta_corr_) +
+           ", beta-lr-coef " + ToString(beta_learn_rate_coef_);
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // out = (in < 0.0 ? aplha*in : beta*in)
     out->ParametricRelu(in, alpha_, beta_);
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // in_diff = (in > 0 ? alpha * out_diff : beta * out_diff)
     in_diff->DiffParametricRelu(in, out_diff, alpha_, beta_);
   }
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     // we use these hyperparameters,
     const BaseFloat alpha_lr = opts_.learn_rate * alpha_learn_rate_coef_;
     const BaseFloat beta_lr = opts_.learn_rate * beta_learn_rate_coef_;
     const BaseFloat mmt = opts_.momentum;
 
     if (alpha_learn_rate_coef_ > 0.0) {
-       // get gradient,
-       alpha_aux_ = input;
-       alpha_aux_.ApplyFloor(0.0); // masking positive Relu inputs,
-       alpha_aux_.MulElements(diff);
-       alpha_corr_.AddRowSumMat(1.0, alpha_aux_, mmt);
-       // update,
-       alpha_.AddVec(-alpha_lr, alpha_corr_);
+      // get gradient,
+      alpha_aux_ = input;
+      alpha_aux_.ApplyFloor(0.0);  // masking positive Relu inputs,
+      alpha_aux_.MulElements(diff);
+      alpha_corr_.AddRowSumMat(1.0, alpha_aux_, mmt);
+      // update,
+      alpha_.AddVec(-alpha_lr, alpha_corr_);
     }
     if (beta_learn_rate_coef_ > 0.0) {
-       // get gradient,
-       beta_aux_ = input;
-       beta_aux_.ApplyCeiling(0.0); // masking positive Relu inputs,
-       beta_aux_.MulElements(diff);
-       beta_corr_.AddRowSumMat(1.0, beta_aux_, mmt);
-       beta_.AddVec(-beta_lr, beta_corr_);
+      // get gradient,
+      beta_aux_ = input;
+      beta_aux_.ApplyCeiling(0.0);  // masking positive Relu inputs,
+      beta_aux_.MulElements(diff);
+      beta_corr_.AddRowSumMat(1.0, beta_aux_, mmt);
+      beta_.AddVec(-beta_lr, beta_corr_);
     }
   }
 
- private:
+private:
   CuVector<BaseFloat> alpha_;  ///< Vector of 'alphas', one value per neuron.
   CuVector<BaseFloat> beta_;  ///< Vector of 'betas', one value per neuron.
 

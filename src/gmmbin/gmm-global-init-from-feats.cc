@@ -41,7 +41,7 @@ void InitGmmFromRandomFrames(const Matrix<BaseFloat> &feats, DiagGmm *gmm) {
   var.AddVec2(-1.0, mean);
   if (var.Max() <= 0.0)
     KALDI_ERR << "Features do not have positive variance " << var;
-  
+
   DiagGmmNormal gmm_normal(*gmm);
 
   std::set<int32> used_frames;
@@ -59,10 +59,10 @@ void InitGmmFromRandomFrames(const Matrix<BaseFloat> &feats, DiagGmm *gmm) {
 }
 
 void TrainOneIter(const Matrix<BaseFloat> &feats,
-                  const MleDiagGmmOptions &gmm_opts,
-                  int32 iter,
-                  int32 num_threads,
-                  DiagGmm *gmm) {
+    const MleDiagGmmOptions &gmm_opts,
+    int32 iter,
+    int32 num_threads,
+    DiagGmm *gmm) {
   AccumDiagGmm gmm_acc(*gmm, kGmmAll);
 
   Vector<BaseFloat> frame_weights(feats.NumRows(), kUndefined);
@@ -75,7 +75,7 @@ void TrainOneIter(const Matrix<BaseFloat> &feats,
   KALDI_LOG << "Likelihood per frame on iteration " << iter
             << " was " << (tot_like / feats.NumRows()) << " over "
             << feats.NumRows() << " frames.";
-  
+
   BaseFloat objf_change, count;
   MleDiagGmmUpdate(gmm_opts, gmm_acc, kGmmAll, gmm, &objf_change, &count);
 
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 
     ParseOptions po(usage);
     MleDiagGmmOptions gmm_opts;
-    
+
     bool binary = true;
     int32 num_gauss = 100;
     int32 num_gauss_init = 0;
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
     int32 num_frames = 200000;
     int32 srand_seed = 0;
     int32 num_threads = 4;
-    
+
     po.Register("binary", &binary, "Write output in binary mode");
     po.Register("num-gauss", &num_gauss, "Number of Gaussians in the model");
     po.Register("num-gauss-init", &num_gauss_init, "Number of Gaussians in "
@@ -117,13 +117,13 @@ int main(int argc, char *argv[]) {
     po.Register("srand", &srand_seed, "Seed for random number generator ");
     po.Register("num-threads", &num_threads, "Number of threads used for "
                 "statistics accumulation");
-                
+
     gmm_opts.Register(&po);
 
     po.Read(argc, argv);
 
-    srand(srand_seed);    
-    
+    srand(srand_seed);
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -131,18 +131,18 @@ int main(int argc, char *argv[]) {
 
     std::string feature_rspecifier = po.GetArg(1),
         model_wxfilename = po.GetArg(2);
-    
+
     Matrix<BaseFloat> feats;
 
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
 
 
     KALDI_ASSERT(num_frames > 0);
-    
+
     int64 num_read = 0, dim = 0;
 
     KALDI_LOG << "Reading features (will keep " << num_frames << " frames.)";
-    
+
     for (; !feature_reader.Done(); feature_reader.Next()) {
       const Matrix<BaseFloat>  &this_feats = feature_reader.Value();
       for (int32 t = 0; t < this_feats.NumRows(); t++) {
@@ -178,9 +178,9 @@ int main(int argc, char *argv[]) {
 
     if (num_gauss_init <= 0 || num_gauss_init > num_gauss)
       num_gauss_init = num_gauss;
-    
+
     DiagGmm gmm(num_gauss_init, dim);
-    
+
     KALDI_LOG << "Initializing GMM means from random frames to "
               << num_gauss_init << " Gaussians.";
     InitGmmFromRandomFrames(feats, &gmm);
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
     // till halfway through training.
     int32 cur_num_gauss = num_gauss_init,
         gauss_inc = (num_gauss - num_gauss_init) / (num_iters / 2);
-        
+
     for (int32 iter = 0; iter < num_iters; iter++) {
       TrainOneIter(feats, gmm_opts, iter, num_threads, &gmm);
 

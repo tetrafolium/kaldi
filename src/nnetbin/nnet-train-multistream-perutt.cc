@@ -38,12 +38,12 @@ int main(int argc, char *argv[]) {
 
   try {
     const char *usage =
-      "Perform one iteration of Multi-stream training, per-utterance BPTT for (B)LSTMs.\n"
-      "The updates are done per-utterance, while several utterances are \n"
-      "processed at the same time.\n"
-      "\n"
-      "Usage: nnet-train-multistream-perutt [options] <feature-rspecifier> <labels-rspecifier> <model-in> [<model-out>]\n"
-      "e.g.: nnet-train-blstm-streams scp:feats.scp ark:targets.ark nnet.init nnet.iter1\n";
+        "Perform one iteration of Multi-stream training, per-utterance BPTT for (B)LSTMs.\n"
+        "The updates are done per-utterance, while several utterances are \n"
+        "processed at the same time.\n"
+        "\n"
+        "Usage: nnet-train-multistream-perutt [options] <feature-rspecifier> <labels-rspecifier> <model-in> [<model-out>]\n"
+        "e.g.: nnet-train-blstm-streams scp:feats.scp ark:targets.ark nnet.init nnet.iter1\n";
 
     ParseOptions po(usage);
 
@@ -93,8 +93,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string feature_rspecifier = po.GetArg(1),
-      targets_rspecifier = po.GetArg(2),
-      model_filename = po.GetArg(3);
+        targets_rspecifier = po.GetArg(2),
+        model_filename = po.GetArg(3);
 
     std::string target_model_filename;
     if (!crossvalidate) {
@@ -147,8 +147,8 @@ int main(int argc, char *argv[]) {
     matrix_buffer.Init(&feature_reader);
 
     int32 num_done = 0,
-          num_no_tgt_mat = 0,
-          num_other_error = 0;
+        num_no_tgt_mat = 0,
+        num_other_error = 0;
 
     while (!matrix_buffer.Done()) {
 
@@ -319,9 +319,9 @@ int main(int argc, char *argv[]) {
       if (tmp_done / N != num_done / N) {
         double time_now = time.Elapsed();
         KALDI_VLOG(1) << "After " << num_done << " utterances, "
-          << "(" << total_frames/360000.0 << "h), "
-          << "time elapsed = " << time_now / 60 << " min; "
-          << "processed " << total_frames / time_now << " frames per sec.";
+                      << "(" << total_frames/360000.0 << "h), "
+                      << "time elapsed = " << time_now / 60 << " min; "
+                      << "processed " << total_frames / time_now << " frames per sec.";
       }
 
       // monitor the NN training (--verbose=2),

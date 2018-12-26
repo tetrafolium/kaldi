@@ -52,7 +52,7 @@ struct PldaConfig {
   // prior to dot-product scoring.
   bool normalize_length;
   bool simple_length_norm;
-  PldaConfig(): normalize_length(true), simple_length_norm(false) { }
+  PldaConfig() : normalize_length(true), simple_length_norm(false) { }
   void Register(OptionsItf *opts) {
     opts->Register("normalize-length", &normalize_length,
                    "If true, do length normalization as part of PLDA (see "
@@ -72,7 +72,7 @@ struct PldaConfig {
 
 
 class Plda {
- public:
+public:
   Plda() { }
 
 
@@ -94,16 +94,16 @@ class Plda {
   /// normalization factor is computed that causes the iVector length
   /// to be equal to the square root of the iVector dimension.
   double TransformIvector(const PldaConfig &config,
-                          const VectorBase<double> &ivector,
-                          int32 num_examples,
-                          VectorBase<double> *transformed_ivector) const;
+      const VectorBase<double> &ivector,
+      int32 num_examples,
+      VectorBase<double> *transformed_ivector) const;
 
   /// float version of the above (not BaseFloat because we'd be implementing it
   /// twice for the same type if BaseFloat == double).
   float TransformIvector(const PldaConfig &config,
-                         const VectorBase<float> &ivector,
-                         int32 num_examples,
-                         VectorBase<float> *transformed_ivector) const;
+      const VectorBase<float> &ivector,
+      int32 num_examples,
+      VectorBase<float> *transformed_ivector) const;
 
   /// Returns the log-likelihood ratio
   /// log (p(test_ivector | same) / p(test_ivector | different)).
@@ -113,9 +113,9 @@ class Plda {
   /// Note: any length normalization will have been done while computing
   /// the transformed iVectors.
   double LogLikelihoodRatio(const VectorBase<double> &transformed_train_ivector,
-                            int32 num_train_utts,
-                            const VectorBase<double> &transformed_test_ivector)
-                            const;
+      int32 num_train_utts,
+      const VectorBase<double> &transformed_test_ivector)
+  const;
 
 
   /// This function smooths the within-class covariance by adding to it,
@@ -129,7 +129,7 @@ class Plda {
   int32 Dim() const { return mean_.Dim(); }
   void Write(std::ostream &os, bool binary) const;
   void Read(std::istream &is, bool binary);
- protected:
+protected:
   void ComputeDerivedVars(); // computes offset_.
   friend class PldaEstimator;
   friend class PldaUnsupervisedAdaptor;
@@ -143,7 +143,7 @@ class Plda {
 
   Vector<double> offset_;  // derived variable: -1.0 * transform_ * mean_
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(Plda);
   /// This returns a normalization factor, which is a quantity we
   /// must multiply "transformed_ivector" by so that it has the length
@@ -152,14 +152,14 @@ class Plda {
   /// multiplied by transform_).  The covariance it "should" have
   /// in this space is \Psi + I/num_examples.
   double GetNormalizationFactor(const VectorBase<double> &transformed_ivector,
-                                int32 num_examples) const;
+      int32 num_examples) const;
 
 };
 
 
 class PldaStats {
- public:
-  PldaStats(): dim_(0) { } /// The dimension is set up the first time you add samples.
+public:
+  PldaStats() : dim_(0) { } /// The dimension is set up the first time you add samples.
 
   /// This function adds training samples corresponding to
   /// one class (e.g. a speaker).  Each row is a separate
@@ -167,7 +167,7 @@ class PldaStats {
   /// be 1.0, but you can set it to other values if you want
   /// to weight your training samples.
   void AddSamples(double weight,
-                  const Matrix<double> &group);
+      const Matrix<double> &group);
 
   int32 Dim() const { return dim_; }
 
@@ -176,7 +176,7 @@ class PldaStats {
   void Sort() { std::sort(class_info_.begin(), class_info_.end()); }
   bool IsSorted() const;
   ~PldaStats();
- protected:
+protected:
 
   friend class PldaEstimator;
 
@@ -201,19 +201,19 @@ class PldaStats {
     bool operator < (const ClassInfo &other) const {
       return (num_examples < other.num_examples);
     }
-    ClassInfo(double weight, Vector<double> *mean, int32 num_examples):
-        weight(weight), mean(mean), num_examples(num_examples) { }
+    ClassInfo(double weight, Vector<double> *mean, int32 num_examples) :
+      weight(weight), mean(mean), num_examples(num_examples) { }
   };
 
   std::vector<ClassInfo> class_info_;
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(PldaStats);
 };
 
 
 struct PldaEstimationConfig {
   int32 num_em_iters;
-  PldaEstimationConfig(): num_em_iters(10){ }
+  PldaEstimationConfig() : num_em_iters(10){ }
   void Register(OptionsItf *opts) {
     opts->Register("num-em-iters", &num_em_iters,
                    "Number of iterations of E-M used for PLDA estimation");
@@ -221,11 +221,11 @@ struct PldaEstimationConfig {
 };
 
 class PldaEstimator {
- public:
+public:
   PldaEstimator(const PldaStats &stats);
 
   void Estimate(const PldaEstimationConfig &config,
-                Plda *output);
+      Plda *output);
 private:
   typedef PldaStats::ClassInfo ClassInfo;
 
@@ -280,10 +280,10 @@ struct PldaUnsupervisedAdaptorConfig {
   BaseFloat within_covar_scale;
   BaseFloat between_covar_scale;
 
-  PldaUnsupervisedAdaptorConfig():
-      mean_diff_scale(1.0),
-      within_covar_scale(0.3),
-      between_covar_scale(0.7) { }
+  PldaUnsupervisedAdaptorConfig() :
+    mean_diff_scale(1.0),
+    within_covar_scale(0.3),
+    between_covar_scale(0.7) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("mean-diff-scale", &mean_diff_scale,
@@ -301,20 +301,20 @@ struct PldaUnsupervisedAdaptorConfig {
 };
 
 /**
-  This class takes unlabeled iVectors from the domain of interest and uses their
-  mean and variance to adapt your PLDA matrices to a new domain.  This class
-  also stores stats for this form of adaptation.  */
+   This class takes unlabeled iVectors from the domain of interest and uses their
+   mean and variance to adapt your PLDA matrices to a new domain.  This class
+   also stores stats for this form of adaptation.  */
 class PldaUnsupervisedAdaptor {
- public:
-  PldaUnsupervisedAdaptor(): tot_weight_(0.0) { }
+public:
+  PldaUnsupervisedAdaptor() : tot_weight_(0.0) { }
   // Add stats to this class.  Normally the weight will be 1.0.
   void AddStats(double weight, const Vector<double> &ivector);
   void AddStats(double weight, const Vector<float> &ivector);
 
 
   void UpdatePlda(const PldaUnsupervisedAdaptorConfig &config,
-                  Plda *plda) const;
- private:
+      Plda *plda) const;
+private:
 
   double tot_weight_;
   Vector<double> mean_stats_;

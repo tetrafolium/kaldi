@@ -43,7 +43,7 @@ struct FmpeOptions {
   // and the update equations are rather simpler than described in
   // the paper; we take away some stuff, but add in the capability to
   // do l2 regularization during the update phase.
-  
+
   std::string context_expansion; // This string describes the various contexts...
   // the easiest way to think of it is, we first generate the high-dimensional
   // features without context expansion, and we then append the left and right
@@ -68,9 +68,9 @@ struct FmpeOptions {
   // features (1 of these for every [feat-dim] of the offset features).
   // Typically 5.0-- this just gives a bit more emphasis to these posteriors
   // during training, like a faster learning rate.
-  
-  FmpeOptions(): context_expansion("0,1.0:-1,1.0:1,1.0:-2,0.5;-3,0.5:2,0.5;3,0.5:-4,0.5;-5,0.5:4,0.5;5,0.5:-6,0.333;-7,0.333;-8,0.333:6,0.333;7,0.333;8,0.333"),
-                post_scale(5.0) { }
+
+  FmpeOptions() : context_expansion("0,1.0:-1,1.0:1,1.0:-2,0.5;-3,0.5:2,0.5;3,0.5:-4,0.5;-5,0.5:4,0.5;5,0.5:-6,0.333;-7,0.333;-8,0.333:6,0.333;7,0.333;8,0.333"),
+    post_scale(5.0) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("post-scale", &post_scale, "Scaling constant on posterior "
@@ -89,15 +89,15 @@ struct FmpeUpdateOptions {
   BaseFloat learning_rate; // Learning rate constant.  Like inverse of E
   // in the papers.
   BaseFloat l2_weight; // Weight on l2 regularization term
-  
-  FmpeUpdateOptions(): learning_rate(0.1), l2_weight(100.0) { }
+
+  FmpeUpdateOptions() : learning_rate(0.1), l2_weight(100.0) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("learning-rate", &learning_rate,
                    "Learning rate constant (like inverse of E in fMPE papers)");
     opts->Register("l2-weight", &l2_weight,
                    "Weight on l2 regularization term in objective function.");
-  }  
+  }
 };
 
 class Fmpe;
@@ -109,7 +109,7 @@ struct FmpeStats {
 
   void Write(std::ostream &os, bool binary) const;
   void Read(std::istream &is, bool binary, bool add = false);
-  
+
   SubMatrix<BaseFloat> DerivPlus() const;
   SubMatrix<BaseFloat> DerivMinus() const;
 
@@ -117,11 +117,11 @@ struct FmpeStats {
   /// that will be used in the update phase to verify that the computation
   /// of the indirect differential was done correctly
   void AccumulateChecks(const MatrixBase<BaseFloat> &feats,
-                        const MatrixBase<BaseFloat> &direct_deriv,
-                        const MatrixBase<BaseFloat> &indirect_deriv);
+      const MatrixBase<BaseFloat> &direct_deriv,
+      const MatrixBase<BaseFloat> &indirect_deriv);
   void DoChecks(); // Will check that stuff cancels.  Just prints
   // messages for now.
- private:
+private:
   Matrix<BaseFloat> deriv; // contains positive and negative parts of derivatives
   // separately as sub-parts of the matrix, to ensure memory locality.
 
@@ -136,7 +136,7 @@ struct FmpeStats {
 };
 
 class Fmpe {
- public:
+public:
   Fmpe() {}
   Fmpe(const DiagGmm &gmm, const FmpeOptions &config);
 
@@ -151,25 +151,25 @@ class Fmpe {
   int32 ProjectionTNumRows() const { return (FeatDim()+1) * NumGauss(); }
   int32 ProjectionTNumCols() const { return FeatDim() * NumContexts(); }
 
-  
+
   // Computes the fMPE feature offsets and outputs them.
   // You can add feat_in to this afterwards, if you want.
   // Requires the Gaussian-selection info, which would normally
   // be computed by a separate program-- this consists of
   // lists of the top-scoring Gaussians for these features.
   void ComputeFeatures(const MatrixBase<BaseFloat> &feat_in,
-                       const std::vector<std::vector<int32> > &gselect,
-                       Matrix<BaseFloat> *feat_out) const;
+      const std::vector<std::vector<int32> > &gselect,
+      Matrix<BaseFloat> *feat_out) const;
 
   // For training-- compute the derivative w.r.t the projection matrix
   // (we keep the positive and negative parts separately to help
   // set the learning rates).
   void AccStats(const MatrixBase<BaseFloat> &feat_in,
-                const std::vector<std::vector<int32> > &gselect,
-                const MatrixBase<BaseFloat> &direct_feat_deriv,
-                const MatrixBase<BaseFloat> *indirect_feat_deriv, // may be NULL
-                FmpeStats *stats) const;
-  
+      const std::vector<std::vector<int32> > &gselect,
+      const MatrixBase<BaseFloat> &direct_feat_deriv,
+      const MatrixBase<BaseFloat> *indirect_feat_deriv,           // may be NULL
+      FmpeStats *stats) const;
+
   // Note: the form on disk starts with the GMM; that way,
   // the gselect program can treat the fMPE object as if it
   // is a GMM.
@@ -178,36 +178,36 @@ class Fmpe {
 
   // Returns total objf improvement, based on linear assumption.
   BaseFloat Update(const FmpeUpdateOptions &config,
-                   const FmpeStats &stats);
-  
- private:
+      const FmpeStats &stats);
+
+private:
   void SetContexts(std::string context_str);
   void ComputeC(); // Computes the Cholesky factor C, from the GMM.
   void ComputeStddevs();
 
   // Constructs the high-dim features and applies the main projection matrix proj_.
   void ApplyProjection(const MatrixBase<BaseFloat> &feat_in,
-                       const std::vector<std::vector<int32> > &gselect,
-                       MatrixBase<BaseFloat> *intermed_feat) const;
+      const std::vector<std::vector<int32> > &gselect,
+      MatrixBase<BaseFloat> *intermed_feat) const;
 
   // The same in reverse, for computing derivatives.
   void ApplyProjectionReverse(const MatrixBase<BaseFloat> &feat_in,
-                              const std::vector<std::vector<int32> > &gselect,
-                              const MatrixBase<BaseFloat> &intermed_feat_deriv,
-                              MatrixBase<BaseFloat> *proj_deriv_plus,
-                              MatrixBase<BaseFloat> *proj_deriv_minus) const;
+      const std::vector<std::vector<int32> > &gselect,
+      const MatrixBase<BaseFloat> &intermed_feat_deriv,
+      MatrixBase<BaseFloat> *proj_deriv_plus,
+      MatrixBase<BaseFloat> *proj_deriv_minus) const;
 
   // Applies the temporal context splicing from the intermediate
   // features-- adds the result to feat_out which at this point
   // will typically be zero.
   void ApplyContext(const MatrixBase<BaseFloat> &intermed_feat,
-                    MatrixBase<BaseFloat> *feat_out) const;
+      MatrixBase<BaseFloat> *feat_out) const;
 
   // This is as ApplyContext but for back-propagating the derivative.
   // Result is added to intermediate_feat_deriv which at this point will
   // typically be zero.
   void ApplyContextReverse(const MatrixBase<BaseFloat> &feat_deriv,
-                           MatrixBase<BaseFloat> *intermed_feat_deriv) const;
+      MatrixBase<BaseFloat> *intermed_feat_deriv) const;
 
   // Multiplies the feature offsets by the Cholesky matrix C.
   void ApplyC(MatrixBase<BaseFloat> *feat_out, bool reverse = false) const;
@@ -217,8 +217,8 @@ class Fmpe {
   // by C (this is how derivatives behave...)
   void ApplyCReverse(MatrixBase<BaseFloat> *deriv) const { ApplyC(deriv, true); }
 
-  
-  
+
+
   DiagGmm gmm_; // The GMM used to get posteriors.
   FmpeOptions config_;
   Matrix<BaseFloat> stddevs_; // The standard deviations of the
@@ -228,19 +228,19 @@ class Fmpe {
   Matrix<BaseFloat> projT_; // The transpose of the projection matrix;
   // this is of dimension
   // (NumGauss() * (FeatDim()+1)) * (FeatDim() * NumContexts()).
-  
+
   TpMatrix<BaseFloat> C_; // Cholesky factor of the variance Sigma of
   // features around their mean (as estimated from GMM)... applied
   // to fMPE offset just before we add it to the features.  This allows
   // us to simplify the fMPE update and not have to worry about
   // the features having non-unit variance, and what effect this should
   // have on the learning rate..
-  
+
   // The following variable dictates how we use temporal context.
   // e.g. contexts = { { (0, 1.0) }, { (-1, 1.0) }, { (1, 1.0) },
   //                   { (-2, 0.5 ), (-3, 0.5) }, ...  }
   std::vector<std::vector<std::pair<int32, BaseFloat> > > contexts_;
-  
+
 };
 
 /// Computes derivatives of the likelihood of these states (weighted),
@@ -256,12 +256,12 @@ class Fmpe {
 /// are numerator == ml stats-- this is only the same thing in the MMI
 /// case, not fMPE.
 BaseFloat ComputeAmGmmFeatureDeriv(const AmDiagGmm &am_gmm,
-                                   const TransitionModel &trans_model,
-                                   const Posterior &posterior,
-                                   const MatrixBase<BaseFloat> &features,
-                                   Matrix<BaseFloat> *direct_deriv,
-                                   const AccumAmDiagGmm *model_diff = NULL,
-                                   Matrix<BaseFloat> *indirect_deriv = NULL);
+    const TransitionModel &trans_model,
+    const Posterior &posterior,
+    const MatrixBase<BaseFloat> &features,
+    Matrix<BaseFloat> *direct_deriv,
+    const AccumAmDiagGmm *model_diff = NULL,
+    Matrix<BaseFloat> *indirect_deriv = NULL);
 
 
 

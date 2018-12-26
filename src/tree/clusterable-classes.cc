@@ -125,7 +125,7 @@ std::string ScalarClusterable::Info() {
     str << "[empty]";
   } else {
     str << "[mean " << (x_ / count_) << ", var " << (x2_ / count_ -
-        (x_ * x_ / (count_ * count_))) << "]";
+    (x_ * x_ / (count_ * count_))) << "]";
   }
   return str.str();
 }
@@ -135,7 +135,7 @@ std::string ScalarClusterable::Info() {
 // ============================================================================
 
 void GaussClusterable::AddStats(const VectorBase<BaseFloat> &vec,
-                                BaseFloat weight) {
+    BaseFloat weight) {
   count_ += weight;
   stats_.Row(0).AddVec(weight, vec);
   stats_.Row(1).AddVec2(weight, vec);
@@ -271,9 +271,9 @@ void VectorClusterable::Write(std::ostream &os, bool binary) const {
   WriteToken(os, binary, "VCL");  // magic string.
   WriteToken(os, binary, "<Weight>");
   WriteBasicType(os, binary, weight_);
-  WriteToken(os, binary, "<Sumsq>");  
+  WriteToken(os, binary, "<Sumsq>");
   WriteBasicType(os, binary, sumsq_);
-  WriteToken(os, binary, "<Stats>");    
+  WriteToken(os, binary, "<Stats>");
   stats_.Write(os, binary);
 }
 
@@ -287,19 +287,19 @@ void VectorClusterable::Read(std::istream &is, bool binary) {
   ExpectToken(is, binary, "VCL");  // magic string.
   ExpectToken(is, binary, "<Weight>");
   ReadBasicType(is, binary, &weight_);
-  ExpectToken(is, binary, "<Sumsq>");  
+  ExpectToken(is, binary, "<Sumsq>");
   ReadBasicType(is, binary, &sumsq_);
-  ExpectToken(is, binary, "<Stats>");    
+  ExpectToken(is, binary, "<Stats>");
   stats_.Read(is, binary);
 }
 
 VectorClusterable::VectorClusterable(const Vector<BaseFloat> &vector,
-                                     BaseFloat weight):
-    weight_(weight), stats_(vector), sumsq_(0.0) {
+    BaseFloat weight) :
+  weight_(weight), stats_(vector), sumsq_(0.0) {
   stats_.Scale(weight);
   KALDI_ASSERT(weight >= 0.0);
   sumsq_ = VecVec(vector, vector) * weight;
-}    
+}
 
 
 BaseFloat VectorClusterable::Objf() const {
@@ -311,7 +311,7 @@ BaseFloat VectorClusterable::Objf() const {
   }
   // ans is a negated weighted sum of squared distances; it should not be
   // positive.
-  double ans = -(sumsq_ - direct_sumsq); 
+  double ans = -(sumsq_ - direct_sumsq);
   if (ans > 0.0) {
     if (ans > 1.0) {
       KALDI_WARN << "Positive objective function encountered (treating as zero): "

@@ -99,15 +99,15 @@ int32 RandInt(int32 min_val, int32 max_val, struct RandomState* state) {
 #ifdef _MSC_VER
   // RAND_MAX is quite small on Windows -> may need to handle larger numbers.
   if (RAND_MAX > (max_val-min_val)*8) {
-        // *8 to avoid large inaccuracies in probability, from the modulus...
+    // *8 to avoid large inaccuracies in probability, from the modulus...
     return min_val +
-      ((unsigned int)Rand(state) % (unsigned int)(max_val+1-min_val));
+           ((unsigned int)Rand(state) % (unsigned int)(max_val+1-min_val));
   } else {
     if ((unsigned int)(RAND_MAX*RAND_MAX) >
         (unsigned int)((max_val+1-min_val)*8)) {
-        // *8 to avoid inaccuracies in probability, from the modulus...
+      // *8 to avoid inaccuracies in probability, from the modulus...
       return min_val + ( (unsigned int)( (Rand(state)+RAND_MAX*Rand(state)))
-                    % (unsigned int)(max_val+1-min_val));
+             % (unsigned int)(max_val+1-min_val));
     } else {
       throw std::runtime_error(std::string()
                                +"rand_int failed because we do not support "
@@ -117,7 +117,7 @@ int32 RandInt(int32 min_val, int32 max_val, struct RandomState* state) {
   }
 #else
   return min_val +
-      (static_cast<int32>(Rand(state)) % static_cast<int32>(max_val+1-min_val));
+         (static_cast<int32>(Rand(state)) % static_cast<int32>(max_val+1-min_val));
 #endif
 }
 

@@ -24,13 +24,13 @@ namespace kaldi {
 namespace nnet3 {
 
 NnetComputeProb::NnetComputeProb(const NnetComputeProbOptions &config,
-                                 const Nnet &nnet):
-    config_(config),
-    nnet_(nnet),
-    deriv_nnet_owned_(true),
-    deriv_nnet_(NULL),
-    compiler_(nnet, config_.optimize_config, config_.compiler_config),
-    num_minibatches_processed_(0) {
+    const Nnet &nnet) :
+  config_(config),
+  nnet_(nnet),
+  deriv_nnet_owned_(true),
+  deriv_nnet_(NULL),
+  compiler_(nnet, config_.optimize_config, config_.compiler_config),
+  num_minibatches_processed_(0) {
   if (config_.compute_deriv) {
     deriv_nnet_ = new Nnet(nnet_);
     ScaleNnet(0.0, deriv_nnet_);
@@ -43,13 +43,13 @@ NnetComputeProb::NnetComputeProb(const NnetComputeProbOptions &config,
 
 
 NnetComputeProb::NnetComputeProb(const NnetComputeProbOptions &config,
-                                 Nnet *nnet):
-    config_(config),
-    nnet_(*nnet),
-    deriv_nnet_owned_(false),
-    deriv_nnet_(nnet),
-    compiler_(*nnet, config_.optimize_config, config_.compiler_config),
-    num_minibatches_processed_(0) {
+    Nnet *nnet) :
+  config_(config),
+  nnet_(*nnet),
+  deriv_nnet_owned_(false),
+  deriv_nnet_(nnet),
+  compiler_(*nnet, config_.optimize_config, config_.compiler_config),
+  num_minibatches_processed_(0) {
   KALDI_ASSERT(config.store_component_stats && !config.compute_deriv);
 }
 
@@ -85,7 +85,7 @@ void NnetComputeProb::Compute(const NnetExample &eg) {
                         &request);
   const NnetComputation *computation = compiler_.Compile(request);
   NnetComputer computer(config_.compute_config, *computation,
-                        nnet_, deriv_nnet_);
+      nnet_, deriv_nnet_);
   // give the inputs to the computer object.
   computer.AcceptInputs(nnet_, eg.io);
   computer.Run();
@@ -95,7 +95,7 @@ void NnetComputeProb::Compute(const NnetExample &eg) {
 }
 
 void NnetComputeProb::ProcessOutputs(const NnetExample &eg,
-                                     NnetComputer *computer) {
+    NnetComputer *computer) {
   std::vector<NnetIo>::const_iterator iter = eg.io.begin(),
       end = eg.io.end();
   for (; iter != end; ++iter) {
@@ -122,11 +122,11 @@ void NnetComputeProb::ProcessOutputs(const NnetExample &eg,
         totals.tot_objective += tot_objf;
       }
       // May not be meaningful in non-classification tasks
-      if (config_.compute_accuracy) {  
+      if (config_.compute_accuracy) {
         BaseFloat tot_weight, tot_accuracy;
         PerDimObjectiveInfo &acc_totals = accuracy_info_[io.name];
 
-        if (config_.compute_per_dim_accuracy && 
+        if (config_.compute_per_dim_accuracy &&
             acc_totals.tot_objective_vec.Dim() == 0) {
           acc_totals.tot_objective_vec.Resize(output.NumCols());
           acc_totals.tot_weight_vec.Resize(output.NumCols());
@@ -134,9 +134,9 @@ void NnetComputeProb::ProcessOutputs(const NnetExample &eg,
 
         ComputeAccuracy(io.features, output,
                         &tot_weight, &tot_accuracy,
-                        config_.compute_per_dim_accuracy ? 
+                        config_.compute_per_dim_accuracy ?
                           &acc_totals.tot_weight_vec : NULL,
-                        config_.compute_per_dim_accuracy ? 
+                        config_.compute_per_dim_accuracy ?
                           &acc_totals.tot_objective_vec : NULL);
         acc_totals.tot_weight += tot_weight;
         acc_totals.tot_objective += tot_accuracy;
@@ -149,8 +149,8 @@ void NnetComputeProb::ProcessOutputs(const NnetExample &eg,
 bool NnetComputeProb::PrintTotalStats() const {
   bool ans = false;
   { // First print regular objectives
-    unordered_map<std::string, SimpleObjectiveInfo, 
-                  StringHasher>::const_iterator iter, end;
+    unordered_map<std::string, SimpleObjectiveInfo,
+        StringHasher>::const_iterator iter, end;
     iter = objf_info_.begin();
     end = objf_info_.end();
     for (; iter != end; ++iter) {
@@ -168,9 +168,9 @@ bool NnetComputeProb::PrintTotalStats() const {
         ans = true;
     }
   }
-  { 
-    unordered_map<std::string, PerDimObjectiveInfo, 
-                  StringHasher>::const_iterator iter, end;
+  {
+    unordered_map<std::string, PerDimObjectiveInfo,
+        StringHasher>::const_iterator iter, end;
     // now print accuracies.
     iter = accuracy_info_.begin();
     end = accuracy_info_.end();
@@ -185,14 +185,14 @@ bool NnetComputeProb::PrintTotalStats() const {
         Vector<BaseFloat> accuracy_vec(info.tot_weight_vec.Dim());
         for (size_t j = 0; j < info.tot_weight_vec.Dim(); j++) {
           if (info.tot_weight_vec(j) !=  0) {
-            accuracy_vec(j) = info.tot_objective_vec(j) 
-                              / info.tot_weight_vec(j);
+            accuracy_vec(j) = info.tot_objective_vec(j)
+                / info.tot_weight_vec(j);
           } else {
             accuracy_vec(j) = -1.0;
           }
         }
 
-        KALDI_LOG << "Overall per-dim accuracy vector for '" << name 
+        KALDI_LOG << "Overall per-dim accuracy vector for '" << name
                   << "' is " << accuracy_vec << " per frame"
                   << ", over " << info.tot_weight << " frames.";
       }
@@ -204,11 +204,11 @@ bool NnetComputeProb::PrintTotalStats() const {
 }
 
 void ComputeAccuracy(const GeneralMatrix &supervision,
-                     const CuMatrixBase<BaseFloat> &nnet_output,
-                     BaseFloat *tot_weight_out,
-                     BaseFloat *tot_accuracy_out,
-                     VectorBase<BaseFloat> *tot_weight_vec,
-                     VectorBase<BaseFloat> *tot_accuracy_vec) {
+    const CuMatrixBase<BaseFloat> &nnet_output,
+    BaseFloat *tot_weight_out,
+    BaseFloat *tot_accuracy_out,
+    VectorBase<BaseFloat> *tot_weight_vec,
+    VectorBase<BaseFloat> *tot_accuracy_vec) {
   int32 num_rows = nnet_output.NumRows(),
       num_cols = nnet_output.NumCols();
   KALDI_ASSERT(supervision.NumRows() == num_rows &&
@@ -234,70 +234,70 @@ void ComputeAccuracy(const GeneralMatrix &supervision,
   // note: we expect that in most cases where this code is called,
   // supervision.Type() will be kSparseMatrix.
   switch (supervision.Type()) {
-    case kCompressedMatrix: {
-      Matrix<BaseFloat> mat;
-      supervision.GetMatrix(&mat);
-      for (int32 r = 0; r < num_rows; r++) {
-        SubVector<BaseFloat> vec(mat, r);
-        BaseFloat row_sum = vec.Sum();
-        int32 best_index;
-        vec.Max(&best_index);  // discard max value.
-        tot_weight += row_sum;
-        if (tot_weight_vec)
-          (*tot_weight_vec)(best_index) += row_sum;
-        if (best_index == best_index_cpu[r]) {
-          tot_accuracy += row_sum;
-          if (tot_accuracy_vec)
-            (*tot_accuracy_vec)(best_index) += row_sum;
-        }
+  case kCompressedMatrix: {
+    Matrix<BaseFloat> mat;
+    supervision.GetMatrix(&mat);
+    for (int32 r = 0; r < num_rows; r++) {
+      SubVector<BaseFloat> vec(mat, r);
+      BaseFloat row_sum = vec.Sum();
+      int32 best_index;
+      vec.Max(&best_index);    // discard max value.
+      tot_weight += row_sum;
+      if (tot_weight_vec)
+        (*tot_weight_vec)(best_index) += row_sum;
+      if (best_index == best_index_cpu[r]) {
+        tot_accuracy += row_sum;
+        if (tot_accuracy_vec)
+          (*tot_accuracy_vec)(best_index) += row_sum;
       }
-      break;
     }
-    case kFullMatrix: {
-      const Matrix<BaseFloat> &mat = supervision.GetFullMatrix();
-      for (int32 r = 0; r < num_rows; r++) {
-        SubVector<BaseFloat> vec(mat, r);
-        BaseFloat row_sum = vec.Sum();
-        int32 best_index;
-        vec.Max(&best_index);  // discard max value.
-        tot_weight += row_sum;
-        if (tot_weight_vec)
-          (*tot_weight_vec)(best_index) += row_sum;
-        if (best_index == best_index_cpu[r]) {
-          tot_accuracy += row_sum;
-          if (tot_accuracy_vec)
-            (*tot_accuracy_vec)(best_index) += row_sum;
-        }
+    break;
+  }
+  case kFullMatrix: {
+    const Matrix<BaseFloat> &mat = supervision.GetFullMatrix();
+    for (int32 r = 0; r < num_rows; r++) {
+      SubVector<BaseFloat> vec(mat, r);
+      BaseFloat row_sum = vec.Sum();
+      int32 best_index;
+      vec.Max(&best_index);    // discard max value.
+      tot_weight += row_sum;
+      if (tot_weight_vec)
+        (*tot_weight_vec)(best_index) += row_sum;
+      if (best_index == best_index_cpu[r]) {
+        tot_accuracy += row_sum;
+        if (tot_accuracy_vec)
+          (*tot_accuracy_vec)(best_index) += row_sum;
       }
-      break;
     }
-    case kSparseMatrix: {
-      const SparseMatrix<BaseFloat> &smat = supervision.GetSparseMatrix();
-      for (int32 r = 0; r < num_rows; r++) {
-        const SparseVector<BaseFloat> &row = smat.Row(r);
-        BaseFloat row_sum = row.Sum();
-        int32 best_index;
-        row.Max(&best_index);
-        KALDI_ASSERT(best_index < num_cols);
-        tot_weight += row_sum;
-        if (tot_weight_vec)
-          (*tot_weight_vec)(best_index) += row_sum;
-        if (best_index == best_index_cpu[r]) {
-          tot_accuracy += row_sum;
-          if (tot_accuracy_vec)
-            (*tot_accuracy_vec)(best_index) += row_sum;
-        }
+    break;
+  }
+  case kSparseMatrix: {
+    const SparseMatrix<BaseFloat> &smat = supervision.GetSparseMatrix();
+    for (int32 r = 0; r < num_rows; r++) {
+      const SparseVector<BaseFloat> &row = smat.Row(r);
+      BaseFloat row_sum = row.Sum();
+      int32 best_index;
+      row.Max(&best_index);
+      KALDI_ASSERT(best_index < num_cols);
+      tot_weight += row_sum;
+      if (tot_weight_vec)
+        (*tot_weight_vec)(best_index) += row_sum;
+      if (best_index == best_index_cpu[r]) {
+        tot_accuracy += row_sum;
+        if (tot_accuracy_vec)
+          (*tot_accuracy_vec)(best_index) += row_sum;
       }
-      break;
     }
-    default: KALDI_ERR << "Bad general-matrix type.";
+    break;
+  }
+  default: KALDI_ERR << "Bad general-matrix type.";
   }
   *tot_weight_out = tot_weight;
   *tot_accuracy_out = tot_accuracy;
 }
 
 const SimpleObjectiveInfo* NnetComputeProb::GetObjective(
-    const std::string &output_name) const {
+  const std::string &output_name) const {
   unordered_map<std::string, SimpleObjectiveInfo, StringHasher>::const_iterator
       iter = objf_info_.find(output_name);
   if (iter != objf_info_.end())
@@ -310,7 +310,7 @@ double NnetComputeProb::GetTotalObjective(double *tot_weight) const {
   double tot_objectives = 0.0;
   *tot_weight = 0.0;
   unordered_map<std::string, SimpleObjectiveInfo, StringHasher>::const_iterator
-    iter = objf_info_.begin(), end = objf_info_.end();
+      iter = objf_info_.begin(), end = objf_info_.end();
   for (; iter != end; ++iter) {
     tot_objectives += iter->second.tot_objective;
     (*tot_weight) += iter->second.tot_weight;

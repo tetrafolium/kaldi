@@ -44,15 +44,15 @@
 
 
 #if (defined(HAVE_CLAPACK) && (defined(HAVE_ATLAS) || defined(HAVE_MKL))) \
-    || (defined(HAVE_ATLAS) && defined(HAVE_MKL))
+  || (defined(HAVE_ATLAS) && defined(HAVE_MKL))
 #error "Do not define more than one of HAVE_CLAPACK, HAVE_ATLAS and HAVE_MKL"
 #endif
 
 #ifdef HAVE_ATLAS
-  extern "C" {
+extern "C" {
     #include <cblas.h>
     #include <clapack.h>
-  }
+}
 #elif defined(HAVE_CLAPACK)
   #ifdef __APPLE__
     #ifndef __has_extension
@@ -61,22 +61,22 @@
     #define vImage_Utilities_h
     #define vImage_CVUtilities_h
     #include <Accelerate/Accelerate.h>
-    typedef __CLPK_integer          integer;
-    typedef __CLPK_logical          logical;
-    typedef __CLPK_real             real;
-    typedef __CLPK_doublereal       doublereal;
-    typedef __CLPK_complex          complex;
-    typedef __CLPK_doublecomplex    doublecomplex;
-    typedef __CLPK_ftnlen           ftnlen;
+typedef __CLPK_integer          integer;
+typedef __CLPK_logical          logical;
+typedef __CLPK_real             real;
+typedef __CLPK_doublereal       doublereal;
+typedef __CLPK_complex          complex;
+typedef __CLPK_doublecomplex    doublecomplex;
+typedef __CLPK_ftnlen           ftnlen;
   #else
-    extern "C" {
-      // May be in /usr/[local]/include if installed; else this uses the one
-      // from the tools/CLAPACK_include directory.
+extern "C" {
+// May be in /usr/[local]/include if installed; else this uses the one
+// from the tools/CLAPACK_include directory.
       #include <cblas.h>
       #include <f2c.h>
-      #include <clapack.h>  
+      #include <clapack.h>
 
-      // get rid of macros from f2c.h -- these are dangerous.
+// get rid of macros from f2c.h -- these are dangerous.
       #undef abs
       #undef dabs
       #undef min
@@ -86,20 +86,20 @@
       #undef bit_test
       #undef bit_clear
       #undef bit_set
-    }
+}
   #endif
 #elif defined(HAVE_MKL)
-  extern "C" {
+extern "C" {
     #include <mkl.h>
-  }
+}
 #elif defined(HAVE_OPENBLAS)
-  // getting cblas.h and lapacke.h from <openblas-install-dir>/.
-  // putting in "" not <> to search -I before system libraries.
+// getting cblas.h and lapacke.h from <openblas-install-dir>/.
+// putting in "" not <> to search -I before system libraries.
   #include "cblas.h"
   #include "lapacke.h"
   #undef I
   #undef complex
-  // get rid of macros from f2c.h -- these are dangerous.
+// get rid of macros from f2c.h -- these are dangerous.
   #undef abs
   #undef dabs
   #undef min
@@ -110,7 +110,7 @@
   #undef bit_clear
   #undef bit_set
 #else
-  #error "You need to define (using the preprocessor) either HAVE_CLAPACK or HAVE_ATLAS or HAVE_MKL (but not more than one)"  
+  #error "You need to define (using the preprocessor) either HAVE_CLAPACK or HAVE_ATLAS or HAVE_MKL (but not more than one)"
 #endif
 
 #ifdef HAVE_OPENBLAS

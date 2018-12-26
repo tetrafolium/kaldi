@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
                 "more memory.  E.g. 500");
     po.Register("read-disambig-syms", &disambig_rxfilename, "File containing "
                 "list of disambiguation symbols in phone symbol table");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 5) {
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
       if (!ReadIntegerVectorSimple(disambig_rxfilename, &disambig_syms))
         KALDI_ERR << "fstcomposecontext: Could not read disambiguation symbols from "
                   << disambig_rxfilename;
-    
+
     TrainingGraphCompiler gc(trans_model, ctx_dep, lex_fst, disambig_syms, gopts);
 
     lex_fst = NULL;  // we gave ownership to gc.
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
         keys.clear();
         transcripts.clear();
         for (; !transcript_reader.Done() &&
-                static_cast<int32>(transcripts.size()) < batch_size;
+            static_cast<int32>(transcripts.size()) < batch_size;
             transcript_reader.Next()) {
           keys.push_back(transcript_reader.Key());
           transcripts.push_back(transcript_reader.Value());

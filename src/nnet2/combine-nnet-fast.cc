@@ -25,26 +25,27 @@ namespace kaldi {
 namespace nnet2 {
 
 /*
-  This class is responsible for computing a Fisher matrix which is a kind of
-  scatter of gradients on subsets; it's used for preconditioning the update in
-  class FastNnetCombiner.  */
+   This class is responsible for computing a Fisher matrix which is a kind of
+   scatter of gradients on subsets; it's used for preconditioning the update in
+   class FastNnetCombiner.  */
 class FisherComputationClass: public MultiThreadable {
- public:
+public:
   FisherComputationClass(const Nnet &nnet,
-                         const std::vector<Nnet> &nnets,
-                         const std::vector<NnetExample> &egs,
-                         int32 minibatch_size,
-                         SpMatrix<double> *scatter):
-      nnet_(nnet), nnets_(nnets), egs_(egs), minibatch_size_(minibatch_size),
-      scatter_ptr_(scatter) { } // This initializer is only used to create a
+      const std::vector<Nnet> &nnets,
+      const std::vector<NnetExample> &egs,
+      int32 minibatch_size,
+      SpMatrix<double> *scatter) :
+    nnet_(nnet), nnets_(nnets), egs_(egs), minibatch_size_(minibatch_size),
+    scatter_ptr_(scatter) { }   // This initializer is only used to create a
   // temporary version of the object; the next initializer is used to
   // create the separate versions for the parallel jobs.
 
-  FisherComputationClass(const FisherComputationClass &other):
-      MultiThreadable(other),
-      nnet_(other.nnet_), nnets_(other.nnets_), egs_(other.egs_),
-      minibatch_size_(other.minibatch_size_), scatter_ptr_(other.scatter_ptr_) {
-    scatter_.Resize(nnets_.size() * nnet_.NumUpdatableComponents());  }
+  FisherComputationClass(const FisherComputationClass &other) :
+    MultiThreadable(other),
+    nnet_(other.nnet_), nnets_(other.nnets_), egs_(other.egs_),
+    minibatch_size_(other.minibatch_size_), scatter_ptr_(other.scatter_ptr_) {
+    scatter_.Resize(nnets_.size() * nnet_.NumUpdatableComponents());
+  }
 
   void operator () () {
     // b is the "minibatch id."
@@ -59,16 +60,16 @@ class FisherComputationClass: public MultiThreadable {
       bool is_gradient = true;
       nnet_gradient.SetZero(is_gradient);
       std::vector<NnetExample> minibatch(egs_.begin() + offset,
-                                                 egs_.begin() + offset + length);
+          egs_.begin() + offset + length);
       DoBackprop(nnet_, minibatch, &nnet_gradient);
       Vector<double> gradient(nnets_.size() * nnet_.NumUpdatableComponents());
       int32 i = 0;
       for (int32 n = 0; n < static_cast<int32>(nnets_.size()); n++) {
         for (int32 c = 0; c < nnet_.NumComponents(); c++) {
           const UpdatableComponent *uc = dynamic_cast<const UpdatableComponent*>(
-              &(nnet_gradient.GetComponent(c))),
+            &(nnet_gradient.GetComponent(c))),
               *uc_other = dynamic_cast<const UpdatableComponent*>(
-                  &(nnets_[n].GetComponent(c)));
+            &(nnets_[n].GetComponent(c)));
           if (uc != NULL) {
             gradient(i) = uc->DotProduct(*uc_other);
             i++;
@@ -87,7 +88,7 @@ class FisherComputationClass: public MultiThreadable {
     }
   }
 
- private:
+private:
   const Nnet &nnet_; // point at which we compute the parameter gradients.
   const std::vector<Nnet> &nnets_; // The dot-product  of each of these with the parameter gradients,
   // are the actual gradients that go into "scatter".
@@ -100,13 +101,13 @@ class FisherComputationClass: public MultiThreadable {
 
 
 class FastNnetCombiner {
- public:
+public:
   FastNnetCombiner(const NnetCombineFastConfig &combine_config,
-                   const std::vector<NnetExample> &validation_set,
-                   const std::vector<Nnet> &nnets_in,
-                   Nnet *nnet_out):
-      config_(combine_config), egs_(validation_set),
-      nnets_(nnets_in), nnet_out_(nnet_out) {
+      const std::vector<NnetExample> &validation_set,
+      const std::vector<Nnet> &nnets_in,
+      Nnet *nnet_out) :
+    config_(combine_config), egs_(validation_set),
+    nnets_(nnets_in), nnet_out_(nnet_out) {
 
     GetInitialParams();
     ComputePreconditioner();
@@ -124,7 +125,7 @@ class FastNnetCombiner {
     lbfgs_options.first_step_impr = config_.initial_impr;
 
     OptimizeLbfgs<double> lbfgs(params_,
-                                lbfgs_options);
+        lbfgs_options);
 
     for (int32 i = 0; i < config_.num_lbfgs_iters; i++) {
       params_.CopyFromVec(lbfgs.GetProposedValue());
@@ -154,10 +155,10 @@ class FastNnetCombiner {
     }
   }
 
- private:
+private:
   int32 GetInitialModel(
-      const std::vector<NnetExample> &validation_set,
-      const std::vector<Nnet> &nnets) const;
+    const std::vector<NnetExample> &validation_set,
+    const std::vector<Nnet> &nnets) const;
 
   void GetInitialParams();
 
@@ -167,15 +168,15 @@ class FastNnetCombiner {
   // regularizer term if applicable.  Also puts just the regularizer
   // term in *regularizer_objf.
   double ComputeObjfAndGradient(
-      Vector<double> *gradient,
-      double *regularizer_objf);
+    Vector<double> *gradient,
+    double *regularizer_objf);
 
   void ComputeCurrentNnet(
-      Nnet *dest, bool debug = false);
+    Nnet *dest, bool debug = false);
 
   static void CombineNnets(const Vector<double> &scale_params,
-                           const std::vector<Nnet> &nnets,
-                           Nnet *dest);
+      const std::vector<Nnet> &nnets,
+      Nnet *dest);
 
 
   // C_ is the cholesky of the smoothed Fisher matrix F.
@@ -199,8 +200,8 @@ class FastNnetCombiner {
 
 // static
 void FastNnetCombiner::CombineNnets(const Vector<double> &scale_params,
-                                    const std::vector<Nnet> &nnets,
-                                    Nnet *dest) {
+    const std::vector<Nnet> &nnets,
+    Nnet *dest) {
   int32 num_nnets = nnets.size();
   KALDI_ASSERT(num_nnets >= 1);
   int32 num_uc = nnets[0].NumUpdatableComponents();
@@ -225,8 +226,8 @@ void FastNnetCombiner::ComputePreconditioner() {
   { // This block does the multi-threaded computation.
     // The next line just initializes an "example" object.
     FisherComputationClass fc(nnet, nnets_, egs_,
-                              config_.fisher_minibatch_size,
-                              &F);
+        config_.fisher_minibatch_size,
+        &F);
 
     // Setting num_threads to zero if config_.num_threads == 1
     // is a signal to the MultiThreader class to run without creating
@@ -297,8 +298,8 @@ void FastNnetCombiner::GetInitialParams() {
 
 /// Computes objf at point "params_".
 double FastNnetCombiner::ComputeObjfAndGradient(
-    Vector<double> *gradient,
-    double *regularizer_objf_ptr) {
+  Vector<double> *gradient,
+  double *regularizer_objf_ptr) {
   Nnet nnet;
   ComputeCurrentNnet(&nnet); // compute it at the value "params_".
 
@@ -354,7 +355,7 @@ double FastNnetCombiner::ComputeObjfAndGradient(
 }
 
 void FastNnetCombiner::ComputeCurrentNnet(
-    Nnet *dest, bool debug) {
+  Nnet *dest, bool debug) {
   int32 num_nnets = nnets_.size();
   KALDI_ASSERT(num_nnets >= 1);
   KALDI_ASSERT(params_.Dim() == num_nnets * nnets_[0].NumUpdatableComponents());
@@ -368,7 +369,7 @@ void FastNnetCombiner::ComputeCurrentNnet(
 
   if (debug) {
     Matrix<double> params_mat(num_nnets,
-                              nnets_[0].NumUpdatableComponents());
+        nnets_[0].NumUpdatableComponents());
     params_mat.CopyRowsFromVec(raw_params);
     KALDI_LOG << "Scale parameters are " << params_mat;
   }
@@ -379,8 +380,8 @@ void FastNnetCombiner::ComputeCurrentNnet(
 /// either 0 ... num-models - 1 for the best individual model,
 /// or (#models) for the average of all of them.
 int32 FastNnetCombiner::GetInitialModel(
-    const std::vector<NnetExample> &validation_set,
-    const std::vector<Nnet> &nnets) const {
+  const std::vector<NnetExample> &validation_set,
+  const std::vector<Nnet> &nnets) const {
   int32 num_nnets = static_cast<int32>(nnets.size());
   KALDI_ASSERT(!nnets.empty());
   int32 best_n = -1;
@@ -428,14 +429,14 @@ int32 FastNnetCombiner::GetInitialModel(
 }
 
 void CombineNnetsFast(const NnetCombineFastConfig &combine_config,
-                      const std::vector<NnetExample> &validation_set,
-                      const std::vector<Nnet> &nnets_in,
-                      Nnet *nnet_out) {
+    const std::vector<NnetExample> &validation_set,
+    const std::vector<Nnet> &nnets_in,
+    Nnet *nnet_out) {
   // Everything happens in the initializer.
   FastNnetCombiner combiner(combine_config,
-                            validation_set,
-                            nnets_in,
-                            nnet_out);
+      validation_set,
+      nnets_in,
+      nnet_out);
 }
 
 

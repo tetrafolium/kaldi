@@ -33,11 +33,11 @@ int main(int argc, char *argv[]) {
 
   try {
     const char *usage =
-      "Perform one iteration (epoch) of Neural Network training with\n"
-      "mini-batch Stochastic Gradient Descent. The training targets\n"
-      "are usually pdf-posteriors, prepared by ali-to-post.\n"
-      "Usage:  nnet-train-frmshuff [options] <feature-rspecifier> <targets-rspecifier> <model-in> [<model-out>]\n"
-      "e.g.: nnet-train-frmshuff scp:feats.scp ark:posterior.ark nnet.init nnet.iter1\n";
+        "Perform one iteration (epoch) of Neural Network training with\n"
+        "mini-batch Stochastic Gradient Descent. The training targets\n"
+        "are usually pdf-posteriors, prepared by ali-to-post.\n"
+        "Usage:  nnet-train-frmshuff [options] <feature-rspecifier> <targets-rspecifier> <model-in> [<model-out>]\n"
+        "e.g.: nnet-train-frmshuff scp:feats.scp ark:posterior.ark nnet.init nnet.iter1\n";
 
     ParseOptions po(usage);
 
@@ -94,8 +94,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string feature_rspecifier = po.GetArg(1),
-      targets_rspecifier = po.GetArg(2),
-      model_filename = po.GetArg(3);
+        targets_rspecifier = po.GetArg(2),
+        model_filename = po.GetArg(3);
 
     std::string target_model_filename;
     if (!crossvalidate) {
@@ -162,8 +162,8 @@ int main(int argc, char *argv[]) {
               << " STARTED";
 
     int32 num_done = 0,
-          num_no_tgt_mat = 0,
-          num_other_error = 0;
+        num_no_tgt_mat = 0,
+        num_other_error = 0;
 
     // main loop,
     while (!feature_reader.Done()) {
@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
       CuDevice::Instantiate().CheckGpuHealth();
 #endif
       // fill the randomizer,
-      for ( ; !feature_reader.Done(); feature_reader.Next()) {
+      for (; !feature_reader.Done(); feature_reader.Next()) {
         if (feature_randomizer.IsFull()) {
           // break the loop without calling Next(),
           // we keep the 'utt' for next round,
@@ -220,8 +220,8 @@ int main(int argc, char *argv[]) {
         // skip too long utterances (or we run out of memory),
         if (mat.NumRows() > max_frames) {
           KALDI_WARN << "Utterance too long, skipping! " << utt
-            << " (length " << mat.NumRows() << ", max_frames "
-            << max_frames << ")";
+                     << " (length " << mat.NumRows() << ", max_frames "
+                     << max_frames << ")";
           num_other_error++;
           continue;
         }
@@ -301,24 +301,24 @@ int main(int argc, char *argv[]) {
         if (num_done % 5000 == 0) {
           double time_now = time.Elapsed();
           KALDI_VLOG(1) << "After " << num_done << " utterances: "
-            << "time elapsed = " << time_now / 60 << " min; "
-            << "processed " << total_frames / time_now << " frames per sec.";
+                        << "time elapsed = " << time_now / 60 << " min; "
+                        << "processed " << total_frames / time_now << " frames per sec.";
         }
       }
 
       // randomize,
       if (!crossvalidate && randomize) {
         const std::vector<int32>& mask =
-          randomizer_mask.Generate(feature_randomizer.NumFrames());
+            randomizer_mask.Generate(feature_randomizer.NumFrames());
         feature_randomizer.Randomize(mask);
         targets_randomizer.Randomize(mask);
         weights_randomizer.Randomize(mask);
       }
 
       // train with data from randomizers (using mini-batches),
-      for ( ; !feature_randomizer.Done(); feature_randomizer.Next(),
-                                          targets_randomizer.Next(),
-                                          weights_randomizer.Next()) {
+      for (; !feature_randomizer.Done(); feature_randomizer.Next(),
+          targets_randomizer.Next(),
+          weights_randomizer.Next()) {
         // get block of feature/target pairs,
         const CuMatrixBase<BaseFloat>& nnet_in = feature_randomizer.Value();
         const Posterior& nnet_tgt = targets_randomizer.Value();
@@ -390,12 +390,12 @@ int main(int argc, char *argv[]) {
     }
 
     KALDI_LOG << "Done " << num_done << " files, "
-      << num_no_tgt_mat << " with no tgt_mats, "
-      << num_other_error << " with other errors. "
-      << "[" << (crossvalidate ? "CROSS-VALIDATION" : "TRAINING")
-      << ", " << (randomize ? "RANDOMIZED" : "NOT-RANDOMIZED")
-      << ", " << time.Elapsed() / 60 << " min, processing "
-      << total_frames / time.Elapsed() << " frames per sec.]";
+              << num_no_tgt_mat << " with no tgt_mats, "
+              << num_other_error << " with other errors. "
+              << "[" << (crossvalidate ? "CROSS-VALIDATION" : "TRAINING")
+              << ", " << (randomize ? "RANDOMIZED" : "NOT-RANDOMIZED")
+              << ", " << time.Elapsed() / 60 << " min, processing "
+              << total_frames / time.Elapsed() << " frames per sec.]";
 
     if (objective_function == "xent") {
       KALDI_LOG << xent.ReportPerClass();

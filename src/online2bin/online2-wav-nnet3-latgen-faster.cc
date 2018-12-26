@@ -32,10 +32,10 @@
 namespace kaldi {
 
 void GetDiagnosticsAndPrintOutput(const std::string &utt,
-                                  const fst::SymbolTable *word_syms,
-                                  const CompactLattice &clat,
-                                  int64 *tot_num_frames,
-                                  double *tot_like) {
+    const fst::SymbolTable *word_syms,
+    const CompactLattice &clat,
+    int64 *tot_num_frames,
+    double *tot_like) {
   if (clat.NumStates() == 0) {
     KALDI_WARN << "Empty lattice.";
     return;
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
     // objects.  It takes a pointer to am_nnet because if it has iVectors it has
     // to modify the nnet to accept iVectors at intervals.
     nnet3::DecodableNnetSimpleLoopedInfo decodable_info(decodable_opts,
-                                                        &am_nnet);
+        &am_nnet);
 
 
     fst::Fst<fst::StdArc> *decode_fst = ReadFstKaldiGeneric(fst_rxfilename);
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
       std::string spk = spk2utt_reader.Key();
       const std::vector<std::string> &uttlist = spk2utt_reader.Value();
       OnlineIvectorExtractorAdaptationState adaptation_state(
-          feature_info.ivector_extractor_info);
+        feature_info.ivector_extractor_info);
       for (size_t i = 0; i < uttlist.size(); i++) {
         std::string utt = uttlist[i];
         if (!wav_reader.HasKey(utt)) {
@@ -212,13 +212,13 @@ int main(int argc, char *argv[]) {
         feature_pipeline.SetAdaptationState(adaptation_state);
 
         OnlineSilenceWeighting silence_weighting(
-            trans_model,
-            feature_info.silence_weighting_config,
-	    decodable_opts.frame_subsampling_factor);
+          trans_model,
+          feature_info.silence_weighting_config,
+          decodable_opts.frame_subsampling_factor);
 
         SingleUtteranceNnet3Decoder decoder(decoder_opts, trans_model,
-                                            decodable_info,
-                                            *decode_fst, &feature_pipeline);
+            decodable_info,
+            *decode_fst, &feature_pipeline);
         OnlineTimer decoding_timer(utt);
 
         BaseFloat samp_freq = wave_data.SampFreq();
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
         while (samp_offset < data.Dim()) {
           int32 samp_remaining = data.Dim() - samp_offset;
           int32 num_samp = chunk_length < samp_remaining ? chunk_length
-                                                         : samp_remaining;
+              : samp_remaining;
 
           SubVector<BaseFloat> wave_part(data, samp_offset, num_samp);
           feature_pipeline.AcceptWaveform(samp_freq, wave_part);

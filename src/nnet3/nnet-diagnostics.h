@@ -34,8 +34,8 @@ namespace nnet3 {
 struct SimpleObjectiveInfo {
   double tot_weight;
   double tot_objective;
-  SimpleObjectiveInfo(): tot_weight(0.0),
-                         tot_objective(0.0) { }
+  SimpleObjectiveInfo() : tot_weight(0.0),
+    tot_objective(0.0) { }
 };
 
 /* This is used to store more detailed information about the objective,
@@ -61,18 +61,18 @@ struct NnetComputeProbOptions {
   // constructor of NnetComputeProb that takes a pointer to the nnet, and the
   // stats will be stored there.
   bool store_component_stats;
-  
+
   bool compute_per_dim_accuracy;
 
   NnetOptimizeOptions optimize_config;
   NnetComputeOptions compute_config;
   CachingOptimizingCompilerOptions compiler_config;
-  NnetComputeProbOptions():
-      debug_computation(false),
-      compute_deriv(false),
-      compute_accuracy(true),
-      store_component_stats(false),
-      compute_per_dim_accuracy(false) { }
+  NnetComputeProbOptions() :
+    debug_computation(false),
+    compute_deriv(false),
+    compute_accuracy(true),
+    store_component_stats(false),
+    compute_per_dim_accuracy(false) { }
   void Register(OptionsItf *opts) {
     // compute_deriv is not included in the command line options
     // because it's not relevant for nnet3-compute-prob.
@@ -105,10 +105,10 @@ struct NnetComputeProbOptions {
     reflect the fact that it's the cross-entropy objective.
  */
 class NnetComputeProb {
- public:
+public:
   // does not store a reference to 'config' but does store one to 'nnet'.
   NnetComputeProb(const NnetComputeProbOptions &config,
-                  const Nnet &nnet);
+      const Nnet &nnet);
 
   // This version of the constructor may only be called if
   // config.store_component_stats == true and config.compute_deriv == false;
@@ -116,7 +116,7 @@ class NnetComputeProb {
   // case you should call ZeroComponentStats(nnet) first if you want
   // the stats to be zeroed first.
   NnetComputeProb(const NnetComputeProbOptions &config,
-                  Nnet *nnet);
+      Nnet *nnet);
 
 
   // Reset the likelihood stats, and the derivative stats (if computed).
@@ -142,9 +142,9 @@ class NnetComputeProb {
   const Nnet &GetDeriv() const;
 
   ~NnetComputeProb();
- private:
+private:
   void ProcessOutputs(const NnetExample &eg,
-                      NnetComputer *computer);
+      NnetComputer *computer);
 
   NnetComputeProbOptions config_;
   const Nnet &nnet_;
@@ -179,34 +179,34 @@ class NnetComputeProb {
                      interpreted as a weighting factor (although we expect that
                      this sum will usually be one).
 
-  @param [in] nnet_output   The neural net output must have the same dimensions
+   @param [in] nnet_output   The neural net output must have the same dimensions
                      as the supervision.  Only the index of the maximum value in
                      each row matters.  Ties will be broken in an unspecified
                      way.
    @param [out] tot_weight  The sum of the values in the supervision matrix
    @param [out] tot_accuracy  The total accuracy, equal to the sum over all row
                      indexes r such that the maximum column index of row r of
-                     supervision and nnet_output is the same, of the sum of 
+                     supervision and nnet_output is the same, of the sum of
                      the r'th row of supervision (i.e. the row's weight).
    @param [out] tot_weight_vec  If non-NULL, we write to this location
                     the counts per-class in the supervision matrix.
-                    This is expected to have the same dimension as the 
-                    corresponding output in the network. 
-   @param [out] tot_accuracy_vec  If non-NULL, we write to this location 
-                    the accuracy per-class. For index j, 
-                    the value is equal to the sum 
-                    over all row indexes r such that the maximum column index 
+                    This is expected to have the same dimension as the
+                    corresponding output in the network.
+   @param [out] tot_accuracy_vec  If non-NULL, we write to this location
+                    the accuracy per-class. For index j,
+                    the value is equal to the sum
+                    over all row indexes r such that the maximum column index
                     of row r of supervision is j and nnet_output is also j,
-                    of the sum of the r'th row of supervision 
+                    of the sum of the r'th row of supervision
                     (i.e. the row's weight)
 
-*/
+ */
 void ComputeAccuracy(const GeneralMatrix &supervision,
-                     const CuMatrixBase<BaseFloat> &nnet_output,
-                     BaseFloat *tot_weight,
-                     BaseFloat *tot_accuracy,
-                     VectorBase<BaseFloat> *tot_weight_vec = NULL,
-                     VectorBase<BaseFloat> *tot_accuracy_vec = NULL);
+    const CuMatrixBase<BaseFloat> &nnet_output,
+    BaseFloat *tot_weight,
+    BaseFloat *tot_accuracy,
+    VectorBase<BaseFloat> *tot_weight_vec = NULL,
+    VectorBase<BaseFloat> *tot_accuracy_vec = NULL);
 
 
 } // namespace nnet3

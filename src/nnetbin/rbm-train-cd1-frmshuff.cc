@@ -35,14 +35,14 @@ int main(int argc, char *argv[]) {
   typedef kaldi::int32 int32;
   try {
     const char *usage =
-      "Train RBM by Contrastive Divergence alg. with 1 step of "
-      "Markov Chain Monte-Carlo.\n"
-      "The tool can perform several iterations (--num-iters) "
-      "or it can subsample the training dataset (--drop-data)\n"
+        "Train RBM by Contrastive Divergence alg. with 1 step of "
+        "Markov Chain Monte-Carlo.\n"
+        "The tool can perform several iterations (--num-iters) "
+        "or it can subsample the training dataset (--drop-data)\n"
 
-      "Usage: rbm-train-cd1-frmshuff [options] <model-in> "
-      "<feature-rspecifier> <model-out>\n"
-      "e.g.: rbm-train-cd1-frmshuff 1.rbm.init scp:train.scp 1.rbm\n";
+        "Usage: rbm-train-cd1-frmshuff [options] <model-in> "
+        "<feature-rspecifier> <model-out>\n"
+        "e.g.: rbm-train-cd1-frmshuff 1.rbm.init scp:train.scp 1.rbm\n";
 
     ParseOptions po(usage);
 
@@ -136,8 +136,8 @@ int main(int argc, char *argv[]) {
     Mse mse;
 
     CuMatrix<BaseFloat> feats_transf,
-                        pos_hid, pos_hid_aux,
-                        neg_vis, neg_hid;
+        pos_hid, pos_hid_aux,
+        neg_vis, neg_hid;
     CuMatrix<BaseFloat> dummy_mse_mat;
 
     Timer time;
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
       CuDevice::Instantiate().CheckGpuHealth();
 #endif
       // fill the randomizer,
-      for ( ; !feature_reader.Done(); feature_reader.Next()) {
+      for (; !feature_reader.Done(); feature_reader.Next()) {
         if (feature_randomizer.IsFull()) {
           // break the loop without calling Next(),
           // we keep the 'utt' for next round,
@@ -166,8 +166,8 @@ int main(int argc, char *argv[]) {
         // skip too long segments (avoid runinning out of memory)
         if (mat.NumRows() > max_frames) {
           KALDI_WARN << "Skipping " << utt
-            << " that has " << mat.NumRows() << " frames,"
-            << " it is longer than '--max-frames'" << max_frames;
+                     << " that has " << mat.NumRows() << " frames,"
+                     << " it is longer than '--max-frames'" << max_frames;
           num_other_error++;
           continue;
         }
@@ -181,23 +181,23 @@ int main(int argc, char *argv[]) {
         if (num_done % 5000 == 0) {
           double time_now = time.Elapsed();
           KALDI_VLOG(1) << "After " << num_done << " utterances: "
-            << "time elapsed = " << time_now / 60 << " min; "
-            << "processed " << total_frames / time_now << " frames per sec.";
+                        << "time elapsed = " << time_now / 60 << " min; "
+                        << "processed " << total_frames / time_now << " frames per sec.";
         }
       }
 
       // randomize,
       feature_randomizer.Randomize(
         randomizer_mask.Generate(feature_randomizer.NumFrames())
-      );
+        );
 
       // train with data from randomizer (using mini-batches)
-      for ( ; !feature_randomizer.Done(); feature_randomizer.Next()) {
+      for (; !feature_randomizer.Done(); feature_randomizer.Next()) {
         // get the mini-batch,
         const CuMatrixBase<BaseFloat>& pos_vis = feature_randomizer.Value();
         // get the dims,
         int32 num_frames = pos_vis.NumRows(),
-              dim_hid = rbm.OutputDim();
+            dim_hid = rbm.OutputDim();
         // Create dummy frame-weights for Mse::Eval,
         Vector<BaseFloat> dummy_weights(num_frames);
         dummy_weights.Set(1.0);
@@ -243,10 +243,10 @@ int main(int argc, char *argv[]) {
             n_prev = n;
             BaseFloat learning_rate_actual = learn_rate*(1-momentum_actual);
             KALDI_VLOG(1) << "Setting momentum "
-              << (with_bug ? momentum_max : momentum_actual)
-              << " and learning rate " << learning_rate_actual
-              << " after processing "
-              << static_cast<double>(total_frames) / 360000 << " h";
+                          << (with_bug ? momentum_max : momentum_actual)
+                          << " and learning rate " << learning_rate_actual
+                          << " after processing "
+                          << static_cast<double>(total_frames) / 360000 << " h";
             // pass values to rbm,
             trn_opts_rbm.momentum = (with_bug ? momentum_max : momentum_actual);
             trn_opts_rbm.learn_rate = learning_rate_actual;

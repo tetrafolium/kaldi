@@ -115,102 +115,102 @@ Component::ComponentType Component::MarkerToType(const std::string &s) {
 
 
 Component* Component::NewComponentOfType(ComponentType comp_type,
-                      int32 input_dim, int32 output_dim) {
+    int32 input_dim, int32 output_dim) {
   Component *ans = NULL;
   switch (comp_type) {
-    case Component::kAffineTransform :
-      ans = new AffineTransform(input_dim, output_dim);
-      break;
-    case Component::kLinearTransform :
-      ans = new LinearTransform(input_dim, output_dim);
-      break;
-    case Component::kConvolutionalComponent :
-      ans = new ConvolutionalComponent(input_dim, output_dim);
-      break;
-    case Component::kConvolutional2DComponent :
-      ans = new Convolutional2DComponent(input_dim, output_dim);
-      break;
-    case Component::kLstmProjected :
-      ans = new LstmProjected(input_dim, output_dim);
-      break;
-    case Component::kBlstmProjected :
-      ans = new BlstmProjected(input_dim, output_dim);
-      break;
-    case Component::kRecurrentComponent :
-      ans = new RecurrentComponent(input_dim, output_dim);
-      break;
-    case Component::kSoftmax :
-      ans = new Softmax(input_dim, output_dim);
-      break;
-    case Component::kHiddenSoftmax :
-      ans = new HiddenSoftmax(input_dim, output_dim);
-      break;
-    case Component::kBlockSoftmax :
-      ans = new BlockSoftmax(input_dim, output_dim);
-      break;
-    case Component::kSigmoid :
-      ans = new Sigmoid(input_dim, output_dim);
-      break;
-    case Component::kTanh :
-      ans = new Tanh(input_dim, output_dim);
-      break;
-    case Component::kParametricRelu :
-      ans = new ParametricRelu(input_dim, output_dim);
-      break;
-    case Component::kDropout :
-      ans = new Dropout(input_dim, output_dim);
-      break;
-    case Component::kLengthNormComponent :
-      ans = new LengthNormComponent(input_dim, output_dim);
-      break;
-    case Component::kRbm :
-      ans = new Rbm(input_dim, output_dim);
-      break;
-    case Component::kSplice :
-      ans = new Splice(input_dim, output_dim);
-      break;
-    case Component::kCopy :
-      ans = new CopyComponent(input_dim, output_dim);
-      break;
-    case Component::kAddShift :
-      ans = new AddShift(input_dim, output_dim);
-      break;
-    case Component::kRescale :
-      ans = new Rescale(input_dim, output_dim);
-      break;
-    case Component::kKlHmm :
-      ans = new KlHmm(input_dim, output_dim);
-      break;
-    case Component::kSentenceAveragingComponent :
-      ans = new SentenceAveragingComponent(input_dim, output_dim);
-      break;
-    case Component::kSimpleSentenceAveragingComponent :
-      ans = new SimpleSentenceAveragingComponent(input_dim, output_dim);
-      break;
-    case Component::kAveragePoolingComponent :
-      ans = new AveragePoolingComponent(input_dim, output_dim);
-      break;
-    case Component::kAveragePooling2DComponent :
-      ans = new AveragePooling2DComponent(input_dim, output_dim);
-      break;
-    case Component::kMaxPoolingComponent :
-      ans = new MaxPoolingComponent(input_dim, output_dim);
-      break;
-    case Component::kMaxPooling2DComponent :
-      ans = new MaxPooling2DComponent(input_dim, output_dim);
-      break;
-    case Component::kFramePoolingComponent :
-      ans = new FramePoolingComponent(input_dim, output_dim);
-      break;
-    case Component::kParallelComponent :
-      ans = new ParallelComponent(input_dim, output_dim);
-      break;
-    case Component::kMultiBasisComponent :
-      ans = new MultiBasisComponent(input_dim, output_dim);
-      break;
-    case Component::kUnknown :
-    default :
-      KALDI_ERR << "Missing type: " << TypeToMarker(comp_type);
+  case Component::kAffineTransform:
+    ans = new AffineTransform(input_dim, output_dim);
+    break;
+  case Component::kLinearTransform:
+    ans = new LinearTransform(input_dim, output_dim);
+    break;
+  case Component::kConvolutionalComponent:
+    ans = new ConvolutionalComponent(input_dim, output_dim);
+    break;
+  case Component::kConvolutional2DComponent:
+    ans = new Convolutional2DComponent(input_dim, output_dim);
+    break;
+  case Component::kLstmProjected:
+    ans = new LstmProjected(input_dim, output_dim);
+    break;
+  case Component::kBlstmProjected:
+    ans = new BlstmProjected(input_dim, output_dim);
+    break;
+  case Component::kRecurrentComponent:
+    ans = new RecurrentComponent(input_dim, output_dim);
+    break;
+  case Component::kSoftmax:
+    ans = new Softmax(input_dim, output_dim);
+    break;
+  case Component::kHiddenSoftmax:
+    ans = new HiddenSoftmax(input_dim, output_dim);
+    break;
+  case Component::kBlockSoftmax:
+    ans = new BlockSoftmax(input_dim, output_dim);
+    break;
+  case Component::kSigmoid:
+    ans = new Sigmoid(input_dim, output_dim);
+    break;
+  case Component::kTanh:
+    ans = new Tanh(input_dim, output_dim);
+    break;
+  case Component::kParametricRelu:
+    ans = new ParametricRelu(input_dim, output_dim);
+    break;
+  case Component::kDropout:
+    ans = new Dropout(input_dim, output_dim);
+    break;
+  case Component::kLengthNormComponent:
+    ans = new LengthNormComponent(input_dim, output_dim);
+    break;
+  case Component::kRbm:
+    ans = new Rbm(input_dim, output_dim);
+    break;
+  case Component::kSplice:
+    ans = new Splice(input_dim, output_dim);
+    break;
+  case Component::kCopy:
+    ans = new CopyComponent(input_dim, output_dim);
+    break;
+  case Component::kAddShift:
+    ans = new AddShift(input_dim, output_dim);
+    break;
+  case Component::kRescale:
+    ans = new Rescale(input_dim, output_dim);
+    break;
+  case Component::kKlHmm:
+    ans = new KlHmm(input_dim, output_dim);
+    break;
+  case Component::kSentenceAveragingComponent:
+    ans = new SentenceAveragingComponent(input_dim, output_dim);
+    break;
+  case Component::kSimpleSentenceAveragingComponent:
+    ans = new SimpleSentenceAveragingComponent(input_dim, output_dim);
+    break;
+  case Component::kAveragePoolingComponent:
+    ans = new AveragePoolingComponent(input_dim, output_dim);
+    break;
+  case Component::kAveragePooling2DComponent:
+    ans = new AveragePooling2DComponent(input_dim, output_dim);
+    break;
+  case Component::kMaxPoolingComponent:
+    ans = new MaxPoolingComponent(input_dim, output_dim);
+    break;
+  case Component::kMaxPooling2DComponent:
+    ans = new MaxPooling2DComponent(input_dim, output_dim);
+    break;
+  case Component::kFramePoolingComponent:
+    ans = new FramePoolingComponent(input_dim, output_dim);
+    break;
+  case Component::kParallelComponent:
+    ans = new ParallelComponent(input_dim, output_dim);
+    break;
+  case Component::kMultiBasisComponent:
+    ans = new MultiBasisComponent(input_dim, output_dim);
+    break;
+  case Component::kUnknown:
+  default:
+    KALDI_ERR << "Missing type: " << TypeToMarker(comp_type);
   }
   return ans;
 }

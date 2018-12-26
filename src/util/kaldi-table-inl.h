@@ -42,7 +42,7 @@ namespace kaldi {
 /// @{
 
 template<class Holder> class SequentialTableReaderImplBase {
- public:
+public:
   typedef typename Holder::T T;
   // note that Open takes rxfilename not rspecifier.  Open will only be
   // called on a just-allocated object.
@@ -77,18 +77,18 @@ template<class Holder> class SequentialTableReaderImplBase {
   virtual void SwapHolder(Holder *other_holder) = 0;
   SequentialTableReaderImplBase() { }
   virtual ~SequentialTableReaderImplBase() { }  // throws.
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(SequentialTableReaderImplBase);
 };
 
 // This is the implementation for SequentialTableReader
 // when it's actually a script file.
 template<class Holder>  class SequentialTableReaderScriptImpl:
-      public SequentialTableReaderImplBase<Holder> {
- public:
+  public SequentialTableReaderImplBase<Holder> {
+public:
   typedef typename Holder::T T;
 
-  SequentialTableReaderScriptImpl(): state_(kUninitialized) { }
+  SequentialTableReaderScriptImpl() : state_(kUninitialized) { }
 
   // You may call Open from states kUninitialized and kError.
   // It may leave the object in any of the states.
@@ -126,35 +126,35 @@ template<class Holder>  class SequentialTableReaderScriptImpl:
 
   virtual bool IsOpen() const {
     switch (state_) {
-      case kEof: case kHaveScpLine: case kHaveObject: case kHaveRange:
-        return true;
-      case kUninitialized: case kError:
-        return false;
-      default: KALDI_ERR << "IsOpen() called on invalid object.";
-        // note: kFileStart is not a valid state for the user to call a member
-        // function (we never return from a public function in this state).
-        return false;
+    case kEof: case kHaveScpLine: case kHaveObject: case kHaveRange:
+      return true;
+    case kUninitialized: case kError:
+      return false;
+    default: KALDI_ERR << "IsOpen() called on invalid object.";
+      // note: kFileStart is not a valid state for the user to call a member
+      // function (we never return from a public function in this state).
+      return false;
     }
   }
 
   virtual bool Done() const {
     switch (state_) {
-      case kHaveScpLine: case kHaveObject: case kHaveRange: return false;
-      case kEof: case kError: return true;  // Error condition, like Eof, counts
-        // as Done(); the destructor/Close() will inform the user of the error.
-      default: KALDI_ERR << "Done() called on TableReader object at the wrong"
-          " time.";
-        return false;
+    case kHaveScpLine: case kHaveObject: case kHaveRange: return false;
+    case kEof: case kError: return true;    // Error condition, like Eof, counts
+    // as Done(); the destructor/Close() will inform the user of the error.
+    default: KALDI_ERR << "Done() called on TableReader object at the wrong"
+        " time.";
+      return false;
     }
   }
 
   virtual std::string Key() {
     // Valid to call this whenever Done() returns false.
     switch (state_) {
-      case kHaveScpLine: case kHaveObject: case kHaveRange: break;
-      default:
-        // coding error.
-        KALDI_ERR << "Key() called on TableReader object at the wrong time.";
+    case kHaveScpLine: case kHaveObject: case kHaveRange: break;
+    default:
+      // coding error.
+      KALDI_ERR << "Key() called on TableReader object at the wrong time.";
     }
     return key_;
   }
@@ -256,7 +256,7 @@ template<class Holder>  class SequentialTableReaderScriptImpl:
     if (old_state == kError || (old_state == kEof && status != 0)) {
       if (opts_.permissive) {
         KALDI_WARN << "Close() called on scp file with read error, ignoring the"
-            " error because permissive mode specified.";
+          " error because permissive mode specified.";
         return true;
       } else {
         return false;  // User will do something with the error status.
@@ -277,9 +277,9 @@ template<class Holder>  class SequentialTableReaderScriptImpl:
   virtual ~SequentialTableReaderScriptImpl() {
     if (this->IsOpen() && !Close())
       KALDI_ERR << "TableReader: reading script file failed: from scp "
-                      << PrintableRxfilename(script_rxfilename_);
+                << PrintableRxfilename(script_rxfilename_);
   }
- private:
+private:
 
   // Function EnsureObjectLoaded() ensures that we have fully loaded any object
   // (including object range) associated with the current key, and returns true
@@ -295,7 +295,7 @@ template<class Holder>  class SequentialTableReaderScriptImpl:
   // could not be extracted, we go to state kLoadSucceeded but return false.
   bool EnsureObjectLoaded() {
     if (!(state_ == kHaveScpLine || state_ == kHaveObject ||
-          state_ == kHaveRange))
+        state_ == kHaveRange))
       KALDI_ERR << "Invalid state (code error)";
 
     if (state_ == kHaveScpLine) {  // need to load the object into holder_.
@@ -337,9 +337,9 @@ template<class Holder>  class SequentialTableReaderScriptImpl:
     // the range object.  Note: ExtractRange() will throw with KALDI_ERR if the
     // object type doesn't support ranges.
     if (!range_holder_.ExtractRange(holder_, range_)) {
-      KALDI_WARN  << "Failed to load object from "
-                  << PrintableRxfilename(data_rxfilename_)
-                  << "[" << range_ << "]";
+      KALDI_WARN << "Failed to load object from "
+                 << PrintableRxfilename(data_rxfilename_)
+                 << "[" << range_ << "]";
       return false;
     } else {
       state_ = kHaveRange;
@@ -360,14 +360,14 @@ template<class Holder>  class SequentialTableReaderScriptImpl:
   // Possible exit states: kEof, kError, kHaveScpLine, kHaveObject.
   void NextScpLine() {
     switch (state_) {  // Check and simplify the state.
-      case kHaveRange:
-        range_holder_.Clear();
-        state_ = kHaveObject;
-        break;
-      case kHaveScpLine: case kHaveObject: case kFileStart: break;
-      default:
-        // No other states are valid to call Next() from.
-        KALDI_ERR << "Reading script file: Next called wrongly.";
+    case kHaveRange:
+      range_holder_.Clear();
+      state_ = kHaveObject;
+      break;
+    case kHaveScpLine: case kHaveObject: case kFileStart: break;
+    default:
+      // No other states are valid to call Next() from.
+      KALDI_ERR << "Reading script file: Next called wrongly.";
     }
     // at this point the state will be kHaveObject, kHaveScpLine, or kFileStart.
     std::string line;
@@ -481,18 +481,18 @@ template<class Holder>  class SequentialTableReaderScriptImpl:
 // or text mode, for reading purposes.
 
 template<class Holder>  class SequentialTableReaderArchiveImpl:
-      public SequentialTableReaderImplBase<Holder> {
- public:
+  public SequentialTableReaderImplBase<Holder> {
+public:
   typedef typename Holder::T T;
 
-  SequentialTableReaderArchiveImpl(): state_(kUninitialized) { }
+  SequentialTableReaderArchiveImpl() : state_(kUninitialized) { }
 
   virtual bool Open(const std::string &rspecifier) {
     if (state_ != kUninitialized) {
       if (!Close()) {  // call Close() yourself to suppress this exception.
         if (opts_.permissive)
           KALDI_WARN << "Error closing previous input "
-              "(only warning, since permissive mode).";
+            "(only warning, since permissive mode).";
         else
           KALDI_ERR << "Error closing previous input.";
       }
@@ -530,13 +530,13 @@ template<class Holder>  class SequentialTableReaderArchiveImpl:
 
   virtual void Next() {
     switch (state_) {
-      case kHaveObject:
-        holder_.Clear();
-        break;
-      case kFileStart: case kFreedObject:
-        break;
-      default:
-        KALDI_ERR << "Next() called wrongly.";
+    case kHaveObject:
+      holder_.Clear();
+      break;
+    case kFileStart: case kFreedObject:
+      break;
+    default:
+      KALDI_ERR << "Next() called wrongly.";
     }
     std::istream &is = input_.Stream();
     is.clear();  // Clear any fail bits that may have been set... just in case
@@ -555,7 +555,7 @@ template<class Holder>  class SequentialTableReaderArchiveImpl:
     }
     int c;
     if ((c = is.peek()) != ' ' && c != '\t' && c != '\n') {  // We expect a
-                                                     // space ' ' after the key.
+      // space ' ' after the key.
       // We also allow tab [which is consumed] and newline [which is not], just
       // so we can read archives generated by scripts that may not be fully
       // aware of how this format works.
@@ -580,45 +580,45 @@ template<class Holder>  class SequentialTableReaderArchiveImpl:
 
   virtual bool IsOpen() const {
     switch (state_) {
-      case kEof: case kError: case kHaveObject: case kFreedObject: return true;
-      case kUninitialized: return false;
-      default: KALDI_ERR << "IsOpen() called on invalid object.";  // kFileStart
-        // is not valid state for user to call something on.
-        return false;
+    case kEof: case kError: case kHaveObject: case kFreedObject: return true;
+    case kUninitialized: return false;
+    default: KALDI_ERR << "IsOpen() called on invalid object.";    // kFileStart
+      // is not valid state for user to call something on.
+      return false;
     }
   }
 
   virtual bool Done() const {
     switch (state_) {
-      case kHaveObject:
-        return false;
-      case kEof: case kError:
-        return true;  // Error-state counts as Done(), but destructor
-        // will fail (unless you check the status with Close()).
-      default:
-        KALDI_ERR << "Done() called on TableReader object at the wrong time.";
-        return false;
+    case kHaveObject:
+      return false;
+    case kEof: case kError:
+      return true;    // Error-state counts as Done(), but destructor
+    // will fail (unless you check the status with Close()).
+    default:
+      KALDI_ERR << "Done() called on TableReader object at the wrong time.";
+      return false;
     }
   }
 
   virtual std::string Key() {
     // Valid to call this whenever Done() returns false
     switch (state_) {
-      case kHaveObject: break;  // only valid case.
-      default:
-        // coding error.
-        KALDI_ERR << "Key() called on TableReader object at the wrong time.";
+    case kHaveObject: break;    // only valid case.
+    default:
+      // coding error.
+      KALDI_ERR << "Key() called on TableReader object at the wrong time.";
     }
     return key_;
   }
 
   const T &Value() {
     switch (state_) {
-      case kHaveObject:
-        break;  // only valid case.
-      default:
-        // coding error.
-        KALDI_ERR << "Value() called on TableReader object at the wrong time.";
+    case kHaveObject:
+      break;    // only valid case.
+    default:
+      // coding error.
+      KALDI_ERR << "Value() called on TableReader object at the wrong time.";
     }
     return holder_.Value();
   }
@@ -641,7 +641,7 @@ template<class Holder>  class SequentialTableReaderArchiveImpl:
       state_ = kFreedObject;
     } else {
       KALDI_ERR << "SwapHolder called at the wrong time "
-                   "(error related to ',bg' modifier).";
+        "(error related to ',bg' modifier).";
     }
   }
 
@@ -678,7 +678,7 @@ template<class Holder>  class SequentialTableReaderArchiveImpl:
       KALDI_ERR << "TableReader: error detected closing archive "
                 << PrintableRxfilename(archive_rxfilename_);
   }
- private:
+private:
   Input input_;  // Input object for the archive
   Holder holder_;     // Holds the object.
   std::string key_;
@@ -700,13 +700,13 @@ template<class Holder>  class SequentialTableReaderArchiveImpl:
 // implementation and allows it to do the reading in a background thread.
 template<class Holder>
 class SequentialTableReaderBackgroundImpl:
-      public SequentialTableReaderImplBase<Holder> {
- public:
+  public SequentialTableReaderImplBase<Holder> {
+public:
   typedef typename Holder::T T;
 
   SequentialTableReaderBackgroundImpl(
-      SequentialTableReaderImplBase<Holder> *base_reader):
-      base_reader_(base_reader) {}
+    SequentialTableReaderImplBase<Holder> *base_reader) :
+    base_reader_(base_reader) {}
 
   // This function ignores the rxfilename argument.
   // We use the same function signature as the regular Open(),
@@ -840,7 +840,7 @@ class SequentialTableReaderBackgroundImpl:
       }
     }
   }
- private:
+private:
   std::string key_;
   Holder holder_;
   // I couldn't figure out what to call these semaphores.  consumer_sem_ is the
@@ -855,7 +855,7 @@ class SequentialTableReaderBackgroundImpl:
 
 template<class Holder>
 SequentialTableReader<Holder>::SequentialTableReader(const std::string
-                                                     &rspecifier): impl_(NULL) {
+    &rspecifier) : impl_(NULL) {
   if (rspecifier != "" && !Open(rspecifier))
     KALDI_ERR << "Error constructing TableReader: rspecifier is " << rspecifier;
 }
@@ -870,15 +870,15 @@ bool SequentialTableReader<Holder>::Open(const std::string &rspecifier) {
   RspecifierOptions opts;
   RspecifierType wt = ClassifyRspecifier(rspecifier, NULL, &opts);
   switch (wt) {
-    case kArchiveRspecifier:
-      impl_ = new SequentialTableReaderArchiveImpl<Holder>();
-      break;
-    case kScriptRspecifier:
-      impl_ = new SequentialTableReaderScriptImpl<Holder>();
-      break;
-    case kNoRspecifier: default:
-      KALDI_WARN << "Invalid rspecifier " << rspecifier;
-      return false;
+  case kArchiveRspecifier:
+    impl_ = new SequentialTableReaderArchiveImpl<Holder>();
+    break;
+  case kScriptRspecifier:
+    impl_ = new SequentialTableReaderScriptImpl<Holder>();
+    break;
+  case kNoRspecifier: default:
+    KALDI_WARN << "Invalid rspecifier " << rspecifier;
+    return false;
   }
   if (!impl_->Open(rspecifier)) {
     delete impl_;
@@ -960,7 +960,7 @@ SequentialTableReader<Holder>::~SequentialTableReader() {
 
 
 template<class Holder> class TableWriterImplBase {
- public:
+public:
   typedef typename Holder::T T;
 
   virtual bool Open(const std::string &wspecifier) = 0;
@@ -985,7 +985,7 @@ template<class Holder> class TableWriterImplBase {
   virtual ~TableWriterImplBase() { }
 
   TableWriterImplBase() { }
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(TableWriterImplBase);
 };
 
@@ -994,19 +994,19 @@ template<class Holder> class TableWriterImplBase {
 // to an archive with no associated scp.
 template<class Holder>
 class TableWriterArchiveImpl: public TableWriterImplBase<Holder> {
- public:
+public:
   typedef typename Holder::T T;
 
   virtual bool Open(const std::string &wspecifier) {
     switch (state_) {
-      case kUninitialized:
-        break;
-      case kWriteError:
-        KALDI_ERR << "Opening stream, already open with write error.";
-      case kOpen: default:
-        if (!Close())  // throw because this error may not have been previously
-          // detected by the user.
-          KALDI_ERR << "Opening stream, error closing previously open stream.";
+    case kUninitialized:
+      break;
+    case kWriteError:
+      KALDI_ERR << "Opening stream, already open with write error.";
+    case kOpen: default:
+      if (!Close())    // throw because this error may not have been previously
+        // detected by the user.
+        KALDI_ERR << "Opening stream, error closing previously open stream.";
     }
     wspecifier_ = wspecifier;
     WspecifierType ws = ClassifyWspecifier(wspecifier,
@@ -1016,7 +1016,7 @@ class TableWriterArchiveImpl: public TableWriterImplBase<Holder> {
     KALDI_ASSERT(ws == kArchiveWspecifier);  // or wrongly called.
 
     if (output_.Open(archive_wxfilename_, opts_.binary, false)) {  // false
-                                                      // means no binary header.
+      // means no binary header.
       state_ = kOpen;
       return true;
     } else {
@@ -1029,9 +1029,9 @@ class TableWriterArchiveImpl: public TableWriterImplBase<Holder> {
 
   virtual bool IsOpen() const {
     switch (state_) {
-      case kUninitialized: return false;
-      case kOpen: case kWriteError: return true;
-      default: KALDI_ERR << "IsOpen() called on TableWriter in invalid state.";
+    case kUninitialized: return false;
+    case kOpen: case kWriteError: return true;
+    default: KALDI_ERR << "IsOpen() called on TableWriter in invalid state.";
     }
     return false;
   }
@@ -1040,14 +1040,14 @@ class TableWriterArchiveImpl: public TableWriterImplBase<Holder> {
   // some errors may not be detected till we call Close().
   virtual bool Write(const std::string &key, const T &value) {
     switch (state_) {
-      case kOpen: break;
-      case kWriteError:
-        // user should have known from the last
-        // call to Write that there was a problem.
-        KALDI_WARN << "Attempting to write to invalid stream.";
-        return false;
-      case kUninitialized: default:
-        KALDI_ERR << "Write called on invalid stream";
+    case kOpen: break;
+    case kWriteError:
+      // user should have known from the last
+      // call to Write that there was a problem.
+      KALDI_WARN << "Attempting to write to invalid stream.";
+      return false;
+    case kUninitialized: default:
+      KALDI_ERR << "Write called on invalid stream";
     }
     // state is now kOpen or kWriteError.
     if (!IsToken(key))  // e.g. empty string or has spaces...
@@ -1072,11 +1072,11 @@ class TableWriterArchiveImpl: public TableWriterImplBase<Holder> {
   //  any errors will be reported on the next Write or Close.
   virtual void Flush() {
     switch (state_) {
-      case kWriteError: case kOpen:
-        output_.Stream().flush();  // Don't check error status.
-        return;
-      default:
-        KALDI_WARN << "Flush called on not-open writer.";
+    case kWriteError: case kOpen:
+      output_.Stream().flush();    // Don't check error status.
+      return;
+    default:
+      KALDI_WARN << "Flush called on not-open writer.";
     }
   }
 
@@ -1100,7 +1100,7 @@ class TableWriterArchiveImpl: public TableWriterImplBase<Holder> {
     return true;
   }
 
-  TableWriterArchiveImpl(): state_(kUninitialized) {}
+  TableWriterArchiveImpl() : state_(kUninitialized) {}
 
   // May throw on write error if Close was not called.
   virtual ~TableWriterArchiveImpl() {
@@ -1110,7 +1110,7 @@ class TableWriterArchiveImpl: public TableWriterImplBase<Holder> {
                 << "failed: wspecifier is "<<  wspecifier_;
   }
 
- private:
+private:
   Output output_;
   WspecifierOptions opts_;
   std::string wspecifier_;
@@ -1134,17 +1134,17 @@ class TableWriterArchiveImpl: public TableWriterImplBase<Holder> {
 
 template<class Holder>
 class TableWriterScriptImpl: public TableWriterImplBase<Holder> {
- public:
+public:
   typedef typename Holder::T T;
 
-  TableWriterScriptImpl(): last_found_(0), state_(kUninitialized) {}
+  TableWriterScriptImpl() : last_found_(0), state_(kUninitialized) {}
 
   virtual bool Open(const std::string &wspecifier) {
     switch (state_) {
-      case kReadScript:
-        KALDI_ERR << " Opening already open TableWriter: call Close first.";
-      case kUninitialized: case kNotReadScript:
-        break;
+    case kReadScript:
+      KALDI_ERR << " Opening already open TableWriter: call Close first.";
+    case kUninitialized: case kNotReadScript:
+      break;
     }
     wspecifier_ = wspecifier;
     WspecifierType ws = ClassifyWspecifier(wspecifier,
@@ -1199,7 +1199,7 @@ class TableWriterScriptImpl: public TableWriterImplBase<Holder> {
     if (!LookupFilename(key, &wxfilename)) {
       if (opts_.permissive) {
         return true;  // In permissive mode, it's as if we're writing to
-                     // /dev/null for missing keys.
+                      // /dev/null for missing keys.
       } else {
         KALDI_WARN << "Script file "
                    << PrintableRxfilename(script_rxfilename_)
@@ -1234,7 +1234,7 @@ class TableWriterScriptImpl: public TableWriterImplBase<Holder> {
     // Nothing to do in destructor.
   }
 
- private:
+private:
   // Note: this function is almost the same as in
   // RandomAccessTableReaderScriptImpl.
   bool LookupFilename(const std::string &key, std::string *wxfilename) {
@@ -1249,7 +1249,7 @@ class TableWriterScriptImpl: public TableWriterImplBase<Holder> {
     // compares less than or equal to any string, so lower_bound points to the
     // element that has the same key.
     typedef typename std::vector<std::pair<std::string, std::string> >
-                     ::const_iterator IterType;
+        ::const_iterator IterType;
     IterType iter = std::lower_bound(script_.begin(), script_.end(), pr);
     if (iter != script_.end() && iter->first == key) {
       last_found_ = iter - script_.begin();
@@ -1287,19 +1287,19 @@ class TableWriterScriptImpl: public TableWriterImplBase<Holder> {
 // to an archive plus an associated scp.
 template<class Holder>
 class TableWriterBothImpl: public TableWriterImplBase<Holder> {
- public:
+public:
   typedef typename Holder::T T;
 
   virtual bool Open(const std::string &wspecifier) {
     switch (state_) {
-      case kUninitialized:
-        break;
-      case kWriteError:
-        KALDI_ERR << "Opening stream, already open with write error.";
-      case kOpen: default:
-        if (!Close())  // throw because this error may not have been previously
+    case kUninitialized:
+      break;
+    case kWriteError:
+      KALDI_ERR << "Opening stream, already open with write error.";
+    case kOpen: default:
+      if (!Close())    // throw because this error may not have been previously
                        // detected by user.
-          KALDI_ERR << "Opening stream, error closing previously open stream.";
+        KALDI_ERR << "Opening stream, error closing previously open stream.";
     }
     wspecifier_ = wspecifier;
     WspecifierType ws = ClassifyWspecifier(wspecifier,
@@ -1309,8 +1309,8 @@ class TableWriterBothImpl: public TableWriterImplBase<Holder> {
     KALDI_ASSERT(ws == kBothWspecifier);  // or wrongly called.
     if (ClassifyWxfilename(archive_wxfilename_) != kFileOutput)
       KALDI_WARN << "When writing to both archive and script, the script file "
-          "will generally not be interpreted correctly unless the archive is "
-          "an actual file: wspecifier = " << wspecifier;
+        "will generally not be interpreted correctly unless the archive is "
+        "an actual file: wspecifier = " << wspecifier;
 
     if (!archive_output_.Open(archive_wxfilename_, opts_.binary, false)) {
       // false means no binary header.
@@ -1330,15 +1330,15 @@ class TableWriterBothImpl: public TableWriterImplBase<Holder> {
 
   virtual bool IsOpen() const {
     switch (state_) {
-      case kUninitialized: return false;
-      case kOpen: case kWriteError: return true;
-      default: KALDI_ERR << "IsOpen() called on TableWriter in invalid state.";
+    case kUninitialized: return false;
+    case kOpen: case kWriteError: return true;
+    default: KALDI_ERR << "IsOpen() called on TableWriter in invalid state.";
     }
     return false;
   }
 
   void MakeFilename(typename std::ostream::pos_type streampos,
-                    std::string *output) const {
+      std::string *output) const {
     std::ostringstream ss;
     ss << ':' << streampos;
     KALDI_ASSERT(ss.str() != ":-1");
@@ -1354,14 +1354,14 @@ class TableWriterBothImpl: public TableWriterImplBase<Holder> {
   // some errors may not be detected till we call Close().
   virtual bool Write(const std::string &key, const T &value) {
     switch (state_) {
-      case kOpen: break;
-      case kWriteError:
-        // user should have known from the last
-        // call to Write that there was a problem.  Warn about it.
-        KALDI_WARN << "Writing to non-open TableWriter object.";
-        return false;
-      case kUninitialized: default:
-        KALDI_ERR << "Write called on invalid stream";
+    case kOpen: break;
+    case kWriteError:
+      // user should have known from the last
+      // call to Write that there was a problem.  Warn about it.
+      KALDI_WARN << "Writing to non-open TableWriter object.";
+      return false;
+    case kUninitialized: default:
+      KALDI_ERR << "Write called on invalid stream";
     }
     // state is now kOpen or kWriteError.
     if (!IsToken(key))  // e.g. empty string or has spaces...
@@ -1415,12 +1415,12 @@ class TableWriterBothImpl: public TableWriterImplBase<Holder> {
   //  any errors will be reported on the next Write or Close.
   virtual void Flush() {
     switch (state_) {
-      case kWriteError: case kOpen:
-        archive_output_.Stream().flush();  // Don't check error status.
-        script_output_.Stream().flush();  // Don't check error status.
-        return;
-      default:
-        KALDI_WARN << "Flush called on not-open writer.";
+    case kWriteError: case kOpen:
+      archive_output_.Stream().flush();    // Don't check error status.
+      script_output_.Stream().flush();    // Don't check error status.
+      return;
+    default:
+      KALDI_WARN << "Flush called on not-open writer.";
     }
   }
 
@@ -1437,7 +1437,7 @@ class TableWriterBothImpl: public TableWriterImplBase<Holder> {
     return ans;
   }
 
-  TableWriterBothImpl(): state_(kUninitialized) {}
+  TableWriterBothImpl() : state_(kUninitialized) {}
 
   // May throw on write error if Close() was not called.
   // User can get the error status by calling Close().
@@ -1448,7 +1448,7 @@ class TableWriterBothImpl: public TableWriterImplBase<Holder> {
                 << wspecifier_;
   }
 
- private:
+private:
   Output archive_output_;
   Output script_output_;
   WspecifierOptions opts_;
@@ -1464,7 +1464,7 @@ class TableWriterBothImpl: public TableWriterImplBase<Holder> {
 
 
 template<class Holder>
-TableWriter<Holder>::TableWriter(const std::string &wspecifier): impl_(NULL) {
+TableWriter<Holder>::TableWriter(const std::string &wspecifier) : impl_(NULL) {
   if (wspecifier != "" && !Open(wspecifier))
     KALDI_ERR << "Failed to open table for writing with wspecifier: " << wspecifier
               << ": errno (in case it's relevant) is: " << strerror(errno);
@@ -1485,18 +1485,18 @@ bool TableWriter<Holder>::Open(const std::string &wspecifier) {
   KALDI_ASSERT(impl_ == NULL);
   WspecifierType wtype = ClassifyWspecifier(wspecifier, NULL, NULL, NULL);
   switch (wtype) {
-    case kBothWspecifier:
-      impl_ = new TableWriterBothImpl<Holder>();
-      break;
-    case kArchiveWspecifier:
-      impl_ = new TableWriterArchiveImpl<Holder>();
-      break;
-    case kScriptWspecifier:
-      impl_ = new TableWriterScriptImpl<Holder>();
-      break;
-    case kNoWspecifier: default:
-      KALDI_WARN << "ClassifyWspecifier: invalid wspecifier " << wspecifier;
-      return false;
+  case kBothWspecifier:
+    impl_ = new TableWriterBothImpl<Holder>();
+    break;
+  case kArchiveWspecifier:
+    impl_ = new TableWriterArchiveImpl<Holder>();
+    break;
+  case kScriptWspecifier:
+    impl_ = new TableWriterScriptImpl<Holder>();
+    break;
+  case kNoWspecifier: default:
+    KALDI_WARN << "ClassifyWspecifier: invalid wspecifier " << wspecifier;
+    return false;
   }
   if (impl_->Open(wspecifier)) {
     return true;
@@ -1509,7 +1509,7 @@ bool TableWriter<Holder>::Open(const std::string &wspecifier) {
 
 template<class Holder>
 void TableWriter<Holder>::Write(const std::string &key,
-                                const T &value) const {
+    const T &value) const {
   CheckImpl();
   if (!impl_->Write(key, value))
     KALDI_ERR << "Error in TableWriter::Write";
@@ -1567,7 +1567,7 @@ TableWriter<Holder>::~TableWriter() {
 // it was the standard input and these conditions held).
 
 template<class Holder> class RandomAccessTableReaderImplBase {
- public:
+public:
   typedef typename Holder::T T;
 
   virtual bool Open(const std::string &rspecifier) = 0;
@@ -1591,19 +1591,19 @@ template<class Holder> class RandomAccessTableReaderImplBase {
 // try to keep them in sync.
 template<class Holder>
 class RandomAccessTableReaderScriptImpl:
-      public RandomAccessTableReaderImplBase<Holder> {
- public:
+  public RandomAccessTableReaderImplBase<Holder> {
+public:
   typedef typename Holder::T T;
 
-  RandomAccessTableReaderScriptImpl(): last_found_(0), state_(kUninitialized) {}
+  RandomAccessTableReaderScriptImpl() : last_found_(0), state_(kUninitialized) {}
 
   virtual bool Open(const std::string &rspecifier) {
     switch (state_) {
-      case kNotHaveObject: case kHaveObject: case kHaveRange:
-        KALDI_ERR << " Opening already open RandomAccessTableReader:"
-                     " call Close first.";
-      case kUninitialized: case kNotReadScript:
-        break;
+    case kNotHaveObject: case kHaveObject: case kHaveRange:
+      KALDI_ERR << " Opening already open RandomAccessTableReader:"
+        " call Close first.";
+    case kUninitialized: case kNotReadScript:
+      break;
     }
     rspecifier_ = rspecifier;
     RspecifierType rs = ClassifyRspecifier(rspecifier,
@@ -1633,8 +1633,8 @@ class RandomAccessTableReaderScriptImpl:
         bool same = (script_[i].first == script_[i+1].first);
         KALDI_WARN << "Script file " << PrintableRxfilename(script_rxfilename_)
                    << (same ? " contains duplicate key: " :
-                       " is not sorted (remove s, option or add ns, option):"
-                       " key is ") << script_[i].first;
+        " is not sorted (remove s, option or add ns, option):"
+        " key is ") << script_[i].first;
         state_ = kNotReadScript;
         return false;
       }
@@ -1646,13 +1646,13 @@ class RandomAccessTableReaderScriptImpl:
 
   virtual bool IsOpen() const {
     return  (state_ == kNotHaveObject || state_ == kHaveObject ||
-             state_ == kHaveRange);
+           state_ == kHaveRange);
   }
 
   virtual bool Close() {
     if (!IsOpen())
       KALDI_ERR << "Close() called on RandomAccessTableReader that was not"
-                   " open.";
+        " open.";
     holder_.Clear();
     range_holder_.Clear();
     state_ = kUninitialized;
@@ -1680,7 +1680,7 @@ class RandomAccessTableReaderScriptImpl:
     if (!HasKeyInternal(key, true)) // true == preload.
       KALDI_ERR << "Could not get item for key " << key
                 << ", rspecifier is " << rspecifier_ << " [to ignore this, "
-                 << "add the p, (permissive) option to the rspecifier.";
+                << "add the p, (permissive) option to the rspecifier.";
     KALDI_ASSERT(key_ == key);
     if (state_ == kHaveObject) {
       return holder_.Value();
@@ -1692,7 +1692,7 @@ class RandomAccessTableReaderScriptImpl:
 
   virtual ~RandomAccessTableReaderScriptImpl() { }
 
- private:
+private:
 
   // HasKeyInternal when called with preload == false just tells us whether the
   // key is in the scp.  With preload == true, which happens when the ,p
@@ -1702,18 +1702,18 @@ class RandomAccessTableReaderScriptImpl:
   // This function is called both from HasKey and from Value().
   virtual bool HasKeyInternal(const std::string &key, bool preload) {
     switch (state_) {
-      case kUninitialized: case kNotReadScript:
-        KALDI_ERR << "HasKey called on RandomAccessTableReader object that is"
-                     " not open.";
-      case kHaveObject:
-        if (key == key_ && range_.empty())
-          return true;
-        break;
-      case kHaveRange:
-        if (key == key_)
-          return true;
-        break;
-      case kNotHaveObject: default: break;
+    case kUninitialized: case kNotReadScript:
+      KALDI_ERR << "HasKey called on RandomAccessTableReader object that is"
+        " not open.";
+    case kHaveObject:
+      if (key == key_ && range_.empty())
+        return true;
+      break;
+    case kHaveRange:
+      if (key == key_)
+        return true;
+      break;
+    case kNotHaveObject: default: break;
     }
     KALDI_ASSERT(IsToken(key));
     size_t key_pos = 0;
@@ -1774,7 +1774,7 @@ class RandomAccessTableReaderScriptImpl:
               state_ = kHaveObject;
             } else {
               KALDI_WARN << "Error reading object from "
-                  "stream " << PrintableRxfilename(data_rxfilename);
+                "stream " << PrintableRxfilename(data_rxfilename);
               return false;
             }
           }
@@ -1786,9 +1786,9 @@ class RandomAccessTableReaderScriptImpl:
           state_ = kHaveRange;
           return true;
         } else {
-          KALDI_WARN  << "Failed to load object from "
-                      << PrintableRxfilename(data_rxfilename)
-                      << "[" << range << "]";
+          KALDI_WARN << "Failed to load object from "
+                     << PrintableRxfilename(data_rxfilename)
+                     << "[" << range << "]";
           // leave state at kHaveObject.
           return false;
         }
@@ -1817,7 +1817,7 @@ class RandomAccessTableReaderScriptImpl:
     // compares less than or equal to any string, so lower_bound points to the
     // element that has the same key.
     typedef typename std::vector<std::pair<std::string, std::string> >
-                     ::const_iterator IterType;
+        ::const_iterator IterType;
     IterType iter = std::lower_bound(script_.begin(), script_.end(), pr);
     if (iter != script_.end() && iter->first == key) {
       last_found_ = *script_offset = iter - script_.begin();
@@ -1893,12 +1893,12 @@ class RandomAccessTableReaderScriptImpl:
 
 template<class Holder>
 class RandomAccessTableReaderArchiveImplBase:
-      public RandomAccessTableReaderImplBase<Holder> {
- public:
+  public RandomAccessTableReaderImplBase<Holder> {
+public:
   typedef typename Holder::T T;
 
-  RandomAccessTableReaderArchiveImplBase(): holder_(NULL),
-                                            state_(kUninitialized) { }
+  RandomAccessTableReaderArchiveImplBase() : holder_(NULL),
+    state_(kUninitialized) { }
 
   virtual bool Open(const std::string &rspecifier) {
     if (state_ != kUninitialized) {
@@ -1981,10 +1981,10 @@ class RandomAccessTableReaderArchiveImplBase:
 
   virtual bool IsOpen() const {
     switch (state_) {
-      case kEof: case kError: case kHaveObject: case kNoObject: return true;
-      case kUninitialized: return false;
-      default: KALDI_ERR << "IsOpen() called on invalid object.";
-        return false;
+    case kEof: case kError: case kHaveObject: case kNoObject: return true;
+    case kUninitialized: return false;
+    default: KALDI_ERR << "IsOpen() called on invalid object.";
+      return false;
     }
   }
 
@@ -2016,9 +2016,9 @@ class RandomAccessTableReaderArchiveImplBase:
     // The child class has the responsibility to call CloseInternal().
     KALDI_ASSERT(state_ == kUninitialized && holder_ == NULL);
   }
- private:
+private:
   Input input_;       // Input object for the archive
- protected:
+protected:
   // The variables below are accessed by child classes.
 
   std::string cur_key_;   // current key (if state == kHaveObject).
@@ -2049,7 +2049,7 @@ class RandomAccessTableReaderArchiveImplBase:
 
 template<class Holder>
 class RandomAccessTableReaderDSortedArchiveImpl:
-      public RandomAccessTableReaderArchiveImplBase<Holder> {
+  public RandomAccessTableReaderArchiveImplBase<Holder> {
   using RandomAccessTableReaderArchiveImplBase<Holder>::kUninitialized;
   using RandomAccessTableReaderArchiveImplBase<Holder>::kHaveObject;
   using RandomAccessTableReaderArchiveImplBase<Holder>::kNoObject;
@@ -2062,7 +2062,7 @@ class RandomAccessTableReaderDSortedArchiveImpl:
   using RandomAccessTableReaderArchiveImplBase<Holder>::rspecifier_;
   using RandomAccessTableReaderArchiveImplBase<Holder>::archive_rxfilename_;
   using RandomAccessTableReaderArchiveImplBase<Holder>::ReadNextObject;
- public:
+public:
   typedef typename Holder::T T;
 
   RandomAccessTableReaderDSortedArchiveImpl() { }
@@ -2082,7 +2082,7 @@ class RandomAccessTableReaderDSortedArchiveImpl:
                 << " in archive " << PrintableRxfilename(archive_rxfilename_);
     }
     KALDI_ASSERT(this->state_ == kHaveObject && key == this->cur_key_
-                 && holder_ != NULL);
+        && holder_ != NULL);
     return this->holder_->Value();
   }
 
@@ -2094,7 +2094,7 @@ class RandomAccessTableReaderDSortedArchiveImpl:
         KALDI_ERR << "Error closing RandomAccessTableReader: rspecifier is "
                   << rspecifier_;
   }
- private:
+private:
   // FindKeyInternal tries to find the key by calling "ReadNextObject()"
   // as many times as necessary till we get to it.  It is called from
   // both FindKey and Value().
@@ -2114,15 +2114,15 @@ class RandomAccessTableReaderDSortedArchiveImpl:
 
     if (state_ == kNoObject)
       ReadNextObject();  // This can only happen
-      // once, the first time someone calls HasKey() or Value().  We don't
-      // do it in the initializer to stop the program hanging too soon,
-      // if reading from a pipe.
+    // once, the first time someone calls HasKey() or Value().  We don't
+    // do it in the initializer to stop the program hanging too soon,
+    // if reading from a pipe.
 
     if (state_ == kEof || state_ == kError) return false;
 
     if (state_ == kUninitialized)
       KALDI_ERR << "Trying to access a RandomAccessTableReader object that is"
-                   " not open.";
+        " not open.";
 
     std::string last_key_;  // To check that
     // the archive we're reading is in sorted order.
@@ -2148,7 +2148,7 @@ class RandomAccessTableReaderDSortedArchiveImpl:
         if (cur_key_.compare(last_key_) <= 0) {
           KALDI_ERR << "You provided the \"s\" option "
                     << " (sorted order), but keys are out of order or"
-                       " duplicated: "
+            " duplicated: "
                     << last_key_ << " is followed by " << cur_key_
                     << ": rspecifier is " << rspecifier_;
         }
@@ -2165,7 +2165,7 @@ class RandomAccessTableReaderDSortedArchiveImpl:
 // called-sorted (cs) options.
 template<class Holder>
 class RandomAccessTableReaderSortedArchiveImpl:
-      public RandomAccessTableReaderArchiveImplBase<Holder> {
+  public RandomAccessTableReaderArchiveImplBase<Holder> {
   using RandomAccessTableReaderArchiveImplBase<Holder>::kUninitialized;
   using RandomAccessTableReaderArchiveImplBase<Holder>::kHaveObject;
   using RandomAccessTableReaderArchiveImplBase<Holder>::kNoObject;
@@ -2179,12 +2179,12 @@ class RandomAccessTableReaderSortedArchiveImpl:
   using RandomAccessTableReaderArchiveImplBase<Holder>::archive_rxfilename_;
   using RandomAccessTableReaderArchiveImplBase<Holder>::ReadNextObject;
 
- public:
+public:
   typedef typename Holder::T T;
 
-  RandomAccessTableReaderSortedArchiveImpl():
-      last_found_index_(static_cast<size_t>(-1)),
-      pending_delete_(static_cast<size_t>(-1)) { }
+  RandomAccessTableReaderSortedArchiveImpl() :
+    last_found_index_(static_cast<size_t>(-1)),
+    pending_delete_(static_cast<size_t>(-1)) { }
 
   virtual bool Close() {
     for (size_t i = 0; i < seen_pairs_.size(); i++)
@@ -2233,7 +2233,7 @@ class RandomAccessTableReaderSortedArchiveImpl:
         KALDI_ERR << "Error closing RandomAccessTableReader: rspecifier is "
                   << rspecifier_;
   }
- private:
+private:
   void HandlePendingDelete() {
     const size_t npos = static_cast<size_t>(-1);
     if (pending_delete_ != npos) {
@@ -2259,14 +2259,14 @@ class RandomAccessTableReaderSortedArchiveImpl:
     // First, an optimization in case the previous call was for the
     // same key, and we found it.
     if (last_found_index_ < seen_pairs_.size()
-       && seen_pairs_[last_found_index_].first == key) {
+        && seen_pairs_[last_found_index_].first == key) {
       *index = last_found_index_;
       return true;
     }
 
     if (state_ == kUninitialized)
       KALDI_ERR << "Trying to access a RandomAccessTableReader object that is"
-                   " not open.";
+        " not open.";
 
     // Step one is to see whether we have to read ahead for the object..
     // Note, the possible states right now are kNoObject, kEof or kError.
@@ -2274,7 +2274,7 @@ class RandomAccessTableReaderSortedArchiveImpl:
     // ReadNextObject().
     bool looped = false;
     while (state_ == kNoObject &&
-          (seen_pairs_.empty() || key.compare(seen_pairs_.back().first) > 0)) {
+        (seen_pairs_.empty() || key.compare(seen_pairs_.back().first) > 0)) {
       looped = true;
       // Read this as:
       //  while ( the stream is potentially good for reading &&
@@ -2284,7 +2284,7 @@ class RandomAccessTableReaderSortedArchiveImpl:
       ReadNextObject();
       if (state_ == kHaveObject) {  // Successfully read object.
         if (!seen_pairs_.empty() &&  // This is just a check.
-           cur_key_.compare(seen_pairs_.back().first) <= 0) {
+            cur_key_.compare(seen_pairs_.back().first) <= 0) {
           // read the expression above as: !( cur_key_ > previous_key).
           // it means we are not in sorted order [the user specified that we
           // are, or we would not be using this implementation].
@@ -2314,7 +2314,7 @@ class RandomAccessTableReaderSortedArchiveImpl:
         iter = std::lower_bound(seen_pairs_.begin(), seen_pairs_.end(),
                                 pr, PairCompare());
     if (iter != seen_pairs_.end() &&
-       key == iter->first) {
+        key == iter->first) {
       last_found_index_ = *index = (iter - seen_pairs_.begin());
       return true;
     } else {
@@ -2336,7 +2336,7 @@ class RandomAccessTableReaderSortedArchiveImpl:
     // PairCompare is the Less-than operator for the pairs of(key, Holder).
     // compares the keys.
     inline bool operator() (const std::pair<std::string, Holder*> &pr1,
-                            const std::pair<std::string, Holder*> &pr2) {
+        const std::pair<std::string, Holder*> &pr2) {
       return  (pr1.first.compare(pr2.first) < 0);
     }
   };
@@ -2356,7 +2356,7 @@ class RandomAccessTableReaderSortedArchiveImpl:
 
 template<class Holder>
 class RandomAccessTableReaderUnsortedArchiveImpl:
-      public RandomAccessTableReaderArchiveImplBase<Holder> {
+  public RandomAccessTableReaderArchiveImplBase<Holder> {
   using RandomAccessTableReaderArchiveImplBase<Holder>::kUninitialized;
   using RandomAccessTableReaderArchiveImplBase<Holder>::kHaveObject;
   using RandomAccessTableReaderArchiveImplBase<Holder>::kNoObject;
@@ -2372,9 +2372,9 @@ class RandomAccessTableReaderUnsortedArchiveImpl:
 
   typedef typename Holder::T T;
 
- public:
-  RandomAccessTableReaderUnsortedArchiveImpl(): to_delete_iter_(map_.end()),
-                                                to_delete_iter_valid_(false) {
+public:
+  RandomAccessTableReaderUnsortedArchiveImpl() : to_delete_iter_(map_.end()),
+    to_delete_iter_valid_(false) {
     map_.max_load_factor(0.5);  // make it quite empty -> quite efficient.
     // default seems to be 1.
   }
@@ -2411,7 +2411,7 @@ class RandomAccessTableReaderUnsortedArchiveImpl:
         KALDI_ERR << "Error closing RandomAccessTableReader: rspecifier is "
                   << rspecifier_;
   }
- private:
+private:
   void HandlePendingDelete() {
     if (to_delete_iter_valid_) {
       to_delete_iter_valid_ = false;
@@ -2506,11 +2506,11 @@ class RandomAccessTableReaderUnsortedArchiveImpl:
 
 template<class Holder>
 RandomAccessTableReader<Holder>::RandomAccessTableReader(const
-                                                       std::string &rspecifier):
-    impl_(NULL) {
+    std::string &rspecifier) :
+  impl_(NULL) {
   if (rspecifier != "" && !Open(rspecifier))
     KALDI_ERR << "Error opening RandomAccessTableReader object "
-        " (rspecifier is: " << rspecifier << ")";
+      " (rspecifier is: " << rspecifier << ")";
 }
 
 template<class Holder>
@@ -2520,23 +2520,23 @@ bool RandomAccessTableReader<Holder>::Open(const std::string &rspecifier) {
   RspecifierOptions opts;
   RspecifierType rs = ClassifyRspecifier(rspecifier, NULL, &opts);
   switch (rs) {
-    case kScriptRspecifier:
-      impl_ = new RandomAccessTableReaderScriptImpl<Holder>();
-      break;
-    case kArchiveRspecifier:
-      if (opts.sorted) {
-        if (opts.called_sorted)  // "doubly" sorted case.
-          impl_ = new RandomAccessTableReaderDSortedArchiveImpl<Holder>();
-        else
-          impl_ = new RandomAccessTableReaderSortedArchiveImpl<Holder>();
-      } else {
-        impl_ = new RandomAccessTableReaderUnsortedArchiveImpl<Holder>();
-      }
-      break;
-    case kNoRspecifier: default:
-      KALDI_WARN << "Invalid rspecifier: "
-                 << rspecifier;
-      return false;
+  case kScriptRspecifier:
+    impl_ = new RandomAccessTableReaderScriptImpl<Holder>();
+    break;
+  case kArchiveRspecifier:
+    if (opts.sorted) {
+      if (opts.called_sorted)    // "doubly" sorted case.
+        impl_ = new RandomAccessTableReaderDSortedArchiveImpl<Holder>();
+      else
+        impl_ = new RandomAccessTableReaderSortedArchiveImpl<Holder>();
+    } else {
+      impl_ = new RandomAccessTableReaderUnsortedArchiveImpl<Holder>();
+    }
+    break;
+  case kNoRspecifier: default:
+    KALDI_WARN << "Invalid rspecifier: "
+               << rspecifier;
+    return false;
   }
   if (!impl_->Open(rspecifier)) {
     // A warning will already have been printed.
@@ -2604,16 +2604,16 @@ void TableWriter<Holder>::CheckImpl() const {
 
 template<class Holder>
 RandomAccessTableReaderMapped<Holder>::RandomAccessTableReaderMapped(
-    const std::string &table_rxfilename,
-    const std::string &utt2spk_rxfilename):
-    reader_(table_rxfilename), token_reader_(table_rxfilename.empty() ? "" :
-                                             utt2spk_rxfilename),
-    utt2spk_rxfilename_(utt2spk_rxfilename) { }
+  const std::string &table_rxfilename,
+  const std::string &utt2spk_rxfilename) :
+  reader_(table_rxfilename), token_reader_(table_rxfilename.empty() ? "" :
+      utt2spk_rxfilename),
+  utt2spk_rxfilename_(utt2spk_rxfilename) { }
 
 template<class Holder>
 bool RandomAccessTableReaderMapped<Holder>::Open(
-    const std::string &table_rxfilename,
-    const std::string &utt2spk_rxfilename) {
+  const std::string &table_rxfilename,
+  const std::string &utt2spk_rxfilename) {
   if (reader_.IsOpen()) reader_.Close();
   if (token_reader_.IsOpen()) token_reader_.Close();
   KALDI_ASSERT(!table_rxfilename.empty());
@@ -2648,7 +2648,7 @@ bool RandomAccessTableReaderMapped<Holder>::HasKey(const std::string &utt) {
 
 template<class Holder>
 const typename Holder::T& RandomAccessTableReaderMapped<Holder>::Value(
-    const std::string &utt) {
+  const std::string &utt) {
   if (token_reader_.IsOpen()) {  // We need to map the key from utt to spk.
     if (!token_reader_.HasKey(utt))
       KALDI_ERR << "Attempting to read key " << utt << ", which is not present "

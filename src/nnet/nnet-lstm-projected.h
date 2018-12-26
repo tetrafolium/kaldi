@@ -30,24 +30,24 @@
 #include "cudamatrix/cu-math.h"
 
 /*************************************
- * x: input neuron
- * g: squashing neuron near input
- * i: Input gate
- * f: Forget gate
- * o: Output gate
- * c: memory Cell (CEC)
- * h: squashing neuron near output
- * m: output neuron of Memory block
- * r: recurrent projection neuron
- * y: output neuron of LSTMP
- *************************************/
+* x: input neuron
+* g: squashing neuron near input
+* i: Input gate
+* f: Forget gate
+* o: Output gate
+* c: memory Cell (CEC)
+* h: squashing neuron near output
+* m: output neuron of Memory block
+* r: recurrent projection neuron
+* y: output neuron of LSTMP
+*************************************/
 
 namespace kaldi {
 namespace nnet1 {
 
 class LstmProjected : public MultistreamComponent {
- public:
-  LstmProjected(int32 input_dim, int32 output_dim):
+public:
+  LstmProjected(int32 input_dim, int32 output_dim) :
     MultistreamComponent(input_dim, output_dim),
     cell_dim_(0),
     proj_dim_(output_dim),
@@ -110,27 +110,27 @@ class LstmProjected : public MultistreamComponent {
       std::string token;
       int first_char = PeekToken(is, binary);
       switch (first_char) {
-        case 'C': ReadToken(is, false, &token);
-          /**/ if (token == "<CellDim>") ReadBasicType(is, binary, &cell_dim_);
-          else if (token == "<CellClip>") ReadBasicType(is, binary, &cell_clip_);
-          else if (token == "<CellDiffClip>") ReadBasicType(is, binary, &cell_diff_clip_);
-          else if (token == "<ClipGradient>") ReadBasicType(is, binary, &grad_clip_); // bwd-compat.
-          else KALDI_ERR << "Unknown token: " << token;
-          break;
-        case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
-          ReadBasicType(is, binary, &learn_rate_coef_);
-          break;
-        case 'B': ExpectToken(is, binary, "<BiasLearnRateCoef>");
-          ReadBasicType(is, binary, &bias_learn_rate_coef_);
-          break;
-        case 'D': ExpectToken(is, binary, "<DiffClip>");
-          ReadBasicType(is, binary, &diff_clip_);
-          break;
-        case 'G': ExpectToken(is, binary, "<GradClip>");
-          ReadBasicType(is, binary, &grad_clip_);
-          break;
-        default: ReadToken(is, false, &token);
-          KALDI_ERR << "Unknown token: " << token;
+      case 'C': ReadToken(is, false, &token);
+        /**/ if (token == "<CellDim>") ReadBasicType(is, binary, &cell_dim_);
+        else if (token == "<CellClip>") ReadBasicType(is, binary, &cell_clip_);
+        else if (token == "<CellDiffClip>") ReadBasicType(is, binary, &cell_diff_clip_);
+        else if (token == "<ClipGradient>") ReadBasicType(is, binary, &grad_clip_);   // bwd-compat.
+        else KALDI_ERR << "Unknown token: " << token;
+        break;
+      case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
+        ReadBasicType(is, binary, &learn_rate_coef_);
+        break;
+      case 'B': ExpectToken(is, binary, "<BiasLearnRateCoef>");
+        ReadBasicType(is, binary, &bias_learn_rate_coef_);
+        break;
+      case 'D': ExpectToken(is, binary, "<DiffClip>");
+        ReadBasicType(is, binary, &diff_clip_);
+        break;
+      case 'G': ExpectToken(is, binary, "<GradClip>");
+        ReadBasicType(is, binary, &grad_clip_);
+        break;
+      default: ReadToken(is, false, &token);
+        KALDI_ERR << "Unknown token: " << token;
       }
     }
     KALDI_ASSERT(cell_dim_ != 0);
@@ -180,12 +180,12 @@ class LstmProjected : public MultistreamComponent {
 
   int32 NumParams() const {
     return ( w_gifo_x_.NumRows() * w_gifo_x_.NumCols() +
-         w_gifo_r_.NumRows() * w_gifo_r_.NumCols() +
-         bias_.Dim() +
-         peephole_i_c_.Dim() +
-         peephole_f_c_.Dim() +
-         peephole_o_c_.Dim() +
-         w_r_m_.NumRows() * w_r_m_.NumCols() );
+           w_gifo_r_.NumRows() * w_gifo_r_.NumCols() +
+           bias_.Dim() +
+           peephole_i_c_.Dim() +
+           peephole_f_c_.Dim() +
+           peephole_o_c_.Dim() +
+           w_r_m_.NumRows() * w_r_m_.NumCols() );
   }
 
   void GetGradient(VectorBase<BaseFloat>* gradient) const {
@@ -277,18 +277,18 @@ class LstmProjected : public MultistreamComponent {
 
   std::string Info() const {
     return std::string("cell-dim ") + ToString(cell_dim_) + " " +
-      "( learn_rate_coef_ " + ToString(learn_rate_coef_) +
-      ", bias_learn_rate_coef_ " + ToString(bias_learn_rate_coef_) +
-      ", cell_clip_ " + ToString(cell_clip_) +
-      ", diff_clip_ " + ToString(diff_clip_) +
-      ", grad_clip_ " + ToString(grad_clip_) + " )" +
-      "\n  w_gifo_x_  "   + MomentStatistics(w_gifo_x_) +
-      "\n  w_gifo_r_  "   + MomentStatistics(w_gifo_r_) +
-      "\n  bias_  "     + MomentStatistics(bias_) +
-      "\n  peephole_i_c_  " + MomentStatistics(peephole_i_c_) +
-      "\n  peephole_f_c_  " + MomentStatistics(peephole_f_c_) +
-      "\n  peephole_o_c_  " + MomentStatistics(peephole_o_c_) +
-      "\n  w_r_m_  "    + MomentStatistics(w_r_m_);
+           "( learn_rate_coef_ " + ToString(learn_rate_coef_) +
+           ", bias_learn_rate_coef_ " + ToString(bias_learn_rate_coef_) +
+           ", cell_clip_ " + ToString(cell_clip_) +
+           ", diff_clip_ " + ToString(diff_clip_) +
+           ", grad_clip_ " + ToString(grad_clip_) + " )" +
+           "\n  w_gifo_x_  "   + MomentStatistics(w_gifo_x_) +
+           "\n  w_gifo_r_  "   + MomentStatistics(w_gifo_r_) +
+           "\n  bias_  "     + MomentStatistics(bias_) +
+           "\n  peephole_i_c_  " + MomentStatistics(peephole_i_c_) +
+           "\n  peephole_f_c_  " + MomentStatistics(peephole_f_c_) +
+           "\n  peephole_o_c_  " + MomentStatistics(peephole_o_c_) +
+           "\n  w_r_m_  "    + MomentStatistics(w_r_m_);
   }
 
   std::string InfoGradient() const {
@@ -313,37 +313,37 @@ class LstmProjected : public MultistreamComponent {
     const CuSubMatrix<BaseFloat> DR(backpropagate_buf_.ColRange(7*cell_dim_, proj_dim_));
 
     return std::string("") +
-      "( learn_rate_coef_ " + ToString(learn_rate_coef_) +
-      ", bias_learn_rate_coef_ " + ToString(bias_learn_rate_coef_) +
-      ", cell_clip_ " + ToString(cell_clip_) +
-      ", diff_clip_ " + ToString(diff_clip_) +
-      ", grad_clip_ " + ToString(grad_clip_) + " )" +
-      "\n  ### Gradients " +
-      "\n  w_gifo_x_corr_  "   + MomentStatistics(w_gifo_x_corr_) +
-      "\n  w_gifo_r_corr_  "   + MomentStatistics(w_gifo_r_corr_) +
-      "\n  bias_corr_  "     + MomentStatistics(bias_corr_) +
-      "\n  peephole_i_c_corr_  " + MomentStatistics(peephole_i_c_corr_) +
-      "\n  peephole_f_c_corr_  " + MomentStatistics(peephole_f_c_corr_) +
-      "\n  peephole_o_c_corr_  " + MomentStatistics(peephole_o_c_corr_) +
-      "\n  w_r_m_corr_  "    + MomentStatistics(w_r_m_corr_) +
-      "\n  ### Activations (mostly after non-linearities)" +
-      "\n  YI(0..1)^  " + MomentStatistics(YI) +
-      "\n  YF(0..1)^  " + MomentStatistics(YF) +
-      "\n  YO(0..1)^  " + MomentStatistics(YO) +
-      "\n  YG(-1..1)  " + MomentStatistics(YG) +
-      "\n  YC(-R..R)* " + MomentStatistics(YC) +
-      "\n  YH(-1..1)  " + MomentStatistics(YH) +
-      "\n  YM(-1..1)  " + MomentStatistics(YM) +
-      "\n  YR(-R..R)  " + MomentStatistics(YR) +
-      "\n  ### Derivatives (w.r.t. inputs of non-linearities)" +
-      "\n  DI^ " + MomentStatistics(DI) +
-      "\n  DF^ " + MomentStatistics(DF) +
-      "\n  DO^ " + MomentStatistics(DO) +
-      "\n  DG  " + MomentStatistics(DG) +
-      "\n  DC* " + MomentStatistics(DC) +
-      "\n  DH  " + MomentStatistics(DH) +
-      "\n  DM  " + MomentStatistics(DM) +
-      "\n  DR  " + MomentStatistics(DR);
+           "( learn_rate_coef_ " + ToString(learn_rate_coef_) +
+           ", bias_learn_rate_coef_ " + ToString(bias_learn_rate_coef_) +
+           ", cell_clip_ " + ToString(cell_clip_) +
+           ", diff_clip_ " + ToString(diff_clip_) +
+           ", grad_clip_ " + ToString(grad_clip_) + " )" +
+           "\n  ### Gradients " +
+           "\n  w_gifo_x_corr_  "   + MomentStatistics(w_gifo_x_corr_) +
+           "\n  w_gifo_r_corr_  "   + MomentStatistics(w_gifo_r_corr_) +
+           "\n  bias_corr_  "     + MomentStatistics(bias_corr_) +
+           "\n  peephole_i_c_corr_  " + MomentStatistics(peephole_i_c_corr_) +
+           "\n  peephole_f_c_corr_  " + MomentStatistics(peephole_f_c_corr_) +
+           "\n  peephole_o_c_corr_  " + MomentStatistics(peephole_o_c_corr_) +
+           "\n  w_r_m_corr_  "    + MomentStatistics(w_r_m_corr_) +
+           "\n  ### Activations (mostly after non-linearities)" +
+           "\n  YI(0..1)^  " + MomentStatistics(YI) +
+           "\n  YF(0..1)^  " + MomentStatistics(YF) +
+           "\n  YO(0..1)^  " + MomentStatistics(YO) +
+           "\n  YG(-1..1)  " + MomentStatistics(YG) +
+           "\n  YC(-R..R)* " + MomentStatistics(YC) +
+           "\n  YH(-1..1)  " + MomentStatistics(YH) +
+           "\n  YM(-1..1)  " + MomentStatistics(YM) +
+           "\n  YR(-R..R)  " + MomentStatistics(YR) +
+           "\n  ### Derivatives (w.r.t. inputs of non-linearities)" +
+           "\n  DI^ " + MomentStatistics(DI) +
+           "\n  DF^ " + MomentStatistics(DF) +
+           "\n  DO^ " + MomentStatistics(DO) +
+           "\n  DG  " + MomentStatistics(DG) +
+           "\n  DC* " + MomentStatistics(DC) +
+           "\n  DH  " + MomentStatistics(DH) +
+           "\n  DM  " + MomentStatistics(DM) +
+           "\n  DR  " + MomentStatistics(DR);
   }
 
   /**
@@ -363,7 +363,7 @@ class LstmProjected : public MultistreamComponent {
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
 
     // reset context on each sentence if 'sequence_lengths_' not set
     // (happens in 'nnet-forward' or 'single-stream' training),
@@ -473,9 +473,9 @@ class LstmProjected : public MultistreamComponent {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
 
     // the number of sequences to be processed in parallel
     int32 T = in.NumRows() / NumStreams();
@@ -536,17 +536,17 @@ class LstmProjected : public MultistreamComponent {
       d_r.AddMatMat(1.0, DGIFO.RowRange((t+1)*S, S), kNoTrans, w_gifo_r_, kNoTrans, 1.0);
 
       /*
-      //   Version 2 (Alex Graves' PhD dissertation):
-      //   only backprop g(t+1) to r(t)
-      CuSubMatrix<BaseFloat> w_g_r_(w_gifo_r_.RowRange(0, cell_dim_));
-      d_r.AddMatMat(1.0, DG.RowRange((t+1)*S,S), kNoTrans, w_g_r_, kNoTrans, 1.0);
-      */
+         //   Version 2 (Alex Graves' PhD dissertation):
+         //   only backprop g(t+1) to r(t)
+         CuSubMatrix<BaseFloat> w_g_r_(w_gifo_r_.RowRange(0, cell_dim_));
+         d_r.AddMatMat(1.0, DG.RowRange((t+1)*S,S), kNoTrans, w_g_r_, kNoTrans, 1.0);
+       */
 
       /*
-      //   Version 3 (Felix Gers' PhD dissertation):
-      //   truncate gradients of g(t+1), i(t+1), f(t+1), o(t+1) once they leak out memory block
-      //   CEC(with forget connection) is the only "error-bridge" through time
-      */
+         //   Version 3 (Felix Gers' PhD dissertation):
+         //   truncate gradients of g(t+1), i(t+1), f(t+1), o(t+1) once they leak out memory block
+         //   CEC(with forget connection) is the only "error-bridge" through time
+       */
 
       // r -> m
       d_m.AddMatMat(1.0, d_r, kNoTrans, w_r_m_, kNoTrans, 0.0);
@@ -569,7 +569,7 @@ class LstmProjected : public MultistreamComponent {
       d_c.AddMatMatElements(1.0, DC.RowRange((t+1)*S, S), YF.RowRange((t+1)*S,S), 1.0);
       d_c.AddMatDiagVec(1.0, DI.RowRange((t+1)*S, S), kNoTrans, peephole_i_c_, 1.0);
       d_c.AddMatDiagVec(1.0, DF.RowRange((t+1)*S, S), kNoTrans, peephole_f_c_, 1.0);
-      d_c.AddMatDiagVec(1.0, d_o                    , kNoTrans, peephole_o_c_, 1.0);
+      d_c.AddMatDiagVec(1.0, d_o, kNoTrans, peephole_o_c_, 1.0);
       // optionally clip the cell_derivative,
       if (cell_diff_clip_ > 0.0) {
         d_c.ApplyFloor(-cell_diff_clip_);
@@ -630,10 +630,10 @@ class LstmProjected : public MultistreamComponent {
 
     // weight x -> g, i, f, o
     w_gifo_x_corr_.AddMatMat(1.0, DGIFO.RowRange(1*S, T*S), kTrans,
-                                  in                      , kNoTrans, mmt);
+                                  in, kNoTrans, mmt);
     // recurrent weight r -> g, i, f, o
     w_gifo_r_corr_.AddMatMat(1.0, DGIFO.RowRange(1*S, T*S), kTrans,
-                                  YR.RowRange(0*S, T*S)   , kNoTrans, mmt);
+                                  YR.RowRange(0*S, T*S), kNoTrans, mmt);
     // bias of g, i, f, o
     bias_corr_.AddRowSumMat(1.0, DGIFO.RowRange(1*S, T*S), mmt);
 
@@ -652,7 +652,7 @@ class LstmProjected : public MultistreamComponent {
   }
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
 
     // apply the gradient clipping,
     if (clip_gradient_ > 0.0) {
@@ -685,7 +685,7 @@ class LstmProjected : public MultistreamComponent {
     w_r_m_.AddMat(-lr * learn_rate_coef_, w_r_m_corr_);
   }
 
- private:
+private:
   // dims
   int32 cell_dim_;
   int32 proj_dim_;  ///< recurrent projection layer dim
