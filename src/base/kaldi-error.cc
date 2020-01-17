@@ -76,7 +76,7 @@ static std::string Demangle(std::string trace_name) {
 
   // try to locate '(' and '+', take the string in between,
   size_t begin(trace_name.find("(")),
-         end(trace_name.rfind("+"));
+  end(trace_name.rfind("+"));
   if (begin != std::string::npos && end != std::string::npos && begin < end) {
     trace_name = trace_name.substr(begin+1,end-(begin+1));
   }
@@ -138,7 +138,7 @@ static std::string KaldiGetStackTrace() {
 /***** KALDI LOGGING *****/
 
 MessageLogger::MessageLogger(LogMessageEnvelope::Severity severity,
-                             const char *func, const char *file, int32 line) {
+    const char *func, const char *file, int32 line) {
   // Obviously, we assume the strings survive the destruction of this object.
   envelope_.severity = severity;
   envelope_.func = func;
@@ -159,7 +159,7 @@ MessageLogger::~MessageLogger() KALDI_NOEXCEPT(false) {
 
 
 void MessageLogger::HandleMessage(const LogMessageEnvelope &envelope,
-                                  const char *message) {
+    const char *message) {
   // Send to a logging handler if provided.
   if (g_log_handler != NULL) {
     g_log_handler(envelope, message);
@@ -171,20 +171,20 @@ void MessageLogger::HandleMessage(const LogMessageEnvelope &envelope,
       header << "VLOG[" << envelope.severity << "] (";
     } else {
       switch (envelope.severity) {
-        case LogMessageEnvelope::kInfo :
-          header << "LOG (";
-          break;
-        case LogMessageEnvelope::kWarning :
-          header << "WARNING (";
-          break;
-        case LogMessageEnvelope::kError :
-          header << "ERROR (";
-          break;
-        case LogMessageEnvelope::kAssertFailed :
-          header << "ASSERTION_FAILED (";
-          break;
-        default:
-          abort();  // coding error (unknown 'severity'),
+      case LogMessageEnvelope::kInfo:
+        header << "LOG (";
+        break;
+      case LogMessageEnvelope::kWarning:
+        header << "WARNING (";
+        break;
+      case LogMessageEnvelope::kError:
+        header << "ERROR (";
+        break;
+      case LogMessageEnvelope::kAssertFailed:
+        header << "ASSERTION_FAILED (";
+        break;
+      default:
+        abort();    // coding error (unknown 'severity'),
       }
     }
     // fill the other info from the envelope,
@@ -205,22 +205,22 @@ void MessageLogger::HandleMessage(const LogMessageEnvelope &envelope,
 
   // Should we throw exception, or abort?
   switch (envelope.severity) {
-    case LogMessageEnvelope::kAssertFailed:
-      abort(); // ASSERT_FAILED,
-      break;
-    case LogMessageEnvelope::kError:
-      if (!std::uncaught_exception()) {
-        // throw exception with empty message,
-        throw std::runtime_error(""); // KALDI_ERR,
-      } else {
-        // If we got here, this thread has already thrown exception,
-        // and this exception has not yet arrived to its 'catch' clause...
-        // Throwing a new exception would be unsafe!
-        // (can happen during 'stack unwinding', if we have 'KALDI_ERR << msg'
-        // in a destructor of some local object).
-        abort();
-      }
-      break;
+  case LogMessageEnvelope::kAssertFailed:
+    abort();   // ASSERT_FAILED,
+    break;
+  case LogMessageEnvelope::kError:
+    if (!std::uncaught_exception()) {
+      // throw exception with empty message,
+      throw std::runtime_error("");   // KALDI_ERR,
+    } else {
+      // If we got here, this thread has already thrown exception,
+      // and this exception has not yet arrived to its 'catch' clause...
+      // Throwing a new exception would be unsafe!
+      // (can happen during 'stack unwinding', if we have 'KALDI_ERR << msg'
+      // in a destructor of some local object).
+      abort();
+    }
+    break;
   }
 }
 
@@ -228,7 +228,7 @@ void MessageLogger::HandleMessage(const LogMessageEnvelope &envelope,
 /***** KALDI ASSERTS *****/
 
 void KaldiAssertFailure_(const char *func, const char *file,
-                         int32 line, const char *cond_str) {
+    int32 line, const char *cond_str) {
   MessageLogger ml(LogMessageEnvelope::kAssertFailed, func, file, line);
   ml.stream() << ": '" << cond_str << "' ";
 }

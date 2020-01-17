@@ -28,7 +28,7 @@ namespace kaldi {
 namespace unittest {
 
 void RandPosdefSpMatrix(int32 dim, SpMatrix<BaseFloat> *matrix,
-                        TpMatrix<BaseFloat> *matrix_sqrt, BaseFloat *logdet) {
+    TpMatrix<BaseFloat> *matrix_sqrt, BaseFloat *logdet) {
   // generate random (non-singular) matrix
   Matrix<BaseFloat> tmp(dim, dim);
   while (1) {
@@ -50,9 +50,9 @@ void RandPosdefSpMatrix(int32 dim, SpMatrix<BaseFloat> *matrix,
 }
 
 void RandDiagGaussFeatures(int32 num_samples,
-                           const VectorBase<BaseFloat> &mean,
-                           const VectorBase<BaseFloat> &sqrt_var,
-                           MatrixBase<BaseFloat> *feats) {
+    const VectorBase<BaseFloat> &mean,
+    const VectorBase<BaseFloat> &sqrt_var,
+    MatrixBase<BaseFloat> *feats) {
   int32 dim = mean.Dim();
   KALDI_ASSERT(feats != NULL);
   KALDI_ASSERT(feats->NumRows() == num_samples &&
@@ -70,9 +70,9 @@ void RandDiagGaussFeatures(int32 num_samples,
 }
 
 void RandFullGaussFeatures(int32 num_samples,
-                           const VectorBase<BaseFloat> &mean,
-                           const TpMatrix<BaseFloat> &sqrt_var,
-                           MatrixBase<BaseFloat> *feats) {
+    const VectorBase<BaseFloat> &mean,
+    const TpMatrix<BaseFloat> &sqrt_var,
+    MatrixBase<BaseFloat> *feats) {
   int32 dim = mean.Dim();
   KALDI_ASSERT(feats != NULL);
   KALDI_ASSERT(feats->NumRows() == num_samples && feats->NumCols() == dim);

@@ -28,20 +28,20 @@
 namespace kaldi {
 
 class DeterminizeLatticeTask {
- public:
+public:
   // Initializer takes ownership of "lat".
   DeterminizeLatticeTask(
-      fst::DeterminizeLatticePrunedOptions &opts,
-      std::string key,
-      BaseFloat acoustic_scale,
-      BaseFloat beam,
-      bool minimize,
-      Lattice *lat,
-      CompactLatticeWriter *clat_writer,
-      int32 *num_warn):
-      opts_(opts), key_(key), acoustic_scale_(acoustic_scale), beam_(beam),
-      minimize_(minimize), lat_(lat), clat_writer_(clat_writer),
-      num_warn_(num_warn) { }
+    fst::DeterminizeLatticePrunedOptions &opts,
+    std::string key,
+    BaseFloat acoustic_scale,
+    BaseFloat beam,
+    bool minimize,
+    Lattice *lat,
+    CompactLatticeWriter *clat_writer,
+    int32 *num_warn) :
+    opts_(opts), key_(key), acoustic_scale_(acoustic_scale), beam_(beam),
+    minimize_(minimize), lat_(lat), clat_writer_(clat_writer),
+    num_warn_(num_warn) { }
 
   void operator () () {
     Invert(lat_); // to get word labels on the input side.
@@ -50,14 +50,14 @@ class DeterminizeLatticeTask {
     fst::ScaleLattice(fst::AcousticLatticeScale(acoustic_scale_), lat_);
     if (!TopSort(lat_)) {
       KALDI_WARN << "Could not topologically sort lattice: this probably means it"
-          " has bad properties e.g. epsilon cycles.  Your LM or lexicon might "
-          "be broken, e.g. LM with epsilon cycles or lexicon with empty words.";
+        " has bad properties e.g. epsilon cycles.  Your LM or lexicon might "
+        "be broken, e.g. LM with epsilon cycles or lexicon with empty words.";
       (*num_warn_)++;
     }
     fst::ArcSort(lat_, fst::ILabelCompare<LatticeArc>());
     if (!DeterminizeLatticePruned(*lat_, beam_, &det_clat_, opts_)) {
       KALDI_WARN << "For key " << key_ << ", determinization did not succeed"
-          "(partial output will be pruned tighter than the specified beam.)";
+        "(partial output will be pruned tighter than the specified beam.)";
       (*num_warn_)++;
     }
     delete lat_; // This is no longer needed so we can delete it now;
@@ -76,7 +76,7 @@ class DeterminizeLatticeTask {
                   << " for key " << key_;
     clat_writer_->Write(key_, det_clat_);
   }
- private:
+private:
   const fst::DeterminizeLatticePrunedOptions &opts_;
   std::string key_;
   BaseFloat acoustic_scale_;
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
     typedef kaldi::int32 int32;
-    
+
     const char *usage =
         "Determinize lattices, keeping only the best path (sequence of acoustic states)\n"
         "for each input-symbol sequence.  This is a version of lattice-determnize-pruned\n"
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
         "\n"
         "Usage: lattice-determinize-pruned-parallel [options] lattice-rspecifier lattice-wspecifier\n"
         " e.g.: lattice-determinize-pruned-parallel --acoustic-scale=0.1 --beam=6.0 ark:in.lats ark:det.lats\n";
-    
+
     ParseOptions po(usage);
     BaseFloat acoustic_scale = 1.0;
     BaseFloat beam = 10.0;
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
     // being more part of "fst world", so we register its elements independently.
     determinize_config.max_mem = 50000000;
     determinize_config.max_loop = 0; // was 500000;
-    
+
     po.Register("acoustic-scale", &acoustic_scale,
                 "Scaling factor for acoustic likelihoods");
     po.Register("beam", &beam, "Pruning beam [applied after acoustic scaling].");
@@ -140,11 +140,11 @@ int main(int argc, char *argv[]) {
     // Read as regular lattice-- this is the form the determinization code
     // accepts.
     SequentialLatticeReader lat_reader(lats_rspecifier);
-    
+
     // Write as compact lattice.
-    CompactLatticeWriter compact_lat_writer(lats_wspecifier); 
+    CompactLatticeWriter compact_lat_writer(lats_wspecifier);
     TaskSequencer<DeterminizeLatticeTask> sequencer(sequencer_config);
-    
+
     int32 n_done = 0, n_warn = 0;
 
     if (acoustic_scale == 0.0)
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
 
       Lattice *lat = lat_reader.Value().Copy(); // will give ownership to "task"
                                                 // below
-      
+
       KALDI_VLOG(2) << "Processing lattice " << key;
 
       DeterminizeLatticeTask *task = new DeterminizeLatticeTask(

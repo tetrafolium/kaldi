@@ -37,7 +37,7 @@ namespace cu {
 /// stopped, we zero the gradient.  (Dan: not sure why).
 template<typename Real>
 void RegularizeL1(CuMatrixBase<Real> *weight, CuMatrixBase<Real> *gradient,
-                  Real l1_penalty, Real learning_rate);
+    Real l1_penalty, Real learning_rate);
 
 /// Copies a permutation of src into tgt. The row permutation is specified in
 /// copy_from_idx such that src.Row(copy_from_idx[r]) == tgt.Row(r). The
@@ -45,8 +45,8 @@ void RegularizeL1(CuMatrixBase<Real> *weight, CuMatrixBase<Real> *gradient,
 /// tgt and src and all elements in the vector must be in [0, src.numRows()-1].
 template<typename Real>
 void Randomize(const CuMatrixBase<Real> &src,
-               const CuArray<int32> &copy_from_idx,
-               CuMatrixBase<Real> *tgt);
+    const CuArray<int32> &copy_from_idx,
+    CuMatrixBase<Real> *tgt);
 
 /// Splice concatenates frames of src as specified in frame_offsets into tgt.
 /// The dimensions of tgt must be equivalent to the number of rows in src
@@ -60,8 +60,8 @@ void Randomize(const CuMatrixBase<Real> &src,
 /// an index out of bounds.
 template<typename Real>
 void Splice(const CuMatrixBase<Real> &src,
-            const CuArray<int32> &frame_offsets,
-            CuMatrixBase<Real> *tgt);
+    const CuArray<int32> &frame_offsets,
+    CuMatrixBase<Real> *tgt);
 
 /// Copies elements from src into tgt as given by copy_from_indices.
 /// The matrices src and tgt must have the same dimensions and
@@ -70,31 +70,31 @@ void Splice(const CuMatrixBase<Real> &src,
 /// Also see CuMatrix::CopyCols(), which is more general.
 template<typename Real>
 void Copy(const CuMatrixBase<Real> &src,
-          const CuArray<int32> &copy_from_indices,
-          CuMatrixBase<Real> *tgt);
+    const CuArray<int32> &copy_from_indices,
+    CuMatrixBase<Real> *tgt);
 
 template <typename Real>
 void Group2norm(const CuMatrixBase<Real> &src,
-                CuMatrixBase<Real> *dest,
-                int32 group_stride);
+    CuMatrixBase<Real> *dest,
+    int32 group_stride);
 
 /**
- this is a special-purpose function used by class LstmNonlinearityComponent,
- to do its forward propagation.  It computes the core part of the LSTM nonlinearity.
- Refer to class LstmNonlinearityComponent in ../nnet3/nnet-simple-component.h
- for more context.
+   this is a special-purpose function used by class LstmNonlinearityComponent,
+   to do its forward propagation.  It computes the core part of the LSTM nonlinearity.
+   Refer to class LstmNonlinearityComponent in ../nnet3/nnet-simple-component.h
+   for more context.
 
- @param [in]  input  A matrix, of dimension N by 5C (i.e. its num-cols must be
+   @param [in]  input  A matrix, of dimension N by 5C (i.e. its num-cols must be
                      a multiple of 5).  The column-space is interpreted as 5
                      consecutive blocks, each of dimension C, which we name:
                      (i_part, f_part, c_part, o_part, c_{t-1}).
                      This function will also accept input of dimension N by 5C + 3,
                      and the three final elements will be used as scaling factors
                      on i_t, f_t and o_t (useful as per-frame dropout masks).
- @param [in] params  A matrix, of dimension 3 by C, with rows containing the three
+   @param [in] params  A matrix, of dimension 3 by C, with rows containing the three
                      diagonal parameter matrices used in LSTMs, namely
                      w_{ic}, w_{fc} and w_{oc}.
- @param [out] output A matrix, of dimension N by 2C.  The quantities c_t and m_t
+   @param [out] output A matrix, of dimension N by 2C.  The quantities c_t and m_t
                      respectively are put there (in two blocks of column-dimension C),
                      according to the following equations:
 
@@ -115,14 +115,14 @@ void Group2norm(const CuMatrixBase<Real> &src,
  */
 template<typename Real>
 void ComputeLstmNonlinearity(const CuMatrixBase<Real> &input,
-                             const CuMatrixBase<Real> &params,
-                             CuMatrixBase<Real> *output);
+    const CuMatrixBase<Real> &params,
+    CuMatrixBase<Real> *output);
 // This is a version of ComputeLstmNonlinearity that only uses the CPU
 // even if a GPU is available. It's made available for testing purposes.
 template<typename Real>
 void CpuComputeLstmNonlinearity(const MatrixBase<Real> &input,
-                                const MatrixBase<Real> &params,
-                                MatrixBase<Real> *output);
+    const MatrixBase<Real> &params,
+    MatrixBase<Real> *output);
 
 
 /**
@@ -139,7 +139,7 @@ void CpuComputeLstmNonlinearity(const MatrixBase<Real> &input,
    forward pass before it actually does the backprop.
 
 
- @param [in]  input  The same as in ComputeLstmNonlinearity().
+   @param [in]  input  The same as in ComputeLstmNonlinearity().
                      A matrix, of dimension N by 5C (i.e. its num-cols must be
                      a multiple of 5).  The column-space is interpreted as 5
                      consecutive blocks, each of dimension C, which we name:
@@ -147,15 +147,15 @@ void CpuComputeLstmNonlinearity(const MatrixBase<Real> &input,
                      This function will also accept input of dimension N by 5C + 3,
                      and the three final elements will be interpreted as scaling factors
                      on i_t, f_t and o_t (useful as per-frame dropout masks).
- @param [in] params  The same as in ComputeLstmNonlinearity().
+   @param [in] params  The same as in ComputeLstmNonlinearity().
                      A matrix, of dimension 3 by C, with rows containing the three
                      diagonal parameter matrices used in LSTMs, namely
                      w_{ic}, w_{fc} and w_{oc}.
- @param [in] output_deriv
+   @param [in] output_deriv
                      A matrix, of dimension N by 2C, containing the derivative of the
                      objective function we're backpropagating, w.r.t. the quantities
                      c_t and m_t (in two blocks of column-dimension C).
- @param [in] deriv_sum_in
+   @param [in] deriv_sum_in
                      This is used in the self-repair code to identify oversaturated
                      nonlinearities.  It is a matrix, of dimension 5 by C, corresponding
                      to the totals of the derivatives of the 5 sigmoid and tanh
@@ -164,17 +164,17 @@ void CpuComputeLstmNonlinearity(const MatrixBase<Real> &input,
                      they appear in the equations for (i_t, f_t, c_t, o_t, m_t).
                      This will be divided by 'count_in' to get the average derivative
                      value so far, for each of the nonlinearities.
- @param [in] self_repair_config
+   @param [in] self_repair_config
                      A vector of dimension 10, containing the configuration of the self-repair
                      to be used for the 5 nonlinearities.  The first 5 elements are the
                      self_repair_lower_threshold values (typically 0.05 for sigmoid and 0.2
                      for tanh), and the next 5 elements are the corresponding
                      self-repair-scales (typically 10^-5).
- @param [in] count_in  The data-count that corresponds to the stats in 'deriv_sum_in'
+   @param [in] count_in  The data-count that corresponds to the stats in 'deriv_sum_in'
                      at entry to the function.  This function should tolerate the count
                      being zero (in that case, it is free to do the self-repair or not,
                      as this should only happen on the 1st minibatch of each training job).
- @param [out] input_deriv
+   @param [out] input_deriv
                      May be NULL; if not, this function writes, to this
                      location, the backpropagated derivative of the objective
                      function w.r.t. the 'input' matrix.  This matrix should
@@ -185,19 +185,19 @@ void CpuComputeLstmNonlinearity(const MatrixBase<Real> &input,
                      masks), the derivatives w.r.t. the dropout masks will not
                      be set; they will retain their value prior to this
                      function call.
- @param [out] params_deriv
+   @param [out] params_deriv
                      May be NULL; if not, this is where this function *writes*
                      [not adds] the backpropagated derivative of the objective
                      function w.r.t. 'params'; it should have the same dimension
                      as 'params' (3 by C).  (This matrix will then be processed
                      by the natural gradient code and added to the appropriate
                      copy of the parameter matrix, outside this function).
- @param [out] value_sum_out
+   @param [out] value_sum_out
                      Must be NULL if params_deriv is NULL; if not, a matrix of
                      dimension 5 by C.  This function *adds* to this location
                      the total value of each of the sigmoid/tanh nonlinearities
                      that it computes (this is for diagnostic purposes).
- @param [out] deriv_sum_out
+   @param [out] deriv_sum_out
                      Must be NULL if params_deriv is NULL; if not, a matrix of
                      dimension 5 by C; this function *adds* to this location the
                      total of the derivative of each of the sigmoid/tanh
@@ -205,41 +205,41 @@ void CpuComputeLstmNonlinearity(const MatrixBase<Real> &input,
                      purposes and to control the self-repair).  This function
                      should tolerate the case when 'deriv_sum_out' points to the
                      same data as 'deriv_sum_in'.
- @param [out] self_repair_sum_out
+   @param [out] self_repair_sum_out
                      Must be NULL if params_deriv is NULL; if not, a matrix of
                      dimension 5 by C; this function *writes* to this location
                      the sum of the number of times the self-repair code was
                      activated (integer values 0 <= k <= N).  This will be
                      processed outside this function into self-repair stats for
                      diagnostics.
-*/
+ */
 
 template<typename Real>
 void BackpropLstmNonlinearity(const CuMatrixBase<Real> &input,
-                              const CuMatrixBase<Real> &params,
-                              const CuMatrixBase<Real> &output_deriv,
-                              const CuMatrixBase<double> &deriv_sum_in,
-                              const CuVectorBase<Real> &self_repair_config,
-                              double count_in,
-                              CuMatrixBase<Real> *input_deriv,
-                              CuMatrixBase<Real> *params_deriv,
-                              CuMatrixBase<double> *value_sum_out,
-                              CuMatrixBase<double> *deriv_sum_out,
-                              CuMatrixBase<Real> *self_repair_sum_out);
+    const CuMatrixBase<Real> &params,
+    const CuMatrixBase<Real> &output_deriv,
+    const CuMatrixBase<double> &deriv_sum_in,
+    const CuVectorBase<Real> &self_repair_config,
+    double count_in,
+    CuMatrixBase<Real> *input_deriv,
+    CuMatrixBase<Real> *params_deriv,
+    CuMatrixBase<double> *value_sum_out,
+    CuMatrixBase<double> *deriv_sum_out,
+    CuMatrixBase<Real> *self_repair_sum_out);
 // This is a version of BackpropLstmNonlinearity that only uses the CPU
 // even if a GPU is available. It's made available for testing purposes.
 template<typename Real>
 void CpuBackpropLstmNonlinearity(const MatrixBase<Real> &input,
-                                 const MatrixBase<Real> &params,
-                                 const MatrixBase<Real> &output_deriv,
-                                 const MatrixBase<double> &deriv_sum_in,
-                                 const VectorBase<Real> &self_repair_config,
-                                 double count_in,
-                                 MatrixBase<Real> *input_deriv,
-                                 MatrixBase<Real> *params_deriv,
-                                 MatrixBase<double> *value_sum_out,
-                                 MatrixBase<double> *deriv_sum_out,
-                                 MatrixBase<Real> *self_repair_sum_out);
+    const MatrixBase<Real> &params,
+    const MatrixBase<Real> &output_deriv,
+    const MatrixBase<double> &deriv_sum_in,
+    const VectorBase<Real> &self_repair_config,
+    double count_in,
+    MatrixBase<Real> *input_deriv,
+    MatrixBase<Real> *params_deriv,
+    MatrixBase<double> *value_sum_out,
+    MatrixBase<double> *deriv_sum_out,
+    MatrixBase<Real> *self_repair_sum_out);
 
 /// Normalize nonlinearity modifies the vector of activations
 /// by scaling it so that the root-mean-square equals 1.0.
@@ -255,7 +255,7 @@ void CpuBackpropLstmNonlinearity(const MatrixBase<Real> &input,
 /// is an extra dimension of the output.
 template<typename Real>
 void NormalizePerRow(const CuMatrixBase<Real>& in, const Real target_rms,
-                     const bool add_log_stddev, CuMatrixBase<Real>* out);
+    const bool add_log_stddev, CuMatrixBase<Real>* out);
 
 // A note on the derivative of NormalizeComponent...
 // let both row_in and row_out be vectors of dimension D.
@@ -279,9 +279,9 @@ void NormalizePerRow(const CuMatrixBase<Real>& in, const Real target_rms,
 // dF/dx_i = dF/df . df/dx_i => df/dx_i = x_i/(x^T x)
 template<typename Real>
 void DiffNormalizePerRow(const CuMatrixBase<Real> &in_value,
-                         const CuMatrixBase<Real> &out_deriv,
-                         const Real target_rms, const bool add_log_stddev,
-                         CuMatrixBase<Real>* in_deriv);
+    const CuMatrixBase<Real> &out_deriv,
+    const Real target_rms, const bool add_log_stddev,
+    CuMatrixBase<Real>* in_deriv);
 
 
 } // namespace cu

@@ -28,23 +28,23 @@ namespace kaldi {
 namespace nnet3 {
 
 
-TimeHeightConvolutionComponent::TimeHeightConvolutionComponent():
-    use_natural_gradient_(true),
-    num_minibatches_history_(4.0) { }
+TimeHeightConvolutionComponent::TimeHeightConvolutionComponent() :
+  use_natural_gradient_(true),
+  num_minibatches_history_(4.0) { }
 
 TimeHeightConvolutionComponent::TimeHeightConvolutionComponent(
-    const TimeHeightConvolutionComponent &other):
-    UpdatableComponent(other),  // initialize base-class
-    model_(other.model_),
-    all_time_offsets_(other.all_time_offsets_),
-    time_offset_required_(other.time_offset_required_),
-    linear_params_(other.linear_params_),
-    bias_params_(other.bias_params_),
-    max_memory_mb_(other.max_memory_mb_),
-    use_natural_gradient_(other.use_natural_gradient_),
-    num_minibatches_history_(other.num_minibatches_history_),
-    preconditioner_in_(other.preconditioner_in_),
-    preconditioner_out_(other.preconditioner_out_) {
+  const TimeHeightConvolutionComponent &other) :
+  UpdatableComponent(other),    // initialize base-class
+  model_(other.model_),
+  all_time_offsets_(other.all_time_offsets_),
+  time_offset_required_(other.time_offset_required_),
+  linear_params_(other.linear_params_),
+  bias_params_(other.bias_params_),
+  max_memory_mb_(other.max_memory_mb_),
+  use_natural_gradient_(other.use_natural_gradient_),
+  num_minibatches_history_(other.num_minibatches_history_),
+  preconditioner_in_(other.preconditioner_in_),
+  preconditioner_out_(other.preconditioner_out_) {
   Check();
 }
 
@@ -106,8 +106,8 @@ void TimeHeightConvolutionComponent::InitUnit() {
               << "not have the offset (0, 0).";
 
   CuSubMatrix<BaseFloat> zero_offset_block(
-      linear_params_, 0, linear_params_.NumRows(),
-      zero_offset * model_.num_filters_in, model_.num_filters_in);
+    linear_params_, 0, linear_params_.NumRows(),
+    zero_offset * model_.num_filters_in, model_.num_filters_in);
 
   KALDI_ASSERT(zero_offset_block.NumRows() == zero_offset_block.NumCols());
   zero_offset_block.AddToDiag(1.0);  // set this block to the unit matrix.
@@ -130,8 +130,8 @@ void TimeHeightConvolutionComponent::InitFromConfig(ConfigLine *cfl) {
       cfl->GetValue("time-offsets", &time_offsets);
   if (!ok) {
     KALDI_ERR << "Bad initializer: expected all the values "
-        "num-filters-in, num-filters-out, height-in, height-out, "
-        "height-offsets, time-offsets to be defined: "
+      "num-filters-in, num-filters-out, height-in, height-out, "
+      "height-offsets, time-offsets to be defined: "
               << cfl->WholeLine();
   }
   // some optional structural configs.
@@ -153,7 +153,7 @@ void TimeHeightConvolutionComponent::InitFromConfig(ConfigLine *cfl) {
     if (height_offsets_vec.empty() || !IsSortedAndUniq(height_offsets_vec) ||
         time_offsets_vec.empty() || !IsSortedAndUniq(time_offsets_vec)) {
       KALDI_ERR << "Options time-offsets and height-offsets must be nonempty, "
-          "sorted and unique.";
+        "sorted and unique.";
     }
     if (required_time_offsets == "undef") {
       required_time_offsets_vec = time_offsets_vec;
@@ -162,8 +162,8 @@ void TimeHeightConvolutionComponent::InitFromConfig(ConfigLine *cfl) {
                                  &required_time_offsets_vec) ||
           required_time_offsets_vec.empty() ||
           !IsSortedAndUniq(required_time_offsets_vec)) {
-      KALDI_ERR << "Formatting problem in required-time-offsets: "
-                << cfl->WholeLine();
+        KALDI_ERR << "Formatting problem in required-time-offsets: "
+                  << cfl->WholeLine();
       }
     }
     model_.offsets.clear();
@@ -188,8 +188,8 @@ void TimeHeightConvolutionComponent::InitFromConfig(ConfigLine *cfl) {
   }
   if (!model_.Check(true, true)) {
     KALDI_WARN << "There are input heights unused in "
-        "TimeHeightConvolutionComponent; consider increasing output "
-        "height or decreasing height of preceding layer."
+      "TimeHeightConvolutionComponent; consider increasing output "
+      "height or decreasing height of preceding layer."
                << cfl->WholeLine();
   }
 
@@ -256,9 +256,9 @@ void TimeHeightConvolutionComponent::InitFromConfig(ConfigLine *cfl) {
 }
 
 void* TimeHeightConvolutionComponent::Propagate(
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in,
-    CuMatrixBase<BaseFloat> *out) const {
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *out) const {
   const PrecomputedIndexes *indexes =
       dynamic_cast<const PrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL);
@@ -266,8 +266,8 @@ void* TimeHeightConvolutionComponent::Propagate(
     KALDI_ASSERT(out->Stride() == out->NumCols() &&
                  out->NumCols() == model_.height_out * model_.num_filters_out);
     CuSubMatrix<BaseFloat> out_reshaped(
-        out->Data(), out->NumRows() * model_.height_out,
-        model_.num_filters_out, model_.num_filters_out);
+      out->Data(), out->NumRows() * model_.height_out,
+      model_.num_filters_out, model_.num_filters_out);
     out_reshaped.CopyRowsFromVec(bias_params_);
   }
   ConvolveForward(indexes->computation, in, linear_params_, out);
@@ -275,14 +275,14 @@ void* TimeHeightConvolutionComponent::Propagate(
 }
 
 void TimeHeightConvolutionComponent::Backprop(
-    const std::string &debug_info,
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &, // out_value
-    const CuMatrixBase<BaseFloat> &out_deriv,
-    void*, // memo
-    Component *to_update_in,
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const std::string &debug_info,
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &,   // out_value
+  const CuMatrixBase<BaseFloat> &out_deriv,
+  void*,   // memo
+  Component *to_update_in,
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   const PrecomputedIndexes *indexes =
       dynamic_cast<const PrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL);
@@ -307,17 +307,17 @@ void TimeHeightConvolutionComponent::Backprop(
 }
 
 void TimeHeightConvolutionComponent::UpdateSimple(
-    const PrecomputedIndexes &indexes,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &out_deriv) {
+  const PrecomputedIndexes &indexes,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &out_deriv) {
 
   { // this block handles the bias term.
     KALDI_ASSERT(out_deriv.Stride() == out_deriv.NumCols() &&
                  out_deriv.NumCols() ==
                  model_.height_out * model_.num_filters_out);
     CuSubMatrix<BaseFloat> out_deriv_reshaped(
-        out_deriv.Data(), out_deriv.NumRows() * model_.height_out,
-        model_.num_filters_out, model_.num_filters_out);
+      out_deriv.Data(), out_deriv.NumRows() * model_.height_out,
+      model_.num_filters_out, model_.num_filters_out);
     bias_params_.AddRowSumMat(learning_rate_, out_deriv_reshaped);
   }
 
@@ -327,9 +327,9 @@ void TimeHeightConvolutionComponent::UpdateSimple(
 
 
 void TimeHeightConvolutionComponent::UpdateNaturalGradient(
-    const PrecomputedIndexes &indexes,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &out_deriv) {
+  const PrecomputedIndexes &indexes,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &out_deriv) {
 
   CuVector<BaseFloat> bias_temp(bias_params_.Dim());
 
@@ -338,19 +338,19 @@ void TimeHeightConvolutionComponent::UpdateNaturalGradient(
                  out_deriv.NumCols() ==
                  model_.height_out * model_.num_filters_out);
     CuSubMatrix<BaseFloat> out_deriv_reshaped(
-        out_deriv.Data(), out_deriv.NumRows() * model_.height_out,
-        model_.num_filters_out, model_.num_filters_out);
+      out_deriv.Data(), out_deriv.NumRows() * model_.height_out,
+      model_.num_filters_out, model_.num_filters_out);
     bias_temp.AddRowSumMat(1.0, out_deriv_reshaped);
   }
 
   CuMatrix<BaseFloat> params_temp(linear_params_.NumRows(),
-                                  linear_params_.NumCols() + 1);
+      linear_params_.NumCols() + 1);
   params_temp.CopyColFromVec(bias_temp, linear_params_.NumCols());
 
 
   CuSubMatrix<BaseFloat> linear_params_temp(
-      params_temp, 0, linear_params_.NumRows(),
-      0, linear_params_.NumCols());
+    params_temp, 0, linear_params_.NumRows(),
+    0, linear_params_.NumCols());
 
   ConvolveBackwardParams(indexes.computation, in_value, out_deriv,
                          1.0, &linear_params_temp);
@@ -384,8 +384,8 @@ void TimeHeightConvolutionComponent::UpdateNaturalGradient(
 
 
 void TimeHeightConvolutionComponent::ReorderIndexes(
-    std::vector<Index> *input_indexes,
-    std::vector<Index> *output_indexes) const {
+  std::vector<Index> *input_indexes,
+  std::vector<Index> *output_indexes) const {
   using namespace time_height_convolution;
   ConvolutionComputationOptions opts;
   opts.max_memory_mb = max_memory_mb_;
@@ -483,9 +483,9 @@ void TimeHeightConvolutionComponent::ComputeDerived() {
 }
 
 void TimeHeightConvolutionComponent::GetInputIndexes(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    std::vector<Index> *desired_indexes) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  std::vector<Index> *desired_indexes) const {
   KALDI_ASSERT(output_index.t != kNoTime);
   size_t size = all_time_offsets_.size();
   desired_indexes->resize(size);
@@ -498,10 +498,10 @@ void TimeHeightConvolutionComponent::GetInputIndexes(
 
 
 bool TimeHeightConvolutionComponent::IsComputable(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    const IndexSet &input_index_set,
-    std::vector<Index> *used_inputs) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  const IndexSet &input_index_set,
+  std::vector<Index> *used_inputs) const {
   KALDI_ASSERT(output_index.t != kNoTime);
   size_t size = all_time_offsets_.size();
   Index index(output_index);
@@ -539,10 +539,10 @@ bool TimeHeightConvolutionComponent::IsComputable(
 
 
 ComponentPrecomputedIndexes* TimeHeightConvolutionComponent::PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const {
+  const MiscComputationInfo &misc_info,
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  bool need_backprop) const {
   using namespace time_height_convolution;
   ConvolutionComputationOptions opts;
   opts.max_memory_mb = max_memory_mb_;
@@ -570,7 +570,7 @@ void TimeHeightConvolutionComponent::Scale(BaseFloat scale) {
 }
 
 void TimeHeightConvolutionComponent::Add(BaseFloat alpha,
-                                         const Component &other_in) {
+    const Component &other_in) {
   const TimeHeightConvolutionComponent *other =
       dynamic_cast<const TimeHeightConvolutionComponent*>(&other_in);
   KALDI_ASSERT(other != NULL);
@@ -580,7 +580,7 @@ void TimeHeightConvolutionComponent::Add(BaseFloat alpha,
 
 void TimeHeightConvolutionComponent::PerturbParams(BaseFloat stddev) {
   CuMatrix<BaseFloat> temp_mat(linear_params_.NumRows(),
-                               linear_params_.NumCols(), kUndefined);
+      linear_params_.NumCols(), kUndefined);
   temp_mat.SetRandn();
   linear_params_.AddMat(stddev, temp_mat);
   CuVector<BaseFloat> temp_vec(bias_params_.Dim(), kUndefined);
@@ -589,21 +589,21 @@ void TimeHeightConvolutionComponent::PerturbParams(BaseFloat stddev) {
 }
 
 BaseFloat TimeHeightConvolutionComponent::DotProduct(
-    const UpdatableComponent &other_in) const {
+  const UpdatableComponent &other_in) const {
   const TimeHeightConvolutionComponent *other =
       dynamic_cast<const TimeHeightConvolutionComponent*>(&other_in);
   KALDI_ASSERT(other != NULL);
   return TraceMatMat(linear_params_, other->linear_params_, kTrans) +
-      VecVec(bias_params_, other->bias_params_);
+         VecVec(bias_params_, other->bias_params_);
 }
 
 int32 TimeHeightConvolutionComponent::NumParameters() const {
   return linear_params_.NumRows() * linear_params_.NumCols() +
-      bias_params_.Dim();
+         bias_params_.Dim();
 }
 
 void TimeHeightConvolutionComponent::Vectorize(
-    VectorBase<BaseFloat> *params) const {
+  VectorBase<BaseFloat> *params) const {
   KALDI_ASSERT(params->Dim() == NumParameters());
   int32 linear_size = linear_params_.NumRows() * linear_params_.NumCols(),
       bias_size = bias_params_.Dim();
@@ -612,7 +612,7 @@ void TimeHeightConvolutionComponent::Vectorize(
 }
 
 void TimeHeightConvolutionComponent::UnVectorize(
-    const VectorBase<BaseFloat> &params) {
+  const VectorBase<BaseFloat> &params) {
   KALDI_ASSERT(params.Dim() == NumParameters());
   int32 linear_size = linear_params_.NumRows() * linear_params_.NumCols(),
       bias_size = bias_params_.Dim();
@@ -631,7 +631,7 @@ TimeHeightConvolutionComponent::PrecomputedIndexes::Copy() const {
 }
 
 void TimeHeightConvolutionComponent::PrecomputedIndexes::Write(
-    std::ostream &os, bool binary) const {
+  std::ostream &os, bool binary) const {
   WriteToken(os, binary, "<TimeHeightConvolutionComponentPrecomputedIndexes>");
   WriteToken(os, binary, "<Computation>");
   computation.Write(os, binary);
@@ -639,7 +639,7 @@ void TimeHeightConvolutionComponent::PrecomputedIndexes::Write(
 }
 
 void TimeHeightConvolutionComponent::PrecomputedIndexes::Read(
-    std::istream &is, bool binary) {
+  std::istream &is, bool binary) {
   ExpectOneOrTwoTokens(is, binary,
                        "<TimeHeightConvolutionComponentPrecomputedIndexes>",
                        "<Computation>");

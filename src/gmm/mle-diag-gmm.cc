@@ -86,9 +86,9 @@ void AccumDiagGmm::Write(std::ostream &out_stream, bool binary) const {
   // convert into BaseFloat before writing things
   Vector<BaseFloat> occupancy_bf(occupancy_.Dim());
   Matrix<BaseFloat> mean_accumulator_bf(mean_accumulator_.NumRows(),
-                                        mean_accumulator_.NumCols());
+      mean_accumulator_.NumCols());
   Matrix<BaseFloat> variance_accumulator_bf(variance_accumulator_.NumRows(),
-                                            variance_accumulator_.NumCols());
+      variance_accumulator_.NumCols());
   occupancy_bf.CopyFromVec(occupancy_);
   mean_accumulator_bf.CopyFromMat(mean_accumulator_);
   variance_accumulator_bf.CopyFromMat(variance_accumulator_);
@@ -138,7 +138,7 @@ void AccumDiagGmm::Scale(BaseFloat f, GmmFlagsType flags) {
 }
 
 void AccumDiagGmm::AccumulateForComponent(const VectorBase<BaseFloat> &data,
-                                          int32 comp_index, BaseFloat weight) {
+    int32 comp_index, BaseFloat weight) {
   if (flags_ & kGmmMeans)
     KALDI_ASSERT(data.Dim() == Dim());
   double wt = static_cast<double>(weight);
@@ -156,9 +156,9 @@ void AccumDiagGmm::AccumulateForComponent(const VectorBase<BaseFloat> &data,
 }
 
 void AccumDiagGmm::AddStatsForComponent(int32 g,
-                                        double occ,
-                                        const VectorBase<double> &x_stats,
-                                        const VectorBase<double> &x2_stats) {
+    double occ,
+    const VectorBase<double> &x_stats,
+    const VectorBase<double> &x2_stats) {
   KALDI_ASSERT(g < NumGauss());
   occupancy_(g) += occ;
   if (flags_ & kGmmMeans)
@@ -169,8 +169,8 @@ void AccumDiagGmm::AddStatsForComponent(int32 g,
 
 
 void AccumDiagGmm::AccumulateFromPosteriors(
-    const VectorBase<BaseFloat> &data,
-    const VectorBase<BaseFloat> &posteriors) {
+  const VectorBase<BaseFloat> &data,
+  const VectorBase<BaseFloat> &posteriors) {
   if (flags_ & kGmmMeans)
     KALDI_ASSERT(static_cast<int32>(data.Dim()) == Dim());
   KALDI_ASSERT(static_cast<int32>(posteriors.Dim()) == NumGauss());
@@ -189,8 +189,8 @@ void AccumDiagGmm::AccumulateFromPosteriors(
 }
 
 BaseFloat AccumDiagGmm::AccumulateFromDiag(const DiagGmm &gmm,
-                                           const VectorBase<BaseFloat> &data,
-                                           BaseFloat frame_posterior) {
+    const VectorBase<BaseFloat> &data,
+    BaseFloat frame_posterior) {
   KALDI_ASSERT(gmm.NumGauss() == NumGauss());
   KALDI_ASSERT(gmm.Dim() == Dim());
   KALDI_ASSERT(static_cast<int32>(data.Dim()) == Dim());
@@ -253,13 +253,13 @@ void AccumDiagGmm::SmoothWithModel(BaseFloat tau, const DiagGmm &gmm) {
 }
 
 AccumDiagGmm::AccumDiagGmm(const AccumDiagGmm &other)
-    : dim_(other.dim_), num_comp_(other.num_comp_),
-      flags_(other.flags_), occupancy_(other.occupancy_),
-      mean_accumulator_(other.mean_accumulator_),
-      variance_accumulator_(other.variance_accumulator_) {}
+  : dim_(other.dim_), num_comp_(other.num_comp_),
+  flags_(other.flags_), occupancy_(other.occupancy_),
+  mean_accumulator_(other.mean_accumulator_),
+  variance_accumulator_(other.variance_accumulator_) {}
 
 BaseFloat MlObjective(const DiagGmm &gmm,
-                      const AccumDiagGmm &diag_gmm_acc) {
+    const AccumDiagGmm &diag_gmm_acc) {
   GmmFlagsType acc_flags = diag_gmm_acc.Flags();
   Vector<BaseFloat> occ_bf(diag_gmm_acc.occupancy());
   Matrix<BaseFloat> mean_accs_bf(diag_gmm_acc.mean_accumulator());
@@ -273,14 +273,14 @@ BaseFloat MlObjective(const DiagGmm &gmm,
 }
 
 void MleDiagGmmUpdate(const MleDiagGmmOptions &config,
-                      const AccumDiagGmm &diag_gmm_acc,
-                      GmmFlagsType flags,
-                      DiagGmm *gmm,
-                      BaseFloat *obj_change_out,
-                      BaseFloat *count_out,
-                      int32 *floored_elements_out,
-                      int32 *floored_gaussians_out,
-                      int32 *removed_gaussians_out) {
+    const AccumDiagGmm &diag_gmm_acc,
+    GmmFlagsType flags,
+    DiagGmm *gmm,
+    BaseFloat *obj_change_out,
+    BaseFloat *count_out,
+    int32 *floored_elements_out,
+    int32 *floored_gaussians_out,
+    int32 *removed_gaussians_out) {
   KALDI_ASSERT(gmm != NULL);
 
   if (flags & ~diag_gmm_acc.Flags())
@@ -364,8 +364,8 @@ void MleDiagGmmUpdate(const MleDiagGmmOptions &config,
       } else {
         KALDI_WARN << "Gaussian has too little data but not removing it because"
                    << (config.remove_low_count_gaussians ?
-                       " it is the last Gaussian: i = "
-                       : " remove-low-count-gaussians == false: g = ") << i
+        " it is the last Gaussian: i = "
+        : " remove-low-count-gaussians == false: g = ") << i
                    << ", occ = " << diag_gmm_acc.occupancy()(i) << ", weight = " << prob;
         ngmm.weights_(i) =
             std::max(prob, static_cast<double>(config.min_gaussian_weight));
@@ -408,11 +408,11 @@ void AccumDiagGmm::Add(double scale, const AccumDiagGmm &acc) {
 
 
 void MapDiagGmmUpdate(const MapDiagGmmOptions &config,
-                      const AccumDiagGmm &diag_gmm_acc,
-                      GmmFlagsType flags,
-                      DiagGmm *gmm,
-                      BaseFloat *obj_change_out,
-                      BaseFloat *count_out) {
+    const AccumDiagGmm &diag_gmm_acc,
+    GmmFlagsType flags,
+    DiagGmm *gmm,
+    BaseFloat *obj_change_out,
+    BaseFloat *count_out) {
   KALDI_ASSERT(gmm != NULL);
 
   if (flags & ~diag_gmm_acc.Flags())
@@ -459,7 +459,7 @@ void MapDiagGmmUpdate(const MapDiagGmmOptions &config,
       var.Scale(1.0 / occ);
       var.AddVec2(1.0, ngmm.means_.Row(i));
       SubVector<double> mean_acc(diag_gmm_acc.mean_accumulator(), i),
-          mean(ngmm.means_, i);
+      mean(ngmm.means_, i);
       var.AddVecVec(-2.0 / occ, mean_acc, mean, 1.0);
       // now var is E(x^2) + m^2 - 2 mu E(x).
       // Next we do the appropriate weighting usnig the tau value.
@@ -484,16 +484,16 @@ void MapDiagGmmUpdate(const MapDiagGmmOptions &config,
 
 
 class AccumulateMultiThreadedClass: public MultiThreadable {
- public:
+public:
   AccumulateMultiThreadedClass(const DiagGmm &diag_gmm,
-                               const MatrixBase<BaseFloat> &data,
-                               const VectorBase<BaseFloat> &frame_weights,
-                               AccumDiagGmm *accum,
-                               double *tot_like):
-      diag_gmm_(diag_gmm), data_(data),
-      frame_weights_(frame_weights), dest_accum_(accum),
-      tot_like_ptr_(tot_like), tot_like_(0.0) { }
-  AccumulateMultiThreadedClass(const AccumulateMultiThreadedClass &other):
+      const MatrixBase<BaseFloat> &data,
+      const VectorBase<BaseFloat> &frame_weights,
+      AccumDiagGmm *accum,
+      double *tot_like) :
+    diag_gmm_(diag_gmm), data_(data),
+    frame_weights_(frame_weights), dest_accum_(accum),
+    tot_like_ptr_(tot_like), tot_like_(0.0) { }
+  AccumulateMultiThreadedClass(const AccumulateMultiThreadedClass &other) :
     MultiThreadable(other),
     diag_gmm_(other.diag_gmm_), data_(other.data_),
     frame_weights_(other.frame_weights_), dest_accum_(other.dest_accum_),
@@ -524,7 +524,7 @@ class AccumulateMultiThreadedClass: public MultiThreadable {
       *tot_like_ptr_ += tot_like_;
     }
   }
- private:
+private:
   const DiagGmm &diag_gmm_;
   const MatrixBase<BaseFloat> &data_;
   const VectorBase<BaseFloat> &frame_weights_;
@@ -536,19 +536,19 @@ class AccumulateMultiThreadedClass: public MultiThreadable {
 
 
 BaseFloat AccumDiagGmm::AccumulateFromDiagMultiThreaded(
-    const DiagGmm &gmm,
-    const MatrixBase<BaseFloat> &data,
-    const VectorBase<BaseFloat> &frame_weights,
-    int32 num_threads) {
+  const DiagGmm &gmm,
+  const MatrixBase<BaseFloat> &data,
+  const VectorBase<BaseFloat> &frame_weights,
+  int32 num_threads) {
 
   double tot_like = 0.0;
   AccumulateMultiThreadedClass accumulator(gmm, data, frame_weights,
-                                           this, &tot_like);
+      this, &tot_like);
   {
     // Note: everything happens in the constructor and destructor of
     // the object created below.
     MultiThreader<AccumulateMultiThreadedClass> threader(num_threads,
-                                                         accumulator);
+        accumulator);
     // we need to make sure it's destroyed before we access the
     // value of tot_like.
   }

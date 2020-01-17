@@ -33,8 +33,8 @@ namespace kaldi {
 
 template<typename Real>
 OptimizeLbfgs<Real>::OptimizeLbfgs(const VectorBase<Real> &x,
-                                   const LbfgsOptions &opts):
-    opts_(opts), k_(0), computation_state_(kBeforeStep), H_was_set_(false) {
+    const LbfgsOptions &opts) :
+  opts_(opts), k_(0), computation_state_(kBeforeStep), H_was_set_(false) {
   KALDI_ASSERT(opts.m > 0); // dimension.
   MatrixIndexT dim = x.Dim();
   KALDI_ASSERT(dim > 0);
@@ -77,13 +77,13 @@ void OptimizeLbfgs<Real>::ComputeHifNeeded(const VectorBase<Real> &gradient) {
         // We are setting up H for the first time.
         Real gradient_length = gradient.Norm(2.0);
         learning_rate = (gradient_length > 0.0 ?
-                         opts_.first_step_length / gradient_length :
-                         1.0);
+            opts_.first_step_length / gradient_length :
+            1.0);
       } else if (opts_.first_step_impr > 0.0) {
         Real gradient_length = gradient.Norm(2.0);
         learning_rate = (gradient_length > 0.0 ?
-                  opts_.first_step_impr / (gradient_length * gradient_length) :
-                  1.0);
+            opts_.first_step_impr / (gradient_length * gradient_length) :
+            1.0);
       } else {
         learning_rate = opts_.first_step_learning_rate;
       }
@@ -105,14 +105,14 @@ void OptimizeLbfgs<Real>::ComputeHifNeeded(const VectorBase<Real> &gradient) {
       H_.Set(gamma_k);
     }
   }
-}  
+}
 
 // This represents the first 2 lines of Algorithm 7.5 (N&W), which
 // in fact is mostly a call to Algorithm 7.4.
 // Note: this is valid whether we are minimizing or maximizing.
 template<typename Real>
 void OptimizeLbfgs<Real>::ComputeNewDirection(Real function_value,
-                                              const VectorBase<Real> &gradient) {
+    const VectorBase<Real> &gradient) {
   KALDI_ASSERT(computation_state_ == kBeforeStep);
   SignedMatrixIndexT m = M(), k = k_;
   ComputeHifNeeded(gradient);
@@ -128,8 +128,8 @@ void OptimizeLbfgs<Real>::ComputeNewDirection(Real function_value,
   Vector<Real> alpha(m);
   // for i = k - 1, k - 2, ... k - m
   for (SignedMatrixIndexT i = k - 1;
-       i >= std::max(k - m, static_cast<SignedMatrixIndexT>(0));
-       i--) { 
+      i >= std::max(k - m, static_cast<SignedMatrixIndexT>(0));
+      i--) {
     alpha(i % m) = rho_(i % m) * VecVec(S(i), q); // \alpha_i <-- \rho_i s_i^T q.
     q.AddVec(-alpha(i % m), Y(i)); // q <-- q - \alpha_i y_i
   }
@@ -137,8 +137,8 @@ void OptimizeLbfgs<Real>::ComputeNewDirection(Real function_value,
   r.AddVecVec(1.0, H_, q, 0.0); // r <-- H_k^{(0)} q.
   // for k = k - m, k - m + 1, ... , k - 1
   for (SignedMatrixIndexT i = std::max(k - m, static_cast<SignedMatrixIndexT>(0));
-       i < k;
-       i++) {
+      i < k;
+      i++) {
     Real beta = rho_(i % m) * VecVec(Y(i), r); // \beta <-- \rho_i y_i^T r
     r.AddVec(alpha(i % m) - beta, S(i)); // r <-- r + s_i (\alpha_i - \beta)
   }
@@ -148,7 +148,7 @@ void OptimizeLbfgs<Real>::ComputeNewDirection(Real function_value,
     if ((opts_.minimize && dot < 0) || (!opts_.minimize && dot > 0))
       KALDI_WARN << "Step direction has the wrong sign!  Routine will fail.";
   }
-  
+
   // Now we're out of Alg. 7.4 and back into Alg. 7.5.
   // Alg. 7.4 returned r (using new_x_ as the location), and with \alpha_k = 1
   // as the initial guess, we're setting x_{k+1} = x_k + \alpha_k p_k, with
@@ -171,14 +171,14 @@ void OptimizeLbfgs<Real>::ComputeNewDirection(Real function_value,
 
 template<typename Real>
 bool OptimizeLbfgs<Real>::AcceptStep(Real function_value,
-                                     const VectorBase<Real> &gradient) {
+    const VectorBase<Real> &gradient) {
   // Save s_k = x_{k+1} - x_{k}, and y_k = \nabla f_{k+1} - \nabla f_k.
   SubVector<Real> s = S(k_), y = Y(k_);
   s.CopyFromVec(new_x_);
   s.AddVec(-1.0, x_); // s = new_x_ - x_.
   y.CopyFromVec(gradient);
   y.AddVec(-1.0, deriv_); // y = gradient - deriv_.
-  
+
   // Warning: there is a division in the next line.  This could
   // generate inf or nan, but this wouldn't necessarily be an error
   // at this point because for zero step size or derivative we should
@@ -190,11 +190,11 @@ bool OptimizeLbfgs<Real>::AcceptStep(Real function_value,
   if ((opts_.minimize && prod <= 1.0e-20) || (!opts_.minimize && prod >= -1.0e-20)
       || len == 0.0)
     return false; // This will force restart.
-  
+
   KALDI_VLOG(3) << "Accepted step; length was " << len
                 << ", prod was " << prod;
   RecordStepLength(len);
-  
+
   // store x_{k+1} and the function value f_{k+1}.
   x_.CopyFromVec(new_x_);
   f_ = function_value;
@@ -213,8 +213,8 @@ void OptimizeLbfgs<Real>::RecordStepLength(Real s) {
 
 template<typename Real>
 void OptimizeLbfgs<Real>::Restart(const VectorBase<Real> &x,
-                                  Real f,
-                                  const VectorBase<Real> &gradient) {
+    Real f,
+    const VectorBase<Real> &gradient) {
   // Note: we will consider restarting (the transition of x_ -> x)
   // as a step, even if it has zero step size.  This is necessary in
   // order for convergence to be detected.
@@ -236,15 +236,15 @@ void OptimizeLbfgs<Real>::Restart(const VectorBase<Real> &x,
 
 template<typename Real>
 void OptimizeLbfgs<Real>::StepSizeIteration(Real function_value,
-                                            const VectorBase<Real> &gradient) {
+    const VectorBase<Real> &gradient) {
   KALDI_VLOG(3) << "In step size iteration, function value changed "
                 << f_ << " to " << function_value;
-  
+
   // We're in some part of the backtracking, and the user is providing
   // the objective function value and gradient.
   // We're checking two conditions: Wolfe i) [the Armijo rule] and
   // Wolfe ii).
-  
+
   // The Armijo rule (when minimizing) is:
   // f(k_k + \alpha_k p_k) <= f(x_k) + c_1 \alpha_k p_k^T \nabla f(x_k), where
   //  \nabla means the derivative.
@@ -255,11 +255,11 @@ void OptimizeLbfgs<Real>::StepSizeIteration(Real function_value,
   // Below, pf is \alpha_k p_k^T \nabla f(x_k).
   Real pf = VecVec(new_x_, deriv_) - VecVec(x_, deriv_);
   Real temp = f_ + opts_.c1 * pf;
-  
+
   bool wolfe_i_ok;
   if (opts_.minimize) wolfe_i_ok = (function_value <= temp);
   else wolfe_i_ok = (function_value >= temp);
-  
+
   // Wolfe condition ii) can be written as:
   //  p_k^T \nabla f(x_k + \alpha_k p_k) >= c_2 p_k^T \nabla f(x_k)
   // p2f equals \alpha_k p_k^T \nabla f(x_k + \alpha_k p_k), where
@@ -285,7 +285,7 @@ void OptimizeLbfgs<Real>::StepSizeIteration(Real function_value,
   // code will quickly detect convergence.
 
   d_action = kNoChange; // the default.
-  
+
   if (wolfe_i_ok && wolfe_ii_ok) {
     iteration_action = kAccept;
     d_action = kNoChange; // actually doesn't matter, it'll get reset.
@@ -319,13 +319,13 @@ void OptimizeLbfgs<Real>::StepSizeIteration(Real function_value,
 
   if (d_action == kDecrease)
     d_ = std::sqrt(d_);
-  
+
   KALDI_VLOG(3) << "d = " << d_ << ", iter = " << k_ << ", action = "
                 << (iteration_action == kAccept ? "accept" :
-                    (iteration_action == kDecreaseStep ? "decrease" :
-                     (iteration_action == kIncreaseStep ? "increase" :
-                      "reject")));
-  
+  (iteration_action == kDecreaseStep ? "decrease" :
+  (iteration_action == kIncreaseStep ? "increase" :
+  "reject")));
+
   // Note: even if iteration_action != Restart at this point,
   // some code below may set it to Restart.
   if (iteration_action == kAccept) {
@@ -358,7 +358,7 @@ void OptimizeLbfgs<Real>::StepSizeIteration(Real function_value,
                     << "close to the old value; restarting.";
       iteration_action = kRestart;
     }
-        
+
     if (iteration_action == kDecreaseStep) {
       num_wolfe_i_failures_++;
       last_failure_type_ = kWolfeI;
@@ -381,7 +381,7 @@ void OptimizeLbfgs<Real>::StepSizeIteration(Real function_value,
 
 template<typename Real>
 void OptimizeLbfgs<Real>::DoStep(Real function_value,
-                                 const VectorBase<Real> &gradient) {
+    const VectorBase<Real> &gradient) {
   if (opts_.minimize ? function_value < best_f_ : function_value > best_f_) {
     best_f_ = function_value;
     best_x_.CopyFromVec(new_x_);
@@ -394,8 +394,8 @@ void OptimizeLbfgs<Real>::DoStep(Real function_value,
 
 template<typename Real>
 void OptimizeLbfgs<Real>::DoStep(Real function_value,
-                                 const VectorBase<Real> &gradient,
-                                 const VectorBase<Real> &diag_approx_2nd_deriv) {
+    const VectorBase<Real> &gradient,
+    const VectorBase<Real> &diag_approx_2nd_deriv) {
   if (opts_.minimize ? function_value < best_f_ : function_value > best_f_) {
     best_f_ = function_value;
     best_x_.CopyFromVec(new_x_);
@@ -433,7 +433,7 @@ OptimizeLbfgs<Real>::GetValue(Real *objf_value) const {
 //  p_k : A-conjugate direction
 //  \beta_k  : coefficient used in A-conjugate direction computation for next
 //  iteration
-//  
+//
 //  Algo.  LinearCG(A,b,x_0)
 //  ========================
 //  r_0 = Ax_0 - b
@@ -451,9 +451,9 @@ OptimizeLbfgs<Real>::GetValue(Real *objf_value) const {
 
 template<class Real>
 int32 LinearCgd(const LinearCgdOptions &opts,
-                const SpMatrix<Real> &A,
-                const VectorBase<Real> &b,
-                VectorBase<Real> *x) {
+    const SpMatrix<Real> &A,
+    const VectorBase<Real> &b,
+    VectorBase<Real> *x) {
   // Initialize the variables
   //
   int32 M = A.NumCols();
@@ -464,21 +464,21 @@ int32 LinearCgd(const LinearCgdOptions &opts,
   p.AddSpVec(-1.0, A, *x, 1.0);  // p_0 = b - A x_0
   r.AddVec(-1.0, p);  // r_0 = - p_0
   x_orig.CopyFromVec(*x);  // in case of failure.
-  
+
   Real r_cur_norm_sq = VecVec(r, r),
       r_initial_norm_sq = r_cur_norm_sq,
       r_recompute_norm_sq = r_cur_norm_sq;
 
   KALDI_VLOG(5) << "In linear CG: initial norm-square of residual = "
                 << r_initial_norm_sq;
-  
+
   KALDI_ASSERT(opts.recompute_residual_factor <= 1.0);
   Real max_error_sq = std::max<Real>(opts.max_error * opts.max_error,
                                      std::numeric_limits<Real>::min()),
       residual_factor = opts.recompute_residual_factor *
-                        opts.recompute_residual_factor,
+      opts.recompute_residual_factor,
       inv_residual_factor = 1.0 / residual_factor;
-  
+
   // Note: although from a mathematical point of view the method should converge
   // after M iterations, in practice (due to roundoff) it does not always
   // converge to good precision after that many iterations so we let the maximum
@@ -492,7 +492,7 @@ int32 LinearCgd(const LinearCgdOptions &opts,
     // Below is how the code used to look.
     // // next line: \alpha_k = (r_k^T r_k) / (p_k^T A p_k)
     // Real alpha = r_cur_norm_sq / VecVec(p, Ap);
-    // 
+    //
     // We changed r_cur_norm_sq below to -VecVec(p, r).  Although this is
     // slightly less efficient, it seems to make the algorithm dramatically more
     // robust.  Note that -p^T r is the mathematically more natural quantity to
@@ -500,23 +500,23 @@ int32 LinearCgd(const LinearCgdOptions &opts,
     // recommended in Nocedal and Wright only as a kind of optimization as it is
     // supposed to be the same as -p^T r and we already have it computed.
     Real alpha = -VecVec(p, r) / VecVec(p, Ap);
-    
+
     // next line: x_{k+1} = x_k + \alpha_k p_k;
     x->AddVec(alpha, p);
     // next line: r_{k+1} = r_k + \alpha_k A p_k
     r.AddVec(alpha, Ap);
     Real r_next_norm_sq = VecVec(r, r);
-    
+
     if (r_next_norm_sq < residual_factor * r_recompute_norm_sq ||
         r_next_norm_sq > inv_residual_factor * r_recompute_norm_sq) {
-         
+
       // Recompute the residual from scratch if the residual norm has decreased
       // a lot; this costs an extra matrix-vector multiply, but helps keep the
       // residual accurate.
       // Also do the same if the residual norm has increased a lot since
       // the last time we recomputed... this shouldn't happen often, but
       // it can indicate bad stuff is happening.
-      
+
       // r_{k+1} = A x_{k+1} - b
       r.AddSpVec(1.0, A, *x, 0.0);
       r.AddVec(-1.0, b);
@@ -530,7 +530,7 @@ int32 LinearCgd(const LinearCgdOptions &opts,
     // Check if converged.
     if (r_next_norm_sq <= max_error_sq)
       break;
-    
+
     // next line: \beta_{k+1} = \frac{r_{k+1}^T r_{k+1}}{r_k^T r_K}
     Real beta_next = r_next_norm_sq / r_cur_norm_sq;
     // next lines: p_{k+1} = -r_{k+1} + \beta_{k+1} p_k
@@ -547,7 +547,7 @@ int32 LinearCgd(const LinearCgdOptions &opts,
   if (r_cur_norm_sq > r_initial_norm_sq &&
       r_cur_norm_sq > r_initial_norm_sq + 1.0e-10 * VecVec(b, b)) {
     KALDI_WARN << "Doing linear CGD in dimension " << A.NumRows() << ", after " << k
-              << " iterations the squared residual has got worse, "
+               << " iterations the squared residual has got worse, "
                << r_cur_norm_sq << " > " << r_initial_norm_sq
                << ".  Will do an exact optimization.";
     SolverOptions opts("called-from-linearCGD");
@@ -555,8 +555,8 @@ int32 LinearCgd(const LinearCgdOptions &opts,
     SolveQuadraticProblem(A, b, opts, x);
   }
   return k;
-} 
-    
+}
+
 // Instantiate the class for float and double.
 template
 class OptimizeLbfgs<float>;
@@ -566,12 +566,12 @@ class OptimizeLbfgs<double>;
 
 template
 int32 LinearCgd<float>(const LinearCgdOptions &opts,
-                      const SpMatrix<float> &A, const VectorBase<float> &b,
-                      VectorBase<float> *x);
+    const SpMatrix<float> &A, const VectorBase<float> &b,
+    VectorBase<float> *x);
 
 template
 int32 LinearCgd<double>(const LinearCgdOptions &opts,
-                        const SpMatrix<double> &A, const VectorBase<double> &b,
-                        VectorBase<double> *x);
+    const SpMatrix<double> &A, const VectorBase<double> &b,
+    VectorBase<double> *x);
 
 } // end namespace kaldi

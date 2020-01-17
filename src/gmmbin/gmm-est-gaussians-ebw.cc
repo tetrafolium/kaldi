@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("update-flags", &update_flags_str, "Which GMM parameters to "
                 "update: e.g. m or mv (w, t ignored).");
-    
+
     ebw_opts.Register(&po);
 
     po.Read(argc, argv);
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     }
 
     kaldi::GmmFlagsType update_flags =
-        StringToGmmFlags(update_flags_str);    
+        StringToGmmFlags(update_flags_str);
 
     std::string model_in_filename = po.GetArg(1),
         num_stats_filename = po.GetArg(2),
@@ -81,15 +81,15 @@ int main(int argc, char *argv[]) {
       num_transition_accs.Read(ki.Stream(), binary);
       num_stats.Read(ki.Stream(), binary, true);  // true == add; doesn't matter here.
     }
-    
+
     {
       bool binary;
       Input ki(den_stats_filename, &binary);
       num_transition_accs.Read(ki.Stream(), binary);
       den_stats.Read(ki.Stream(), binary, true);  // true == add; doesn't matter here.
     }
-      
- 
+
+
     {  // Update GMMs.
       BaseFloat auxf_impr, count;
       int32 num_floored;

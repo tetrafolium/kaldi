@@ -37,7 +37,7 @@ void WritePosterior(std::ostream &os, bool binary, const Posterior &post) {
       int32 sz2 = iter->size();
       WriteBasicType(os, binary, sz2);
       for (std::vector<std::pair<int32, BaseFloat> >::const_iterator
-               iter2 = iter->begin(); iter2 != iter->end(); ++iter2) {
+          iter2 = iter->begin(); iter2 != iter->end(); ++iter2) {
         WriteBasicType(os, binary, iter2->first);
         WriteBasicType(os, binary, iter2->second);
       }
@@ -49,8 +49,8 @@ void WritePosterior(std::ostream &os, bool binary, const Posterior &post) {
     for (Posterior::const_iterator iter = post.begin(); iter != post.end(); ++iter) {
       os << "[ ";
       for (std::vector<std::pair<int32, BaseFloat> >::const_iterator iter2=iter->begin();
-           iter2 != iter->end();
-           iter2++) {
+          iter2 != iter->end();
+          iter2++) {
         os << iter2->first << ' ' << iter2->second << ' ';
       }
       os << "] ";
@@ -77,8 +77,8 @@ void ReadPosterior(std::istream &is, bool binary, Posterior *post) {
         KALDI_ERR << "Reading posteriors: got negative size";
       iter->resize(sz2);
       for (std::vector<std::pair<int32, BaseFloat> >::iterator iter2=iter->begin();
-           iter2 != iter->end();
-           iter2++) {
+          iter2 != iter->end();
+          iter2++) {
         ReadBasicType(is, true, &(iter2->first));
         ReadBasicType(is, true, &(iter2->second));
       }
@@ -101,8 +101,8 @@ void ReadPosterior(std::istream &is, bool binary, Posterior *post) {
         // of what might have gone wrong.
         KALDI_ERR << "Reading Posterior object: expecting [, got '" << str
                   << (ConvertStringToInteger(str, &str_int) ?
-                      "': did you provide alignments instead of posteriors?" :
-                      "'.");
+        "': did you provide alignments instead of posteriors?" :
+        "'.");
       }
       std::vector<std::pair<int32, BaseFloat> > this_vec;
       while (1) {
@@ -164,8 +164,8 @@ bool GaussPostHolder::Write(std::ostream &os, bool binary, const T &t) {
       int32 sz2 = iter->size();
       WriteBasicType(os, binary, sz2);
       for (std::vector<std::pair<int32, Vector<BaseFloat> > >::const_iterator iter2=iter->begin();
-           iter2 != iter->end();
-           iter2++) {
+          iter2 != iter->end();
+          iter2++) {
         WriteBasicType(os, binary, iter2->first);
         iter2->second.Write(os, binary);
       }
@@ -199,9 +199,9 @@ bool GaussPostHolder::Read(std::istream &is) {
         KALDI_ERR << "Reading posteriors: got negative size";
       iter->resize(sz2);
       for (std::vector<std::pair<int32, Vector<BaseFloat> > >::iterator
-               iter2=iter->begin();
-           iter2 != iter->end();
-           iter2++) {
+          iter2=iter->begin();
+          iter2 != iter->end();
+          iter2++) {
         ReadBasicType(is, is_binary, &(iter2->first));
         iter2->second.Read(is, is_binary);
       }
@@ -240,8 +240,8 @@ BaseFloat TotalPosterior(const Posterior &post) {
 }
 
 bool PosteriorEntriesAreDisjoint(
-    const std::vector<std::pair<int32,BaseFloat> > &post_elem1,
-    const std::vector<std::pair<int32,BaseFloat> > &post_elem2) {
+  const std::vector<std::pair<int32,BaseFloat> > &post_elem1,
+  const std::vector<std::pair<int32,BaseFloat> > &post_elem2) {
   unordered_set<int32> set1;
   for (size_t i = 0; i < post_elem1.size(); i++) set1.insert(post_elem1[i].first);
   for (size_t i = 0; i < post_elem2.size(); i++)
@@ -256,10 +256,10 @@ bool PosteriorEntriesAreDisjoint(
 // were disjoint (no common transition-ids or whatever index
 // we are using).
 int32 MergePosteriors(const Posterior &post1,
-                      const Posterior &post2,
-                      bool merge,
-                      bool drop_frames,
-                      Posterior *post) {
+    const Posterior &post2,
+    bool merge,
+    bool drop_frames,
+    Posterior *post) {
   KALDI_ASSERT(post1.size() == post2.size()); // precondition.
   post->resize(post1.size());
 
@@ -288,7 +288,7 @@ int32 MergePosteriors(const Posterior &post1,
 }
 
 void AlignmentToPosterior(const std::vector<int32> &ali,
-                          Posterior *post) {
+    Posterior *post) {
   post->clear();
   post->resize(ali.size());
   for (size_t i = 0; i < ali.size(); i++) {
@@ -300,9 +300,9 @@ void AlignmentToPosterior(const std::vector<int32> &ali,
 
 struct ComparePosteriorByPdfs {
   const TransitionModel *tmodel_;
-  ComparePosteriorByPdfs(const TransitionModel &tmodel): tmodel_(&tmodel) {}
+  ComparePosteriorByPdfs(const TransitionModel &tmodel) : tmodel_(&tmodel) {}
   bool operator() (const std::pair<int32, BaseFloat> &a,
-                   const std::pair<int32, BaseFloat> &b) {
+      const std::pair<int32, BaseFloat> &b) {
     if (tmodel_->TransitionIdToPdf(a.first)
         < tmodel_->TransitionIdToPdf(b.first))
       return true;
@@ -312,7 +312,7 @@ struct ComparePosteriorByPdfs {
 };
 
 void SortPosteriorByPdfs(const TransitionModel &tmodel,
-                         Posterior *post) {
+    Posterior *post) {
   ComparePosteriorByPdfs compare(tmodel);
   for (size_t i = 0; i < post->size(); i++) {
     sort((*post)[i].begin(), (*post)[i].end(), compare);
@@ -320,8 +320,8 @@ void SortPosteriorByPdfs(const TransitionModel &tmodel,
 }
 
 void ConvertPosteriorToPdfs(const TransitionModel &tmodel,
-                            const Posterior &post_in,
-                            Posterior *post_out) {
+    const Posterior &post_in,
+    Posterior *post_out) {
   post_out->clear();
   post_out->resize(post_in.size());
   for (size_t i = 0; i < post_out->size(); i++) {
@@ -337,7 +337,7 @@ void ConvertPosteriorToPdfs(const TransitionModel &tmodel,
     }
     (*post_out)[i].reserve(pdf_to_post.size());
     for (unordered_map<int32, BaseFloat>::const_iterator iter =
-             pdf_to_post.begin(); iter != pdf_to_post.end(); ++iter) {
+        pdf_to_post.begin(); iter != pdf_to_post.end(); ++iter) {
       if (iter->second != 0.0)
         (*post_out)[i].push_back(
             std::make_pair(iter->first, iter->second));
@@ -346,8 +346,8 @@ void ConvertPosteriorToPdfs(const TransitionModel &tmodel,
 }
 
 void ConvertPosteriorToPhones(const TransitionModel &tmodel,
-                              const Posterior &post_in,
-                              Posterior *post_out) {
+    const Posterior &post_in,
+    Posterior *post_out) {
   post_out->clear();
   post_out->resize(post_in.size());
   for (size_t i = 0; i < post_out->size(); i++) {
@@ -363,7 +363,7 @@ void ConvertPosteriorToPhones(const TransitionModel &tmodel,
     }
     (*post_out)[i].reserve(phone_to_post.size());
     for (std::map<int32, BaseFloat>::const_iterator iter =
-             phone_to_post.begin(); iter != phone_to_post.end(); ++iter) {
+        phone_to_post.begin(); iter != phone_to_post.end(); ++iter) {
       if (iter->second != 0.0)
         (*post_out)[i].push_back(
             std::make_pair(iter->first, iter->second));
@@ -373,9 +373,9 @@ void ConvertPosteriorToPhones(const TransitionModel &tmodel,
 
 
 void WeightSilencePost(const TransitionModel &trans_model,
-                       const ConstIntegerSet<int32> &silence_set,
-                       BaseFloat silence_scale,
-                       Posterior *post) {
+    const ConstIntegerSet<int32> &silence_set,
+    BaseFloat silence_scale,
+    Posterior *post) {
   for (size_t i = 0; i < post->size(); i++) {
     std::vector<std::pair<int32, BaseFloat> > this_post;
     this_post.reserve((*post)[i].size());
@@ -396,13 +396,13 @@ void WeightSilencePost(const TransitionModel &trans_model,
 
 
 void WeightSilencePostDistributed(const TransitionModel &trans_model,
-                                  const ConstIntegerSet<int32> &silence_set,
-                                  BaseFloat silence_scale,
-                                  Posterior *post) {
+    const ConstIntegerSet<int32> &silence_set,
+    BaseFloat silence_scale,
+    Posterior *post) {
   for (size_t i = 0; i < post->size(); i++) {
     std::vector<std::pair<int32, BaseFloat> > this_post;
     this_post.reserve((*post)[i].size());
-    BaseFloat sil_weight = 0.0, nonsil_weight = 0.0;   
+    BaseFloat sil_weight = 0.0, nonsil_weight = 0.0;
     for (size_t j = 0; j < (*post)[i].size(); j++) {
       int32 tid = (*post)[i][j].first,
           phone = trans_model.TransitionIdToPhone(tid);
@@ -414,23 +414,23 @@ void WeightSilencePostDistributed(const TransitionModel &trans_model,
     // weighting approach doesn't make sense if we have negative weights.
     if (sil_weight + nonsil_weight == 0.0) continue;
     BaseFloat frame_scale = (sil_weight * silence_scale + nonsil_weight) /
-                            (sil_weight + nonsil_weight);
+        (sil_weight + nonsil_weight);
     if (frame_scale != 0.0) {
       for (size_t j = 0; j < (*post)[i].size(); j++) {
         int32 tid = (*post)[i][j].first;
-        BaseFloat weight = (*post)[i][j].second;    
+        BaseFloat weight = (*post)[i][j].second;
         this_post.push_back(std::make_pair(tid, weight * frame_scale));
       }
     }
-    (*post)[i].swap(this_post);    
+    (*post)[i].swap(this_post);
   }
 }
 
 BaseFloat VectorToPosteriorEntry(
-    const VectorBase<BaseFloat> &log_likes,
-    int32 num_gselect,
-    BaseFloat min_post,
-    std::vector<std::pair<int32, BaseFloat> > *post_entry) {
+  const VectorBase<BaseFloat> &log_likes,
+  int32 num_gselect,
+  BaseFloat min_post,
+  std::vector<std::pair<int32, BaseFloat> > *post_entry) {
   KALDI_ASSERT(num_gselect > 0 && min_post >= 0 && min_post < 1.0);
   // we name num_gauss assuming each entry in log_likes represents a Gaussian;
   // it doesn't matter if they don't.
@@ -457,7 +457,7 @@ BaseFloat VectorToPosteriorEntry(
   post_entry->insert(post_entry->end(),
                      temp_post.begin(), temp_post.begin() + num_gselect);
   while (post_entry->size() > 1 && post_entry->back().second < min_post)
-    post_entry->pop_back();  
+    post_entry->pop_back();
   // Now renormalize to sum to one after pruning.
   BaseFloat tot = 0.0;
   size_t size = post_entry->size();
@@ -472,7 +472,7 @@ BaseFloat VectorToPosteriorEntry(
 
 template <typename Real>
 void PosteriorToMatrix(const Posterior &post,
-                       const int32 post_dim, Matrix<Real> *mat) {
+    const int32 post_dim, Matrix<Real> *mat) {
   // Make a host-matrix,
   int32 num_rows = post.size();
   mat->Resize(num_rows, post_dim, kSetZero);  // zero-filled
@@ -490,20 +490,20 @@ void PosteriorToMatrix(const Posterior &post,
 }
 // instantiate the template function,
 template void PosteriorToMatrix<float>(const Posterior &post,
-                                       const int32 post_dim,
-                                       Matrix<float> *mat);
+    const int32 post_dim,
+    Matrix<float> *mat);
 template void PosteriorToMatrix<double>(const Posterior &post,
-                                        const int32 post_dim,
-                                        Matrix<double> *mat);
+    const int32 post_dim,
+    Matrix<double> *mat);
 
 
 template <typename Real>
 void PosteriorToPdfMatrix(const Posterior &post,
-                          const TransitionModel &model,
-                          Matrix<Real> *mat) {
+    const TransitionModel &model,
+    Matrix<Real> *mat) {
   // Allocate the matrix,
   int32 num_rows = post.size(),
-        num_cols = model.NumPdfs();
+      num_cols = model.NumPdfs();
   mat->Resize(num_rows, num_cols, kSetZero);  // zero-filled,
   // Fill from Posterior,
   for (int32 t = 0; t < post.size(); t++) {
@@ -519,10 +519,10 @@ void PosteriorToPdfMatrix(const Posterior &post,
 }
 // instantiate the template function,
 template void PosteriorToPdfMatrix<float>(const Posterior &post,
-                                          const TransitionModel &model,
-                                          Matrix<float> *mat);
+    const TransitionModel &model,
+    Matrix<float> *mat);
 template void PosteriorToPdfMatrix<double>(const Posterior &post,
-                                           const TransitionModel &model,
-                                           Matrix<double> *mat);
+    const TransitionModel &model,
+    Matrix<double> *mat);
 
 } // End namespace kaldi

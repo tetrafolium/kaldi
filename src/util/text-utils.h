@@ -40,37 +40,37 @@ namespace kaldi {
 /// in the set "delim" within the input string.  In this case
 /// the empty string is split to a single empty string.
 void SplitStringToVector(const std::string &full, const char *delim,
-                         bool omit_empty_strings,
-                         std::vector<std::string> *out);
+    bool omit_empty_strings,
+    std::vector<std::string> *out);
 
 /// Joins the elements of a vector of strings into a single string using
 /// "delim" as the delimiter. If omit_empty_strings == true, any empty strings
 /// in the vector are skipped. A vector of empty strings results in an empty
 /// string on the output.
 void JoinVectorToString(const std::vector<std::string> &vec_in,
-                        const char *delim, bool omit_empty_strings,
-                        std::string *str_out);
+    const char *delim, bool omit_empty_strings,
+    std::string *str_out);
 
 /**
-  \brief Split a string (e.g. 1:2:3) into a vector of integers.
+   \brief Split a string (e.g. 1:2:3) into a vector of integers.
 
-  \param [in]  delim  String containing a list of characters, any of which
+   \param [in]  delim  String containing a list of characters, any of which
                       is allowed as a delimiter.
-  \param [in] omit_empty_strings If true, empty strings between delimiters are
+   \param [in] omit_empty_strings If true, empty strings between delimiters are
                       allowed and will not produce an output integer; if false,
                       instances of characters in 'delim' that are consecutive or
                       at the start or end of the string would be an error.
                       You'll normally want this to be true if 'delim' consists
                       of spaces, and false otherwise.
-  \param [out] out   The output list of integers.
-*/
+   \param [out] out   The output list of integers.
+ */
 template<class I>
 bool SplitStringToIntegers(const std::string &full,
-                           const char *delim,
-                           bool omit_empty_strings,  // typically false [but
+    const char *delim,
+    bool omit_empty_strings,                         // typically false [but
                                                      // should probably be true
                                                      // if "delim" is spaces].
-                           std::vector<I> *out) {
+    std::vector<I> *out) {
   KALDI_ASSERT(out != NULL);
   KALDI_ASSERT_IS_INTEGER_TYPE(I);
   if (*(full.c_str()) == '\0') {
@@ -104,9 +104,9 @@ bool SplitStringToIntegers(const std::string &full,
 // This is defined for F = float and double.
 template<class F>
 bool SplitStringToFloats(const std::string &full,
-                         const char *delim,
-                         bool omit_empty_strings,  // typically false
-                         std::vector<F> *out);
+    const char *delim,
+    bool omit_empty_strings,                       // typically false
+    std::vector<F> *out);
 
 
 /// Converts a string into an integer via strtoll and returns false if there was
@@ -116,7 +116,7 @@ bool SplitStringToFloats(const std::string &full,
 /// true.
 template<class Int>
 bool ConvertStringToInteger(const std::string &str,
-                            Int *out) {
+    Int *out) {
   KALDI_ASSERT_IS_INTEGER_TYPE(Int);
   const char *this_str = str.c_str();
   char *end = NULL;
@@ -142,7 +142,7 @@ bool ConvertStringToInteger(const std::string &str,
 /// Be careful- this function will successfully read inf's or nan's.
 template <typename T>
 bool ConvertStringToReal(const std::string &str,
-                         T *out);
+    T *out);
 
 /// Removes the beginning and trailing whitespaces from a string
 void Trim(std::string *str);
@@ -154,8 +154,8 @@ void Trim(std::string *str);
 /// everything that remains after removing leading and trailing whitespace goes
 /// in "first".
 void SplitStringOnFirstSpace(const std::string &line,
-                             std::string *first,
-                             std::string *rest);
+    std::string *first,
+    std::string *rest);
 
 
 /// Returns true if "token" is nonempty, and all characters are
@@ -180,8 +180,8 @@ bool IsLine(const std::string &line);
    an argument of 1 it would return true.
  */
 bool StringsApproxEqual(const std::string &a,
-                        const std::string &b,
-                        int32 decimal_places_check = 2);
+    const std::string &b,
+    int32 decimal_places_check = 2);
 
 
 }  // namespace kaldi

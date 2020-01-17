@@ -26,20 +26,20 @@ namespace kaldi {
 
 template<class C>
 void OnlineGenericBaseFeature<C>::GetFrame(int32 frame,
-                                           VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   // 'at' does size checking.
   feat->CopyFromVec(*(features_.at(frame)));
 };
 
 template<class C>
 OnlineGenericBaseFeature<C>::OnlineGenericBaseFeature(
-    const typename C::Options &opts):
-    computer_(opts), window_function_(computer_.GetFrameOptions()),
-    input_finished_(false), waveform_offset_(0) { }
+  const typename C::Options &opts) :
+  computer_(opts), window_function_(computer_.GetFrameOptions()),
+  input_finished_(false), waveform_offset_(0) { }
 
 template<class C>
 void OnlineGenericBaseFeature<C>::AcceptWaveform(BaseFloat sampling_rate,
-                                                 const VectorBase<BaseFloat> &waveform) {
+    const VectorBase<BaseFloat> &waveform) {
   BaseFloat expected_sampling_rate = computer_.GetFrameOptions().samp_freq;
   if (sampling_rate != expected_sampling_rate)
     KALDI_ERR << "Sampling frequency mismatch, expected "
@@ -111,10 +111,10 @@ template class OnlineGenericBaseFeature<PlpComputer>;
 template class OnlineGenericBaseFeature<FbankComputer>;
 
 
-OnlineCmvnState::OnlineCmvnState(const OnlineCmvnState &other):
-    speaker_cmvn_stats(other.speaker_cmvn_stats),
-    global_cmvn_stats(other.global_cmvn_stats),
-    frozen_state(other.frozen_state) { }
+OnlineCmvnState::OnlineCmvnState(const OnlineCmvnState &other) :
+  speaker_cmvn_stats(other.speaker_cmvn_stats),
+  global_cmvn_stats(other.global_cmvn_stats),
+  frozen_state(other.frozen_state) { }
 
 void OnlineCmvnState::Write(std::ostream &os, bool binary) const {
   WriteToken(os, binary, "<OnlineCmvnState>");  // magic string.
@@ -141,9 +141,9 @@ void OnlineCmvnState::Read(std::istream &is, bool binary) {
 
 
 OnlineCmvn::OnlineCmvn(const OnlineCmvnOptions &opts,
-                       const OnlineCmvnState &cmvn_state,
-                       OnlineFeatureInterface *src):
-    opts_(opts), src_(src) {
+    const OnlineCmvnState &cmvn_state,
+    OnlineFeatureInterface *src) :
+  opts_(opts), src_(src) {
   SetState(cmvn_state);
   if (!SplitStringToIntegers(opts.skip_dims, ":", false, &skip_dims_))
     KALDI_ERR << "Bad --skip-dims option (should be colon-separated list of "
@@ -151,7 +151,7 @@ OnlineCmvn::OnlineCmvn(const OnlineCmvnOptions &opts,
 }
 
 OnlineCmvn::OnlineCmvn(const OnlineCmvnOptions &opts,
-                       OnlineFeatureInterface *src): opts_(opts), src_(src) {
+    OnlineFeatureInterface *src) : opts_(opts), src_(src) {
   if (!SplitStringToIntegers(opts.skip_dims, ":", false, &skip_dims_))
     KALDI_ERR << "Bad --skip-dims option (should be colon-separated list of "
               <<  "integers)";
@@ -159,8 +159,8 @@ OnlineCmvn::OnlineCmvn(const OnlineCmvnOptions &opts,
 
 
 void OnlineCmvn::GetMostRecentCachedFrame(int32 frame,
-                                          int32 *cached_frame,
-                                          Matrix<double> *stats) {
+    int32 *cached_frame,
+    Matrix<double> *stats) {
   KALDI_ASSERT(frame >= 0);
   InitRingBufferIfNeeded();
   // look for a cached frame on a previous frame as close as possible in time
@@ -235,7 +235,7 @@ OnlineCmvn::~OnlineCmvn() {
 }
 
 void OnlineCmvn::ComputeStatsForFrame(int32 frame,
-                                      MatrixBase<double> *stats_out) {
+    MatrixBase<double> *stats_out) {
   KALDI_ASSERT(frame >= 0 && frame < src_->NumFramesReady());
 
   int32 dim = this->Dim(), cur_frame;
@@ -270,9 +270,9 @@ void OnlineCmvn::ComputeStatsForFrame(int32 frame,
 
 // static
 void OnlineCmvn::SmoothOnlineCmvnStats(const MatrixBase<double> &speaker_stats,
-                                       const MatrixBase<double> &global_stats,
-                                       const OnlineCmvnOptions &opts,
-                                       MatrixBase<double> *stats) {
+    const MatrixBase<double> &global_stats,
+    const OnlineCmvnOptions &opts,
+    MatrixBase<double> *stats) {
   int32 dim = stats->NumCols() - 1;
   double cur_count = (*stats)(0, dim);
   // If count exceeded cmn_window it would be an error in how "window_stats"
@@ -307,7 +307,7 @@ void OnlineCmvn::SmoothOnlineCmvnStats(const MatrixBase<double> &speaker_stats,
 }
 
 void OnlineCmvn::GetFrame(int32 frame,
-                          VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   src_->GetFrame(frame, feat);
   KALDI_ASSERT(feat->Dim() == this->Dim());
   int32 dim = feat->Dim();
@@ -353,7 +353,7 @@ void OnlineCmvn::Freeze(int32 cur_frame) {
 }
 
 void OnlineCmvn::GetState(int32 cur_frame,
-                          OnlineCmvnState *state_out) {
+    OnlineCmvnState *state_out) {
   *state_out = this->orig_state_;
   { // This block updates state_out->speaker_cmvn_stats
     int32 dim = this->Dim();
@@ -407,8 +407,8 @@ void OnlineSpliceFrames::GetFrame(int32 frame, VectorBase<BaseFloat> *feat) {
 }
 
 OnlineTransform::OnlineTransform(const MatrixBase<BaseFloat> &transform,
-                                 OnlineFeatureInterface *src):
-    src_(src) {
+    OnlineFeatureInterface *src) :
+  src_(src) {
   int32 src_dim = src_->Dim();
   if (transform.NumCols() == src_dim) {  // Linear transform
     linear_term_ = transform;
@@ -448,7 +448,7 @@ int32 OnlineDeltaFeature::NumFramesReady() const {
 }
 
 void OnlineDeltaFeature::GetFrame(int32 frame,
-                                      VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   KALDI_ASSERT(frame >= 0 && frame < NumFramesReady());
   KALDI_ASSERT(feat->Dim() == Dim());
   // We'll produce a temporary matrix containing the features we want to
@@ -475,8 +475,8 @@ void OnlineDeltaFeature::GetFrame(int32 frame,
 
 
 OnlineDeltaFeature::OnlineDeltaFeature(const DeltaFeaturesOptions &opts,
-                                       OnlineFeatureInterface *src):
-    src_(src), opts_(opts), delta_features_(opts) { }
+    OnlineFeatureInterface *src) :
+  src_(src), opts_(opts), delta_features_(opts) { }
 
 void OnlineCacheFeature::GetFrame(int32 frame, VectorBase<BaseFloat> *feat) {
   KALDI_ASSERT(frame >= 0);

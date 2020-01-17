@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
         "we want to model\n"
         "Usage: sgmm2-project [options] <model-in> <lda-mllt-mat-in> <model-out> <new-projection-out>\n"
         "e.g.: sgmm2-project --start-dim=0 --end-dim=52 final.mdl final.inv_full_mat final_proj1.mdl proj1.mat\n";
-    
+
     std::string write_flags_str = "gsnu";
 
     bool binary_write = false;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     kaldi::SgmmWriteFlagsType write_flags =
         StringToSgmmWriteFlags(write_flags_str);
-    
+
     AmSgmm2 am_sgmm;
     TransitionModel trans_model;
     {
@@ -90,12 +90,12 @@ int main(int argc, char *argv[]) {
     Matrix<BaseFloat> total_projection(projection.NumRows(), projection.NumCols());
     total_projection.AddMatMat(1.0, projection, kNoTrans,
                                inv_lda_mllt_mat, kNoTrans, 0.0);
-    
+
     sgmm_project.ApplyProjection(total_projection, &am_sgmm);
-    
+
     am_sgmm.ComputeDerivedVars(); // recompute normalizers, and possibly
     // weights.
-    
+
     {
       Output ko(model_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 
     WriteKaldiObject(projection, proj_wxfilename, binary_write);
     KALDI_LOG << "Wrote projection matrix to " << proj_wxfilename;
-    
+
     return 0;
   } catch(const std::exception &e) {
     std::cerr << e.what();

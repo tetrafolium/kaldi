@@ -32,7 +32,7 @@ namespace kaldi {
  * The documentation and "interface" for this class is given in online-audio-source.h
  */
 class OnlineTcpVectorSource : public OnlineAudioSourceItf {
- public:
+public:
   OnlineTcpVectorSource(int32 socket);
   ~OnlineTcpVectorSource();
 
@@ -47,7 +47,7 @@ class OnlineTcpVectorSource : public OnlineAudioSourceItf {
   //resets the number of samples
   void ResetSamples();
 
- private:
+private:
   int32 socket_desc;
   bool connected;
   char* pack;

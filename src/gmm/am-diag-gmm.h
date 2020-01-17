@@ -34,7 +34,7 @@ namespace kaldi {
 /// kaldi Diagonal Gaussian Mixture Models
 
 class AmDiagGmm {
- public:
+public:
   AmDiagGmm() {}
   ~AmDiagGmm();
 
@@ -54,8 +54,8 @@ class AmDiagGmm {
   // we enforce a min-count on Gaussians while splitting (don't split
   // if it would take it below min-count).
   void SplitByCount(const Vector<BaseFloat> &state_occs,
-                    int32 target_components, float perturb_factor,
-                    BaseFloat power, BaseFloat min_count);
+      int32 target_components, float perturb_factor,
+      BaseFloat power, BaseFloat min_count);
 
 
   // In SplitByCount we use the "target_components" and "power"
@@ -63,21 +63,21 @@ class AmDiagGmm {
   // and any state over its target gets mixed down.  If some states
   // were under their target, this may take the #Gauss below the target.
   void MergeByCount(const Vector<BaseFloat> &state_occs,
-                    int32 target_components,
-                    BaseFloat power, BaseFloat min_count);
+      int32 target_components,
+      BaseFloat power, BaseFloat min_count);
 
   /// Sets the gconsts for all the PDFs. Returns the total number of Gaussians
   /// over all PDFs that are "invalid" e.g. due to zero weights or variances.
   int32 ComputeGconsts();
 
   BaseFloat LogLikelihood(const int32 pdf_index,
-                          const VectorBase<BaseFloat> &data) const;
-  
+      const VectorBase<BaseFloat> &data) const;
+
   void Read(std::istream &in_stream, bool binary);
   void Write(std::ostream &out_stream, bool binary) const;
 
   int32 Dim() const {
-    return (densities_.size() > 0)? densities_[0]->Dim() : 0;
+    return (densities_.size() > 0) ? densities_[0]->Dim() : 0;
   }
   int32 NumPdfs() const { return densities_.size(); }
   int32 NumGauss() const;
@@ -87,15 +87,15 @@ class AmDiagGmm {
   DiagGmm& GetPdf(int32 pdf_index);
   const DiagGmm& GetPdf(int32 pdf_index) const;
   void GetGaussianMean(int32 pdf_index, int32 gauss,
-                       VectorBase<BaseFloat> *out) const;
+      VectorBase<BaseFloat> *out) const;
   void GetGaussianVariance(int32 pdf_index, int32 gauss,
-                           VectorBase<BaseFloat> *out) const;
+      VectorBase<BaseFloat> *out) const;
 
   /// Mutators
   void SetGaussianMean(int32 pdf_index, int32 gauss_index,
-                       const VectorBase<BaseFloat> &in);
+      const VectorBase<BaseFloat> &in);
 
- private:
+private:
   std::vector<DiagGmm*> densities_;
 //  int32 dim_;
 
@@ -106,7 +106,7 @@ class AmDiagGmm {
 
 
 inline BaseFloat AmDiagGmm::LogLikelihood(
-    const int32 pdf_index, const VectorBase<BaseFloat> &data) const {
+  const int32 pdf_index, const VectorBase<BaseFloat> &data) const {
   return densities_[pdf_index]->LogLikelihood(data);
 }
 
@@ -118,42 +118,42 @@ inline int32 AmDiagGmm::NumGaussInPdf(int32 pdf_index) const {
 
 inline DiagGmm& AmDiagGmm::GetPdf(int32 pdf_index) {
   KALDI_ASSERT((static_cast<size_t>(pdf_index) < densities_.size())
-               && (densities_[pdf_index] != NULL));
+      && (densities_[pdf_index] != NULL));
   return *(densities_[pdf_index]);
 }
 
 inline const DiagGmm& AmDiagGmm::GetPdf(int32 pdf_index) const {
   KALDI_ASSERT((static_cast<size_t>(pdf_index) < densities_.size())
-               && (densities_[pdf_index] != NULL));
+      && (densities_[pdf_index] != NULL));
   return *(densities_[pdf_index]);
 }
 
 inline void AmDiagGmm::GetGaussianMean(int32 pdf_index, int32 gauss,
-                                       VectorBase<BaseFloat> *out) const {
+    VectorBase<BaseFloat> *out) const {
   KALDI_ASSERT((static_cast<size_t>(pdf_index) < densities_.size())
       && (densities_[pdf_index] != NULL));
   densities_[pdf_index]->GetComponentMean(gauss, out);
 }
 
 inline void AmDiagGmm::GetGaussianVariance(int32 pdf_index, int32 gauss,
-                                           VectorBase<BaseFloat> *out) const {
+    VectorBase<BaseFloat> *out) const {
   KALDI_ASSERT((static_cast<size_t>(pdf_index) < densities_.size())
-               && (densities_[pdf_index] != NULL));
+      && (densities_[pdf_index] != NULL));
   densities_[pdf_index]->GetComponentVariance(gauss, out);
 }
 
 inline void AmDiagGmm::SetGaussianMean(int32 pdf_index, int32 gauss_index,
-                                       const VectorBase<BaseFloat> &in) {
+    const VectorBase<BaseFloat> &in) {
   KALDI_ASSERT((static_cast<size_t>(pdf_index) < densities_.size())
-               && (densities_[pdf_index] != NULL));
+      && (densities_[pdf_index] != NULL));
   densities_[pdf_index]->SetComponentMean(gauss_index, in);
 }
 
 inline void AmDiagGmm::SplitPdf(int32 pdf_index,
-                                           int32 target_components,
-                                           float perturb_factor) {
+    int32 target_components,
+    float perturb_factor) {
   KALDI_ASSERT((static_cast<size_t>(pdf_index) < densities_.size())
-               && (densities_[pdf_index] != NULL));
+      && (densities_[pdf_index] != NULL));
   densities_[pdf_index]->Split(target_components, perturb_factor);
 }
 
@@ -165,14 +165,14 @@ struct UbmClusteringOptions {
   int32 max_am_gauss;
 
   UbmClusteringOptions()
-      : ubm_num_gauss(400), reduce_state_factor(0.2),
-        intermediate_num_gauss(4000), cluster_varfloor(0.01),
-        max_am_gauss(20000) {}
+    : ubm_num_gauss(400), reduce_state_factor(0.2),
+    intermediate_num_gauss(4000), cluster_varfloor(0.01),
+    max_am_gauss(20000) {}
   UbmClusteringOptions(int32 ncomp, BaseFloat red, int32 interm_gauss,
-                       BaseFloat vfloor, int32 max_am_gauss)
-        : ubm_num_gauss(ncomp), reduce_state_factor(red),
-          intermediate_num_gauss(interm_gauss), cluster_varfloor(vfloor),
-          max_am_gauss(max_am_gauss) {}
+      BaseFloat vfloor, int32 max_am_gauss)
+    : ubm_num_gauss(ncomp), reduce_state_factor(red),
+    intermediate_num_gauss(interm_gauss), cluster_varfloor(vfloor),
+    max_am_gauss(max_am_gauss) {}
   void Register(OptionsItf *opts) {
     std::string module = "UbmClusteringOptions: ";
     opts->Register("max-am-gauss", &max_am_gauss, module+
@@ -206,9 +206,9 @@ struct UbmClusteringOptions {
  *  recognition", In Computer Speech and Language, April 2011.
  */
 void ClusterGaussiansToUbm(const AmDiagGmm &am,
-                           const Vector<BaseFloat> &state_occs,
-                           UbmClusteringOptions opts,
-                           DiagGmm *ubm_out);
+    const Vector<BaseFloat> &state_occs,
+    UbmClusteringOptions opts,
+    DiagGmm *ubm_out);
 
 
 

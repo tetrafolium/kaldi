@@ -38,7 +38,7 @@ struct NnetDiscriminativeOptions {
 
   bool apply_deriv_weights;
 
-  NnetDiscriminativeOptions(): apply_deriv_weights(true) { }
+  NnetDiscriminativeOptions() : apply_deriv_weights(true) { }
 
   void Register(OptionsItf *opts) {
     nnet_config.Register(opts);
@@ -58,38 +58,38 @@ struct DiscriminativeObjectiveFunctionInfo {
   discriminative::DiscriminativeObjectiveInfo stats;
   discriminative::DiscriminativeObjectiveInfo stats_this_phase;
 
-  DiscriminativeObjectiveFunctionInfo():
-      current_phase(0) { }
+  DiscriminativeObjectiveFunctionInfo() :
+    current_phase(0) { }
 
   // This function updates the stats and, if the phase has just changed,
   // prints a message indicating progress.  The phase equals
   // minibatch_counter / minibatches_per_phase.  Its only function is to
   // control how frequently we print logging messages.
   void UpdateStats(const std::string &output_name,
-                   const std::string &criterion,
-                   int32 minibatches_per_phase,
-                   int32 minibatch_counter,
-                   discriminative::DiscriminativeObjectiveInfo stats);
+      const std::string &criterion,
+      int32 minibatches_per_phase,
+      int32 minibatch_counter,
+      discriminative::DiscriminativeObjectiveInfo stats);
 
   // Prints stats for the current phase.
   void PrintStatsForThisPhase(const std::string &output_name,
-                              const std::string &criterion,
-                              int32 minibatches_per_phase) const;
+      const std::string &criterion,
+      int32 minibatches_per_phase) const;
   // Prints total stats, and returns true if total stats' weight was nonzero.
   bool PrintTotalStats(const std::string &output_name,
-                       const std::string &criterion) const;
+      const std::string &criterion) const;
 };
 
 
 /**
-   This class is for single-threaded discriminative training of neural nets 
-*/
+   This class is for single-threaded discriminative training of neural nets
+ */
 class NnetDiscriminativeTrainer {
- public:
+public:
   NnetDiscriminativeTrainer(const NnetDiscriminativeOptions &config,
-                            const TransitionModel &tmodel,
-                            const VectorBase<BaseFloat> &priors,
-                            Nnet *nnet);
+      const TransitionModel &tmodel,
+      const VectorBase<BaseFloat> &priors,
+      Nnet *nnet);
 
   // train on one minibatch.
   void Train(const NnetDiscriminativeExample &eg);
@@ -98,15 +98,15 @@ class NnetDiscriminativeTrainer {
   bool PrintTotalStats() const;
 
   ~NnetDiscriminativeTrainer();
- private:
+private:
   void ProcessOutputs(const NnetDiscriminativeExample &eg,
-                      NnetComputer *computer);
+      NnetComputer *computer);
 
   const NnetDiscriminativeOptions opts_;
 
   const TransitionModel &tmodel_;
   CuVector<BaseFloat> log_priors_;
-  
+
   Nnet *nnet_;
 
   Nnet *delta_nnet_;  // Only used if momentum != 0.0.  nnet representing

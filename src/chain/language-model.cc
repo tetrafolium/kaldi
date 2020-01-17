@@ -47,7 +47,7 @@ void LanguageModelEstimator::AddCounts(const std::vector<int32> &sentence) {
 }
 
 void LanguageModelEstimator::IncrementCount(const std::vector<int32> &history,
-                                            int32 next_phone) {
+    int32 next_phone) {
   int32 lm_state_index = FindOrCreateLmStateIndexForHistory(history);
   if (lm_states_[lm_state_index].tot_count == 0) {
     num_active_lm_states_++;
@@ -86,7 +86,7 @@ int32 LanguageModelEstimator::CheckActiveStates() const {
 }
 
 int32 LanguageModelEstimator::FindLmStateIndexForHistory(
-    const std::vector<int32> &hist) const {
+  const std::vector<int32> &hist) const {
   MapType::const_iterator iter = hist_to_lmstate_index_.find(hist);
   if (iter == hist_to_lmstate_index_.end())
     return -1;
@@ -95,7 +95,7 @@ int32 LanguageModelEstimator::FindLmStateIndexForHistory(
 }
 
 int32 LanguageModelEstimator::FindNonzeroLmStateIndexForHistory(
-    std::vector<int32> hist) const {
+  std::vector<int32> hist) const {
   while (1) {
     int32 l = FindLmStateIndexForHistory(hist);
     if (l == -1 || lm_states_[l].tot_count == 0) {
@@ -111,7 +111,7 @@ int32 LanguageModelEstimator::FindNonzeroLmStateIndexForHistory(
 }
 
 int32 LanguageModelEstimator::FindOrCreateLmStateIndexForHistory(
-    const std::vector<int32> &hist) {
+  const std::vector<int32> &hist) {
   MapType::const_iterator iter = hist_to_lmstate_index_.find(hist);
   if (iter != hist_to_lmstate_index_.end())
     return iter->second;
@@ -124,7 +124,7 @@ int32 LanguageModelEstimator::FindOrCreateLmStateIndexForHistory(
   if (hist.size() >= opts_.no_prune_ngram_order) {
     // we need a backoff state to exist- create one if needed.
     std::vector<int32> backoff_hist(hist.begin() + 1,
-                                    hist.end());
+        hist.end());
 
     int32 backoff_lm_state = FindOrCreateLmStateIndexForHistory(
         backoff_hist);
@@ -186,7 +186,7 @@ void LanguageModelEstimator::InitializeQueue() {
 }
 
 BaseFloat LanguageModelEstimator::BackoffLogLikelihoodChange(
-    int32 l) const {
+  int32 l) const {
   const LmState &lm_state = lm_states_.at(l);
   KALDI_ASSERT(lm_state.backoff_allowed && lm_state.backoff_lmstate_index >= 0);
   const LmState &backoff_lm_state = lm_states_.at(
@@ -350,8 +350,8 @@ bool LanguageModelEstimator::BackoffAllowed(int32 l) const {
 }
 
 void LanguageModelEstimator::OutputToFst(
-    int32 num_states,
-    fst::StdVectorFst *fst) const {
+  int32 num_states,
+  fst::StdVectorFst *fst) const {
   KALDI_ASSERT(num_states == num_active_lm_states_);
   fst->DeleteStates();
   for (int32 i = 0; i < num_states; i++)

@@ -30,8 +30,8 @@
 namespace kaldi {
 
 nnet2::Component *ConvertAffineTransformComponent(
-    const nnet1::Component &nnet1_component,
-    const bool use_preconditioned_affine_component) {
+  const nnet1::Component &nnet1_component,
+  const bool use_preconditioned_affine_component) {
   const nnet1::AffineTransform *affine =
       dynamic_cast<const nnet1::AffineTransform*>(&nnet1_component);
   KALDI_ASSERT(affine != NULL);
@@ -40,10 +40,10 @@ nnet2::Component *ConvertAffineTransformComponent(
   BaseFloat learning_rate = 1.0e-05;
   if (use_preconditioned_affine_component) {
     int32 rank_in = 20,
-          rank_out = 80,
-          update_period = 4;
+        rank_out = 80,
+        update_period = 4;
     BaseFloat num_samples_history = 2000.,
-              alpha = 4.;
+        alpha = 4.;
     return new nnet2::AffineComponentPreconditionedOnline(
       nnet2::AffineComponent(affine->GetLinearity(),
         affine->GetBias(),
@@ -61,7 +61,7 @@ nnet2::Component *ConvertAffineTransformComponent(
 }
 
 nnet2::Component *ConvertSoftmaxComponent(
-    const nnet1::Component &nnet1_component) {
+  const nnet1::Component &nnet1_component) {
   const nnet1::Softmax *softmax =
       dynamic_cast<const nnet1::Softmax*>(&nnet1_component);
   KALDI_ASSERT(softmax != NULL);
@@ -69,7 +69,7 @@ nnet2::Component *ConvertSoftmaxComponent(
 }
 
 nnet2::Component *ConvertSigmoidComponent(
-    const nnet1::Component &nnet1_component) {
+  const nnet1::Component &nnet1_component) {
   const nnet1::Sigmoid *sigmoid =
       dynamic_cast<const nnet1::Sigmoid*>(&nnet1_component);
   KALDI_ASSERT(sigmoid != NULL);
@@ -77,7 +77,7 @@ nnet2::Component *ConvertSigmoidComponent(
 }
 
 nnet2::Component *ConvertSpliceComponent(
-    const nnet1::Component &nnet1_component) {
+  const nnet1::Component &nnet1_component) {
   const nnet1::Splice *splice =
       dynamic_cast<const nnet1::Splice*>(&nnet1_component);
   KALDI_ASSERT(splice != NULL);
@@ -97,7 +97,7 @@ nnet2::Component *ConvertSpliceComponent(
 
 
 nnet2::Component *ConvertAddShiftComponent(
-    const nnet1::Component &nnet1_component) {
+  const nnet1::Component &nnet1_component) {
   const nnet1::AddShift *add_shift =
       dynamic_cast<const nnet1::AddShift*>(&nnet1_component);
   KALDI_ASSERT(add_shift != NULL);
@@ -112,7 +112,7 @@ nnet2::Component *ConvertAddShiftComponent(
 }
 
 nnet2::Component *ConvertRescaleComponent(
-    const nnet1::Component &nnet1_component) {
+  const nnet1::Component &nnet1_component) {
   const nnet1::Rescale *rescale =
       dynamic_cast<const nnet1::Rescale*>(&nnet1_component);
   KALDI_ASSERT(rescale != NULL);
@@ -131,23 +131,23 @@ nnet2::Component *ConvertComponent(const nnet1::Component &nnet1_component,
     const bool use_preconditioned_affine_component) {
   nnet1::Component::ComponentType type_in = nnet1_component.GetType();
   switch (type_in) {
-    case nnet1::Component::kAffineTransform:
-      return ConvertAffineTransformComponent(nnet1_component,
+  case nnet1::Component::kAffineTransform:
+    return ConvertAffineTransformComponent(nnet1_component,
           use_preconditioned_affine_component);
-    case nnet1::Component::kSoftmax:
-      return ConvertSoftmaxComponent(nnet1_component);
-    case nnet1::Component::kSigmoid:
-      return ConvertSigmoidComponent(nnet1_component);
-    case nnet1::Component::kSplice:
-      return ConvertSpliceComponent(nnet1_component); // note, this will for now only handle the
-      // special case nnet1::Component::where all splice indexes in nnet1_component are contiguous, e.g.
-      // -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 .
-    case nnet1::Component::kAddShift:
-      return ConvertAddShiftComponent(nnet1_component); // convert to FixedBiasComponent
-    case nnet1::Component::kRescale:
-      return ConvertRescaleComponent(nnet1_component); // convert to FixedScaleComponent
-    default: KALDI_ERR << "Un-handled nnet1 component type "
-                       << nnet1::Component::TypeToMarker(type_in);
+  case nnet1::Component::kSoftmax:
+    return ConvertSoftmaxComponent(nnet1_component);
+  case nnet1::Component::kSigmoid:
+    return ConvertSigmoidComponent(nnet1_component);
+  case nnet1::Component::kSplice:
+    return ConvertSpliceComponent(nnet1_component);   // note, this will for now only handle the
+  // special case nnet1::Component::where all splice indexes in nnet1_component are contiguous, e.g.
+  // -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 .
+  case nnet1::Component::kAddShift:
+    return ConvertAddShiftComponent(nnet1_component);   // convert to FixedBiasComponent
+  case nnet1::Component::kRescale:
+    return ConvertRescaleComponent(nnet1_component);   // convert to FixedScaleComponent
+  default: KALDI_ERR << "Un-handled nnet1 component type "
+                     << nnet1::Component::TypeToMarker(type_in);
     return NULL;
   }
 }
@@ -160,7 +160,7 @@ nnet2::Nnet *ConvertNnet1ToNnet2(const nnet1::Nnet &nnet1,
   std::vector<nnet2::Component*> *components = new std::vector<nnet2::Component*>();
   components->resize(size);
   for (size_t i = 0; i < size; i++) {
-      (*components)[i] = ConvertComponent(nnet1.GetComponent(i),
+    (*components)[i] = ConvertComponent(nnet1.GetComponent(i),
           use_preconditioned_affine_component);
   }
 

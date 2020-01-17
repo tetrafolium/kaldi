@@ -1,7 +1,7 @@
 // gmm/diag-gmm-normal.h
 
 // Copyright 2009-2011  Saarland University  Korbinian Riedhammer  Yanmin Qian
-//                      
+//
 
 // See ../../COPYING for clarification regarding multiple authors
 //
@@ -43,7 +43,7 @@ class DiagGmm;
  *  not have any extra methods that are not needed.
  */
 class DiagGmmNormal {
- public:
+public:
   /// Empty constructor.
   DiagGmmNormal() { }
 

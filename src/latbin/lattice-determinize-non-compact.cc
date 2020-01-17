@@ -36,15 +36,15 @@ typedef Lattice::Arc Arc;
 
 // This function is a copy of the function in the program lattice-determinize
 bool DeterminizeLatticeWrapper(const Lattice &lat,
-                               const std::string &key,
-                               bool prune,
-                               BaseFloat beam,
-                               BaseFloat beam_ratio,
-                               int32 max_mem,
-                               int32 max_loop,
-                               BaseFloat delta,
-                               int32 num_loops,
-                               CompactLattice *clat) {
+    const std::string &key,
+    bool prune,
+    BaseFloat beam,
+    BaseFloat beam_ratio,
+    int32 max_mem,
+    int32 max_loop,
+    BaseFloat delta,
+    int32 num_loops,
+    CompactLattice *clat) {
   fst::DeterminizeLatticeOptions lat_opts;
   lat_opts.max_mem = max_mem;
   lat_opts.max_loop = max_loop;
@@ -91,9 +91,9 @@ bool DeterminizeLatticeWrapper(const Lattice &lat,
 }
 
 void ComputeAcousticScoresMap(
-    const Lattice &lat,
-    unordered_map<std::pair<int32, int32>, std::pair<BaseFloat, int32>,
-                                        PairHasher<int32> > *acoustic_scores) {
+  const Lattice &lat,
+  unordered_map<std::pair<int32, int32>, std::pair<BaseFloat, int32>,
+  PairHasher<int32> > *acoustic_scores) {
   acoustic_scores->clear();
 
   std::vector<int32> state_times;
@@ -104,7 +104,7 @@ void ComputeAcousticScoresMap(
   for (StateId s = 0; s < lat.NumStates(); s++) {
     int32 t = state_times[s];
     for (fst::ArcIterator<Lattice> aiter(lat, s); !aiter.Done();
-          aiter.Next()) {
+        aiter.Next()) {
       const Arc &arc = aiter.Value();
       const LatticeWeight &weight = arc.weight;
 
@@ -112,13 +112,13 @@ void ComputeAcousticScoresMap(
 
       if (tid != 0) {
         unordered_map<std::pair<int32, int32>, std::pair<BaseFloat, int32>,
-          PairHasher<int32> >::iterator it = acoustic_scores->find(std::make_pair(t, tid));
+            PairHasher<int32> >::iterator it = acoustic_scores->find(std::make_pair(t, tid));
         if (it == acoustic_scores->end()) {
           acoustic_scores->insert(std::make_pair(std::make_pair(t, tid),
                                           std::make_pair(weight.Value2(), 1)));
         } else {
           if (it->second.second == 2
-                && it->second.first / it->second.second != weight.Value2()) {
+              && it->second.first / it->second.second != weight.Value2()) {
             KALDI_VLOG(2) << "Transitions on the same frame have different "
                           << "acoustic costs for tid " << tid << "; "
                           << it->second.first / it->second.second
@@ -143,9 +143,9 @@ void ComputeAcousticScoresMap(
 }
 
 void ReplaceAcousticScoresFromMap(
-    const unordered_map<std::pair<int32, int32>, std::pair<BaseFloat, int32>,
-                                        PairHasher<int32> > &acoustic_scores,
-    Lattice *lat) {
+  const unordered_map<std::pair<int32, int32>, std::pair<BaseFloat, int32>,
+  PairHasher<int32> > &acoustic_scores,
+  Lattice *lat) {
   fst::TopSort(lat);
 
   std::vector<int32> state_times;
@@ -156,13 +156,13 @@ void ReplaceAcousticScoresFromMap(
   for (StateId s = 0; s < lat->NumStates(); s++) {
     int32 t = state_times[s];
     for (fst::MutableArcIterator<Lattice> aiter(lat, s);
-          !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       Arc arc(aiter.Value());
 
       int32 tid = arc.ilabel;
       if (tid != 0) {
         unordered_map<std::pair<int32, int32>, std::pair<BaseFloat, int32>,
-          PairHasher<int32> >::const_iterator it = acoustic_scores.find(std::make_pair(t, tid));
+            PairHasher<int32> >::const_iterator it = acoustic_scores.find(std::make_pair(t, tid));
         if (it == acoustic_scores.end()) {
           KALDI_ERR << "Could not find tid " << tid << " at time " << t
                     << " in the acoustic scores map.";
@@ -260,7 +260,7 @@ int main(int argc, char *argv[]) {
 
     // depth stats (for diagnostics).
     double sum_depth_in = 0.0,
-          sum_depth_out = 0.0, sum_t = 0.0;
+        sum_depth_out = 0.0, sum_t = 0.0;
 
     if (acoustic_scale == 0.0)
       KALDI_ERR << "Do not use a zero acoustic scale (cannot be inverted)";
@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
 
       // Compute a map from each (t, tid) to (sum_of_acoustic_scores, count)
       unordered_map<std::pair<int32,int32>, std::pair<BaseFloat, int32>,
-                                          PairHasher<int32> > acoustic_scores;
+          PairHasher<int32> > acoustic_scores;
       ComputeAcousticScoresMap(lat, &acoustic_scores);
 
       Invert(&lat); // make it so word labels are on the input.

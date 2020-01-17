@@ -26,18 +26,18 @@
 #include "fstext/kaldi-fst-io.h"
 
 /*
-Test:
-the command below should print out something similar to the given
-input.  and if you remove ,t from the output side it should print something
-binary.
-cat <<EOF | fstcopy ark,t:- ark,t:-
-foo
-0 1 9 9
-1 0.0
+   Test:
+   the command below should print out something similar to the given
+   input.  and if you remove ,t from the output side it should print something
+   binary.
+   cat <<EOF | fstcopy ark,t:- ark,t:-
+   foo
+   0 1 9 9
+   1 0.0
 
-EOF
+   EOF
 
-*/
+ */
 int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
@@ -57,14 +57,14 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     std::string fst_rspecifier = po.GetArg(1),
         fst_wspecifier = po.GetArg(2);
 
     SequentialTableReader<VectorFstHolder> fst_reader(fst_rspecifier);
     TableWriter<VectorFstHolder> fst_writer(fst_wspecifier);
     int32 n_done = 0;
-    
+
     for (; !fst_reader.Done(); fst_reader.Next(), n_done++)
       fst_writer.Write(fst_reader.Key(), fst_reader.Value());
 

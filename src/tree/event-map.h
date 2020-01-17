@@ -59,7 +59,7 @@ typedef std::vector<std::pair<EventKeyType, EventValueType> > EventType;
 // It is required to be sorted and have unique keys-- i.e. functions assume this when called
 // with this type.
 
-inline std::pair<EventKeyType, EventValueType> MakeEventPair (EventKeyType k, EventValueType v) {  
+inline std::pair<EventKeyType, EventValueType> MakeEventPair (EventKeyType k, EventValueType v) {
   return std::pair<EventKeyType, EventValueType>(k, v);
 }
 
@@ -84,7 +84,7 @@ struct EventMapVectorEqual {  // Equality object for EventType pointers-- test e
 /// EventAnswerType which is just an integer.  See \ref tree_internals
 /// for overview.
 class EventMap {
- public:
+public:
   static void Check(const EventType &event);  // will crash if not sorted and unique on key.
   static bool Lookup(const EventType &event, EventKeyType key, EventValueType *ans);
 
@@ -113,7 +113,7 @@ class EventMap {
   // Copy() does not take ownership of the pointers in new_leaves (it uses the Copy() function of those
   // EventMaps).
   virtual EventMap *Copy(const std::vector<EventMap*> &new_leaves) const = 0;
-  
+
   EventMap *Copy() const { std::vector<EventMap*> new_leaves; return Copy(new_leaves); }
 
   // The function MapValues() is intended to be used to map phone-sets between
@@ -128,8 +128,8 @@ class EventMap {
   // used for keys in "keys_to_map" are not mapped by "value_map".  This
   // function is not currently used.
   virtual EventMap *MapValues(
-      const unordered_set<EventKeyType> &keys_to_map,
-      const unordered_map<EventValueType,EventValueType> &value_map) const = 0;
+    const unordered_set<EventKeyType> &keys_to_map,
+    const unordered_map<EventValueType,EventValueType> &value_map) const = 0;
 
   // The function Prune() is like Copy(), except it removes parts of the tree
   // that return only -1 (it will return NULL if this EventMap returns only -1).
@@ -138,7 +138,7 @@ class EventMap {
   // want, you'd put a ConstantEventMap with -1; you'd then call
   // Prune() on the result.  This function is not currently used.
   virtual EventMap *Prune() const = 0;
-  
+
   virtual EventAnswerType MaxResult() const {  // child classes may override this for efficiency; here is basic version.
     // returns -1 if nothing found.
     std::vector<EventAnswerType> tmp; EventType empty_event;
@@ -147,7 +147,7 @@ class EventMap {
       KALDI_WARN << "EventMap::MaxResult(), empty result";
       return std::numeric_limits<EventAnswerType>::min();
     }
-    else { return * std::max_element(tmp.begin(), tmp.end()); }
+    else { return *std::max_element(tmp.begin(), tmp.end()); }
   }
 
   /// Write to stream.
@@ -164,15 +164,15 @@ class EventMap {
 
 
 class ConstantEventMap: public EventMap {
- public:
+public:
   virtual bool Map(const EventType &event, EventAnswerType *ans) const {
     *ans = answer_;
     return true;
   }
 
   virtual void MultiMap(const EventType &,
-                        std::vector<EventAnswerType> *ans) const {
-     ans->push_back(answer_);
+      std::vector<EventAnswerType> *ans) const {
+    ans->push_back(answer_);
   }
 
   virtual void GetChildren(std::vector<EventMap*> *out) const { out->clear(); }
@@ -185,31 +185,31 @@ class ConstantEventMap: public EventMap {
   }
 
   virtual EventMap *MapValues(
-      const unordered_set<EventKeyType> &keys_to_map,
-      const unordered_map<EventValueType,EventValueType> &value_map) const {
+    const unordered_set<EventKeyType> &keys_to_map,
+    const unordered_map<EventValueType,EventValueType> &value_map) const {
     return new ConstantEventMap(answer_);
   }
 
   virtual EventMap *Prune() const {
     return (answer_ == -1 ? NULL : new ConstantEventMap(answer_));
   }
-  
-  explicit ConstantEventMap(EventAnswerType answer): answer_(answer) { }
-  
+
+  explicit ConstantEventMap(EventAnswerType answer) : answer_(answer) { }
+
   virtual void Write(std::ostream &os, bool binary);
   static ConstantEventMap *Read(std::istream &is, bool binary);
- private:
+private:
   EventAnswerType answer_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(ConstantEventMap);
 };
 
 class TableEventMap: public EventMap {
- public:
+public:
 
   virtual bool Map(const EventType &event, EventAnswerType *ans) const {
     EventValueType tmp;   *ans = -1;  // means no answer
     if (Lookup(event, key_, &tmp) && tmp >= 0
-       && tmp < (EventValueType)table_.size() && table_[tmp] != NULL) {
+        && tmp < (EventValueType)table_.size() && table_[tmp] != NULL) {
       return table_[tmp]->Map(event, ans);
     }
     return false;
@@ -228,19 +228,19 @@ class TableEventMap: public EventMap {
         return table_[tmp]->MultiMap(event, ans);
       // else no answers.
     } else {  // all answers are possible if no such key.
-      for (size_t i = 0;i < table_.size();i++)
+      for (size_t i = 0; i < table_.size(); i++)
         if (table_[i] != NULL) table_[i]->MultiMap(event, ans);  // append.
     }
   }
 
   virtual EventMap *Prune() const;
-  
+
   virtual EventMap *MapValues(
-      const unordered_set<EventKeyType> &keys_to_map,
-      const unordered_map<EventValueType,EventValueType> &value_map) const;
-  
+    const unordered_set<EventKeyType> &keys_to_map,
+    const unordered_map<EventValueType,EventValueType> &value_map) const;
+
   /// Takes ownership of pointers.
-  explicit TableEventMap(EventKeyType key, const std::vector<EventMap*> &table): key_(key), table_(table) {}
+  explicit TableEventMap(EventKeyType key, const std::vector<EventMap*> &table) : key_(key), table_(table) {}
   /// Takes ownership of pointers.
   explicit TableEventMap(EventKeyType key, const std::map<EventValueType, EventMap*> &map_in);
   /// This initializer creates a ConstantEventMap for each value in the map.
@@ -251,13 +251,13 @@ class TableEventMap: public EventMap {
 
   virtual EventMap *Copy(const std::vector<EventMap*> &new_leaves) const {
     std::vector<EventMap*> new_table_(table_.size(), NULL);
-    for (size_t i = 0;i<table_.size();i++) if (table_[i]) new_table_[i]=table_[i]->Copy(new_leaves);
+    for (size_t i = 0; i<table_.size(); i++) if (table_[i]) new_table_[i]=table_[i]->Copy(new_leaves);
     return new TableEventMap(key_, new_table_);
   }
   virtual ~TableEventMap() {
     DeletePointers(&table_);
   }
- private:
+private:
   EventKeyType key_;
   std::vector<EventMap*> table_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(TableEventMap);
@@ -267,7 +267,7 @@ class TableEventMap: public EventMap {
 
 
 class SplitEventMap: public EventMap {  // A decision tree [non-leaf] node.
- public:
+public:
 
   virtual bool Map(const EventType &event, EventAnswerType *ans) const {
     EventValueType value;
@@ -308,25 +308,25 @@ class SplitEventMap: public EventMap {  // A decision tree [non-leaf] node.
   static SplitEventMap *Read(std::istream &is, bool binary);
 
   virtual EventMap *Prune() const;
-  
+
   virtual EventMap *MapValues(
-      const unordered_set<EventKeyType> &keys_to_map,
-      const unordered_map<EventValueType,EventValueType> &value_map) const;
-  
+    const unordered_set<EventKeyType> &keys_to_map,
+    const unordered_map<EventValueType,EventValueType> &value_map) const;
+
   virtual ~SplitEventMap() { Destroy(); }
 
   /// This constructor takes ownership of the "yes" and "no" arguments.
   SplitEventMap(EventKeyType key, const std::vector<EventValueType> &yes_set,
-                EventMap *yes, EventMap *no): key_(key), yes_set_(yes_set), yes_(yes), no_(no) {
+      EventMap *yes, EventMap *no) : key_(key), yes_set_(yes_set), yes_(yes), no_(no) {
     KALDI_PARANOID_ASSERT(IsSorted(yes_set));
     KALDI_ASSERT(yes_ != NULL && no_ != NULL);
   }
 
 
- private:
+private:
   /// This constructor used in the Copy() function.
   SplitEventMap(EventKeyType key, const ConstIntegerSet<EventValueType> &yes_set,
-                EventMap *yes, EventMap *no): key_(key), yes_set_(yes_set), yes_(yes), no_(no) {
+      EventMap *yes, EventMap *no) : key_(key), yes_set_(yes_set), yes_(yes), no_(no) {
     KALDI_ASSERT(yes_ != NULL && no_ != NULL);
   }
   void Destroy() {
@@ -351,11 +351,11 @@ class SplitEventMap: public EventMap {  // A decision tree [non-leaf] node.
    structure, where parent[i] > i, except for the last (root) node where parent[i] == i.
    If the EventMap does not have this structure (e.g. if multiple different leaf nodes share
    the same number), then it will return false.
-*/
+ */
 
 bool GetTreeStructure(const EventMap &map,
-                      int32 *num_leaves,
-                      std::vector<int32> *parents);
+    int32 *num_leaves,
+    std::vector<int32> *parents);
 
 
 /// @} end "addtogroup event_map_group"

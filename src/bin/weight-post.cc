@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
         continue;
       }
       const Vector<BaseFloat> &weights = weights_reader.Value(key);
-      if (std::abs(weights.Dim() - static_cast<int32>(post.size())) > 
+      if (std::abs(weights.Dim() - static_cast<int32>(post.size())) >
           length_tolerance) {
         KALDI_WARN << "Weights for utterance " << key
                    << " have wrong size, " << weights.Dim()

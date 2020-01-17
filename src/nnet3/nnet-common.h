@@ -40,14 +40,14 @@ namespace nnet3 {
    recognition, and 'x', which is a catch-all extra index which we might use in
    convolutional setups or for other reasons.  It is possible to extend this by
    adding new indexes if needed.
-*/
+ */
 struct Index {
   int32 n;  // member-index of minibatch, or zero.
   int32 t;  // time-frame.
   int32 x;  // this may come in useful in convoluational approaches.
   // ... it is possible to add extra index here, if needed.
-  Index(): n(0), t(0), x(0) { }
-  Index(int32 n, int32 t, int32 x = 0): n(n), t(t), x(x) { }
+  Index() : n(0), t(0), x(0) { }
+  Index(int32 n, int32 t, int32 x = 0) : n(n), t(t), x(x) { }
 
   bool operator == (const Index &a) const {
     return n == a.n && t == a.t && x == a.x;
@@ -103,10 +103,10 @@ std::ostream &operator << (std::ostream &ostream, const Index &index);
 
 
 void WriteIndexVector(std::ostream &os, bool binary,
-                      const std::vector<Index> &vec);
+    const std::vector<Index> &vec);
 
 void ReadIndexVector(std::istream &is, bool binary,
-                     std::vector<Index> *vec);
+    std::vector<Index> *vec);
 
 
 /* A Cindex is a pair of a node-index (i.e. the index of a NetworkNode) and an
@@ -136,7 +136,7 @@ struct IndexVectorHasher {
 
 // this will only be used for pretty-printing.
 void PrintCindex(std::ostream &ostream, const Cindex &cindex,
-                 const std::vector<std::string> &node_names);
+    const std::vector<std::string> &node_names);
 
 /// this will only be used for pretty-printing.  It prints
 /// a vector of Indexes in a compact, human-readable way with
@@ -146,7 +146,7 @@ void PrintCindex(std::ostream &ostream, const Cindex &cindex,
 /// which would correspond to the indexes
 /// [ (1,1,0), (1,2,0) ... (1,20,0) (2,1,0) ... (2,20,0) ].
 void PrintIndexes(std::ostream &ostream,
-                  const std::vector<Index> &indexes);
+    const std::vector<Index> &indexes);
 
 /// this will only be used for pretty-printing.  It prints a vector of Cindexes
 /// in a compact, human-readable way with compression of ranges.  If the values
@@ -156,24 +156,24 @@ void PrintIndexes(std::ostream &ostream,
 /// same node name, and will print out each range in the way we just mentioned.
 /// 'node_names' will usually come from a call like nnet.GetNodeNames().
 void PrintCindexes(std::ostream &ostream,
-                   const std::vector<Cindex> &cindexes,
-                   const std::vector<std::string> &node_names);
+    const std::vector<Cindex> &cindexes,
+    const std::vector<std::string> &node_names);
 
 /// Appends to 'out' the pairs (node, indexes[0]), (node, indexes[1]), ...
 void AppendCindexes(int32 node, const std::vector<Index> &indexes,
-                    std::vector<Cindex> *out);
+    std::vector<Cindex> *out);
 
 void WriteCindexVector(std::ostream &os, bool binary,
-                       const std::vector<Cindex> &vec);
+    const std::vector<Cindex> &vec);
 
 void ReadCindexVector(std::istream &is, bool binary,
-                      std::vector<Cindex> *vec);
+    std::vector<Cindex> *vec);
 
 // this function prints a vector of integers in a human-readable
 // way, for pretty-printing; it outputs ranges and repeats in
 // a compact form e.g. [ -1x10, 1:20, 25:40 ]
 void PrintIntegerVector(std::ostream &ostream,
-                        const std::vector<int32> &ints);
+    const std::vector<int32> &ints);
 
 
 // this will be used only for debugging output.

@@ -40,8 +40,8 @@ namespace nnet1 {
  * by default (boost = multiply, it's equivalent to applying learning-rate factor).
  */
 class SimpleSentenceAveragingComponent : public Component {
- public:
-  SimpleSentenceAveragingComponent(int32 dim_in, int32 dim_out):
+public:
+  SimpleSentenceAveragingComponent(int32 dim_in, int32 dim_out) :
     Component(dim_in, dim_out),
     gradient_boost_(100.0),
     shrinkage_(0.0),
@@ -77,28 +77,28 @@ class SimpleSentenceAveragingComponent : public Component {
     while (!end_loop && '<' == Peek(is, binary)) {
       int first_char = PeekToken(is, binary);
       switch (first_char) {
-        case 'G': ExpectToken(is, binary, "<GradientBoost>");
-          ReadBasicType(is, binary, &gradient_boost_);
-          break;
-        case 'S': ExpectToken(is, binary, "<Shrinkage>");
-          ReadBasicType(is, binary, &shrinkage_);
-          break;
-        case 'O': ExpectToken(is, binary, "<OnlySumming>");
-          // compatibility trick,
-          // in some models 'only_summing_' was float '0.0',
-          // from now 'only_summing_' is 'bool':
-          try {
-            ReadBasicType(is, binary, &only_summing_);
-          } catch(const std::exception &e) {
-            KALDI_WARN << "ERROR was handled by exception!";
-            BaseFloat dummy_float;
-            ReadBasicType(is, binary, &dummy_float);
-          }
-          break;
-        case '!':
-          ExpectToken(is, binary, "<!EndOfComponent>");
-        default:
-          end_loop = true;
+      case 'G': ExpectToken(is, binary, "<GradientBoost>");
+        ReadBasicType(is, binary, &gradient_boost_);
+        break;
+      case 'S': ExpectToken(is, binary, "<Shrinkage>");
+        ReadBasicType(is, binary, &shrinkage_);
+        break;
+      case 'O': ExpectToken(is, binary, "<OnlySumming>");
+        // compatibility trick,
+        // in some models 'only_summing_' was float '0.0',
+        // from now 'only_summing_' is 'bool':
+        try {
+          ReadBasicType(is, binary, &only_summing_);
+        } catch(const std::exception &e) {
+          KALDI_WARN << "ERROR was handled by exception!";
+          BaseFloat dummy_float;
+          ReadBasicType(is, binary, &dummy_float);
+        }
+        break;
+      case '!':
+        ExpectToken(is, binary, "<!EndOfComponent>");
+      default:
+        end_loop = true;
       }
     }
   }
@@ -114,15 +114,15 @@ class SimpleSentenceAveragingComponent : public Component {
 
   std::string Info() const {
     return std::string("\n  gradient-boost ") + ToString(gradient_boost_) +
-      ", shrinkage: " + ToString(shrinkage_) +
-      ", only summing: " + ToString(only_summing_);
+           ", shrinkage: " + ToString(shrinkage_) +
+           ", only summing: " + ToString(only_summing_);
   }
   std::string InfoGradient() const {
     return Info();
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // get the average row-vector,
     average_row_.Resize(InputDim());
     if (only_summing_) {
@@ -135,9 +135,9 @@ class SimpleSentenceAveragingComponent : public Component {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // When averaging, a single frame from input influenced all the frames
     // on the output. So the derivative w.r.t. single input frame is a sum
     // of the output derivatives, scaled by the averaging constant 1/K.
@@ -157,7 +157,7 @@ class SimpleSentenceAveragingComponent : public Component {
     in_diff->AddVecToRows(gradient_boost_, average_diff_, 0.0);
   }
 
- private:
+private:
   /// Auxiliary buffer for forward propagation (for average vector),
   CuVector<BaseFloat> average_row_;
 
@@ -178,8 +178,8 @@ class SimpleSentenceAveragingComponent : public Component {
 
 /** Deprecated!!!, keeping it as Katka Zmolikova used it in JSALT 2015 */
 class SentenceAveragingComponent : public UpdatableComponent {
- public:
-  SentenceAveragingComponent(int32 dim_in, int32 dim_out):
+public:
+  SentenceAveragingComponent(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out), learn_rate_factor_(100.0)
   { }
   ~SentenceAveragingComponent()
@@ -246,7 +246,7 @@ class SentenceAveragingComponent : public UpdatableComponent {
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // Get NN output
     CuMatrix<BaseFloat> out_nnet;
     nnet_.Propagate(in, &out_nnet);
@@ -254,8 +254,8 @@ class SentenceAveragingComponent : public UpdatableComponent {
     // averaging corresponds to extraction of a 'constant vector'
     // code for single sentence,
     int32 num_inputs = in.NumCols(),
-      nnet_outputs = nnet_.OutputDim(),
-      num_frames = out_nnet.NumRows();
+        nnet_outputs = nnet_.OutputDim(),
+        num_frames = out_nnet.NumRows();
 
     CuVector<BaseFloat> average_row(nnet_outputs);
     average_row.AddRowSumMat(1.0/num_frames, out_nnet, 0.0);
@@ -265,20 +265,20 @@ class SentenceAveragingComponent : public UpdatableComponent {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     if (in_diff == NULL) return;
     int32 num_inputs = in.NumCols(),
-      nnet_outputs = nnet_.OutputDim();
+        nnet_outputs = nnet_.OutputDim();
     in_diff->CopyFromMat(out_diff.ColRange(nnet_outputs, num_inputs));
   }
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     // get useful dims,
     int32 nnet_outputs = nnet_.OutputDim(),
-      num_frames = diff.NumRows();
+        num_frames = diff.NumRows();
     // Passing the derivative into the nested network. The loss derivative is averaged:
     // single frame from nested network influenced all the frames in the main network,
     // so to get the derivative w.r.t. single frame from nested network we sum derivatives
@@ -302,7 +302,7 @@ class SentenceAveragingComponent : public UpdatableComponent {
     nnet_.SetTrainOptions(opts_);
   }
 
- private:
+private:
   Nnet nnet_;
   float learn_rate_factor_;
 };

@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     std::string silence_phones_str;
 
     kaldi::ParseOptions po(usage);
-    po.Register("b", &b, 
+    po.Register("b", &b,
                 "Boosting factor (more -> more boosting of errors / larger margin)");
     po.Register("max-silence", &max_silence_error,
                 "Maximum error assigned to silence phones [c.f. --silence-phones option]."
@@ -61,14 +61,14 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     std::vector<int32> silence_phones;
     if (!kaldi::SplitStringToIntegers(silence_phones_str, ":", false, &silence_phones))
       KALDI_ERR << "Invalid silence-phones string " << silence_phones_str;
     kaldi::SortAndUniq(&silence_phones);
     if (silence_phones.empty())
       KALDI_WARN <<"No silence phones specified, make sure this is what you intended.";
-    
+
     std::string model_rxfilename = po.GetArg(1),
         lats_rspecifier = po.GetArg(2),
         ali_rspecifier = po.GetArg(3),
@@ -85,9 +85,9 @@ int main(int argc, char *argv[]) {
       kaldi::Input ki(model_rxfilename, &binary_in);
       trans.Read(ki.Stream(), binary_in);
     }
-    
+
     int32 n_done = 0, n_err = 0, n_no_ali = 0;
-    
+
     for (; !lattice_reader.Done(); lattice_reader.Next()) {
       std::string key = lattice_reader.Key();
       kaldi::Lattice lat = lattice_reader.Value();
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
         n_err++;
         continue;
       }
-      
+
       if (b != 0.0) {
         if (!alignment_reader.HasKey(key)) {
           KALDI_WARN << "No alignment for utterance " << key;

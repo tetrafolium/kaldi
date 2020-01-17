@@ -75,13 +75,13 @@ struct IoSpecification {
   bool has_deriv;  // For output nodes, true if a derivative w.r.t. that output
                    // will be supplied.  For input nodes, true if the derivative
                    // w.r.t. that input will be needed.
-  IoSpecification(): has_deriv(false) { }
+  IoSpecification() : has_deriv(false) { }
 
-  IoSpecification(const IoSpecification &other):
-      name(other.name), indexes(other.indexes), has_deriv(other.has_deriv) { }
+  IoSpecification(const IoSpecification &other) :
+    name(other.name), indexes(other.indexes), has_deriv(other.has_deriv) { }
   IoSpecification(const std::string &name, const std::vector<Index> &indexes,
-                  bool has_deriv = false):
-      name(name), indexes(indexes), has_deriv(has_deriv) { }
+      bool has_deriv = false) :
+    name(name), indexes(indexes), has_deriv(has_deriv) { }
   // This constructor sets n = 0, x = 0 and t from t_start to t_end-1; and
   // has_deriv to false.
   IoSpecification(const std::string &name, int32 t_start, int32 t_end);
@@ -129,8 +129,8 @@ struct ComputationRequest {
   /// framework.
   MiscComputationInfo misc_info;
 
-  ComputationRequest(): need_model_derivative(false),
-                        store_component_stats(false) { }
+  ComputationRequest() : need_model_derivative(false),
+    store_component_stats(false) { }
 
   /// returns true if any of inputs[*].has_deriv is true, or
   /// need_model_derivative is true.
@@ -244,7 +244,7 @@ struct ComputationRequest {
      conditionals, this should be the last command, as remaining
      commands will be unreachable.
 
-*/
+ */
 enum CommandType {
   kAllocMatrixUndefined, kAllocMatrixZeroed,
   kDeallocMatrix, kAllocMatrixFromOther, kAllocMatrixFromOtherZeroed,
@@ -253,7 +253,8 @@ enum CommandType {
   kCopyRowsMulti, kCopyToRowsMulti, kAddRowsMulti, kAddToRowsMulti,
   kAddRowRanges, kAcceptInput, kProvideOutput,
   kNoOperation, kNoOperationPermanent, kNoOperationMarker, kNoOperationLabel,
-  kGotoLabel };
+  kGotoLabel
+};
 
 
 
@@ -267,15 +268,15 @@ struct NnetComputation {
     MatrixStrideType stride_type;
     MatrixInfo() { }
     MatrixInfo(int32 num_rows, int32 num_cols,
-               MatrixStrideType stride_type):
-        num_rows(num_rows), num_cols(num_cols), stride_type(stride_type) {}
+        MatrixStrideType stride_type) :
+      num_rows(num_rows), num_cols(num_cols), stride_type(stride_type) {}
     void Read(std::istream &istream, bool binary);
     void Write(std::ostream &ostream, bool binary) const;
   };
   struct MatrixDebugInfo {
     bool is_deriv;  // true if this represents a derivative, not a value.
     std::vector<Cindex> cindexes;
-    MatrixDebugInfo(): is_deriv(false) { }
+    MatrixDebugInfo() : is_deriv(false) { }
     void Swap(MatrixDebugInfo *other);  // Shallow swap
     void Read(std::istream &istream, bool binary);
     void Write(std::ostream &ostream, bool binary) const;
@@ -288,9 +289,9 @@ struct NnetComputation {
     int32 num_cols;
     SubMatrixInfo() { }
     SubMatrixInfo(int32 matrix_index, int32 row_offset, int32 num_rows,
-                  int32 col_offset, int32 num_cols):
-        matrix_index(matrix_index), row_offset(row_offset), num_rows(num_rows),
-        col_offset(col_offset), num_cols(num_cols) {}
+        int32 col_offset, int32 num_cols) :
+      matrix_index(matrix_index), row_offset(row_offset), num_rows(num_rows),
+      col_offset(col_offset), num_cols(num_cols) {}
     void Read(std::istream &istream, bool binary);
     void Write(std::ostream &ostream, bool binary) const;
     bool operator== (const SubMatrixInfo &other) const;
@@ -305,10 +306,10 @@ struct NnetComputation {
     int32 arg6;
     int32 arg7;
     Command(CommandType command_type = kNoOperationMarker,
-            int32 arg1 = -1, int32 arg2 = -1, int32 arg3 = -1, int32 arg4 = -1,
-            int32 arg5 = -1, int32 arg6 = -1, int32 arg7 = -1):
-        command_type(command_type), arg1(arg1), arg2(arg2), arg3(arg3),
-        arg4(arg4), arg5(arg5), arg6(arg6), arg7(arg7) { }
+        int32 arg1 = -1, int32 arg2 = -1, int32 arg3 = -1, int32 arg4 = -1,
+        int32 arg5 = -1, int32 arg6 = -1, int32 arg7 = -1) :
+      command_type(command_type), arg1(arg1), arg2(arg2), arg3(arg3),
+      arg4(arg4), arg5(arg5), arg6(arg6), arg7(arg7) { }
     void Read(std::istream &istream, bool binary);
     void Write(std::ostream &ostream, bool binary) const;
   };
@@ -328,7 +329,7 @@ struct NnetComputation {
     ComponentPrecomputedIndexes *data;
     std::vector<Index> input_indexes;
     std::vector<Index> output_indexes;
-    PrecomputedIndexesInfo(): data(NULL) { }
+    PrecomputedIndexesInfo() : data(NULL) { }
   };
 
 
@@ -405,8 +406,8 @@ struct NnetComputation {
   /// 'this->submatrices'.  There is no mechanism to stop duplicates from being
   /// created, but calling RenumberComputation() will remove such duplicates.
   int32 NewSubMatrix(int32 base_submatrix,
-                     int32 row_offset, int32 num_rows,
-                     int32 col_offset, int32 num_cols);
+      int32 row_offset, int32 num_rows,
+      int32 col_offset, int32 num_cols);
 
   // returns true if this submatrix corresponds to the whole of a matrix.
   // submatrix_index must be > 0.
@@ -428,7 +429,7 @@ struct NnetComputation {
   // that explains the meaning of each one: something like "m1", "m2";
   // and for parts of matrices, "m1(0:10, 20:40)".
   void GetSubmatrixStrings(const Nnet &nnet,
-                           std::vector<std::string> *submat_strings) const;
+      std::vector<std::string> *submat_strings) const;
 
   // This function outputs a vector, indexed by matrix index, that gives you for
   // each matrix, the index of a submatrix which refers to the whole of that
@@ -441,8 +442,8 @@ struct NnetComputation {
   // newlines on these).   This is used in the debugging code in NnetComputer.
   // either pointer argument may be NULL.
   void GetCommandStrings(const Nnet &nnet,
-                         std::string *preamble,
-                         std::vector<std::string> *command_strings) const;
+      std::string *preamble,
+      std::vector<std::string> *command_strings) const;
 
 
   // destructor deletes pointers in component_precomputed_indexes.
@@ -455,7 +456,7 @@ struct NnetComputation {
   // Assignment operator.
   NnetComputation &operator = (const NnetComputation &other);
   // Default constructor
-  NnetComputation(): need_model_derivative(false) { }
+  NnetComputation() : need_model_derivative(false) { }
 };
 
 
@@ -466,7 +467,7 @@ struct NnetComputation {
 // We don't give Read and Write functions to struct NnetComputation, because we
 // don't anticipate needing to write it to disk.
 std::ostream &operator << (std::ostream &os,
-                           NnetComputation &computation);
+    NnetComputation &computation);
 
 
 

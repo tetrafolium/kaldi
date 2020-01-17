@@ -35,7 +35,7 @@ void NnetStats::StatsElement::PrintStats(std::ostream &os) {
      << ", abs-avg-value mean,stddev=" << abs_value_mean << ','
      << abs_value_stddev;
 }
-  
+
 void NnetStats::StatsElement::AddStats(BaseFloat avg_deriv, BaseFloat avg_value) {
   count++;
   deriv_sum += avg_deriv;
@@ -51,7 +51,7 @@ int32 NnetStats::BucketFor(BaseFloat avg_deriv) {
   int32 index = static_cast<int32>(avg_deriv / bucket_width_ + 0.5);
   while (index >= static_cast<int32>(buckets_.size()))
     buckets_.push_back(StatsElement(buckets_.size() * bucket_width_,
-                                    (buckets_.size() + 1) * bucket_width_));
+        (buckets_.size() + 1) * bucket_width_));
   return index;
 }
 
@@ -62,10 +62,10 @@ void NnetStats::AddStats(BaseFloat avg_deriv, BaseFloat avg_value) {
 
 void NnetStats::AddStatsFromNnet(const Nnet &nnet) {
   const AffineComponent *ac = dynamic_cast<const AffineComponent*>(
-      &(nnet.GetComponent(affine_component_index_)));
+    &(nnet.GetComponent(affine_component_index_)));
   KALDI_ASSERT(ac != NULL); // would be an error in calling code.
   const NonlinearComponent *nc = dynamic_cast<const NonlinearComponent*>(
-      &(nnet.GetComponent(affine_component_index_ + 1)));
+    &(nnet.GetComponent(affine_component_index_ + 1)));
   KALDI_ASSERT(nc != NULL); // would be an error in calling code.
 
   double count = nc->Count();
@@ -97,19 +97,19 @@ void NnetStats::PrintStats(std::ostream &os) {
 }
 
 void GetNnetStats(const NnetStatsConfig &config,
-                  const Nnet &nnet,
-                  std::vector<NnetStats> *stats) {
+    const Nnet &nnet,
+    std::vector<NnetStats> *stats) {
   KALDI_ASSERT(stats->size() == 0);
   for (int32 c = 0; c + 1 < nnet.NumComponents(); c++) {
     const AffineComponent *ac = dynamic_cast<const AffineComponent*>(
-        &(nnet.GetComponent(c)));
+      &(nnet.GetComponent(c)));
     if (ac == NULL) continue;
     const NonlinearComponent *nc = dynamic_cast<const NonlinearComponent*>(
-        &(nnet.GetComponent(c + 1)));
+      &(nnet.GetComponent(c + 1)));
     if (nc == NULL) continue;
     // exclude softmax.
     const SoftmaxComponent *sc = dynamic_cast<const SoftmaxComponent*>(
-        &(nnet.GetComponent(c + 1)));
+      &(nnet.GetComponent(c + 1)));
     if (sc != NULL) continue;
     stats->push_back(NnetStats(c, config.bucket_width));
     stats->back().AddStatsFromNnet(nnet);

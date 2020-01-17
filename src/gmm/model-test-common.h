@@ -29,16 +29,16 @@ namespace kaldi {
 namespace unittest {
 
 void RandPosdefSpMatrix(int32 dim, SpMatrix<BaseFloat> *matrix,
-                        TpMatrix<BaseFloat> *matrix_sqrt = NULL,
-                        BaseFloat *logdet = NULL);
+    TpMatrix<BaseFloat> *matrix_sqrt = NULL,
+    BaseFloat *logdet = NULL);
 void RandDiagGaussFeatures(int32 num_samples,
-                           const VectorBase<BaseFloat> &mean,
-                           const VectorBase<BaseFloat> &sqrt_var,
-                           MatrixBase<BaseFloat> *feats);
+    const VectorBase<BaseFloat> &mean,
+    const VectorBase<BaseFloat> &sqrt_var,
+    MatrixBase<BaseFloat> *feats);
 void RandFullGaussFeatures(int32 num_samples,
-                           const VectorBase<BaseFloat> &mean,
-                           const TpMatrix<BaseFloat> &sqrt_var,
-                           MatrixBase<BaseFloat> *feats);
+    const VectorBase<BaseFloat> &mean,
+    const TpMatrix<BaseFloat> &sqrt_var,
+    MatrixBase<BaseFloat> *feats);
 void InitRandDiagGmm(int32 dim, int32 num_comp, DiagGmm *gmm);
 void InitRandFullGmm(int32 dim, int32 num_comp, FullGmm *gmm);
 

@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
         "Usage:  nnet-shuffle-egs-discriminative [options] <egs-rspecifier> <egs-wspecifier>\n"
         "\n"
         "nnet-shuffle-egs-discriminative --srand=1 ark:train.degs ark:shuffled.degs\n";
-    
+
     int32 srand_seed = 0;
     int32 buffer_size = 0;
     ParseOptions po(usage);
@@ -45,11 +45,11 @@ int main(int argc, char *argv[]) {
     po.Register("buffer-size", &buffer_size, "If >0, size of a buffer we use "
                 "to do limited-memory partial randomization.  Otherwise, do "
                 "full randomization.");
-    
+
     po.Read(argc, argv);
 
     srand(srand_seed);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -62,17 +62,17 @@ int main(int argc, char *argv[]) {
 
     std::vector<DiscriminativeNnetExample*> egs;
     SequentialDiscriminativeNnetExampleReader example_reader(
-        examples_rspecifier);
+      examples_rspecifier);
     DiscriminativeNnetExampleWriter example_writer(
-        examples_wspecifier);
+      examples_wspecifier);
     if (buffer_size == 0) { // Do full randomization
       // Putting in an extra level of indirection here to avoid excessive
       // computation and memory demands when we have to resize the vector.
-    
+
       for (; !example_reader.Done(); example_reader.Next())
         egs.push_back(new DiscriminativeNnetExample(
             example_reader.Value()));
-      
+
       std::random_shuffle(egs.begin(), egs.end());
     } else {
       KALDI_ASSERT(buffer_size > 0);
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
           *(egs[index]) = example_reader.Value();
           num_done++;
         }
-      }      
+      }
     }
     for (size_t i = 0; i < egs.size(); i++) {
       std::ostringstream ostr;
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     KALDI_LOG << "Shuffled order of " << num_done
               << " neural-network training examples "
               << (buffer_size ? "using a buffer (partial randomization)" : "");
-                  
+
     return (num_done == 0 ? 1 : 0);
   } catch(const std::exception &e) {
     std::cerr << e.what() << '\n';

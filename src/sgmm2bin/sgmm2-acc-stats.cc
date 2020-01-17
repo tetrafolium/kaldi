@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
         "<posteriors-rspecifier> <stats-out>\n"
         "e.g.: sgmm2-acc-stats --gselect=ark:gselect.ark 1.mdl 1.ali scp:train.scp 'ark:ali-to-post 1.ali ark:-|' 1.acc\n"
         "(note: gselect option is mandatory)\n";
-        
+
     ParseOptions po(usage);
     bool binary = true;
     std::string gselect_rspecifier, spkvecs_rspecifier, utt2spk_rspecifier;
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     }
     if (gselect_rspecifier == "")
       KALDI_ERR << "--gselect option is mandatory.";
-    
+
     std::string model_filename = po.GetArg(1),
         feature_rspecifier = po.GetArg(2),
         posteriors_rspecifier = po.GetArg(3),
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     { // this anonymous scope is to ensure deallocation of unnecessary stuff
       // while we're writing out the accs, which could be a long time for large
       // models.
-      
+
       // Initialize the readers before the model, as the model can
       // be large, and we don't want to call fork() after reading it if
       // virtual memory may be low.
@@ -86,9 +86,9 @@ int main(int argc, char *argv[]) {
       RandomAccessPosteriorReader posteriors_reader(posteriors_rspecifier);
       RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier);
       RandomAccessBaseFloatVectorReaderMapped spkvecs_reader(spkvecs_rspecifier,
-                                                             utt2spk_rspecifier);
+          utt2spk_rspecifier);
       RandomAccessTokenReader utt2spk_map(utt2spk_rspecifier);
-      
+
       AmSgmm2 am_sgmm;
       TransitionModel trans_model;
       {
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
       kaldi::Sgmm2PerFrameDerivedVars per_frame_vars;
       std::string cur_spk;
       Sgmm2PerSpkDerivedVars spk_vars;
-              
+
       for (; !feature_reader.Done(); feature_reader.Next()) {
         std::string utt = feature_reader.Key();
         std::string spk = utt;
@@ -121,8 +121,8 @@ int main(int argc, char *argv[]) {
         }
 
         if (spk != cur_spk && cur_spk != "")
-          sgmm_accs.CommitStatsForSpk(am_sgmm, spk_vars);        
-        
+          sgmm_accs.CommitStatsForSpk(am_sgmm, spk_vars);
+
         if (spk != cur_spk || spk_vars.Empty()) {
           spk_vars.Clear();
           if (spkvecs_reader.IsOpen()) {
@@ -136,9 +136,9 @@ int main(int argc, char *argv[]) {
             }
           } // else spk_vars is "empty"
         }
-        
+
         cur_spk = spk;
-        
+
         const Matrix<BaseFloat> &features = feature_reader.Value();
         if (!posteriors_reader.HasKey(utt) ||
             posteriors_reader.Value(utt).size() != features.NumRows()) {
@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
           continue;
         }
         const Posterior &posterior = posteriors_reader.Value(utt);
-      
+
         if (!gselect_reader.HasKey(utt)
             && gselect_reader.Value(utt).size() != features.NumRows()) {
           KALDI_WARN << "No Gaussian-selection info available for utterance "
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
             gselect_reader.Value(utt);
 
         num_done++;
-      
+
         BaseFloat tot_like_this_file = 0.0, tot_weight = 0.0;
 
         Posterior pdf_posterior;
@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
             trans_model.Accumulate(weight, tid, &transition_accs);
           }
         }
-        
+
         KALDI_VLOG(2) << "Average like for this file is "
                       << (tot_like_this_file/tot_weight) << " over "
                       << tot_weight <<" frames.";
@@ -199,13 +199,13 @@ int main(int argc, char *argv[]) {
       }
       sgmm_accs.CommitStatsForSpk(am_sgmm, spk_vars); // commit stats for
       // last speaker.
-      
+
       KALDI_LOG << "Overall like per frame (Gaussian only) = "
                 << (tot_like/tot_t) << " over " << tot_t << " frames.";
 
       KALDI_LOG << "Done " << num_done << " files, " << num_err
                 << " with errors.";
-    } 
+    }
 
     {
       Output ko(accs_wxfilename, binary);

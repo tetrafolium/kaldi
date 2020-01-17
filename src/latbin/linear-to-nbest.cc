@@ -25,10 +25,10 @@
 
 namespace kaldi {
 void MakeLatticeFromLinear(const std::vector<int32> &ali,
-                           const std::vector<int32> &words,
-                           BaseFloat lm_cost,
-                           BaseFloat ac_cost,
-                           Lattice *lat_out) {
+    const std::vector<int32> &words,
+    BaseFloat lm_cost,
+    BaseFloat ac_cost,
+    Lattice *lat_out) {
   typedef LatticeArc::StateId StateId;
   typedef LatticeArc::Weight Weight;
   typedef LatticeArc::Label Label;

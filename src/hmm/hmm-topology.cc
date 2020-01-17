@@ -43,9 +43,9 @@ void HmmTopology::Read(std::istream &is, bool binary) {
     phone2idx_.clear();
     entries_.clear();
     std::string token;
-    while ( ! (is >> token).fail() ) {
+    while ( !(is >> token).fail() ) {
       if (token == "</Topology>") { break; } // finished parsing.
-      else  if (token != "<TopologyEntry>") {
+      else if (token != "<TopologyEntry>") {
         KALDI_ERR << "Reading HmmTopology object, expected </Topology> or <TopologyEntry>, got "<<token;
       } else {
         ExpectToken(is, binary, "<ForPhones>");
@@ -140,7 +140,7 @@ void HmmTopology::Read(std::istream &is, bool binary) {
       int32 thist_sz;
       ReadBasicType(is, binary, &thist_sz);
       entries_[i].resize(thist_sz);
-      for (int32 j = 0 ; j < thist_sz; j++) {
+      for (int32 j = 0; j < thist_sz; j++) {
         ReadBasicType(is, binary, &(entries_[i][j].forward_pdf_class));
         if (is_hmm)
           entries_[i][j].self_loop_pdf_class = entries_[i][j].forward_pdf_class;
@@ -245,7 +245,7 @@ void HmmTopology::Check() {
     int32 num_states = static_cast<int32>(entries_[i].size());
     if (num_states <= 1)
       KALDI_ERR << "HmmTopology::Check(), cannot only have one state (i.e., must "
-          "have at least one emitting state).";
+        "have at least one emitting state).";
     if (!entries_[i][num_states-1].transitions.empty())
       KALDI_ERR << "HmmTopology::Check(), last state must have no transitions.";
     // not sure how necessary this next stipulation is.
@@ -263,8 +263,8 @@ void HmmTopology::Check() {
       }
       std::set<int32> seen_transition;
       for (int32 k = 0;
-           static_cast<size_t>(k) < entries_[i][j].transitions.size();
-           k++) {
+          static_cast<size_t>(k) < entries_[i][j].transitions.size();
+          k++) {
         tot_prob += entries_[i][j].transitions[k].second;
         if (entries_[i][j].transitions[k].second <= 0.0)
           KALDI_ERR << "HmmTopology::Check(), negative or zero transition prob.";
@@ -276,9 +276,9 @@ void HmmTopology::Check() {
         if (dst_state == num_states-1 // && j != 0
             && entries_[i][j].forward_pdf_class == kNoPdf)
           KALDI_ERR << "We do not allow any state to be "
-              "nonemitting and have a transition to the final-state (this would "
-              "stop the SplitToPhones function from identifying the last state "
-              "of a phone.";
+            "nonemitting and have a transition to the final-state (this would "
+            "stop the SplitToPhones function from identifying the last state "
+            "of a phone.";
         if (dst_state < 0 || dst_state >= num_states)
           KALDI_ERR << "HmmTopology::Check(), invalid dest state " << (dst_state);
         if (seen_transition.count(dst_state) != 0)
@@ -295,7 +295,7 @@ void HmmTopology::Check() {
                      "(with nonzero probability)");
         if (fabs(tot_prob - 1.0) > 0.01)
           KALDI_WARN << "Total probability for state " << j <<
-              " in topology entry is " << tot_prob;
+            " in topology entry is " << tot_prob;
       } else
         KALDI_ASSERT(tot_prob == 0.0);
     }
@@ -307,7 +307,7 @@ void HmmTopology::Check() {
     if (seen_pdf_classes.front() != 0 ||
         seen_pdf_classes.back() != static_cast<int32>(seen_pdf_classes.size()) - 1) {
       KALDI_ERR << "HmmTopology::Check(), pdf_classes are expected to be "
-          "contiguous and start from zero.";
+        "contiguous and start from zero.";
     }
   }
 }
@@ -320,7 +320,7 @@ bool HmmTopology::IsHmm() const {
     const TopologyEntry &entry = TopologyForPhone(phone);
     for (int32 j = 0; j < static_cast<int32>(entry.size()); j++) {  // for each state...
       int32 forward_pdf_class = entry[j].forward_pdf_class,
-            self_loop_pdf_class = entry[j].self_loop_pdf_class;
+          self_loop_pdf_class = entry[j].self_loop_pdf_class;
       if (forward_pdf_class != self_loop_pdf_class)
         return false;
     }
@@ -351,7 +351,7 @@ int32 HmmTopology::MinLength(int32 phone) const {
   // min_length[state] gives the minimum length for sequences up to and
   // including that state.
   std::vector<int32> min_length(entry.size(),
-                                std::numeric_limits<int32>::max());
+      std::numeric_limits<int32>::max());
   KALDI_ASSERT(!entry.empty());
 
   min_length[0] = (entry[0].forward_pdf_class == -1 ? 0 : 1);

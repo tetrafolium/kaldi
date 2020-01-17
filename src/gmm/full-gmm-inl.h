@@ -37,7 +37,7 @@ void FullGmm::SetWeights(const Vector<Real> &w) {
 template<class Real>
 void FullGmm::SetMeans(const Matrix<Real> &m) {
   KALDI_ASSERT(means_invcovars_.NumRows() == m.NumRows()
-    && means_invcovars_.NumCols() == m.NumCols());
+      && means_invcovars_.NumCols() == m.NumCols());
   size_t num_comp = NumGauss();
   Matrix<BaseFloat> m_bf(m);
   for (size_t i = 0; i < num_comp; i++) {
@@ -48,10 +48,10 @@ void FullGmm::SetMeans(const Matrix<Real> &m) {
 
 template<class Real>
 void FullGmm::SetInvCovarsAndMeans(
-    const std::vector<SpMatrix<Real> > &invcovars, const Matrix<Real> &means) {
+  const std::vector<SpMatrix<Real> > &invcovars, const Matrix<Real> &means) {
   KALDI_ASSERT(means_invcovars_.NumRows() == means.NumRows()
-    && means_invcovars_.NumCols() == means.NumCols()
-    && inv_covars_.size() == invcovars.size());
+      && means_invcovars_.NumCols() == means.NumCols()
+      && inv_covars_.size() == invcovars.size());
 
   size_t num_comp = NumGauss();
   for (size_t i = 0; i < num_comp; i++) {
@@ -65,11 +65,11 @@ void FullGmm::SetInvCovarsAndMeans(
 
 template<class Real>
 void FullGmm::SetInvCovarsAndMeansInvCovars(
-    const std::vector<SpMatrix<Real> > &invcovars,
-    const Matrix<Real> &means_invcovars) {
+  const std::vector<SpMatrix<Real> > &invcovars,
+  const Matrix<Real> &means_invcovars) {
   KALDI_ASSERT(means_invcovars_.NumRows() == means_invcovars.NumRows()
-               && means_invcovars_.NumCols() == means_invcovars.NumCols()
-               && inv_covars_.size() == invcovars.size());
+      && means_invcovars_.NumCols() == means_invcovars.NumCols()
+      && inv_covars_.size() == invcovars.size());
 
   size_t num_comp = NumGauss();
   for (size_t i = 0; i < num_comp; i++) {
@@ -130,7 +130,7 @@ void FullGmm::GetMeans(Matrix<Real> *M) const {
 
 template<class Real>
 void FullGmm::GetCovarsAndMeans(std::vector< SpMatrix<Real> > *covars,
-                                Matrix<Real> *means) const {
+    Matrix<Real> *means) const {
   KALDI_ASSERT(covars != NULL && means != NULL);
   size_t dim = Dim();
   size_t num_gauss = NumGauss();
@@ -149,7 +149,7 @@ void FullGmm::GetCovarsAndMeans(std::vector< SpMatrix<Real> > *covars,
 
 template<class Real>
 void FullGmm::GetComponentMean(int32 gauss,
-                               VectorBase<Real> *out) const {
+    VectorBase<Real> *out) const {
   KALDI_ASSERT(gauss < NumGauss() && out != NULL);
   KALDI_ASSERT(out->Dim() == Dim());
   out->SetZero();

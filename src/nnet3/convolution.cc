@@ -40,11 +40,11 @@ namespace time_height_convolution {
    many-to-one.  Each element of 'backward_columns' will be of dimension
    input_dim.  For each columns[i] = j such that j != -1,
    for some k we will have (*backward_columns)[k][j] = i.
-*/
+ */
 static void ReverseColumnMapping(
-    const std::vector<int32> &columns,
-    int32 input_dim,
-    std::vector<std::vector<int32> > *backward_columns) {
+  const std::vector<int32> &columns,
+  int32 input_dim,
+  std::vector<std::vector<int32> > *backward_columns) {
   int32 columns_dim = columns.size();
   std::vector<std::vector<int32> > temp(input_dim);
   for (int32 i = 0; i < columns_dim; i++) {
@@ -98,7 +98,7 @@ std::string ConvolutionModel::Info() const {
   }
   os << "], required-time-offsets=[";
   for (std::set<int32>::const_iterator iter = required_time_offsets.begin();
-       iter != required_time_offsets.end(); ++iter) {
+      iter != required_time_offsets.end(); ++iter) {
     if (iter != required_time_offsets.begin()) os << ',';
     os << *iter;
   }
@@ -110,7 +110,7 @@ void ConvolutionModel::ComputeDerived() {
   { // compute all_time_offsets
     all_time_offsets.clear();
     for (std::vector<Offset>::const_iterator iter = offsets.begin();
-         iter != offsets.end(); ++iter)
+        iter != offsets.end(); ++iter)
       all_time_offsets.insert(iter->time_offset);
   }
   { // compute time_offsets_modulus
@@ -128,7 +128,7 @@ void ConvolutionModel::ComputeDerived() {
 
 
 bool ConvolutionModel::Check(bool check_heights_used,
-                             bool allow_height_padding) const {
+    bool allow_height_padding) const {
   if (num_filters_in <= 0 || num_filters_out <= 0 ||
       height_in <= 0 || height_out <= 0 ||
       height_subsample_out <=  0  || offsets.empty() ||
@@ -144,7 +144,7 @@ bool ConvolutionModel::Check(bool check_heights_used,
   }
   // check that required_time_offsets is included in all_time_offsets.
   for (std::set<int32>::iterator iter = required_time_offsets.begin();
-       iter != required_time_offsets.end(); ++iter) {
+      iter != required_time_offsets.end(); ++iter) {
     if (all_time_offsets.count(*iter) == 0) {
       KALDI_WARN << "Required time offsets not a subset of all_time_offsets.";
       return false;
@@ -158,7 +158,7 @@ bool ConvolutionModel::Check(bool check_heights_used,
   // required input (from required_time_offsets), each
   // height in the output is potentially nonzero.
   for (int32 h_out = 0; h_out < height_out * height_subsample_out;
-       h_out += height_subsample_out) {
+      h_out += height_subsample_out) {
     bool some_input_available = false;
     for (size_t i = 0; i < offsets.size(); i++) {
       const Offset &offset = offsets[i];
@@ -182,8 +182,8 @@ bool ConvolutionModel::Check(bool check_heights_used,
       std::ostringstream os;
       Write(os, false);
       KALDI_WARN << "for the " << (h_out / height_out) << "'th output height, "
-                 "no input is available, if only required time-indexes "
-                 "are available.";
+        "no input is available, if only required time-indexes "
+        "are available.";
       // We could later change this part of the validation code to accept
       // such models, if there is a legitimate use-case.
       return false;
@@ -211,14 +211,14 @@ bool ConvolutionModel::Check(bool check_heights_used,
 
 bool ConvolutionModel::operator == (const ConvolutionModel &other) const {
   return num_filters_in == other.num_filters_in &&
-      num_filters_out == other.num_filters_out &&
-      height_in == other.height_in &&
-      height_out == other.height_out &&
-      height_subsample_out == other.height_subsample_out &&
-      offsets == other.offsets &&
-      required_time_offsets == other.required_time_offsets &&
-      all_time_offsets == other.all_time_offsets &&
-      time_offsets_modulus == other.time_offsets_modulus;
+         num_filters_out == other.num_filters_out &&
+         height_in == other.height_in &&
+         height_out == other.height_out &&
+         height_subsample_out == other.height_subsample_out &&
+         offsets == other.offsets &&
+         required_time_offsets == other.required_time_offsets &&
+         all_time_offsets == other.all_time_offsets &&
+         time_offsets_modulus == other.time_offsets_modulus;
 }
 
 
@@ -242,7 +242,7 @@ void ConvolutionModel::Write(std::ostream &os, bool binary) const {
   }
   WriteIntegerPairVector(os, binary, pairs);
   std::vector<int32> required_time_offsets_list(required_time_offsets.begin(),
-                                                required_time_offsets.end());
+      required_time_offsets.end());
   WriteToken(os, binary, "<RequiredTimeOffsets>");
   WriteIntegerVector(os, binary, required_time_offsets_list);
   WriteToken(os, binary, "</ConvolutionModel>");
@@ -352,8 +352,8 @@ void ConvolutionComputation::Check() const {
   KALDI_ASSERT(num_t_in >= num_t_out &&
                num_t_out > 0 && num_images > 0);
   KALDI_ASSERT((temp_rows == 0 && temp_cols == 0) ||
-               (temp_rows <= num_t_out * num_images &&
-                temp_cols > 0));
+      (temp_rows <= num_t_out * num_images &&
+      temp_cols > 0));
   KALDI_ASSERT(temp_rows % num_images == 0);
   bool temp_mat_required = false;
   int32 num_steps = steps.size();
@@ -446,11 +446,11 @@ void ConvolutionComputation::Check() const {
 // if the matrices are very large and we've broken the
 // computation up into pieces to save memoiry.
 static void ConvolveForwardInternal(
-    const ConvolutionComputation &cc,
-    const CuMatrixBase<BaseFloat> &input,
-    const CuMatrixBase<BaseFloat> &params,
-    CuMatrixBase<BaseFloat> *temp_mat,
-    CuMatrixBase<BaseFloat> *output) {
+  const ConvolutionComputation &cc,
+  const CuMatrixBase<BaseFloat> &input,
+  const CuMatrixBase<BaseFloat> &params,
+  CuMatrixBase<BaseFloat> *temp_mat,
+  CuMatrixBase<BaseFloat> *output) {
   KALDI_ASSERT(temp_mat->Stride() == temp_mat->NumCols());
 
   // num_t_out supersedes cc.num_t_out (they'll only be different in
@@ -469,17 +469,17 @@ static void ConvolveForwardInternal(
     // note: 'input_part' will normally be almost all of 'input', perhaps
     // minus one or two time steps at the start or end.
     CuSubMatrix<BaseFloat> input_part(input,
-                                      input_row_start, output_rows,
-                                      0, input.NumCols());
+        input_row_start, output_rows,
+        0, input.NumCols());
     int32 temp_num_cols = step.columns.Dim(),
         param_cols = temp_num_cols / cc.height_out;
     CuSubMatrix<BaseFloat> params_part(params,
-                                       0, params.NumRows(),
-                                       step.params_start_col,
-                                       param_cols);
+        0, params.NumRows(),
+        step.params_start_col,
+        param_cols);
     CuSubMatrix<BaseFloat> output_reshaped(
-        output->Data(), output_rows * cc.height_out,
-        cc.num_filters_out, cc.num_filters_out);
+      output->Data(), output_rows * cc.height_out,
+      cc.num_filters_out, cc.num_filters_out);
     if (!step.columns_are_contiguous ||
         temp_num_cols != input.NumCols()) {
       // In most cases we will take this branch, where we have to copy the input
@@ -491,8 +491,8 @@ static void ConvolveForwardInternal(
       // are the same (this is necessary so that we can do reshaping in
       // ConvolutionReshapedMultiply()).
       CuSubMatrix<BaseFloat> temp_mat_part(temp_mat->Data(),
-                                           temp_mat->NumRows(),
-                                           temp_num_cols, temp_num_cols);
+          temp_mat->NumRows(),
+          temp_num_cols, temp_num_cols);
       if (!step.columns_are_contiguous) {
         // we're doing a column mapping.
         temp_mat_part.CopyCols(input_part, step.columns);
@@ -504,16 +504,16 @@ static void ConvolveForwardInternal(
                                                       step.columns.Dim()));
       }
       CuSubMatrix<BaseFloat> temp_mat_part_reshaped(
-          temp_mat_part.Data(), temp_mat_part.NumRows() * cc.height_out,
-          temp_num_cols / cc.height_out, temp_num_cols / cc.height_out);
+        temp_mat_part.Data(), temp_mat_part.NumRows() * cc.height_out,
+        temp_num_cols / cc.height_out, temp_num_cols / cc.height_out);
 
       output_reshaped.AddMatMat(1.0, temp_mat_part_reshaped, kNoTrans,
                                 params_part, kTrans, 1.0);
     } else {
       CuSubMatrix<BaseFloat> input_reshaped(
-          input_part.Data(), input_part.NumRows() * cc.height_out,
-          input_part.NumCols() / cc.height_out,
-          input_part.NumCols() / cc.height_out);
+        input_part.Data(), input_part.NumRows() * cc.height_out,
+        input_part.NumCols() / cc.height_out,
+        input_part.NumCols() / cc.height_out);
 
       output_reshaped.AddMatMat(1.0, input_reshaped, kNoTrans,
                                 params_part, kTrans, 1.0);
@@ -522,10 +522,10 @@ static void ConvolveForwardInternal(
 }
 
 void ConvolveForward(
-    const ConvolutionComputation &cc,
-    const CuMatrixBase<BaseFloat> &input,
-    const CuMatrixBase<BaseFloat> &params,
-    CuMatrixBase<BaseFloat> *output) {
+  const ConvolutionComputation &cc,
+  const CuMatrixBase<BaseFloat> &input,
+  const CuMatrixBase<BaseFloat> &params,
+  CuMatrixBase<BaseFloat> *output) {
   KALDI_ASSERT(input.NumCols() == input.Stride() &&
                output->NumCols() == output->Stride());
   KALDI_ASSERT(params.NumRows() == cc.num_filters_out);
@@ -550,13 +550,13 @@ void ConvolveForward(
         new_num_cols = num_cols * multiple,
         new_stride = new_num_cols;
     CuSubMatrix<BaseFloat> input_reshaped(
-        input.Data(), required_input_rows, new_num_cols, new_stride);
+      input.Data(), required_input_rows, new_num_cols, new_stride);
     ConvolveForward(cc, input_reshaped, params, output);
     return;
   }
 
   CuMatrix<BaseFloat> temp_mat(cc.temp_rows, cc.temp_cols,
-                               kUndefined, kStrideEqualNumCols);
+      kUndefined, kStrideEqualNumCols);
 
   // this if-statement handles breaking up the arguments
   // and the computation into row-ranges if the temporary
@@ -570,20 +570,20 @@ void ConvolveForward(
     int32 num_extra_in = cc.num_t_in - cc.num_t_out;
 
     for (int32 t_start = 0; t_start < cc.num_t_out;
-         t_start += num_time_steps_per_chunk) {
+        t_start += num_time_steps_per_chunk) {
       int32 num_t_left = cc.num_t_out - t_start,
           this_num_t_out = std::min<int32>(num_t_left,
                                            num_time_steps_per_chunk),
           this_num_t_in = this_num_t_out + num_extra_in;
       CuSubMatrix<BaseFloat> input_part(input, t_start * cc.num_images,
-                                        this_num_t_in * cc.num_images,
-                                        0, input.NumCols());
+          this_num_t_in * cc.num_images,
+          0, input.NumCols());
       CuSubMatrix<BaseFloat> output_part(*output, t_start * cc.num_images,
-                                         this_num_t_out * cc.num_images,
-                                         0, output->NumCols());
+          this_num_t_out * cc.num_images,
+          0, output->NumCols());
       CuSubMatrix<BaseFloat> temp_part(temp_mat, 0,
-                                       this_num_t_out * cc.num_images,
-                                       0, temp_mat.NumCols());
+          this_num_t_out * cc.num_images,
+          0, temp_mat.NumCols());
       ConvolveForwardInternal(cc, input_part, params,
                               &temp_part, &output_part);
     }
@@ -601,11 +601,11 @@ void ConvolveForward(
 // We require that temp_mat should not contain inf's
 // or nan's on entry.
 static void ConvolveBackwardDataInternal(
-    const ConvolutionComputation &cc,
-    const CuMatrixBase<BaseFloat> &params,
-    const CuMatrixBase<BaseFloat> &output_deriv,
-    CuMatrixBase<BaseFloat> *temp_mat,
-    CuMatrixBase<BaseFloat> *input_deriv) {
+  const ConvolutionComputation &cc,
+  const CuMatrixBase<BaseFloat> &params,
+  const CuMatrixBase<BaseFloat> &output_deriv,
+  CuMatrixBase<BaseFloat> *temp_mat,
+  CuMatrixBase<BaseFloat> *input_deriv) {
   KALDI_ASSERT(temp_mat->Stride() == temp_mat->NumCols());
 
   // num_t_out supersedes cc.num_t_out (they'll only be different in
@@ -622,17 +622,17 @@ static void ConvolveBackwardDataInternal(
     const ConvolutionComputation::ConvolutionStep &step = cc.steps[s];
     int32 input_row_start = step.input_time_shift * cc.num_images;
     CuSubMatrix<BaseFloat> input_deriv_part(*input_deriv,
-                                            input_row_start, output_rows,
-                                            0, input_deriv->NumCols());
+        input_row_start, output_rows,
+        0, input_deriv->NumCols());
     int32 temp_num_cols = step.columns.Dim(),
         param_cols = temp_num_cols / cc.height_out;
     CuSubMatrix<BaseFloat> params_part(params,
-                                       0, params.NumRows(),
-                                       step.params_start_col,
-                                       param_cols);
+        0, params.NumRows(),
+        step.params_start_col,
+        param_cols);
     CuSubMatrix<BaseFloat> output_deriv_reshaped(
-        output_deriv.Data(), output_rows * cc.height_out,
-        cc.num_filters_out, cc.num_filters_out);
+      output_deriv.Data(), output_rows * cc.height_out,
+      cc.num_filters_out, cc.num_filters_out);
 
     if (!step.columns_are_contiguous ||
         temp_num_cols != input_deriv->NumCols()) {
@@ -646,9 +646,9 @@ static void ConvolveBackwardDataInternal(
       // are the same (this is necessary so that we can do reshaping in
       // ConvolutionReshapedMultiply()).
       CuSubMatrix<BaseFloat> temp_mat_part(temp_mat->Data(),
-                                           temp_mat->NumRows(),
-                                           temp_num_cols, temp_num_cols),
-          temp_mat_part_reshaped(
+          temp_mat->NumRows(),
+          temp_num_cols, temp_num_cols),
+      temp_mat_part_reshaped(
               temp_mat_part.Data(), temp_mat_part.NumRows() * cc.height_out,
               temp_num_cols / cc.height_out, temp_num_cols / cc.height_out);
 
@@ -669,9 +669,9 @@ static void ConvolveBackwardDataInternal(
       }
     } else {
       CuSubMatrix<BaseFloat> input_deriv_reshaped(
-          input_deriv_part.Data(), input_deriv_part.NumRows() * cc.height_out,
-          input_deriv_part.NumCols() / cc.height_out,
-          input_deriv_part.NumCols() / cc.height_out);
+        input_deriv_part.Data(), input_deriv_part.NumRows() * cc.height_out,
+        input_deriv_part.NumCols() / cc.height_out,
+        input_deriv_part.NumCols() / cc.height_out);
       input_deriv_reshaped.AddMatMat(1.0, output_deriv_reshaped, kNoTrans,
                                      params_part, kNoTrans, 1.0);
     }
@@ -680,10 +680,10 @@ static void ConvolveBackwardDataInternal(
 
 
 void ConvolveBackwardData(
-    const ConvolutionComputation &cc,
-    const CuMatrixBase<BaseFloat> &params,
-    const CuMatrixBase<BaseFloat> &output_deriv,
-    CuMatrixBase<BaseFloat> *input_deriv) {
+  const ConvolutionComputation &cc,
+  const CuMatrixBase<BaseFloat> &params,
+  const CuMatrixBase<BaseFloat> &output_deriv,
+  CuMatrixBase<BaseFloat> *input_deriv) {
   KALDI_ASSERT(input_deriv->NumCols() == input_deriv->Stride() &&
                output_deriv.NumCols() == output_deriv.Stride());
   KALDI_ASSERT(params.NumRows() == cc.num_filters_out);
@@ -708,14 +708,14 @@ void ConvolveBackwardData(
         new_num_cols = num_cols * multiple,
         new_stride = new_num_cols;
     CuSubMatrix<BaseFloat> input_deriv_reshaped(
-        input_deriv->Data(), required_input_rows,
-        new_num_cols, new_stride);
+      input_deriv->Data(), required_input_rows,
+      new_num_cols, new_stride);
     ConvolveBackwardData(cc, params, output_deriv, &input_deriv_reshaped);
     return;
   }
 
   CuMatrix<BaseFloat> temp_mat(cc.temp_rows, cc.temp_cols,
-                               kSetZero, kStrideEqualNumCols);
+      kSetZero, kStrideEqualNumCols);
 
   // this if-statement handles breaking up the arguments
   // and the computation into row-ranges if the temporary
@@ -729,22 +729,22 @@ void ConvolveBackwardData(
     int32 num_extra_in = cc.num_t_in - cc.num_t_out;
 
     for (int32 t_start = 0; t_start < cc.num_t_out;
-         t_start += num_time_steps_per_chunk) {
+        t_start += num_time_steps_per_chunk) {
       int32 num_t_left = cc.num_t_out - t_start,
           this_num_t_out = std::min<int32>(num_t_left,
                                            num_time_steps_per_chunk),
           this_num_t_in = this_num_t_out + num_extra_in;
       CuSubMatrix<BaseFloat> input_deriv_part(
-          *input_deriv, t_start * cc.num_images,
-          this_num_t_in * cc.num_images,
-          0, input_deriv->NumCols());
+        *input_deriv, t_start * cc.num_images,
+        this_num_t_in * cc.num_images,
+        0, input_deriv->NumCols());
       CuSubMatrix<BaseFloat> output_deriv_part(
-          output_deriv, t_start * cc.num_images,
-          this_num_t_out * cc.num_images,
-          0, output_deriv.NumCols());
+        output_deriv, t_start * cc.num_images,
+        this_num_t_out * cc.num_images,
+        0, output_deriv.NumCols());
       CuSubMatrix<BaseFloat> temp_part(
-          temp_mat, 0, this_num_t_out * cc.num_images,
-          0, temp_mat.NumCols());
+        temp_mat, 0, this_num_t_out * cc.num_images,
+        0, temp_mat.NumCols());
       ConvolveBackwardDataInternal(cc, params, output_deriv_part,
                                    &temp_part, &input_deriv_part);
     }
@@ -761,12 +761,12 @@ void ConvolveBackwardData(
 // if the matrices are very large and we've broken the
 // computation up into pieces to save memoiry.
 static void ConvolveBackwardParamsInternal(
-    const ConvolutionComputation &cc,
-    const CuMatrixBase<BaseFloat> &input,
-    const CuMatrixBase<BaseFloat> &output_deriv,
-    BaseFloat alpha,
-    CuMatrixBase<BaseFloat> *temp_mat,
-    CuMatrixBase<BaseFloat> *params_deriv) {
+  const ConvolutionComputation &cc,
+  const CuMatrixBase<BaseFloat> &input,
+  const CuMatrixBase<BaseFloat> &output_deriv,
+  BaseFloat alpha,
+  CuMatrixBase<BaseFloat> *temp_mat,
+  CuMatrixBase<BaseFloat> *params_deriv) {
   KALDI_ASSERT(temp_mat->Stride() == temp_mat->NumCols());
 
   // num_t_out supersedes cc.num_t_out (they'll only be different in
@@ -785,17 +785,17 @@ static void ConvolveBackwardParamsInternal(
     // note: 'input_part' will normally be almost all of 'input', perhaps
     // minus one or two time steps at the start or end.
     CuSubMatrix<BaseFloat> input_part(input,
-                                      input_row_start, output_rows,
-                                      0, input.NumCols());
+        input_row_start, output_rows,
+        0, input.NumCols());
     int32 temp_num_cols = step.columns.Dim(),
         param_cols = temp_num_cols / cc.height_out;
     CuSubMatrix<BaseFloat> params_deriv_part(*params_deriv,
-                                       0, params_deriv->NumRows(),
-                                       step.params_start_col,
-                                       param_cols);
+        0, params_deriv->NumRows(),
+        step.params_start_col,
+        param_cols);
     CuSubMatrix<BaseFloat> output_deriv_reshaped(
-        output_deriv.Data(), output_rows * cc.height_out,
-        cc.num_filters_out, cc.num_filters_out);
+      output_deriv.Data(), output_rows * cc.height_out,
+      cc.num_filters_out, cc.num_filters_out);
     if (!step.columns_are_contiguous ||
         temp_num_cols != input.NumCols()) {
       // In most cases we will take this branch, where we have to copy the input
@@ -807,8 +807,8 @@ static void ConvolveBackwardParamsInternal(
       // are the same (this is necessary so that we can do reshaping in
       // ConvolutionReshapedMultiply()).
       CuSubMatrix<BaseFloat> temp_mat_part(temp_mat->Data(),
-                                           temp_mat->NumRows(),
-                                           temp_num_cols, temp_num_cols);
+          temp_mat->NumRows(),
+          temp_num_cols, temp_num_cols);
       if (!step.columns_are_contiguous) {
         // we're doing a column mapping.
         temp_mat_part.CopyCols(input_part, step.columns);
@@ -820,16 +820,16 @@ static void ConvolveBackwardParamsInternal(
                                                       step.columns.Dim()));
       }
       CuSubMatrix<BaseFloat> temp_mat_part_reshaped(
-          temp_mat_part.Data(), temp_mat_part.NumRows() * cc.height_out,
-          temp_num_cols / cc.height_out, temp_num_cols / cc.height_out);
+        temp_mat_part.Data(), temp_mat_part.NumRows() * cc.height_out,
+        temp_num_cols / cc.height_out, temp_num_cols / cc.height_out);
 
       params_deriv_part.AddMatMat(alpha, output_deriv_reshaped, kTrans,
                                   temp_mat_part_reshaped, kNoTrans, 1.0);
     } else {
       CuSubMatrix<BaseFloat> input_reshaped(
-          input_part.Data(), input_part.NumRows() * cc.height_out,
-          input_part.NumCols() / cc.height_out,
-          input_part.NumCols() / cc.height_out);
+        input_part.Data(), input_part.NumRows() * cc.height_out,
+        input_part.NumCols() / cc.height_out,
+        input_part.NumCols() / cc.height_out);
 
       params_deriv_part.AddMatMat(alpha, output_deriv_reshaped, kTrans,
                                   input_reshaped, kNoTrans, 1.0);
@@ -838,11 +838,11 @@ static void ConvolveBackwardParamsInternal(
 }
 
 void ConvolveBackwardParams(
-    const ConvolutionComputation &cc,
-    const CuMatrixBase<BaseFloat> &input,
-    const CuMatrixBase<BaseFloat> &output_deriv,
-    BaseFloat alpha,
-    CuMatrixBase<BaseFloat> *params_deriv) {
+  const ConvolutionComputation &cc,
+  const CuMatrixBase<BaseFloat> &input,
+  const CuMatrixBase<BaseFloat> &output_deriv,
+  BaseFloat alpha,
+  CuMatrixBase<BaseFloat> *params_deriv) {
   KALDI_ASSERT(input.NumCols() == input.Stride() &&
               output_deriv.NumCols() == output_deriv.Stride());
   KALDI_ASSERT(params_deriv->NumRows() == cc.num_filters_out);
@@ -867,14 +867,14 @@ void ConvolveBackwardParams(
         new_num_cols = num_cols * multiple,
         new_stride = new_num_cols;
     CuSubMatrix<BaseFloat> input_reshaped(
-        input.Data(), required_input_rows, new_num_cols, new_stride);
+      input.Data(), required_input_rows, new_num_cols, new_stride);
     ConvolveBackwardParams(cc, input_reshaped, output_deriv, alpha,
                            params_deriv);
     return;
   }
 
   CuMatrix<BaseFloat> temp_mat(cc.temp_rows, cc.temp_cols,
-                               kUndefined, kStrideEqualNumCols);
+      kUndefined, kStrideEqualNumCols);
 
   // this if-statement handles breaking up the arguments
   // and the computation into row-ranges if the temporary
@@ -888,22 +888,22 @@ void ConvolveBackwardParams(
     int32 num_extra_in = cc.num_t_in - cc.num_t_out;
 
     for (int32 t_start = 0; t_start < cc.num_t_out;
-         t_start += num_time_steps_per_chunk) {
+        t_start += num_time_steps_per_chunk) {
       int32 num_t_left = cc.num_t_out - t_start,
           this_num_t_out = std::min<int32>(num_t_left,
                                            num_time_steps_per_chunk),
           this_num_t_in = this_num_t_out + num_extra_in;
       CuSubMatrix<BaseFloat> input_part(
-          input, t_start * cc.num_images,
-          this_num_t_in * cc.num_images,
-          0, input.NumCols());
+        input, t_start * cc.num_images,
+        this_num_t_in * cc.num_images,
+        0, input.NumCols());
       CuSubMatrix<BaseFloat> output_deriv_part(
-          output_deriv, t_start * cc.num_images,
-          this_num_t_out * cc.num_images,
-          0, output_deriv.NumCols());
+        output_deriv, t_start * cc.num_images,
+        this_num_t_out * cc.num_images,
+        0, output_deriv.NumCols());
       CuSubMatrix<BaseFloat> temp_part(temp_mat,
-                                       0, this_num_t_out * cc.num_images,
-                                       0, temp_mat.NumCols());
+          0, this_num_t_out * cc.num_images,
+          0, temp_mat.NumCols());
       ConvolveBackwardParamsInternal(cc, input_part, output_deriv_part,
                                      alpha, &temp_part, params_deriv);
     }
@@ -916,7 +916,7 @@ void ConvolveBackwardParams(
 
 
 void PadModelHeight(const ConvolutionModel &model,
-                    ConvolutionModel *model_padded) {
+    ConvolutionModel *model_padded) {
   *model_padded = model;
   KALDI_ASSERT(!model.offsets.empty());
   int32 min_height_offset = model.offsets[0].height_offset,
@@ -954,7 +954,7 @@ void PadModelHeight(const ConvolutionModel &model,
 /** This function sets 'temp_rows' and 'temp_cols' in 'computation'.
  */
 static void ComputeTempMatrixSize(const ConvolutionComputationOptions &opts,
-                                  ConvolutionComputation *computation) {
+    ConvolutionComputation *computation) {
   int32 temp_rows = 0, temp_cols = 0;
   for (size_t i = 0; i < computation->steps.size(); i++) {
     const ConvolutionComputation::ConvolutionStep &step = computation->steps[i];
@@ -999,12 +999,12 @@ static void ComputeTempMatrixSize(const ConvolutionComputationOptions &opts,
 }
 
 void UnPadModelHeight(const ConvolutionComputationOptions &opts,
-                      const ConvolutionModel &model,
-                      const ConvolutionModel &model_padded,
-                      ConvolutionComputation *computation) {
+    const ConvolutionModel &model,
+    const ConvolutionModel &model_padded,
+    ConvolutionComputation *computation) {
   // First work out how much padding was done in PadModelHeight().
   int32 bottom_padding = (model_padded.offsets[0].height_offset -
-                          model.offsets[0].height_offset),
+      model.offsets[0].height_offset),
       total_padding = model_padded.height_in - model.height_in,
       top_padding = total_padding - bottom_padding;
 
@@ -1049,7 +1049,7 @@ void UnPadModelHeight(const ConvolutionComputationOptions &opts,
 
 
 void PadComputationInputTime(const ConvolutionModel &model,
-                             ConvolutionComputationIo *io) {
+    ConvolutionComputationIo *io) {
   if (model.time_offsets_modulus == 0) {
     // this can only happen if model->all_time_offsets.size() == 1,
     // and no padding could be required here. W return to avoid
@@ -1108,7 +1108,7 @@ static int32 RoundDownToMultipleOf(int32 i, int32 n) {
 // shifts all time-offsets in the model (in 'offsets[*].time_offset',
 // 'required_time_offsets', 'all_time_offsets') by adding 'shift' to them.
 static void ShiftAllTimeOffsets(int32 shift,
-                                ConvolutionModel *model) {
+    ConvolutionModel *model) {
   { // shift 'offsets'.
     std::vector<ConvolutionModel::Offset>::iterator
         iter = model->offsets.begin(),
@@ -1119,23 +1119,23 @@ static void ShiftAllTimeOffsets(int32 shift,
   std::set<int32> temp;
   std::set<int32>::const_iterator iter;
   for (iter = model->required_time_offsets.begin();
-       iter != model->required_time_offsets.end(); ++iter)
+      iter != model->required_time_offsets.end(); ++iter)
     temp.insert(*iter + shift);
   model->required_time_offsets.swap(temp);
   temp.clear();
   for (iter = model->all_time_offsets.begin();
-       iter != model->all_time_offsets.end(); ++iter)
+      iter != model->all_time_offsets.end(); ++iter)
     temp.insert(*iter + shift);
   model->all_time_offsets.swap(temp);
 }
 
 
 /*
-  \brief This function has been broken out of 'AppendInputFrames()' for clarity.  It
+   \brief This function has been broken out of 'AppendInputFrames()' for clarity.  It
       deals with appending input frames together, in cases where the input stride
       is smaller than the output stride.
 
-  \param [in,out] io  The input object representing the I/O of the convolution.
+   \param [in,out] io  The input object representing the I/O of the convolution.
                      It may be modified slightly by this function, in two respects.
                      Firstly, if we are going to be reshaping the input into
                      an input with fewer frames of larger dimension, we need to
@@ -1144,19 +1144,19 @@ static void ShiftAllTimeOffsets(int32 shift,
                      Also, we may modify the stride of 'io' in cases where there
                      is exactly one frame.  This is for convenience of implementation
                      and does not affect the frames represented.
-  \param [out] io_appended  The output object representing the I/O of the
+   \param [out] io_appended  The output object representing the I/O of the
                     possibly-frame-appended computation.  This may be the same
                     as I/O, but it won't be if the input stride is smaller than
                     the output stride-- in that case we need to append the frames.
                     Note: at exit, 'io' and 'io_appended' will really represent
                     two different 'views' of the same data, via a reshaping.
 
-  \return  Returns the integer ratio >= 1 between the num-cols of the
+   \return  Returns the integer ratio >= 1 between the num-cols of the
              'appended' features and the original features; this also
              equals the number of frames we append together
-*/
+ */
 static int32 PrepareIoForAppending(ConvolutionComputationIo *io,
-                                   ConvolutionComputationIo *io_appended) {
+    ConvolutionComputationIo *io_appended) {
   // first make sure that the output has nonzero stride (it would only have zero
   // stride if there was only one output time index, which is unusual).  if
   // there's only one output time index we can set the stride to whatever we
@@ -1201,9 +1201,9 @@ static int32 PrepareIoForAppending(ConvolutionComputationIo *io,
 }
 
 void AppendInputFrames(const ConvolutionModel &model,
-                       ConvolutionComputationIo *io,
-                       ConvolutionModel *model_appended,
-                       ConvolutionComputationIo *io_appended) {
+    ConvolutionComputationIo *io,
+    ConvolutionModel *model_appended,
+    ConvolutionComputationIo *io_appended) {
   int32 ratio = PrepareIoForAppending(io, io_appended);
 
   if (ratio == 1) {
@@ -1275,7 +1275,7 @@ void ConvolutionComputation::ComputeDerived() {
 
   int32 largest_required_temp_cols = 0;
   for (std::vector<ConvolutionStep>::iterator iter = steps.begin();
-       iter != steps.end(); ++iter) {
+      iter != steps.end(); ++iter) {
     ConvolutionStep &step = *iter;
     std::vector<int32> columns;
     int32 temp_height = step.height_map.size();
@@ -1306,7 +1306,7 @@ void ConvolutionComputation::ComputeDerived() {
 
     bool need_temp_matrix =
         !(step.columns_are_contiguous && step.height_map[0] == 0 &&
-          step.height_map.size() == height_in);
+        step.height_map.size() == height_in);
     if (need_temp_matrix) {
       largest_required_temp_cols = std::max<int32>(
           largest_required_temp_cols, static_cast<int32>(columns.size()));
@@ -1319,16 +1319,16 @@ void ConvolutionComputation::ComputeDerived() {
 // returns true if the time value 't' is one of the
 // time values available on the input of 'io.
 static bool TimeValueInInput(const ConvolutionComputationIo &io,
-                             int32 t) {
+    int32 t) {
   int32 t_step_in = std::max<int32>(1, io.t_step_in);
   return (t >= io.start_t_in &&
-          t < io.start_t_in + (t_step_in * io.num_t_in) &&
-          (t - io.start_t_in) % t_step_in == 0);
+         t < io.start_t_in + (t_step_in * io.num_t_in) &&
+         (t - io.start_t_in) % t_step_in == 0);
 }
 
 void CheckModelAndIo(const ConvolutionModel &model,
-                     const ConvolutionComputationIo &io,
-                     bool allow_extra_input) {
+    const ConvolutionComputationIo &io,
+    bool allow_extra_input) {
   KALDI_ASSERT(io.num_t_in > 0 && io.num_t_out > 0 &&
                !model.required_time_offsets.empty() &&
                !model.all_time_offsets.empty());
@@ -1346,15 +1346,15 @@ void CheckModelAndIo(const ConvolutionModel &model,
     int32 t_out = io.start_t_out +
         RandInt(0, io.num_t_out - 1) * io.t_step_out;
     for (std::set<int32>::const_iterator iter =
-             model.required_time_offsets.begin();
-         iter != model.required_time_offsets.end();
-         ++iter) {
+        model.required_time_offsets.begin();
+        iter != model.required_time_offsets.end();
+        ++iter) {
       int32 offset = *iter;
       input_times_to_check.insert(t_out + offset);
     }
   }
   for (std::set<int32>::const_iterator iter = input_times_to_check.begin();
-       iter != input_times_to_check.end(); ++iter) {
+      iter != input_times_to_check.end(); ++iter) {
     int32 t = *iter;
     if (!TimeValueInInput(io, t)) {
       KALDI_ERR << "Error checking model and IO: time " << t
@@ -1365,13 +1365,13 @@ void CheckModelAndIo(const ConvolutionModel &model,
 
 
 void CompileConvolutionComputation(
-    const ConvolutionModel &model,
-    const std::vector<Index> &input_indexes,
-    const std::vector<Index> &output_indexes,
-    const ConvolutionComputationOptions &opts,
-    ConvolutionComputation *computation,
-    std::vector<Index> *input_indexes_modified,
-    std::vector<Index> *output_indexes_modified) {
+  const ConvolutionModel &model,
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  const ConvolutionComputationOptions &opts,
+  ConvolutionComputation *computation,
+  std::vector<Index> *input_indexes_modified,
+  std::vector<Index> *output_indexes_modified) {
 
   // stage zero [preparing the input and output in a regular grid.]
   ConvolutionComputationIo io;
@@ -1429,9 +1429,9 @@ static int32 FindGcdOfDifferences(std::vector<int32> &vec) {
 }
 
 static void RegularizeTList(std::vector<int32> &t_values,
-                            int32 *start,
-                            int32 *step,
-                            int32 *num_values) {
+    int32 *start,
+    int32 *step,
+    int32 *num_values) {
   KALDI_ASSERT(!t_values.empty() && IsSortedAndUniq(t_values));
   *start = t_values[0];
   *step = FindGcdOfDifferences(t_values);
@@ -1468,8 +1468,8 @@ static void RegularizeTList(std::vector<int32> &t_values,
    And within each block, the 't' values have the smallest stride (of 1).
  */
 static void CreateIndexes(const std::vector<std::pair<int32, int32> > &n_x_pairs,
-                          int32 t_start, int32 t_step, int32 num_t_values,
-                          int32 reorder_t, std::vector<Index> *indexes) {
+    int32 t_start, int32 t_step, int32 num_t_values,
+    int32 reorder_t, std::vector<Index> *indexes) {
   KALDI_ASSERT(reorder_t >= 1 && num_t_values % reorder_t == 0 && t_step >= 0);
   if (t_step == 0) {
     KALDI_ASSERT(num_t_values == 1);
@@ -1503,23 +1503,23 @@ static void CreateIndexes(const std::vector<std::pair<int32, int32> > &n_x_pairs
    indexes into the input and output.
  */
 static void SetSomeIndexesBlank(const std::vector<Index> &ref_indexes,
-                                std::vector<Index> *indexes) {
+    std::vector<Index> *indexes) {
   std::unordered_set<Index, IndexHasher> ref_set;
   for (std::vector<Index>::const_iterator iter = ref_indexes.begin();
-       iter != ref_indexes.end(); ++iter)
+      iter != ref_indexes.end(); ++iter)
     ref_set.insert(*iter);
 
   for (std::vector<Index>::iterator iter = indexes->begin();
-       iter != indexes->end(); ++iter) {
+      iter != indexes->end(); ++iter) {
     if (ref_set.count(*iter) == 0)
       iter->t = kNoTime;
   }
 }
 
 void GetComputationIo(
-    const std::vector<Index> &input_indexes,
-    const std::vector<Index> &output_indexes,
-    ConvolutionComputationIo *io) {
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  ConvolutionComputationIo *io) {
   std::vector<std::pair<int32, int32> > n_x_pairs;
   GetNxList(input_indexes, &n_x_pairs);
   KALDI_ASSERT(!n_x_pairs.empty());
@@ -1541,17 +1541,17 @@ void GetComputationIo(
 
 
 void GetIndexesForComputation(
-    const ConvolutionComputationIo &io,
-    const std::vector<Index> &orig_input_indexes,
-    const std::vector<Index> &orig_output_indexes,
-    std::vector<Index> *input_indexes,
-    std::vector<Index> *output_indexes) {
+  const ConvolutionComputationIo &io,
+  const std::vector<Index> &orig_input_indexes,
+  const std::vector<Index> &orig_output_indexes,
+  std::vector<Index> *input_indexes,
+  std::vector<Index> *output_indexes) {
   std::unordered_set<Index, IndexHasher> input_set, output_set;
   for (std::vector<Index>::const_iterator iter = orig_input_indexes.begin();
-       iter != orig_input_indexes.end(); ++iter)
+      iter != orig_input_indexes.end(); ++iter)
     input_set.insert(*iter);
   for (std::vector<Index>::const_iterator iter = orig_output_indexes.begin();
-       iter != orig_output_indexes.end(); ++iter)
+      iter != orig_output_indexes.end(); ++iter)
     output_set.insert(*iter);
   std::vector<std::pair<int32, int32> > n_x_pairs;
   GetNxList(orig_input_indexes, &n_x_pairs);
@@ -1566,9 +1566,9 @@ void GetIndexesForComputation(
 
 
 void MakeComputation(const ConvolutionModel &model,
-                     ConvolutionComputationIo &io,
-                     const ConvolutionComputationOptions &opts,
-                     ConvolutionComputation *computation) {
+    ConvolutionComputationIo &io,
+    const ConvolutionComputationOptions &opts,
+    ConvolutionComputation *computation) {
   KALDI_ASSERT(io.t_step_in == io.t_step_out);
   computation->num_filters_in = model.num_filters_in;
   computation->num_filters_out = model.num_filters_out;
@@ -1597,8 +1597,8 @@ void MakeComputation(const ConvolutionModel &model,
   for(; cur_start_offset < num_offsets; cur_start_offset = cur_end_offset) {
     cur_end_offset = cur_start_offset;
     while (cur_end_offset < num_offsets &&
-           model.offsets[cur_end_offset].time_offset ==
-           model.offsets[cur_start_offset].time_offset)
+        model.offsets[cur_end_offset].time_offset ==
+        model.offsets[cur_start_offset].time_offset)
       cur_end_offset++;
     // we are processing the range of indexes into 'offsets'
     // from cur_start_offset to cur_end_offset - 1.
@@ -1619,8 +1619,8 @@ void MakeComputation(const ConvolutionModel &model,
     step.height_map.clear();
     step.height_map.reserve(model.height_out * this_num_offsets);
     for (int32 h_out = 0;
-         h_out < model.height_out * model.height_subsample_out;
-         h_out += model.height_subsample_out) {
+        h_out < model.height_out * model.height_subsample_out;
+        h_out += model.height_subsample_out) {
       for (int32 o = cur_start_offset; o < cur_end_offset; o++) {
         int32 this_height_offset = model.offsets[o].height_offset,
             h_in = h_out + this_height_offset;

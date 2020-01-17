@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     TableWriter<WaveHolder> writer(wav_wspecifier);
     int32 num_success = 0;
 
-    for(; !reader.Done(); reader.Next()){
+    for(; !reader.Done(); reader.Next()) {
       std::string wav_key = reader.Key();
       const WaveData &wave = reader.Value();
 
@@ -66,20 +66,20 @@ int main(int argc, char *argv[]) {
       int32 num_chan = wave_data.NumRows();       // number of channels in recording
 
       Matrix<BaseFloat> new_wave(wave_data.NumRows(), wave_data.NumCols());
-      for(int32 i = 0; i < num_chan; i++){
+      for(int32 i = 0; i < num_chan; i++) {
         OnlineSpeexEncoder spx_encoder(spx_config);
         OnlineSpeexDecoder spx_decoder(spx_config);
         Vector<BaseFloat> wav_this_chan(wave_data.Row(i));
         Vector<BaseFloat> wav_decode(wav_this_chan.Dim());
 
         int32 samp_offset = 0, decode_sample_offset = 0,
-          max_samp = samp_freq * chunk_length_secs;
+            max_samp = samp_freq * chunk_length_secs;
         while (samp_offset < wav_this_chan.Dim()) {
           int32 this_num_samp = max_samp;
           if (this_num_samp > wav_this_chan.Dim() - samp_offset)
             this_num_samp = wav_this_chan.Dim() - samp_offset;
           SubVector<BaseFloat> wave_part(wav_this_chan, samp_offset,
-                                         this_num_samp);
+              this_num_samp);
 
           spx_encoder.AcceptWaveform(samp_freq, wave_part);
           if (this_num_samp == wav_this_chan.Dim() - samp_offset)  // no more input.
@@ -97,11 +97,11 @@ int main(int argc, char *argv[]) {
             SubVector<BaseFloat> wave_part_tmp(wave_part_spx,0,num_samp_last);
 
             wav_decode.Range(decode_sample_offset, num_samp_last).
-              CopyFromVec(wave_part_tmp);
+            CopyFromVec(wave_part_tmp);
             decode_sample_offset += num_samp_last;
           } else {
             wav_decode.Range(decode_sample_offset, decode_num_samp).
-              CopyFromVec(wave_part_spx);
+            CopyFromVec(wave_part_spx);
             decode_sample_offset += wave_part_spx.Dim();
           }
 

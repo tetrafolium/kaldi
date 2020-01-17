@@ -47,13 +47,13 @@ int main(int argc, char *argv[]) {
     int32 remove_layers = 2;
 
     ParseOptions po(usage);
-    
+
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("remove-layers", &remove_layers, "Number of final layers "
                 "to remove before adding input raw network.");
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     std::string nnet_rxfilename = po.GetArg(1),
         raw_nnet_rxfilename = po.GetArg(2),
         nnet_wxfilename = po.GetArg(3);
-    
+
     TransitionModel trans_model;
     AmNnet am_nnet;
     {
@@ -75,14 +75,14 @@ int main(int argc, char *argv[]) {
     Nnet src_nnet; // the one we'll insert.
     ReadKaldiObject(raw_nnet_rxfilename, &src_nnet);
 
-    
+
     // This function is declared in nnet-functions.h
     ReplaceLastComponents(src_nnet,
                           remove_layers,
                           &(am_nnet.GetNnet()));
     KALDI_LOG << "Removed " << remove_layers << " components and added "
               << src_nnet.NumComponents();
-    
+
     {
       Output ko(nnet_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);

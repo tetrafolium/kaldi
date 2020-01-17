@@ -20,7 +20,7 @@
 #include "tree/tree-renderer.h"
 
 void MakeEvent(std::string &qry, fst::SymbolTable *phone_syms,
-               kaldi::EventType **query)
+    kaldi::EventType **query)
 {
   using namespace kaldi;
 
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
         "Outputs a decision tree description in GraphViz format\n"
         "Usage: draw-tree [options] <phone-symbols> <tree>\n"
         "e.g.: draw-tree phones.txt tree | dot -Gsize=8,10.5 -Tps | ps2pdf - tree.pdf\n";
-    
+
     ParseOptions po(usage);
     po.Register("query", &qry,
                 "a query to trace through the tree"
@@ -92,10 +92,10 @@ int main(int argc, char **argv) {
 
     fst::SymbolTable *phones_symtab = NULL;
     {
-        std::ifstream is(phnfile.c_str());
-        phones_symtab = ::fst::SymbolTable::ReadText(is, phnfile);
-        if (!phones_symtab)
-            KALDI_ERR << "Could not read phones symbol table file "<< phnfile;
+      std::ifstream is(phnfile.c_str());
+      phones_symtab = ::fst::SymbolTable::ReadText(is, phnfile);
+      if (!phones_symtab)
+        KALDI_ERR << "Could not read phones symbol table file "<< phnfile;
     }
 
     EventType *query = NULL;

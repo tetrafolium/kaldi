@@ -41,12 +41,12 @@ int main(int argc, char *argv[]) {
         "<integer-phone-id> [begin|end|singleton|internal|nonword]\n"
         "See also: lattice-align-words-lexicon, for use in cases where phones\n"
         "don't have word-position information.\n";
-    
+
     ParseOptions po(usage);
     BaseFloat max_expand = 0.0;
     bool output_if_error = true;
     bool do_test = false;
-    
+
     po.Register("output-error-lats", &output_if_error, "Output lattices that aligned "
                 "with errors (e.g. due to force-out");
     po.Register("test", &do_test, "Test the algorithm while running it.");
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
                 "program will expand lattices before refusing to continue.  E.g. 10."
                 "This can be used to prevent this program consuming excessive memory "
                 "if there is a mismatch on the command-line or a 'problem' lattice.");
-    
+
     WordBoundaryInfoNewOpts opts;
     opts.Register(&po);
 
@@ -73,14 +73,14 @@ int main(int argc, char *argv[]) {
 
     TransitionModel tmodel;
     ReadKaldiObject(model_rxfilename, &tmodel);
-    
+
     SequentialCompactLatticeReader clat_reader(lats_rspecifier);
-    CompactLatticeWriter clat_writer(lats_wspecifier); 
+    CompactLatticeWriter clat_writer(lats_wspecifier);
 
     WordBoundaryInfo info(opts, word_boundary_rxfilename);
-    
+
     int32 num_done = 0, num_err = 0;
-    
+
     for (; !clat_reader.Done(); clat_reader.Next()) {
       std::string key = clat_reader.Key();
       const CompactLattice &clat = clat_reader.Value();
@@ -89,9 +89,9 @@ int main(int argc, char *argv[]) {
       int32 max_states;
       if (max_expand > 0) max_states = 1000 + max_expand * clat.NumStates();
       else max_states = 0;
-      
+
       bool ok = WordAlignLattice(clat, tmodel, info, max_states, &aligned_clat);
-      
+
       if (do_test && ok)
         TestWordAlignedLattice(clat, tmodel, info, aligned_clat);
 

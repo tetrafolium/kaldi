@@ -18,7 +18,7 @@
 // limitations under the License.
 
 /** @brief Relabels neural network egs with the read pdf-id alignments
-*/
+ */
 
 #include <sstream>
 
@@ -27,27 +27,27 @@
 #include "nnet2/nnet-example.h"
 
 namespace kaldi {
-  
-  // this functions splits an egs key like <utt_id>-<frame_id> into 
-  // separate utterance id and frame id on the last delimiter.
-  // Returns false if the delimiter is not found in the key.
-  bool SplitEgsKey(const std::string &key, 
-                    std::string *utt_id, int32 *frame_id) {
-    size_t start = 0, found = 0, end = key.size();
-    utt_id->clear();
- 
-    found = key.find_last_of("-", end);
-    // start != end condition is for when the delimiter is at the end
-    
-    if (found != start && start != end && found < end) {
-      *utt_id = key.substr(start, found - start);
-      std::istringstream tmp(key.substr(found + 1, end));
-      tmp >> *frame_id;
-      return true;
-    }
 
-    return false;
+// this functions splits an egs key like <utt_id>-<frame_id> into
+// separate utterance id and frame id on the last delimiter.
+// Returns false if the delimiter is not found in the key.
+bool SplitEgsKey(const std::string &key,
+    std::string *utt_id, int32 *frame_id) {
+  size_t start = 0, found = 0, end = key.size();
+  utt_id->clear();
+
+  found = key.find_last_of("-", end);
+  // start != end condition is for when the delimiter is at the end
+
+  if (found != start && start != end && found < end) {
+    *utt_id = key.substr(start, found - start);
+    std::istringstream tmp(key.substr(found + 1, end));
+    tmp >> *frame_id;
+    return true;
   }
+
+  return false;
+}
 }
 
 int main(int argc, char *argv[]) {
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
     po.Read(argc, argv);
 
-    // Here we expect equal number of input egs archive and output egs archives. 
+    // Here we expect equal number of input egs archive and output egs archives.
     // So the total number of arguments including the alignment specifier must be odd.
     if (po.NumArgs() < 3 || po.NumArgs() % 2 == 0) {
       po.PrintUsage();
@@ -81,19 +81,19 @@ int main(int argc, char *argv[]) {
 
     std::string alignments_rspecifier = po.GetArg(1);
     int32 num_archives = (po.NumArgs() - 1) / 2;
-    
+
     SequentialInt32VectorReader ali_reader(alignments_rspecifier);
 
     unordered_map<std::string, std::vector<int32>* > utt_to_pdf_ali;
 
     // Keep statistics
     int32 num_ali = 0;
-    int64 num_frames_ali = 0, num_frames_egs = 0, 
-          num_frames_missing = 0, num_frames_relabelled = 0;
+    int64 num_frames_ali = 0, num_frames_egs = 0,
+        num_frames_missing = 0, num_frames_relabelled = 0;
 
     // Read alignments and put the pointer in an unordered map
-    // indexed by the key. This is so that we can efficiently find the 
-    // alignment corresponding to the utterance to 
+    // indexed by the key. This is so that we can efficiently find the
+    // alignment corresponding to the utterance to
     // which a particular frame belongs
     for (; !ali_reader.Done(); ali_reader.Next(), num_ali++) {
       std::string key = ali_reader.Key();
@@ -112,14 +112,14 @@ int main(int argc, char *argv[]) {
       NnetExampleWriter egs_writer(egs_wspecifier);
 
       for (; !egs_reader.Done(); egs_reader.Next(), num_frames_egs++) {
-      
+
         std::string key(egs_reader.Key());
 
         std::string utt_id;
         int32 frame_id;
 
         if (!SplitEgsKey(key, &utt_id, &frame_id)) {
-          KALDI_ERR << "Unable to split key " << key << " on delimiter - " 
+          KALDI_ERR << "Unable to split key " << key << " on delimiter - "
                     << " into utterance id and frame id";
         }
         NnetExample eg(egs_reader.Value());
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
                       << "should be < " << alignment->size();
           }
           if (eg.GetLabelSingle(t_offset) != (*alignment)[t])
-            num_frames_relabelled++; 
+            num_frames_relabelled++;
           eg.SetLabelSingle(t_offset, (*alignment)[t]);
         }
         egs_writer.Write(key, eg);
@@ -148,14 +148,14 @@ int main(int argc, char *argv[]) {
     }
 
     unordered_map<std::string, std::vector<int32>*>::iterator iter;
-    
+
     for (iter = utt_to_pdf_ali.begin(); iter != utt_to_pdf_ali.end(); ++iter)
       delete iter->second;
-    
-    KALDI_LOG << "Read " << num_ali << " alignments containing a total of " 
-              << num_frames_ali << " frames; labelled " 
-              << num_frames_egs - num_frames_missing << " frames out of " 
-              << num_frames_egs << " examples; labels changed for " 
+
+    KALDI_LOG << "Read " << num_ali << " alignments containing a total of "
+              << num_frames_ali << " frames; labelled "
+              << num_frames_egs - num_frames_missing << " frames out of "
+              << num_frames_egs << " examples; labels changed for "
               << num_frames_relabelled << " of those frames.\n.";
 
     return (num_frames_missing > 0.5  * num_frames_egs);

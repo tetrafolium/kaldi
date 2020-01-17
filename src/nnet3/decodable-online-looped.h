@@ -54,13 +54,13 @@ namespace nnet3 {
 // NumIndices() functions so it is not usable as an object of type
 // DecodableInterface.
 class DecodableNnetLoopedOnlineBase: public DecodableInterface {
- public:
+public:
   // Constructor.  'input_feature' is for the feature that will be given
   // as 'input' to the neural network; 'ivector_feature' is for the iVector
   // feature, or NULL if iVectors are not being used.
   DecodableNnetLoopedOnlineBase(const DecodableNnetSimpleLoopedInfo &info,
-                                 OnlineFeatureInterface *input_features,
-                                 OnlineFeatureInterface *ivector_features);
+      OnlineFeatureInterface *input_features,
+      OnlineFeatureInterface *ivector_features);
 
   // note: the LogLikelihood function is not overridden; the child
   // class needs to do this.
@@ -82,7 +82,7 @@ class DecodableNnetLoopedOnlineBase: public DecodableInterface {
   }
 
 
- protected:
+protected:
 
   /// If the neural-network outputs for this frame are not cached, this function
   /// computes them (and possibly also some later frames).  Note:
@@ -93,7 +93,7 @@ class DecodableNnetLoopedOnlineBase: public DecodableInterface {
     KALDI_ASSERT(subsampled_frame >= current_log_post_subsampled_offset_ &&
                  "Frames must be accessed in order.");
     while (subsampled_frame >= current_log_post_subsampled_offset_ +
-           current_log_post_.NumRows())
+        current_log_post_.NumRows())
       AdvanceChunk();
   }
 
@@ -111,7 +111,7 @@ class DecodableNnetLoopedOnlineBase: public DecodableInterface {
 
   const DecodableNnetSimpleLoopedInfo &info_;
 
- private:
+private:
 
   // This function does the computation for the next chunk.  It will change
   // current_log_post_ and current_log_post_subsampled_offset_, and
@@ -135,12 +135,12 @@ class DecodableNnetLoopedOnlineBase: public DecodableInterface {
 // of the DecodableNnetSimpleLoopedInfo that you initailized this
 // with.
 class DecodableNnetLoopedOnline: public DecodableNnetLoopedOnlineBase {
- public:
+public:
   DecodableNnetLoopedOnline(
-      const DecodableNnetSimpleLoopedInfo &info,
-      OnlineFeatureInterface *input_features,
-      OnlineFeatureInterface *ivector_features):
-      DecodableNnetLoopedOnlineBase(info, input_features, ivector_features) { }
+    const DecodableNnetSimpleLoopedInfo &info,
+    OnlineFeatureInterface *input_features,
+    OnlineFeatureInterface *ivector_features) :
+    DecodableNnetLoopedOnlineBase(info, input_features, ivector_features) { }
 
 
   // returns the output-dim of the neural net.
@@ -151,7 +151,7 @@ class DecodableNnetLoopedOnline: public DecodableNnetLoopedOnlineBase {
   // represents the pdf-id (or other output of the network) PLUS ONE.
   virtual BaseFloat LogLikelihood(int32 subsampled_frame, int32 index);
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableNnetLoopedOnline);
 
 };
@@ -165,14 +165,14 @@ class DecodableNnetLoopedOnline: public DecodableNnetLoopedOnlineBase {
 // of the DecodableNnetSimpleLoopedInfo that you initailized this
 // with.
 class DecodableAmNnetLoopedOnline: public DecodableNnetLoopedOnlineBase {
- public:
+public:
   DecodableAmNnetLoopedOnline(
-      const TransitionModel &trans_model,
-      const DecodableNnetSimpleLoopedInfo &info,
-      OnlineFeatureInterface *input_features,
-      OnlineFeatureInterface *ivector_features):
-      DecodableNnetLoopedOnlineBase(info, input_features, ivector_features),
-      trans_model_(trans_model) { }
+    const TransitionModel &trans_model,
+    const DecodableNnetSimpleLoopedInfo &info,
+    OnlineFeatureInterface *input_features,
+    OnlineFeatureInterface *ivector_features) :
+    DecodableNnetLoopedOnlineBase(info, input_features, ivector_features),
+    trans_model_(trans_model) { }
 
 
   // returns the output-dim of the neural net.
@@ -181,9 +181,9 @@ class DecodableAmNnetLoopedOnline: public DecodableNnetLoopedOnlineBase {
   // 'subsampled_frame' is a frame, but if frame-subsampling-factor != 1, it's a
   // reduced-rate output frame (e.g. a 't' index divided by 3).
   virtual BaseFloat LogLikelihood(int32 subsampled_frame,
-                                  int32 transition_id);
+      int32 transition_id);
 
- private:
+private:
   const TransitionModel &trans_model_;
 
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableAmNnetLoopedOnline);

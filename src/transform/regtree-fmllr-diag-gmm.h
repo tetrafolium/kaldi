@@ -42,8 +42,8 @@ struct RegtreeFmllrOptions {
   bool use_regtree;     ///< If 'true', find transforms to generate using regression tree.
                         ///< If 'false', generate transforms for each baseclass.
 
-  RegtreeFmllrOptions(): update_type("full"), min_count(1000.0),
-                         num_iters(10), use_regtree(true) { }
+  RegtreeFmllrOptions() : update_type("full"), min_count(1000.0),
+    num_iters(10), use_regtree(true) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("fmllr-update-type", &update_type,
@@ -67,13 +67,13 @@ struct RegtreeFmllrOptions {
  *  to the leaves of the tree).
  */
 class RegtreeFmllrDiagGmm {
- public:
+public:
   RegtreeFmllrDiagGmm() : dim_(-1), num_xforms_(-1), valid_logdet_(false) {}
   explicit RegtreeFmllrDiagGmm(const RegtreeFmllrDiagGmm &other)
-      : dim_(other.dim_), num_xforms_(other.num_xforms_),
-        xform_matrices_(other.xform_matrices_), logdet_(other.logdet_),
-        valid_logdet_(other.valid_logdet_),
-        bclass2xforms_(other.bclass2xforms_) {}
+    : dim_(other.dim_), num_xforms_(other.num_xforms_),
+    xform_matrices_(other.xform_matrices_), logdet_(other.logdet_),
+    valid_logdet_(other.valid_logdet_),
+    bclass2xforms_(other.bclass2xforms_) {}
   ~RegtreeFmllrDiagGmm() {}
   /// Allocates memory for transform matrix & bias vector
   void Init(size_t num_xforms, size_t dim);
@@ -84,7 +84,7 @@ class RegtreeFmllrDiagGmm {
   void ComputeLogDets();
   /// Get the transformed features for each of the transforms.
   void TransformFeature(const VectorBase<BaseFloat> &in,
-                        std::vector< Vector<BaseFloat> > *out) const;
+      std::vector< Vector<BaseFloat> > *out) const;
   void Write(std::ostream &out_stream, bool binary) const;
   void Read(std::istream &in_stream, bool binary);
 
@@ -100,7 +100,7 @@ class RegtreeFmllrDiagGmm {
   void SetParameters(const MatrixBase<BaseFloat> &mat, size_t regclass);
   void set_bclass2xforms(const std::vector<int32> &in) { bclass2xforms_ = in; }
 
- private:
+private:
   int32 dim_;             ///< Dimension of feature vectors
   int32 num_xforms_;            ///< Number of transform matrices
   std::vector< Matrix<BaseFloat> > xform_matrices_;  ///< Transform matrices
@@ -113,17 +113,17 @@ class RegtreeFmllrDiagGmm {
 };
 
 inline void RegtreeFmllrDiagGmm::GetXformMatrix(int32 xform_index,
-                                              Matrix<BaseFloat> *out) const {
+    Matrix<BaseFloat> *out) const {
   if (xform_index >= num_xforms_) {
     KALDI_ERR << "Index (" << xform_index << ") out of range [0, "
-        << num_xforms_ << "]";
+              << num_xforms_ << "]";
   }
   out->Resize(dim_, dim_ + 1);
   out->CopyFromMat(xform_matrices_[xform_index], kNoTrans);
 }
 
 inline void RegtreeFmllrDiagGmm::SetParameters(const MatrixBase<BaseFloat> &mat,
-                                        size_t regclass) {
+    size_t regclass) {
   xform_matrices_[regclass].CopyFromMat(mat, kNoTrans);
   valid_logdet_ = false;
 }
@@ -135,9 +135,9 @@ inline void RegtreeFmllrDiagGmm::GetLogDets(VectorBase<BaseFloat> *out) const {
 
 typedef TableWriter< KaldiObjectHolder<RegtreeFmllrDiagGmm> >  RegtreeFmllrDiagGmmWriter;
 typedef RandomAccessTableReader< KaldiObjectHolder<RegtreeFmllrDiagGmm> >
-            RandomAccessRegtreeFmllrDiagGmmReader;
+    RandomAccessRegtreeFmllrDiagGmmReader;
 typedef RandomAccessTableReaderMapped< KaldiObjectHolder<RegtreeFmllrDiagGmm> >
-            RandomAccessRegtreeFmllrDiagGmmReaderMapped;
+    RandomAccessRegtreeFmllrDiagGmmReaderMapped;
 typedef SequentialTableReader< KaldiObjectHolder<RegtreeFmllrDiagGmm> >  RegtreeFmllrDiagGmmSeqReader;
 
 /** \class RegtreeFmllrDiagGmmAccs
@@ -146,7 +146,7 @@ typedef SequentialTableReader< KaldiObjectHolder<RegtreeFmllrDiagGmm> >  Regtree
  *  Gaussian mixture models as emission densities.
  */
 class RegtreeFmllrDiagGmmAccs {
- public:
+public:
   RegtreeFmllrDiagGmmAccs() : num_baseclasses_(-1), dim_(-1) {}
   ~RegtreeFmllrDiagGmmAccs() { DeletePointers(&baseclass_stats_); }
 
@@ -159,20 +159,20 @@ class RegtreeFmllrDiagGmmAccs {
   /// do a 2nd pass of regression-tree fMLLR estimation, which as I write
   /// (Dan, 2016) I'm not sure that this framework even supports.
   BaseFloat AccumulateForGmm(const RegressionTree &regtree,
-                             const AmDiagGmm &am,
-                             const VectorBase<BaseFloat> &data,
-                             size_t pdf_index, BaseFloat weight);
+      const AmDiagGmm &am,
+      const VectorBase<BaseFloat> &data,
+      size_t pdf_index, BaseFloat weight);
 
   /// Accumulate stats for a single Gaussian component in the model.
   void AccumulateForGaussian(const RegressionTree &regtree,
-                             const AmDiagGmm &am,
-                             const VectorBase<BaseFloat> &data,
-                             size_t pdf_index, size_t gauss_index,
-                             BaseFloat weight);
+      const AmDiagGmm &am,
+      const VectorBase<BaseFloat> &data,
+      size_t pdf_index, size_t gauss_index,
+      BaseFloat weight);
 
   void Update(const RegressionTree &regtree, const RegtreeFmllrOptions &opts,
-              RegtreeFmllrDiagGmm *out_fmllr, BaseFloat *auxf_impr,
-              BaseFloat *tot_t) const;
+      RegtreeFmllrDiagGmm *out_fmllr, BaseFloat *auxf_impr,
+      BaseFloat *tot_t) const;
 
   void Write(std::ostream &out_stream, bool binary) const;
   void Read(std::istream &in_stream, bool binary, bool add);
@@ -184,7 +184,7 @@ class RegtreeFmllrDiagGmmAccs {
     return baseclass_stats_;
   }
 
- private:
+private:
   /// Per-baseclass stats; used for accumulation
   std::vector<AffineXformStats*> baseclass_stats_;
   /// Number of baseclasses

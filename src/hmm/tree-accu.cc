@@ -24,7 +24,7 @@
 namespace kaldi {
 
 static int32 MapPhone(const std::vector<int32> &phone_map,
-                      int32 phone) {
+    int32 phone) {
   if (phone == 0 || phone_map.empty()) return phone;
   else if (phone < 0 || phone >= phone_map.size()) {
     KALDI_ERR << "Out-of-range phone " << phone << " bad --phone-map option?";
@@ -34,10 +34,10 @@ static int32 MapPhone(const std::vector<int32> &phone_map,
 
 
 void AccumulateTreeStats(const TransitionModel &trans_model,
-                         const AccumulateTreeStatsInfo &info,
-                         const std::vector<int32> &alignment,
-                         const Matrix<BaseFloat> &features,
-                         std::map<EventType, GaussClusterable*> *stats) {
+    const AccumulateTreeStatsInfo &info,
+    const std::vector<int32> &alignment,
+    const Matrix<BaseFloat> &features,
+    std::map<EventType, GaussClusterable*> *stats) {
   std::vector<std::vector<int32> > split_alignment;
   bool ans = SplitToPhones(trans_model, alignment, &split_alignment);
   if (!ans) {
@@ -81,7 +81,7 @@ void AccumulateTreeStats(const TransitionModel &trans_model,
         if (is_ctx_dep || j == info.central_position)
           evec.push_back(std::make_pair(static_cast<EventKeyType>(j), static_cast<EventValueType>(phone)));
       }
-      for (int32 j = 0; j < static_cast<int32>(split_alignment[i+info.central_position].size());j++) {
+      for (int32 j = 0; j < static_cast<int32>(split_alignment[i+info.central_position].size()); j++) {
         // for central phone of this window...
         EventType evec_more(evec);
         int32 pdf_class = trans_model.TransitionIdToPdfClass(
@@ -104,7 +104,7 @@ void AccumulateTreeStats(const TransitionModel &trans_model,
 
 
 void ReadPhoneMap(std::string phone_map_rxfilename,
-                  std::vector<int32> *phone_map) {
+    std::vector<int32> *phone_map) {
   phone_map->clear();
   // phone map file has format e.g.:
   // 1 1
@@ -115,10 +115,10 @@ void ReadPhoneMap(std::string phone_map_rxfilename,
   // (if file has right format). first is old phone, second is new phone
   if (!ReadIntegerVectorVectorSimple(phone_map_rxfilename, &vec))
     KALDI_ERR << "Error reading phone map from " <<
-        PrintableRxfilename(phone_map_rxfilename);
+      PrintableRxfilename(phone_map_rxfilename);
   for (size_t i = 0; i < vec.size(); i++) {
     if (vec[i].size() != 2 || vec[i][0]<=0 || vec[i][1]<=0 ||
-       (vec[i][0]<static_cast<int32>(phone_map->size()) &&
+        (vec[i][0]<static_cast<int32>(phone_map->size()) &&
         (*phone_map)[vec[i][0]] != -1))
       KALDI_ERR << "Error reading phone map from "
                 <<   PrintableRxfilename(phone_map_rxfilename)
@@ -135,10 +135,10 @@ void ReadPhoneMap(std::string phone_map_rxfilename,
 }
 
 AccumulateTreeStatsInfo::AccumulateTreeStatsInfo(
-    const AccumulateTreeStatsOptions &opts):
-    var_floor(opts.var_floor),
-    context_width(opts.context_width),
-    central_position(opts.central_position) {
+  const AccumulateTreeStatsOptions &opts) :
+  var_floor(opts.var_floor),
+  context_width(opts.context_width),
+  central_position(opts.central_position) {
   if (central_position < 0 || context_width <= central_position)
     KALDI_ERR << "Invalid options: --central-position=" << central_position
               << ", --context-width=" << context_width;

@@ -128,16 +128,16 @@ struct NnetOptimizeOptions;  // Forward declaration.
    nnet-optimize.cc:VariableMerginOptimization()).
  */
 class VariableMergingOptimizer {
- public:
+public:
   VariableMergingOptimizer(const NnetOptimizeOptions &config,
-                           const Nnet &nnet,
-                           NnetComputation *computation);
+      const Nnet &nnet,
+      NnetComputation *computation);
   // Note: you can call this only once.  If it returns true, it means it has
   // merged variables.  In this case, you have the option to instantiate another
   // copy of the class and try again with that other copy.
   bool MergeVariables();
 
- private:
+private:
   /// @brief This function returns a pair of bools saying whether we can do a
   ///   (left and/or right) merge respectively, based on the conditions defined
   ///   in the header.
@@ -193,7 +193,7 @@ class VariableMergingOptimizer {
    data-derivatives from the model-update part of backprop.
  */
 void ConsolidateModelUpdate(const Nnet &nnet,
-                            NnetComputation *computation);
+    NnetComputation *computation);
 
 
 
@@ -211,15 +211,15 @@ void ConsolidateModelUpdate(const Nnet &nnet,
 // be accurate and that all matrices will be initialized with
 // zero contents.
 class DerivativeTimeLimiter {
- public:
+public:
   DerivativeTimeLimiter(const Nnet &nnet,
-                        int32 min_deriv_time,
-                        int32 max_deriv_time,
-                        NnetComputation *computation);
+      int32 min_deriv_time,
+      int32 max_deriv_time,
+      NnetComputation *computation);
 
   void LimitDerivTimes();
 
- private:
+private:
 
   // sets up matrix_prune_info_.
   void ComputeMatrixPruneInfo();
@@ -251,7 +251,7 @@ class DerivativeTimeLimiter {
   // limit the size of the matrix (because variables outside the
   // desired range are never accessed), and false otherwise.
   inline bool CanLimitMatrix(const Analyzer &analyzer,
-                             int32 matrix_index) const;
+      int32 matrix_index) const;
 
   // called from PruneMatrices after it has figured out which matrices we need
   // to limit to a row-range, this function changes computation->submatrices and
@@ -294,22 +294,22 @@ class DerivativeTimeLimiter {
   // to 'left_prune' and 'right_prune' the number of rows we have
   // removed on the left and on the right respectively.
   inline void GetPruneValues(int32 initial_submatrix,
-                             int32 new_submatrix,
-                             int32 *left_prune,
-                             int32 *right_prune) const;
+      int32 new_submatrix,
+      int32 *left_prune,
+      int32 *right_prune) const;
 
   // This helper function, used while mapping commands, returns true if the
   // Cindex represented by the pair (submatrix, row_index) has a 't' value
   // within the range [min_deriv_time_, max_deriv_time_].
   bool RowIsKept(int32 submatrix,
-                 int32 row_index) const;
+      int32 row_index) const;
 
 
   struct MatrixPruneInfo {
     bool is_deriv;  // true if the matrix represents a derivative (copied from
                     // the debug-info; repeated here for convenience).
     bool fully_inside_range;  // True if the matrix is completely inside the time range
-                             // specified.
+                              // specified.
     bool partly_inside_range;  // true if the matrix is partly (but not fully)
                                // inside the time range specified.
     int32 row_begin;  // if partly_inside_range, the first row that's within the time range (i.e. for which
@@ -365,9 +365,9 @@ int32 MaxOutputTimeInRequest(const ComputationRequest &request);
 // DerivativeLimiter.  Will do nothing if min_deriv_time and max_deriv_time are
 // their default -inf,+inf values.
 void LimitDerivativeTimes(const Nnet &nnet,
-                          int32 min_deriv_time,
-                          int32 max_deriv_time,
-                          NnetComputation *computation);
+    int32 min_deriv_time,
+    int32 max_deriv_time,
+    NnetComputation *computation);
 
 /**  This function, used in 'shortcut' compilation where we first compile a
      smaller computation with the same structure but only 2 distinct 'n'
@@ -387,14 +387,14 @@ void LimitDerivativeTimes(const Nnet &nnet,
         in nnet-optimize-utils.cc.
  */
 bool RequestIsDecomposable(const ComputationRequest &request,
-                           ComputationRequest *mini_request,
-                           int32 *num_n_values);
+    ComputationRequest *mini_request,
+    int32 *num_n_values);
 
 
 /**
-  This function is used in 'shortcut' compilation to expand a computation
-  that has been compiled for exactly 2 'n' values, to one that is suitable
-  for some num_n_values > 2.
+   This function is used in 'shortcut' compilation to expand a computation
+   that has been compiled for exactly 2 'n' values, to one that is suitable
+   for some num_n_values > 2.
      @param [in] nnet         The neural network for which this computation
                               is being built.
      @param [in] misc_info    The same MiscComputationInfo object that was
@@ -413,11 +413,11 @@ bool RequestIsDecomposable(const ComputationRequest &request,
 
  */
 void ExpandComputation(const Nnet &nnet,
-                       const MiscComputationInfo &misc_info,
-                       const NnetComputation &computation,
-                       bool need_debug_info,
-                       int32 num_n_values,
-                       NnetComputation *expanded_computation);
+    const MiscComputationInfo &misc_info,
+    const NnetComputation &computation,
+    bool need_debug_info,
+    int32 num_n_values,
+    NnetComputation *expanded_computation);
 
 
 
@@ -461,7 +461,7 @@ void RemoveNoOps(NnetComputation *computation);
 /// submatrices.  This is useful in renumbering code.  Note: some of the
 /// pointers may point to a zero value, for optional submatrix args.
 void IdentifySubmatrixArgs(NnetComputation::Command *command,
-                           std::vector<int32*> *submatrix_args);
+    std::vector<int32*> *submatrix_args);
 
 
 /// This function outputs to "submatrix_args" the addresses of the args
@@ -469,7 +469,7 @@ void IdentifySubmatrixArgs(NnetComputation::Command *command,
 /// the indexes of submatrices.  This is useful in renumbering code.  Note: some
 /// of the pointers may point to a zero value, for optional submatrix args.
 void IdentifySubmatrixArgs(std::vector<NnetComputation::Command> *commands,
-                           std::vector<int32*> *submatrix_args);
+    std::vector<int32*> *submatrix_args);
 
 /// This function outputs to "submatrix_args" the addresses of integers in
 /// 'computation' that correspond to submatrices.  These may be present in
@@ -478,32 +478,32 @@ void IdentifySubmatrixArgs(std::vector<NnetComputation::Command> *commands,
 /// args in commands, but for efficiency we don't provide pointers for the -1's
 /// in 'indexes_multi'.
 void IdentifySubmatrixArgsInComputation(NnetComputation *computation,
-                                        std::vector<int32*> *submatrix_args);
+    std::vector<int32*> *submatrix_args);
 
 
 /// Identifies in the vector of commands, arguments that correspond to indexes
 /// into the computation's indexes_multi array, and outputs a list of pointers
 /// to those arguments to 'indexes_multi_args'.  Useful in renumbering code.
 void IdentifyIndexesMultiArgs(std::vector<NnetComputation::Command> *commands,
-                              std::vector<int32*> *indexes_multi_args);
+    std::vector<int32*> *indexes_multi_args);
 
 /// Identifies in the vector of commands, arguments that correspond to indexes
 /// into the computation's 'indexes' array, and outputs a list of pointers
 /// to those arguments to 'indexes_args'.  Useful in renumbering code.
 void IdentifyIndexesArgs(std::vector<NnetComputation::Command> *commands,
-                         std::vector<int32*> *indexes_args);
+    std::vector<int32*> *indexes_args);
 
 /// Identifies in the vector of commands, arguments that correspond to indexes
 /// into the computation's 'indexes' array, and outputs a list of pointers
 /// to those arguments to 'indexes_args'.  Useful in renumbering code.
 void IdentifyIndexesArgs(std::vector<NnetComputation::Command> *commands,
-                         std::vector<int32*> *indexes_args);
+    std::vector<int32*> *indexes_args);
 
 /// Identifies in the vector of commands, arguments that correspond to indexes
 /// into the computation's 'indexes_ranges' array, and outputs a list of pointers
 /// to those arguments to 'indexes_ranges_args'.  Useful in renumbering code.
 void IdentifyIndexesRangesArgs(std::vector<NnetComputation::Command> *commands,
-                               std::vector<int32*> *indexes_ranges_args);
+    std::vector<int32*> *indexes_ranges_args);
 
 /// This function tries to optimize computation 'computation' for an 'looped'
 /// computation.  It expects as input a computation with no backprop but with
@@ -518,7 +518,7 @@ void IdentifyIndexesRangesArgs(std::vector<NnetComputation::Command> *commands,
 /// [If this optimization fails, the whole computation may have to be
 /// regenerated with more segments.]
 void OptimizeLoopedComputation(const Nnet &nnet,
-                               NnetComputation *computation);
+    NnetComputation *computation);
 
 
 /// This function ensures that the arg1 of a final command of type kGotoLabel is

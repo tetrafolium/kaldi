@@ -27,8 +27,8 @@ const std::string TreeRenderer::kEdgeColorQuery = "red";
 
 void
 TreeRenderer::RenderNonLeaf(int32 id, const EventKeyType &key, bool in_query) {
-  std::string color = in_query? kEdgeColorQuery: kEdgeColor;
-  int32 width = in_query? kEdgeWidthQuery: kEdgeWidth;
+  std::string color = in_query ? kEdgeColorQuery : kEdgeColor;
+  int32 width = in_query ? kEdgeWidthQuery : kEdgeWidth;
   std::string label;
   if (key == kPdfClass) {
     label = "\"PdfClass = ?\"";
@@ -57,7 +57,7 @@ TreeRenderer::RenderNonLeaf(int32 id, const EventKeyType &key, bool in_query) {
 
 std::string
 TreeRenderer::MakeEdgeLabel(const EventKeyType &key,
-                            const ConstIntegerSet<EventValueType> &intset) {
+    const ConstIntegerSet<EventValueType> &intset) {
   std::ostringstream oss;
   ConstIntegerSet<EventValueType>::iterator child = intset.begin();
   for (; child != intset.end(); ++child) {
@@ -88,12 +88,12 @@ void TreeRenderer::RenderSplit(const EventType *query, int32 id) {
   EventValueType value = -30000000; // just a value I guess is invalid
   if (query != NULL)
     EventMap::Lookup(*query, key, &value);
-  const EventType *query_yes = yes_set.count(value)? query: NULL;
-  const EventType *query_no = (query_yes == NULL)? query: NULL;
-  std::string color_yes = (query_yes)? kEdgeColorQuery: kEdgeColor;
-  std::string color_no = (query && !query_yes)? kEdgeColorQuery: kEdgeColor;
-  int32 width_yes = (query_yes)? kEdgeWidthQuery: kEdgeWidth;
-  int32 width_no = (query && !query_yes)? kEdgeWidthQuery: kEdgeWidth;
+  const EventType *query_yes = yes_set.count(value) ? query : NULL;
+  const EventType *query_no = (query_yes == NULL) ? query : NULL;
+  std::string color_yes = (query_yes) ? kEdgeColorQuery : kEdgeColor;
+  std::string color_no = (query && !query_yes) ? kEdgeColorQuery : kEdgeColor;
+  int32 width_yes = (query_yes) ? kEdgeWidthQuery : kEdgeWidth;
+  int32 width_no = (query && !query_yes) ? kEdgeWidthQuery : kEdgeWidth;
   RenderNonLeaf(id, key, (query != NULL)); // Draw the node itself
   std::string yes_label = MakeEdgeLabel(key, yes_set);
   out_ << "\t" << id << " -> " << next_id_++ << " ["; // YES edge
@@ -125,8 +125,8 @@ void TreeRenderer::RenderTable(const EventType *query, int32 id) {
     EventMap::Lookup(*query, key, &value);
   RenderNonLeaf(id, key, (query != NULL));
   for (size_t t = 0; t < size; t++) {
-    std::string color = (t == value)? kEdgeColorQuery: kEdgeColor;
-    int32 width = (t==value)? kEdgeWidthQuery: kEdgeWidth;
+    std::string color = (t == value) ? kEdgeColorQuery : kEdgeColor;
+    int32 width = (t==value) ? kEdgeWidthQuery : kEdgeWidth;
     std::ostringstream label;
     if (key == kPdfClass) {
       label << t;
@@ -137,8 +137,8 @@ void TreeRenderer::RenderTable(const EventType *query, int32 id) {
       }
       std::string phone = phone_syms_.Find(static_cast<kaldi::int64>(t));
       if (phone.empty())
-          KALDI_ERR << "Phone ID found in a TableEventMap, but not in the "
-                    << "phone symbol table! ID: " << t;
+        KALDI_ERR << "Phone ID found in a TableEventMap, but not in the "
+                  << "phone symbol table! ID: " << t;
       label << phone;
     } else {
       KALDI_ERR << "TableEventMap: Invalid event key: " << key;
@@ -146,7 +146,7 @@ void TreeRenderer::RenderTable(const EventType *query, int32 id) {
     // draw the edge to the child subtree
     out_ << "\t" << id << " -> " << next_id_++ << " [label=" << label.str()
          << ", color=" << color << ", penwidth=" << width <<  "];\n";
-    const EventType *query_child = (t == value)? query: NULL;
+    const EventType *query_child = (t == value) ? query : NULL;
     RenderSubTree(query_child, next_id_-1); // render the child subtree
   }
 
@@ -158,8 +158,8 @@ void TreeRenderer::RenderConstant(const EventType *query, int32 id) {
   EventAnswerType answer;
   ReadBasicType(is_, binary_, &answer);
 
-  std::string color = (query!=NULL)? kEdgeColorQuery: kEdgeColor;
-  int32 width = (query!=NULL)? kEdgeWidthQuery: kEdgeWidth;
+  std::string color = (query!=NULL) ? kEdgeColorQuery : kEdgeColor;
+  int32 width = (query!=NULL) ? kEdgeWidthQuery : kEdgeWidth;
   out_ << id << "[shape=doublecircle, label=" << answer
        << ",color=" << color << ", penwidth=" << width << "];\n";
 }

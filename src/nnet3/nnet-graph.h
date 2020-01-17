@@ -33,7 +33,7 @@ namespace nnet3 {
    This file contains a few functions that treat the neural net as a graph on nodes:
    e.g. to find strongly-connected components in the graph, and from there to
    compute an ordering on the graph nodes.
-*/
+ */
 
 
 /// Prints a graph to a string in a pretty way for human readability, e.g. as 0
@@ -48,7 +48,7 @@ std::string PrintGraphToString(const std::vector<std::vector<int32> > &graph);
 /// instance, if n is the output node, (*graph)[n] will be the empty list
 /// because no other node will depend on it.
 void NnetToDirectedGraph(const Nnet &nnet,
-                         std::vector<std::vector<int32> > *graph);
+    std::vector<std::vector<int32> > *graph);
 
 
 /// Given a directed graph (where each std::vector<int32> is a list
@@ -58,7 +58,7 @@ void NnetToDirectedGraph(const Nnet &nnet,
 /// Each element of 'sccs' is a list of node indexes that are
 /// in that scc.
 void FindSccs(const std::vector<std::vector<int32> > &graph,
-              std::vector<std::vector<int32> > *sccs);
+    std::vector<std::vector<int32> > *sccs);
 
 
 /// This function returns 'true' if the graph represented in 'graph'
@@ -70,8 +70,8 @@ bool GraphHasCycles(const std::vector<std::vector<int32> > &graph);
 /// Given a list of sccs of a graph (e.g. as computed by FindSccs), compute a
 /// directed graph on the sccs.  Of course this directed graph will be acyclic.
 void MakeSccGraph(const std::vector<std::vector<int32> > &graph,
-                  const std::vector<std::vector<int32> > &sccs,
-                  std::vector<std::vector<int32> > *scc_graph);
+    const std::vector<std::vector<int32> > &sccs,
+    std::vector<std::vector<int32> > *scc_graph);
 
 /// Given an acyclic graph (where each std::vector<int32> is a list of
 /// destination-nodes of arcs coming from the current node), compute a
@@ -81,12 +81,12 @@ void MakeSccGraph(const std::vector<std::vector<int32> > &graph,
 /// permutation of the numbers 0 ... graph.size() - 1.  This function should
 /// crash if the graph contains cycles.
 void ComputeTopSortOrder(const std::vector<std::vector<int32> > &graph,
-                         std::vector<int32> *node_to_order);
+    std::vector<int32> *node_to_order);
 
 
 /// Outputs a graph in which the order of arcs is reversed.
 void ComputeGraphTranspose(const std::vector<std::vector<int32> > &graph,
-                           std::vector<std::vector<int32> > *graph_transpose);
+    std::vector<std::vector<int32> > *graph_transpose);
 
 /// This function computes the order in which we need to compute each node in
 /// the graph, where each node-index n maps to an epoch-index t = 0, 1, ... that
@@ -99,7 +99,7 @@ void ComputeGraphTranspose(const std::vector<std::vector<int32> > &graph,
 /// Internally it calls NnetToDirectedGraph, FindSccs, MakeSccGraph and
 /// ComputeTopSortOrder.
 void ComputeNnetComputationEpochs(const Nnet &nnet,
-                                  std::vector<int32> *node_to_epoch);
+    std::vector<int32> *node_to_epoch);
 
 
 } // namespace nnet3

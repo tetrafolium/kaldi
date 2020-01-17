@@ -39,7 +39,7 @@ enum {
 /// as an arc where ilabel == olabel == 0.
 template<class Arc>
 void ComputeStateInfo(const VectorFst<Arc> &fst,
-                      std::vector<char> *epsilon_info);
+    std::vector<char> *epsilon_info);
 
 /// This function modifies the fst (while maintaining equivalence) in such a way
 /// that, after the modification, all states of the FST which have epsilon-arcs

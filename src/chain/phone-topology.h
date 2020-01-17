@@ -34,21 +34,21 @@ namespace chain {
 
 
 /**
-  The 'PhoneTopology' object stores the topology for each of the phones that the
-  system handles.  This is the equivalent of a HMM topology, except that the
-  emission probabilities are on the arcs not the states (so it's much more
-  FST-like), and there are no transition probabilities (these are just folded
-  into the emission probabilities).  Note that it's the fact that the 'chain'
-  system is trained discriminatively from the start is what enables us to treat
-  the transition probabilities this way.
+   The 'PhoneTopology' object stores the topology for each of the phones that the
+   system handles.  This is the equivalent of a HMM topology, except that the
+   emission probabilities are on the arcs not the states (so it's much more
+   FST-like), and there are no transition probabilities (these are just folded
+   into the emission probabilities).  Note that it's the fact that the 'chain'
+   system is trained discriminatively from the start is what enables us to treat
+   the transition probabilities this way.
 
-  A topology is an epsilon-free finite state acceptor.  The
-  'normal' topology that you get if you don't do anything special, is as
-  follows:
+   A topology is an epsilon-free finite state acceptor.  The
+   'normal' topology that you get if you don't do anything special, is as
+   follows:
 
-0   1   1      # transition from state 0 to state 1 with label 1.
-1   1   2      # transition from state 1 to state 1 (self-loop) with label 2.
-1   0          # this says that state 1 is final.
+   0   1   1      # transition from state 0 to state 1 with label 1.
+   1   1   2      # transition from state 1 to state 1 (self-loop) with label 2.
+   1   0          # this says that state 1 is final.
 
    The FSTs have the following properties:
       - they are epsilon free
@@ -59,13 +59,13 @@ namespace chain {
         unused symbols between the smallest and largest symbol).
 
 
-  Phones are given indexes from 1 to NumPhones() (no gaps are allowed here).
+   Phones are given indexes from 1 to NumPhones() (no gaps are allowed here).
 
-  A topology for a phone is an FST
+   A topology for a phone is an FST
  */
 
 class PhoneTopology {
- public:
+public:
   int32 NumPhones() { returns static_cast<int32>(fsts_.size()) - 1; }
 
   // Returns the topology for a given phone.
@@ -85,7 +85,7 @@ class PhoneTopology {
   //    symbols on arcs out of other states.
   //  - there are no arcs ending in the start state.
   bool IsAlignable();
- private:
+private:
   void Check();
 
   // index zero is not used.

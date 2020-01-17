@@ -104,7 +104,7 @@ namespace nnet3 {
                      positions we chose, in addition to the input values.
  */
 class RestrictedAttentionComponent: public Component {
- public:
+public:
 
   // The use of this constructor should only precede InitFromConfig()
   RestrictedAttentionComponent() { }
@@ -130,26 +130,26 @@ class RestrictedAttentionComponent: public Component {
   virtual std::string Type() const { return "RestrictedAttentionComponent"; }
   virtual int32 Properties() const {
     return kReordersIndexes|kBackpropNeedsInput|kPropagateAdds|kBackpropAdds|
-        kStoresStats|kUsesMemo;
+           kStoresStats|kUsesMemo;
   }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void StoreStats(const CuMatrixBase<BaseFloat> &in_value,
-                          const CuMatrixBase<BaseFloat> &out_value,
-                          void *memo);
+      const CuMatrixBase<BaseFloat> &out_value,
+      void *memo);
   virtual void Scale(BaseFloat scale);
   virtual void Add(BaseFloat alpha, const Component &other);
   virtual void ZeroStats();
 
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
   virtual Component* Copy() const {
@@ -163,30 +163,30 @@ class RestrictedAttentionComponent: public Component {
   // t == kNoTime) as well as reordering the indexes.  This is allowed
   // behavior of ReorderIndexes functions.
   virtual void ReorderIndexes(std::vector<Index> *input_indexes,
-                              std::vector<Index> *output_indexes) const;
+      std::vector<Index> *output_indexes) const;
 
   virtual void GetInputIndexes(const MiscComputationInfo &misc_info,
-                               const Index &output_index,
-                               std::vector<Index> *desired_indexes) const;
+      const Index &output_index,
+      std::vector<Index> *desired_indexes) const;
 
   // This function returns true if at least one of the input indexes used to
   // compute this output index is computable.
   virtual bool IsComputable(const MiscComputationInfo &misc_info,
-                            const Index &output_index,
-                            const IndexSet &input_index_set,
-                            std::vector<Index> *used_inputs) const;
+      const Index &output_index,
+      const IndexSet &input_index_set,
+      std::vector<Index> *used_inputs) const;
 
   virtual ComponentPrecomputedIndexes* PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const;
+    const MiscComputationInfo &misc_info,
+    const std::vector<Index> &input_indexes,
+    const std::vector<Index> &output_indexes,
+    bool need_backprop) const;
 
   class PrecomputedIndexes: public ComponentPrecomputedIndexes {
-   public:
+public:
     PrecomputedIndexes() { }
-    PrecomputedIndexes(const PrecomputedIndexes &other):
-        io(other.io) { }
+    PrecomputedIndexes(const PrecomputedIndexes &other) :
+      io(other.io) { }
     virtual PrecomputedIndexes *Copy() const;
     virtual void Write(std::ostream &os, bool binary) const;
     virtual void Read(std::istream &os, bool binary);
@@ -208,7 +208,7 @@ class RestrictedAttentionComponent: public Component {
     CuMatrix<BaseFloat> c;
   };
 
- private:
+private:
 
   // Does the propagation for one head; this is called for each
   // head by the top-level Propagate function.  Later on we may
@@ -219,19 +219,19 @@ class RestrictedAttentionComponent: public Component {
   //
   // Assumes 'c' has already been zerooed.
   void PropagateOneHead(
-      const time_height_convolution::ConvolutionComputationIo &io,
-      const CuMatrixBase<BaseFloat> &in,
-      CuMatrixBase<BaseFloat> *c,
-      CuMatrixBase<BaseFloat> *out) const;
+    const time_height_convolution::ConvolutionComputationIo &io,
+    const CuMatrixBase<BaseFloat> &in,
+    CuMatrixBase<BaseFloat> *c,
+    CuMatrixBase<BaseFloat> *out) const;
 
 
   // does the backprop for one head; called by Backprop().
   void BackpropOneHead(
-      const time_height_convolution::ConvolutionComputationIo &io,
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &c,
-      const CuMatrixBase<BaseFloat> &out_deriv,
-      CuMatrixBase<BaseFloat> *in_deriv) const;
+    const time_height_convolution::ConvolutionComputationIo &io,
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &c,
+    const CuMatrixBase<BaseFloat> &out_deriv,
+    CuMatrixBase<BaseFloat> *in_deriv) const;
 
   // This function, used in ReorderIndexes() and PrecomputedIndexes(),
   // works out what grid structure over time we will have at the input
@@ -242,9 +242,9 @@ class RestrictedAttentionComponent: public Component {
   // padding, and at the input of this component those placeholders
   // will be zero; at the output the placeholders will be ignored.
   void GetComputationStructure(
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      time_height_convolution::ConvolutionComputationIo *io) const;
+    const std::vector<Index> &input_indexes,
+    const std::vector<Index> &output_indexes,
+    time_height_convolution::ConvolutionComputationIo *io) const;
 
   // This function, used in ReorderIndexes(), obtains the indexes with the
   // correct structure and order (the structure is specified in the 'io' object.
@@ -257,11 +257,11 @@ class RestrictedAttentionComponent: public Component {
   // new indexes that were not present in the old indexes, they get replaced with
   // kNoTime.
   void GetIndexes(
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      time_height_convolution::ConvolutionComputationIo &io,
-      std::vector<Index> *new_input_indexes,
-      std::vector<Index> *new_output_indexes) const;
+    const std::vector<Index> &input_indexes,
+    const std::vector<Index> &output_indexes,
+    time_height_convolution::ConvolutionComputationIo &io,
+    std::vector<Index> *new_input_indexes,
+    std::vector<Index> *new_output_indexes) const;
 
   /// Utility function used in GetIndexes().  Creates a grid of Indexes, where
   /// 't' has the larger stride, and within each block of Indexes for a given
@@ -270,10 +270,10 @@ class RestrictedAttentionComponent: public Component {
   /// to kNoTime (indicating that it's only for padding, not a real input or an
   /// output that's ever used).
   static void CreateIndexesVector(
-      const std::vector<std::pair<int32, int32> > &n_x_pairs,
-      int32 t_start, int32 t_step, int32 num_t_values,
-      const std::unordered_set<Index, IndexHasher> &index_set,
-      std::vector<Index> *output_indexes);
+    const std::vector<std::pair<int32, int32> > &n_x_pairs,
+    int32 t_start, int32 t_step, int32 num_t_values,
+    const std::unordered_set<Index, IndexHasher> &index_set,
+    std::vector<Index> *output_indexes);
 
 
   void Check() const;

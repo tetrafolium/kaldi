@@ -23,39 +23,39 @@ import java.util.Vector;
 
 public class MLF {
 
-	public static class LabFile {
-		String filename;
-		Vector<String> words = new Vector<String>();
-	}
+  public static class LabFile {
+    String filename;
+    Vector<String> words = new Vector<String>();
+  }
 
-	private Vector<LabFile> labels = new Vector<LabFile>();
+  private Vector<LabFile> labels = new Vector<LabFile>();
 
-	public void add(String filename, OutputProcess outputs) {
-		LabFile file = new LabFile();
+  public void add(String filename, OutputProcess outputs) {
+    LabFile file = new LabFile();
 
-		file.filename = filename;
-		for (OutputProcess.Word word : outputs.words) {
-			file.words.add(word.word);
-		}
+    file.filename = filename;
+    for (OutputProcess.Word word : outputs.words) {
+      file.words.add(word.word);
+    }
 
-		labels.add(file);
-	}
+    labels.add(file);
+  }
 
-	public void save(File file) throws FileNotFoundException, UnsupportedEncodingException {
+  public void save(File file) throws FileNotFoundException, UnsupportedEncodingException {
 
-		PrintWriter writer = new PrintWriter(file, Options.KALDI_ENCODING);
+    PrintWriter writer = new PrintWriter(file, Options.KALDI_ENCODING);
 
-		writer.println("#!MLF!#");
+    writer.println("#!MLF!#");
 
-		for (LabFile labfile : labels) {
-			writer.println("\"*/" + labfile.filename + "\"");
+    for (LabFile labfile : labels) {
+      writer.println("\"*/" + labfile.filename + "\"");
 
-			for (String word : labfile.words)
-				writer.println(word);
+      for (String word : labfile.words)
+        writer.println(word);
 
-			writer.println(".");
-		}
+      writer.println(".");
+    }
 
-		writer.close();
-	}
+    writer.close();
+  }
 }

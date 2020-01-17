@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
         "\n"
         "e.g.\n"
         "nnet-combine-egs-discriminative --max-length=512 ark:temp.1.degs ark:1.degs\n";
-        
+
     int32 max_length = 512;
     int32 hard_max_length = 2048;
     int32 batch_size = 250;
@@ -51,9 +51,9 @@ int main(int argc, char *argv[]) {
     po.Register("hard-max-length", &hard_max_length, "Length of example beyond "
                 "which we will discard (very long examples may cause out of "
                 "memory errors)");
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -61,14 +61,14 @@ int main(int argc, char *argv[]) {
 
     KALDI_ASSERT(hard_max_length >= max_length);
     KALDI_ASSERT(batch_size >= 1);
-    
+
     std::string examples_rspecifier = po.GetArg(1),
         examples_wspecifier = po.GetArg(2);
 
     SequentialDiscriminativeNnetExampleReader example_reader(
-        examples_rspecifier);
+      examples_rspecifier);
     DiscriminativeNnetExampleWriter example_writer(
-        examples_wspecifier);
+      examples_wspecifier);
 
     int64 num_read = 0, num_written = 0, num_discarded = 0;
 
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
       buffer.reserve(size);
 
       for (; !example_reader.Done() && buffer.size() < size;
-           example_reader.Next()) {
+          example_reader.Next()) {
         buffer.push_back(example_reader.Value());
         num_read++;
       }
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-    
+
     KALDI_LOG << "Read " << num_read << " discriminative neural-network training"
               << " examples, wrote " << num_written << ", discarded "
               << num_discarded;

@@ -27,7 +27,7 @@
 
 namespace kaldi {
 class Timer {
- public:
+public:
   Timer() { Reset(); }
 
   // You can initialize with bool to control whether or not you want the time to
@@ -47,10 +47,10 @@ class Timer {
       return 0.0;
     }
     return (static_cast<double>(time_end.QuadPart) -
-            static_cast<double>(time_start_.QuadPart)) /
+           static_cast<double>(time_start_.QuadPart)) /
            (static_cast<double>(freq.QuadPart));
   }
- private:
+private:
   LARGE_INTEGER time_start_;
 };
 }
@@ -61,7 +61,7 @@ class Timer {
 
 namespace kaldi {
 class Timer {
- public:
+public:
   Timer() { Reset(); }
 
   // You can initialize with bool to control whether or not you want the time to
@@ -77,13 +77,13 @@ class Timer {
     gettimeofday(&time_end, &time_zone);
     double t1, t2;
     t1 =  static_cast<double>(time_start_.tv_sec) +
-          static_cast<double>(time_start_.tv_usec)/(1000*1000);
+        static_cast<double>(time_start_.tv_usec)/(1000*1000);
     t2 =  static_cast<double>(time_end.tv_sec) +
-          static_cast<double>(time_end.tv_usec)/(1000*1000);
+        static_cast<double>(time_end.tv_usec)/(1000*1000);
     return t2-t1;
   }
 
- private:
+private:
   struct timeval time_start_;
   struct timezone time_zone_;
 };

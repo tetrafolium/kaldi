@@ -42,7 +42,7 @@ namespace kaldi {
 
 template<typename Real>
 Real VecVec(const CuVectorBase<Real> &a,
-            const CuVectorBase<Real> &b) {
+    const CuVectorBase<Real> &b) {
   //MatrixIndexT a_dim = a.Dim();
   KALDI_ASSERT(a.Dim() == b.Dim());
   Real result = 0;
@@ -52,7 +52,7 @@ Real VecVec(const CuVectorBase<Real> &a,
     CUBLAS_SAFE_CALL(cublas_dot(GetCublasHandle(), a.Dim(), a.Data(), 1, b.Data(),
                                 1, &result));
     CuDevice::Instantiate().AccuProfile(__func__, tim);
-} else
+  } else
 #endif
   {
     result = VecVec(a.Vec(), b.Vec());
@@ -437,12 +437,12 @@ void CuVectorBase<Real>::ApplyLog() {
 
 template<typename Real>
 void CuVectorBase<Real>::AddMatVec(const Real alpha,
-                                   const CuMatrixBase<Real> &M,
-                                   MatrixTransposeType trans,
-                                   const CuVectorBase<Real> &v,
-                                   const Real beta) {
+    const CuMatrixBase<Real> &M,
+    MatrixTransposeType trans,
+    const CuVectorBase<Real> &v,
+    const Real beta) {
   KALDI_ASSERT((trans == kNoTrans && M.NumCols() == v.dim_ && M.NumRows() == dim_) ||
-               (trans == kTrans && M.NumRows() == v.dim_ && M.NumCols() == dim_));
+      (trans == kTrans && M.NumRows() == v.dim_ && M.NumCols() == dim_));
   KALDI_ASSERT(&v != this);
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
@@ -452,7 +452,7 @@ void CuVectorBase<Real>::AddMatVec(const Real alpha,
     // Everything is backwards in CuBlas.  We need to reverse rows, columns,
     // transpose-ness.
     CUBLAS_SAFE_CALL(cublas_gemv(GetCublasHandle(),
-                                 (trans==kTrans? CUBLAS_OP_N:CUBLAS_OP_T),
+        (trans==kTrans ? CUBLAS_OP_N : CUBLAS_OP_T),
                                  M.NumCols(), M.NumRows(), alpha, M.Data(),
                                  M.Stride(), v.Data(), 1, beta, data_, 1));
 
@@ -466,9 +466,9 @@ void CuVectorBase<Real>::AddMatVec(const Real alpha,
 
 template<typename Real>
 void CuVectorBase<Real>::AddSpVec(const Real alpha,
-                                  const CuSpMatrix<Real> &M,
-                                  const CuVectorBase<Real> &v,
-                                  const Real beta) {
+    const CuSpMatrix<Real> &M,
+    const CuVectorBase<Real> &v,
+    const Real beta) {
   KALDI_ASSERT(M.NumCols() == v.dim_ && M.NumRows() == dim_);
   KALDI_ASSERT(&v != this);
 #if HAVE_CUDA == 1
@@ -491,7 +491,7 @@ void CuVectorBase<Real>::AddSpVec(const Real alpha,
 
 template<typename Real>
 void CuVectorBase<Real>::AddVecVec(Real alpha, const CuVectorBase<Real> &v,
-                                   const CuVectorBase<Real> &r, Real beta) {
+    const CuVectorBase<Real> &r, Real beta) {
   KALDI_ASSERT((dim_ == v.dim_ && dim_ == r.dim_));
   KALDI_ASSERT(this != &v && this != &r);
 #if HAVE_CUDA == 1
@@ -526,7 +526,7 @@ bool CuVectorBase<Real>::ApproxEqual(const CuVectorBase<Real> &other, float tol)
 
 template<typename Real>
 void CuVectorBase<Real>::AddDiagMat2(Real alpha, const CuMatrixBase<Real> &M,
-                                     MatrixTransposeType trans, Real beta) {
+    MatrixTransposeType trans, Real beta) {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
     if (dim_ == 0) return;
@@ -542,9 +542,9 @@ void CuVectorBase<Real>::AddDiagMat2(Real alpha, const CuMatrixBase<Real> &M,
 
 template<typename Real>
 void CuVectorBase<Real>::AddDiagMatMat(Real alpha, const CuMatrixBase<Real> &M,
-                                       MatrixTransposeType transM,
-                                       const CuMatrixBase<Real> &N,
-                                       MatrixTransposeType transN, Real beta) {
+    MatrixTransposeType transM,
+    const CuMatrixBase<Real> &N,
+    MatrixTransposeType transN, Real beta) {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
     CuTimer tim;
@@ -610,9 +610,9 @@ void CuVectorBase<Real>::AddDiagMatMat(Real alpha, const CuMatrixBase<Real> &M,
 
 template<typename Real>
 void CuVectorBase<Real>::AddTpVec(const Real alpha, const CuTpMatrix<Real> &M,
-                                  const MatrixTransposeType trans,
-                                  const CuVectorBase<Real> &v,
-                                  const Real beta) {
+    const MatrixTransposeType trans,
+    const CuVectorBase<Real> &v,
+    const Real beta) {
   KALDI_ASSERT(dim_ == v.dim_ && dim_ == M.NumRows());
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
@@ -644,7 +644,7 @@ void CuVectorBase<Real>::MulTp(const CuTpMatrix<Real> &M, const MatrixTransposeT
   if (CuDevice::Instantiate().Enabled()) {
     if (dim_ == 0) return;
     CuTimer tim;
-    cublas_tpmv(GetCublasHandle(), (trans==kTrans? CUBLAS_OP_N:CUBLAS_OP_T),
+    cublas_tpmv(GetCublasHandle(), (trans==kTrans ? CUBLAS_OP_N : CUBLAS_OP_T),
                 M.NumRows(), M.Data(), data_, 1);
     CuDevice::Instantiate().AccuProfile("CuVectorBase::MulTp", tim);
   } else
@@ -1124,7 +1124,7 @@ void CuVectorBase<Real>::Scale(Real value) {
 
 template<typename Real>
 void CuVectorBase<Real>::AddVec(Real alpha, const CuVectorBase<Real> &vec,
-                                Real beta) {
+    Real beta) {
   KALDI_ASSERT(vec.Dim() == Dim());
 
 #if HAVE_CUDA == 1
@@ -1148,7 +1148,7 @@ void CuVectorBase<Real>::AddVec(Real alpha, const CuVectorBase<Real> &vec,
 template<typename Real>
 template<typename OtherReal>
 void CuVectorBase<Real>::AddVec(Real alpha, const CuVectorBase<OtherReal> &vec,
-                                Real beta) {
+    Real beta) {
   // We could implement this directly, without using a temporary-- this can
   // be done later, when we have time.
   CuVector<Real> temp(vec);
@@ -1157,14 +1157,14 @@ void CuVectorBase<Real>::AddVec(Real alpha, const CuVectorBase<OtherReal> &vec,
 // instantiate the template above.
 template
 void CuVectorBase<float>::AddVec(float alpha, const CuVectorBase<double> &vec,
-                                 float beta);
+    float beta);
 template
 void CuVectorBase<double>::AddVec(double alpha, const CuVectorBase<float> &vec,
-                                  double beta);
+    double beta);
 
 template<typename Real>
 void CuVectorBase<Real>::AddRowSumMat(Real alpha, const CuMatrixBase<Real> &mat,
-                                      Real beta) {
+    Real beta) {
   KALDI_ASSERT(mat.NumCols() == Dim());
   if (Dim() == 0)
     return;
@@ -1176,7 +1176,7 @@ void CuVectorBase<Real>::AddRowSumMat(Real alpha, const CuMatrixBase<Real> &mat,
 
 template<typename Real>
 void CuVectorBase<Real>::AddColSumMat(Real alpha, const CuMatrixBase<Real> &mat,
-                                      Real beta) {
+    Real beta) {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
     CuTimer tim;

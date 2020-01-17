@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     BaseFloat silence_weight = 0.0;
     if (!ConvertStringToReal(silence_weight_str, &silence_weight))
       KALDI_ERR << "Invalid silence-weight parameter: expected float, got \""
-                 << silence_weight_str << '"';
+                << silence_weight_str << '"';
     std::vector<int32> silence_phones;
     if (!SplitStringToIntegers(silence_phones_str, ":", false, &silence_phones))
       KALDI_ERR << "Invalid silence-phones string " << silence_phones_str;

@@ -48,9 +48,9 @@ int main(int argc, char *argv[]) {
         wav_out_fn = po.GetArg(2);
 
     bool in_is_rspecifier = (ClassifyRspecifier(wav_in_fn, NULL, NULL)
-                             != kNoRspecifier),
+        != kNoRspecifier),
         out_is_wspecifier = (ClassifyWspecifier(wav_out_fn, NULL, NULL, NULL)
-                              != kNoWspecifier);
+        != kNoWspecifier);
 
     if (in_is_rspecifier != out_is_wspecifier)
       KALDI_ERR << "Cannot mix archives with regular files";

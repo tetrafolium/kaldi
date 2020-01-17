@@ -78,14 +78,14 @@ void Plda::ComputeDerivedVars() {
    where \bar{u}^g is the mean of the "gallery examples"; and we can expand the
    log likelihood ratio as
      - 0.5 [ (u^p - m) (I + \Psi/(n \Psi + I))^{-1} (u^p - m)  +  logdet(I + \Psi/(n \Psi + I)) ]
-     + 0.5 [u^p (I + \Psi) u^p  +  logdet(I + \Psi) ]
+ + 0.5 [u^p (I + \Psi) u^p  +  logdet(I + \Psi) ]
    where m = (n \Psi)/(n \Psi + I) \bar{u}^g.
 
  */
 
 double Plda::GetNormalizationFactor(
-    const VectorBase<double> &transformed_ivector,
-    int32 num_examples) const {
+  const VectorBase<double> &transformed_ivector,
+  int32 num_examples) const {
   KALDI_ASSERT(num_examples > 0);
   // Work out the normalization factor.  The covariance for an average over
   // "num_examples" training iVectors equals \Psi + I/num_examples.
@@ -105,16 +105,16 @@ double Plda::GetNormalizationFactor(
 
 
 double Plda::TransformIvector(const PldaConfig &config,
-                              const VectorBase<double> &ivector,
-                              int32 num_examples,
-                              VectorBase<double> *transformed_ivector) const {
+    const VectorBase<double> &ivector,
+    int32 num_examples,
+    VectorBase<double> *transformed_ivector) const {
   KALDI_ASSERT(ivector.Dim() == Dim() && transformed_ivector->Dim() == Dim());
   double normalization_factor;
   transformed_ivector->CopyFromVec(offset_);
   transformed_ivector->AddMatVec(1.0, transform_, kNoTrans, ivector, 1.0);
   if (config.simple_length_norm)
     normalization_factor = sqrt(transformed_ivector->Dim())
-      / transformed_ivector->Norm(2.0);
+        / transformed_ivector->Norm(2.0);
   else
     normalization_factor = GetNormalizationFactor(*transformed_ivector,
                                                   num_examples);
@@ -125,9 +125,9 @@ double Plda::TransformIvector(const PldaConfig &config,
 
 // "float" version of TransformIvector.
 float Plda::TransformIvector(const PldaConfig &config,
-                             const VectorBase<float> &ivector,
-                             int32 num_examples,
-                             VectorBase<float> *transformed_ivector) const {
+    const VectorBase<float> &ivector,
+    int32 num_examples,
+    VectorBase<float> *transformed_ivector) const {
   Vector<double> tmp(ivector), tmp_out(ivector.Dim());
   float ans = TransformIvector(config, tmp, num_examples, &tmp_out);
   transformed_ivector->CopyFromVec(tmp_out);
@@ -138,9 +138,9 @@ float Plda::TransformIvector(const PldaConfig &config,
 // There is an extended comment within this file, referencing a paper by
 // Ioffe, that may clarify what this function is doing.
 double Plda::LogLikelihoodRatio(
-    const VectorBase<double> &transformed_train_ivector,
-    int32 n, // number of training utterances.
-    const VectorBase<double> &transformed_test_ivector) const {
+  const VectorBase<double> &transformed_train_ivector,
+  int32 n,   // number of training utterances.
+  const VectorBase<double> &transformed_test_ivector) const {
   int32 dim = Dim();
   double loglike_given_class, loglike_without_class;
   { // work out loglike_given_class.
@@ -152,7 +152,7 @@ double Plda::LogLikelihoodRatio(
     Vector<double> variance(dim, kUndefined);
     for (int32 i = 0; i < dim; i++) {
       mean(i) = n * psi_(i) / (n * psi_(i) + 1.0)
-        * transformed_train_ivector(i);
+          * transformed_train_ivector(i);
       variance(i) = 1.0 + psi_(i) / (n * psi_(i) + 1.0);
     }
     double logdet = variance.SumLog();
@@ -161,7 +161,7 @@ double Plda::LogLikelihoodRatio(
     sqdiff.ApplyPow(2.0);
     variance.InvertElements();
     loglike_given_class = -0.5 * (logdet + M_LOG_2PI * dim +
-                                  VecVec(sqdiff, variance));
+        VecVec(sqdiff, variance));
   }
   { // work out loglike_without_class.  Here the mean is zero and the variance
     // is I + \Psi.
@@ -172,7 +172,7 @@ double Plda::LogLikelihoodRatio(
     double logdet = variance.SumLog();
     variance.InvertElements();
     loglike_without_class = -0.5 * (logdet + M_LOG_2PI * dim +
-                                    VecVec(sqdiff, variance));
+        VecVec(sqdiff, variance));
   }
   double loglike_ratio = loglike_given_class - loglike_without_class;
   return loglike_ratio;
@@ -205,7 +205,7 @@ void Plda::SmoothWithinClassCovariance(double smoothing_factor) {
 }
 
 void PldaStats::AddSamples(double weight,
-                           const Matrix<double> &group) {
+    const Matrix<double> &group) {
   if (dim_ == 0) {
     Init(group.NumCols());
   } else {
@@ -223,7 +223,7 @@ void PldaStats::AddSamples(double weight,
 
   class_info_.push_back(ClassInfo(weight, mean, n));
 
-  num_classes_ ++;
+  num_classes_++;
   num_examples_ += n;
   class_weight_ += weight;
   example_weight_ += weight * n;
@@ -256,8 +256,8 @@ void PldaStats::Init(int32 dim) {
 }
 
 
-PldaEstimator::PldaEstimator(const PldaStats &stats):
-    stats_(stats) {
+PldaEstimator::PldaEstimator(const PldaStats &stats) :
+  stats_(stats) {
   KALDI_ASSERT(stats.IsSorted());
   InitParameters();
 }
@@ -279,7 +279,7 @@ double PldaEstimator::ComputeObjfPart1() const {
   KALDI_ASSERT(det_sign == 1 && "Within-class covariance is singular");
 
   double objf = -0.5 * (within_class_count * (within_logdet + M_LOG_2PI * Dim())
-                        + TraceSpSp(inv_within_var, stats_.offset_scatter_));
+      + TraceSpSp(inv_within_var, stats_.offset_scatter_));
   return objf;
 }
 
@@ -303,7 +303,7 @@ double PldaEstimator::ComputeObjfPart2() const {
     Vector<double> mean (*(info.mean));
     mean.AddVec(-1.0 / stats_.class_weight_, stats_.sum_);
     tot_objf += info.weight * -0.5 * (combined_var_logdet + M_LOG_2PI * Dim()
-                                      + VecSpVec(mean, combined_inv_var, mean));
+        + VecSpVec(mean, combined_inv_var, mean));
   }
   return tot_objf;
 }
@@ -444,7 +444,7 @@ void PldaEstimator::EstimateOneIter() {
 
 
 void PldaEstimator::Estimate(const PldaEstimationConfig &config,
-                             Plda *plda) {
+    Plda *plda) {
   KALDI_ASSERT(stats_.example_weight_ > 0 && "Cannot estimate with no stats");
   for (int32 i = 0; i < config.num_em_iters; i++) {
     KALDI_LOG << "Plda estimation iteration " << i
@@ -456,7 +456,7 @@ void PldaEstimator::Estimate(const PldaEstimationConfig &config,
 
 template<class Real>
 static void ComputeNormalizingTransform(const SpMatrix<Real> &covar,
-                                        MatrixBase<Real> *proj) {
+    MatrixBase<Real> *proj) {
   int32 dim = covar.NumRows();
   TpMatrix<Real> C(dim);  // Cholesky of covar, covar = C C^T
   C.Cholesky(covar);
@@ -524,7 +524,7 @@ void PldaEstimator::GetOutput(Plda *plda) {
 }
 
 void PldaUnsupervisedAdaptor::AddStats(double weight,
-                                       const Vector<double> &ivector) {
+    const Vector<double> &ivector) {
   if (mean_stats_.Dim() == 0) {
     mean_stats_.Resize(ivector.Dim());
     variance_stats_.Resize(ivector.Dim());
@@ -536,13 +536,13 @@ void PldaUnsupervisedAdaptor::AddStats(double weight,
 }
 
 void PldaUnsupervisedAdaptor::AddStats(double weight,
-                                       const Vector<float> &ivector) {
+    const Vector<float> &ivector) {
   Vector<double> ivector_dbl(ivector);
   this->AddStats(weight, ivector_dbl);
 }
 
 void PldaUnsupervisedAdaptor::UpdatePlda(const PldaUnsupervisedAdaptorConfig &config,
-                                         Plda *plda) const {
+    Plda *plda) const {
   KALDI_ASSERT(tot_weight_ > 0.0);
   int32 dim = mean_stats_.Dim();
   KALDI_ASSERT(dim == plda->Dim());
@@ -629,17 +629,17 @@ void PldaUnsupervisedAdaptor::UpdatePlda(const PldaUnsupervisedAdaptorConfig &co
       Wproj2mod(i, i) += excess_within_covar;
       Bproj2mod(i, i) += excess_between_covar;
     } /*
-        Below I was considering a method like below, to try to scale up
-        the dimensions that had less variance than expected in our sample..
-        this didn't help, and actually when I set that power to +0.2 instead
-        of -0.5 it gave me an improvement on sre08.  But I'm not sure
-        about this.. it just doesn't seem right.
-      else {
-      BaseFloat scale = pow(std::max(1.0e-10, s(i)), -0.5);
-      BaseFloat max_scale = 10.0;  // I'll make this configurable later.
-      scale = std::min(scale, max_scale);
-      Ptrans.Row(i).Scale(scale);
-      } */
+         Below I was considering a method like below, to try to scale up
+         the dimensions that had less variance than expected in our sample..
+         this didn't help, and actually when I set that power to +0.2 instead
+         of -0.5 it gave me an improvement on sre08.  But I'm not sure
+         about this.. it just doesn't seem right.
+         else {
+         BaseFloat scale = pow(std::max(1.0e-10, s(i)), -0.5);
+         BaseFloat max_scale = 10.0;  // I'll make this configurable later.
+         scale = std::min(scale, max_scale);
+         Ptrans.Row(i).Scale(scale);
+         } */
   }
 
   // combined transform "transform_mod" and then P^T that takes us to the space

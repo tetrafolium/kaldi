@@ -67,7 +67,7 @@ struct OnlineFasterDecoderOpts : public FasterDecoderOptions {
 };
 
 class OnlineFasterDecoder : public FasterDecoder {
- public:
+public:
   // Codes returned by Decode() to show the current state of the decoder
   enum DecodeState {
     kEndFeats = 1, // No more scores are available from the Decodable
@@ -77,16 +77,16 @@ class OnlineFasterDecoder : public FasterDecoder {
 
   // "sil_phones" - the IDs of all silence phones
   OnlineFasterDecoder(const fst::Fst<fst::StdArc> &fst,
-                      const OnlineFasterDecoderOpts &opts,
-                      const std::vector<int32> &sil_phones,
-                      const TransitionModel &trans_model)
-      : FasterDecoder(fst, opts), opts_(opts),
-        silence_set_(sil_phones), trans_model_(trans_model),
-        max_beam_(opts.beam), effective_beam_(FasterDecoder::config_.beam),
-        state_(kEndFeats), frame_(0), utt_frames_(0) {}
+      const OnlineFasterDecoderOpts &opts,
+      const std::vector<int32> &sil_phones,
+      const TransitionModel &trans_model)
+    : FasterDecoder(fst, opts), opts_(opts),
+    silence_set_(sil_phones), trans_model_(trans_model),
+    max_beam_(opts.beam), effective_beam_(FasterDecoder::config_.beam),
+    state_(kEndFeats), frame_(0), utt_frames_(0) {}
 
   DecodeState Decode(DecodableInterface *decodable);
-  
+
   // Makes a linear graph, by tracing back from the last "immortal" token
   // to the previous one
   bool PartialTraceback(fst::MutableFst<LatticeArc> *out_fst);
@@ -101,7 +101,7 @@ class OnlineFasterDecoder : public FasterDecoder {
 
   int32 frame() { return frame_; }
 
- private:
+private:
   void ResetDecoder(bool full);
 
   // Returns a linear fst by tracing back the last N frames, beginning
@@ -110,8 +110,8 @@ class OnlineFasterDecoder : public FasterDecoder {
 
   // Makes a linear "lattice", by tracing back a path delimited by two tokens
   void MakeLattice(const Token *start,
-                   const Token *end,
-                   fst::MutableFst<LatticeArc> *out_fst) const;
+      const Token *end,
+      fst::MutableFst<LatticeArc> *out_fst) const;
 
   // Searches for the last token, ancestor of all currently active tokens
   void UpdateImmortalToken();

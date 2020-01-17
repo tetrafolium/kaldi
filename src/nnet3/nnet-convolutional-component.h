@@ -193,19 +193,19 @@ namespace nnet3 {
      num-filters-in=32 num-filters-out=64 height-in=20 height-out=9 \
        height-subsample-out=2 height-offsets=0,1,2 time-offsets=0,2,4
 
-  [note: subsampling on the time axis is not expressed in the layer itself:
-  any time you increase the distance between time-offsets, like changing
-  them from 0,1,2 to 0,2,4, you are effectively subsampling the previous
-  layer-- assuming you only request the output at one time value or at
-  multiples of the total subsampling factor.]
+   [note: subsampling on the time axis is not expressed in the layer itself:
+   any time you increase the distance between time-offsets, like changing
+   them from 0,1,2 to 0,2,4, you are effectively subsampling the previous
+   layer-- assuming you only request the output at one time value or at
+   multiples of the total subsampling factor.]
 
-  Example of a 1x1 kernel:
+   Example of a 1x1 kernel:
 
      num-filters-in=64 num-filters-out=64 height-in=20 height-out=20 \
        height-subsample-out=1 height-offsets=0 time-offsets=0
  */
 class TimeHeightConvolutionComponent: public UpdatableComponent {
- public:
+public:
 
   // The use of this constructor should only precede InitFromConfig()
   TimeHeightConvolutionComponent();
@@ -221,20 +221,20 @@ class TimeHeightConvolutionComponent: public UpdatableComponent {
   virtual std::string Type() const { return "TimeHeightConvolutionComponent"; }
   virtual int32 Properties() const {
     return kUpdatableComponent|kLinearInParameters|
-        kReordersIndexes|kBackpropAdds|kBackpropNeedsInput|
-        kInputContiguous|kOutputContiguous;
+           kReordersIndexes|kBackpropAdds|kBackpropNeedsInput|
+           kInputContiguous|kOutputContiguous;
   }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -249,24 +249,24 @@ class TimeHeightConvolutionComponent: public UpdatableComponent {
   // t == kNoTime) as well as reordering the indexes.  This is allowed
   // behavior of ReorderIndexes functions.
   virtual void ReorderIndexes(std::vector<Index> *input_indexes,
-                              std::vector<Index> *output_indexes) const;
+      std::vector<Index> *output_indexes) const;
 
   virtual void GetInputIndexes(const MiscComputationInfo &misc_info,
-                               const Index &output_index,
-                               std::vector<Index> *desired_indexes) const;
+      const Index &output_index,
+      std::vector<Index> *desired_indexes) const;
 
   // This function returns true if at least one of the input indexes used to
   // compute this output index is computable.
   virtual bool IsComputable(const MiscComputationInfo &misc_info,
-                            const Index &output_index,
-                            const IndexSet &input_index_set,
-                            std::vector<Index> *used_inputs) const;
+      const Index &output_index,
+      const IndexSet &input_index_set,
+      std::vector<Index> *used_inputs) const;
 
   virtual ComponentPrecomputedIndexes* PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const;
+    const MiscComputationInfo &misc_info,
+    const std::vector<Index> &input_indexes,
+    const std::vector<Index> &output_indexes,
+    bool need_backprop) const;
 
   // Some functions from base-class UpdatableComponent.
   virtual void Scale(BaseFloat scale);
@@ -280,10 +280,10 @@ class TimeHeightConvolutionComponent: public UpdatableComponent {
 
 
   class PrecomputedIndexes: public ComponentPrecomputedIndexes {
-   public:
+public:
     PrecomputedIndexes() { }
-    PrecomputedIndexes(const PrecomputedIndexes &other):
-        computation(other.computation) { }
+    PrecomputedIndexes(const PrecomputedIndexes &other) :
+      computation(other.computation) { }
     virtual PrecomputedIndexes *Copy() const;
     virtual void Write(std::ostream &os, bool binary) const;
     virtual void Read(std::istream &os, bool binary);
@@ -296,7 +296,7 @@ class TimeHeightConvolutionComponent: public UpdatableComponent {
   };
 
   void ScaleLinearParams(BaseFloat alpha) { linear_params_.Scale(alpha); }
- private:
+private:
 
   void Check() const;
 
@@ -306,16 +306,16 @@ class TimeHeightConvolutionComponent: public UpdatableComponent {
   // Function that updates linear_params_ and bias_params_, which
   // uses the natural gradient code.
   void UpdateNaturalGradient(
-      const PrecomputedIndexes &indexes,
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &out_deriv);
+    const PrecomputedIndexes &indexes,
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &out_deriv);
 
   // Function that updates linear_params_ and bias_params_, which
   // does not use the natural gradient code.
   void UpdateSimple(
-      const PrecomputedIndexes &indexes,
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &out_deriv);
+    const PrecomputedIndexes &indexes,
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &out_deriv);
 
   // Function called to initialize linear_params_ if init-unit=true in the config
   // line.

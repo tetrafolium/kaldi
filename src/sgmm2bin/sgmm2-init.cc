@@ -37,13 +37,13 @@ int main(int argc, char *argv[]) {
         "The <init-model> argument can be a UBM (the default case) or another\n"
         "SGMM (if the --init-from-sgmm flag is used).\n"
         "For systems with two-level tree, use --pdf-map argument.";
-    
+
     bool binary = true, init_from_sgmm = false, spk_dep_weights = false; // will
     // make it true later.
     int32 phn_space_dim = 0, spk_space_dim = 0;
     std::string pdf_map_rxfilename;
     double self_weight = 1.0;
-    
+
     kaldi::ParseOptions po(usage);
     po.Register("binary", &binary, "Write output in binary mode");
     po.Register("phn-space-dim", &phn_space_dim, "Phonetic space dimension.");
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     po.Register("pdf-map", &pdf_map_rxfilename,
                 "For systems with 2-level trees [SCTM systems], the file that "
                 "maps from pdfs to groups (from build-tree-two-level)");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 4) {
@@ -88,12 +88,12 @@ int main(int argc, char *argv[]) {
       for (int32 i = 0; i < ctx_dep.NumPdfs(); i++) pdf2group.push_back(i);
     }
 
-    
+
     HmmTopology topo;
     ReadKaldiObject(topo_in_filename, &topo);
 
     TransitionModel trans_model(ctx_dep, topo);
-    
+
     kaldi::AmSgmm2 sgmm;
     if (init_from_sgmm) {
       kaldi::AmSgmm2 init_sgmm;

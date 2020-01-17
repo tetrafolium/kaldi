@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         "nnet-copy-egs ark:train.egs ark,t:text.egs\n"
         "or:\n"
         "nnet-copy-egs ark:train.egs ark:1.egs ark:2.egs\n";
-        
+
     bool random = false;
     int32 srand_seed = 0;
     BaseFloat keep_proportion = 1.0;
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     // you can set frame to a number to select a single frame with a particular
     // offset, or to 'random' to select a random single frame.
     std::string frame_str;
-    
+
     ParseOptions po(usage);
     po.Register("random", &random, "If true, will write frames to output "
                 "archives randomly, not round-robin.");
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     po.Register("right-context", &right_context, "Can be used to truncate the "
                 "feature right-context that we output.");
 
-    
+
     po.Read(argc, argv);
 
     srand(srand_seed);
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
       num_frames = 1;
       start_frame = frame;  // value will be ignored if frame == -2.
     }
-    
+
     if (po.NumArgs() < 2) {
       po.PrintUsage();
       exit(1);
@@ -134,11 +134,11 @@ int main(int argc, char *argv[]) {
     for (int32 i = 0; i < num_outputs; i++)
       example_writers[i] = new NnetExampleWriter(po.GetArg(i+2));
 
-    
+
     int64 num_read = 0, num_written = 0;
     for (; !example_reader.Done(); example_reader.Next(), num_read++) {
       // count is normally 1; could be 0, or possibly >1.
-      int32 count = GetCount(keep_proportion);  
+      int32 count = GetCount(keep_proportion);
       std::string key = example_reader.Key();
       const NnetExample &eg = example_reader.Value();
       for (int32 c = 0; c < count; c++) {
@@ -154,9 +154,9 @@ int main(int argc, char *argv[]) {
             // --left-context or --right-context options were set (reducing
             // context).  -1 means use whatever we had in the original eg.
             NnetExample eg_mod(eg, start_frame, num_frames,
-                               left_context, right_context);
+                left_context, right_context);
             example_writers[index]->Write(key, eg_mod);
-            num_written++;            
+            num_written++;
           }
           // else this frame was out of range for this eg; we don't make this an
           // error, because it can happen for truncated multi-frame egs that
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-    
+
     for (int32 i = 0; i < num_outputs; i++)
       delete example_writers[i];
     KALDI_LOG << "Read " << num_read << " neural-network training examples, wrote "

@@ -31,26 +31,26 @@ namespace kaldi {
 
 
 class DecodableDiagGmmScaledOnline : public DecodableInterface {
- public:
+public:
   DecodableDiagGmmScaledOnline(const AmDiagGmm &am,
-                               const TransitionModel &trans_model,
-                               const BaseFloat scale,
-                               OnlineFeatureInterface *input_feats);
+      const TransitionModel &trans_model,
+      const BaseFloat scale,
+      OnlineFeatureInterface *input_feats);
 
-  
+
   /// Returns the scaled log likelihood
   virtual BaseFloat LogLikelihood(int32 frame, int32 index);
-  
+
   virtual bool IsLastFrame(int32 frame) const;
 
-  virtual int32 NumFramesReady() const;  
-  
+  virtual int32 NumFramesReady() const;
+
   /// Indices are one-based!  This is for compatibility with OpenFst.
   virtual int32 NumIndices() const { return trans_model_.NumTransitionIds(); }
 
- private:
+private:
   void CacheFrame(int32 frame);
-  
+
   OnlineFeatureInterface *features_;
   const AmDiagGmm &ac_model_;
   BaseFloat ac_scale_;

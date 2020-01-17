@@ -75,7 +75,7 @@ enum ComponentProperties {
   kBackpropNeedsOutput = 0x200,  // true if backprop operation needs access to
                                  // forward-pass output (e.g. true for Sigmoid).
   kBackpropInPlace = 0x400,   // true if we can do the backprop operation in-place
-                             // (input and output matrices may be the same).
+                              // (input and output matrices may be the same).
   kStoresStats = 0x800,      // true if the StoreStats operation stores
                              // statistics e.g. on average node activations and
                              // derivatives of the nonlinearity, (as it does for
@@ -103,7 +103,7 @@ enum ComponentProperties {
 // must be a child class of class ComponentPrecomputedIndexes, where they
 // can store any indexes that they need.
 class ComponentPrecomputedIndexes {
- public:
+public:
   virtual ComponentPrecomputedIndexes *Copy() const = 0;
   virtual void Write(std::ostream &os, bool binary) const = 0;
   virtual void Read(std::istream &os, bool binary) = 0;
@@ -111,7 +111,7 @@ class ComponentPrecomputedIndexes {
   static ComponentPrecomputedIndexes* ReadNew(std::istream &is, bool binary);
   // cpi stands for component_precomputed_indexes
   static ComponentPrecomputedIndexes* NewComponentPrecomputedIndexesOfType(
-                                           const std::string &cpi_type);
+    const std::string &cpi_type);
   virtual ~ComponentPrecomputedIndexes() { }
 };
 
@@ -120,7 +120,7 @@ class IndexSet;  // Forward declaration; declared in nnet-computation-graph.h.
 
 /// Abstract base-class for neural-net components.
 class Component {
- public:
+public:
   /// \brief Propagate function.
   ///   \param [in] indexes  A pointer to some information output by this class's
   ///      PrecomputeIndexes function (will be NULL for simple components,
@@ -136,8 +136,8 @@ class Component {
   ///      components which have the flag kUsesMemo set.  This value will
   ///      be passed into the corresponding Backprop routine.
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                          const CuMatrixBase<BaseFloat> &in,
-                          CuMatrixBase<BaseFloat> *out) const = 0;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const = 0;
 
   /// \brief Backprop function; depending on which of the arguments 'to_update'
   ///     and 'in_deriv' are non-NULL, this can compute input-data derivatives
@@ -170,14 +170,14 @@ class Component {
   ///       is added to by the Backprop routine, else it is set.  The component
   ///       code chooses which mode to work in, based on convenience.
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update, // may be NULL; may be identical
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update,                   // may be NULL; may be identical
                                               // to "this" or different.
-                        CuMatrixBase<BaseFloat> *in_deriv) const = 0;
+      CuMatrixBase<BaseFloat> *in_deriv) const = 0;
 
   /// \brief This function may store stats on average activation values, and for
   ///        some component types, the average value of the derivative of the
@@ -192,8 +192,8 @@ class Component {
   /// \param [in] memo  The 'memo' returned by the Propagate() function; this
   ///        will usually be NULL.
   virtual void StoreStats(const CuMatrixBase<BaseFloat> &in_value,
-                          const CuMatrixBase<BaseFloat> &out_value,
-                          void *memo) { }
+      const CuMatrixBase<BaseFloat> &out_value,
+      void *memo) { }
 
   /// \brief Components that provide an implementation of StoreStats should also
   ///        provide an implementation of ZeroStats(), to set those stats to
@@ -224,8 +224,8 @@ class Component {
   /// SimpleComponent; it just copies the output_index to a single identical
   /// element in input_indexes.
   virtual void GetInputIndexes(const MiscComputationInfo &misc_info,
-                               const Index &output_index,
-                               std::vector<Index> *desired_indexes) const;
+      const Index &output_index,
+      std::vector<Index> *desired_indexes) const;
 
   /// \brief This function only does something interesting for non-simple
   ///    Components, and it exists to make it possible to manage
@@ -255,9 +255,9 @@ class Component {
   ///   input_index_set, and if so sets used_inputs to vector containing that
   ///   one Index.
   virtual bool IsComputable(const MiscComputationInfo &misc_info,
-                            const Index &output_index,
-                            const IndexSet &input_index_set,
-                            std::vector<Index> *used_inputs) const;
+      const Index &output_index,
+      const IndexSet &input_index_set,
+      std::vector<Index> *used_inputs) const;
 
   /// \brief This function only does something interesting for non-simple
   ///  Components.  It provides an opportunity for a Component to reorder the or
@@ -278,7 +278,7 @@ class Component {
   ///  \param [in,out]  Indexes at the input of the Component.
   ///  \param [in,out]  Indexes at the output of the Component
   virtual void ReorderIndexes(std::vector<Index> *input_indexes,
-                              std::vector<Index> *output_indexes) const {}
+      std::vector<Index> *output_indexes) const {}
 
 
 
@@ -308,10 +308,10 @@ class Component {
   ///       NULL if this component for does not need to precompute any indexes
   ///       (e.g. if it is a simple component and does not care about indexes).
   virtual ComponentPrecomputedIndexes* PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const { return NULL;  }
+    const MiscComputationInfo &misc_info,
+    const std::vector<Index> &input_indexes,
+    const std::vector<Index> &output_indexes,
+    bool need_backprop) const { return NULL;  }
 
 
   /// \brief Returns a string such as "SigmoidComponent", describing
@@ -385,13 +385,13 @@ class Component {
 
   virtual ~Component() { }
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(Component);
 };
 
 
 class RandomComponent: public Component {
- public:
+public:
   // This function is required in testing code and in other places we need
   // consistency in the random number generation (e.g. when optimizing
   // validation-set performance), but check where else we call srand().  You'll
@@ -402,11 +402,11 @@ class RandomComponent: public Component {
   // from normal mode.
   void SetTestMode(bool test_mode) { test_mode_ = test_mode; }
 
-  RandomComponent(): test_mode_(false) { }
+  RandomComponent() : test_mode_(false) { }
 
-  RandomComponent(const RandomComponent &other):
-      test_mode_(other.test_mode_) {}
- protected:
+  RandomComponent(const RandomComponent &other) :
+    test_mode_(other.test_mode_) {}
+protected:
   CuRand<BaseFloat> random_generator_;
 
   // This is true if we want a different behavior for inference from  that for
@@ -441,14 +441,14 @@ class RandomComponent: public Component {
                            apply).  default=0.0.
  */
 class UpdatableComponent: public Component {
- public:
+public:
   UpdatableComponent(const UpdatableComponent &other);
 
   // If these defaults are changed, the defaults in
   // InitLearningRatesFromConfig() should be changed too.
-  UpdatableComponent(): learning_rate_(0.001), learning_rate_factor_(1.0),
-                        l2_regularize_(0.0), is_gradient_(false),
-                        max_change_(0.0) { }
+  UpdatableComponent() : learning_rate_(0.001), learning_rate_factor_(1.0),
+    l2_regularize_(0.0), is_gradient_(false),
+    max_change_(0.0) { }
 
   virtual ~UpdatableComponent() { }
 
@@ -517,7 +517,7 @@ class UpdatableComponent: public Component {
     KALDI_ASSERT(0);
   }
 
- protected:
+protected:
   // to be called from child classes, extracts any learning rate information
   // from the config line and sets them appropriately.
   void InitLearningRatesFromConfig(ConfigLine *cfl);
@@ -548,7 +548,7 @@ class UpdatableComponent: public Component {
                       ///< gradient.
   BaseFloat max_change_; ///< configuration value for imposing max-change
 
- private:
+private:
   const UpdatableComponent &operator = (const UpdatableComponent &other); // Disallow.
 };
 
@@ -557,7 +557,7 @@ class UpdatableComponent: public Component {
 /// storing statistics on the average activations and derivatives encountered
 /// during training.
 class NonlinearComponent: public Component {
- public:
+public:
 
   NonlinearComponent();
   explicit NonlinearComponent(const NonlinearComponent &other);
@@ -606,7 +606,7 @@ class NonlinearComponent: public Component {
 
   double Count() const { return count_; }
 
- protected:
+protected:
   enum { kUnsetThreshold = -1000 };
 
   friend class SigmoidComponent;
@@ -619,7 +619,7 @@ class NonlinearComponent: public Component {
   // count_. (If deriv == NULL, it won't update "deriv_sum_").
   // It will be called from the Backprop function of child classes.
   void StoreStatsInternal(const CuMatrixBase<BaseFloat> &out_value,
-                          const CuMatrixBase<BaseFloat> *deriv = NULL);
+      const CuMatrixBase<BaseFloat> *deriv = NULL);
 
 
   const NonlinearComponent &operator = (const NonlinearComponent &other); // Disallow.

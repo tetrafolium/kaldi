@@ -43,8 +43,8 @@ namespace fst {
 /// The output will be topologically sorted.
 template<class Weight, class IntType>
 bool MinimizeCompactLattice(
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *clat,
-    float delta = fst::kDelta);
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *clat,
+  float delta = fst::kDelta);
 
 
 

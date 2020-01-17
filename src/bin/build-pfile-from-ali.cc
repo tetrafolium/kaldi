@@ -32,7 +32,7 @@ using std::vector;
 /** @brief Build pfiles for Neural Network training from alignment.
  * The pfiles contains both the data vectors and their corresponding
  * class/state labels (zero-based).
-*/
+ */
 
 int main(int argc, char *argv[]) {
   using namespace kaldi;
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     int32 every_nth_frame = 1;
     po.Register("every-nth-frame", &every_nth_frame, "This option will cause it to print "
                 "out only every n'th frame (for subsampling)");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 4) {
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     int32 num_utt = 0;
 
     KALDI_ASSERT(every_nth_frame >= 1);
-    
+
     Output ko(pfile_wspecifier, false);
 
     for (; !feature_reader.Done(); feature_reader.Next()) {
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
           ko.Stream() << "\n";
         }
       }
-      num_done ++; num_utt ++;
+      num_done++; num_utt++;
     }
     ko.Close();
     KALDI_LOG << "Converted " << num_done << " alignments to pfiles.";

@@ -81,7 +81,7 @@ namespace kaldi {
 /// GenericHolder serves to document the requirements of the Holder interface;
 /// it's not intended to be used.
 template<class SomeType> class GenericHolder {
- public:
+public:
   typedef SomeType T;
 
   /// Must have a constructor that takes no arguments.
@@ -151,7 +151,7 @@ template<class SomeType> class GenericHolder {
   /// If the object held pointers, the destructor would free them.
   ~GenericHolder() { }
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(GenericHolder);
   T t_;  // t_ may alternatively be of type T*.
 };
@@ -241,23 +241,23 @@ bool ExtractObjectRange(const T &input, const std::string &range, T *output) {
 /// have ranges extracted.
 template <class Real>
 bool ExtractObjectRange(const Matrix<Real> &input, const std::string &range,
-                        Matrix<Real> *output);
+    Matrix<Real> *output);
 
 /// The template is specialized types Vector<float> and Vector<double>.
 template <class Real>
 bool ExtractObjectRange(const Vector<Real> &input, const std::string &range,
-                        Vector<Real> *output);
+    Vector<Real> *output);
 
 /// GeneralMatrix is always of type BaseFloat
 bool ExtractObjectRange(const GeneralMatrix &input, const std::string &range,
-                        GeneralMatrix *output);
+    GeneralMatrix *output);
 
 /// CompressedMatrix is always of the type BaseFloat but it is more
 /// efficient to provide template as it uses CompressedMatrix's own
 /// conversion to Matrix<Real>
 template <class Real>
 bool ExtractObjectRange(const CompressedMatrix &input, const std::string &range,
-                        Matrix<Real> *output);
+    Matrix<Real> *output);
 
 // In SequentialTableReaderScriptImpl and RandomAccessTableReaderScriptImpl, for
 // cases where the scp contained 'range specifiers' (things in square brackets
@@ -268,8 +268,8 @@ bool ExtractObjectRange(const CompressedMatrix &input, const std::string &range,
 // false if for example the string contained more than one '['.  This function
 // should only be called if 'line' ends in ']', otherwise it is an error.
 bool ExtractRangeSpecifier(const std::string &rxfilename_with_range,
-                           std::string *data_rxfilename,
-                           std::string *range);
+    std::string *data_rxfilename,
+    std::string *range);
 
 
 /// @} end "addtogroup holders"

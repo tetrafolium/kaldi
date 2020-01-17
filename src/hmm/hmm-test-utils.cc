@@ -54,27 +54,27 @@ HmmTopology GetDefaultTopology(const std::vector<int32> &phones_in) {
 
   std::ostringstream topo_string;
   topo_string <<  "<Topology>\n"
-      "<TopologyEntry>\n"
-      "<ForPhones> ";
+    "<TopologyEntry>\n"
+    "<ForPhones> ";
   for (size_t i = 0; i < phones.size(); i++)
     topo_string << phones[i] << " ";
 
   topo_string << "</ForPhones>\n"
-      "<State> 0 <PdfClass> 0\n"
-      "<Transition> 0 0.5\n"
-      "<Transition> 1 0.5\n"
-      "</State> \n"
-      "<State> 1 <PdfClass> 1 \n"
-      "<Transition> 1 0.5\n"
-      "<Transition> 2 0.5\n"
-      "</State>  \n"
-      " <State> 2 <PdfClass> 2\n"
-      " <Transition> 2 0.5\n"
-      " <Transition> 3 0.5\n"
-      " </State>   \n"
-      " <State> 3 </State>\n"
-      " </TopologyEntry>\n"
-      " </Topology>\n";
+    "<State> 0 <PdfClass> 0\n"
+    "<Transition> 0 0.5\n"
+    "<Transition> 1 0.5\n"
+    "</State> \n"
+    "<State> 1 <PdfClass> 1 \n"
+    "<Transition> 1 0.5\n"
+    "<Transition> 2 0.5\n"
+    "</State>  \n"
+    " <State> 2 <PdfClass> 2\n"
+    " <Transition> 2 0.5\n"
+    " <Transition> 3 0.5\n"
+    " </State>   \n"
+    " <State> 3 </State>\n"
+    " </TopologyEntry>\n"
+    " </Topology>\n";
 
   HmmTopology topo;
   std::istringstream iss(topo_string.str());
@@ -85,14 +85,14 @@ HmmTopology GetDefaultTopology(const std::vector<int32> &phones_in) {
 
 
 HmmTopology GenRandTopology(const std::vector<int32> &phones_in,
-                            const std::vector<int32> &num_pdf_classes) {
+    const std::vector<int32> &num_pdf_classes) {
   std::vector<int32> phones(phones_in);
   std::sort(phones.begin(), phones.end());
   KALDI_ASSERT(IsSortedAndUniq(phones) && !phones.empty());
 
   std::ostringstream topo_string;
 
-   std::map<int32, std::vector<int32> > num_pdf_classes_to_phones;
+  std::map<int32, std::vector<int32> > num_pdf_classes_to_phones;
   for (size_t i = 0; i < phones.size(); i++) {
     int32 p = phones[i];
     KALDI_ASSERT(static_cast<size_t>(p) < num_pdf_classes.size());
@@ -107,7 +107,7 @@ HmmTopology GenRandTopology(const std::vector<int32> &phones_in,
       end = num_pdf_classes_to_phones.end();
   for (; iter != end; ++iter) {
     topo_string << "<TopologyEntry>\n"
-        "<ForPhones> ";
+      "<ForPhones> ";
     int32 this_num_pdf_classes = iter->first;
     const std::vector<int32> &phones = iter->second;
     for (size_t i = 0; i < phones.size(); i++)
@@ -188,9 +188,9 @@ HmmTopology GenRandTopology() {
 }
 
 void GeneratePathThroughHmm(const HmmTopology &topology,
-                            bool reorder,
-                            int32 phone,
-                            std::vector<std::pair<int32, int32> > *path) {
+    bool reorder,
+    int32 phone,
+    std::vector<std::pair<int32, int32> > *path) {
   path->clear();
   const HmmTopology::TopologyEntry &this_entry =
       topology.TopologyForPhone(phone);
@@ -209,7 +209,7 @@ void GeneratePathThroughHmm(const HmmTopology &topology,
         path->push_back(pr);
       } else {
         bool is_self_loop = (cur_state ==
-                             cur_hmm_state.transitions[transition_index].first);
+            cur_hmm_state.transitions[transition_index].first);
         if (is_self_loop) { // save these up, we'll put them after the forward
                             // transition.
           pending_self_loops.push_back(pr);
@@ -230,10 +230,10 @@ void GeneratePathThroughHmm(const HmmTopology &topology,
 
 
 void GenerateRandomAlignment(const ContextDependencyInterface &ctx_dep,
-                             const TransitionModel &trans_model,
-                             bool reorder,
-                             const std::vector<int32> &phone_sequence,
-                             std::vector<int32> *alignment) {
+    const TransitionModel &trans_model,
+    bool reorder,
+    const std::vector<int32> &phone_sequence,
+    std::vector<int32> *alignment) {
   int32 context_width = ctx_dep.ContextWidth(),
       central_position = ctx_dep.CentralPosition(),
       num_phones = phone_sequence.size();
@@ -242,8 +242,8 @@ void GenerateRandomAlignment(const ContextDependencyInterface &ctx_dep,
     std::vector<int32> context_window;
     context_window.reserve(context_width);
     for (int32 j = i - central_position;
-         j < i - central_position + context_width;
-         j++) {
+        j < i - central_position + context_width;
+        j++) {
       if (j >= 0 && j < num_phones) context_window.push_back(phone_sequence[j]);
       else context_window.push_back(0);  // zero for out-of-window phones
     }

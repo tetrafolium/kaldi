@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string lats_rspecifier, rnn_word_list,
-      word_symbols_rxfilename, rnnlm_rxfilename, lats_wspecifier, unk_prob_file;
+        word_symbols_rxfilename, rnnlm_rxfilename, lats_wspecifier, unk_prob_file;
     if (po.NumArgs() == 5) {
       rnn_word_list = po.GetArg(1);
       word_symbols_rxfilename = po.GetArg(2);
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
 
     // Reads the TF language model.
     KaldiTfRnnlmWrapper rnnlm(opts, rnn_word_list, word_symbols_rxfilename,
-                                unk_prob_file, rnnlm_rxfilename);
+        unk_prob_file, rnnlm_rxfilename);
 
     // Reads and writes as compact lattice.
     SequentialCompactLatticeReader compact_lattice_reader(lats_rspecifier);
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
         fst::ScaleLattice(fst::GraphLatticeScale(lm_scale), &determinized_clat);
         if (determinized_clat.Start() == fst::kNoStateId) {
           KALDI_WARN << "Empty lattice for utterance " << key
-              << " (incompatible LM?)";
+                     << " (incompatible LM?)";
           n_fail++;
         } else {
           compact_lattice_writer.Write(key, determinized_clat);

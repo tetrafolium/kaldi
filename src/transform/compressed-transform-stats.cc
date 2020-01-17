@@ -26,7 +26,7 @@ using std::vector;
 namespace kaldi {
 
 void CompressedAffineXformStats::CopyFromAffineXformStats(
-    const AffineXformStats &input) {
+  const AffineXformStats &input) {
   int32 dim = input.Dim();
   beta_ = input.beta_;
   if (beta_ == 0.0) { // empty; no stats.
@@ -37,7 +37,7 @@ void CompressedAffineXformStats::CopyFromAffineXformStats(
     return;
   }
   KALDI_ASSERT(input.G_.size() == dim && input.K_.NumCols() == dim+1
-               && input.K_.NumRows() == dim && input.G_[0].NumRows() == dim+1);
+      && input.K_.NumRows() == dim && input.G_[0].NumRows() == dim+1);
   // OK, we have valid, nonempty stats.
   // We first slightly change the format of G.
   Matrix<double> Gtmp(dim, 1 + (((dim+1)*(dim+2))/2));
@@ -76,7 +76,7 @@ void CompressedAffineXformStats::CopyFromAffineXformStats(
     // new_ki - new_G_i u_i = old_ki - old_G_i u_i
     // new_ki = old_ki - old_G_i u_i + new_G_i u_i.
     // new_ki = old_ki - (i'th row of old G_i) + (i'th row of new G_i).
-    
+
     SubVector<double> Ki(K_corrected, i);
     Ki.AddVec(-1.0, old_g_row);
     Ki.AddVec(+1.0, new_g_row);
@@ -87,7 +87,7 @@ void CompressedAffineXformStats::CopyFromAffineXformStats(
 }
 
 void CompressedAffineXformStats::CopyToAffineXformStats(
-    AffineXformStats *output) const {
+  AffineXformStats *output) const {
   int32 dim = K_.NumRows();
   if (dim == 0) {
     output->Init(0, 0);
@@ -126,8 +126,8 @@ void CompressedAffineXformStats::Read(std::istream &is, bool binary) {
 // Convert one G matrix into linearized, normalized form ready
 // for compression.  A static function.
 void CompressedAffineXformStats::PrepareOneG(const SpMatrix<double> &Gi,
-                                             double beta,
-                                             SubVector<double> *linearized) {
+    double beta,
+    SubVector<double> *linearized) {
   KALDI_ASSERT(beta != 0.0);
   int32 dim = Gi.NumRows() - 1;
   double raw_trace = Gi.Trace();
@@ -140,13 +140,13 @@ void CompressedAffineXformStats::PrepareOneG(const SpMatrix<double> &Gi,
   C.Scale(sqrt(dim / raw_trace)); // This is the scaling that is equivalent
   // to scaling Gi by dim / raw_trace, which would make the diagonals
   // of Gi average to 1.  We can reverse this when we decompress.
-  linearized_matrix.CopyFromPacked(C);  
+  linearized_matrix.CopyFromPacked(C);
 }
 
 // Reverse the process of PrepareOneG.  A static function.
 void CompressedAffineXformStats::ExtractOneG(const SubVector<double> &linearized,
-                                             double beta,
-                                             SpMatrix<double> *Gi) {
+    double beta,
+    SpMatrix<double> *Gi) {
   int32 dim = Gi->NumRows() - 1;
   KALDI_ASSERT(dim > 0);
   double norm_trace = linearized(0);

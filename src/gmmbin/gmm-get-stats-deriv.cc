@@ -29,27 +29,27 @@ int main(int argc, char *argv[]) {
     using namespace kaldi;
     typedef kaldi::int32 int32;
     MleDiagGmmOptions gmm_opts;
-    
+
     const char *usage =
         "Get statistics derivative for GMM models\n"
         "(used in fMPE/fMMI feature-space discriminative training)\n"
         "Usage:  gmm-get-stats-deriv [options] <model-in> <num-stats-in>"
         " <den-stats-in> <ml-stats-in> <deriv-out>\n"
         "e.g. (for fMMI/fBMMI): gmm-get-stats-deriv 1.mdl 1.acc 2.mdl\n";
-    
+
     bool binary_write = true;
     MleDiagGmmOptions opts; // Not passed to command-line-- just a mechanism to
     // ensure our options have the same default values as those ones.
     BaseFloat min_variance = opts.min_variance;
     BaseFloat min_gaussian_occupancy = opts.min_gaussian_occupancy;
-                            
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("min-variance", &min_variance,
                 "Variance floor (absolute variance).");
     po.Register("min-gaussian-occupancy", &min_gaussian_occupancy,
                 "Minimum occupancy to update a Gaussian.");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 5) {
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         den_stats_rxfilename = po.GetArg(3),
         ml_stats_rxfilename = po.GetArg(4),
         deriv_wxfilename = po.GetArg(5);
-        
+
     AmDiagGmm am_gmm;
     TransitionModel trans_model;
     {
@@ -97,13 +97,13 @@ int main(int argc, char *argv[]) {
     AccumAmDiagGmm model_deriv; // Use GMM accumulators to represent
     // derivative of discriminative objective function w.r.t.
     // accumulated stats.
-        
+
     GetStatsDerivative(am_gmm, num_stats, den_stats, ml_stats,
                        min_variance, min_gaussian_occupancy,
                        &model_deriv);
 
     WriteKaldiObject(model_deriv, deriv_wxfilename, binary_write);
-    
+
     KALDI_LOG << "Computed model derivative and wrote it to "
               << deriv_wxfilename;
 

@@ -35,7 +35,7 @@
 namespace kaldi {
 
 class OnlineAudioSourceItf {
- public:
+public:
   // Reads from the audio source, and writes the samples converted to BaseFloat
   // into the vector pointed by "data".
   // The user sets data->Dim() as a way of requesting that many samples.
@@ -64,7 +64,7 @@ class OnlineAudioSourceItf {
 // OnlineAudioSourceItf implementation using PortAudio to read samples in real-time
 // from a sound card/microphone.
 class OnlinePaSource : public OnlineAudioSourceItf {
- public:
+public:
   typedef int16 SampleType; // hardcoded 16-bit audio
   typedef ring_buffer_size_t rbs_t;
 
@@ -80,9 +80,9 @@ class OnlinePaSource : public OnlineAudioSourceItf {
   //                    at every ovfw_msg_interval-th call to Read().
   //                    Putting 0 into this argument disables the reporting.
   OnlinePaSource(const uint32 timeout,
-                 const uint32 sample_rate,
-                 const uint32 rb_size,
-                 const uint32 report_interval);
+      const uint32 sample_rate,
+      const uint32 rb_size,
+      const uint32 report_interval);
 
   // Implementation of the OnlineAudioSourceItf
   bool Read(Vector<BaseFloat> *data);
@@ -90,10 +90,10 @@ class OnlinePaSource : public OnlineAudioSourceItf {
   // Making friends with the callback so it will be able to access a private
   // member function to delegate the processing
   friend int PaCallback(const void *input, void *output,
-                        long unsigned frame_count,
-                        const PaStreamCallbackTimeInfo *time_info,
-                        PaStreamCallbackFlags status_flags,
-                        void *user_data);
+      long unsigned frame_count,
+      const PaStreamCallbackTimeInfo *time_info,
+      PaStreamCallbackFlags status_flags,
+      void *user_data);
 
   // Returns True if the last call to Read() failed to read the requested
   // number of samples due to timeout.
@@ -101,12 +101,12 @@ class OnlinePaSource : public OnlineAudioSourceItf {
 
   ~OnlinePaSource();
 
- private:
+private:
   // The real PortAudio callback delegates to this one
   int Callback(const void *input, void *output,
-               ring_buffer_size_t frame_count,
-               const PaStreamCallbackTimeInfo *time_info,
-               PaStreamCallbackFlags status_flags);
+      ring_buffer_size_t frame_count,
+      const PaStreamCallbackTimeInfo *time_info,
+      PaStreamCallbackFlags status_flags);
 
   uint32 timeout_; // timeout in milliseconds. if > 0, after this many ms. we
                    // give up trying to read data from PortAudio
@@ -127,24 +127,24 @@ class OnlinePaSource : public OnlineAudioSourceItf {
 
 // The actual PortAudio callback - delegates to OnlinePaSource->PaCallback()
 int PaCallback(const void *input, void *output,
-               long unsigned frame_count,
-               const PaStreamCallbackTimeInfo *time_info,
-               PaStreamCallbackFlags status_flags,
-               void *user_data);
+    long unsigned frame_count,
+    const PaStreamCallbackTimeInfo *time_info,
+    PaStreamCallbackFlags status_flags,
+    void *user_data);
 #endif //KALDI_NO_PORTAUDIO
 
 // Simulates audio input, by returning data from a Vector.
 // This class is mostly meant to be used for online decoder testing using
 // pre-recorded audio
 class OnlineVectorSource: public OnlineAudioSourceItf {
- public:
+public:
   OnlineVectorSource(const VectorBase<BaseFloat> &input)
-      : src_(input), pos_(0) {}
+    : src_(input), pos_(0) {}
 
   // Implementation of the OnlineAudioSourceItf
   bool Read(Vector<BaseFloat> *data);
 
- private:
+private:
   Vector<BaseFloat> src_;
   uint32 pos_; // the index of the first element, not yet consumed
   KALDI_DISALLOW_COPY_AND_ASSIGN(OnlineVectorSource);

@@ -49,7 +49,7 @@ void PackedMatrix<Real>::SetRandn() {
   Real *data = data_;
   size_t dim = num_rows_, size = ((dim*(dim+1))/2);
   for (size_t i = 0; i < size; i++)
-    data[i] = RandGauss();  
+    data[i] = RandGauss();
 }
 
 template<typename Real>
@@ -211,14 +211,14 @@ void PackedMatrix<Real>::SetZero() {
 template<typename Real>
 void PackedMatrix<Real>::SetUnit() {
   memset(data_, 0, SizeInBytes());
-  for (MatrixIndexT row = 0;row < num_rows_;row++)
+  for (MatrixIndexT row = 0; row < num_rows_; row++)
     (*this)(row, row) = 1.0;
 }
 
 template<typename Real>
 Real PackedMatrix<Real>::Trace() const {
   Real ans = 0.0;
-  for (MatrixIndexT row = 0;row < num_rows_;row++)
+  for (MatrixIndexT row = 0; row < num_rows_; row++)
     ans += (*this)(row, row);
   return ans;
 }
@@ -242,12 +242,12 @@ void PackedMatrix<Real>::Write(std::ostream &os, bool binary) const {
   KALDI_ASSERT(this->NumRows() == (MatrixIndexT) size);
   MatrixIndexT num_elems = ((size+1)*(MatrixIndexT)size)/2;
 
-  if(binary) {  
+  if(binary) {
     std::string my_token = (sizeof(Real) == 4 ? "FP" : "DP");
     WriteToken(os, binary, my_token);
     WriteBasicType(os, binary, size);
-  // We don't use the built-in Kaldi write routines for the floats, as they are
-  // not efficient enough.
+    // We don't use the built-in Kaldi write routines for the floats, as they are
+    // not efficient enough.
     os.write((const char*) data_, sizeof(Real) * num_elems);
   }
   else {
@@ -256,11 +256,11 @@ void PackedMatrix<Real>::Write(std::ostream &os, bool binary) const {
     else {
       os<<"[\n";
       MatrixIndexT i = 0;
-      for (int32 j = 0; j < size; j++) {  
+      for (int32 j = 0; j < size; j++) {
         for (int32 k = 0; k < j + 1; k++) {
           WriteBasicType(os, binary, data_[i++]);
         }
-        os << ( (j==size-1)? "]\n" : "\n");
+        os << ( (j==size-1) ? "]\n" : "\n");
       }
       KALDI_ASSERT(i == num_elems);
     }
@@ -337,7 +337,7 @@ void PackedMatrix<Real>::Read(std::istream& is, bool binary, bool add) {
       goto bad;
     }
     //new format it is
-    is_new_format = true; 
+    is_new_format = true;
   }
   if(!is_new_format) {
     ReadBasicType(is, binary, &size);  // throws on error.
@@ -378,7 +378,7 @@ void PackedMatrix<Real>::Read(std::istream& is, bool binary, bool add) {
         }
         //now process the data:
         num_lines = int32(sqrt(data.size()*2));
-        
+
         KALDI_ASSERT(data.size() == num_lines*(num_lines+1)/2);
 
         this->Resize(num_lines);
@@ -392,12 +392,12 @@ void PackedMatrix<Real>::Read(std::istream& is, bool binary, bool add) {
         //std::cout<<"here!!!!!hxu!!!!!"<<std::endl;
       }
       else if ( (i >= '0' && i <= '9') || i == '-' ) {  // A number...
-        Real r; 
+        Real r;
         is >> r;
         if (is.fail()) {
           specific_error << "Stream failure/EOF while reading matrix data.";
           goto bad;
-        } 
+        }
         data.push_back(r);
       }
       else if (isspace(i)) {
@@ -415,9 +415,9 @@ void PackedMatrix<Real>::Read(std::istream& is, bool binary, bool add) {
         } else {
           specific_error << "Expecting numeric matrix data, got " << str;
           goto bad;
-        } 
-      }       
-    } 
+        }
+      }
+    }
   }
 bad:
   KALDI_ERR << "Failed to read packed matrix from stream. " << specific_error.str()

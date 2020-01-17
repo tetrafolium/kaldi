@@ -45,13 +45,13 @@ int main(int argc, char *argv[]) {
     }
     std::string rspecifier = po.GetArg(1);
     std::string wspecifier = po.GetArg(2);
-    
+
     SequentialBaseFloatMatrixReader mat_reader(rspecifier);
     BaseFloatVectorWriter vec_writer(wspecifier);
-    
+
     int32 num_done = 0;
     int64 num_rows_done = 0;
-    
+
     for (; !mat_reader.Done(); mat_reader.Next()) {
       std::string key = mat_reader.Key();
       Matrix<double> mat(mat_reader.Value());
@@ -63,10 +63,10 @@ int main(int argc, char *argv[]) {
       num_done++;
       num_rows_done += mat.NumRows();
     }
-    
+
     KALDI_LOG << "Summed rows " << num_done << " matrices, "
               << num_rows_done << " rows in total.";
-    
+
     return (num_done != 0 ? 0 : 1);
   } catch(const std::exception &e) {
     std::cerr << e.what();

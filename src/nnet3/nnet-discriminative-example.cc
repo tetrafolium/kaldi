@@ -38,8 +38,8 @@ void NnetDiscriminativeSupervision::Write(std::ostream &os, bool binary) const {
 
 bool NnetDiscriminativeSupervision::operator == (const NnetDiscriminativeSupervision &other) const {
   return name == other.name && indexes == other.indexes &&
-      supervision == other.supervision &&
-      deriv_weights.ApproxEqual(other.deriv_weights);
+         supervision == other.supervision &&
+         deriv_weights.ApproxEqual(other.deriv_weights);
 }
 
 void NnetDiscriminativeSupervision::Read(std::istream &is, bool binary) {
@@ -82,21 +82,21 @@ void NnetDiscriminativeSupervision::CheckDim() const {
   }
 }
 
-NnetDiscriminativeSupervision::NnetDiscriminativeSupervision(const NnetDiscriminativeSupervision &other):
-    name(other.name),
-    indexes(other.indexes),
-    supervision(other.supervision),
-    deriv_weights(other.deriv_weights) { CheckDim(); }
+NnetDiscriminativeSupervision::NnetDiscriminativeSupervision(const NnetDiscriminativeSupervision &other) :
+  name(other.name),
+  indexes(other.indexes),
+  supervision(other.supervision),
+  deriv_weights(other.deriv_weights) { CheckDim(); }
 
 NnetDiscriminativeSupervision::NnetDiscriminativeSupervision(
-    const std::string &name,
-    const discriminative::DiscriminativeSupervision &supervision,
-    const VectorBase<BaseFloat> &deriv_weights,
-    int32 first_frame,
-    int32 frame_skip):
-    name(name),
-    supervision(supervision),
-    deriv_weights(deriv_weights) {
+  const std::string &name,
+  const discriminative::DiscriminativeSupervision &supervision,
+  const VectorBase<BaseFloat> &deriv_weights,
+  int32 first_frame,
+  int32 frame_skip) :
+  name(name),
+  supervision(supervision),
+  deriv_weights(deriv_weights) {
   // note: this will set the 'x' index to zero.
   indexes.resize(supervision.num_sequences *
                  supervision.frames_per_sequence);
@@ -179,12 +179,12 @@ void NnetDiscriminativeExample::Compress() {
   for (; iter != end; ++iter) iter->features.Compress();
 }
 
-NnetDiscriminativeExample::NnetDiscriminativeExample(const NnetDiscriminativeExample &other):
-    inputs(other.inputs), outputs(other.outputs) { }
+NnetDiscriminativeExample::NnetDiscriminativeExample(const NnetDiscriminativeExample &other) :
+  inputs(other.inputs), outputs(other.outputs) { }
 
 void MergeSupervision(
-    const std::vector<const NnetDiscriminativeSupervision*> &inputs,
-    NnetDiscriminativeSupervision *output) {
+  const std::vector<const NnetDiscriminativeSupervision*> &inputs,
+  NnetDiscriminativeSupervision *output) {
   int32 num_inputs = inputs.size(),
       num_indexes = 0;
   for (int32 n = 0; n < num_inputs; n++) {
@@ -250,9 +250,9 @@ void MergeSupervision(
 
 
 void MergeDiscriminativeExamples(
-    bool compress,
-    std::vector<NnetDiscriminativeExample> *input,
-    NnetDiscriminativeExample *output) {
+  bool compress,
+  std::vector<NnetDiscriminativeExample> *input,
+  NnetDiscriminativeExample *output) {
   int32 num_examples = input->size();
   KALDI_ASSERT(num_examples > 0);
   // we temporarily make the input-features in 'input' look like regular
@@ -287,12 +287,12 @@ void MergeDiscriminativeExamples(
 
 
 void GetDiscriminativeComputationRequest(const Nnet &nnet,
-                                         const NnetDiscriminativeExample &eg,
-                                         bool need_model_derivative,
-                                         bool store_component_stats,
-                                         bool use_xent_regularization,
-                                         bool use_xent_derivative,
-                                         ComputationRequest *request) {
+    const NnetDiscriminativeExample &eg,
+    bool need_model_derivative,
+    bool store_component_stats,
+    bool use_xent_regularization,
+    bool use_xent_derivative,
+    ComputationRequest *request) {
   request->inputs.clear();
   request->inputs.reserve(eg.inputs.size());
   request->outputs.clear();
@@ -333,7 +333,7 @@ void GetDiscriminativeComputationRequest(const Nnet &nnet,
       size_t cur_size = request->outputs.size();
       request->outputs.resize(cur_size + 1);
       IoSpecification &io_spec = request->outputs[cur_size - 1],
-          &io_spec_xent = request->outputs[cur_size];
+      &io_spec_xent = request->outputs[cur_size];
       // the IoSpecification for the -xent output is the same
       // as for the regular output, except for its name which has
       // the -xent suffix (and the has_deriv member may differ).
@@ -350,8 +350,8 @@ void GetDiscriminativeComputationRequest(const Nnet &nnet,
 }
 
 void ShiftDiscriminativeExampleTimes(int32 frame_shift,
-                            const std::vector<std::string> &exclude_names,
-                            NnetDiscriminativeExample *eg) {
+    const std::vector<std::string> &exclude_names,
+    NnetDiscriminativeExample *eg) {
   std::vector<NnetIo>::iterator input_iter = eg->inputs.begin(),
       input_end = eg->inputs.end();
   for (; input_iter != input_end; ++input_iter) {
@@ -396,7 +396,7 @@ void ShiftDiscriminativeExampleTimes(int32 frame_shift,
 }
 
 size_t NnetDiscriminativeExampleStructureHasher::operator () (
-    const NnetDiscriminativeExample &eg) const noexcept {
+  const NnetDiscriminativeExample &eg) const noexcept {
   // these numbers were chosen at random from a list of primes.
   NnetIoStructureHasher io_hasher;
   size_t size = eg.inputs.size(), ans = size * 35099;
@@ -413,8 +413,8 @@ size_t NnetDiscriminativeExampleStructureHasher::operator () (
 }
 
 bool NnetDiscriminativeExampleStructureCompare::operator () (
-    const NnetDiscriminativeExample &a,
-    const NnetDiscriminativeExample &b) const {
+  const NnetDiscriminativeExample &a,
+  const NnetDiscriminativeExample &b) const {
   NnetIoStructureCompare io_compare;
   if (a.inputs.size() != b.inputs.size() ||
       a.outputs.size() != b.outputs.size())
@@ -449,9 +449,9 @@ int32 GetNnetDiscriminativeExampleSize(const NnetDiscriminativeExample &a) {
 
 
 DiscriminativeExampleMerger::DiscriminativeExampleMerger(const ExampleMergingConfig &config,
-                             NnetDiscriminativeExampleWriter *writer):
-    finished_(false), num_egs_written_(0),
-    config_(config), writer_(writer) { }
+    NnetDiscriminativeExampleWriter *writer) :
+  finished_(false), num_egs_written_(0),
+  config_(config), writer_(writer) { }
 
 
 void DiscriminativeExampleMerger::AcceptExample(NnetDiscriminativeExample *eg) {
@@ -486,7 +486,7 @@ void DiscriminativeExampleMerger::AcceptExample(NnetDiscriminativeExample *eg) {
 }
 
 void DiscriminativeExampleMerger::WriteMinibatch(
-    std::vector<NnetDiscriminativeExample> *egs) {
+  std::vector<NnetDiscriminativeExample> *egs) {
   KALDI_ASSERT(!egs->empty());
   int32 eg_size = GetNnetDiscriminativeExampleSize((*egs)[0]);
   NnetDiscriminativeExampleStructureHasher eg_hasher;
@@ -521,7 +521,7 @@ void DiscriminativeExampleMerger::Finish() {
     int32 eg_size = GetNnetDiscriminativeExampleSize(*(vec[0]));
     bool input_ended = true;
     while (!vec.empty() &&
-           (minibatch_size = config_.MinibatchSize(eg_size, vec.size(),
+        (minibatch_size = config_.MinibatchSize(eg_size, vec.size(),
                                                    input_ended)) != 0) {
       // MergeDiscriminativeExamples() expects a vector of
       // NnetDiscriminativeExample, not of pointers, so use swap to create that

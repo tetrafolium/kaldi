@@ -32,9 +32,9 @@ using std::vector;
 
 namespace kaldi {
 void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
-                            const GaussPost &gpost,
-                            const AmDiagGmm &am_gmm,
-                            FmllrDiagGmmAccs *spk_stats) {
+    const GaussPost &gpost,
+    const AmDiagGmm &am_gmm,
+    FmllrDiagGmmAccs *spk_stats) {
   for (size_t i = 0; i < gpost.size(); i++) {
     for (size_t j = 0; j < gpost[i].size(); j++) {
       int32 pdf_id = gpost[i][j].first;
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
 
         if (static_cast<int32>(gpost.size()) != feats.NumRows()) {
           KALDI_WARN << "GauPost has wrong size " << gpost.size()
-              << " vs. " << feats.NumRows();
+                     << " vs. " << feats.NumRows();
           num_other_error++;
           continue;
         }

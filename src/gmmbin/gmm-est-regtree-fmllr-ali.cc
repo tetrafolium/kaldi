@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
           }
           if (!alignments_reader.HasKey(*utt_itr)) {
             KALDI_WARN << "Did not find aligned transcription for utterance "
-                << *utt_itr;
+                       << *utt_itr;
             num_no_alignment++;
             continue;
           }
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
           const vector<int32> &alignment = alignments_reader.Value(*utt_itr);
           if (static_cast<int32>(alignment.size()) != feats.NumRows()) {
             KALDI_WARN << "Alignments has wrong size " << (alignment.size())
-                << " vs. " << (feats.NumRows());
+                       << " vs. " << (feats.NumRows());
             num_other_error++;
             continue;
           }
@@ -123,8 +123,8 @@ int main(int argc, char *argv[]) {
                 feats.Row(i), pdf_id, 1.0);
           }
           KALDI_VLOG(2) << "Average like for this file is " << (file_like
-              / alignment.size()) << " over " << alignment.size()
-              << " frames.\n";
+          / alignment.size()) << " over " << alignment.size()
+                        << " frames.\n";
           tot_like += file_like;
           tot_t += alignment.size();
           num_done++;
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
         string key = feature_reader.Key();
         if (!alignments_reader.HasKey(key)) {
           KALDI_WARN << "Did not find aligned transcription for utterance "
-              << key;
+                     << key;
           num_no_alignment++;
           continue;
         }
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
 
         if (static_cast<int32>(alignment.size()) != feats.NumRows()) {
           KALDI_WARN << "Alignments has wrong size " << (alignment.size())
-              << " vs. " << (feats.NumRows());
+                     << " vs. " << (feats.NumRows());
           num_other_error++;
           continue;
         }
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
               feats.Row(i), pdf_id, 1.0);
         }
         KALDI_VLOG(2) << "Average like for this file is " << (file_like
-            / alignment.size()) << " over " << alignment.size() << " frames.";
+        / alignment.size()) << " over " << alignment.size() << " frames.";
         tot_like += file_like;
         tot_t += alignment.size();
         if (num_done % 10 == 0) KALDI_VLOG(1)

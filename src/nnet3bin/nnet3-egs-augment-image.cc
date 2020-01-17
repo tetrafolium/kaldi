@@ -37,12 +37,12 @@ struct ImageAugmentationConfig {
   BaseFloat vertical_shift;
   std::string fill_mode_string;
 
-  ImageAugmentationConfig():
-      num_channels(1),
-      horizontal_flip_prob(0.0),
-      horizontal_shift(0.0),
-      vertical_shift(0.0),
-      fill_mode_string("nearest") { }
+  ImageAugmentationConfig() :
+    num_channels(1),
+    horizontal_flip_prob(0.0),
+    horizontal_shift(0.0),
+    vertical_shift(0.0),
+    fill_mode_string("nearest") { }
 
 
   void Register(ParseOptions *po) {
@@ -58,8 +58,8 @@ struct ImageAugmentationConfig {
                  "Maximum allowed vertical shift as proportion of image "
                  "height.  Padding is with closest pixel.");
     po->Register("fill-mode", &fill_mode_string, "Mode for dealing with "
-		 "points outside the image boundary when applying transformation. "
-		 "Choices = {nearest, reflect}");
+                 "points outside the image boundary when applying transformation. "
+                 "Choices = {nearest, reflect}");
   }
 
   void Check() const {
@@ -77,10 +77,10 @@ struct ImageAugmentationConfig {
       fill_mode = kReflect;
     } else {
       if (fill_mode_string != "nearest") {
-	KALDI_ERR << "Choices for --fill-mode are 'nearest' or 'reflect', got: "
-		  << fill_mode_string;
+        KALDI_ERR << "Choices for --fill-mode are 'nearest' or 'reflect', got: "
+                  << fill_mode_string;
       } else {
-	fill_mode = kNearest;
+        fill_mode = kNearest;
       }
     }
     return fill_mode;
@@ -88,23 +88,23 @@ struct ImageAugmentationConfig {
 };
 
 /**
-  This function applies a geometric transformation 'transform' to the image.
-  Reference: Digital Image Processing book by Gonzalez and Woods.
-  @param [in] transform  The 3x3 geometric transformation matrix to apply.
-  @param [in] num_channels  Number of channels (i.e. colors) of the image
-  @param [in,out] image  The image matrix to be modified.
+   This function applies a geometric transformation 'transform' to the image.
+   Reference: Digital Image Processing book by Gonzalez and Woods.
+   @param [in] transform  The 3x3 geometric transformation matrix to apply.
+   @param [in] num_channels  Number of channels (i.e. colors) of the image
+   @param [in,out] image  The image matrix to be modified.
                      image->NumRows() is the width (number of x values) in
                      the image; image->NumCols() is the height times number
                      of channels (channel varies the fastest).
  */
 void ApplyAffineTransform(MatrixBase<BaseFloat> &transform,
-                          int32 num_channels,
-                          MatrixBase<BaseFloat> *image,
-                          FillMode fill_mode) {
+    int32 num_channels,
+    MatrixBase<BaseFloat> *image,
+    FillMode fill_mode) {
   int32 num_rows = image->NumRows(),
-        num_cols = image->NumCols(),
-        height = num_cols / num_channels,
-        width = num_rows;
+      num_cols = image->NumCols(),
+      height = num_cols / num_channels,
+      width = num_rows;
   KALDI_ASSERT(num_cols % num_channels == 0);
   Matrix<BaseFloat> original_image(*image);
   for (int32 r = 0; r < width; r++) {
@@ -112,9 +112,9 @@ void ApplyAffineTransform(MatrixBase<BaseFloat> &transform,
       // (r_old, c_old) is the coordinate of the pixel in the original image
       // while (r, c) is the coordinate in the new (transformed) image.
       BaseFloat r_old = transform(0, 0) * r +
-                                          transform(0, 1) * c + transform(0, 2);
+          transform(0, 1) * c + transform(0, 2);
       BaseFloat c_old = transform(1, 0) * r +
-                                          transform(1, 1) * c + transform(1, 2);
+          transform(1, 1) * c + transform(1, 2);
       // We are going to do bilinear interpolation between 4 closest points
       // to the point (r_old, c_old) of the original image. We have:
       // r1  <=  r_old  <=  r2
@@ -151,15 +151,15 @@ void ApplyAffineTransform(MatrixBase<BaseFloat> &transform,
       } else {
         KALDI_ASSERT(fill_mode == kReflect);
         if (r1 < 0) {
-          r1 = - r1;
-          if (r2 < 0) r2 = - r2;
+          r1 = -r1;
+          if (r2 < 0) r2 = -r2;
         }
         if (r2 >= width) {
           r2 = 2 * width - 2 - r2;
           if (r1 >= width) r1 = 2 * width - 2 - r1;
         }
         if (c1 < 0) {
-          c1 = - c1;
+          c1 = -c1;
           if (c2 < 0) c2 = -c2;
         }
         if (c2 >= height) {
@@ -191,9 +191,9 @@ void ApplyAffineTransform(MatrixBase<BaseFloat> &transform,
    image->NumRows() is the width (number of x values) in
    the image; image->NumCols() is the height times number
    of channels/colors (channel varies the fastest).
-*/
+ */
 void PerturbImage(const ImageAugmentationConfig &config,
-                  MatrixBase<BaseFloat> *image) {
+    MatrixBase<BaseFloat> *image) {
   config.Check();
   FillMode fill_mode = config.GetFillMode();
   int32 image_width = image->NumRows(),
@@ -201,7 +201,7 @@ void PerturbImage(const ImageAugmentationConfig &config,
       image_height = image->NumCols() / num_channels;
   if (image->NumCols() % num_channels != 0) {
     KALDI_ERR << "Number of columns in image must divide the number "
-        "of channels";
+      "of channels";
   }
   // We do an affine transform which
   // handles flipping, translation, rotation, magnification, and shear.
@@ -280,10 +280,10 @@ void PerturbImage(const ImageAugmentationConfig &config,
    This function does image perturbation as directed by 'config'
    The example 'eg' is expected to contain a NnetIo member with the
    name 'input', representing an image.
-*/
+ */
 void PerturbImageInNnetExample(
-    const ImageAugmentationConfig &config,
-    NnetExample *eg) {
+  const ImageAugmentationConfig &config,
+  NnetExample *eg) {
   int32 io_size = eg->io.size();
   bool found_input = false;
   for (int32 i = 0; i < io_size; i++) {

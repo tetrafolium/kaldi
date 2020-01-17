@@ -35,8 +35,8 @@ Semaphore::~Semaphore() {}
 bool Semaphore::TryWait() {
   std::unique_lock<std::mutex> lock(mutex_);
   if(count_) {
-      count_--;
-      return true;
+    count_--;
+    return true;
   }
   return false;
 }

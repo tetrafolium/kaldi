@@ -59,21 +59,21 @@ std::string RestrictedAttentionComponent::Info() const {
 }
 
 RestrictedAttentionComponent::RestrictedAttentionComponent(
-    const RestrictedAttentionComponent &other):
-    num_heads_(other.num_heads_),
-    key_dim_(other.key_dim_),
-    value_dim_(other.value_dim_),
-    num_left_inputs_(other.num_left_inputs_),
-    num_right_inputs_(other.num_right_inputs_),
-    time_stride_(other.time_stride_),
-    context_dim_(other.context_dim_),
-    num_left_inputs_required_(other.num_left_inputs_required_),
-    num_right_inputs_required_(other.num_right_inputs_required_),
-    output_context_(other.output_context_),
-    key_scale_(other.key_scale_),
-    stats_count_(other.stats_count_),
-    entropy_stats_(other.entropy_stats_),
-    posterior_stats_(other.posterior_stats_) { }
+  const RestrictedAttentionComponent &other) :
+  num_heads_(other.num_heads_),
+  key_dim_(other.key_dim_),
+  value_dim_(other.value_dim_),
+  num_left_inputs_(other.num_left_inputs_),
+  num_right_inputs_(other.num_right_inputs_),
+  time_stride_(other.time_stride_),
+  context_dim_(other.context_dim_),
+  num_left_inputs_required_(other.num_left_inputs_required_),
+  num_right_inputs_required_(other.num_right_inputs_required_),
+  output_context_(other.output_context_),
+  key_scale_(other.key_scale_),
+  stats_count_(other.stats_count_),
+  entropy_stats_(other.entropy_stats_),
+  posterior_stats_(other.posterior_stats_) { }
 
 
 
@@ -98,7 +98,7 @@ void RestrictedAttentionComponent::InitFromConfig(ConfigLine *cfl) {
 
   if (!ok)
     KALDI_ERR << "All of the values key-dim, value-dim, "
-        "num-left-inputs and num-right-inputs must be defined.";
+      "num-left-inputs and num-right-inputs must be defined.";
   // optional arguments.
   cfl->GetValue("num-heads", &num_heads_);
   cfl->GetValue("time-stride", &time_stride_);
@@ -130,10 +130,10 @@ void RestrictedAttentionComponent::InitFromConfig(ConfigLine *cfl) {
 
 void*
 RestrictedAttentionComponent::Propagate(const ComponentPrecomputedIndexes *indexes_in,
-                                        const CuMatrixBase<BaseFloat> &in,
-                                        CuMatrixBase<BaseFloat> *out) const {
+    const CuMatrixBase<BaseFloat> &in,
+    CuMatrixBase<BaseFloat> *out) const {
   const PrecomputedIndexes *indexes = dynamic_cast<const PrecomputedIndexes*>(
-      indexes_in);
+    indexes_in);
   KALDI_ASSERT(indexes != NULL &&
                in.NumRows() == indexes->io.num_t_in * indexes->io.num_images &&
                out->NumRows() == indexes->io.num_t_out * indexes->io.num_images);
@@ -147,10 +147,10 @@ RestrictedAttentionComponent::Propagate(const ComponentPrecomputedIndexes *index
       output_dim_per_head = value_dim_ + (output_context_ ? context_dim_ : 0);
   for (int32 h = 0; h < num_heads_; h++) {
     CuSubMatrix<BaseFloat> in_part(in, 0, in.NumRows(),
-                                   h * input_dim_per_head, input_dim_per_head),
-        c_part(memo->c, 0, out->NumRows(),
+        h * input_dim_per_head, input_dim_per_head),
+    c_part(memo->c, 0, out->NumRows(),
                h * context_dim_, context_dim_),
-        out_part(*out, 0, out->NumRows(),
+    out_part(*out, 0, out->NumRows(),
                  h * output_dim_per_head, output_dim_per_head);
     PropagateOneHead(indexes->io, in_part, &c_part, &out_part);
   }
@@ -158,10 +158,10 @@ RestrictedAttentionComponent::Propagate(const ComponentPrecomputedIndexes *index
 }
 
 void RestrictedAttentionComponent::PropagateOneHead(
-    const time_height_convolution::ConvolutionComputationIo &io,
-    const CuMatrixBase<BaseFloat> &in,
-    CuMatrixBase<BaseFloat> *c,
-    CuMatrixBase<BaseFloat> *out) const {
+  const time_height_convolution::ConvolutionComputationIo &io,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *c,
+  CuMatrixBase<BaseFloat> *out) const {
   int32 query_dim = key_dim_ + context_dim_,
       full_value_dim = value_dim_ + (output_context_ ? context_dim_ : 0);
   KALDI_ASSERT(in.NumRows() == io.num_images * io.num_t_in &&
@@ -169,7 +169,7 @@ void RestrictedAttentionComponent::PropagateOneHead(
                out->NumCols() == full_value_dim &&
                in.NumCols() == (key_dim_ + value_dim_ + query_dim) &&
                io.t_step_in == io.t_step_out &&
-               (io.start_t_out - io.start_t_in) % io.t_step_in == 0);
+      (io.start_t_out - io.start_t_in) % io.t_step_in == 0);
 
   // 'steps_left_context' is the number of time-steps the input has on the left
   // that don't appear in the output.
@@ -183,7 +183,7 @@ void RestrictedAttentionComponent::PropagateOneHead(
   // 'out'; the remaining rows of 'in' that we didn't select correspond to left
   // and right temporal context.
   CuSubMatrix<BaseFloat> queries(in, rows_left_context, out->NumRows(),
-                                 key_dim_ + value_dim_, query_dim);
+      key_dim_ + value_dim_, query_dim);
   // 'keys' contains the keys; note, these are not extended with
   // context information; that happens further in.
   CuSubMatrix<BaseFloat> keys(in, 0, in.NumRows(), 0, key_dim_);
@@ -198,9 +198,9 @@ void RestrictedAttentionComponent::PropagateOneHead(
 
 
 void RestrictedAttentionComponent::StoreStats(
-    const CuMatrixBase<BaseFloat> &, // in_value
-    const CuMatrixBase<BaseFloat> &, // out_value
-    void *memo_in) {
+  const CuMatrixBase<BaseFloat> &,   // in_value
+  const CuMatrixBase<BaseFloat> &,   // out_value
+  void *memo_in) {
   const Memo *memo = static_cast<const Memo*>(memo_in);
   KALDI_ASSERT(memo != NULL);
   if (entropy_stats_.Dim() != num_heads_) {
@@ -218,7 +218,7 @@ void RestrictedAttentionComponent::StoreStats(
     c_sum.AddRowSumMat(1.0, c, 0.0);
     // view the vector as a matrix.
     CuSubMatrix<BaseFloat> c_sum_as_mat(c_sum.Data(), num_heads_,
-                                        context_dim_, context_dim_);
+        context_dim_, context_dim_);
     CuMatrix<double> c_sum_as_mat_dbl(c_sum_as_mat);
     posterior_stats_.AddMat(1.0, c_sum_as_mat_dbl);
     KALDI_ASSERT(c.NumCols() == num_heads_ * context_dim_);
@@ -237,7 +237,7 @@ void RestrictedAttentionComponent::StoreStats(
     // per head.  We'd have to divide by c.NumRows() to get the
     // actual entropy, but that's reflected in stats_count_.
     CuSubMatrix<BaseFloat> entropy_mat(dot_prod.Data(), num_heads_,
-                                       context_dim_, context_dim_);
+        context_dim_, context_dim_);
     CuVector<BaseFloat> entropy_vec(num_heads_);
     entropy_vec.AddColSumMat(1.0, entropy_mat);
     Vector<double> entropy_vec_dbl(entropy_vec);
@@ -277,7 +277,7 @@ void RestrictedAttentionComponent::Add(BaseFloat alpha, const Component &other_i
 void RestrictedAttentionComponent::Check() const {
   KALDI_ASSERT(num_heads_ > 0 && key_dim_ > 0 && value_dim_ > 0 &&
                num_left_inputs_ >= 0 && num_right_inputs_ >= 0 &&
-               (num_left_inputs_ + num_right_inputs_) > 0 &&
+      (num_left_inputs_ + num_right_inputs_) > 0 &&
                time_stride_ > 0 &&
                context_dim_ == (num_left_inputs_ + 1 + num_right_inputs_) &&
                num_left_inputs_required_ >= 0 &&
@@ -290,14 +290,14 @@ void RestrictedAttentionComponent::Check() const {
 
 
 void RestrictedAttentionComponent::Backprop(
-    const std::string &debug_info,
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &, // out_value
-    const CuMatrixBase<BaseFloat> &out_deriv,
-    void *memo_in,
-    Component *to_update_in,
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const std::string &debug_info,
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &,   // out_value
+  const CuMatrixBase<BaseFloat> &out_deriv,
+  void *memo_in,
+  Component *to_update_in,
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   const PrecomputedIndexes *indexes =
       dynamic_cast<const PrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL);
@@ -317,13 +317,13 @@ void RestrictedAttentionComponent::Backprop(
 
   for (int32 h = 0; h < num_heads_; h++) {
     CuSubMatrix<BaseFloat>
-        in_value_part(in_value, 0, in_value.NumRows(),
-                      h * input_dim_per_head, input_dim_per_head),
-        c_part(c, 0, out_deriv.NumRows(),
+    in_value_part(in_value, 0, in_value.NumRows(),
+        h * input_dim_per_head, input_dim_per_head),
+    c_part(c, 0, out_deriv.NumRows(),
                h * context_dim_, context_dim_),
-        out_deriv_part(out_deriv, 0, out_deriv.NumRows(),
+    out_deriv_part(out_deriv, 0, out_deriv.NumRows(),
                        h * output_dim_per_head, output_dim_per_head),
-        in_deriv_part(*in_deriv, 0, in_value.NumRows(),
+    in_deriv_part(*in_deriv, 0, in_value.NumRows(),
                       h * input_dim_per_head, input_dim_per_head);
     BackpropOneHead(io, in_value_part, c_part, out_deriv_part,
                     &in_deriv_part);
@@ -332,11 +332,11 @@ void RestrictedAttentionComponent::Backprop(
 
 
 void RestrictedAttentionComponent::BackpropOneHead(
-    const time_height_convolution::ConvolutionComputationIo &io,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &c,
-    const CuMatrixBase<BaseFloat> &out_deriv,
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const time_height_convolution::ConvolutionComputationIo &io,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &c,
+  const CuMatrixBase<BaseFloat> &out_deriv,
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   // the easiest way to understand this is to compare it with PropagateOneHead().
   int32 query_dim = key_dim_ + context_dim_,
       full_value_dim = value_dim_ + (output_context_ ? context_dim_ : 0);
@@ -345,7 +345,7 @@ void RestrictedAttentionComponent::BackpropOneHead(
                out_deriv.NumCols() == full_value_dim &&
                in_value.NumCols() == (key_dim_ + value_dim_ + query_dim) &&
                io.t_step_in == io.t_step_out &&
-               (io.start_t_out - io.start_t_in) % io.t_step_in == 0 &&
+      (io.start_t_out - io.start_t_in) % io.t_step_in == 0 &&
                SameDim(in_value, *in_deriv) &&
                c.NumRows() == out_deriv.NumRows() &&
                c.NumCols() == context_dim_);
@@ -358,13 +358,13 @@ void RestrictedAttentionComponent::BackpropOneHead(
 
 
   CuSubMatrix<BaseFloat> queries(in_value, rows_left_context, out_deriv.NumRows(),
-                                 key_dim_ + value_dim_, query_dim),
-      queries_deriv(*in_deriv, rows_left_context, out_deriv.NumRows(),
+      key_dim_ + value_dim_, query_dim),
+  queries_deriv(*in_deriv, rows_left_context, out_deriv.NumRows(),
                     key_dim_ + value_dim_, query_dim),
-      keys(in_value, 0, in_value.NumRows(), 0, key_dim_),
-      keys_deriv(*in_deriv,  0, in_value.NumRows(), 0, key_dim_),
-      values(in_value, 0, in_value.NumRows(), key_dim_, value_dim_),
-      values_deriv(*in_deriv, 0, in_value.NumRows(), key_dim_, value_dim_);
+  keys(in_value, 0, in_value.NumRows(), 0, key_dim_),
+  keys_deriv(*in_deriv,  0, in_value.NumRows(), 0, key_dim_),
+  values(in_value, 0, in_value.NumRows(), key_dim_, value_dim_),
+  values_deriv(*in_deriv, 0, in_value.NumRows(), key_dim_, value_dim_);
 
   attention::AttentionBackward(key_scale_, keys, queries, values, c, out_deriv,
                                &keys_deriv, &queries_deriv, &values_deriv);
@@ -373,8 +373,8 @@ void RestrictedAttentionComponent::BackpropOneHead(
 
 
 void RestrictedAttentionComponent::ReorderIndexes(
-    std::vector<Index> *input_indexes,
-    std::vector<Index> *output_indexes) const {
+  std::vector<Index> *input_indexes,
+  std::vector<Index> *output_indexes) const {
   using namespace time_height_convolution;
   ConvolutionComputationIo io;
   GetComputationStructure(*input_indexes, *output_indexes, &io);
@@ -386,9 +386,9 @@ void RestrictedAttentionComponent::ReorderIndexes(
 }
 
 void RestrictedAttentionComponent::GetComputationStructure(
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      time_height_convolution::ConvolutionComputationIo *io) const {
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  time_height_convolution::ConvolutionComputationIo *io) const {
   GetComputationIo(input_indexes, output_indexes, io);
   // if there was only one output and/or input index (unlikely),
   // just let the grid periodicity be t_stride_.
@@ -415,14 +415,14 @@ void RestrictedAttentionComponent::GetComputationStructure(
   // the requested left-context and right context; if
   // this increases the amount of input, we'll do zero-padding.
   int32 first_requested_input =
-          io->start_t_out - (time_stride_ * num_left_inputs_),
+      io->start_t_out - (time_stride_ * num_left_inputs_),
       first_required_input =
-         io->start_t_out - (time_stride_ * num_left_inputs_required_),
+      io->start_t_out - (time_stride_ * num_left_inputs_required_),
       last_t_out = io->start_t_out + (io->num_t_out - 1) * t_step,
       last_t_in = io->start_t_in + (io->num_t_in - 1) * t_step,
       last_requested_input = last_t_out + (time_stride_ * num_right_inputs_),
       last_required_input =
-           last_t_out + (time_stride_ * num_right_inputs_required_);
+      last_t_out + (time_stride_ * num_right_inputs_required_);
 
   // check that we don't have *more* than the requested context,
   // but that we have at least the required context.
@@ -504,9 +504,9 @@ void RestrictedAttentionComponent::Read(std::istream &is, bool binary) {
 
 
 void RestrictedAttentionComponent::GetInputIndexes(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    std::vector<Index> *desired_indexes) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  std::vector<Index> *desired_indexes) const {
   KALDI_ASSERT(output_index.t != kNoTime);
   int32 first_time = output_index.t - (time_stride_ * num_left_inputs_),
       last_time = output_index.t + (time_stride_ * num_right_inputs_);
@@ -524,10 +524,10 @@ void RestrictedAttentionComponent::GetInputIndexes(
 
 
 bool RestrictedAttentionComponent::IsComputable(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    const IndexSet &input_index_set,
-    std::vector<Index> *used_inputs) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  const IndexSet &input_index_set,
+  std::vector<Index> *used_inputs) const {
   KALDI_ASSERT(output_index.t != kNoTime);
   Index index(output_index);
 
@@ -559,8 +559,8 @@ bool RestrictedAttentionComponent::IsComputable(
         first_time_required = t - (time_stride_ * num_left_inputs_required_),
         last_time_required = t + (time_stride_ * num_right_inputs_required_);
     for (int32 t = first_time_required;
-         t <= last_time_required;
-         t += time_stride_) {
+        t <= last_time_required;
+        t += time_stride_) {
       index.t = t;
       if (!input_index_set(index))
         return false;
@@ -572,10 +572,10 @@ bool RestrictedAttentionComponent::IsComputable(
 
 // static
 void RestrictedAttentionComponent::CreateIndexesVector(
-    const std::vector<std::pair<int32, int32> > &n_x_pairs,
-    int32 t_start, int32 t_step, int32 num_t_values,
-    const std::unordered_set<Index, IndexHasher> &index_set,
-    std::vector<Index> *output_indexes) {
+  const std::vector<std::pair<int32, int32> > &n_x_pairs,
+  int32 t_start, int32 t_step, int32 num_t_values,
+  const std::unordered_set<Index, IndexHasher> &index_set,
+  std::vector<Index> *output_indexes) {
   output_indexes->resize(static_cast<size_t>(num_t_values) * n_x_pairs.size());
   std::vector<Index>::iterator out_iter = output_indexes->begin();
   for (int32 t = t_start; t < t_start + (t_step * num_t_values); t += t_step) {
@@ -594,18 +594,18 @@ void RestrictedAttentionComponent::CreateIndexesVector(
 }
 
 void RestrictedAttentionComponent::GetIndexes(
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      time_height_convolution::ConvolutionComputationIo &io,
-      std::vector<Index> *new_input_indexes,
-      std::vector<Index> *new_output_indexes) const {
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  time_height_convolution::ConvolutionComputationIo &io,
+  std::vector<Index> *new_input_indexes,
+  std::vector<Index> *new_output_indexes) const {
 
   std::unordered_set<Index, IndexHasher> input_set, output_set;
   for (std::vector<Index>::const_iterator iter = input_indexes.begin();
-       iter != input_indexes.end(); ++iter)
+      iter != input_indexes.end(); ++iter)
     input_set.insert(*iter);
   for (std::vector<Index>::const_iterator iter = output_indexes.begin();
-       iter != output_indexes.end(); ++iter)
+      iter != output_indexes.end(); ++iter)
     output_set.insert(*iter);
 
   std::vector<std::pair<int32, int32> > n_x_pairs;
@@ -619,11 +619,11 @@ void RestrictedAttentionComponent::GetIndexes(
 }
 
 ComponentPrecomputedIndexes* RestrictedAttentionComponent::PrecomputeIndexes(
-    const MiscComputationInfo &,  // misc_info
-    const std::vector<Index> &input_indexes,
-    const std::vector<Index> &output_indexes,
-    bool) // need_backprop
-    const {
+  const MiscComputationInfo &,    // misc_info
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  bool)   // need_backprop
+const {
   PrecomputedIndexes *ans = new PrecomputedIndexes();
   GetComputationStructure(input_indexes, output_indexes, &(ans->io));
   if (GetVerboseLevel() >= 2) {
@@ -650,7 +650,7 @@ RestrictedAttentionComponent::PrecomputedIndexes::Copy() const {
 }
 
 void RestrictedAttentionComponent::PrecomputedIndexes::Write(
-    std::ostream &os, bool binary) const {
+  std::ostream &os, bool binary) const {
   WriteToken(os, binary, "<RestrictedAttentionComponentPrecomputedIndexes>");
   WriteToken(os, binary, "<Io>");
   io.Write(os, binary);
@@ -658,7 +658,7 @@ void RestrictedAttentionComponent::PrecomputedIndexes::Write(
 }
 
 void RestrictedAttentionComponent::PrecomputedIndexes::Read(
-    std::istream &is, bool binary) {
+  std::istream &is, bool binary) {
   ExpectOneOrTwoTokens(is, binary,
                        "<RestrictedAttentionComponentPrecomputedIndexes>",
                        "<Io>");

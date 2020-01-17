@@ -26,10 +26,10 @@ namespace discriminative {
 
 
 DiscriminativeSupervision::DiscriminativeSupervision(
-    const DiscriminativeSupervision &other):
-    weight(other.weight), num_sequences(other.num_sequences),
-    frames_per_sequence(other.frames_per_sequence),
-    num_ali(other.num_ali), den_lat(other.den_lat) { }
+  const DiscriminativeSupervision &other) :
+  weight(other.weight), num_sequences(other.num_sequences),
+  frames_per_sequence(other.frames_per_sequence),
+  num_ali(other.num_ali), den_lat(other.den_lat) { }
 
 void DiscriminativeSupervision::Swap(DiscriminativeSupervision *other) {
   std::swap(weight, other->weight);
@@ -40,12 +40,12 @@ void DiscriminativeSupervision::Swap(DiscriminativeSupervision *other) {
 }
 
 bool DiscriminativeSupervision::operator == (
-    const DiscriminativeSupervision &other) const {
+  const DiscriminativeSupervision &other) const {
   return ( weight == other.weight &&
-      num_sequences == other.num_sequences &&
-      frames_per_sequence == other.frames_per_sequence &&
-      num_ali == other.num_ali &&
-      fst::Equal(den_lat, other.den_lat) );
+         num_sequences == other.num_sequences &&
+         frames_per_sequence == other.frames_per_sequence &&
+         num_ali == other.num_ali &&
+         fst::Equal(den_lat, other.den_lat) );
 }
 
 void DiscriminativeSupervision::Write(std::ostream &os, bool binary) const {
@@ -103,8 +103,8 @@ void DiscriminativeSupervision::Read(std::istream &is, bool binary) {
 }
 
 bool DiscriminativeSupervision::Initialize(const std::vector<int32> &num_ali,
-                                           const Lattice &den_lat,
-                                           BaseFloat weight) {
+    const Lattice &den_lat,
+    BaseFloat weight) {
   if (num_ali.size() == 0) return false;
   if (den_lat.NumStates() == 0) return false;
 
@@ -134,10 +134,10 @@ void DiscriminativeSupervision::Check() const {
 }
 
 DiscriminativeSupervisionSplitter::DiscriminativeSupervisionSplitter(
-    const SplitDiscriminativeSupervisionOptions &config,
-    const TransitionModel &tmodel,
-    const DiscriminativeSupervision &supervision):
-    config_(config), tmodel_(tmodel), supervision_(supervision) {
+  const SplitDiscriminativeSupervisionOptions &config,
+  const TransitionModel &tmodel,
+  const DiscriminativeSupervision &supervision) :
+  config_(config), tmodel_(tmodel), supervision_(supervision) {
   if (supervision_.num_sequences != 1) {
     KALDI_WARN << "Splitting already-reattached sequence (only expected in "
                << "testing code)";
@@ -149,7 +149,7 @@ DiscriminativeSupervisionSplitter::DiscriminativeSupervisionSplitter(
   PrepareLattice(&den_lat_, &den_lat_scores_);
 
   int32 num_states = den_lat_.NumStates(),
-        num_frames = supervision_.frames_per_sequence * supervision_.num_sequences;
+      num_frames = supervision_.frames_per_sequence * supervision_.num_sequences;
   KALDI_ASSERT(num_states > 0);
   int32 start_state = den_lat_.Start();
   // Lattice should be top-sorted and connected, so start-state must be 0.
@@ -167,7 +167,7 @@ DiscriminativeSupervisionSplitter::DiscriminativeSupervisionSplitter(
 // objective function will be affected by the phone-identities being
 // different even if the pdf-ids are the same.
 void DiscriminativeSupervisionSplitter::CollapseTransitionIds(
-    const std::vector<int32> &state_times, Lattice *lat) const {
+  const std::vector<int32> &state_times, Lattice *lat) const {
   typedef Lattice::StateId StateId;
   typedef Lattice::Arc Arc;
 
@@ -178,7 +178,7 @@ void DiscriminativeSupervisionSplitter::CollapseTransitionIds(
   for (StateId s = 0; s < num_states; s++) {
     int32 t = state_times[s];
     for (fst::MutableArcIterator<Lattice> aiter(lat, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       KALDI_ASSERT(t >= 0 && t < num_frames);
       Arc arc = aiter.Value();
       KALDI_ASSERT(arc.ilabel != 0 && arc.ilabel == arc.olabel);
@@ -204,7 +204,7 @@ void DiscriminativeSupervisionSplitter::LatticeInfo::Check() const {
 }
 
 void DiscriminativeSupervisionSplitter::GetFrameRange(int32 begin_frame, int32 num_frames, bool normalize,
-                                                      DiscriminativeSupervision *out_supervision) const {
+    DiscriminativeSupervision *out_supervision) const {
   int32 end_frame = begin_frame + num_frames;
   // Note: end_frame is not included in the range of frames that the
   // output supervision object covers; it's one past the end.
@@ -230,9 +230,9 @@ void DiscriminativeSupervisionSplitter::GetFrameRange(int32 begin_frame, int32 n
 }
 
 void DiscriminativeSupervisionSplitter::CreateRangeLattice(
-    const Lattice &in_lat, const LatticeInfo &scores,
-    int32 begin_frame, int32 end_frame, bool normalize,
-    Lattice *out_lat) const {
+  const Lattice &in_lat, const LatticeInfo &scores,
+  int32 begin_frame, int32 end_frame, bool normalize,
+  Lattice *out_lat) const {
   typedef Lattice::StateId StateId;
 
   const std::vector<int32> &state_times = scores.state_times;
@@ -248,14 +248,14 @@ void DiscriminativeSupervisionSplitter::CreateRangeLattice(
                                   state_times.end(), end_frame);
 
   KALDI_ASSERT(*begin_iter == begin_frame &&
-               (begin_iter == state_times.begin() ||
-                begin_iter[-1] < begin_frame));
+      (begin_iter == state_times.begin() ||
+      begin_iter[-1] < begin_frame));
   // even if end_frame == supervision_.num_frames, there should be a state with
   // that frame index.
   KALDI_ASSERT(end_iter[-1] < end_frame &&
-               (end_iter < state_times.end() || *end_iter == end_frame));
+      (end_iter < state_times.end() || *end_iter == end_frame));
   StateId begin_state = begin_iter - state_times.begin(),
-          end_state = end_iter - state_times.begin();
+      end_state = end_iter - state_times.begin();
 
   KALDI_ASSERT(end_state > begin_state);
   out_lat->DeleteStates();
@@ -297,7 +297,7 @@ void DiscriminativeSupervisionSplitter::CreateRangeLattice(
       KALDI_ASSERT(scores.state_times[state] < end_frame);
     }
     for (fst::ArcIterator<Lattice> aiter(in_lat, state);
-          !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       const LatticeArc &arc = aiter.Value();
       StateId nextstate = arc.nextstate;
       if (nextstate >= end_state) {
@@ -360,7 +360,7 @@ void DiscriminativeSupervisionSplitter::CreateRangeLattice(
 }
 
 void DiscriminativeSupervisionSplitter::PrepareLattice(
-    Lattice *lat, LatticeInfo *scores) const {
+  Lattice *lat, LatticeInfo *scores) const {
   // Scale the lattice to appropriate acoustic scale. It is important to
   // ensure this is equal to the acoustic scale used while training. This is
   // because, on splitting lattices, the initial and final costs are added

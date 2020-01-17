@@ -64,9 +64,9 @@ int main(int argc, char *argv[]) {
         index_wspecifier = po.GetOptArg(2);
 
     SequentialTableReader< VectorFstTplHolder<KwsLexicographicArc> >
-                                                index_reader(index_rspecifier);
+    index_reader(index_rspecifier);
     TableWriter< VectorFstTplHolder<KwsLexicographicArc> >
-                                                index_writer(index_wspecifier);
+    index_writer(index_wspecifier);
 
     int32 n_done = 0;
     KwsLexicographicFst global_index;

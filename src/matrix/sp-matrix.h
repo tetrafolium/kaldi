@@ -36,15 +36,15 @@ template<typename Real> class SpMatrix;
 
 /**
  * @brief Packed symetric matrix class
-*/
+ */
 template<typename Real>
 class SpMatrix : public PackedMatrix<Real> {
   friend class CuSpMatrix<Real>;
- public:
+public:
   // so it can use our assignment operator.
   friend class std::vector<Matrix<Real> >;
 
-  SpMatrix(): PackedMatrix<Real>() {}
+  SpMatrix() : PackedMatrix<Real>() {}
 
   /// Copy constructor from CUDA version of SpMatrix
   /// This is defined in ../cudamatrix/cu-sp-matrix.h
@@ -52,25 +52,25 @@ class SpMatrix : public PackedMatrix<Real> {
   explicit SpMatrix(const CuSpMatrix<Real> &cu);
 
   explicit SpMatrix(MatrixIndexT r, MatrixResizeType resize_type = kSetZero)
-      : PackedMatrix<Real>(r, resize_type) {}
+    : PackedMatrix<Real>(r, resize_type) {}
 
   SpMatrix(const SpMatrix<Real> &orig)
-      : PackedMatrix<Real>(orig) {}
+    : PackedMatrix<Real>(orig) {}
 
   template<typename OtherReal>
   explicit SpMatrix(const SpMatrix<OtherReal> &orig)
-      : PackedMatrix<Real>(orig) {}
+    : PackedMatrix<Real>(orig) {}
 
 #ifdef KALDI_PARANOID
   explicit SpMatrix(const MatrixBase<Real> & orig,
-                    SpCopyType copy_type = kTakeMeanAndCheck)
-      : PackedMatrix<Real>(orig.NumRows(), kUndefined) {
+      SpCopyType copy_type = kTakeMeanAndCheck)
+    : PackedMatrix<Real>(orig.NumRows(), kUndefined) {
     CopyFromMat(orig, copy_type);
   }
 #else
   explicit SpMatrix(const MatrixBase<Real> & orig,
-                    SpCopyType copy_type = kTakeMean)
-      : PackedMatrix<Real>(orig.NumRows(), kUndefined) {
+      SpCopyType copy_type = kTakeMean)
+    : PackedMatrix<Real>(orig.NumRows(), kUndefined) {
     CopyFromMat(orig, copy_type);
   }
 #endif
@@ -93,10 +93,10 @@ class SpMatrix : public PackedMatrix<Real> {
 
 #ifdef KALDI_PARANOID
   void CopyFromMat(const MatrixBase<Real> &orig,
-                   SpCopyType copy_type = kTakeMeanAndCheck);
+      SpCopyType copy_type = kTakeMeanAndCheck);
 #else  // different default arg if non-paranoid mode.
   void CopyFromMat(const MatrixBase<Real> &orig,
-                   SpCopyType copy_type = kTakeMean);
+      SpCopyType copy_type = kTakeMean);
 #endif
 
   inline Real operator() (MatrixIndexT r, MatrixIndexT c) const {
@@ -134,12 +134,12 @@ class SpMatrix : public PackedMatrix<Real> {
   /// if inverse_needed = false, will fill matrix with garbage.
   /// (only useful if logdet wanted).
   void Invert(Real *logdet = NULL, Real *det_sign= NULL,
-              bool inverse_needed = true);
+      bool inverse_needed = true);
 
   // Below routine does inversion in double precision,
   // even for single-precision object.
   void InvertDouble(Real *logdet = NULL, Real *det_sign = NULL,
-                    bool inverse_needed = true);
+      bool inverse_needed = true);
 
   /// Returns maximum ratio of singular values.
   inline Real Cond() const {
@@ -158,7 +158,7 @@ class SpMatrix : public PackedMatrix<Real> {
   /// decomposition (*this) = P * diag(s) * P^T with P orthogonal.  Will throw
   /// exception if input is not positive semidefinite to within a tolerance.
   void SymPosSemiDefEig(VectorBase<Real> *s, MatrixBase<Real> *P,
-                        Real tolerance = 0.001) const;
+      Real tolerance = 0.001) const;
 
   /// Solves the symmetric eigenvalue problem: at end we should have (*this) = P
   /// * diag(s) * P^T.  We solve the problem using the symmetric QR method.
@@ -193,7 +193,7 @@ class SpMatrix : public PackedMatrix<Real> {
   /// whole point of this function is to reduce the dimension of the SVD
   /// computation.
   void TopEigs(VectorBase<Real> *s, MatrixBase<Real> *P,
-               MatrixIndexT lanczos_dim = 0) const;
+      MatrixIndexT lanczos_dim = 0) const;
 
 
   /// Returns the maximum of the absolute values of any of the
@@ -226,11 +226,11 @@ class SpMatrix : public PackedMatrix<Real> {
 
   /// rank-two update, this <-- this + alpha (v w' + w v').
   void AddVecVec(const Real alpha, const VectorBase<Real> &v,
-                 const VectorBase<Real> &w);
+      const VectorBase<Real> &w);
 
   /// Does *this = beta * *thi + alpha * diag(v) * S * diag(v)
   void AddVec2Sp(const Real alpha, const VectorBase<Real> &v,
-                 const SpMatrix<Real> &S, const Real beta);
+      const SpMatrix<Real> &S, const Real beta);
 
   /// diagonal update, this <-- this + diag(v)
   template<typename OtherReal>
@@ -243,21 +243,21 @@ class SpMatrix : public PackedMatrix<Real> {
   ///  (*this) = beta*(*this) + alpha * M^T * M
   /// Note: beta used to default to 0.0.
   void AddMat2(const Real alpha, const MatrixBase<Real> &M,
-               MatrixTransposeType transM, const Real beta);
+      MatrixTransposeType transM, const Real beta);
 
   /// Extension of rank-N update:
   /// this <-- beta*this  +  alpha * M * A * M^T.
   /// (*this) and A are allowed to be the same.
   /// If transM == kTrans, then we do it as M^T * A * M.
   void AddMat2Sp(const Real alpha, const MatrixBase<Real> &M,
-                 MatrixTransposeType transM, const SpMatrix<Real> &A,
-                 const Real beta = 0.0);
+      MatrixTransposeType transM, const SpMatrix<Real> &A,
+      const Real beta = 0.0);
 
   /// This is a version of AddMat2Sp specialized for when M is fairly sparse.
   /// This was required for making the raw-fMLLR code efficient.
   void AddSmat2Sp(const Real alpha, const MatrixBase<Real> &M,
-                  MatrixTransposeType transM, const SpMatrix<Real> &A,
-                  const Real beta = 0.0);
+      MatrixTransposeType transM, const SpMatrix<Real> &A,
+      const Real beta = 0.0);
 
   /// The following function does:
   /// this <-- beta*this  +  alpha * T * A * T^T.
@@ -266,8 +266,8 @@ class SpMatrix : public PackedMatrix<Real> {
   /// Currently it just calls AddMat2Sp, but if needed we
   /// can implement it more efficiently.
   void AddTp2Sp(const Real alpha, const TpMatrix<Real> &T,
-                MatrixTransposeType transM, const SpMatrix<Real> &A,
-                const Real beta = 0.0);
+      MatrixTransposeType transM, const SpMatrix<Real> &A,
+      const Real beta = 0.0);
 
   /// The following function does:
   /// this <-- beta*this  +  alpha * T * T^T.
@@ -276,15 +276,15 @@ class SpMatrix : public PackedMatrix<Real> {
   /// Currently it just calls AddMat2, but if needed we
   /// can implement it more efficiently.
   void AddTp2(const Real alpha, const TpMatrix<Real> &T,
-              MatrixTransposeType transM, const Real beta = 0.0);
+      MatrixTransposeType transM, const Real beta = 0.0);
 
   /// Extension of rank-N update:
   /// this <-- beta*this + alpha * M * diag(v) * M^T.
   /// if transM == kTrans, then
   /// this <-- beta*this + alpha * M^T * diag(v) * M.
   void AddMat2Vec(const Real alpha, const MatrixBase<Real> &M,
-                  MatrixTransposeType transM, const VectorBase<Real> &v,
-                  const Real beta = 0.0);
+      MatrixTransposeType transM, const VectorBase<Real> &v,
+      const Real beta = 0.0);
 
 
   ///  Floors this symmetric matrix to the matrix
@@ -296,7 +296,7 @@ class SpMatrix : public PackedMatrix<Real> {
   /// if Floor is not positive definite. Returns the number of
   /// elements that were floored.
   int ApplyFloor(const SpMatrix<Real> &Floor, Real alpha = 1.0,
-                 bool verbose = false);
+      bool verbose = false);
 
   /// Floor: Given a positive semidefinite matrix, floors the eigenvalues
   /// to the specified quantity.  A previous version of this function had
@@ -355,9 +355,9 @@ class SpMatrix : public PackedMatrix<Real> {
   /// this.
   void Qr(MatrixBase<Real> *Q);
 
- private:
- void EigInternal(VectorBase<Real> *s, MatrixBase<Real> *P,
-                   Real tolerance, int recurse) const;
+private:
+  void EigInternal(VectorBase<Real> *s, MatrixBase<Real> *P,
+      Real tolerance, int recurse) const;
 };
 
 /// @} end of "addtogroup matrix_group"
@@ -373,13 +373,13 @@ double TraceSpSp(const SpMatrix<double> &A, const SpMatrix<double> &B);
 
 template<typename Real>
 inline bool ApproxEqual(const SpMatrix<Real> &A,
-                        const SpMatrix<Real> &B, Real tol = 0.01) {
-  return  A.ApproxEqual(B, tol);
+    const SpMatrix<Real> &B, Real tol = 0.01) {
+  return A.ApproxEqual(B, tol);
 }
 
 template<typename Real>
 inline void AssertEqual(const SpMatrix<Real> &A,
-                        const SpMatrix<Real> &B, Real tol = 0.01) {
+    const SpMatrix<Real> &B, Real tol = 0.01) {
   KALDI_ASSERT(ApproxEqual(A, B, tol));
 }
 
@@ -407,15 +407,15 @@ Real TraceSpMat(const SpMatrix<Real> &A, const MatrixBase<Real> &B);
 /// (A and C may be transposed as specified by transA and transC).
 template<typename Real>
 Real TraceMatSpMat(const MatrixBase<Real> &A, MatrixTransposeType transA,
-                   const SpMatrix<Real> &B, const MatrixBase<Real> &C,
-                   MatrixTransposeType transC);
+    const SpMatrix<Real> &B, const MatrixBase<Real> &C,
+    MatrixTransposeType transC);
 
 /// Returns tr (A B C D)
 /// (A and C may be transposed as specified by transA and transB).
 template<typename Real>
 Real TraceMatSpMatSp(const MatrixBase<Real> &A, MatrixTransposeType transA,
-                     const SpMatrix<Real> &B, const MatrixBase<Real> &C,
-                     MatrixTransposeType transC, const SpMatrix<Real> &D);
+    const SpMatrix<Real> &B, const MatrixBase<Real> &C,
+    MatrixTransposeType transC, const SpMatrix<Real> &D);
 
 /** Computes v1^T * M * v2.  Not as efficient as it could be where v1 == v2
  * (but no suitable blas routines available).
@@ -425,7 +425,7 @@ Real TraceMatSpMatSp(const MatrixBase<Real> &A, MatrixTransposeType transA,
 /// Not as efficient as it could be where v1 == v2.
 template<typename Real>
 Real VecSpVec(const VectorBase<Real> &v1, const SpMatrix<Real> &M,
-               const VectorBase<Real> &v2);
+    const VectorBase<Real> &v2);
 
 
 /// @} \addtogroup matrix_funcs_scalar
@@ -447,13 +447,13 @@ struct SolverOptions {
   bool optimize_delta;
   bool diagonal_precondition;
   bool print_debug_output;
-  explicit SolverOptions(const std::string &name):
-      K(1.0e+4), eps(1.0e-40), name(name),
-      optimize_delta(true), diagonal_precondition(false),
-      print_debug_output(true) { }
-  SolverOptions(): K(1.0e+4), eps(1.0e-40), name("[unknown]"),
-                   optimize_delta(true), diagonal_precondition(false),
-                   print_debug_output(true) { }
+  explicit SolverOptions(const std::string &name) :
+    K(1.0e+4), eps(1.0e-40), name(name),
+    optimize_delta(true), diagonal_precondition(false),
+    print_debug_output(true) { }
+  SolverOptions() : K(1.0e+4), eps(1.0e-40), name("[unknown]"),
+    optimize_delta(true), diagonal_precondition(false),
+    print_debug_output(true) { }
   void Check() const;
 };
 
@@ -467,9 +467,9 @@ struct SolverOptions {
 
 template<typename Real>
 Real SolveQuadraticProblem(const SpMatrix<Real> &H,
-                           const VectorBase<Real> &g,
-                           const SolverOptions &opts,
-                           VectorBase<Real> *x);
+    const VectorBase<Real> &g,
+    const SolverOptions &opts,
+    VectorBase<Real> *x);
 
 
 
@@ -485,10 +485,10 @@ Real SolveQuadraticProblem(const SpMatrix<Real> &H,
 /// the option but it's set false for back compatibility).
 template<typename Real>
 Real SolveQuadraticMatrixProblem(const SpMatrix<Real> &Q,
-                                 const MatrixBase<Real> &Y,
-                                 const SpMatrix<Real> &P,
-                                 const SolverOptions &opts,
-                                 MatrixBase<Real> *M);
+    const MatrixBase<Real> &Y,
+    const SpMatrix<Real> &P,
+    const SolverOptions &opts,
+    MatrixBase<Real> *M);
 
 /// Maximizes the auxiliary function :
 /// \f[   Q(M) =  tr(M^T G) -0.5 tr(P_1 M Q_1 M^T) -0.5 tr(P_2 M Q_2 M^T).   \f]
@@ -496,12 +496,12 @@ Real SolveQuadraticMatrixProblem(const SpMatrix<Real> &Q,
 /// condition but it should be less frequently necessary, and can be set larger.
 template<typename Real>
 Real SolveDoubleQuadraticMatrixProblem(const MatrixBase<Real> &G,
-                                       const SpMatrix<Real> &P1,
-                                       const SpMatrix<Real> &P2,
-                                       const SpMatrix<Real> &Q1,
-                                       const SpMatrix<Real> &Q2,
-                                       const SolverOptions &opts,
-                                       MatrixBase<Real> *M);
+    const SpMatrix<Real> &P1,
+    const SpMatrix<Real> &P2,
+    const SpMatrix<Real> &Q1,
+    const SpMatrix<Real> &Q2,
+    const SolverOptions &opts,
+    MatrixBase<Real> *M);
 
 
 /// @} End of "addtogroup matrix_funcs_misc"

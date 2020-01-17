@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     }
 
     int32 num_gauss = gmm_accs.NumGauss(), dim = gmm_accs.Dim(),
-          tot_floored = 0, gauss_floored = 0, tot_low_occ = 0;
+        tot_floored = 0, gauss_floored = 0, tot_low_occ = 0;
 
     FullGmm fgmm(num_components, dim);
 
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
         diag.Set(1.0);
         covar.AddDiagVec(1.0, diag);
         tot_low_occ++;
-      // This is the typical case.
+        // This is the typical case.
       } else {
         mean.CopyRowFromMat(gmm_accs.mean_accumulator(), i);
         mean.Scale(1.0 / occ);

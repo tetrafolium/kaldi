@@ -64,8 +64,8 @@ namespace nnet1 {
  *
  */
 class ConvolutionalComponent : public UpdatableComponent {
- public:
-  ConvolutionalComponent(int32 dim_in, int32 dim_out):
+public:
+  ConvolutionalComponent(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out),
     patch_dim_(0),
     patch_step_(0),
@@ -87,10 +87,10 @@ class ConvolutionalComponent : public UpdatableComponent {
     while (is >> std::ws, !is.eof()) {
       ReadToken(is, false, &token);
       /**/ if (token == "<ParamStddev>") ReadBasicType(is, false, &param_stddev);
-      else if (token == "<BiasMean>")    ReadBasicType(is, false, &bias_mean);
-      else if (token == "<BiasRange>")   ReadBasicType(is, false, &bias_range);
-      else if (token == "<PatchDim>")    ReadBasicType(is, false, &patch_dim_);
-      else if (token == "<PatchStep>")   ReadBasicType(is, false, &patch_step_);
+      else if (token == "<BiasMean>") ReadBasicType(is, false, &bias_mean);
+      else if (token == "<BiasRange>") ReadBasicType(is, false, &bias_range);
+      else if (token == "<PatchDim>") ReadBasicType(is, false, &patch_dim_);
+      else if (token == "<PatchStep>") ReadBasicType(is, false, &patch_step_);
       else if (token == "<PatchStride>") ReadBasicType(is, false, &patch_stride_);
       else if (token == "<LearnRateCoef>") ReadBasicType(is, false, &learn_rate_coef_);
       else if (token == "<BiasLearnRateCoef>") ReadBasicType(is, false, &bias_learn_rate_coef_);
@@ -144,17 +144,17 @@ class ConvolutionalComponent : public UpdatableComponent {
     while (!end_loop) {
       int first_char = PeekToken(is, binary);
       switch (first_char) {
-        case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
-          ReadBasicType(is, binary, &learn_rate_coef_);
-          break;
-        case 'B': ExpectToken(is, binary, "<BiasLearnRateCoef>");
-          ReadBasicType(is, binary, &bias_learn_rate_coef_);
-          break;
-        case 'M': ExpectToken(is, binary, "<MaxNorm>");
-          ReadBasicType(is, binary, &max_norm_);
-          break;
-        case '!': ExpectToken(is, binary, "<!EndOfComponent>");
-        default: end_loop = true;
+      case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
+        ReadBasicType(is, binary, &learn_rate_coef_);
+        break;
+      case 'B': ExpectToken(is, binary, "<BiasLearnRateCoef>");
+        ReadBasicType(is, binary, &bias_learn_rate_coef_);
+        break;
+      case 'M': ExpectToken(is, binary, "<MaxNorm>");
+        ReadBasicType(is, binary, &max_norm_);
+        break;
+      case '!': ExpectToken(is, binary, "<!EndOfComponent>");
+      default: end_loop = true;
       }
     }
 
@@ -241,22 +241,22 @@ class ConvolutionalComponent : public UpdatableComponent {
 
   std::string Info() const {
     return std::string("\n  filters") + MomentStatistics(filters_) +
-      ", lr-coef " + ToString(learn_rate_coef_) +
-      ", max-norm " + ToString(max_norm_) +
-      "\n  bias" + MomentStatistics(bias_) +
-      ", lr-coef " + ToString(bias_learn_rate_coef_);
+           ", lr-coef " + ToString(learn_rate_coef_) +
+           ", max-norm " + ToString(max_norm_) +
+           "\n  bias" + MomentStatistics(bias_) +
+           ", lr-coef " + ToString(bias_learn_rate_coef_);
   }
 
   std::string InfoGradient() const {
     return std::string("\n  filters_grad") + MomentStatistics(filters_grad_) +
-      ", lr-coef " + ToString(learn_rate_coef_) +
-      ", max-norm " + ToString(max_norm_) +
-      "\n  bias_grad" + MomentStatistics(bias_grad_) +
-      ", lr-coef " + ToString(bias_learn_rate_coef_);
+           ", lr-coef " + ToString(learn_rate_coef_) +
+           ", max-norm " + ToString(max_norm_) +
+           "\n  bias_grad" + MomentStatistics(bias_grad_) +
+           ", lr-coef " + ToString(bias_learn_rate_coef_);
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // useful dims
     int32 num_splice = input_dim_ / patch_stride_;
     int32 num_patches = 1 + (patch_stride_ - patch_dim_) / patch_step_;
@@ -309,25 +309,25 @@ class ConvolutionalComponent : public UpdatableComponent {
   }
 
   /*
-   This function does an operation similar to reversing a map,
-   except it handles maps that are not one-to-one by outputting
-   the reversed map as a vector of lists.
-   @param[in] forward_indexes is a vector of int32, each of whose
+     This function does an operation similar to reversing a map,
+     except it handles maps that are not one-to-one by outputting
+     the reversed map as a vector of lists.
+     @param[in] forward_indexes is a vector of int32, each of whose
               elements is between 0 and input_dim - 1.
-   @param[in] input_dim. See definitions of forward_indexes and
+     @param[in] input_dim. See definitions of forward_indexes and
               backward_indexes.
-   @param[out] backward_indexes is a vector of dimension input_dim
+     @param[out] backward_indexes is a vector of dimension input_dim
               of lists, The list at (backward_indexes[i]) is a list
               of all indexes j such that forward_indexes[j] = i.
-  */
+   */
   void ReverseIndexes(const std::vector<int32> &forward_indexes,
-                      std::vector<std::vector<int32> > *backward_indexes) {
+      std::vector<std::vector<int32> > *backward_indexes) {
     int32 i;
     int32 size = forward_indexes.size();
     backward_indexes->resize(input_dim_);
     int32 reserve_size = 2+ forward_indexes.size() / input_dim_;
     std::vector<std::vector<int32> >::iterator iter = backward_indexes->begin(),
-      end = backward_indexes->end();
+        end = backward_indexes->end();
     for (; iter != end; ++iter)
       iter->reserve(reserve_size);
     for (int32 j = 0; j < size; j++) {
@@ -338,37 +338,37 @@ class ConvolutionalComponent : public UpdatableComponent {
   }
 
   /*
-   This function transforms a vector of lists into a list of vectors,
-   padded with -1.
-   @param[in] The input vector of lists. Let in.size() be D, and let
+     This function transforms a vector of lists into a list of vectors,
+     padded with -1.
+     @param[in] The input vector of lists. Let in.size() be D, and let
               the longest list length (i.e. the max of in[i].size()) be L.
-   @param[out] The output list of vectors. The length of the list will
+     @param[out] The output list of vectors. The length of the list will
               be L, each vector-dimension will be D (i.e. out[i].size() == D),
               and if in[i] == j, then for some k we will have that
               out[k][j] = i. The output vectors are padded with -1
               where necessary if not all the input lists have the same side.
-  */
+   */
   void RearrangeIndexes(const std::vector<std::vector<int32> > &in,
-                        std::vector<std::vector<int32> > *out) {
+      std::vector<std::vector<int32> > *out) {
     int32 D = in.size();
     int32 L = 0;
     for (int32 i = 0; i < D; i++)
-      if (in[i].size() > L)
+      if (in [i].size() > L)
         L = in[i].size();
     out->resize(L);
     for (int32 i = 0; i < L; i++)
       (*out)[i].resize(D, -1);
     for (int32 i = 0; i < D; i++) {
-      for (int32 j = 0; j < in[i].size(); j++) {
+      for (int32 j = 0; j < in [i].size(); j++) {
         (*out)[j][i] = in[i][j];
       }
     }
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // useful dims
     int32 num_patches = 1 + (patch_stride_ - patch_dim_) / patch_step_;
     int32 num_filters = filters_.NumRows();
@@ -398,7 +398,7 @@ class ConvolutionalComponent : public UpdatableComponent {
 
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     // useful dims
     int32 num_patches = 1 + (patch_stride_ - patch_dim_) / patch_step_;
     int32 num_filters = filters_.NumRows();
@@ -444,12 +444,12 @@ class ConvolutionalComponent : public UpdatableComponent {
     }
   }
 
- private:
+private:
   int32 patch_dim_,    ///< number of consecutive inputs, 1st dim of patch
-        patch_step_,   ///< step of the convolution
+      patch_step_,     ///< step of the convolution
                        ///  (i.e. shift between 2 patches)
-        patch_stride_;  ///< shift for 2nd dim of a patch
-                       ///  (i.e. frame length before splicing)
+      patch_stride_;    ///< shift for 2nd dim of a patch
+                        ///  (i.e. frame length before splicing)
 
   CuMatrix<BaseFloat> filters_;  ///< row = vectorized rectangular filter
   CuVector<BaseFloat> bias_;  ///< bias for each filter

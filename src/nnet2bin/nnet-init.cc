@@ -38,17 +38,17 @@ int main(int argc, char *argv[]) {
         "Usage:  nnet-init [options] <config-in> <raw-nnet-out>\n"
         "e.g.:\n"
         " nnet-init nnet.config 1.raw\n";
-    
+
     bool binary_write = true;
     int32 srand_seed = 0;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("srand", &srand_seed, "Seed for random number generator");
-    
+
     po.Read(argc, argv);
     srand(srand_seed);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 
     std::string config_rxfilename = po.GetArg(1),
         raw_nnet_wxfilename = po.GetArg(2);
-    
+
     Nnet nnet;
     {
       bool binary;

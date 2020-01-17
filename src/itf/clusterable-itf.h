@@ -28,15 +28,15 @@ namespace kaldi {
 
 
 /** \addtogroup clustering_group
- @{
-  A virtual class for clusterable objects; see \ref clustering for an
-  explanation if its function.
-*/
+   @{
+   A virtual class for clusterable objects; see \ref clustering for an
+   explanation if its function.
+ */
 
 
 
 class Clusterable {
- public:
+public:
   /// \name Functions that must be overridden
   /// @{
 
@@ -58,7 +58,7 @@ class Clusterable {
     KALDI_ERR << "This Clusterable object does not implement Scale().";
   }
 
-  /// Return a string that describes the inherited type. 
+  /// Return a string that describes the inherited type.
   virtual std::string Type() const = 0;
 
   /// Write data to stream.

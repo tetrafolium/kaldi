@@ -38,11 +38,11 @@ int main(int argc, char *argv[]) {
         "e.g.:\n"
         " raw-nnet-copy --binary=false 1.mdl text.mdl\n"
         "See also: nnet-to-raw-nnet, nnet-am-copy\n";
-    
+
     int32 truncate = -1;
     bool binary_write = true;
     std::string learning_rate_scales_str = " ";
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("truncate", &truncate, "If set, will truncate the neural net "
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
                 "--learning-rate-scales=AffineComponent=0.5");
 
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -62,10 +62,10 @@ int main(int argc, char *argv[]) {
 
     std::string raw_nnet_rxfilename = po.GetArg(1),
         raw_nnet_wxfilename = po.GetArg(2);
-    
+
     Nnet nnet;
     ReadKaldiObject(raw_nnet_rxfilename, &nnet);
-    
+
     if (truncate >= 0)
       nnet.Resize(truncate);
 
@@ -83,10 +83,10 @@ int main(int argc, char *argv[]) {
                             "=", false,  &parts);
         if (!ConvertStringToReal(parts[1], &scale_factor)) {
           KALDI_ERR << "Unknown format for --learning-rate-scales option. "
-              << "Expected format is "
-              << "--learning-rate-scales=AffineComponent=0.1:AffineComponentPreconditioned=0.5 "
-              << "instead got "
-              << learning_rate_scales_str;
+                    << "Expected format is "
+                    << "--learning-rate-scales=AffineComponent=0.1:AffineComponentPreconditioned=0.5 "
+                    << "instead got "
+                    << learning_rate_scales_str;
         }
         learning_rate_scales.insert(std::pair<std::string, BaseFloat>(
                 parts[0], scale_factor));

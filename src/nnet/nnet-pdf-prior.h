@@ -37,7 +37,7 @@ struct PdfPriorOptions {
   BaseFloat prior_scale;
   BaseFloat prior_floor;
 
-  PdfPriorOptions():
+  PdfPriorOptions() :
     class_frame_counts(""),
     prior_scale(1.0),
     prior_floor(1e-10)
@@ -57,14 +57,14 @@ struct PdfPriorOptions {
 };
 
 class PdfPrior {
- public:
+public:
   /// Initialize pdf-prior from options
   explicit PdfPrior(const PdfPriorOptions &opts);
 
   /// Subtract pdf priors from log-posteriors to get pseudo log-likelihoods
   void SubtractOnLogpost(CuMatrixBase<BaseFloat> *llk);
 
- private:
+private:
   BaseFloat prior_scale_;
   CuVector<BaseFloat> log_priors_;
 

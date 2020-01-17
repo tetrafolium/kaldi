@@ -43,12 +43,12 @@ namespace kaldi {
 // CAUTION: for fMPE (as opposed to fMMI), to get the right answer, you would have
 // to pre-scale the num and den accs by the acoustic scale (e.g. 0.1).
 void GetStatsDerivative(const AmDiagGmm &gmm,
-                        const AccumAmDiagGmm &num_accs, // for MMI, would equal ml accs.
-                        const AccumAmDiagGmm &den_accs,
-                        const AccumAmDiagGmm &ml_accs,
-                        BaseFloat min_variance,
-                        BaseFloat min_gaussian_occupancy,
-                        AccumAmDiagGmm *out_accs);
+    const AccumAmDiagGmm &num_accs,                     // for MMI, would equal ml accs.
+    const AccumAmDiagGmm &den_accs,
+    const AccumAmDiagGmm &ml_accs,
+    BaseFloat min_variance,
+    BaseFloat min_gaussian_occupancy,
+    AccumAmDiagGmm *out_accs);
 
 
 // This function "DoRescalingUpdate" updates the GMMs in a special way-- it
@@ -62,10 +62,10 @@ void GetStatsDerivative(const AmDiagGmm &gmm,
 // of that nature, and we want to update the model but preserve the discriminative
 // training (viewed as an offset).
 void DoRescalingUpdate(const AccumAmDiagGmm &old_ml_accs,
-                       const AccumAmDiagGmm &new_ml_accs,
-                       BaseFloat min_variance,
-                       BaseFloat min_gaussian_occupancy,
-                       AmDiagGmm *gmm);
+    const AccumAmDiagGmm &new_ml_accs,
+    BaseFloat min_variance,
+    BaseFloat min_gaussian_occupancy,
+    AmDiagGmm *gmm);
 
 
 } // end namespace kaldi

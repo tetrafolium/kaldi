@@ -24,7 +24,7 @@ namespace kaldi {
 namespace nnet1 {
 
 PdfPrior::PdfPrior(const PdfPriorOptions &opts)
-    : prior_scale_(opts.prior_scale) {
+  : prior_scale_(opts.prior_scale) {
   if (opts.class_frame_counts == "") {
     // class_frame_counts is empty, the PdfPrior is deactivated...
     // (for example when 'nnet-forward' generates bottleneck features)

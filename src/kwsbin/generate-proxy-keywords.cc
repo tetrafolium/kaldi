@@ -27,11 +27,11 @@
 namespace fst {
 
 bool PrintProxyFstPath(const VectorFst<StdArc> &proxy,
-                       vector<vector<StdArc::Label> > *path,
-                       vector<StdArc::Weight> *weight,
-                       StdArc::StateId cur_state,
-                       vector<StdArc::Label> cur_path,
-                       StdArc::Weight cur_weight) {
+    vector<vector<StdArc::Label> > *path,
+    vector<StdArc::Weight> *weight,
+    StdArc::StateId cur_state,
+    vector<StdArc::Label> cur_path,
+    StdArc::Weight cur_weight) {
   if (proxy.Final(cur_state) != StdArc::Weight::Zero()) {
     // Assumes only final state has non-zero weight.
     cur_weight = Times(proxy.Final(cur_state), cur_weight);
@@ -41,7 +41,7 @@ bool PrintProxyFstPath(const VectorFst<StdArc> &proxy,
   }
 
   for (ArcIterator<StdFst> aiter(proxy, cur_state);
-       !aiter.Done(); aiter.Next()) {
+      !aiter.Done(); aiter.Next()) {
     const StdArc &arc = aiter.Value();
     StdArc::Weight temp_weight = Times(arc.weight, cur_weight);
     cur_path.push_back(arc.ilabel);

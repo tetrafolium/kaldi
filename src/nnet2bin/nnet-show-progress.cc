@@ -41,25 +41,25 @@ int main(int argc, char *argv[]) {
         "\n"
         "Usage:  nnet-show-progress [options] <old-model-in> <new-model-in> [<training-examples-in>]\n"
         "e.g.: nnet-show-progress 1.nnet 2.nnet ark:valid.egs\n";
-    
+
     ParseOptions po(usage);
 
     int32 num_segments = 1;
     int32 batch_size = 1024;
     std::string use_gpu = "optional";
-    
+
     po.Register("num-segments", &num_segments,
                 "Number of line segments used for computing derivatives");
     po.Register("use-gpu", &use_gpu,
                 "yes|no|optional|wait, only has effect if compiled with CUDA");
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() < 2 || po.NumArgs() > 3) {
       po.PrintUsage();
       exit(1);
     }
-    
+
 #if HAVE_CUDA==1
     CuDevice::Instantiate().SelectGpuId(use_gpu);
 #endif
@@ -81,8 +81,8 @@ int main(int argc, char *argv[]) {
       Input ki(nnet2_rxfilename, &binary_read);
       trans_model.Read(ki.Stream(), binary_read);
       am_nnet2.Read(ki.Stream(), binary_read);
-    }    
-    
+    }
+
     if (am_nnet1.GetNnet().GetParameterDim() !=
         am_nnet2.GetNnet().GetParameterDim()) {
       KALDI_WARN << "Parameter-dim mismatch, cannot show progress.";
@@ -90,8 +90,8 @@ int main(int argc, char *argv[]) {
     }
 
     int32 ret = 0;
-    
-    if (!examples_rspecifier.empty()) { 
+
+    if (!examples_rspecifier.empty()) {
       Nnet nnet_gradient(am_nnet2.GetNnet());
       const bool treat_as_gradient = true;
       nnet_gradient.SetZero(treat_as_gradient);
@@ -102,10 +102,10 @@ int main(int argc, char *argv[]) {
         examples.push_back(example_reader.Value());
 
       int32 num_examples = examples.size();
-    
+
       int32 num_updatable = am_nnet1.GetNnet().NumUpdatableComponents();
       Vector<BaseFloat> diff(num_updatable);
-    
+
       for (int32 s = 0; s < num_segments; s++) {
         // start and end segments of the line between 0 and 1
         BaseFloat start = (s + 0.0) / num_segments,
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
         Nnet interp_nnet(am_nnet2.GetNnet());
         interp_nnet.Scale(middle);
         interp_nnet.AddNnet(1.0 - middle, am_nnet1.GetNnet());
-      
+
         Nnet nnet_gradient(am_nnet2.GetNnet());
         const bool treat_as_gradient = true;
         nnet_gradient.SetZero(treat_as_gradient);
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
       KALDI_LOG << "Total objf change per component is " << diff;
       if (num_examples == 0) ret = 1;
     }
-   
+
     { // Get info about magnitude of parameter change.
       Nnet diff_nnet(am_nnet1.GetNnet());
       diff_nnet.AddNnet(-1.0, am_nnet2.GetNnet());

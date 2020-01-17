@@ -38,34 +38,34 @@ namespace kaldi {
    dim, and beta is a scalar. Note: we use zero-based
    not one-based indexing. */
 /*
-// We are commenting out the function below ("House") because it's not
-// needed, but we keep it just to show how we came up with HouseBackward.
-template<typename Real>
-void House(MatrixIndexT dim, const Real *x, Real *v, Real *beta) {
-  KALDI_ASSERT(dim > 0);
-  // To avoid overflow, we first compute the max of x_ (or
-  // one if that's zero, and we'll replace "x" by x/max(x_i)
-  // below.  The householder vector is anyway invariant to
-  // the magnitude of x.  We could actually avoid this extra loop
-  // over x if we wanted to be a bit smarter, but anyway this
-  // doesn't dominate the O(N) performance of the algorithm.
-  Real s; // s is a scale on x.
-  {
+   // We are commenting out the function below ("House") because it's not
+   // needed, but we keep it just to show how we came up with HouseBackward.
+   template<typename Real>
+   void House(MatrixIndexT dim, const Real *x, Real *v, Real *beta) {
+   KALDI_ASSERT(dim > 0);
+   // To avoid overflow, we first compute the max of x_ (or
+   // one if that's zero, and we'll replace "x" by x/max(x_i)
+   // below.  The householder vector is anyway invariant to
+   // the magnitude of x.  We could actually avoid this extra loop
+   // over x if we wanted to be a bit smarter, but anyway this
+   // doesn't dominate the O(N) performance of the algorithm.
+   Real s; // s is a scale on x.
+   {
     Real max_x = std::numeric_limits<Real>::min();
     for (MatrixIndexT i = 0; i < dim; i++)
       max_x = std::max(max_x, (x[i] < 0 ? -x[i] : x[i]));
     if (max_x == 0.0) max_x = 1.0;
     s = 1.0 / max_x;
-  }
-  
-  Real sigma = 0.0;
-  v[0] = 1.0;
-  for (MatrixIndexT i = 1; i < dim; i++) {
+   }
+
+   Real sigma = 0.0;
+   v[0] = 1.0;
+   for (MatrixIndexT i = 1; i < dim; i++) {
     sigma += (x[i]*s) * (x[i]*s);
     v[i] = x[i]*s;
-  }
-  if (sigma == 0.0) *beta = 0.0;
-  else {
+   }
+   if (sigma == 0.0) *beta = 0.0;
+   else {
     // When we say x1 = x[0], we reference the one-based indexing
     // in Golub and Van Loan.
     Real x1 = x[0] * s, mu = std::sqrt(x1*x1 + sigma);
@@ -73,11 +73,11 @@ void House(MatrixIndexT dim, const Real *x, Real *v, Real *beta) {
       v[0] = x1 - mu;
     } else {
       v[0] = -sigma / (x1 + mu);
-      KALDI_ASSERT(KALDI_ISFINITE(v[dim-1]));      
+      KALDI_ASSERT(KALDI_ISFINITE(v[dim-1]));
     }
     Real v1 = v[0];
     Real v1sq = v1 * v1;
-    *beta = 2 * v1sq / (sigma + v1sq);
+ * beta = 2 * v1sq / (sigma + v1sq);
     Real inv_v1 = 1.0 / v1;
     if (KALDI_ISINF(inv_v1)) {
       // can happen if v1 is denormal.
@@ -89,9 +89,9 @@ void House(MatrixIndexT dim, const Real *x, Real *v, Real *beta) {
     if (KALDI_ISNAN(inv_v1)) {
       KALDI_ERR << "NaN encountered in HouseBackward";
     }
-  }
-}
-*/
+   }
+   }
+ */
 
 // This is a backward version of the "House" routine above:
 // backward because it's the last index, not the first index of
@@ -155,17 +155,17 @@ void HouseBackward(MatrixIndexT dim, const Real *x, Real *v, Real *beta) {
    with packed lower-triangular matrices to do it this way.  There's also
    a shift from one-based to zero-based indexing, so the index
    k is transformed k -> n - k, and a corresponding transpose...
-   
+
    Let the original *this be A.  This algorithms replaces *this with
    a tridiagonal matrix T such that T = Q A Q^T for an orthogonal Q.
    Caution: Q is transposed vs. Golub and Van Loan.
-   If Q != NULL it outputs Q. 
-*/
+   If Q != NULL it outputs Q.
+ */
 template<typename Real>
 void SpMatrix<Real>::Tridiagonalize(MatrixBase<Real> *Q) {
   MatrixIndexT n = this->NumRows();
   KALDI_ASSERT(Q == NULL || (Q->NumRows() == n &&
-                             Q->NumCols() == n));
+      Q->NumCols() == n));
   if (Q != NULL) Q->SetUnit();
   Real *data = this->Data();
   Real *qdata = (Q == NULL ? NULL : Q->Data());
@@ -195,7 +195,7 @@ void SpMatrix<Real>::Tridiagonalize(MatrixBase<Real> *Q) {
     if (Q != NULL) { // C.f. Golub, Q is H_1 .. H_n-2... in this
       // case we apply them in the opposite order so it's H_n-1 .. H_1,
       // but also Q is transposed so we really have Q = H_1 .. H_n-1.
-      // It's a double negative.    
+      // It's a double negative.
       // Anyway, we left-multiply Q by each one.  The H_n would each be
       // diag(I + beta v v', I) but we don't ever touch the last dims.
       // We do (in Matlab notation):
@@ -243,9 +243,9 @@ inline void Givens(Real a, Real b, Real *c, Real *s) {
 // their Q for memory locality with row-major-indexed matrices.
 template <typename Real>
 void QrStep(MatrixIndexT n,
-            Real *diag,
-            Real *off_diag,
-            MatrixBase<Real> *Q) {
+    Real *diag,
+    Real *off_diag,
+    MatrixBase<Real> *Q) {
   KALDI_ASSERT(n >= 2);
   // below, "scale" could be any number; we introduce it to keep the
   // floating point quantities within a good range.
@@ -309,13 +309,13 @@ void QrStep(MatrixIndexT n,
     if (k < n-2) {
       // Next is the elements (k+2, k) and (k+2, k-1), to be rotated, again
       // backwards.
-      Real &elem_kp2_k = z, 
-          &elem_kp2_kp1 = off_diag[k+1];
+      Real &elem_kp2_k = z,
+      &elem_kp2_kp1 = off_diag[k+1];
       // Note: elem_kp2_k == z would start off as zero because it's
-       // two off the diagonal, and not been touched yet.  Therefore
+      // two off the diagonal, and not been touched yet.  Therefore
       // we eliminate it in expressions below, commenting it out.
       // If we didn't do this we should set it to zero first.
-      elem_kp2_k =  - s * elem_kp2_kp1; // + c*elem_kp2_k
+      elem_kp2_k =  -s * elem_kp2_kp1;  // + c*elem_kp2_k
       elem_kp2_kp1 =  c * elem_kp2_kp1; // + s*elem_kp2_k (original value).
       // The next part is from the algorithm they describe: x = t_{k+1,k}
       x = off_diag[k];
@@ -329,16 +329,16 @@ void QrStep(MatrixIndexT n,
 // vectors of length n and n-1.
 template <typename Real>
 void QrInternal(MatrixIndexT n,
-                Real *diag,
-                Real *off_diag,
-                MatrixBase<Real> *Q) {
+    Real *diag,
+    Real *off_diag,
+    MatrixBase<Real> *Q) {
   KALDI_ASSERT(Q == NULL || Q->NumCols() == n); // We may
   // later relax the condition that Q->NumCols() == n.
 
   MatrixIndexT counter = 0, max_iters = 500 + 4*n, // Should never take this many iters.
       large_iters = 100 + 2*n;
   Real epsilon = (pow(2.0, sizeof(Real) == 4 ? -23.0 : -52.0));
-  
+
   for (; counter < max_iters; counter++) { // this takes the place of "until
                                            // q=n"... we'll break out of the
                                            // loop when we converge.
@@ -356,7 +356,7 @@ void QrInternal(MatrixIndexT n,
         off_diag[i] = 0.0;
     }
     // The next code works out p, q, and npq which is n - p - q.
-    // For the definitions of q and p, see Golub and Van Loan; we 
+    // For the definitions of q and p, see Golub and Van Loan; we
     // partition the n dims into pieces of size (p, n-p-q, q) where
     // the part of size q is diagonal and the part of size n-p-p is
     // "unreduced", i.e. has no zero off-diagonal elements.
@@ -392,7 +392,7 @@ void QrInternal(MatrixIndexT n,
     } else {
       QrStep(npq, diag + p, off_diag + p,
              static_cast<MatrixBase<Real>*>(NULL));
-    }      
+    }
   }
   if (counter == max_iters) {
     KALDI_WARN << "Failure to converge in QR algorithm. "
@@ -404,7 +404,7 @@ void QrInternal(MatrixIndexT n,
 /**
    This is the symmetric QR algorithm, from Golub and Van Loan 3rd ed., Algorithm
    8.3.3.  Q is transposed w.r.t. there, though.
-*/
+ */
 template <typename Real>
 void SpMatrix<Real>::Qr(MatrixBase<Real> *Q) {
   KALDI_ASSERT(this->IsTridiagonal());
@@ -452,7 +452,7 @@ void SpMatrix<Real>::Eig(VectorBase<Real> *s, MatrixBase<Real> *P) const {
 
 template<typename Real>
 void SpMatrix<Real>::TopEigs(VectorBase<Real> *s, MatrixBase<Real> *P,
-                             MatrixIndexT lanczos_dim) const {
+    MatrixIndexT lanczos_dim) const {
   const SpMatrix<Real> &S(*this); // call this "S" for easy notation.
   MatrixIndexT eig_dim = s->Dim(); // Space of dim we want to retain.
   if (lanczos_dim <= 0)
@@ -528,11 +528,11 @@ void SpMatrix<Real>::TopEigs(VectorBase<Real> *s, MatrixBase<Real> *P,
     }
   }
 
-  Matrix<Real> R(lanczos_dim, lanczos_dim);  
+  Matrix<Real> R(lanczos_dim, lanczos_dim);
   R.SetUnit();
   T.Qr(&R); // Diagonalizes T.
   Vector<Real> s_tmp(lanczos_dim);
-  s_tmp.CopyDiagFromSp(T);  
+  s_tmp.CopyDiagFromSp(T);
 
   // Now T = R * diag(s_tmp) * R^T.
   // The next call sorts the elements of s from greatest to least absolute value,
@@ -544,7 +544,7 @@ void SpMatrix<Real>::TopEigs(VectorBase<Real> *s, MatrixBase<Real> *P,
   SubMatrix<Real> Rsub(R, 0, eig_dim, 0, lanczos_dim);
   SubVector<Real> s_sub(s_tmp, 0, eig_dim);
   s->CopyFromVec(s_sub);
-      
+
   // For working out what to do now, just assume the other eigenvalues were
   // zero.  This is just for purposes of knowing how to get the result, and
   // not getting things wrongly transposed.

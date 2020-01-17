@@ -33,10 +33,10 @@ using std::vector;
 
 namespace kaldi {
 void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
-                            const Posterior &post,
-                            const TransitionModel &trans_model,
-                            const AmDiagGmm &am_gmm,
-                            FmllrDiagGmmAccs *spk_stats) {
+    const Posterior &post,
+    const TransitionModel &trans_model,
+    const AmDiagGmm &am_gmm,
+    FmllrDiagGmmAccs *spk_stats) {
   Posterior pdf_post;
   ConvertPosteriorToPdfs(trans_model, post, &pdf_post);
   for (size_t i = 0; i < post.size(); i++) {

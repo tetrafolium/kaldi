@@ -26,14 +26,14 @@ namespace kaldi {
 namespace nnet2 {
 
 NnetOnlineComputer::NnetOnlineComputer(const Nnet &nnet, bool pad_input)
-    : nnet_(nnet), pad_input_(pad_input),
-      is_first_chunk_(true), finished_(false) {
+  : nnet_(nnet), pad_input_(pad_input),
+  is_first_chunk_(true), finished_(false) {
   data_.resize(nnet_.NumComponents() + 1);
   reusable_component_inputs_.resize(nnet_.NumComponents()+1);
 }
 
 void NnetOnlineComputer::Compute(const CuMatrixBase<BaseFloat> &input,
-                                 CuMatrix<BaseFloat> *output) {
+    CuMatrix<BaseFloat> *output) {
   KALDI_ASSERT(output != NULL);
   KALDI_ASSERT(!finished_);
   int32 dim = input.NumCols();
@@ -53,7 +53,7 @@ void NnetOnlineComputer::Compute(const CuMatrixBase<BaseFloat> &input,
   // Checking if feature dimension matches that required by the neural network.
   if (dim != nnet_.InputDim()) {
     KALDI_ERR << "Feature dimension is " << dim << ", but network expects "
-        << nnet_.InputDim();
+              << nnet_.InputDim();
   }
   // num_effective_input_rows is the effective number of input rows we have, for
   // purposes of computing how much output we will get.  It is the number of
@@ -70,10 +70,10 @@ void NnetOnlineComputer::Compute(const CuMatrixBase<BaseFloat> &input,
       KALDI_ASSERT(reusable_component_inputs_[0].NumRows() == 0);
     // Pad at the start of the file if necessary.
     if ((pad_input_) && (nnet_.LeftContext() > 0))  {
-        input_data.Resize(nnet_.LeftContext() + input.NumRows(), dim);
-        input_data.Range(0, nnet_.LeftContext(), 0,
+      input_data.Resize(nnet_.LeftContext() + input.NumRows(), dim);
+      input_data.Range(0, nnet_.LeftContext(), 0,
                     dim).CopyRowsFromVec(input.Row(0));
-        input_data.Range(nnet_.LeftContext(), input.NumRows(),
+      input_data.Range(nnet_.LeftContext(), input.NumRows(),
                     0, dim).CopyFromMat(input);
     } else {
       input_data.Resize(input.NumRows(), input.NumCols());
@@ -193,19 +193,19 @@ void NnetOnlineComputer::Propagate() {
     int32 last_offset = chunk_info_[c].GetOffset(chunk_size_assumed - 1);
     int32 first_offset = last_offset - input_data.NumRows() + 1;
     ChunkInfo input_chunk_info(chunk_info_[c].NumCols(),
-                               chunk_info_[c].NumChunks(),
-                               first_offset,
-                               last_offset);
+        chunk_info_[c].NumChunks(),
+        first_offset,
+        last_offset);
     // modifying the output chunk_info
     chunk_size_assumed = chunk_info_[c + 1].ChunkSize();
     last_offset = chunk_info_[c + 1].GetOffset(chunk_size_assumed - 1);
     first_offset = last_offset - (input_data.NumRows() -
-                                  (component.Context().back() -
-                                   component.Context().front())) + 1;
+        (component.Context().back() -
+        component.Context().front())) + 1;
     ChunkInfo output_chunk_info(chunk_info_[c + 1].NumCols(),
-                                chunk_info_[c + 1].NumChunks(),
-                                first_offset,
-                                last_offset);
+        chunk_info_[c + 1].NumChunks(),
+        first_offset,
+        last_offset);
     component.Propagate(input_chunk_info, output_chunk_info,
                         input_data, &output_data);
   }

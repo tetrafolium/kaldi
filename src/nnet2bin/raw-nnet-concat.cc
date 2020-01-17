@@ -36,16 +36,16 @@ int main(int argc, char *argv[]) {
         "Usage:  raw-nnet-concat [options] <raw-nnet-in1> <raw-nnet-in2> <raw-nnet-out>\n"
         "e.g.:\n"
         " raw-nnet-concat nnet1 nnet2 nnet_concat\n";
-    
+
     bool binary_write = true;
     int32 srand_seed = 0;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
-    
+
     po.Read(argc, argv);
     srand(srand_seed);
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     std::string raw_nnet1_rxfilename = po.GetArg(1),
         raw_nnet2_rxfilename = po.GetArg(2),
         raw_nnet_wxfilename = po.GetArg(3);
-    
+
     Nnet nnet1;
     ReadKaldiObject(raw_nnet1_rxfilename, &nnet1);
     Nnet nnet2;
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     Nnet nnet_concat(nnet1, nnet2); // Constructor concatenates them.
 
     WriteKaldiObject(nnet_concat, raw_nnet_wxfilename, binary_write);
-    
+
     KALDI_LOG << "Concatenated neural nets from "
               << raw_nnet1_rxfilename << " and " << raw_nnet2_rxfilename
               << " and wrote to " << raw_nnet_wxfilename;

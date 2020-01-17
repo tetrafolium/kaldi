@@ -34,8 +34,8 @@ namespace kaldi {
 namespace nnet1 {
 
 class ParallelComponent : public MultistreamComponent {
- public:
-  ParallelComponent(int32 dim_in, int32 dim_out):
+public:
+  ParallelComponent(int32 dim_in, int32 dim_out) :
     MultistreamComponent(dim_in, dim_out)
   { }
 
@@ -72,8 +72,7 @@ class ParallelComponent : public MultistreamComponent {
           nested_nnet_proto.push_back(file_or_end);
         }
       } else { KALDI_ERR << "Unknown token " << token << ", typo in config?"
-                         << " (NestedNnet|NestedNnetFilename|NestedNnetProto)";
-      }
+                         << " (NestedNnet|NestedNnetFilename|NestedNnetProto)";}
     }
     // Initialize,
     // First, read nnets from files,
@@ -239,7 +238,7 @@ class ParallelComponent : public MultistreamComponent {
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // column-offsets for data buffers 'in,out',
     int32 input_offset = 0, output_offset = 0;
     // loop over nnets,
@@ -247,10 +246,10 @@ class ParallelComponent : public MultistreamComponent {
       // get the data 'windows',
       CuSubMatrix<BaseFloat> src(
         in.ColRange(input_offset, nnet_[i].InputDim())
-      );
+        );
       CuSubMatrix<BaseFloat> tgt(
         out->ColRange(output_offset, nnet_[i].OutputDim())
-      );
+        );
       // forward through auxiliary matrix, as 'Propagate' requires 'CuMatrix',
       CuMatrix<BaseFloat> tgt_aux;
       nnet_[i].Propagate(src, &tgt_aux);
@@ -262,9 +261,9 @@ class ParallelComponent : public MultistreamComponent {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // column-offsets for data buffers 'in,out',
     int32 input_offset = 0, output_offset = 0;
     // loop over nnets,
@@ -272,10 +271,10 @@ class ParallelComponent : public MultistreamComponent {
       // get the data 'windows',
       CuSubMatrix<BaseFloat> src(
         out_diff.ColRange(output_offset, nnet_[i].OutputDim())
-      );
+        );
       CuSubMatrix<BaseFloat> tgt(
         in_diff->ColRange(input_offset, nnet_[i].InputDim())
-      );
+        );
       // ::Backpropagate through auxiliary matrix (CuMatrix in the interface),
       CuMatrix<BaseFloat> tgt_aux;
       nnet_[i].Backpropagate(src, &tgt_aux);
@@ -287,7 +286,7 @@ class ParallelComponent : public MultistreamComponent {
   }
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     { }  // do nothing
   }
 
@@ -312,7 +311,7 @@ class ParallelComponent : public MultistreamComponent {
       for (int32 j = 0; j < nnet_[i].NumComponents(); j++) {
         if (nnet_[i].GetComponent(j).IsUpdatable()) {
           UpdatableComponent& comp =
-            dynamic_cast<UpdatableComponent&>(nnet_[i].GetComponent(j));
+              dynamic_cast<UpdatableComponent&>(nnet_[i].GetComponent(j));
           // set the value,
           comp.SetLearnRateCoef(val);
         }
@@ -331,7 +330,7 @@ class ParallelComponent : public MultistreamComponent {
       for (int32 j = 0; j < nnet_[i].NumComponents(); j++) {
         if (nnet_[i].GetComponent(j).IsUpdatable()) {
           UpdatableComponent& comp =
-            dynamic_cast<UpdatableComponent&>(nnet_[i].GetComponent(j));
+              dynamic_cast<UpdatableComponent&>(nnet_[i].GetComponent(j));
           // set the value,
           comp.SetBiasLearnRateCoef(val);
         }
@@ -351,7 +350,7 @@ class ParallelComponent : public MultistreamComponent {
     }
   }
 
- private:
+private:
   std::vector<Nnet> nnet_;
 };
 

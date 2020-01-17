@@ -27,22 +27,22 @@
 #include <cassert>
 #include "util/stl-utils.h"
 
-  /* ConstIntegerSet is a way to efficiently test whether something is in a
-     supplied set of integers.  It can be initialized from a vector or set, but
-     never changed after that. It either uses a sorted vector or an array of
-     bool, depending on the input.  It behaves like a const version of an STL set, with
-     only a subset of the functionality, except all the member functions are
-     upper-case.
+/* ConstIntegerSet is a way to efficiently test whether something is in a
+   supplied set of integers.  It can be initialized from a vector or set, but
+   never changed after that. It either uses a sorted vector or an array of
+   bool, depending on the input.  It behaves like a const version of an STL set, with
+   only a subset of the functionality, except all the member functions are
+   upper-case.
 
-     Note that we could get rid of the member slow_set_, but we'd have to
-     do more work to implement an iterator type.  This would save memory.
-  */
+   Note that we could get rid of the member slow_set_, but we'd have to
+   do more work to implement an iterator type.  This would save memory.
+ */
 
 namespace kaldi {
 
 template<class I> class ConstIntegerSet {
- public:
-  ConstIntegerSet(): lowest_member_(1), highest_member_(0) { }
+public:
+  ConstIntegerSet() : lowest_member_(1), highest_member_(0) { }
 
   void Init(const std::vector<I> &input) {
     slow_set_ = input;
@@ -55,7 +55,7 @@ template<class I> class ConstIntegerSet {
     InitInternal();
   }
 
-  explicit ConstIntegerSet(const std::vector<I> &input): slow_set_(input) {
+  explicit ConstIntegerSet(const std::vector<I> &input) : slow_set_(input) {
     SortAndUniq(&slow_set_);
     InitInternal();
   }
@@ -63,8 +63,8 @@ template<class I> class ConstIntegerSet {
     CopySetToVector(input, &slow_set_);
     InitInternal();
   }
-  explicit ConstIntegerSet(const ConstIntegerSet<I> &other):
-                           slow_set_(other.slow_set_) {
+  explicit ConstIntegerSet(const ConstIntegerSet<I> &other) :
+    slow_set_(other.slow_set_) {
     InitInternal();
   }
 
@@ -79,7 +79,7 @@ template<class I> class ConstIntegerSet {
   void Write(std::ostream &os, bool binary) const;
   void Read(std::istream &is, bool binary);
 
- private:
+private:
   I lowest_member_;
   I highest_member_;
   bool contiguous_;

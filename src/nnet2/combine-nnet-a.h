@@ -32,7 +32,7 @@ struct NnetCombineAconfig {
   int32 num_bfgs_iters; // The dimension is small (the number of layers)
   // so we do BFGS.  Note: this num-iters is really the number of function
   // evaluations.
-  
+
   BaseFloat initial_step;
 
   BaseFloat valid_impr_thresh;
@@ -42,13 +42,13 @@ struct NnetCombineAconfig {
   BaseFloat max_learning_rate_factor; // 2.0 by default.
   BaseFloat min_learning_rate; // 0.0001 by default; we don't allow learning rate to go below
   // this, mainly because it would lead to roundoff problems.
-  
-  NnetCombineAconfig(): num_bfgs_iters(15), initial_step(0.1),
-                        valid_impr_thresh(0.5), overshoot(1.8),
-                        min_learning_rate_factor(0.5),
-                        max_learning_rate_factor(2.0),
-                        min_learning_rate(0.0001) { }
-  
+
+  NnetCombineAconfig() : num_bfgs_iters(15), initial_step(0.1),
+    valid_impr_thresh(0.5), overshoot(1.8),
+    min_learning_rate_factor(0.5),
+    max_learning_rate_factor(2.0),
+    min_learning_rate(0.0001) { }
+
   void Register(OptionsItf *opts) {
     opts->Register("num-bfgs-iters", &num_bfgs_iters, "Maximum number of function "
                    "evaluations for BFGS to use when optimizing combination weights");
@@ -69,14 +69,14 @@ struct NnetCombineAconfig {
                    "Minimum factor by which to increase the learning rate for any layer.");
     opts->Register("min-learning-rate", &min_learning_rate,
                    "Floor on the automatically updated learning rates");
-  }  
+  }
 };
 
 void CombineNnetsA(const NnetCombineAconfig &combine_config,
-                   const std::vector<NnetExample> &validation_set,
-                   const std::vector<Nnet> &nnets_in,
-                   Nnet *nnet_out);
-  
+    const std::vector<NnetExample> &validation_set,
+    const std::vector<Nnet> &nnets_in,
+    Nnet *nnet_out);
+
 
 
 } // namespace nnet2

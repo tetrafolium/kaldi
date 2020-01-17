@@ -28,10 +28,10 @@ int main(int argc, char *argv[]) {
     typedef kaldi::int32 int32;
 
     const char *usage =
-      "Concatenate Neural Networks (and possibly change binary/text format)\n"
-      "Usage: nnet-concat [options] <nnet-in1> <...> <nnet-inN> <nnet-out>\n"
-      "e.g.:\n"
-      " nnet-concat --binary=false nnet.1 nnet.2 nnet.1.2\n";
+        "Concatenate Neural Networks (and possibly change binary/text format)\n"
+        "Usage: nnet-concat [options] <nnet-in1> <...> <nnet-inN> <nnet-out>\n"
+        "e.g.:\n"
+        " nnet-concat --binary=false nnet.1 nnet.2 nnet.1.2\n";
 
     ParseOptions po(usage);
 

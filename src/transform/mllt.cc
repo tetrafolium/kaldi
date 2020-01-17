@@ -64,14 +64,14 @@ void MlltAccs::Write(std::ostream &os, bool binary) const {
 
 // static version of the Update function.
 void MlltAccs::Update(double beta,
-                      const std::vector<SpMatrix<double> > &G,
-                      MatrixBase<BaseFloat> *M_ptr,
-                      BaseFloat *objf_impr_out,
-                      BaseFloat *count_out) {
+    const std::vector<SpMatrix<double> > &G,
+    MatrixBase<BaseFloat> *M_ptr,
+    BaseFloat *objf_impr_out,
+    BaseFloat *count_out) {
   int32 dim = G.size();
   KALDI_ASSERT(dim != 0 && M_ptr != NULL
-               && M_ptr->NumRows() == dim
-               && M_ptr->NumCols() == dim);
+      && M_ptr->NumRows() == dim
+      && M_ptr->NumCols() == dim);
   if (beta < 10*dim) {  // not really enough data to estimate.
     // don't bother with min-count parameter etc., as MLLT is typically
     // global.
@@ -84,7 +84,7 @@ void MlltAccs::Update(double beta,
   Matrix<double> M(dim, dim), Minv(dim, dim);
   M.CopyFromMat(*M_ptr);
   std::vector<SpMatrix<double> > Ginv(dim);
-  for (int32 i = 0; i < dim;  i++) {
+  for (int32 i = 0; i < dim; i++) {
     Ginv[i].Resize(dim);
     Ginv[i].CopyFromSp(G[i]);
     Ginv[i].Invert();
@@ -129,8 +129,8 @@ void MlltAccs::Update(double beta,
 }
 
 void MlltAccs::AccumulateFromPosteriors(const DiagGmm &gmm,
-                                        const VectorBase<BaseFloat> &data,
-                                        const VectorBase<BaseFloat> &posteriors) {
+    const VectorBase<BaseFloat> &data,
+    const VectorBase<BaseFloat> &posteriors) {
   KALDI_ASSERT(data.Dim() == gmm.Dim());
   KALDI_ASSERT(data.Dim() == Dim());
   KALDI_ASSERT(posteriors.Dim() == gmm.NumGauss());
@@ -160,8 +160,8 @@ void MlltAccs::AccumulateFromPosteriors(const DiagGmm &gmm,
 }
 
 BaseFloat MlltAccs::AccumulateFromGmm(const DiagGmm &gmm,
-                                      const VectorBase<BaseFloat> &data,
-                                      BaseFloat weight) {  // e.g. weight = 1.0
+    const VectorBase<BaseFloat> &data,
+    BaseFloat weight) {                                    // e.g. weight = 1.0
   Vector<BaseFloat> posteriors(gmm.NumGauss());
   BaseFloat ans = gmm.ComponentPosteriors(data, &posteriors);
   posteriors.Scale(weight);
@@ -171,10 +171,10 @@ BaseFloat MlltAccs::AccumulateFromGmm(const DiagGmm &gmm,
 
 
 BaseFloat MlltAccs::AccumulateFromGmmPreselect(
-    const DiagGmm &gmm,
-    const std::vector<int32> &gselect,
-    const VectorBase<BaseFloat> &data,
-    BaseFloat weight) {  // e.g. weight = 1.0
+  const DiagGmm &gmm,
+  const std::vector<int32> &gselect,
+  const VectorBase<BaseFloat> &data,
+  BaseFloat weight) {    // e.g. weight = 1.0
   KALDI_ASSERT(!gselect.empty());
   Vector<BaseFloat> loglikes;
   gmm.LogLikelihoodsPreselect(data, gselect, &loglikes);

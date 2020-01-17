@@ -39,13 +39,13 @@ std::ostream & operator <<(std::ostream & out, const PackedMatrix<Real>& M);
 /// @brief Packed matrix: base class for triangular and symmetric matrices.
 template<typename Real> class PackedMatrix {
   friend class CuPackedMatrix<Real>;
- public:
+public:
   //friend class CuPackedMatrix<Real>;
 
   PackedMatrix() : data_(NULL), num_rows_(0) {}
 
-  explicit PackedMatrix(MatrixIndexT r, MatrixResizeType resize_type = kSetZero):
-      data_(NULL) {  Resize(r, resize_type);  }
+  explicit PackedMatrix(MatrixIndexT r, MatrixResizeType resize_type = kSetZero) :
+    data_(NULL) {  Resize(r, resize_type);  }
 
   explicit PackedMatrix(const PackedMatrix<Real> &orig) : data_(NULL) {
     Resize(orig.num_rows_, kUndefined);
@@ -57,7 +57,7 @@ template<typename Real> class PackedMatrix {
     Resize(orig.NumRows(), kUndefined);
     CopyFromPacked(orig);
   }
-  
+
   void SetZero();  /// < Set to zero
   void SetUnit();  /// < Set to unit matrix.
   void SetRandn(); /// < Set to random values of a normal distribution
@@ -92,13 +92,13 @@ template<typename Real> class PackedMatrix {
 
   template<typename OtherReal>
   void CopyFromPacked(const PackedMatrix<OtherReal> &orig);
-  
+
   /// CopyFromVec just interprets the vector as having the same layout
   /// as the packed matrix.  Must have the same dimension, i.e.
   /// orig.Dim() == (NumRows()*(NumRows()+1)) / 2;
   template<typename OtherReal>
   void CopyFromVec(const SubVector<OtherReal> &orig);
-  
+
   Real* Data() { return data_; }
   const Real* Data() const { return data_; }
   inline MatrixIndexT NumRows() const { return num_rows_; }
@@ -116,7 +116,7 @@ template<typename Real> class PackedMatrix {
                  static_cast<UnsignedMatrixIndexT>(num_rows_) &&
                  static_cast<UnsignedMatrixIndexT>(c) <
                  static_cast<UnsignedMatrixIndexT>(num_rows_)
-                 && c <= r);
+        && c <= r);
     return *(data_ + (r * (r + 1)) / 2 + c);
   }
 
@@ -126,30 +126,30 @@ template<typename Real> class PackedMatrix {
                  static_cast<UnsignedMatrixIndexT>(num_rows_) &&
                  static_cast<UnsignedMatrixIndexT>(c) <
                  static_cast<UnsignedMatrixIndexT>(num_rows_)
-                 && c <= r);
+        && c <= r);
     return *(data_ + (r * (r + 1)) / 2 + c);
   }
 
   Real Max() const {
     KALDI_ASSERT(num_rows_ > 0);
-    return * (std::max_element(data_, data_ + ((num_rows_*(num_rows_+1))/2) ));
+    return *(std::max_element(data_, data_ + ((num_rows_*(num_rows_+1))/2) ));
   }
 
   Real Min() const {
     KALDI_ASSERT(num_rows_ > 0);
-    return * (std::min_element(data_, data_ + ((num_rows_*(num_rows_+1))/2) ));
+    return *(std::min_element(data_, data_ + ((num_rows_*(num_rows_+1))/2) ));
   }
 
   void Scale(Real c);
 
   friend std::ostream & operator << <> (std::ostream & out,
-                                     const PackedMatrix<Real> &m);
+  const PackedMatrix<Real> &m);
   // Use instead of stream<<*this, if you want to add to existing contents.
   // Will throw exception on failure.
   void Read(std::istream &in, bool binary, bool add = false);
 
   void Write(std::ostream &out, bool binary) const;
-  
+
   void Destroy();
 
   /// Swaps the contents of *this and *other.  Shallow swap.
@@ -157,13 +157,13 @@ template<typename Real> class PackedMatrix {
   void Swap(Matrix<Real> *other);
 
 
- protected:
+protected:
   // Will only be called from this class or derived classes.
   void AddPacked(const Real alpha, const PackedMatrix<Real>& M);
   Real *data_;
   MatrixIndexT num_rows_;
   //MatrixIndexT stride_;
- private:
+private:
   /// Init assumes the current contents of the class are is invalid (i.e. junk or
   /// has already been freed), and it sets the matrixd to newly allocated memory
   /// with the specified dimension.  dim == 0 is acceptable.  The memory contents

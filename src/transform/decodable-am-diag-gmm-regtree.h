@@ -36,17 +36,17 @@
 namespace kaldi {
 
 class DecodableAmDiagGmmRegtreeFmllr: public DecodableAmDiagGmmUnmapped {
- public:
+public:
   DecodableAmDiagGmmRegtreeFmllr(const AmDiagGmm &am,
-                                 const TransitionModel &tm,
-                                 const Matrix<BaseFloat> &feats,
-                                 const RegtreeFmllrDiagGmm &fmllr_xform,
-                                 const RegressionTree &regtree,
-                                 BaseFloat scale,
-                                 BaseFloat log_sum_exp_prune = -1.0)
+      const TransitionModel &tm,
+      const Matrix<BaseFloat> &feats,
+      const RegtreeFmllrDiagGmm &fmllr_xform,
+      const RegressionTree &regtree,
+      BaseFloat scale,
+      BaseFloat log_sum_exp_prune = -1.0)
     : DecodableAmDiagGmmUnmapped(am, feats, log_sum_exp_prune), trans_model_(tm),
-      scale_(scale), fmllr_xform_(fmllr_xform), regtree_(regtree),
-      valid_logdets_(false) {}
+    scale_(scale), fmllr_xform_(fmllr_xform), regtree_(regtree),
+    valid_logdets_(false) {}
 
   // Note, frames are numbered from zero but transition-ids (tid) from one.
   virtual BaseFloat LogLikelihood(int32 frame, int32 tid) {
@@ -59,12 +59,12 @@ class DecodableAmDiagGmmRegtreeFmllr: public DecodableAmDiagGmmUnmapped {
   // Indices are one-based!  This is for compatibility with OpenFst.
   virtual int32 NumIndices() const { return trans_model_.NumTransitionIds(); }
 
- protected:
+protected:
   virtual BaseFloat LogLikelihoodZeroBased(int32 frame, int32 state_index);
 
   const TransitionModel *TransModel() { return &trans_model_; }
 
- private:
+private:
   const TransitionModel &trans_model_;  // for transition-id to pdf mapping
   BaseFloat scale_;
   const RegtreeFmllrDiagGmm &fmllr_xform_;
@@ -78,17 +78,17 @@ class DecodableAmDiagGmmRegtreeFmllr: public DecodableAmDiagGmmUnmapped {
 };
 
 class DecodableAmDiagGmmRegtreeMllr: public DecodableAmDiagGmmUnmapped {
- public:
+public:
   DecodableAmDiagGmmRegtreeMllr(const AmDiagGmm &am,
-                                const TransitionModel &tm,
-                                const Matrix<BaseFloat> &feats,
-                                const RegtreeMllrDiagGmm &mllr_xform,
-                                const RegressionTree &regtree,
-                                BaseFloat scale,
-                                BaseFloat log_sum_exp_prune = -1.0):
-      DecodableAmDiagGmmUnmapped(am, feats, log_sum_exp_prune),
-      trans_model_(tm), scale_(scale), mllr_xform_(mllr_xform),
-      regtree_(regtree), data_squared_(feats.NumCols()) { InitCache(); }
+      const TransitionModel &tm,
+      const Matrix<BaseFloat> &feats,
+      const RegtreeMllrDiagGmm &mllr_xform,
+      const RegressionTree &regtree,
+      BaseFloat scale,
+      BaseFloat log_sum_exp_prune = -1.0) :
+    DecodableAmDiagGmmUnmapped(am, feats, log_sum_exp_prune),
+    trans_model_(tm), scale_(scale), mllr_xform_(mllr_xform),
+    regtree_(regtree), data_squared_(feats.NumCols()) { InitCache(); }
   ~DecodableAmDiagGmmRegtreeMllr();
 
   // Note, frames are numbered from zero but transition-ids (tid) from one.
@@ -104,10 +104,10 @@ class DecodableAmDiagGmmRegtreeMllr: public DecodableAmDiagGmmUnmapped {
 
   const TransitionModel *TransModel() { return &trans_model_; }
 
- protected:
+protected:
   virtual BaseFloat LogLikelihoodZeroBased(int32 frame, int32 state_index);
 
- private:
+private:
   /// Initializes the mean & gconst caches
   void InitCache();
   /// Get the transformed means times inverse variances for a given pdf, and

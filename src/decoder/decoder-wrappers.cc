@@ -28,35 +28,35 @@ namespace kaldi {
 
 
 DecodeUtteranceLatticeFasterClass::DecodeUtteranceLatticeFasterClass(
-    LatticeFasterDecoder *decoder,
-    DecodableInterface *decodable,
-    const TransitionModel &trans_model,
-    const fst::SymbolTable *word_syms,
-    std::string utt,
-    BaseFloat acoustic_scale,
-    bool determinize,
-    bool allow_partial,
-    Int32VectorWriter *alignments_writer,
-    Int32VectorWriter *words_writer,
-    CompactLatticeWriter *compact_lattice_writer,
-    LatticeWriter *lattice_writer,
-    double *like_sum, // on success, adds likelihood to this.
-    int64 *frame_sum, // on success, adds #frames to this.
-    int32 *num_done, // on success (including partial decode), increments this.
-    int32 *num_err,  // on failure, increments this.
-    int32 *num_partial):  // If partial decode (final-state not reached), increments this.
-    decoder_(decoder), decodable_(decodable), trans_model_(&trans_model),
-    word_syms_(word_syms), utt_(utt), acoustic_scale_(acoustic_scale),
-    determinize_(determinize), allow_partial_(allow_partial),
-    alignments_writer_(alignments_writer),
-    words_writer_(words_writer),
-    compact_lattice_writer_(compact_lattice_writer),
-    lattice_writer_(lattice_writer),
-    like_sum_(like_sum), frame_sum_(frame_sum),
-    num_done_(num_done), num_err_(num_err),
-    num_partial_(num_partial),
-    computed_(false), success_(false), partial_(false),
-    clat_(NULL), lat_(NULL) { }
+  LatticeFasterDecoder *decoder,
+  DecodableInterface *decodable,
+  const TransitionModel &trans_model,
+  const fst::SymbolTable *word_syms,
+  std::string utt,
+  BaseFloat acoustic_scale,
+  bool determinize,
+  bool allow_partial,
+  Int32VectorWriter *alignments_writer,
+  Int32VectorWriter *words_writer,
+  CompactLatticeWriter *compact_lattice_writer,
+  LatticeWriter *lattice_writer,
+  double *like_sum,   // on success, adds likelihood to this.
+  int64 *frame_sum,   // on success, adds #frames to this.
+  int32 *num_done,   // on success (including partial decode), increments this.
+  int32 *num_err,    // on failure, increments this.
+  int32 *num_partial) :   // If partial decode (final-state not reached), increments this.
+  decoder_(decoder), decodable_(decodable), trans_model_(&trans_model),
+  word_syms_(word_syms), utt_(utt), acoustic_scale_(acoustic_scale),
+  determinize_(determinize), allow_partial_(allow_partial),
+  alignments_writer_(alignments_writer),
+  words_writer_(words_writer),
+  compact_lattice_writer_(compact_lattice_writer),
+  lattice_writer_(lattice_writer),
+  like_sum_(like_sum), frame_sum_(frame_sum),
+  num_done_(num_done), num_err_(num_err),
+  num_partial_(num_partial),
+  computed_(false), success_(false), partial_(false),
+  clat_(NULL), lat_(NULL) { }
 
 
 void DecodeUtteranceLatticeFasterClass::operator () () {
@@ -196,19 +196,19 @@ DecodeUtteranceLatticeFasterClass::~DecodeUtteranceLatticeFasterClass() {
 
 // Takes care of output.  Returns true on success.
 bool DecodeUtteranceLatticeFaster(
-    LatticeFasterDecoder &decoder, // not const but is really an input.
-    DecodableInterface &decodable, // not const but is really an input.
-    const TransitionModel &trans_model,
-    const fst::SymbolTable *word_syms,
-    std::string utt,
-    double acoustic_scale,
-    bool determinize,
-    bool allow_partial,
-    Int32VectorWriter *alignment_writer,
-    Int32VectorWriter *words_writer,
-    CompactLatticeWriter *compact_lattice_writer,
-    LatticeWriter *lattice_writer,
-    double *like_ptr) { // puts utterance's like in like_ptr on success.
+  LatticeFasterDecoder &decoder,   // not const but is really an input.
+  DecodableInterface &decodable,   // not const but is really an input.
+  const TransitionModel &trans_model,
+  const fst::SymbolTable *word_syms,
+  std::string utt,
+  double acoustic_scale,
+  bool determinize,
+  bool allow_partial,
+  Int32VectorWriter *alignment_writer,
+  Int32VectorWriter *words_writer,
+  CompactLatticeWriter *compact_lattice_writer,
+  LatticeWriter *lattice_writer,
+  double *like_ptr) {   // puts utterance's like in like_ptr on success.
   using fst::VectorFst;
 
   if (!decoder.Decode(&decodable)) {
@@ -294,19 +294,19 @@ bool DecodeUtteranceLatticeFaster(
 
 // Takes care of output.  Returns true on success.
 bool DecodeUtteranceLatticeSimple(
-    LatticeSimpleDecoder &decoder, // not const but is really an input.
-    DecodableInterface &decodable, // not const but is really an input.
-    const TransitionModel &trans_model,
-    const fst::SymbolTable *word_syms,
-    std::string utt,
-    double acoustic_scale,
-    bool determinize,
-    bool allow_partial,
-    Int32VectorWriter *alignment_writer,
-    Int32VectorWriter *words_writer,
-    CompactLatticeWriter *compact_lattice_writer,
-    LatticeWriter *lattice_writer,
-    double *like_ptr) { // puts utterance's like in like_ptr on success.
+  LatticeSimpleDecoder &decoder,   // not const but is really an input.
+  DecodableInterface &decodable,   // not const but is really an input.
+  const TransitionModel &trans_model,
+  const fst::SymbolTable *word_syms,
+  std::string utt,
+  double acoustic_scale,
+  bool determinize,
+  bool allow_partial,
+  Int32VectorWriter *alignment_writer,
+  Int32VectorWriter *words_writer,
+  CompactLatticeWriter *compact_lattice_writer,
+  LatticeWriter *lattice_writer,
+  double *like_ptr) {   // puts utterance's like in like_ptr on success.
   using fst::VectorFst;
 
   if (!decoder.Decode(&decodable)) {
@@ -392,7 +392,7 @@ bool DecodeUtteranceLatticeSimple(
 
 // see comment in header.
 void ModifyGraphForCarefulAlignment(
-    fst::VectorFst<fst::StdArc> *fst) {
+  fst::VectorFst<fst::StdArc> *fst) {
   typedef fst::StdArc Arc;
   typedef Arc::StateId StateId;
   typedef Arc::Label Label;
@@ -422,21 +422,21 @@ void ModifyGraphForCarefulAlignment(
 
 
 void AlignUtteranceWrapper(
-    const AlignConfig &config,
-    const std::string &utt,
-    BaseFloat acoustic_scale,  // affects scores written to scores_writer, if
+  const AlignConfig &config,
+  const std::string &utt,
+  BaseFloat acoustic_scale,    // affects scores written to scores_writer, if
                                // present
-    fst::VectorFst<fst::StdArc> *fst,  // non-const in case config.careful ==
+  fst::VectorFst<fst::StdArc> *fst,    // non-const in case config.careful ==
                                        // true.
-    DecodableInterface *decodable,  // not const but is really an input.
-    Int32VectorWriter *alignment_writer,
-    BaseFloatWriter *scores_writer,
-    int32 *num_done,
-    int32 *num_error,
-    int32 *num_retried,
-    double *tot_like,
-    int64 *frame_count,
-    BaseFloatVectorWriter *per_frame_acwt_writer) {
+  DecodableInterface *decodable,    // not const but is really an input.
+  Int32VectorWriter *alignment_writer,
+  BaseFloatWriter *scores_writer,
+  int32 *num_done,
+  int32 *num_error,
+  int32 *num_retried,
+  double *tot_like,
+  int64 *frame_count,
+  BaseFloatVectorWriter *per_frame_acwt_writer) {
 
   if ((config.retry_beam != 0 && config.retry_beam <= config.beam) ||
       config.beam <= 0.0) {

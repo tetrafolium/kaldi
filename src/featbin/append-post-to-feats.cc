@@ -26,9 +26,9 @@
 namespace kaldi {
 
 void AppendPostToFeats(const Matrix<BaseFloat> &in,
-                       const Posterior &post,
-                       const int32 post_dim,
-                       Matrix<BaseFloat> *out) {
+    const Posterior &post,
+    const int32 post_dim,
+    Matrix<BaseFloat> *out) {
   // Check inputs,
   if (in.NumRows() != post.size()) {
     KALDI_WARN << "Mismatch of length!"
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
     if (post_dim == 0) {
       KALDI_ERR << "You have to set the dimensionality of posteriors "
-                   "with '--post-dim=D'";
+        "with '--post-dim=D'";
     }
 
     if (ClassifyRspecifier(po.GetArg(1), NULL, NULL)

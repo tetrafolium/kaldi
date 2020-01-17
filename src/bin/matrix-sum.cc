@@ -28,8 +28,8 @@ namespace kaldi {
 // for back-compatibility with an older form, we support scaling
 // of the first two input archives.
 int32 TypeOneUsage(const ParseOptions &po,
-                   BaseFloat scale1,
-                   BaseFloat scale2) {
+    BaseFloat scale1,
+    BaseFloat scale2) {
   int32 num_args = po.NumArgs();
   std::string matrix_in_fn1 = po.GetArg(1),
       matrix_out_fn = po.GetArg(num_args);
@@ -40,17 +40,17 @@ int32 TypeOneUsage(const ParseOptions &po,
   // Input matrices
   SequentialBaseFloatMatrixReader matrix_reader1(matrix_in_fn1);
   std::vector<RandomAccessBaseFloatMatrixReader*>
-      matrix_readers(num_args-2, 
-                     static_cast<RandomAccessBaseFloatMatrixReader*>(NULL));
+  matrix_readers(num_args-2,
+      static_cast<RandomAccessBaseFloatMatrixReader*>(NULL));
   std::vector<std::string> matrix_in_fns(num_args-2);
   for (int32 i = 2; i < num_args; ++i) {
     matrix_readers[i-2] = new RandomAccessBaseFloatMatrixReader(po.GetArg(i));
     matrix_in_fns[i-2] = po.GetArg(i);
   }
 
-  int32 n_utts = 0, n_total_matrices = 0, 
+  int32 n_utts = 0, n_total_matrices = 0,
       n_success = 0, n_missing = 0, n_other_errors = 0;
-  
+
   for (; !matrix_reader1.Done(); matrix_reader1.Next()) {
     std::string key = matrix_reader1.Key();
     Matrix<BaseFloat> matrix1 = matrix_reader1.Value();
@@ -59,7 +59,7 @@ int32 TypeOneUsage(const ParseOptions &po,
     n_total_matrices++;
 
     matrix1.Scale(scale1);
-    
+
     Matrix<BaseFloat> matrix_out(matrix1);
 
     for (int32 i = 0; i < num_args-2; ++i) {
@@ -71,7 +71,7 @@ int32 TypeOneUsage(const ParseOptions &po,
           // note: i == 0 corresponds to the 2nd input archive.
           matrix_out.AddMat(scale, matrix2, kNoTrans);
         } else {
-          KALDI_WARN << "Dimension mismatch for utterance " << key 
+          KALDI_WARN << "Dimension mismatch for utterance " << key
                      << " : " << matrix2.NumRows() << " by "
                      << matrix2.NumCols() << " for "
                      << "system " << (i + 2) << ", rspecifier: "
@@ -97,26 +97,26 @@ int32 TypeOneUsage(const ParseOptions &po,
             << " different systems";
   KALDI_LOG << "Produced output for " << n_success << " utterances; "
             << n_missing << " total missing matrices";
-  
+
   DeletePointers(&matrix_readers);
-  
+
   return (n_success != 0 && n_missing < (n_success - n_missing)) ? 0 : 1;
 }
 
 int32 TypeTwoUsage(const ParseOptions &po,
-                   bool binary) {
+    bool binary) {
   KALDI_ASSERT(po.NumArgs() == 2);
   KALDI_ASSERT(ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier &&
                "matrix-sum: first argument must be an rspecifier");
   // if next assert fails it would be bug in the code as otherwise we shouldn't
   // be called.
-  KALDI_ASSERT(ClassifyWspecifier(po.GetArg(2), NULL, NULL, NULL) == 
+  KALDI_ASSERT(ClassifyWspecifier(po.GetArg(2), NULL, NULL, NULL) ==
                kNoWspecifier);
 
   SequentialBaseFloatMatrixReader mat_reader(po.GetArg(1));
 
   Matrix<double> sum;
-  
+
   int32 num_done = 0, num_err = 0;
 
   for (; !mat_reader.Done(); mat_reader.Next()) {
@@ -151,7 +151,7 @@ int32 TypeTwoUsage(const ParseOptions &po,
 // sum a bunch of single files to produce a single file [including
 // extended filenames, of course]
 int32 TypeThreeUsage(const ParseOptions &po,
-                     bool binary) {
+    bool binary) {
   KALDI_ASSERT(po.NumArgs() >= 2);
   for (int32 i = 1; i < po.NumArgs(); i++) {
     if (ClassifyRspecifier(po.GetArg(i), NULL, NULL) != kNoRspecifier) {
@@ -159,7 +159,7 @@ int32 TypeThreeUsage(const ParseOptions &po,
                 << "tables, the intermediate arguments must not be tables.";
     }
   }
-  if (ClassifyWspecifier(po.GetArg(po.NumArgs()), NULL, NULL, NULL) != 
+  if (ClassifyWspecifier(po.GetArg(po.NumArgs()), NULL, NULL, NULL) !=
       kNoWspecifier) {
     KALDI_ERR << "Wrong usage (type 3): if first and last arguments are not "
               << "tables, the intermediate arguments must not be tables.";
@@ -218,29 +218,29 @@ int main(int argc, char *argv[]) {
                 "(only for type one usage)");
     po.Register("binary", &binary, "If true, write output as binary (only "
                 "relevant for usage types two or three");
-    
+
     po.Read(argc, argv);
-    
+
     int32 N = po.NumArgs(), exit_status;
-    
+
     if (po.NumArgs() >= 2 &&
         ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) != kNoWspecifier) {
       // output to table.
       exit_status = TypeOneUsage(po, scale1, scale2);
     } else if (po.NumArgs() == 2 &&
-               ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier &&
-               ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) ==
-               kNoWspecifier) {
+        ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier &&
+        ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) ==
+        kNoWspecifier) {
       KALDI_ASSERT(scale1 == 1.0 && scale2 == 1.0);
       // input from a single table, output not to table.
       exit_status = TypeTwoUsage(po, binary);
     } else if (po.NumArgs() >= 2 &&
-               ClassifyRspecifier(po.GetArg(1), NULL, NULL) == kNoRspecifier &&
-               ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) == kNoWspecifier) {
+        ClassifyRspecifier(po.GetArg(1), NULL, NULL) == kNoRspecifier &&
+        ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) == kNoWspecifier) {
       KALDI_ASSERT(scale1 == 1.0 && scale2 == 1.0);
       // summing flat files.
       exit_status = TypeThreeUsage(po, binary);
-    } else {      
+    } else {
       po.PrintUsage();
       exit(1);
     }

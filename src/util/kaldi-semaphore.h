@@ -28,7 +28,7 @@
 namespace kaldi {
 
 class Semaphore {
- public:
+public:
   Semaphore(int32 count = 0);
 
   ~Semaphore();
@@ -37,7 +37,7 @@ class Semaphore {
   void Wait();     ///< decrease the counter
   void Signal();   ///< increase the counter
 
- private:
+private:
   int32 count_;    ///< the semaphore counter, 0 means block on Wait()
 
   std::mutex mutex_;

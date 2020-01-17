@@ -31,8 +31,8 @@ namespace kaldi {
 // form 'name=rspecifier', on the first equals sign.  Will
 // call KALDI_ERR if something seems wrong.
 void SplitArgOnEquals(const std::string &arg,
-                      std::string *name,
-                      std::string *rspecifier) {
+    std::string *name,
+    std::string *rspecifier) {
   size_t pos = arg.find_first_of('=');
   if (pos == std::string::npos) {
     KALDI_ERR << "Bad command line argument (expecting '='): "
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     }
     if (num_err > 0)
       KALDI_WARN << num_err << " utterances had errors and could "
-          "not be processed.";
+        "not be processed.";
     return (num_done > 0 ? 0 : 1);
   } catch(const std::exception &e) {
     std::cerr << e.what() << '\n';

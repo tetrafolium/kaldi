@@ -32,9 +32,9 @@ int main(int argc, char *argv[]) {
   using namespace kaldi::nnet1;
   try {
     const char *usage =
-      "Perform forward pass through Neural Network.\n"
-      "Usage: nnet-forward [options] <nnet1-in> <feature-rspecifier> <feature-wspecifier>\n"
-      "e.g.: nnet-forward final.nnet ark:input.ark ark:output.ark\n";
+        "Perform forward pass through Neural Network.\n"
+        "Usage: nnet-forward [options] <nnet1-in> <feature-rspecifier> <feature-wspecifier>\n"
+        "e.g.: nnet-forward final.nnet ark:input.ark ark:output.ark\n";
 
     ParseOptions po(usage);
 
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
         nnet.RemoveLastComponent();
       } else {
         KALDI_WARN << "Last component 'NOT-REMOVED' by --no-softmax=true, "
-          << "the component was " << Component::TypeToMarker(last_comp_type);
+                   << "the component was " << Component::TypeToMarker(last_comp_type);
       }
     }
 

@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
     // The following quantities will be needed if we're doing
     // an affine transform (i.e. linear plus an offset)
     SubMatrix<BaseFloat> linear_term(transform,
-                                     0, transform.NumRows(),
-                                     0, transform.NumCols() - 1);
+        0, transform.NumRows(),
+        0, transform.NumCols() - 1);
     Vector<BaseFloat> constant_term(transform.NumRows());
     constant_term.CopyColFromMat(transform, transform.NumCols() - 1);
 

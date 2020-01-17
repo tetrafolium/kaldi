@@ -30,15 +30,15 @@
 namespace kaldi {
 
 bool DeterminizeLatticeWrapper(const Lattice &lat,
-                               const std::string &key,
-                               bool prune,
-                               BaseFloat beam,
-                               BaseFloat beam_ratio,
-                               int32 max_mem,
-                               int32 max_loop,
-                               BaseFloat delta,
-                               int32 num_loops,
-                               CompactLattice *clat) {
+    const std::string &key,
+    bool prune,
+    BaseFloat beam,
+    BaseFloat beam_ratio,
+    int32 max_mem,
+    int32 max_loop,
+    BaseFloat delta,
+    int32 num_loops,
+    CompactLattice *clat) {
   fst::DeterminizeLatticeOptions lat_opts;
   lat_opts.max_mem = max_mem;
   lat_opts.max_loop = max_loop;
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
 
     // depth stats (for diagnostics).
     double sum_depth_in = 0.0,
-          sum_depth_out = 0.0, sum_t = 0.0;
+        sum_depth_out = 0.0, sum_t = 0.0;
 
     if (acoustic_scale == 0.0)
       KALDI_ERR << "Do not use a zero acoustic scale (cannot be inverted)";

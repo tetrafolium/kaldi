@@ -47,7 +47,7 @@ void TakeLogOfPitch(Matrix<BaseFloat> *mat) {
 // Subtract the moving average over a largish window
 // (e.g. 151 frames)
 void SubtractMovingAverage(int32 normalization_window_size,
-                           Matrix<BaseFloat> *mat) {
+    Matrix<BaseFloat> *mat) {
   int32 num_frames = mat->NumRows();
   Vector<BaseFloat> temp_pitch(num_frames);
   Matrix<BaseFloat> &features = *mat;
@@ -58,38 +58,38 @@ void SubtractMovingAverage(int32 normalization_window_size,
   // Moving Window Normalization
   BaseFloat mean = 0.0;
   int32 mid_win = (normalization_window_size - 1) / 2;
-  for (i = 0; (i < num_frames) && (i < normalization_window_size); i++) { 
+  for (i = 0; (i < num_frames) && (i < normalization_window_size); i++) {
     mean += features(i, 1);
   }
   mean /= i;
 
   if (num_frames <= normalization_window_size) {
-    for (i = 0; i < num_frames; i++) { 
+    for (i = 0; i < num_frames; i++) {
       features(i, 1) -= mean;
     }
   } else {
-    for (i = 0; i <= mid_win; i++) { 
+    for (i = 0; i <= mid_win; i++) {
       features(i, 1) -= mean;
-    } 
+    }
     for (i = (mid_win + 1); i < num_frames; i++) {
       if (i + (mid_win + 1) < num_frames)
-        mean -= (temp_pitch(i - (mid_win + 1)) - 
-                 temp_pitch(i + (mid_win + 1))) / normalization_window_size; 
+        mean -= (temp_pitch(i - (mid_win + 1)) -
+            temp_pitch(i + (mid_win + 1))) / normalization_window_size;
       features(i,1) -= mean;
-    }    
+    }
   }
 }
 
 // Set to the moving average over a small window, e.g. 5 frames.
 void SetToMovingAverage(int32 average_window_size,
-                        Matrix<BaseFloat> *mat) {
+    Matrix<BaseFloat> *mat) {
   int32 num_frames = mat->NumRows();
   Matrix<BaseFloat> &features = *mat;
   Vector<BaseFloat> temp_pitch(num_frames);
   int32 width = (average_window_size - 1) / 2, i;
   // e.g. if average_window_size is 5, width will equal 2.
-        
-  for (i = width; i < num_frames - width ; i++) {
+
+  for (i = width; i < num_frames - width; i++) {
     temp_pitch(i) = features(i, 1);
     for(int j = 1; j <= width; ++j) {
       temp_pitch(i) += (features(i - j, 1) + features(i + j, 1));
@@ -111,13 +111,13 @@ int main(int argc, char *argv[]) {
         "to put into a speech recognizer.  First use interpolate-feats\n"
         "Usage:  process-pitch-feats [options...] <feats-rspecifier> <feats-wspecifier>\n";
 
-    
+
     // construct all the global objects
     ParseOptions po(usage);
 
     int32 normalization_window_size = 151; // should be odd number
     int32 average_window_size = 5;
-    
+
     // Register the options
     po.Register("normalization-window-size",
                 &normalization_window_size, "Size of window used for "
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
     po.Register("average-window-size",
                 &average_window_size,
                 "Size of moving average window (must be odd).");
-    
+
     // parse options (+filling the registered variables)
     po.Read(argc, argv);
 
@@ -133,12 +133,12 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     KALDI_ASSERT(average_window_size > 0 && average_window_size % 2 == 1 &&
                  "--average-window-size option must be an odd positive number.");
     KALDI_ASSERT(normalization_window_size > 0 && normalization_window_size % 2 == 1 &&
                  "--normalization-window-size option must be an odd positive number.");
-    
+
     std::string input_rspecifier = po.GetArg(1);
     std::string output_wspecifier = po.GetArg(2);
 
@@ -146,13 +146,13 @@ int main(int argc, char *argv[]) {
     BaseFloatMatrixWriter kaldi_writer;  // typedef to TableWriter<something>.
 
     if (!kaldi_writer.Open(output_wspecifier))
-       KALDI_ERR << "Could not initialize output with wspecifier "
+      KALDI_ERR << "Could not initialize output with wspecifier "
                 << output_wspecifier;
 
     int32 num_done = 0, num_err = 0;
 
     for (; !reader.Done(); reader.Next()) {
-      std::string utt = reader.Key();   
+      std::string utt = reader.Key();
       Matrix<BaseFloat> features = reader.Value();
       int num_frames = features.NumRows();
 
@@ -162,14 +162,14 @@ int main(int argc, char *argv[]) {
         num_err++;
         continue;
       }
-      
+
       ProcessPovFeatures(&features);
       TakeLogOfPitch(&features);
       SubtractMovingAverage(normalization_window_size, &features);
       SetToMovingAverage(average_window_size, &features);
       kaldi_writer.Write(utt, features);
       num_done++;
-        
+
       if (num_done % 10 == 0)
         KALDI_LOG << "Processed " << num_done << " utterances";
       KALDI_VLOG(2) << "Processed features for key " << utt;

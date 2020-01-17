@@ -34,75 +34,75 @@ namespace kaldi {
 /// @{
 
 typedef TableWriter<KaldiObjectHolder<Matrix<BaseFloat> > >
-                    BaseFloatMatrixWriter;
+    BaseFloatMatrixWriter;
 typedef SequentialTableReader<KaldiObjectHolder<Matrix<BaseFloat> > >
-                             SequentialBaseFloatMatrixReader;
+    SequentialBaseFloatMatrixReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<Matrix<BaseFloat> > >
-                                RandomAccessBaseFloatMatrixReader;
+    RandomAccessBaseFloatMatrixReader;
 typedef RandomAccessTableReaderMapped<KaldiObjectHolder<Matrix<BaseFloat> > >
-                                      RandomAccessBaseFloatMatrixReaderMapped;
+    RandomAccessBaseFloatMatrixReaderMapped;
 
 typedef TableWriter<KaldiObjectHolder<Matrix<double> > >
-                                      DoubleMatrixWriter;
+    DoubleMatrixWriter;
 typedef SequentialTableReader<KaldiObjectHolder<Matrix<double> > >
-                              SequentialDoubleMatrixReader;
+    SequentialDoubleMatrixReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<Matrix<double> > >
-                                RandomAccessDoubleMatrixReader;
+    RandomAccessDoubleMatrixReader;
 typedef RandomAccessTableReaderMapped<KaldiObjectHolder<Matrix<double> > >
-                                      RandomAccessDoubleMatrixReaderMapped;
+    RandomAccessDoubleMatrixReaderMapped;
 
 typedef TableWriter<KaldiObjectHolder<CompressedMatrix> >
-                                      CompressedMatrixWriter;
+    CompressedMatrixWriter;
 
 typedef TableWriter<KaldiObjectHolder<Vector<BaseFloat> > >
-                                      BaseFloatVectorWriter;
+    BaseFloatVectorWriter;
 typedef SequentialTableReader<KaldiObjectHolder<Vector<BaseFloat> > >
-                              SequentialBaseFloatVectorReader;
+    SequentialBaseFloatVectorReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<Vector<BaseFloat> > >
-                                RandomAccessBaseFloatVectorReader;
+    RandomAccessBaseFloatVectorReader;
 typedef RandomAccessTableReaderMapped<KaldiObjectHolder<Vector<BaseFloat> > >
-                                      RandomAccessBaseFloatVectorReaderMapped;
+    RandomAccessBaseFloatVectorReaderMapped;
 
 typedef TableWriter<KaldiObjectHolder<Vector<double> > >
-                                      DoubleVectorWriter;
+    DoubleVectorWriter;
 typedef SequentialTableReader<KaldiObjectHolder<Vector<double> > >
-                              SequentialDoubleVectorReader;
+    SequentialDoubleVectorReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<Vector<double> > >
-                                RandomAccessDoubleVectorReader;
+    RandomAccessDoubleVectorReader;
 
 typedef TableWriter<KaldiObjectHolder<CuMatrix<BaseFloat> > >
-                                      BaseFloatCuMatrixWriter;
+    BaseFloatCuMatrixWriter;
 typedef SequentialTableReader<KaldiObjectHolder<CuMatrix<BaseFloat> > >
-                              SequentialBaseFloatCuMatrixReader;
+    SequentialBaseFloatCuMatrixReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<CuMatrix<BaseFloat> > >
-                                RandomAccessBaseFloatCuMatrixReader;
+    RandomAccessBaseFloatCuMatrixReader;
 typedef RandomAccessTableReaderMapped<KaldiObjectHolder<CuMatrix<BaseFloat> > >
-                                      RandomAccessBaseFloatCuMatrixReaderMapped;
+    RandomAccessBaseFloatCuMatrixReaderMapped;
 
 typedef TableWriter<KaldiObjectHolder<CuMatrix<double> > >
-                                      DoubleCuMatrixWriter;
+    DoubleCuMatrixWriter;
 typedef SequentialTableReader<KaldiObjectHolder<CuMatrix<double> > >
-                              SequentialDoubleCuMatrixReader;
+    SequentialDoubleCuMatrixReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<CuMatrix<double> > >
-                                RandomAccessDoubleCuMatrixReader;
+    RandomAccessDoubleCuMatrixReader;
 typedef RandomAccessTableReaderMapped<KaldiObjectHolder<CuMatrix<double> > >
-                                      RandomAccessDoubleCuMatrixReaderMapped;
+    RandomAccessDoubleCuMatrixReaderMapped;
 
 typedef TableWriter<KaldiObjectHolder<CuVector<BaseFloat> > >
-                    BaseFloatCuVectorWriter;
+    BaseFloatCuVectorWriter;
 typedef SequentialTableReader<KaldiObjectHolder<CuVector<BaseFloat> > >
-                              SequentialBaseFloatCuVectorReader;
+    SequentialBaseFloatCuVectorReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<CuVector<BaseFloat> > >
-                                RandomAccessBaseFloatCuVectorReader;
+    RandomAccessBaseFloatCuVectorReader;
 typedef RandomAccessTableReaderMapped<KaldiObjectHolder<CuVector<BaseFloat> > >
-                                      RandomAccessBaseFloatCuVectorReaderMapped;
+    RandomAccessBaseFloatCuVectorReaderMapped;
 
 typedef TableWriter<KaldiObjectHolder<CuVector<double> > >
-                    DoubleCuVectorWriter;
+    DoubleCuVectorWriter;
 typedef SequentialTableReader<KaldiObjectHolder<CuVector<double> > >
-                              SequentialDoubleCuVectorReader;
+    SequentialDoubleCuVectorReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<CuVector<double> > >
-                                RandomAccessDoubleCuVectorReader;
+    RandomAccessDoubleCuVectorReader;
 
 
 typedef TableWriter<BasicHolder<int32> >  Int32Writer;
@@ -111,36 +111,36 @@ typedef RandomAccessTableReader<BasicHolder<int32> >  RandomAccessInt32Reader;
 
 typedef TableWriter<BasicVectorHolder<int32> >  Int32VectorWriter;
 typedef SequentialTableReader<BasicVectorHolder<int32> >
-                              SequentialInt32VectorReader;
+    SequentialInt32VectorReader;
 typedef RandomAccessTableReader<BasicVectorHolder<int32> >
-                                RandomAccessInt32VectorReader;
+    RandomAccessInt32VectorReader;
 
 typedef TableWriter<BasicVectorVectorHolder<int32> >  Int32VectorVectorWriter;
 typedef SequentialTableReader<BasicVectorVectorHolder<int32> >
-                              SequentialInt32VectorVectorReader;
+    SequentialInt32VectorVectorReader;
 typedef RandomAccessTableReader<BasicVectorVectorHolder<int32> >
-                                RandomAccessInt32VectorVectorReader;
+    RandomAccessInt32VectorVectorReader;
 
 typedef TableWriter<BasicPairVectorHolder<int32> >  Int32PairVectorWriter;
 typedef SequentialTableReader<BasicPairVectorHolder<int32> >
-                              SequentialInt32PairVectorReader;
+    SequentialInt32PairVectorReader;
 typedef RandomAccessTableReader<BasicPairVectorHolder<int32> >
-                                RandomAccessInt32PairVectorReader;
+    RandomAccessInt32PairVectorReader;
 
 typedef TableWriter<BasicPairVectorHolder<BaseFloat> >
-                    BaseFloatPairVectorWriter;
+    BaseFloatPairVectorWriter;
 typedef SequentialTableReader<BasicPairVectorHolder<BaseFloat> >
-                              SequentialBaseFloatPairVectorReader;
+    SequentialBaseFloatPairVectorReader;
 typedef RandomAccessTableReader<BasicPairVectorHolder<BaseFloat> >
-                                RandomAccessBaseFloatPairVectorReader;
+    RandomAccessBaseFloatPairVectorReader;
 
 typedef TableWriter<BasicHolder<BaseFloat> >  BaseFloatWriter;
 typedef SequentialTableReader<BasicHolder<BaseFloat> >
-                              SequentialBaseFloatReader;
+    SequentialBaseFloatReader;
 typedef RandomAccessTableReader<BasicHolder<BaseFloat> >
-                                RandomAccessBaseFloatReader;
+    RandomAccessBaseFloatReader;
 typedef RandomAccessTableReaderMapped<BasicHolder<BaseFloat> >
-                                      RandomAccessBaseFloatReaderMapped;
+    RandomAccessBaseFloatReaderMapped;
 
 typedef TableWriter<BasicHolder<double> >  DoubleWriter;
 typedef SequentialTableReader<BasicHolder<double> >  SequentialDoubleReader;
@@ -166,17 +166,17 @@ typedef TableWriter<TokenVectorHolder> TokenVectorWriter;
 // Ditto for SequentialTokenVectorReader.
 typedef SequentialTableReader<TokenVectorHolder> SequentialTokenVectorReader;
 typedef RandomAccessTableReader<TokenVectorHolder>
-                                RandomAccessTokenVectorReader;
+    RandomAccessTokenVectorReader;
 
 
 typedef TableWriter<KaldiObjectHolder<GeneralMatrix> >
-                                      GeneralMatrixWriter;
+    GeneralMatrixWriter;
 typedef SequentialTableReader<KaldiObjectHolder<GeneralMatrix> >
-                              SequentialGeneralMatrixReader;
+    SequentialGeneralMatrixReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<GeneralMatrix> >
-                                RandomAccessGeneralMatrixReader;
+    RandomAccessGeneralMatrixReader;
 typedef RandomAccessTableReaderMapped<KaldiObjectHolder<GeneralMatrix> >
-                                      RandomAccessGeneralMatrixReaderMapped;
+    RandomAccessGeneralMatrixReaderMapped;
 
 
 

@@ -29,10 +29,10 @@ int main(int argc, char *argv[]) {
     typedef kaldi::int32 int32;
 
     const char *usage =
-      "Copy Neural Network model (and possibly change binary/text format)\n"
-      "Usage:  nnet-copy [options] <model-in> <model-out>\n"
-      "e.g.:\n"
-      " nnet-copy --binary=false nnet.mdl nnet_txt.mdl\n";
+        "Copy Neural Network model (and possibly change binary/text format)\n"
+        "Usage:  nnet-copy [options] <model-in> <model-out>\n"
+        "e.g.:\n"
+        " nnet-copy --binary=false nnet.mdl nnet_txt.mdl\n";
 
     bool binary_write = true;
     int32 remove_first_components = 0;
@@ -88,17 +88,17 @@ int main(int argc, char *argv[]) {
       // parse the argument,
       int32 component_id = -1, nested_id = 0;
       switch (component_id_nested_id.size()) {
-        case 1:
-          nested_id = component_id_nested_id[0];
-          break;
-        case 2:
-          component_id = component_id_nested_id[0];
-          nested_id = component_id_nested_id[1];
-          break;
-        default:
-          KALDI_ERR << "Check the csl '--from-parallel-component='"
-                    << from_parallel_component
-                    << " There must be 1 or 2 elements.";
+      case 1:
+        nested_id = component_id_nested_id[0];
+        break;
+      case 2:
+        component_id = component_id_nested_id[0];
+        nested_id = component_id_nested_id[1];
+        break;
+      default:
+        KALDI_ERR << "Check the csl '--from-parallel-component='"
+                  << from_parallel_component
+                  << " There must be 1 or 2 elements.";
       }
       // search for first <ParallelComponent> (we don't know component_id yet),
       if (component_id == -1) {
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
       KALDI_ASSERT(nnet.GetComponent(component_id-1).GetType() ==
                    Component::kParallelComponent);
       ParallelComponent& parallel_comp =
-        dynamic_cast<ParallelComponent&>(nnet.GetComponent(component_id-1));
+          dynamic_cast<ParallelComponent&>(nnet.GetComponent(component_id-1));
       nnet = parallel_comp.GetNestedNnet(nested_id-1);  // replace!
     }
 

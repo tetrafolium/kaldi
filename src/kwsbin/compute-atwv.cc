@@ -104,30 +104,30 @@ int main(int argc, char *argv[]) {
         ali_output = po.GetOptArg(4);
 
     kaldi::SequentialTableReader< kaldi::BasicVectorHolder<double> >
-        ref_reader(ref_rspecifier);
+    ref_reader(ref_rspecifier);
 
     for (; !ref_reader.Done(); ref_reader.Next()) {
       std::string kwid = ref_reader.Key();
       std::vector<double> vals = ref_reader.Value();
       if (vals.size() != 4) {
         KALDI_ERR << "Incorrect format of the reference file"
-          << " -- 4 entries expected, " << vals.size() << " given!\n"
-          << "Key: " << kwid << std::endl;
+                  << " -- 4 entries expected, " << vals.size() << " given!\n"
+                  << "Key: " << kwid << std::endl;
       }
       KwsTerm inst(kwid, vals);
       aligner.AddRef(inst);
     }
 
     kaldi::SequentialTableReader< kaldi::BasicVectorHolder<double> >
-        hyp_reader(hyp_rspecifier);
+    hyp_reader(hyp_rspecifier);
 
     for (; !hyp_reader.Done(); hyp_reader.Next()) {
       std::string kwid = hyp_reader.Key();
       std::vector<double> vals = hyp_reader.Value();
       if (vals.size() != 4) {
         KALDI_ERR << "Incorrect format of the hypotheses file"
-          << " -- 4 entries expected, " << vals.size() << " given!\n"
-          << "Key: " << kwid << std::endl;
+                  << " -- 4 entries expected, " << vals.size() << " given!\n"
+                  << "Key: " << kwid << std::endl;
       }
       KwsTerm inst(kwid, vals);
       aligner.AddHyp(inst);
@@ -148,24 +148,24 @@ int main(int argc, char *argv[]) {
     scores.AddAlignment(ali);
 
     std::cout << "aproximate ATWV = "
-      << std::fixed << std::setprecision(4)
-      << scores.Atwv() << std::endl;
+              << std::fixed << std::setprecision(4)
+              << scores.Atwv() << std::endl;
     std::cout << "aproximate STWV = "
-      << std::fixed << std::setprecision(4)
-      << scores.Stwv() << std::endl;
+              << std::fixed << std::setprecision(4)
+              << scores.Stwv() << std::endl;
 
     float mtwv, mtwv_threshold, otwv;
     scores.GetOracleMeasures(&mtwv, &mtwv_threshold, &otwv);
 
     std::cout << "aproximate MTWV = "
-      << std::fixed << std::setprecision(4)
-      << mtwv << std::endl;
+              << std::fixed << std::setprecision(4)
+              << mtwv << std::endl;
     std::cout << "aproximate MTWV threshold = "
-      << std::fixed << std::setprecision(4)
-      << mtwv_threshold << std::endl;
+              << std::fixed << std::setprecision(4)
+              << mtwv_threshold << std::endl;
     std::cout << "aproximate OTWV = "
-      << std::fixed << std::setprecision(4)
-      << otwv << std::endl;
+              << std::fixed << std::setprecision(4)
+              << otwv << std::endl;
   } catch(const std::exception &e) {
     std::cerr << e.what();
     return -1;

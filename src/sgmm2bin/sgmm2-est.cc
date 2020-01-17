@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
         StringToSgmmUpdateFlags(update_flags_str);
     kaldi::SgmmWriteFlagsType write_flags =
         StringToSgmmWriteFlags(write_flags_str);
-    
+
     AmSgmm2 am_sgmm;
     TransitionModel trans_model;
     {
@@ -147,14 +147,14 @@ int main(int argc, char *argv[]) {
 
     am_sgmm.ComputeDerivedVars(); // recompute normalizers, and possibly
     // weights.
-    
+
     {
       Output ko(model_out_filename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);
       am_sgmm.Write(ko.Stream(), binary_write, write_flags);
     }
-    
-    
+
+
     KALDI_LOG << "Written model to " << model_out_filename;
     return 0;
   } catch(const std::exception &e) {

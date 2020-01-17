@@ -36,12 +36,12 @@ struct FasterDecoderOptions {
   int32 min_active;
   BaseFloat beam_delta;
   BaseFloat hash_ratio;
-  FasterDecoderOptions(): beam(16.0),
-                          max_active(std::numeric_limits<int32>::max()),
-                          min_active(20), // This decoder mostly used for
+  FasterDecoderOptions() : beam(16.0),
+    max_active(std::numeric_limits<int32>::max()),
+    min_active(20),                       // This decoder mostly used for
                                           // alignment, use small default.
-                          beam_delta(0.5),
-                          hash_ratio(2.0) { }
+    beam_delta(0.5),
+    hash_ratio(2.0) { }
   void Register(OptionsItf *opts, bool full) {  /// if "full", use obscure
     /// options too.
     /// Depends on program.
@@ -60,14 +60,14 @@ struct FasterDecoderOptions {
 };
 
 class FasterDecoder {
- public:
+public:
   typedef fst::StdArc Arc;
   typedef Arc::Label Label;
   typedef Arc::StateId StateId;
   typedef Arc::Weight Weight;
 
   FasterDecoder(const fst::Fst<fst::StdArc> &fst,
-                const FasterDecoderOptions &config);
+      const FasterDecoderOptions &config);
 
   void SetOptions(const FasterDecoderOptions &config) { config_ = config; }
 
@@ -85,7 +85,7 @@ class FasterDecoder {
   /// FST (will only return false in unusual circumstances where
   /// no tokens survived).
   bool GetBestPath(fst::MutableFst<LatticeArc> *fst_out,
-                   bool use_final_probs = true);
+      bool use_final_probs = true);
 
   /// As a new alternative to Decode(), you can call InitDecoding
   /// and then (possibly multiple times) AdvanceDecoding().
@@ -96,15 +96,15 @@ class FasterDecoder {
   /// object, but if max_num_frames is >= 0 it will decode no more than
   /// that many frames.
   void AdvanceDecoding(DecodableInterface *decodable,
-                       int32 max_num_frames = -1);
+      int32 max_num_frames = -1);
 
   /// Returns the number of frames already decoded.
   int32 NumFramesDecoded() const { return num_frames_decoded_; }
 
- protected:
+protected:
 
   class Token {
-   public:
+public:
     Arc arc_; // contains only the graph part of the cost;
     // we can work out the acoustic part from difference between
     // "cost_" and prev->cost_.
@@ -113,8 +113,8 @@ class FasterDecoder {
     // if you are looking for weight_ here, it was removed and now we just have
     // cost_, which corresponds to ConvertToCost(weight_).
     double cost_;
-    inline Token(const Arc &arc, BaseFloat ac_cost, Token *prev):
-        arc_(arc), prev_(prev), ref_count_(1) {
+    inline Token(const Arc &arc, BaseFloat ac_cost, Token *prev) :
+      arc_(arc), prev_(prev), ref_count_(1) {
       if (prev) {
         prev->ref_count_++;
         cost_ = prev->cost_ + arc.weight.Value() + ac_cost;
@@ -122,8 +122,8 @@ class FasterDecoder {
         cost_ = arc.weight.Value() + ac_cost;
       }
     }
-    inline Token(const Arc &arc, Token *prev):
-        arc_(arc), prev_(prev), ref_count_(1) {
+    inline Token(const Arc &arc, Token *prev) :
+      arc_(arc), prev_(prev), ref_count_(1) {
       if (prev) {
         prev->ref_count_++;
         cost_ = prev->cost_ + arc.weight.Value();
@@ -152,7 +152,7 @@ class FasterDecoder {
 
   /// Gets the weight cutoff.  Also counts the active tokens.
   double GetCutoff(Elem *list_head, size_t *tok_count,
-                   BaseFloat *adaptive_beam, Elem **best_elem);
+      BaseFloat *adaptive_beam, Elem **best_elem);
 
   void PossiblyResizeHash(size_t num_toks);
 

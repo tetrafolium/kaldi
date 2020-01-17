@@ -55,31 +55,31 @@ void DiagGmmNormal::CopyFromDiagGmm(const DiagGmm &diaggmm) {
 }
 
 void DiagGmmNormal::CopyToDiagGmm(DiagGmm *diaggmm, GmmFlagsType flags) const {
-    KALDI_ASSERT((static_cast<int32>(diaggmm->Dim()) == means_.NumCols())
-                 && (static_cast<int32>(diaggmm->weights_.Dim()) == weights_.Dim()));
-    
-    DiagGmmNormal oldg(*diaggmm);
+  KALDI_ASSERT((static_cast<int32>(diaggmm->Dim()) == means_.NumCols())
+      && (static_cast<int32>(diaggmm->weights_.Dim()) == weights_.Dim()));
 
-    if (flags & kGmmWeights)
-      diaggmm->weights_.CopyFromVec(weights_);
+  DiagGmmNormal oldg(*diaggmm);
 
-    if (flags & kGmmVariances) {
-      diaggmm->inv_vars_.CopyFromMat(vars_);
-      diaggmm->inv_vars_.InvertElements();
+  if (flags & kGmmWeights)
+    diaggmm->weights_.CopyFromVec(weights_);
 
-      // update the mean related natural part with the old mean, if necessary
-      if (!(flags & kGmmMeans)) {
-        diaggmm->means_invvars_.CopyFromMat(oldg.means_);
-        diaggmm->means_invvars_.MulElements(diaggmm->inv_vars_);
-      }
-    }
+  if (flags & kGmmVariances) {
+    diaggmm->inv_vars_.CopyFromMat(vars_);
+    diaggmm->inv_vars_.InvertElements();
 
-    if (flags & kGmmMeans) {
-      diaggmm->means_invvars_.CopyFromMat(means_);
+    // update the mean related natural part with the old mean, if necessary
+    if (!(flags & kGmmMeans)) {
+      diaggmm->means_invvars_.CopyFromMat(oldg.means_);
       diaggmm->means_invvars_.MulElements(diaggmm->inv_vars_);
     }
+  }
 
-    diaggmm->valid_gconsts_ = false;
+  if (flags & kGmmMeans) {
+    diaggmm->means_invvars_.CopyFromMat(means_);
+    diaggmm->means_invvars_.MulElements(diaggmm->inv_vars_);
+  }
+
+  diaggmm->valid_gconsts_ = false;
 }
 
 }  // End namespace kaldi

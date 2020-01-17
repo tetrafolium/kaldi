@@ -40,12 +40,12 @@ int main(int argc, char *argv[]) {
         "\n"
         "e.g.:\n"
         "nnet-train-parallel --num-threads=8 1.nnet ark:1.1.egs 2.nnet\n";
-    
+
     bool binary_write = true;
     bool zero_stats = true;
     int32 minibatch_size = 1024;
     int32 srand_seed = 0;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("zero-stats", &zero_stats, "If true, zero stats "
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
                 "implementation of BLAS, the actual number of threads may be larger.]");
     po.Register("minibatch-size", &minibatch_size, "Number of examples to use for "
                 "each minibatch during training.");
-    
+
     po.Read(argc, argv);
     srand(srand_seed);
 
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     std::string nnet_rxfilename = po.GetArg(1),
         examples_rspecifier = po.GetArg(2),
         nnet_wxfilename = po.GetArg(3);
@@ -85,20 +85,20 @@ int main(int argc, char *argv[]) {
 
     double num_examples = 0;
     SequentialNnetExampleReader example_reader(examples_rspecifier);
-    
+
 
     DoBackpropParallel(am_nnet.GetNnet(),
                        minibatch_size,
                        &example_reader,
                        &num_examples,
                        &(am_nnet.GetNnet()));
-    
+
     {
       Output ko(nnet_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);
       am_nnet.Write(ko.Stream(), binary_write);
     }
-    
+
     KALDI_LOG << "Finished training, processed " << num_examples
               << " training examples (weighted).  Wrote model to "
               << nnet_wxfilename;

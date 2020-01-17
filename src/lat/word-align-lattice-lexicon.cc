@@ -33,7 +33,7 @@ const int kNumStatesOffset = 1000; // relates to how we apply the
 // stops this blowing up for pathological cases or in case of a mismatch.
 
 class LatticeLexiconWordAligner {
- public:
+public:
   typedef CompactLatticeArc::StateId StateId;
   typedef CompactLatticeArc::Label Label;
   typedef WordAlignLatticeLexiconInfo::ViabilityMap ViabilityMap;
@@ -41,17 +41,17 @@ class LatticeLexiconWordAligner {
   typedef WordAlignLatticeLexiconInfo::NumPhonesMap NumPhonesMap;
 
   /*
-    The Freshness enum is applied to phone and word-sequences in the computation
-    state; it is related to the epsilon sequencing problem.  If a phone or word
-    is new (added by the latest transition), it is fresh.  We are only concerned
-    with the freshness of the left-most word (i.e. word index 0) in words_, and
-    the freshness of that can take only two values, kNotFresh or kFresh.  As
-    regards the phones_ variable, the difference between kFresh and kAllFresh
-    is: if we just appended a phone it's kFresh, but if we just shifted off a
-    phone or phones by outputting a nonempty word it's kAllFresh, meaning that
-    all sub-sequences of the phone sequence are new.  Note: if a phone or
-    word-sequence is empty the freshness of that sequence does not matter or is
-    not defined; we'll let it default to kNotFresh.
+     The Freshness enum is applied to phone and word-sequences in the computation
+     state; it is related to the epsilon sequencing problem.  If a phone or word
+     is new (added by the latest transition), it is fresh.  We are only concerned
+     with the freshness of the left-most word (i.e. word index 0) in words_, and
+     the freshness of that can take only two values, kNotFresh or kFresh.  As
+     regards the phones_ variable, the difference between kFresh and kAllFresh
+     is: if we just appended a phone it's kFresh, but if we just shifted off a
+     phone or phones by outputting a nonempty word it's kAllFresh, meaning that
+     all sub-sequences of the phone sequence are new.  Note: if a phone or
+     word-sequence is empty the freshness of that sequence does not matter or is
+     not defined; we'll let it default to kNotFresh.
    */
   typedef enum {
     kNotFresh,
@@ -63,7 +63,7 @@ class LatticeLexiconWordAligner {
     /// The state of the computation in which,
     /// along a single path in the lattice, we work out the word
     /// boundaries and output aligned arcs.
-   public:
+public:
 
     /// Advance the computation state by adding the symbols and weights from
     /// this arc.  Outputs weight to "leftover_weight" and sets the weight to
@@ -71,8 +71,8 @@ class LatticeLexiconWordAligner {
     /// previously did PhoneAlignLattice, we can assume this arc corresponds to
     /// exactly one or zero phones.
     void Advance(const CompactLatticeArc &arc,
-                 const TransitionModel &tmodel,
-                 LatticeWeight *leftover_weight);
+        const TransitionModel &tmodel,
+        LatticeWeight *leftover_weight);
 
     /// Returns true if, assuming we were to add one or more phones by calling
     /// Advance one or more times on this, we might be able later to
@@ -92,17 +92,17 @@ class LatticeLexiconWordAligner {
     /// phones without corresponding words; otherwise we'll use the
     /// word label that was there.
     void TakeForcedTransition(int32 partial_word_label,
-                              ComputationState *next_state,
-                              CompactLatticeArc *arc_out) const;
+        ComputationState *next_state,
+        CompactLatticeArc *arc_out) const;
 
     /// Take a transition, if possible; consume "num_phones" phones and (if
     /// word_id != 0) the word "word_id" which must be the first word in words_.
     /// Returns true if we could take the transition.
     bool TakeTransition(const LexiconMap &lexicon_map,
-                        int32 word_id,
-                        int32 num_phones,
-                        ComputationState *next_state,
-                        CompactLatticeArc *arc_out) const;
+        int32 word_id,
+        int32 num_phones,
+        ComputationState *next_state,
+        CompactLatticeArc *arc_out) const;
 
     bool IsEmpty() const { return (transition_ids_.empty() && words_.empty()); }
 
@@ -133,20 +133,20 @@ class LatticeLexiconWordAligner {
       // phones_ is determined by transition-id sequence so don't
       // need to compare it.
       return (transition_ids_ == other.transition_ids_ &&
-              words_ == other.words_ &&
-              weight_ == other.weight_ &&
-              phone_fresh_ == other.phone_fresh_ &&
-              word_fresh_ == other.word_fresh_);
+             words_ == other.words_ &&
+             weight_ == other.weight_ &&
+             phone_fresh_ == other.phone_fresh_ &&
+             word_fresh_ == other.word_fresh_);
     }
 
-    ComputationState(): phone_fresh_(kNotFresh), word_fresh_(kNotFresh),
-                        weight_(LatticeWeight::One()) { } // initial state.
+    ComputationState() : phone_fresh_(kNotFresh), word_fresh_(kNotFresh),
+      weight_(LatticeWeight::One()) { }                   // initial state.
 
-    ComputationState(const ComputationState &other):
-        phones_(other.phones_), words_(other.words_),
-        phone_fresh_(other.phone_fresh_), word_fresh_(other.word_fresh_),
-        transition_ids_(other.transition_ids_), weight_(other.weight_) { }
-   private:
+    ComputationState(const ComputationState &other) :
+      phones_(other.phones_), words_(other.words_),
+      phone_fresh_(other.phone_fresh_), word_fresh_(other.word_fresh_),
+      transition_ids_(other.transition_ids_), weight_(other.weight_) { }
+private:
     std::vector<int32> phones_; // sequence of pending phones
     std::vector<int32> words_; // sequence of pending words.
 
@@ -166,13 +166,13 @@ class LatticeLexiconWordAligner {
 
 
   static void AppendVectors(
-      std::vector<std::vector<int32> >::const_iterator input_begin,
-      std::vector<std::vector<int32> >::const_iterator input_end,
-      std::vector<int32> *output);
+    std::vector<std::vector<int32> >::const_iterator input_begin,
+    std::vector<std::vector<int32> >::const_iterator input_end,
+    std::vector<int32> *output);
 
   struct Tuple {
-    Tuple(StateId input_state, ComputationState comp_state):
-        input_state(input_state), comp_state(comp_state) {}
+    Tuple(StateId input_state, ComputationState comp_state) :
+      input_state(input_state), comp_state(comp_state) {}
     Tuple() {}
     StateId input_state;
     ComputationState comp_state;
@@ -188,7 +188,7 @@ class LatticeLexiconWordAligner {
     bool operator () (const Tuple &state1, const Tuple &state2) const {
       // treat this like operator ==
       return (state1.input_state == state2.input_state
-              && state1.comp_state == state2.comp_state);
+             && state1.comp_state == state2.comp_state);
     }
   };
 
@@ -209,8 +209,8 @@ class LatticeLexiconWordAligner {
 
   // This function may alter queue_, via GetStateForTuple.
   void ProcessTransition(StateId prev_output_state, // state-id of from-state in output lattice
-                         const Tuple &next_tuple,
-                         CompactLatticeArc *arc) { // arc to add (must first modify it by adding "nextstate")
+      const Tuple &next_tuple,
+      CompactLatticeArc *arc) {                    // arc to add (must first modify it by adding "nextstate")
     arc->nextstate = GetStateForTuple(next_tuple); // adds it to queue_ if new.
     lat_out_->AddArc(prev_output_state, *arc);
   }
@@ -283,17 +283,17 @@ class LatticeLexiconWordAligner {
   }
 
   LatticeLexiconWordAligner(const CompactLattice &lat,
-                            const TransitionModel &tmodel,
-                            const WordAlignLatticeLexiconInfo &lexicon_info,
-                            int32 max_states,
-                            int32 partial_word_label,
-                            CompactLattice *lat_out):
-      lat_in_(lat), tmodel_(tmodel), lexicon_info_(lexicon_info),
-      max_states_(max_states),
-      lat_out_(lat_out),
-      partial_word_label_(partial_word_label == 0 ?
-                          kTemporaryEpsilon : partial_word_label),
-      error_(false) {
+      const TransitionModel &tmodel,
+      const WordAlignLatticeLexiconInfo &lexicon_info,
+      int32 max_states,
+      int32 partial_word_label,
+      CompactLattice *lat_out) :
+    lat_in_(lat), tmodel_(tmodel), lexicon_info_(lexicon_info),
+    max_states_(max_states),
+    lat_out_(lat_out),
+    partial_word_label_(partial_word_label == 0 ?
+        kTemporaryEpsilon : partial_word_label),
+    error_(false) {
     // lat_in_ is after PhoneAlignLattice, it is not deterministic and contains epsilons
 
     fst::CreateSuperFinal(&lat_in_); // Creates a super-final state, so the
@@ -361,24 +361,24 @@ class LatticeLexiconWordAligner {
 
 // static
 void LatticeLexiconWordAligner::AppendVectors(
-    std::vector<std::vector<int32> >::const_iterator input_begin,
-    std::vector<std::vector<int32> >::const_iterator input_end,
-    std::vector<int32> *output) {
+  std::vector<std::vector<int32> >::const_iterator input_begin,
+  std::vector<std::vector<int32> >::const_iterator input_end,
+  std::vector<int32> *output) {
   size_t size = 0;
   for (std::vector<std::vector<int32> >::const_iterator iter = input_begin;
-       iter != input_end;
-       ++iter)
+      iter != input_end;
+      ++iter)
     size += iter->size();
   output->clear();
   output->reserve(size);
   for (std::vector<std::vector<int32> >::const_iterator iter = input_begin;
-       iter != input_end;
-       ++iter)
+      iter != input_end;
+      ++iter)
     output->insert(output->end(), iter->begin(), iter->end());
 }
 
 void LatticeLexiconWordAligner::ProcessEpsilonTransitions(
-    const Tuple &tuple, StateId output_state) {
+  const Tuple &tuple, StateId output_state) {
   const ComputationState &comp_state = tuple.comp_state;
   StateId input_state = tuple.input_state;
   StateId zero_word = 0;
@@ -420,8 +420,8 @@ void LatticeLexiconWordAligner::ProcessEpsilonTransitions(
     KALDI_ERR << "Lexicon error: epsilon transition that produces no output:";
 
   for (int32 num_phones = min_num_phones;
-       num_phones <= max_num_phones;
-       num_phones++) {
+      num_phones <= max_num_phones;
+      num_phones++) {
     Tuple next_tuple;
     next_tuple.input_state = input_state; // We're not taking a transition in the
     // input FST so this stays the same.
@@ -437,7 +437,7 @@ void LatticeLexiconWordAligner::ProcessEpsilonTransitions(
 }
 
 void LatticeLexiconWordAligner::ProcessWordTransitions(
-    const Tuple &tuple, StateId output_state) {
+  const Tuple &tuple, StateId output_state) {
   const ComputationState &comp_state = tuple.comp_state;
   StateId input_state = tuple.input_state;
   if (comp_state.NumWords() > 0) {
@@ -467,8 +467,8 @@ void LatticeLexiconWordAligner::ProcessWordTransitions(
     }
 
     for (int32 num_phones = min_num_phones;
-         num_phones <= max_num_phones;
-         num_phones++) {
+        num_phones <= max_num_phones;
+        num_phones++) {
       Tuple next_tuple;
       next_tuple.input_state = input_state; // We're not taking a transition in the
       // input FST so this stays the same.
@@ -486,7 +486,7 @@ void LatticeLexiconWordAligner::ProcessWordTransitions(
 
 
 void LatticeLexiconWordAligner::PossiblyAdvanceArc(
-    const Tuple &tuple, StateId output_state) {
+  const Tuple &tuple, StateId output_state) {
   if (tuple.comp_state.ViableIfAdvanced(lexicon_info_.viability_map_)) {
     for(fst::ArcIterator<CompactLattice> aiter(lat_in_, tuple.input_state);
         !aiter.Done(); aiter.Next()) {
@@ -499,9 +499,9 @@ void LatticeLexiconWordAligner::PossiblyAdvanceArc(
 
       StateId next_output_state = GetStateForTuple(next_tuple);
       CompactLatticeArc arc_out(0, 0,
-                                CompactLatticeWeight(arc_weight,
+          CompactLatticeWeight(arc_weight,
                                                      std::vector<int32>()),
-                                next_output_state);
+          next_output_state);
       lat_out_->AddArc(output_state,
                        arc_out);
     }
@@ -530,7 +530,7 @@ bool LatticeLexiconWordAligner::ProcessFinal() {
 
 bool LatticeLexiconWordAligner::HasNonEpsArcsOut(StateId output_state) {
   for (fst::ArcIterator<CompactLattice> aiter(*lat_out_, output_state);
-       !aiter.Done(); aiter.Next()) {
+      !aiter.Done(); aiter.Next()) {
     const CompactLatticeArc &arc = aiter.Value();
     if (arc.ilabel != 0 || arc.olabel != 0 || !arc.weight.String().empty())
       return true;
@@ -542,7 +542,7 @@ void LatticeLexiconWordAligner::ProcessFinalForceOut() {
   KALDI_ASSERT(queue_.empty());
   std::vector<std::pair<Tuple, StateId> > new_final_queue_;
   new_final_queue_.reserve(final_queue_.size());
-  for (size_t i = 0; i < final_queue_.size();i++) { // note: all the states will
+  for (size_t i = 0; i < final_queue_.size(); i++) { // note: all the states will
     // be final in the orig. lattice
     const Tuple &tuple = final_queue_[i].first;
     StateId output_state = final_queue_[i].second;
@@ -571,7 +571,7 @@ void LatticeLexiconWordAligner::ProcessFinalForceOut() {
 }
 
 void LatticeLexiconWordAligner::ComputationState::Advance(
-    const CompactLatticeArc &arc, const TransitionModel &tmodel, LatticeWeight *weight) {
+  const CompactLatticeArc &arc, const TransitionModel &tmodel, LatticeWeight *weight) {
   const std::vector<int32> &tids = arc.weight.String();
   int32 phone;
   if (tids.empty()) phone = 0;
@@ -602,14 +602,14 @@ void LatticeLexiconWordAligner::ComputationState::Advance(
 
 
 bool LatticeLexiconWordAligner::ComputationState::ViableIfAdvanced(
-    const ViabilityMap &viability_map) const {
+  const ViabilityMap &viability_map) const {
   /* This will ideally to return true if and only if we can ever take
      any kind of transition out of this state after "advancing" it by adding
      words and/or phones.  It's OK to return true in some cases where the
      condition is false, though, if it's a pain to check, because the result
      will just be doing extra work for nothing (those states won't be
      co-accessible in the output).
-  */
+   */
   if (phones_.empty()) return true;
   if (words_.empty()) return true;
   else {
@@ -625,16 +625,16 @@ bool LatticeLexiconWordAligner::ComputationState::ViableIfAdvanced(
       // in the set, it will be the 1st element of the vector, because it's
       // the lowest element.
       return (this_set.front() == 0 ||
-              std::binary_search(this_set.begin(), this_set.end(), words_[0]));
+             std::binary_search(this_set.begin(), this_set.end(), words_[0]));
     }
   }
 }
 
 
 void LatticeLexiconWordAligner::ComputationState::TakeForcedTransition(
-    int32 partial_word_label,
-    ComputationState *next_state,
-    CompactLatticeArc *arc_out) const {
+  int32 partial_word_label,
+  ComputationState *next_state,
+  CompactLatticeArc *arc_out) const {
   KALDI_ASSERT(!IsEmpty());
 
   next_state->phones_.clear();
@@ -671,8 +671,8 @@ void LatticeLexiconWordAligner::ComputationState::TakeForcedTransition(
 
 
 bool LatticeLexiconWordAligner::ComputationState::TakeTransition(
-    const LexiconMap &lexicon_map, int32 word_id, int32 num_phones,
-    ComputationState *next_state, CompactLatticeArc *arc_out) const {
+  const LexiconMap &lexicon_map, int32 word_id, int32 num_phones,
+  ComputationState *next_state, CompactLatticeArc *arc_out) const {
   KALDI_ASSERT(word_id == 0 || (!words_.empty() && word_id == words_[0]));
   KALDI_ASSERT(num_phones <= static_cast<int32>(phones_.size()));
 
@@ -743,9 +743,9 @@ bool LatticeLexiconWordAligner::ComputationState::TakeTransition(
 // has the same input-word and output-word.  The other case is complex
 // to test.
 static bool IsPlausibleWord(const WordAlignLatticeLexiconInfo &lexicon_info,
-                            const TransitionModel &tmodel,
-                            int32 word_id,
-                            const std::vector<int32> &transition_ids) {
+    const TransitionModel &tmodel,
+    int32 word_id,
+    const std::vector<int32> &transition_ids) {
 
   std::vector<std::vector<int32> > split_alignment; // Split into phones.
   if (!SplitToPhones(tmodel, transition_ids, &split_alignment)) {
@@ -772,7 +772,7 @@ static bool IsPlausibleWord(const WordAlignLatticeLexiconInfo &lexicon_info,
 }
 
 void WordAlignLatticeLexiconInfo::UpdateViabilityMap(
-    const std::vector<int32> &lexicon_entry) {
+  const std::vector<int32> &lexicon_entry) {
   int32 word = lexicon_entry[0];  // note: word may be zero.
   int32 num_phones = static_cast<int32>(lexicon_entry.size()) - 2;
   std::vector<int32> phones;
@@ -790,8 +790,8 @@ void WordAlignLatticeLexiconInfo::UpdateViabilityMap(
 
 void WordAlignLatticeLexiconInfo::FinalizeViabilityMap() {
   for (ViabilityMap::iterator iter = viability_map_.begin();
-       iter != viability_map_.end();
-       ++iter) {
+      iter != viability_map_.end();
+      ++iter) {
     std::vector<int32> &words = iter->second;
     SortAndUniq(&words);
     KALDI_ASSERT(words[0] >= 0 && "Error: negative labels in lexicon.");
@@ -802,7 +802,7 @@ void WordAlignLatticeLexiconInfo::FinalizeViabilityMap() {
 /// new word-symbol.  The new word-symbol must always be nonzero; we'll replace
 /// it with kTemporaryEpsilon = -2, if it was zero.
 void WordAlignLatticeLexiconInfo::UpdateLexiconMap(
-    const std::vector<int32> &lexicon_entry) {
+  const std::vector<int32> &lexicon_entry) {
   KALDI_ASSERT(lexicon_entry.size() >= 2);
   std::vector<int32> key;
   key.reserve(lexicon_entry.size() - 1);
@@ -834,7 +834,7 @@ void WordAlignLatticeLexiconInfo::UpdateLexiconMap(
 }
 
 void WordAlignLatticeLexiconInfo::UpdateNumPhonesMap(
-    const std::vector<int32> &lexicon_entry) {
+  const std::vector<int32> &lexicon_entry) {
   int32 num_phones = static_cast<int32>(lexicon_entry.size()) - 2;
   int32 word = lexicon_entry[0];
   if (num_phones_map_.count(word) == 0)
@@ -871,7 +871,7 @@ int32 WordAlignLatticeLexiconInfo::EquivalenceClassOf(int32 word) const {
 }
 
 void WordAlignLatticeLexiconInfo::UpdateEquivalenceMap(
-    const std::vector<std::vector<int32> > &lexicon) {
+  const std::vector<std::vector<int32> > &lexicon) {
   std::vector<std::pair<int32, int32> > equiv_pairs; // pairs of
   // (lower,higher) words that are equivalent.
   for (size_t i = 0; i < lexicon.size(); i++) {
@@ -894,7 +894,7 @@ void WordAlignLatticeLexiconInfo::UpdateEquivalenceMap(
 
 
 WordAlignLatticeLexiconInfo::WordAlignLatticeLexiconInfo(
-    const std::vector<std::vector<int32> > &lexicon) {
+  const std::vector<std::vector<int32> > &lexicon) {
   for (size_t i = 0; i < lexicon.size(); i++) {
     const std::vector<int32> &lexicon_entry = lexicon[i];
     KALDI_ASSERT(lexicon_entry.size() >= 2);
@@ -910,11 +910,11 @@ WordAlignLatticeLexiconInfo::WordAlignLatticeLexiconInfo(
 /// obtained from the lexicon, using the function EquivalenceClassOf in the lexicon_info
 /// object.
 static void MapSymbols(const WordAlignLatticeLexiconInfo &lexicon_info,
-                       CompactLattice *lat) {
+    CompactLattice *lat) {
   typedef CompactLattice::StateId StateId;
   for (StateId s = 0; s < lat->NumStates(); s++) {
     for (fst::MutableArcIterator<CompactLattice> aiter(lat, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       CompactLatticeArc arc (aiter.Value());
       KALDI_ASSERT(arc.ilabel == arc.olabel);
       arc.ilabel = lexicon_info.EquivalenceClassOf(arc.ilabel);
@@ -925,10 +925,10 @@ static void MapSymbols(const WordAlignLatticeLexiconInfo &lexicon_info,
 }
 
 static bool TestWordAlignedLattice(const WordAlignLatticeLexiconInfo &lexicon_info,
-                                   const TransitionModel &tmodel,
-                                   CompactLattice clat,
-                                   CompactLattice aligned_clat,
-                                   bool allow_duplicate_paths) {
+    const TransitionModel &tmodel,
+    CompactLattice clat,
+    CompactLattice aligned_clat,
+    bool allow_duplicate_paths) {
   int32 max_err = 5, num_err = 0;
   { // We test whether the forward-backward likelihoods differ; this is intended
     // to detect when we have duplicate paths in the aligned lattice, for some path
@@ -954,7 +954,7 @@ static bool TestWordAlignedLattice(const WordAlignLatticeLexiconInfo &lexicon_in
   // to an entry in the lexicon.
   for (CompactLattice::StateId s = 0; s < aligned_clat.NumStates(); s++) {
     for (fst::ArcIterator<CompactLattice> aiter(aligned_clat, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       const CompactLatticeArc &arc (aiter.Value());
       KALDI_ASSERT(arc.ilabel == arc.olabel);
       int32 word_id = arc.ilabel;
@@ -999,10 +999,10 @@ static bool TestWordAlignedLattice(const WordAlignLatticeLexiconInfo &lexicon_in
 
 // This is the wrapper function for users to call.
 bool WordAlignLatticeLexicon(const CompactLattice &lat,
-                             const TransitionModel &tmodel,
-                             const WordAlignLatticeLexiconInfo &lexicon_info,
-                             const WordAlignLatticeLexiconOpts &opts,
-                             CompactLattice *lat_out) {
+    const TransitionModel &tmodel,
+    const WordAlignLatticeLexiconInfo &lexicon_info,
+    const WordAlignLatticeLexiconOpts &opts,
+    CompactLattice *lat_out) {
   PhoneAlignLatticeOptions phone_align_opts;
   phone_align_opts.reorder = opts.reorder;
   phone_align_opts.replace_output_symbols = false;
@@ -1034,7 +1034,7 @@ bool WordAlignLatticeLexicon(const CompactLattice &lat,
   // If ans == false, we hope this is due to a forced-out lattice, and we try to
   // continue.
   LatticeLexiconWordAligner aligner(phone_aligned_lat, tmodel, lexicon_info,
-                                    max_states, opts.partial_word_label, lat_out);
+      max_states, opts.partial_word_label, lat_out);
   // We'll let the calling code warn if this is false; it will know the utterance-id.
   ans = aligner.AlignLattice() && ans;
   if (ans && opts.test) { // We only test if it succeeded.
@@ -1049,7 +1049,7 @@ bool WordAlignLatticeLexicon(const CompactLattice &lat,
 }
 
 bool ReadLexiconForWordAlign (std::istream &is,
-                              std::vector<std::vector<int32> > *lexicon) {
+    std::vector<std::vector<int32> > *lexicon) {
   lexicon->clear();
   std::string line;
   while (std::getline(is, line)) {

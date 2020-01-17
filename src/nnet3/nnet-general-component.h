@@ -52,13 +52,13 @@ namespace nnet3 {
      input-dim=xx output-dim=xx
    where input-dim must be a multiple of the output-dim, and n_blocks is
    set to input-dim / output-dim.
-   */
+ */
 class DistributeComponent: public Component {
- public:
+public:
   DistributeComponent(int32 input_dim, int32 output_dim) {
     Init(input_dim, output_dim);
   }
-  DistributeComponent(): input_dim_(0), output_dim_(0) { }
+  DistributeComponent() : input_dim_(0), output_dim_(0) { }
   virtual int32 InputDim() const { return input_dim_; }
   virtual int32 OutputDim() const { return output_dim_; }
 
@@ -67,16 +67,16 @@ class DistributeComponent: public Component {
   virtual std::string Type() const { return "DistributeComponent"; }
   virtual int32 Properties() const { return kLinearInInput; }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *, // to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *,                   // to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary); // This Read function
   // requires that the Component has the correct type.
@@ -90,49 +90,49 @@ class DistributeComponent: public Component {
 
   // Some functions that are only to be reimplemented for GeneralComponents.
   virtual void GetInputIndexes(const MiscComputationInfo &misc_info,
-                               const Index &output_index,
-                               std::vector<Index> *desired_indexes) const;
+      const Index &output_index,
+      std::vector<Index> *desired_indexes) const;
 
   // This function returns true if at least one of the input indexes used to
   // compute this output index is computable.
   virtual bool IsComputable(const MiscComputationInfo &misc_info,
-                            const Index &output_index,
-                            const IndexSet &input_index_set,
-                            std::vector<Index> *used_inputs) const;
+      const Index &output_index,
+      const IndexSet &input_index_set,
+      std::vector<Index> *used_inputs) const;
 
   virtual ComponentPrecomputedIndexes* PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const;
+    const MiscComputationInfo &misc_info,
+    const std::vector<Index> &input_indexes,
+    const std::vector<Index> &output_indexes,
+    bool need_backprop) const;
 
   // Some functions that are specific to this class.
   void Init(int32 input_dim, int32 output_dim);
- private:
+private:
   // computes the input index corresponding to a particular output index.
   // if block != NULL, also computes which block of the input this corresponds to.
   inline void ComputeInputIndexAndBlock(const Index &output_index,
-                                        Index *input_index,
-                                        int32 *block) const;
+      Index *input_index,
+      int32 *block) const;
   inline void ComputeInputPointers(
-      const ComponentPrecomputedIndexes *indexes,
-      const CuMatrixBase<BaseFloat> &in,
-      int32 num_output_rows,
-      std::vector<const BaseFloat*> *input_pointers) const;
+    const ComponentPrecomputedIndexes *indexes,
+    const CuMatrixBase<BaseFloat> &in,
+    int32 num_output_rows,
+    std::vector<const BaseFloat*> *input_pointers) const;
   // non-const version of the above.
   inline void ComputeInputPointers(
-      const ComponentPrecomputedIndexes *indexes,
-      int32 num_output_rows,
-      CuMatrixBase<BaseFloat> *in,
-      std::vector<BaseFloat*> *input_pointers) const;
+    const ComponentPrecomputedIndexes *indexes,
+    int32 num_output_rows,
+    CuMatrixBase<BaseFloat> *in,
+    std::vector<BaseFloat*> *input_pointers) const;
   int32 input_dim_;
   int32 output_dim_;
 
 };
 
 class DistributeComponentPrecomputedIndexes:
-      public ComponentPrecomputedIndexes {
- public:
+  public ComponentPrecomputedIndexes {
+public:
 
   // each pair is a pair (row, dim_offset), and by
   // computing (input.Data() + row * input.Stride() + dim_offset)
@@ -155,51 +155,51 @@ class DistributeComponentPrecomputedIndexes:
 };
 
 /*
-  Class StatisticsExtractionComponent is used together with
-  StatisticsPoolingComponent to extract moving-average mean and
-  standard-deviation statistics.
+   Class StatisticsExtractionComponent is used together with
+   StatisticsPoolingComponent to extract moving-average mean and
+   standard-deviation statistics.
 
-  StatisticsExtractionComponent is designed to extract statistics-- 0th-order,
-  1st-order and optionally diagonal 2nd-order stats-- from small groups of
-  frames, such as 10 frames.  The statistics will then be further processed by
-  StatisticsPoolingComponent to compute moving-average means and (if configured)
-  standard deviations.  The reason for the two-component way of doing this is
-  efficiency, particularly in the graph-compilation phase.  (Otherwise there
-  would be too many dependencies to process).  The StatisticsExtractionComponent
-  is designed to let you extract statistics from fixed-size groups of frames
-  (e.g. 10 frames), and in StatisticsPoolingComponent you are only expected to
-  compute the averages at the same fixed period (e.g. 10 frames), so it's more
-  efficient than if you were to compute a moving average at every single frame;
-  and the computation of the intermediate stats means that most of the
-  computation that goes into extracting the means and standard deviations for
-  nearby frames is shared.
+   StatisticsExtractionComponent is designed to extract statistics-- 0th-order,
+   1st-order and optionally diagonal 2nd-order stats-- from small groups of
+   frames, such as 10 frames.  The statistics will then be further processed by
+   StatisticsPoolingComponent to compute moving-average means and (if configured)
+   standard deviations.  The reason for the two-component way of doing this is
+   efficiency, particularly in the graph-compilation phase.  (Otherwise there
+   would be too many dependencies to process).  The StatisticsExtractionComponent
+   is designed to let you extract statistics from fixed-size groups of frames
+   (e.g. 10 frames), and in StatisticsPoolingComponent you are only expected to
+   compute the averages at the same fixed period (e.g. 10 frames), so it's more
+   efficient than if you were to compute a moving average at every single frame;
+   and the computation of the intermediate stats means that most of the
+   computation that goes into extracting the means and standard deviations for
+   nearby frames is shared.
 
-  The config line in a typical setup will be something like:
+   The config line in a typical setup will be something like:
 
     input-dim=250 input-period=1 output-period=10 include-variance=true
 
-  input-dim is self-explanatory.  The inputs will be obtained at multiples of
-  input-period (e.g. it might be 3 for chain models).  output-period must be a
-  multiple of input period, and the requested output indexes will be expected to
-  be multiples of output-period (which you can ensure through use of the Round
-  descriptor).  For instance, if you request the output on frame 80, it will
-  consist of stats from input frames 80 through 89.
+   input-dim is self-explanatory.  The inputs will be obtained at multiples of
+   input-period (e.g. it might be 3 for chain models).  output-period must be a
+   multiple of input period, and the requested output indexes will be expected to
+   be multiples of output-period (which you can ensure through use of the Round
+   descriptor).  For instance, if you request the output on frame 80, it will
+   consist of stats from input frames 80 through 89.
 
-  An output of this component will be 'computable' any time at least one of
-  the corresponding inputs is computable.
+   An output of this component will be 'computable' any time at least one of
+   the corresponding inputs is computable.
 
-  In all cases the first dimension of the output will be a count (between 1 and
-  10 inclusive in this example).  If include-variance=false, then the output
-  dimension will be input-dim + 1.  and the output dimensions >0 will be
-  1st-order statistics (sums of the input).  If include-variance=true, then the
-  output dimension will be input-dim * 2 + 1, where the raw diagonal 2nd-order
-  statistics are appended to the 0 and 1st order statistics.
+   In all cases the first dimension of the output will be a count (between 1 and
+   10 inclusive in this example).  If include-variance=false, then the output
+   dimension will be input-dim + 1.  and the output dimensions >0 will be
+   1st-order statistics (sums of the input).  If include-variance=true, then the
+   output dimension will be input-dim * 2 + 1, where the raw diagonal 2nd-order
+   statistics are appended to the 0 and 1st order statistics.
 
-  The default configuration values are:
+   The default configuration values are:
      input-dim=-1 input-period=1 output-period=1 include-variance=true
  */
 class StatisticsExtractionComponent: public Component {
- public:
+public:
   // Initializes to defaults which would not pass Check(); use InitFromConfig()
   // or Read() or copy constructor to really initialize.
   StatisticsExtractionComponent();
@@ -215,19 +215,19 @@ class StatisticsExtractionComponent: public Component {
   virtual std::string Type() const { return "StatisticsExtractionComponent"; }
   virtual int32 Properties() const {
     return kPropagateAdds|kReordersIndexes|
-        (include_variance_ ? kBackpropNeedsInput : 0);
+           (include_variance_ ? kBackpropNeedsInput : 0);
   }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *, // to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *,                   // to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary); // This Read function
   // requires that the Component has the correct type.
@@ -240,32 +240,32 @@ class StatisticsExtractionComponent: public Component {
 
   // Some functions that are only to be reimplemented for GeneralComponents.
   virtual void GetInputIndexes(const MiscComputationInfo &misc_info,
-                               const Index &output_index,
-                               std::vector<Index> *desired_indexes) const;
+      const Index &output_index,
+      std::vector<Index> *desired_indexes) const;
 
   virtual bool IsComputable(const MiscComputationInfo &misc_info,
-                            const Index &output_index,
-                            const IndexSet &input_index_set,
-                            std::vector<Index> *used_inputs) const;
+      const Index &output_index,
+      const IndexSet &input_index_set,
+      std::vector<Index> *used_inputs) const;
 
   // This function reorders the input and output indexes so that they
   // are sorted first on n and then x and then t.
   virtual void ReorderIndexes(std::vector<Index> *input_indexes,
-                              std::vector<Index> *output_indexes) const;
+      std::vector<Index> *output_indexes) const;
 
   virtual ComponentPrecomputedIndexes* PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const;
+    const MiscComputationInfo &misc_info,
+    const std::vector<Index> &input_indexes,
+    const std::vector<Index> &output_indexes,
+    bool need_backprop) const;
 
- private:
+private:
   // Checks that the parameters are valid.
   void Check() const;
 
   // Disallow assignment operator.
   StatisticsExtractionComponent &operator =(
-      const StatisticsExtractionComponent &other);
+    const StatisticsExtractionComponent &other);
 
   int32 input_dim_;
   int32 input_period_;
@@ -274,8 +274,8 @@ class StatisticsExtractionComponent: public Component {
 };
 
 class StatisticsExtractionComponentPrecomputedIndexes:
-      public ComponentPrecomputedIndexes {
- public:
+  public ComponentPrecomputedIndexes {
+public:
   // While creating the output we sum over row ranges of the input.
   // forward_indexes.Dim() equals the number of rows of the output, and each
   // element is a (start, end) range of inputs, that is summed over.
@@ -300,17 +300,17 @@ class StatisticsExtractionComponentPrecomputedIndexes:
   virtual void Read(std::istream &is, bool binary);
 
   virtual std::string Type() const { return "StatisticsExtractionComponentPrecomputedIndexes"; }
- private:
+private:
   virtual ~StatisticsExtractionComponentPrecomputedIndexes() { }
 };
 
 /*
-  Class StatisticsPoolingComponent is used together with
-  StatisticsExtractionComponent to extract moving-average mean and
-  standard-deviation statistics.
+   Class StatisticsPoolingComponent is used together with
+   StatisticsExtractionComponent to extract moving-average mean and
+   standard-deviation statistics.
 
-  StatisticsPoolingComponent pools the stats over a specified window and
-  computes means and possibly log-count and stddevs from them for you.
+   StatisticsPoolingComponent pools the stats over a specified window and
+   computes means and possibly log-count and stddevs from them for you.
 
  # In StatisticsPoolingComponent, the first element of the input is interpreted
  # as a count, which we divide by.
@@ -323,18 +323,18 @@ class StatisticsExtractionComponentPrecomputedIndexes:
  #  presumably the original feature dim, and it interprets the last n dimensions of the feature
  #  as a variance; it outputs the square root of the variance instead of the actual variance.
 
- configs and their defaults:  input-dim=-1, input-period=1, left-context=-1, right-context=-1,
+   configs and their defaults:  input-dim=-1, input-period=1, left-context=-1, right-context=-1,
     num-log-count-features=0, output-stddevs=true, variance-floor=1.0e-10
 
- You'd access the output of the StatisticsPoolingComponent using rounding, e.g.
-  Round(component-name, 10)
- or whatever, instead of just component-name, because its output is only defined at multiples
- of its input-period.
+   You'd access the output of the StatisticsPoolingComponent using rounding, e.g.
+   Round(component-name, 10)
+   or whatever, instead of just component-name, because its output is only defined at multiples
+   of its input-period.
 
- The output of StatisticsPoolingComponent will only be defined if at least one input was defined.
+   The output of StatisticsPoolingComponent will only be defined if at least one input was defined.
  */
 class StatisticsPoolingComponent: public Component {
- public:
+public:
   // Initializes to defaults which would not pass Check(); use InitFromConfig()
   // or Read() or copy constructor to really initialize.
   StatisticsPoolingComponent();
@@ -349,21 +349,21 @@ class StatisticsPoolingComponent: public Component {
   virtual std::string Type() const { return "StatisticsPoolingComponent"; }
   virtual int32 Properties() const {
     return kReordersIndexes|kBackpropAdds|
-        (output_stddevs_ || num_log_count_features_ > 0 ?
-         kBackpropNeedsOutput : 0) |
-        (num_log_count_features_ == 0 ? kBackpropNeedsInput : 0);
+           (output_stddevs_ || num_log_count_features_ > 0 ?
+           kBackpropNeedsOutput : 0) |
+           (num_log_count_features_ == 0 ? kBackpropNeedsInput : 0);
   }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *, // to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *,                   // to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary); // This Read function
   // requires that the Component has the correct type.
@@ -376,33 +376,33 @@ class StatisticsPoolingComponent: public Component {
 
   // Some functions that are only to be reimplemented for GeneralComponents.
   virtual void GetInputIndexes(const MiscComputationInfo &misc_info,
-                               const Index &output_index,
-                               std::vector<Index> *desired_indexes) const;
+      const Index &output_index,
+      std::vector<Index> *desired_indexes) const;
 
   // returns true if at least one of its inputs is computable.
   virtual bool IsComputable(const MiscComputationInfo &misc_info,
-                            const Index &output_index,
-                            const IndexSet &input_index_set,
-                            std::vector<Index> *used_inputs) const;
+      const Index &output_index,
+      const IndexSet &input_index_set,
+      std::vector<Index> *used_inputs) const;
 
   // This function reorders the input and output indexes so that they
   // are sorted first on n and then x and then t.
   virtual void ReorderIndexes(std::vector<Index> *input_indexes,
-                              std::vector<Index> *output_indexes) const;
+      std::vector<Index> *output_indexes) const;
 
   virtual ComponentPrecomputedIndexes* PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const;
+    const MiscComputationInfo &misc_info,
+    const std::vector<Index> &input_indexes,
+    const std::vector<Index> &output_indexes,
+    bool need_backprop) const;
 
- private:
+private:
   // Checks that the parameters are valid.
   void Check() const;
 
   // Disallow assignment operator.
   StatisticsPoolingComponent &operator =(
-      const StatisticsPoolingComponent &other);
+    const StatisticsPoolingComponent &other);
 
   int32 input_dim_;
   int32 input_period_;
@@ -414,8 +414,8 @@ class StatisticsPoolingComponent: public Component {
 };
 
 class StatisticsPoolingComponentPrecomputedIndexes:
-      public ComponentPrecomputedIndexes {
- public:
+  public ComponentPrecomputedIndexes {
+public:
 
   // in the first stage of creating the output we sum over row ranges of
   // the input.  forward_indexes.Dim() equals the number of rows of the
@@ -451,17 +451,18 @@ class StatisticsPoolingComponentPrecomputedIndexes:
 // This component will be used to prevent gradient explosion problem in
 // recurrent neural networks
 class BackpropTruncationComponent: public Component {
- public:
+public:
   BackpropTruncationComponent(int32 dim,
-                              BaseFloat scale,
-                              BaseFloat clipping_threshold,
-                              BaseFloat zeroing_threshold,
-                              int32 zeroing_interval,
-                              int32 recurrence_interval) {
+      BaseFloat scale,
+      BaseFloat clipping_threshold,
+      BaseFloat zeroing_threshold,
+      int32 zeroing_interval,
+      int32 recurrence_interval) {
     Init(dim, scale, clipping_threshold, zeroing_threshold,
-        zeroing_interval, recurrence_interval);}
+        zeroing_interval, recurrence_interval);
+  }
 
-  BackpropTruncationComponent(): dim_(0), scale_(1.0), clipping_threshold_(-1),
+  BackpropTruncationComponent() : dim_(0), scale_(1.0), clipping_threshold_(-1),
     zeroing_threshold_(-1), zeroing_interval_(0), recurrence_interval_(0),
     num_clipped_(0), num_zeroed_(0), count_(0), count_zeroing_boundaries_(0) { }
 
@@ -469,8 +470,8 @@ class BackpropTruncationComponent: public Component {
   virtual int32 OutputDim() const { return dim_; }
   virtual void InitFromConfig(ConfigLine *cfl);
   void Init(int32 dim, BaseFloat scale, BaseFloat clipping_threshold,
-            BaseFloat zeroing_threshold, int32 zeroing_interval,
-            int32 recurrence_interval);
+      BaseFloat zeroing_threshold, int32 zeroing_interval,
+      int32 recurrence_interval);
 
   virtual std::string Type() const { return "BackpropTruncationComponent"; }
 
@@ -483,22 +484,22 @@ class BackpropTruncationComponent: public Component {
   virtual Component* Copy() const;
 
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &, // in_value,
-                        const CuMatrixBase<BaseFloat> &, // out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &,                   // in_value,
+      const CuMatrixBase<BaseFloat> &,                   // out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual ComponentPrecomputedIndexes* PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const;
+    const MiscComputationInfo &misc_info,
+    const std::vector<Index> &input_indexes,
+    const std::vector<Index> &output_indexes,
+    bool need_backprop) const;
 
   virtual void Scale(BaseFloat scale);
   virtual void Add(BaseFloat alpha, const Component &other);
@@ -509,7 +510,7 @@ class BackpropTruncationComponent: public Component {
   virtual std::string Info() const;
   virtual ~BackpropTruncationComponent() {
   }
- private:
+private:
   // input/output dimension
   int32 dim_;
 
@@ -539,9 +540,9 @@ class BackpropTruncationComponent: public Component {
   std::string debug_info_;
 
   BackpropTruncationComponent &operator =
-      (const BackpropTruncationComponent &other); // Disallow.
+    (const BackpropTruncationComponent &other);   // Disallow.
 
- protected:
+protected:
   // variables to store stats
   // An element corresponds to rows of derivative matrix
   double num_clipped_;  // number of elements which were clipped
@@ -554,8 +555,8 @@ class BackpropTruncationComponent: public Component {
 };
 
 class BackpropTruncationComponentPrecomputedIndexes:
-      public ComponentPrecomputedIndexes {
- public:
+  public ComponentPrecomputedIndexes {
+public:
 
   // zeroing has the same dimension as the number of rows of out-deriv.
   // Each element in zeroing can take two possible values: -1.0, meaning its
@@ -567,7 +568,7 @@ class BackpropTruncationComponentPrecomputedIndexes:
   // (the sum is computed by CPU). Note that this value would be positive.
   BaseFloat zeroing_sum;
 
-  BackpropTruncationComponentPrecomputedIndexes(): zeroing_sum(0.0) {}
+  BackpropTruncationComponentPrecomputedIndexes() : zeroing_sum(0.0) {}
 
   // this class has a virtual destructor so it can be deleted from a pointer
   // to ComponentPrecomputedIndexes.
@@ -594,7 +595,7 @@ class BackpropTruncationComponentPrecomputedIndexes:
 // It is optionally trainable, and optionally you can use natural
 // gradient.
 class ConstantComponent: public UpdatableComponent {
- public:
+public:
   // actually this component requires no inputs; this value
   // is really a don't-care.
   virtual int32 InputDim() const { return output_.Dim(); }
@@ -615,19 +616,19 @@ class ConstantComponent: public UpdatableComponent {
   virtual std::string Type() const { return "ConstantComponent"; }
   virtual int32 Properties() const {
     return
-        (is_updatable_ ? kUpdatableComponent|kLinearInParameters : 0);
+      (is_updatable_ ? kUpdatableComponent|kLinearInParameters : 0);
   }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &, // in_value
-                        const CuMatrixBase<BaseFloat> &, // out_value
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &,                   // in_value
+      const CuMatrixBase<BaseFloat> &,                   // out_value
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -636,8 +637,8 @@ class ConstantComponent: public UpdatableComponent {
 
   // Some functions that are only to be reimplemented for GeneralComponents.
   virtual void GetInputIndexes(const MiscComputationInfo &misc_info,
-                               const Index &output_index,
-                               std::vector<Index> *desired_indexes) const {
+      const Index &output_index,
+      std::vector<Index> *desired_indexes) const {
     desired_indexes->clear();  // requires no inputs.
   }
 
@@ -645,9 +646,9 @@ class ConstantComponent: public UpdatableComponent {
   // compute this output index is computable.
   // it's simple because this component requires no inputs.
   virtual bool IsComputable(const MiscComputationInfo &misc_info,
-                            const Index &output_index,
-                            const IndexSet &input_index_set,
-                            std::vector<Index> *used_inputs) const {
+      const Index &output_index,
+      const IndexSet &input_index_set,
+      std::vector<Index> *used_inputs) const {
     if (used_inputs) used_inputs->clear();
     return true;
   }
@@ -660,7 +661,7 @@ class ConstantComponent: public UpdatableComponent {
   virtual int32 NumParameters() const;
   virtual void Vectorize(VectorBase<BaseFloat> *params) const;
   virtual void UnVectorize(const VectorBase<BaseFloat> &params);
- private:
+private:
 
   // the output value-- a vector.
   CuVector<BaseFloat> output_;
@@ -686,7 +687,7 @@ class ConstantComponent: public UpdatableComponent {
 // generate a two-dimensional output representing dropout
 //
 class DropoutMaskComponent: public RandomComponent {
- public:
+public:
   // actually this component requires no inputs; this value
   // is really a don't-care.
   virtual int32 InputDim() const { return output_dim_; }
@@ -707,18 +708,18 @@ class DropoutMaskComponent: public RandomComponent {
   virtual int32 Properties() const { return kRandomComponent; }
   // note: the matrix 'in' will be empty.
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                          const CuMatrixBase<BaseFloat> &in,
-                          CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   // backprop does nothing, there is nothing to backprop to and nothing
   // to update.
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &, // in_value
-                        const CuMatrixBase<BaseFloat> &, // out_value
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const { }
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &,                   // in_value
+      const CuMatrixBase<BaseFloat> &,                   // out_value
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const { }
 
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -727,8 +728,8 @@ class DropoutMaskComponent: public RandomComponent {
 
   // Some functions that are only to be reimplemented for GeneralComponents.
   virtual void GetInputIndexes(const MiscComputationInfo &misc_info,
-                               const Index &output_index,
-                               std::vector<Index> *desired_indexes) const {
+      const Index &output_index,
+      std::vector<Index> *desired_indexes) const {
     desired_indexes->clear();  // requires no inputs.
   }
 
@@ -736,16 +737,16 @@ class DropoutMaskComponent: public RandomComponent {
   // compute this output index is computable.
   // it's simple because this component requires no inputs.
   virtual bool IsComputable(const MiscComputationInfo &misc_info,
-                            const Index &output_index,
-                            const IndexSet &input_index_set,
-                            std::vector<Index> *used_inputs) const {
+      const Index &output_index,
+      const IndexSet &input_index_set,
+      std::vector<Index> *used_inputs) const {
     if (used_inputs) used_inputs->clear();
     return true;
   }
 
   void SetDropoutProportion(BaseFloat p) { dropout_proportion_ = p; }
 
- private:
+private:
 
   // The output dimension
   int32 output_dim_;

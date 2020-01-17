@@ -36,22 +36,22 @@ namespace nnet2 {
    Note: this doesn't do the final taking-the-log and correcting for the prior.
    The current implementation is just an inefficient placeholder implementation;
    later we'll modify it to properly use previously computed activations.
-*/
+ */
 
 class NnetOnlineComputer {
 
- public:
+public:
   // All the inputs and outputs are of type CuMatrix, in case we're doing the
   // computation on the GPU (of course, if there is no GPU, it backs off to
   // using the CPU).
   // You should initialize an object of this type for each utterance you want
   // to decode.
-  
+
   // Note: pad_input will normally be true; it means that at the start and end
   // of the file, we pad with repeats of the first/last frame, so that the total
   // number of frames it outputs is the same as the number of input frames.
   NnetOnlineComputer(const Nnet &nnet,
-                     bool pad_input);
+      bool pad_input);
 
   // This function works as follows: given a chunk of input (interpreted
   // as following in time any previously supplied data), do the computation
@@ -62,15 +62,15 @@ class NnetOnlineComputer {
   // It is the responsibility of the user to keep track of frame indices, if
   // required.  This class won't output any frame twice.
   void Compute(const CuMatrixBase<BaseFloat> &input,
-               CuMatrix<BaseFloat> *output);
-  
+      CuMatrix<BaseFloat> *output);
+
   // This flushes out the last frames of output; you call this when all
   // input has finished.  It's invalid to call Compute or Flush after
   // calling Flush.  It's valid to call Flush if no frames have been
   // input or if no frames have been output; this produces empty output.
   void Flush(CuMatrix<BaseFloat> *output);
 
- private:
+private:
   void Propagate();
 
   const Nnet &nnet_;
@@ -78,18 +78,18 @@ class NnetOnlineComputer {
   // data_ contains the intermediate stages and the output of the most recent
   // computation.
   std::vector<CuMatrix<BaseFloat> > data_;
-  
+
   std::vector<ChunkInfo> chunk_info_;  // contains chunk_info(s) for the
   // components
 
-  std::vector<CuMatrix<BaseFloat> > reusable_component_inputs_;  
-        // reusable data from previous chunk, this is a buffer to
-        // store the hidden activations before splice type components
+  std::vector<CuMatrix<BaseFloat> > reusable_component_inputs_;
+  // reusable data from previous chunk, this is a buffer to
+  // store the hidden activations before splice type components
 
   CuMatrix<BaseFloat> unprocessed_buffer_;  // buffer to store unprocessed input
   // from previous chunks (as we can have several chunks with insufficient
   // context)
-  
+
   CuVector<BaseFloat> last_seen_input_frame_;  // stores the last seen frame
   // for the sake of right padding the input. This is useful to deal with the
   // scenario where the initial component is not a splice component.

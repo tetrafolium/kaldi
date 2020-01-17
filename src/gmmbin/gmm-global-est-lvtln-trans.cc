@@ -32,9 +32,9 @@ using std::vector;
 
 namespace kaldi {
 void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
-                            const Posterior &post,
-                            const DiagGmm &gmm,
-                            FmllrDiagGmmAccs *spk_stats) {
+    const Posterior &post,
+    const DiagGmm &gmm,
+    FmllrDiagGmmAccs *spk_stats) {
   KALDI_ASSERT(static_cast<int32>(post.size()) == feats.NumRows());
   for (size_t i = 0; i < post.size(); i++) {
     std::vector<int32> gselect(post[i].size());
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
         "e.g.: gmm-global-est-lvtln-trans 0.ubm 0.lvtln '$feats' ark,s,cs:- ark:1.trans ark:1.warp\n"
         "(where the <gpost-rspecifier> will likely come from gmm-global-get-post or\n"
         "gmm-global-gselect-to-post\n";
-    
+
     ParseOptions po(usage);
     string spk2utt_rspecifier;
     BaseFloat logdet_scale = 1.0;
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
 
         if (static_cast<int32>(post.size()) != feats.NumRows()) {
           KALDI_WARN << "Posterior has wrong size " << post.size()
-              << " vs. " << feats.NumRows();
+                     << " vs. " << feats.NumRows();
           num_other_error++;
           continue;
         }

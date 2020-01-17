@@ -41,13 +41,13 @@ int main(int argc, char *argv[]) {
         "If you want the words and phones jointly (i.e. pronunciations of words, with word\n"
         "alignment), try\n"
         " lattice-1best | nbest-to-prons\n";
-    
+
     ParseOptions po(usage);
     bool output_if_error = true;
-    
+
     po.Register("output-error-lats", &output_if_error, "Output lattices that aligned "
                 "with errors (e.g. due to force-out");
-    
+
     PhoneAlignLatticeOptions opts;
     opts.Register(&po);
 
@@ -62,22 +62,22 @@ int main(int argc, char *argv[]) {
         model_rxfilename = po.GetArg(1),
         lats_rspecifier = po.GetArg(2),
         lats_wspecifier = po.GetArg(3);
-    
+
     TransitionModel tmodel;
     ReadKaldiObject(model_rxfilename, &tmodel);
-    
+
     SequentialCompactLatticeReader clat_reader(lats_rspecifier);
-    CompactLatticeWriter clat_writer(lats_wspecifier); 
+    CompactLatticeWriter clat_writer(lats_wspecifier);
 
     int32 num_done = 0, num_err = 0;
-    
+
     for (; !clat_reader.Done(); clat_reader.Next()) {
       std::string key = clat_reader.Key();
       const CompactLattice &clat = clat_reader.Value();
 
       CompactLattice aligned_clat;
       bool ok = PhoneAlignLattice(clat, tmodel, opts, &aligned_clat);
-      
+
       if (!ok) {
         num_err++;
         if (!output_if_error)

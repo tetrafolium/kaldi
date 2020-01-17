@@ -26,10 +26,10 @@ namespace chain {
 
 
 NumeratorComputation::NumeratorComputation(
-    const Supervision &supervision,
-    const CuMatrixBase<BaseFloat> &nnet_output):
-    supervision_(supervision),
-    nnet_output_(nnet_output) {
+  const Supervision &supervision,
+  const CuMatrixBase<BaseFloat> &nnet_output) :
+  supervision_(supervision),
+  nnet_output_(nnet_output) {
   ComputeFstStateTimes(supervision_.fst, &fst_state_times_);
   KALDI_ASSERT(supervision.num_sequences * supervision.frames_per_sequence ==
                nnet_output.NumRows() &&
@@ -73,7 +73,7 @@ void NumeratorComputation::ComputeLookupIndexes() {
       cur_time = t;
     }
     for (fst::ArcIterator<fst::StdVectorFst> aiter(supervision_.fst, state);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       int32 pdf_id = aiter.Value().ilabel - 1;
       KALDI_ASSERT(pdf_id >= 0 && pdf_id < supervision_.label_dim);
 
@@ -125,7 +125,7 @@ BaseFloat NumeratorComputation::Forward() {
   for (int32 state = 0; state < num_states; state++) {
     double this_log_alpha = log_alpha_data[state];
     for (fst::ArcIterator<fst::StdVectorFst> aiter(fst, state); !aiter.Done();
-         aiter.Next(), ++fst_output_indexes_iter) {
+        aiter.Next(), ++fst_output_indexes_iter) {
       const fst::StdArc &arc = aiter.Value();
       int32 nextstate = arc.nextstate;
       BaseFloat transition_logprob = -arc.weight.Value();
@@ -148,7 +148,7 @@ BaseFloat NumeratorComputation::Forward() {
 
 
 void NumeratorComputation::Backward(
-    CuMatrixBase<BaseFloat> *nnet_output_deriv) {
+  CuMatrixBase<BaseFloat> *nnet_output_deriv) {
   const fst::StdVectorFst &fst = supervision_.fst;
   int32 num_states = fst.NumStates();
   log_beta_.Resize(num_states, kUndefined);
@@ -173,7 +173,7 @@ void NumeratorComputation::Backward(
     double this_log_beta = -fst.Final(state).Value();
     double this_log_alpha = log_alpha_data[state];
     for (fst::ArcIterator<fst::StdVectorFst> aiter(fst, state); !aiter.Done();
-         aiter.Next(), this_fst_output_indexes_iter++) {
+        aiter.Next(), this_fst_output_indexes_iter++) {
       const fst::StdArc &arc = aiter.Value();
       double next_log_beta = log_beta_data[arc.nextstate];
       BaseFloat transition_logprob = -arc.weight.Value();

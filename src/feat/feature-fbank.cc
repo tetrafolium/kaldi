@@ -23,8 +23,8 @@
 
 namespace kaldi {
 
-FbankComputer::FbankComputer(const FbankOptions &opts):
-    opts_(opts), srfft_(NULL) {
+FbankComputer::FbankComputer(const FbankOptions &opts) :
+  opts_(opts), srfft_(NULL) {
   if (opts.energy_floor > 0.0)
     log_energy_floor_ = Log(opts.energy_floor);
 
@@ -37,9 +37,9 @@ FbankComputer::FbankComputer(const FbankOptions &opts):
   GetMelBanks(1.0);
 }
 
-FbankComputer::FbankComputer(const FbankComputer &other):
-    opts_(other.opts_), log_energy_floor_(other.log_energy_floor_),
-    mel_banks_(other.mel_banks_), srfft_(NULL) {
+FbankComputer::FbankComputer(const FbankComputer &other) :
+  opts_(other.opts_), log_energy_floor_(other.log_energy_floor_),
+  mel_banks_(other.mel_banks_), srfft_(NULL) {
   for (std::map<BaseFloat, MelBanks*>::iterator iter = mel_banks_.begin();
       iter != mel_banks_.end();
       ++iter)
@@ -70,9 +70,9 @@ const MelBanks* FbankComputer::GetMelBanks(BaseFloat vtln_warp) {
 }
 
 void FbankComputer::Compute(BaseFloat signal_log_energy,
-                            BaseFloat vtln_warp,
-                            VectorBase<BaseFloat> *signal_frame,
-                            VectorBase<BaseFloat> *feature) {
+    BaseFloat vtln_warp,
+    VectorBase<BaseFloat> *signal_frame,
+    VectorBase<BaseFloat> *feature) {
 
   const MelBanks &mel_banks = *(GetMelBanks(vtln_warp));
 
@@ -93,7 +93,7 @@ void FbankComputer::Compute(BaseFloat signal_log_energy,
   // Convert the FFT into a power spectrum.
   ComputePowerSpectrum(signal_frame);
   SubVector<BaseFloat> power_spectrum(*signal_frame, 0,
-                                      signal_frame->Dim() / 2 + 1);
+      signal_frame->Dim() / 2 + 1);
 
   // Use magnitude instead of power if requested.
   if (!opts_.use_power)
@@ -101,8 +101,8 @@ void FbankComputer::Compute(BaseFloat signal_log_energy,
 
   int32 mel_offset = ((opts_.use_energy && !opts_.htk_compat) ? 1 : 0);
   SubVector<BaseFloat> mel_energies(*feature,
-                                    mel_offset,
-                                    opts_.mel_opts.num_bins);
+      mel_offset,
+      opts_.mel_opts.num_bins);
 
   // Sum with mel fiterbanks over the power spectrum
   mel_banks.Compute(power_spectrum, &mel_energies);

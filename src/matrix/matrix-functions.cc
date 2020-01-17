@@ -27,7 +27,7 @@
 namespace kaldi {
 
 template<typename Real> void ComplexFt (const VectorBase<Real> &in,
-                                     VectorBase<Real> *out, bool forward) {
+    VectorBase<Real> *out, bool forward) {
   int exp_sign = (forward ? -1 : 1);
   KALDI_ASSERT(out != NULL);
   KALDI_ASSERT(in.Dim() == out->Dim());
@@ -68,10 +68,10 @@ template<typename Real> void ComplexFt (const VectorBase<Real> &in,
 
 template
 void ComplexFt (const VectorBase<float> &in,
-                VectorBase<float> *out, bool forward);
+    VectorBase<float> *out, bool forward);
 template
 void ComplexFt (const VectorBase<double> &in,
-                VectorBase<double> *out, bool forward);
+    VectorBase<double> *out, bool forward);
 
 
 #define KALDI_COMPLEXFFT_BLOCKSIZE 8192
@@ -95,9 +95,9 @@ void ComplexFt (const VectorBase<double> &in,
 
 template<typename Real>
 void ComplexFftRecursive (Real *data, int nffts, int N,
-                          const int *factor_begin,
-                          const int *factor_end, bool forward,
-                          Vector<Real> *tmp_vec) {
+    const int *factor_begin,
+    const int *factor_end, bool forward,
+    Vector<Real> *tmp_vec) {
   if (factor_begin == factor_end) {
     KALDI_ASSERT(N == 1);
     return;
@@ -142,7 +142,7 @@ void ComplexFftRecursive (Real *data, int nffts, int N,
             data_tmp[bidx] = data_thisblock[2*aidx+offset];
           }
         }
-        for (int n = 0;n < P*Q;n++) data_thisblock[2*n+offset] = data_tmp[n];
+        for (int n = 0; n < P*Q; n++) data_thisblock[2*n+offset] = data_tmp[n];
       }
     }
   }
@@ -169,7 +169,7 @@ void ComplexFftRecursive (Real *data, int nffts, int N,
       Real qd_re = 1.0, qd_im = 0.0;  // 1^(q'/N)
       for (int qd = 0; qd < Q; qd++) {
         Real pdQ_qd_re = qd_re, pdQ_qd_im = qd_im;  // 1^((p'Q+q') / N) == 1^((p'/P) + (q'/N))
-                                              // Initialize to q'/N, corresponding to p' == 0.
+        // Initialize to q'/N, corresponding to p' == 0.
         for (int pd = 0; pd < P; pd++) {  // pd == p'
           {  // This is the p = 0 case of the loop below [an optimization].
             temp_a[pd*2] = data_thisblock[qd*2];
@@ -327,7 +327,7 @@ void ComplexFftRecursive (Real *data, int nffts, int N,
          end
          delete temporary array e
 
-*/
+ */
 
 // This is the outer-layer calling code for ComplexFftRecursive.
 // It factorizes the dimension and then calls the FFT routine.
@@ -343,7 +343,7 @@ template<typename Real> void ComplexFft(VectorBase<Real> *v, bool forward, Vecto
   if (factors.size() > 0)
     factor_beg = &(factors[0]);
   Vector<Real> tmp;  // allocated in ComplexFftRecursive.
-  ComplexFftRecursive(v->Data(), 1, N, factor_beg, factor_beg+factors.size(), forward, (tmp_in?tmp_in:&tmp));
+  ComplexFftRecursive(v->Data(), 1, N, factor_beg, factor_beg+factors.size(), forward, (tmp_in ? tmp_in : &tmp));
 }
 
 //! Inefficient version of Fourier transform, for testing purposes.
@@ -354,7 +354,7 @@ template<typename Real> void RealFftInefficient (VectorBase<Real> *v, bool forwa
   if (N == 0) return;
   Vector<Real> vtmp(N*2);  // store as complex.
   if (forward) {
-    for (MatrixIndexT i = 0; i < N; i++)  vtmp(i*2) = (*v)(i);
+    for (MatrixIndexT i = 0; i < N; i++) vtmp(i*2) = (*v)(i);
     ComplexFft(&vtmp, forward);  // this is already tested so we can use this.
     v->CopyFromVec( vtmp.Range(0, N) );
     (*v)(1) = vtmp(N);  // Copy the N/2'th fourier component, which is real,
@@ -484,13 +484,13 @@ template void RealFft (VectorBase<double> *v, bool forward);
    We have
        C_k = 1/2 (B_k + B_{N/2 - k}^*)                                 (z0)
        D_k =-1/2i (B_k - B_{N/2 - k}^*)                                (z1)
-so: re(D_k)= 1/2 (im(B_k) + im(B_{N/2-k}))                             (z2)
+   so: re(D_k)= 1/2 (im(B_k) + im(B_{N/2-k}))                             (z2)
     im(D_k) = -1/2 (re(B_k) - re(B_{N/2-k}))                             (z3)
 
     To recover the FT A from C and D, we write, rearranging (1):
 
        A_k = \sum_{n = 0, 2, ..., N-2} a_n 1^(kn/N)
-            +\sum_{n = 1, 3, ..., N-1} a_n 1^(kn/N)
+ +\sum_{n = 1, 3, ..., N-1} a_n 1^(kn/N)
            = \sum_{n = 0, 1, ..., N/2-1} a_n 1^(2kn/N)  + a_{n+1} 1^(2kn/N) 1^(k/N)
            = \sum_{n = 0, 1, ..., N/2-1} c_n 1^(2kn/N)  + d_n  1^(2kn/N) 1^(k/N)
        A_k =  C_k + 1^(k/N) D_k                                              (a0)
@@ -517,7 +517,7 @@ so: re(D_k)= 1/2 (im(B_k) + im(B_{N/2-k}))                             (z2)
      Since B_0 and C_0 are both real, B_0 is the real coefficient of D_0 and C_0 is the
      imaginary coefficient.
 
-     *REVERSING THE PROCESS*
+ * REVERSING THE PROCESS*
 
      Next we want to reverse this process.  We just need to work out C_k and D_k from the
      sequence A_k.  Then we do the inverse complex fft and we get back where we started.
@@ -560,7 +560,7 @@ so: re(D_k)= 1/2 (im(B_k) + im(B_{N/2-k}))                             (z2)
      However, this is not consistent with normal FFT conventions where you get a factor of N.
      For this reason we multiply by two after the process described above.
 
-*/
+ */
 
 
 /*
@@ -583,8 +583,8 @@ so: re(D_k)= 1/2 (im(B_k) + im(B_{N/2-k}))                             (z2)
    So:
       A_k     = 1/2  (C_k + C_{N-k}^*)
     i B_k     = 1/2  (C_k - C_{N-k}^*)
-->    B_k     =-1/2i (C_k - C_{N-k}^*)
-->  re(B_k)   = 1/2 (im(C_k) + im(C_{N-k}))
+   ->    B_k     =-1/2i (C_k - C_{N-k}^*)
+   ->  re(B_k)   = 1/2 (im(C_k) + im(C_{N-k}))
     im(B_k)   =-1/2 (re(C_k) - re(C_{N-k}))
 
  */
@@ -600,7 +600,7 @@ template<typename Real> void ComputeDctMatrix(Matrix<Real> *M) {
   // X_0.
   for (MatrixIndexT j = 0; j < N; j++) (*M)(0, j) = normalizer;
   normalizer = std::sqrt(2.0 / static_cast<Real>(N));  // normalizer for other
-   // elements.
+  // elements.
   for (MatrixIndexT k = 1; k < K; k++)
     for (MatrixIndexT n = 0; n < N; n++)
       (*M)(k, n) = normalizer
@@ -614,10 +614,10 @@ template void ComputeDctMatrix(Matrix<double> *M);
 
 template<typename Real>
 void ComputePca(const MatrixBase<Real> &X,
-                MatrixBase<Real> *U,
-                MatrixBase<Real> *A,
-                bool print_eigs,
-                bool exact) {
+    MatrixBase<Real> *U,
+    MatrixBase<Real> *A,
+    bool print_eigs,
+    bool exact) {
   // Note that some of these matrices may be transposed w.r.t. the
   // way it's most natural to describe them in math... it's the rows
   // of X and U that correspond to the (data-points, basis elements).
@@ -706,17 +706,17 @@ void ComputePca(const MatrixBase<Real> &X,
 
 template
 void ComputePca(const MatrixBase<float> &X,
-                MatrixBase<float> *U,
-                MatrixBase<float> *A,
-                bool print_eigs,
-                bool exact);
+    MatrixBase<float> *U,
+    MatrixBase<float> *A,
+    bool print_eigs,
+    bool exact);
 
 template
 void ComputePca(const MatrixBase<double> &X,
-                MatrixBase<double> *U,
-                MatrixBase<double> *A,
-                bool print_eigs,
-                bool exact);
+    MatrixBase<double> *U,
+    MatrixBase<double> *A,
+    bool print_eigs,
+    bool exact);
 
 
 // Added by Dan, Feb. 13 2012.
@@ -724,12 +724,12 @@ void ComputePca(const MatrixBase<double> &X,
 // *minus += max(0, -(a b^T)).
 template<typename Real>
 void AddOuterProductPlusMinus(Real alpha,
-                              const VectorBase<Real> &a,
-                              const VectorBase<Real> &b,
-                              MatrixBase<Real> *plus,
-                              MatrixBase<Real> *minus) {
+    const VectorBase<Real> &a,
+    const VectorBase<Real> &b,
+    MatrixBase<Real> *plus,
+    MatrixBase<Real> *minus) {
   KALDI_ASSERT(a.Dim() == plus->NumRows() && b.Dim() == plus->NumCols()
-               && a.Dim() == minus->NumRows() && b.Dim() == minus->NumCols());
+      && a.Dim() == minus->NumRows() && b.Dim() == minus->NumCols());
   int32 nrows = a.Dim(), ncols = b.Dim(), pskip = plus->Stride() - ncols,
       mskip = minus->Stride() - ncols;
   const Real *adata = a.Data(), *bdata = b.Data();
@@ -758,16 +758,16 @@ void AddOuterProductPlusMinus(Real alpha,
 // Instantiate template
 template
 void AddOuterProductPlusMinus<float>(float alpha,
-                                     const VectorBase<float> &a,
-                                     const VectorBase<float> &b,
-                                     MatrixBase<float> *plus,
-                                     MatrixBase<float> *minus);
+    const VectorBase<float> &a,
+    const VectorBase<float> &b,
+    MatrixBase<float> *plus,
+    MatrixBase<float> *minus);
 template
 void AddOuterProductPlusMinus<double>(double alpha,
-                                      const VectorBase<double> &a,
-                                      const VectorBase<double> &b,
-                                      MatrixBase<double> *plus,
-                                      MatrixBase<double> *minus);
+    const VectorBase<double> &a,
+    const VectorBase<double> &b,
+    MatrixBase<double> *plus,
+    MatrixBase<double> *minus);
 
 
 } // end namespace kaldi

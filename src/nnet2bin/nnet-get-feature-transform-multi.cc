@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     po.Register("binary", &binary, "Write accumulators in binary mode.");
     opts.Register(&po);
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() < 2) {
       po.PrintUsage();
       exit(1);
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
         KALDI_ERR << "Empty index-list file "
                   << PrintableRxfilename(index_list_rxfilename);
     }
-    
+
     for (int32 i = 2; i < po.NumArgs(); i++) {
       bool binary_in, add = true;
       Input ki(po.GetArg(i), &binary_in);

@@ -54,8 +54,8 @@ struct MelBanksOptions {
   // mel-energy flooring and reproduces a bug in HTK.
   bool htk_mode;
   explicit MelBanksOptions(int num_bins = 25)
-      : num_bins(num_bins), low_freq(20), high_freq(0), vtln_low(100),
-        vtln_high(-500), debug_mel(false), htk_mode(false) {}
+    : num_bins(num_bins), low_freq(20), high_freq(0), vtln_low(100),
+    vtln_high(-500), debug_mel(false), htk_mode(false) {}
 
   void Register(OptionsItf *opts) {
     opts->Register("num-mel-bins", &num_bins,
@@ -76,7 +76,7 @@ struct MelBanksOptions {
 
 
 class MelBanks {
- public:
+public:
 
   static inline BaseFloat InverseMelScale(BaseFloat mel_freq) {
     return 700.0f * (expf (mel_freq / 1127.0f) - 1.0f);
@@ -87,29 +87,29 @@ class MelBanks {
   }
 
   static BaseFloat VtlnWarpFreq(BaseFloat vtln_low_cutoff,
-                                BaseFloat vtln_high_cutoff,  // discontinuities in warp func
-                                BaseFloat low_freq,
-                                BaseFloat high_freq,  // upper+lower frequency cutoffs in
-                                // the mel computation
-                                BaseFloat vtln_warp_factor,
-                                BaseFloat freq);
+      BaseFloat vtln_high_cutoff,                            // discontinuities in warp func
+      BaseFloat low_freq,
+      BaseFloat high_freq,                            // upper+lower frequency cutoffs in
+      // the mel computation
+      BaseFloat vtln_warp_factor,
+      BaseFloat freq);
 
   static BaseFloat VtlnWarpMelFreq(BaseFloat vtln_low_cutoff,
-                                   BaseFloat vtln_high_cutoff,
-                                   BaseFloat low_freq,
-                                   BaseFloat high_freq,
-                                   BaseFloat vtln_warp_factor,
-                                   BaseFloat mel_freq);
+      BaseFloat vtln_high_cutoff,
+      BaseFloat low_freq,
+      BaseFloat high_freq,
+      BaseFloat vtln_warp_factor,
+      BaseFloat mel_freq);
 
 
   MelBanks(const MelBanksOptions &opts,
-           const FrameExtractionOptions &frame_opts,
-           BaseFloat vtln_warp_factor);
+      const FrameExtractionOptions &frame_opts,
+      BaseFloat vtln_warp_factor);
 
   /// Compute Mel energies (note: not log enerties).
   /// At input, "fft_energies" contains the FFT energies (not log).
   void Compute(const VectorBase<BaseFloat> &fft_energies,
-               VectorBase<BaseFloat> *mel_energies_out) const;
+      VectorBase<BaseFloat> *mel_energies_out) const;
 
   int32 NumBins() const { return bins_.size(); }
 
@@ -118,7 +118,7 @@ class MelBanks {
 
   // Copy constructor
   MelBanks(const MelBanks &other);
- private:
+private:
   // Disallow assignment
   MelBanks &operator = (const MelBanks &other);
 
@@ -152,14 +152,14 @@ BaseFloat Durbin(int n, const BaseFloat *pAC, BaseFloat *pLP, BaseFloat *pTmp);
 // Compute LP coefficients from autocorrelation coefficients.
 // Returns log energy of residual (I think)
 BaseFloat ComputeLpc(const VectorBase<BaseFloat> &autocorr_in,
-                     Vector<BaseFloat> *lpc_out);
+    Vector<BaseFloat> *lpc_out);
 
 void Lpc2Cepstrum(int n, const BaseFloat *pLPC, BaseFloat *pCepst);
 
 
 
 void GetEqualLoudnessVector(const MelBanks &mel_banks,
-                            Vector<BaseFloat> *ans);
+    Vector<BaseFloat> *ans);
 
 /// @} End of "addtogroup feat"
 }  // namespace kaldi

@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     TableWriter<VectorFstHolder> fst_writer(fsts_wspecifier);
 
     int32 n_out_done = 0,
-          n_in_done = 0;
+        n_in_done = 0;
     std::string res_key = "";
     VectorFst<StdArc> res_fst;
 

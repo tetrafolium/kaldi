@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
     using namespace kaldi::nnet2;
-    
+
     typedef kaldi::int32 int32;
 
     const char *usage =
@@ -45,9 +45,9 @@ int main(int argc, char *argv[]) {
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("truncate", &truncate, "If set, will truncate the neural net "
                 "to this many components by removing the last components.");
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     std::string nnet_rxfilename = po.GetArg(1),
         raw_nnet_wxfilename = po.GetArg(2);
-    
+
     TransitionModel trans_model;
     AmNnet am_nnet;
     {
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
     const Nnet &nnet = am_nnet.GetNnet();
     WriteKaldiObject(nnet, raw_nnet_wxfilename, binary_write);
-    
+
     KALDI_LOG << "Read neural net from " << nnet_rxfilename
               << " and wrote raw neural net to " << raw_nnet_wxfilename;
     return 0;

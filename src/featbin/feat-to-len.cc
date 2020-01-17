@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         "Usage: feat-to-len [options] <in-rspecifier> [<out-wspecifier>]\n"
         "e.g.: feat-to-len scp:feats.scp ark,t:feats.lengths\n"
         "or: feat-to-len scp:feats.scp\n";
-    
+
     ParseOptions po(usage);
 
     po.Read(argc, argv);

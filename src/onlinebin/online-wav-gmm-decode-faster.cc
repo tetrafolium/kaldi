@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     ParseOptions po(usage);
     BaseFloat acoustic_scale = 0.1;
     int32 cmn_window = 600,
-      min_cmn_window = 100; // adds 1 second latency, only at utterance start.
+        min_cmn_window = 100; // adds 1 second latency, only at utterance start.
     int32 channel = -1;
     int32 right_context = 4, left_context = 4;
 
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     decoder_opts.Register(&po, true);
     OnlineFeatureMatrixOptions feature_reading_opts;
     feature_reading_opts.Register(&po);
-    
+
     po.Register("left-context", &left_context, "Number of frames of left context");
     po.Register("right-context", &right_context, "Number of frames of right context");
     po.Register("acoustic-scale", &acoustic_scale,
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       return 1;
     }
-    
+
     std::string wav_rspecifier = po.GetArg(1),
         model_rspecifier = po.GetArg(2),
         fst_rspecifier = po.GetArg(3),
@@ -95,9 +95,9 @@ int main(int argc, char *argv[]) {
 
     std::vector<int32> silence_phones;
     if (!SplitStringToIntegers(silence_phones_str, ":", false, &silence_phones))
-        KALDI_ERR << "Invalid silence-phones string " << silence_phones_str;
+      KALDI_ERR << "Invalid silence-phones string " << silence_phones_str;
     if (silence_phones.empty())
-        KALDI_ERR << "No silence phones given!";
+      KALDI_ERR << "No silence phones given!";
 
     Int32VectorWriter words_writer(words_wspecifier);
     Int32VectorWriter alignment_writer(alignment_wspecifier);
@@ -112,16 +112,16 @@ int main(int argc, char *argv[]) {
     TransitionModel trans_model;
     AmDiagGmm am_gmm;
     {
-        bool binary;
-        Input ki(model_rspecifier, &binary);
-        trans_model.Read(ki.Stream(), binary);
-        am_gmm.Read(ki.Stream(), binary);
+      bool binary;
+      Input ki(model_rspecifier, &binary);
+      trans_model.Read(ki.Stream(), binary);
+      am_gmm.Read(ki.Stream(), binary);
     }
 
     fst::SymbolTable *word_syms = NULL;
     if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
-        KALDI_ERR << "Could not read symbol table from file "
-                    << word_syms_filename;
+      KALDI_ERR << "Could not read symbol table from file "
+                << word_syms_filename;
 
     fst::Fst<fst::StdArc> *decode_fst = ReadDecodeGraph(fst_rspecifier);
 
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
     decoder_opts.batch_size = std::max(decoder_opts.batch_size, window_size);
 
     OnlineFasterDecoder decoder(*decode_fst, decoder_opts,
-                                silence_phones, trans_model);
+        silence_phones, trans_model);
     SequentialTableReader<WaveHolder> reader(wav_rspecifier);
     VectorFst<LatticeArc> out_fst;
     for (; !reader.Done(); reader.Next()) {
@@ -167,8 +167,8 @@ int main(int argc, char *argv[]) {
       OnlineVectorSource au_src(wav_data.Data().Row(this_chan));
       Mfcc mfcc(mfcc_opts);
       FeInput fe_input(&au_src, &mfcc,
-                       frame_length*(wav_data.SampFreq()/1000),
-                       frame_shift*(wav_data.SampFreq()/1000));
+          frame_length*(wav_data.SampFreq()/1000),
+          frame_shift*(wav_data.SampFreq()/1000));
       OnlineCmnInput cmn_input(&fe_input, cmn_window, min_cmn_window);
       OnlineFeatInputItf *feat_transform = 0;
       if (lda_mat_rspecifier != "") {
@@ -183,10 +183,10 @@ int main(int argc, char *argv[]) {
 
       // feature_reading_opts contains number of retries, batch size.
       OnlineFeatureMatrix feature_matrix(feature_reading_opts,
-                                         feat_transform);
+          feat_transform);
 
       OnlineDecodableDiagGmmScaled decodable(am_gmm, trans_model, acoustic_scale,
-                                             &feature_matrix);
+          &feature_matrix);
       int32 start_frame = 0;
       bool partial_res = false;
       decoder.InitDecoding();

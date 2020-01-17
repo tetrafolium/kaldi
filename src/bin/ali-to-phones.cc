@@ -74,9 +74,9 @@ int main(int argc, char *argv[]) {
     SequentialInt32VectorReader reader(alignments_rspecifier);
     std::string empty;
     Int32VectorWriter phones_writer(ctm_output ? empty :
-                                    (write_lengths ? empty : po.GetArg(3)));
+        (write_lengths ? empty : po.GetArg(3)));
     Int32PairVectorWriter pair_writer(ctm_output ? empty :
-                                      (write_lengths ? po.GetArg(3) : empty));
+        (write_lengths ? po.GetArg(3) : empty));
 
     std::string ctm_wxfilename(ctm_output ? po.GetArg(3) : empty);
     Output ctm_writer(ctm_wxfilename, false);
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
           int32 phone = trans_model.TransitionIdToPhone(split[i][0]);
           int32 num_repeats = split[i].size();
           ctm_writer.Stream() << key << " 1 " << phone_start << " "
-                      << (frame_shift * num_repeats) << " " << phone << std::endl;
+                              << (frame_shift * num_repeats) << " " << phone << std::endl;
           phone_start += frame_shift * num_repeats;
         }
       } else if (!write_lengths) {

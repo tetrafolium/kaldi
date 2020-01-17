@@ -47,7 +47,7 @@ static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
   const NnetComputation *computation = compiler->Compile(request);
   Nnet *nnet_to_update = NULL;  // we're not doing any update.
   NnetComputer computer(NnetComputeOptions(), *computation,
-                  nnet, nnet_to_update);
+      nnet, nnet_to_update);
   CuMatrix<BaseFloat> input_feats_cu(features);
   computer.AcceptInput("input", &input_feats_cu);
   computer.Run();
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 
     std::string use_gpu = "no";
     int32 chunk_size = -1,
-      min_chunk_size = 100;
+        min_chunk_size = 100;
 
     opts.Register(&po);
     po.Register("use-gpu", &use_gpu,
@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
 #endif
 
     std::string nnet_rxfilename = po.GetArg(1),
-                feature_rspecifier = po.GetArg(2),
-                vector_wspecifier = po.GetArg(3);
+        feature_rspecifier = po.GetArg(2),
+        vector_wspecifier = po.GetArg(3);
 
     Nnet nnet;
     ReadKaldiObject(nnet_rxfilename, &nnet);
@@ -146,8 +146,8 @@ int main(int argc, char *argv[]) {
         continue;
       }
       int32 num_rows = features.NumRows(),
-            feat_dim = features.NumCols(),
-            this_chunk_size = chunk_size;
+          feat_dim = features.NumCols(),
+          this_chunk_size = chunk_size;
 
       if (num_rows < min_chunk_size) {
         KALDI_WARN << "Minimum chunk size of " << min_chunk_size

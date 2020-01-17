@@ -24,18 +24,18 @@
 namespace kaldi {
 
 bool ContextDependency::Compute(const std::vector<int32> &phoneseq,
-                                 int32 pdf_class,
-                                 int32 *pdf_id) const {
+    int32 pdf_class,
+    int32 *pdf_id) const {
   KALDI_ASSERT(static_cast<int32>(phoneseq.size()) == N_);
   EventType  event_vec;
   event_vec.reserve(N_+1);
   event_vec.push_back(std::make_pair
-                      (static_cast<EventKeyType>(kPdfClass),  // -1
+      (static_cast<EventKeyType>(kPdfClass),                  // -1
                        static_cast<EventValueType>(pdf_class)));
   KALDI_COMPILE_TIME_ASSERT(kPdfClass < 0);  // or it would not be sorted.
-  for (int32 i = 0;i < N_;i++) {
+  for (int32 i = 0; i < N_; i++) {
     event_vec.push_back(std::make_pair
-                        (static_cast<EventKeyType>(i),
+        (static_cast<EventKeyType>(i),
                          static_cast<EventValueType>(phoneseq[i])));
     KALDI_ASSERT(static_cast<EventAnswerType>(phoneseq[i]) >= 0);
   }
@@ -44,8 +44,8 @@ bool ContextDependency::Compute(const std::vector<int32> &phoneseq,
 }
 
 ContextDependency *GenRandContextDependency(const std::vector<int32> &phone_ids,
-                                            bool ensure_all_covered,
-                                            std::vector<int32> *hmm_lengths) {
+    bool ensure_all_covered,
+    std::vector<int32> *hmm_lengths) {
   KALDI_ASSERT(IsSortedAndUniq(phone_ids));
   int32 num_phones = phone_ids.size();
   int32 num_stats = 1 + (Rand() % 15) * (Rand() % 15);  // up to 14^2 + 1 separate stats.
@@ -85,7 +85,7 @@ ContextDependency *GenRandContextDependency(const std::vector<int32> &phone_ids,
   for (size_t i = 0; i < phone_ids.size(); i++)
     phone_sets[i].push_back(phone_ids[i]);
   std::vector<bool> share_roots(phone_sets.size(), true),
-      do_split(phone_sets.size(), true);
+  do_split(phone_sets.size(), true);
 
   tree = BuildTree(qopts, phone_sets, *hmm_lengths, share_roots,
                    do_split, stats, thresh, 1000, 0.0, P);
@@ -95,9 +95,9 @@ ContextDependency *GenRandContextDependency(const std::vector<int32> &phone_ids,
 
 
 ContextDependency *GenRandContextDependencyLarge(const std::vector<int32> &phone_ids,
-                                                 int N, int P,
-                                                 bool ensure_all_covered,
-                                                 std::vector<int32> *hmm_lengths) {
+    int N, int P,
+    bool ensure_all_covered,
+    std::vector<int32> *hmm_lengths) {
   KALDI_ASSERT(IsSortedAndUniq(phone_ids));
   int32 num_phones = phone_ids.size();
   int32 num_stats = 3000;  // each is a separate context.
@@ -133,7 +133,7 @@ ContextDependency *GenRandContextDependencyLarge(const std::vector<int32> &phone
   for (size_t i = 0; i < phone_ids.size(); i++)
     phone_sets[i].push_back(phone_ids[i]);
   std::vector<bool> share_roots(phone_sets.size(), true),
-      do_split(phone_sets.size(), true);
+  do_split(phone_sets.size(), true);
 
   tree = BuildTree(qopts, phone_sets, *hmm_lengths, share_roots,
                    do_split, stats, thresh, 1000, 0.0, P);
@@ -169,7 +169,7 @@ void ContextDependency::Read (std::istream &is, bool binary) {
     ReadToken(is, binary, &token);
   }
   if (token == "ToPdf") {
-    to_pdf = EventMap::Read(is , binary);
+    to_pdf = EventMap::Read(is, binary);
   } else {
     KALDI_ERR << "Got unexpected token " << token
               << " reading context-dependency object.";
@@ -179,10 +179,10 @@ void ContextDependency::Read (std::istream &is, bool binary) {
 }
 
 void ContextDependency::EnumeratePairs(
-    const std::vector<int32> &phones,
-    int32 self_loop_pdf_class, int32 forward_pdf_class,
-    const std::vector<int32> &phone_window,
-    unordered_set<std::pair<int32, int32>, PairHasher<int32> > *pairs) const {
+  const std::vector<int32> &phones,
+  int32 self_loop_pdf_class, int32 forward_pdf_class,
+  const std::vector<int32> &phone_window,
+  unordered_set<std::pair<int32, int32>, PairHasher<int32> > *pairs) const {
   std::vector<int32> new_phone_window(phone_window);
   EventType vec;
 
@@ -237,7 +237,7 @@ void ContextDependency::EnumeratePairs(
     EnumeratePairs(phones, self_loop_pdf_class, forward_pdf_class,
                    new_phone_window, pairs);
 
-    for (size_t i = 0 ; i < phones.size(); i++) {
+    for (size_t i = 0; i < phones.size(); i++) {
       new_phone_window[position] = phones[i];
       EnumeratePairs(phones, self_loop_pdf_class, forward_pdf_class,
                      new_phone_window, pairs);
@@ -246,28 +246,28 @@ void ContextDependency::EnumeratePairs(
 }
 
 void ContextDependency::GetPdfInfo(
-    const std::vector<int32> &phones,
-    const std::vector<std::vector<std::pair<int32, int32> > > &pdf_class_pairs,
-    std::vector<std::vector<std::vector<std::pair<int32, int32> > > > *pdf_info) const {
+  const std::vector<int32> &phones,
+  const std::vector<std::vector<std::pair<int32, int32> > > &pdf_class_pairs,
+  std::vector<std::vector<std::vector<std::pair<int32, int32> > > > *pdf_info) const {
 
   KALDI_ASSERT(pdf_info != NULL);
   pdf_info->resize(1 + *std::max_element(phones.begin(), phones.end()));
   std::vector<int32> phone_window(N_, -1);
   EventType vec;
-  for (size_t i = 0 ; i < phones.size(); i++) {
+  for (size_t i = 0; i < phones.size(); i++) {
     // loop over phones
     int32 phone = phones[i];
     (*pdf_info)[phone].resize(pdf_class_pairs[phone].size());
     for (size_t j = 0; j < pdf_class_pairs[phone].size(); j++) {
       // loop over pdf_class pairs
       int32 pdf_class = pdf_class_pairs[phone][j].first,
-            self_loop_pdf_class = pdf_class_pairs[phone][j].second;
+          self_loop_pdf_class = pdf_class_pairs[phone][j].second;
       phone_window[P_] = phone;
 
       unordered_set<std::pair<int32, int32>, PairHasher<int32> > pairs;
       EnumeratePairs(phones, self_loop_pdf_class, pdf_class, phone_window, &pairs);
       unordered_set<std::pair<int32, int32>, PairHasher<int32> >::iterator iter = pairs.begin(),
-                           end = pairs.end();
+          end = pairs.end();
       for (; iter != end; ++iter)
         (*pdf_info)[phone][j].push_back(*iter);
       std::sort( ((*pdf_info)[phone][j]).begin(),  ((*pdf_info)[phone][j]).end());
@@ -276,14 +276,14 @@ void ContextDependency::GetPdfInfo(
 }
 
 void ContextDependency::GetPdfInfo(
-    const std::vector<int32> &phones,
-    const std::vector<int32> &num_pdf_classes,  // indexed by phone,
-    std::vector<std::vector<std::pair<int32, int32> > > *pdf_info) const {
+  const std::vector<int32> &phones,
+  const std::vector<int32> &num_pdf_classes,    // indexed by phone,
+  std::vector<std::vector<std::pair<int32, int32> > > *pdf_info) const {
 
   EventType vec;
   KALDI_ASSERT(pdf_info != NULL);
   pdf_info->resize(NumPdfs());
-  for (size_t i = 0 ; i < phones.size(); i++) {
+  for (size_t i = 0; i < phones.size(); i++) {
     int32 phone = phones[i];
     vec.clear();
     vec.push_back(std::make_pair(static_cast<EventKeyType>(P_),
@@ -320,7 +320,7 @@ void ContextDependency::GetPdfInfo(
 
 ContextDependency*
 MonophoneContextDependency(const std::vector<int32> phones,
-                           const std::vector<int32> phone2num_pdf_classes) {
+    const std::vector<int32> phone2num_pdf_classes) {
   std::vector<std::vector<int32> > phone_sets(phones.size());
   for (size_t i = 0; i < phones.size(); i++) phone_sets[i].push_back(phones[i]);
   std::vector<bool> share_roots(phones.size(), false);  // don't share roots.
@@ -332,7 +332,7 @@ MonophoneContextDependency(const std::vector<int32> phones,
 
 ContextDependency*
 MonophoneContextDependencyShared(const std::vector<std::vector<int32> > phone_sets,
-                                 const std::vector<int32> phone2num_pdf_classes) {
+    const std::vector<int32> phone2num_pdf_classes) {
   std::vector<bool> share_roots(phone_sets.size(), false);  // don't share roots.
   // N is context size, P = position of central phone (must be 0).
   int32 num_leaves = 0, P = 0, N = 1;

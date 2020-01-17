@@ -60,18 +60,18 @@ int main(int argc, char *argv[]) {
 }
 
 /*
-Test script:
+   Test script:
 
-cat <<EOF | nnet3-init --binary=false - - | nnet3-info -
-component name=affine1 type=NaturalGradientAffineComponent input-dim=72 output-dim=59
-component name=relu1 type=RectifiedLinearComponent dim=59
-component name=final_affine type=NaturalGradientAffineComponent input-dim=59 output-dim=298
-component name=logsoftmax type=SoftmaxComponent dim=298
-input-node name=input dim=18
-component-node name=affine1_node component=affine1 input=Append(Offset(input, -4), Offset(input, -3), Offset(input, -2), Offset(input, 0))
-component-node name=nonlin1 component=relu1 input=affine1_node
-component-node name=final_affine component=final_affine input=nonlin1
-component-node name=output_nonlin component=logsoftmax input=final_affine
-output-node name=output input=output_nonlin
-EOF
-*/
+   cat <<EOF | nnet3-init --binary=false - - | nnet3-info -
+   component name=affine1 type=NaturalGradientAffineComponent input-dim=72 output-dim=59
+   component name=relu1 type=RectifiedLinearComponent dim=59
+   component name=final_affine type=NaturalGradientAffineComponent input-dim=59 output-dim=298
+   component name=logsoftmax type=SoftmaxComponent dim=298
+   input-node name=input dim=18
+   component-node name=affine1_node component=affine1 input=Append(Offset(input, -4), Offset(input, -3), Offset(input, -2), Offset(input, 0))
+   component-node name=nonlin1 component=relu1 input=affine1_node
+   component-node name=final_affine component=final_affine input=nonlin1
+   component-node name=output_nonlin component=logsoftmax input=final_affine
+   output-node name=output input=output_nonlin
+   EOF
+ */

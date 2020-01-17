@@ -35,13 +35,13 @@ void InitCmvnStats(int32 dim, Matrix<double> *stats);
 
 /// Accumulation from a single frame (weighted).
 void AccCmvnStats(const VectorBase<BaseFloat> &feat,
-                  BaseFloat weight,
-                  MatrixBase<double> *stats);
+    BaseFloat weight,
+    MatrixBase<double> *stats);
 
 /// Accumulation from a feature file (possibly weighted-- useful in excluding silence).
 void AccCmvnStats(const MatrixBase<BaseFloat> &feats,
-                  const VectorBase<BaseFloat> *weights,  // or NULL
-                  MatrixBase<double> *stats);
+    const VectorBase<BaseFloat> *weights,                // or NULL
+    MatrixBase<double> *stats);
 
 /// Apply cepstral mean and variance normalization to a matrix of features.
 /// If norm_vars == true, expects stats to be of dimension 2 by (dim+1), but
@@ -49,8 +49,8 @@ void AccCmvnStats(const MatrixBase<BaseFloat> &feats,
 /// are produced by the balanced-cmvn code when it computes an offset and
 /// represents it as "fake stats".
 void ApplyCmvn(const MatrixBase<double> &stats,
-               bool norm_vars,
-               MatrixBase<BaseFloat> *feats);
+    bool norm_vars,
+    MatrixBase<BaseFloat> *feats);
 
 /// This is as ApplyCmvn, but does so in the reverse sense, i.e. applies a transform
 /// that would take zero-mean, unit-variance input and turn it into output with the
@@ -58,16 +58,16 @@ void ApplyCmvn(const MatrixBase<double> &stats,
 /// to correct a mismatch, so you would first apply CMVN and then do the "reverse"
 /// CMVN with the summed stats of your training data.
 void ApplyCmvnReverse(const MatrixBase<double> &stats,
-                      bool norm_vars,
-                      MatrixBase<BaseFloat> *feats);
+    bool norm_vars,
+    MatrixBase<BaseFloat> *feats);
 
 
 /// Modify the stats so that for some dimensions (specified in "dims"), we
 /// replace them with "fake" stats that have zero mean and unit variance; this
 /// is done to disable CMVN for those dimensions.
 void FakeStatsForSomeDims(const std::vector<int32> &dims,
-                          MatrixBase<double> *stats);
-                          
+    MatrixBase<double> *stats);
+
 
 
 }  // namespace kaldi

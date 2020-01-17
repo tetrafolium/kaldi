@@ -68,7 +68,7 @@ Nnet& Nnet::operator= (const Nnet& other) {
  * (from first component to last).
  */
 void Nnet::Propagate(const CuMatrixBase<BaseFloat> &in,
-                     CuMatrix<BaseFloat> *out) {
+    CuMatrix<BaseFloat> *out) {
   // In case of empty network copy input to output,
   if (NumComponents() == 0) {
     (*out) = in;  // copy,
@@ -94,7 +94,7 @@ void Nnet::Propagate(const CuMatrixBase<BaseFloat> &in,
  * (from last component to first).
  */
 void Nnet::Backpropagate(const CuMatrixBase<BaseFloat> &out_diff,
-                         CuMatrix<BaseFloat> *in_diff) {
+    CuMatrix<BaseFloat> *in_diff) {
   // Copy the derivative in case of empty network,
   if (NumComponents() == 0) {
     (*in_diff) = out_diff;  // copy,
@@ -117,7 +117,7 @@ void Nnet::Backpropagate(const CuMatrixBase<BaseFloat> &out_diff,
     // Update 'Component' (if applicable),
     if (components_[i]->IsUpdatable()) {
       UpdatableComponent* uc =
-        dynamic_cast<UpdatableComponent*>(components_[i]);
+          dynamic_cast<UpdatableComponent*>(components_[i]);
       uc->Update(propagate_buf_[i], backpropagate_buf_[i+1]);
     }
   }
@@ -129,7 +129,7 @@ void Nnet::Backpropagate(const CuMatrixBase<BaseFloat> &out_diff,
 
 
 void Nnet::Feedforward(const CuMatrixBase<BaseFloat> &in,
-                       CuMatrix<BaseFloat> *out) {
+    CuMatrix<BaseFloat> *out) {
   KALDI_ASSERT(NULL != out);
   (*out) = in;  // works even with 0 components,
   CuMatrix<BaseFloat> tmp_in;
@@ -212,7 +212,7 @@ int32 Nnet::NumParams() const {
   for (int32 n = 0; n < components_.size(); n++) {
     if (components_[n]->IsUpdatable()) {
       n_params +=
-        dynamic_cast<UpdatableComponent*>(components_[n])->NumParams();
+          dynamic_cast<UpdatableComponent*>(components_[n])->NumParams();
     }
   }
   return n_params;
@@ -225,7 +225,7 @@ void Nnet::GetGradient(Vector<BaseFloat>* gradient) const {
   for (int32 i = 0; i < components_.size(); i++) {
     if (components_[i]->IsUpdatable()) {
       UpdatableComponent& c =
-        dynamic_cast<UpdatableComponent&>(*components_[i]);
+          dynamic_cast<UpdatableComponent&>(*components_[i]);
       SubVector<BaseFloat> grad_range(gradient->Range(pos, c.NumParams()));
       c.GetGradient(&grad_range);  // getting gradient,
       pos += c.NumParams();
@@ -241,7 +241,7 @@ void Nnet::GetParams(Vector<BaseFloat>* params) const {
   for (int32 i = 0; i < components_.size(); i++) {
     if (components_[i]->IsUpdatable()) {
       UpdatableComponent& c =
-        dynamic_cast<UpdatableComponent&>(*components_[i]);
+          dynamic_cast<UpdatableComponent&>(*components_[i]);
       SubVector<BaseFloat> params_range(params->Range(pos, c.NumParams()));
       c.GetParams(&params_range);  // getting params,
       pos += c.NumParams();
@@ -257,7 +257,7 @@ void Nnet::SetParams(const VectorBase<BaseFloat>& params) {
   for (int32 i = 0; i < components_.size(); i++) {
     if (components_[i]->IsUpdatable()) {
       UpdatableComponent& c =
-        dynamic_cast<UpdatableComponent&>(*components_[i]);
+          dynamic_cast<UpdatableComponent&>(*components_[i]);
       c.SetParams(params.Range(pos, c.NumParams()));  // setting params,
       pos += c.NumParams();
     }
@@ -282,7 +282,7 @@ void Nnet::ResetStreams(const std::vector<int32> &stream_reset_flag) {
   for (int32 c = 0; c < NumComponents(); c++) {
     if (GetComponent(c).IsMultistream()) {
       MultistreamComponent& comp =
-        dynamic_cast<MultistreamComponent&>(GetComponent(c));
+          dynamic_cast<MultistreamComponent&>(GetComponent(c));
       comp.ResetStreams(stream_reset_flag);
     }
   }
@@ -292,7 +292,7 @@ void Nnet::SetSeqLengths(const std::vector<int32> &sequence_lengths) {
   for (int32 c = 0; c < NumComponents(); c++) {
     if (GetComponent(c).IsMultistream()) {
       MultistreamComponent& comp =
-        dynamic_cast<MultistreamComponent&>(GetComponent(c));
+          dynamic_cast<MultistreamComponent&>(GetComponent(c));
       comp.SetSeqLengths(sequence_lengths);
     }
   }
@@ -469,7 +469,7 @@ void Nnet::Check() const {
   for (size_t i = 0; i + 1 < components_.size(); i++) {
     KALDI_ASSERT(components_[i] != NULL);
     int32 output_dim = components_[i]->OutputDim(),
-      next_input_dim = components_[i+1]->InputDim();
+        next_input_dim = components_[i+1]->InputDim();
     // show error message,
     if (output_dim != next_input_dim) {
       KALDI_ERR << "Component dimension mismatch!"

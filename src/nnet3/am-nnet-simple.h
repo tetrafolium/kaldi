@@ -29,34 +29,34 @@ namespace nnet3 {
 
 /*
 
-  The class AmNnetSimple (AM stands for "acoustic model") has the job of taking
-  the "Nnet" class, which is a quite general neural network, and giving it an
-  interface that's suitable for acoustic modeling, i.e. all the stuff that's
-  specific to the speech recognition application, including dividing by the
-  prior.
+   The class AmNnetSimple (AM stands for "acoustic model") has the job of taking
+   the "Nnet" class, which is a quite general neural network, and giving it an
+   interface that's suitable for acoustic modeling, i.e. all the stuff that's
+   specific to the speech recognition application, including dividing by the
+   prior.
 
-  This class is intended for wrapping "simple" neural nets, defined as those
-  having one output named "output", an input named "input" (provided for various
-  t and x=0) and a possible input named "ivector" (provided only for t=0,x=0).
-  The inputs and outputs should have the expected relationship, e.g. the minimum
-  context required to compute an output should be expressible as a left-context
-  and right-context sufficient to cover all cases (for instance, the output
-  can't depend on the input at 2*t).
+   This class is intended for wrapping "simple" neural nets, defined as those
+   having one output named "output", an input named "input" (provided for various
+   t and x=0) and a possible input named "ivector" (provided only for t=0,x=0).
+   The inputs and outputs should have the expected relationship, e.g. the minimum
+   context required to compute an output should be expressible as a left-context
+   and right-context sufficient to cover all cases (for instance, the output
+   can't depend on the input at 2*t).
 
-*/
+ */
 
 
 class AmNnetSimple {
- public:
+public:
   AmNnetSimple() { }
 
-  AmNnetSimple(const AmNnetSimple &other):
+  AmNnetSimple(const AmNnetSimple &other) :
     nnet_(other.nnet_),
     priors_(other.priors_),
     left_context_(other.left_context_),
     right_context_(other.right_context_) { }
 
-  explicit AmNnetSimple(const Nnet &nnet):
+  explicit AmNnetSimple(const Nnet &nnet) :
     nnet_(nnet) { SetContext(); }
 
   int32 NumPdfs() const;
@@ -96,7 +96,7 @@ class AmNnetSimple {
   /// this if you have structurally changed the nnet without calling SetNnet(),
   /// e.g. using non-const GetNnet().
   void SetContext();
- private:
+private:
 
   const AmNnetSimple &operator = (const AmNnetSimple &other); // Disallow.
   Nnet nnet_;

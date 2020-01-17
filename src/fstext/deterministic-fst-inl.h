@@ -1,6 +1,6 @@
 // fstext/deterministic-fst-inl.h
 
-// Copyright 2011-2012 Gilles Boulianne 
+// Copyright 2011-2012 Gilles Boulianne
 //                2014 Telepoint Global Hosting Service, LLC. (Author: David Snyder)
 //           2012-2015 Johns Hopkins University (author: Daniel Povey)
 
@@ -31,7 +31,7 @@ namespace fst {
 template<class Arc>
 typename Arc::StateId
 BackoffDeterministicOnDemandFst<Arc>::GetBackoffState(StateId s,
-                                                      Weight *w) {
+    Weight *w) {
   ArcIterator<Fst<Arc> > aiter(fst_, s);
   if (aiter.Done()) // no arcs.
     return kNoStateId;
@@ -56,17 +56,17 @@ typename Arc::Weight BackoffDeterministicOnDemandFst<Arc>::Final(StateId state) 
 
 template<class Arc>
 BackoffDeterministicOnDemandFst<Arc>::BackoffDeterministicOnDemandFst(
-    const Fst<Arc> &fst): fst_(fst) {
+  const Fst<Arc> &fst) : fst_(fst) {
 #ifdef KALDI_PARANOID
   KALDI_ASSERT(fst_.Properties(kILabelSorted|kIDeterministic, true) ==
-               (kILabelSorted|kIDeterministic) &&
+      (kILabelSorted|kIDeterministic) &&
                "Input FST is not i-label sorted and deterministic.");
 #endif
 }
 
 template<class Arc>
 bool BackoffDeterministicOnDemandFst<Arc>::GetArc(
-    StateId s, Label ilabel, Arc *oarc) {
+  StateId s, Label ilabel, Arc *oarc) {
   KALDI_ASSERT(ilabel != 0); //  We don't allow GetArc for epsilon.
 
   SortedMatcher<Fst<Arc> > sm(fst_, MATCH_INPUT, 1);
@@ -86,7 +86,7 @@ bool BackoffDeterministicOnDemandFst<Arc>::GetArc(
 }
 
 template<class Arc>
-UnweightedNgramFst<Arc>::UnweightedNgramFst(int n): n_(n) {
+UnweightedNgramFst<Arc>::UnweightedNgramFst(int n) : n_(n) {
   // Starting state is an empty vector
   std::vector<Label> start_state;
   state_vec_.push_back(start_state);
@@ -99,8 +99,8 @@ bool UnweightedNgramFst<Arc>::GetArc(
   StateId s, Label ilabel, Arc *oarc) {
 
   // The state ids increment with each state we encounter.
-  // if the assert fails, then we are trying to access 
-  // unseen states that are not immediately traversable. 
+  // if the assert fails, then we are trying to access
+  // unseen states that are not immediately traversable.
   KALDI_ASSERT(static_cast<size_t>(s) < state_vec_.size());
   std::vector<Label> seq = state_vec_[s];
   // Update state info.
@@ -113,7 +113,7 @@ bool UnweightedNgramFst<Arc>::GetArc(
     seq,
     static_cast<Label>(state_vec_.size()));
   // Now get state id for destination state.
-  typedef typename MapType::iterator IterType;  
+  typedef typename MapType::iterator IterType;
   std::pair<IterType, bool> result = state_map_.insert(new_state);
   if (result.second == true) {
     state_vec_.push_back(seq);
@@ -134,8 +134,8 @@ typename Arc::Weight UnweightedNgramFst<Arc>::Final(StateId state) {
 
 template<class Arc>
 ComposeDeterministicOnDemandFst<Arc>::ComposeDeterministicOnDemandFst(
-    DeterministicOnDemandFst<Arc> *fst1,
-    DeterministicOnDemandFst<Arc> *fst2): fst1_(fst1), fst2_(fst2) {
+  DeterministicOnDemandFst<Arc> *fst1,
+  DeterministicOnDemandFst<Arc> *fst2) : fst1_(fst1), fst2_(fst2) {
   KALDI_ASSERT(fst1 != NULL && fst2 != NULL);
   if (fst1_->Start() == -1 || fst2_->Start() == -1) {
     start_state_ = -1;
@@ -158,20 +158,20 @@ typename Arc::Weight ComposeDeterministicOnDemandFst<Arc>::Final(StateId s) {
 
 template<class Arc>
 bool ComposeDeterministicOnDemandFst<Arc>::GetArc(StateId s, Label ilabel,
-                                                  Arc *oarc) {
+    Arc *oarc) {
   typedef typename MapType::iterator IterType;
   KALDI_ASSERT(ilabel != 0);
   KALDI_ASSERT(s < static_cast<StateId>(state_vec_.size()));
   const std::pair<StateId, StateId> pr (state_vec_[s]);
-  
+
   Arc arc1;
   if (!fst1_->GetArc(pr.first, ilabel, &arc1)) return false;
   if (arc1.olabel == 0) { // There is no output label on the
     // arc, so only the first state changes.
     std::pair<const std::pair<StateId, StateId>, StateId> new_value(
-        std::pair<StateId, StateId>(arc1.nextstate, pr.second),
-        next_state_);
-    
+      std::pair<StateId, StateId>(arc1.nextstate, pr.second),
+      next_state_);
+
     std::pair<IterType, bool> result = state_map_.insert(new_value);
     oarc->ilabel = ilabel;
     oarc->olabel = 0;
@@ -189,8 +189,8 @@ bool ComposeDeterministicOnDemandFst<Arc>::GetArc(StateId s, Label ilabel,
   Arc arc2;
   if (!fst2_->GetArc(pr.second, arc1.olabel, &arc2)) return false;
   std::pair<const std::pair<StateId, StateId>, StateId> new_value(
-      std::pair<StateId, StateId>(arc1.nextstate, arc2.nextstate),
-      next_state_);
+    std::pair<StateId, StateId>(arc1.nextstate, arc2.nextstate),
+    next_state_);
   std::pair<IterType, bool> result =
       state_map_.insert(new_value);
   oarc->ilabel = ilabel;
@@ -207,7 +207,7 @@ bool ComposeDeterministicOnDemandFst<Arc>::GetArc(StateId s, Label ilabel,
 
 template<class Arc>
 inline size_t CacheDeterministicOnDemandFst<Arc>::GetIndex(
-    StateId src_state, Label ilabel) {
+  StateId src_state, Label ilabel) {
   const StateId p1 = 26597, p2 = 50329; // these are two
   // values that I drew at random from a table of primes.
   // note: num_cached_arcs_ > 0.
@@ -215,23 +215,23 @@ inline size_t CacheDeterministicOnDemandFst<Arc>::GetIndex(
   // We cast to size_t before the modulus, to ensure the
   // result is positive.
   return static_cast<size_t>(src_state * p1 + ilabel * p2) %
-      static_cast<size_t>(num_cached_arcs_);
+         static_cast<size_t>(num_cached_arcs_);
 }
 
 template<class Arc>
 CacheDeterministicOnDemandFst<Arc>::CacheDeterministicOnDemandFst(
-    DeterministicOnDemandFst<Arc> *fst,
-    StateId num_cached_arcs): fst_(fst),
-                              num_cached_arcs_(num_cached_arcs),
-                              cached_arcs_(num_cached_arcs) {
+  DeterministicOnDemandFst<Arc> *fst,
+  StateId num_cached_arcs) : fst_(fst),
+  num_cached_arcs_(num_cached_arcs),
+  cached_arcs_(num_cached_arcs) {
   KALDI_ASSERT(num_cached_arcs > 0);
   for (StateId i = 0; i < num_cached_arcs; i++)
     cached_arcs_[i].first = kNoStateId; // Invalidate all elements of the cache.
 }
-      
+
 template<class Arc>
 bool CacheDeterministicOnDemandFst<Arc>::GetArc(StateId s, Label ilabel,
-                                                Arc *oarc) {
+    Arc *oarc) {
   // Note: we don't cache anything in case a requested arc does not exist.
   // In the uses that we imagine this will be put to, essentially all the
   // requested arcs will exist.  This only affects efficiency.
@@ -251,13 +251,13 @@ bool CacheDeterministicOnDemandFst<Arc>::GetArc(StateId s, Label ilabel,
     } else {
       return false;
     }
-  }  
+  }
 }
 
 template<class Arc>
 LmExampleDeterministicOnDemandFst<Arc>::LmExampleDeterministicOnDemandFst(
-    void *lm, Label bos_symbol, Label eos_symbol):
-    lm_(lm), bos_symbol_(bos_symbol), eos_symbol_(eos_symbol) {
+  void *lm, Label bos_symbol, Label eos_symbol) :
+  lm_(lm), bos_symbol_(bos_symbol), eos_symbol_(eos_symbol) {
   std::vector<Label> begin_state; // history state corresponding to beginning of sentence
   begin_state.push_back(bos_symbol); // Depending how your LM is set up, you might
   // want to have a history vector with more than one bos_symbol on it.
@@ -279,7 +279,7 @@ typename Arc::Weight LmExampleDeterministicOnDemandFst<Arc>::Final(StateId s) {
 
 template<class Arc>
 bool LmExampleDeterministicOnDemandFst<Arc>::GetArc(
-    StateId s, Label ilabel, Arc *oarc) {
+  StateId s, Label ilabel, Arc *oarc) {
   KALDI_ASSERT(static_cast<size_t>(s) < state_vec_.size());
   std::vector<Label> wseq = state_vec_[s];
   float log_prob = -0.25; // e.g. log_prob = lm->GetLogProb(wseq, ilabel);
@@ -289,7 +289,7 @@ bool LmExampleDeterministicOnDemandFst<Arc>::GetArc(
   while (0) { // e.g. while !lm->HistoryStateExists(wseq)
     wseq.erase(wseq.begin(), wseq.begin() + 1); // remove most distant element of history.
     // note: if your histories are the other way round, you might just do
-    // wseq.pop() here.  
+    // wseq.pop() here.
   }
   if (log_prob == -numeric_limits<float>::infinity()) { // assume this
     // is what happens if prob of the word is zero.  Some LMs will never
@@ -297,11 +297,11 @@ bool LmExampleDeterministicOnDemandFst<Arc>::GetArc(
     return false; // no arc.
   }
   std::pair<const std::vector<Label>, StateId> new_value(
-      wseq,
-      static_cast<Label>(state_vec_.size()));
-  
+    wseq,
+    static_cast<Label>(state_vec_.size()));
+
   // Now get state id for destination state.
-  typedef typename MapType::iterator IterType;  
+  typedef typename MapType::iterator IterType;
   std::pair<IterType, bool> result = state_map_.insert(new_value);
   if (result.second == true) // was inserted
     state_vec_.push_back(wseq);
@@ -315,13 +315,13 @@ bool LmExampleDeterministicOnDemandFst<Arc>::GetArc(
 
 template<class Arc>
 void ComposeDeterministicOnDemand(const Fst<Arc> &fst1,
-                                  DeterministicOnDemandFst<Arc> *fst2,
-                                  MutableFst<Arc> *fst_composed) {
+    DeterministicOnDemandFst<Arc> *fst2,
+    MutableFst<Arc> *fst_composed) {
   typedef typename Arc::Weight Weight;
   typedef typename Arc::StateId StateId;
   typedef std::pair<StateId, StateId> StatePair;
   typedef unordered_map<StatePair, StateId,
-    kaldi::PairHasher<StateId> > MapType;
+          kaldi::PairHasher<StateId> > MapType;
   typedef typename MapType::iterator IterType;
 
   fst_composed->DeleteStates();
@@ -331,8 +331,8 @@ void ComposeDeterministicOnDemand(const Fst<Arc> &fst1,
 
   // Set start state in fst_composed.
   StateId s1 = fst1.Start(),
-          s2 = fst2->Start(),
-          start_state = fst_composed->AddState();
+      s2 = fst2->Start(),
+      start_state = fst_composed->AddState();
   StatePair start_pair(s1, s2);
   state_queue.push(start_pair);
   fst_composed->SetStart(start_state);
@@ -345,7 +345,7 @@ void ComposeDeterministicOnDemand(const Fst<Arc> &fst1,
   while (!state_queue.empty()) {
     StatePair q = state_queue.front();
     StateId q1 = q.first,
-            q2 = q.second;
+        q2 = q.second;
     state_queue.pop();
     // If the product of the final weights of the two fsts is non-zero then
     // we can set a final-prob in fst_composed
@@ -361,8 +361,8 @@ void ComposeDeterministicOnDemand(const Fst<Arc> &fst1,
       Arc arc2;
       StatePair next_pair;
       StateId next_state1 = arc1.nextstate,
-              next_state2,
-              next_state;
+          next_state2,
+          next_state;
       // If there is an epsilon on the arc of fst1 we transition to the next
       // state but keep fst2 at the current state.
       if (arc1.olabel == 0) {
@@ -385,8 +385,8 @@ void ComposeDeterministicOnDemand(const Fst<Arc> &fst1,
         // it should always be added if we reach here.
         KALDI_ASSERT(result.second == true);
         state_queue.push(next_pair);
-      // If sitr != state_map.end() then the next state is already in
-      // the state_map.
+        // If sitr != state_map.end() then the next state is already in
+        // the state_map.
       } else {
         next_state = sitr->second;
       }
@@ -405,13 +405,13 @@ void ComposeDeterministicOnDemand(const Fst<Arc> &fst1,
 // we are doing *fst_composed = Compose(Inverse(*left), right).
 template<class Arc>
 void ComposeDeterministicOnDemandInverse(const Fst<Arc> &right,
-                                         DeterministicOnDemandFst<Arc> *left,
-                                         MutableFst<Arc> *fst_composed) {
+    DeterministicOnDemandFst<Arc> *left,
+    MutableFst<Arc> *fst_composed) {
   typedef typename Arc::Weight Weight;
   typedef typename Arc::StateId StateId;
   typedef std::pair<StateId, StateId> StatePair;
   typedef unordered_map<StatePair, StateId,
-    kaldi::PairHasher<StateId> > MapType;
+          kaldi::PairHasher<StateId> > MapType;
   typedef typename MapType::iterator IterType;
 
   fst_composed->DeleteStates();
@@ -422,8 +422,8 @@ void ComposeDeterministicOnDemandInverse(const Fst<Arc> &right,
 
   // Set start state in fst_composed.
   StateId s_left = left->Start(),
-          s_right = right.Start(),
-          start_state = fst_composed->AddState();
+      s_right = right.Start(),
+      start_state = fst_composed->AddState();
   StatePair start_pair(s_left, s_right);
   state_queue.push(start_pair);
   fst_composed->SetStart(start_state);
@@ -436,7 +436,7 @@ void ComposeDeterministicOnDemandInverse(const Fst<Arc> &right,
   while (!state_queue.empty()) {
     StatePair q = state_queue.front();
     StateId q_left = q.first,
-            q_right = q.second;
+        q_right = q.second;
     state_queue.pop();
     // If the product of the final weights of the two fsts is non-zero then
     // we can set a final-prob in fst_composed
@@ -451,8 +451,8 @@ void ComposeDeterministicOnDemandInverse(const Fst<Arc> &right,
       Arc arc_left;
       StatePair next_pair;
       StateId next_state_right = arc_right.nextstate,
-              next_state_left,
-              next_state;
+          next_state_left,
+          next_state;
       // If there is an epsilon on the input side of the rigth arc, we
       // transition to the next state of the output but keep 'left' at the
       // current state.
@@ -481,8 +481,8 @@ void ComposeDeterministicOnDemandInverse(const Fst<Arc> &right,
         // it should always be added if we reach here.
         KALDI_ASSERT(result.second == true);
         state_queue.push(next_pair);
-      // If sitr != state_map.end() then the next state is already in
-      // the state_map.
+        // If sitr != state_map.end() then the next state is already in
+        // the state_map.
       } else {
         next_state = sitr->second;
       }

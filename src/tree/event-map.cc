@@ -86,8 +86,8 @@ EventMap* TableEventMap::Prune() const {
 }
 
 EventMap* TableEventMap::MapValues(
-    const unordered_set<EventKeyType> &keys_to_map,
-    const unordered_map<EventValueType,EventValueType> &value_map) const {
+  const unordered_set<EventKeyType> &keys_to_map,
+  const unordered_map<EventValueType,EventValueType> &value_map) const {
   std::vector<EventMap*> table;
   table.reserve(table_.size());
   EventValueType size = table_.size();
@@ -163,8 +163,8 @@ EventMap* SplitEventMap::Prune() const {
 }
 
 EventMap* SplitEventMap::MapValues(
-    const unordered_set<EventKeyType> &keys_to_map,
-    const unordered_map<EventValueType,EventValueType> &value_map) const {
+  const unordered_set<EventKeyType> &keys_to_map,
+  const unordered_map<EventValueType,EventValueType> &value_map) const {
   EventMap *yes = yes_->MapValues(keys_to_map, value_map),
       *no = no_->MapValues(keys_to_map, value_map);
 
@@ -173,8 +173,8 @@ EventMap* SplitEventMap::MapValues(
   } else {
     std::vector<EventValueType> yes_set;
     for (ConstIntegerSet<EventValueType>::iterator iter = yes_set_.begin();
-         iter != yes_set_.end();
-         ++iter) {
+        iter != yes_set_.end();
+        ++iter) {
       EventValueType value = *iter;
       unordered_map<EventValueType, EventValueType>::const_iterator
           map_iter = value_map.find(value);
@@ -186,7 +186,7 @@ EventMap* SplitEventMap::MapValues(
     }
     SortAndUniq(&yes_set);
     return new SplitEventMap(key_, yes_set, yes, no);
-  }  
+  }
 }
 
 void SplitEventMap::Write(std::ostream &os, bool binary) {
@@ -281,14 +281,14 @@ size_t EventMapVectorHash::operator ()(const EventType &vec) {
 void EventMap::Check(const std::vector<std::pair<EventKeyType, EventValueType> > &event) {
   // will crash if not sorted or has duplicates
   size_t sz = event.size();
-  for (size_t i = 0;i+1 < sz;i++)
+  for (size_t i = 0; i+1 < sz; i++)
     KALDI_ASSERT(event[i].first < event[i+1].first);
 }
 
 
 // static member of EventMap.
 bool EventMap::Lookup(const EventType &event,
-                      EventKeyType key, EventValueType *ans) {
+    EventKeyType key, EventValueType *ans) {
   // this assumes the the "event" array is sorted (e.g. on the KeyType value;
   // just doing std::sort will do this) and has no duplicate values with the same
   // key.  call Check() to verify this.
@@ -322,7 +322,7 @@ bool EventMap::Lookup(const EventType &event,
   }
 }
 
-TableEventMap::TableEventMap(EventKeyType key, const std::map<EventValueType, EventMap*> &map_in): key_(key) {
+TableEventMap::TableEventMap(EventKeyType key, const std::map<EventValueType, EventMap*> &map_in) : key_(key) {
   if (map_in.size() == 0)
     return;  // empty table.
   else {
@@ -336,7 +336,7 @@ TableEventMap::TableEventMap(EventKeyType key, const std::map<EventValueType, Ev
   }
 }
 
-TableEventMap::TableEventMap(EventKeyType key, const std::map<EventValueType, EventAnswerType> &map_in): key_(key) {
+TableEventMap::TableEventMap(EventKeyType key, const std::map<EventValueType, EventAnswerType> &map_in) : key_(key) {
   if (map_in.size() == 0)
     return;  // empty table.
   else {
@@ -373,19 +373,19 @@ static bool IsLeafNode(const EventMap *e) {
 // false as the EventMap would not have had the required structure.
 
 static bool GetTreeStructureInternal(
-    const EventMap &map,
-    std::vector<const EventMap*> *nonleaf_nodes,
-    std::map<const EventMap*, const EventMap*> *nonleaf_parents,
-    std::vector<const EventMap*> *leaf_parents) {
+  const EventMap &map,
+  std::vector<const EventMap*> *nonleaf_nodes,
+  std::map<const EventMap*, const EventMap*> *nonleaf_parents,
+  std::vector<const EventMap*> *leaf_parents) {
 
   std::vector<const EventMap*> queue; // parents to be processed.
 
   const EventMap *top_node = &map;
-    
+
   queue.push_back(top_node);
   nonleaf_nodes->push_back(top_node);
   (*nonleaf_parents)[top_node] = top_node;
-  
+
   while (!queue.empty()) {
     const EventMap *parent = queue.back();
     queue.pop_back();
@@ -413,24 +413,24 @@ static bool GetTreeStructureInternal(
     }
   }
 
-  for (size_t i = 0; i < leaf_parents->size(); i++) 
+  for (size_t i = 0; i < leaf_parents->size(); i++)
     if ((*leaf_parents)[i] == NULL) {
       KALDI_WARN << "non-consecutively numbered leaves";
-      return false; 
+      return false;
     }
-    // non-consecutively numbered leaves.
-  
+  // non-consecutively numbered leaves.
+
   KALDI_ASSERT(!leaf_parents->empty()); // or no leaves.
-  
+
   return true;
 }
 
 // See the header for a description of what this function does.
 bool GetTreeStructure(const EventMap &map,
-                      int32 *num_leaves,
-                      std::vector<int32> *parents) {
+    int32 *num_leaves,
+    std::vector<int32> *parents) {
   KALDI_ASSERT (num_leaves != NULL && parents != NULL);
-  
+
   if (IsLeafNode(&map)) { // handle degenerate case where root is a leaf.
     int32 leaf;
     if (!map.Map(EventType(), &leaf)
@@ -441,7 +441,7 @@ bool GetTreeStructure(const EventMap &map,
     return true;
   }
 
-  
+
   // This vector gives the address of nonleaf nodes in the tree,
   // in a numbering where 0 is the root and children always come
   // after parents.
@@ -460,7 +460,7 @@ bool GetTreeStructure(const EventMap &map,
 
   *num_leaves = leaf_parents.size();
   int32 num_nodes = leaf_parents.size() + nonleaf_nodes.size();
-  
+
   std::map<const EventMap*, int32> nonleaf_indices;
 
   // number the nonleaf indices so they come after the leaf

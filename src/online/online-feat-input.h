@@ -36,7 +36,7 @@ namespace kaldi {
 
 // Interface specification
 class OnlineFeatInputItf {
- public:
+public:
   // Produces feature vectors in some way.
   // The features may be e.g. extracted from an audio samples, received and/or
   // transformed from another OnlineFeatInput class etc.
@@ -69,7 +69,7 @@ class OnlineFeatInputItf {
   virtual bool Compute(Matrix<BaseFloat> *output) = 0;
 
   virtual int32 Dim() const = 0; // Return the output dimension of these features.
-  
+
   virtual ~OnlineFeatInputItf() {}
 };
 
@@ -77,7 +77,7 @@ class OnlineFeatInputItf {
 // Acts as a proxy to an underlying OnlineFeatInput.
 // Applies cepstral mean normalization
 class OnlineCmnInput: public OnlineFeatInputItf {
- public:
+public:
   // "input" - the underlying(unnormalized) feature source
   // "cmn_window" - the count of the preceding vectors over which the average is
   //                calculated
@@ -85,18 +85,18 @@ class OnlineCmnInput: public OnlineFeatInputItf {
   //                mean, at the start of the file.  Adds latency but only at the
   //                start
   OnlineCmnInput(OnlineFeatInputItf *input, int32 cmn_window, int32 min_window)
-      : input_(input), cmn_window_(cmn_window), min_window_(min_window),
-        history_(cmn_window + 1, input->Dim()), t_in_(0), t_out_(0),
-        sum_(input->Dim()) { KALDI_ASSERT(cmn_window >= min_window && min_window > 0); }
-  
+    : input_(input), cmn_window_(cmn_window), min_window_(min_window),
+    history_(cmn_window + 1, input->Dim()), t_in_(0), t_out_(0),
+    sum_(input->Dim()) { KALDI_ASSERT(cmn_window >= min_window && min_window > 0); }
+
   virtual bool Compute(Matrix<BaseFloat> *output);
 
   virtual int32 Dim() const { return input_->Dim(); }
 
- private:
+private:
   virtual bool ComputeInternal(Matrix<BaseFloat> *output);
 
-  
+
   OnlineFeatInputItf *input_;
   const int32 cmn_window_; // > 0
   const int32 min_window_; // > 0, < cmn_window_.
@@ -108,42 +108,42 @@ class OnlineCmnInput: public OnlineFeatInputItf {
                                                         // of input (read into the
                                                         // history buffer).
   void OutputFrame(VectorBase<BaseFloat> *output); // Output the next frame.
-  
+
   int32 NumOutputFrames(int32 num_new_frames,
-                        bool more_data) const; // Tells the caller, assuming
+      bool more_data) const;                   // Tells the caller, assuming
   // we get given "num_new_frames" of input (and given knowledge of whether
   // there is more data coming), how many frames would we be able to
   // output?
-  
-  
+
+
   int64 t_in_; // Time-counter for what we've obtained from the input.
   int64 t_out_; // Time-counter for what we've written to the output.
-  
+
   Vector<double> sum_; // Sum of the frames from t_out_ - HistoryLength(t_out_),
                        // to t_out_ - 1.
-  
+
   KALDI_DISALLOW_COPY_AND_ASSIGN(OnlineCmnInput);
 };
 
 
 class OnlineCacheInput : public OnlineFeatInputItf {
- public:
-  OnlineCacheInput(OnlineFeatInputItf *input): input_(input) { }
-  
+public:
+  OnlineCacheInput(OnlineFeatInputItf *input) : input_(input) { }
+
   // The Compute function just forwards to the previous member of the
   // chain, except that we locally accumulate the result, and
   // GetCachedData() will return the entire input up to the current time.
   virtual bool Compute(Matrix<BaseFloat> *output);
 
   void GetCachedData(Matrix<BaseFloat> *output);
-  
+
   int32 Dim() const { return input_->Dim(); }
-  
+
   void Deallocate();
-    
+
   virtual ~OnlineCacheInput() { Deallocate(); }
-  
- private:
+
+private:
   OnlineFeatInputItf *input_;
   // data_ is a list of all the outputs we produced in successive
   // calls to Compute().  The memory is owned here.
@@ -157,7 +157,7 @@ class OnlineCacheInput : public OnlineFeatInputItf {
 // The current implementation doesn't support the "timeout" -
 // the server is waiting for data indefinetily long time.
 class OnlineUdpInput : public OnlineFeatInputItf {
- public:
+public:
   OnlineUdpInput(int32 port, int32 feature_dim);
 
   virtual bool Compute(Matrix<BaseFloat> *output);
@@ -167,8 +167,8 @@ class OnlineUdpInput : public OnlineFeatInputItf {
   const sockaddr_in& client_addr() const { return client_addr_; }
 
   const int32 descriptor() const { return sock_desc_; }
-  
- private:
+
+private:
   int32 feature_dim_;
   // various BSD sockets-related data structures
   int32 sock_desc_; // socket descriptor
@@ -183,17 +183,17 @@ class OnlineUdpInput : public OnlineFeatInputItf {
 // Note: the transformation matrix will usually be a linear transformation
 // [output-dim x input-dim] but we accept an affine transformation too.
 class OnlineLdaInput: public OnlineFeatInputItf {
- public:
+public:
   OnlineLdaInput(OnlineFeatInputItf *input,
-                 const Matrix<BaseFloat> &transform,
-                 int32 left_context,
-                 int32 right_context);
+      const Matrix<BaseFloat> &transform,
+      int32 left_context,
+      int32 right_context);
 
   virtual bool Compute(Matrix<BaseFloat> *output);
 
   virtual int32 Dim() const { return linear_transform_.NumRows(); }
 
- private:
+private:
   // The static function SpliceFeats splices together the features and
   // puts them together in a matrix, so that each row of "output" contains
   // a contiguous window of size "context_window" of input frames.  The dimension
@@ -202,15 +202,15 @@ class OnlineLdaInput: public OnlineFeatInputItf {
   // treated as if the frames of input1, input2 and input3 have been appended
   // together before applying the main operation.
   static void SpliceFrames(const MatrixBase<BaseFloat> &input1,
-                           const MatrixBase<BaseFloat> &input2,
-                           const MatrixBase<BaseFloat> &input3,
-                           int32 context_window,
-                           Matrix<BaseFloat> *output);
+      const MatrixBase<BaseFloat> &input2,
+      const MatrixBase<BaseFloat> &input3,
+      int32 context_window,
+      Matrix<BaseFloat> *output);
 
   void TransformToOutput(const MatrixBase<BaseFloat> &spliced_feats,
-                         Matrix<BaseFloat> *output);
+      Matrix<BaseFloat> *output);
   void ComputeNextRemainder(const MatrixBase<BaseFloat> &input);
-  
+
   OnlineFeatInputItf *input_; // underlying/inferior input object
   const int32 input_dim_; // dimension of the feature vectors before xform
   const int32 left_context_;
@@ -219,7 +219,7 @@ class OnlineLdaInput: public OnlineFeatInputItf {
   Vector<BaseFloat> offset_; // Offset, if present; else empty.
   Matrix<BaseFloat> remainder_; // The last few frames of the input, that may
   // be needed for context purposes.
-  
+
   KALDI_DISALLOW_COPY_AND_ASSIGN(OnlineLdaInput);
 };
 
@@ -229,39 +229,39 @@ class OnlineLdaInput: public OnlineFeatInputItf {
 // version of the function ComputeDeltas in feat/feature-functions.h, where the
 // class DeltaFeaturesOptions is also defined.
 class OnlineDeltaInput: public OnlineFeatInputItf {
- public:
+public:
   OnlineDeltaInput(const DeltaFeaturesOptions &delta_opts,
-                   OnlineFeatInputItf *input);
-  
+      OnlineFeatInputItf *input);
+
   virtual bool Compute(Matrix<BaseFloat> *output);
 
   virtual int32 Dim() const { return input_dim_ * (opts_.order + 1); }
-  
- private:
+
+private:
   // The static function AppendFrames appends together the three input matrices,
   // some of which may be empty.
   static void AppendFrames(const MatrixBase<BaseFloat> &input1,
-                           const MatrixBase<BaseFloat> &input2,
-                           const MatrixBase<BaseFloat> &input3,
-                           Matrix<BaseFloat> *output);
+      const MatrixBase<BaseFloat> &input2,
+      const MatrixBase<BaseFloat> &input3,
+      Matrix<BaseFloat> *output);
 
   // Context() is the number of frames on each side of a given frame,
   // that we need for context.
   int32 Context() const { return opts_.order * opts_.window; }
-  
+
   // Does the delta computation.  Here, "output" will be resized to dimension
   // (input.NumRows() - Context() * 2) by (input.NumCols() * opts_.order)
   // "remainder" will be the last Context() rows of "input".
   void DeltaComputation(const MatrixBase<BaseFloat> &input,
-                        Matrix<BaseFloat> *output,
-                        Matrix<BaseFloat> *remainder) const;
-  
+      Matrix<BaseFloat> *output,
+      Matrix<BaseFloat> *remainder) const;
+
   OnlineFeatInputItf *input_; // underlying/inferior input object
   DeltaFeaturesOptions opts_;
   const int32 input_dim_;
   Matrix<BaseFloat> remainder_; // The last few frames of the input, that may
   // be needed for context purposes.
-  
+
   KALDI_DISALLOW_COPY_AND_ASSIGN(OnlineDeltaInput);
 };
 
@@ -269,19 +269,19 @@ class OnlineDeltaInput: public OnlineFeatInputItf {
 // OnlineAudioSource and to extract MFCC/PLP features in the usual way
 template <class E>
 class OnlineFeInput : public OnlineFeatInputItf {
- public:
+public:
   // "au_src" - OnlineAudioSourceItf object
   // "fe" - object implementing MFCC/PLP feature extraction
   // "frame_size" - frame extraction window size in audio samples
   // "frame_shift" - feature frame width in audio samples
   OnlineFeInput(OnlineAudioSourceItf *au_src, E *fe,
-                const int32 frame_size, const int32 frame_shift);
+      const int32 frame_size, const int32 frame_shift);
 
   virtual int32 Dim() const { return extractor_->Dim(); }
 
   virtual bool Compute(Matrix<BaseFloat> *output);
 
- private:
+private:
   OnlineAudioSourceItf *source_; // audio source
   E *extractor_; // the actual feature extractor used
   const int32 frame_size_;
@@ -293,9 +293,9 @@ class OnlineFeInput : public OnlineFeatInputItf {
 
 template<class E>
 OnlineFeInput<E>::OnlineFeInput(OnlineAudioSourceItf *au_src, E *fe,
-                                   int32 frame_size, int32 frame_shift)
-    : source_(au_src), extractor_(fe),
-      frame_size_(frame_size), frame_shift_(frame_shift) {}
+    int32 frame_size, int32 frame_shift)
+  : source_(au_src), extractor_(fe),
+  frame_size_(frame_size), frame_shift_(frame_shift) {}
 
 template<class E> bool
 OnlineFeInput<E>::Compute(Matrix<BaseFloat> *output) {
@@ -325,8 +325,8 @@ struct OnlineFeatureMatrixOptions {
   int32 batch_size; // number of frames to request each time.
   int32 num_tries; // number of tries of getting no output and timing out,
                    // before we give up.
-  OnlineFeatureMatrixOptions(): batch_size(27),
-                                num_tries(5) { }
+  OnlineFeatureMatrixOptions() : batch_size(27),
+    num_tries(5) { }
   void Register(OptionsItf *opts) {
     opts->Register("batch-size", &batch_size,
                    "Number of feature vectors processed w/o interruption");
@@ -340,13 +340,13 @@ struct OnlineFeatureMatrixOptions {
 // OnlineFeatInputItf in a manner that is convenient for
 // a Decodable type to consume.
 class OnlineFeatureMatrix {
- public:
+public:
   OnlineFeatureMatrix(const OnlineFeatureMatrixOptions &opts,
-                      OnlineFeatInputItf *input):
-      opts_(opts), input_(input), feat_dim_(input->Dim()),
-      feat_offset_(0), finished_(false) { }
-  
-  bool IsValidFrame (int32 frame); 
+      OnlineFeatInputItf *input) :
+    opts_(opts), input_(input), feat_dim_(input->Dim()),
+    feat_offset_(0), finished_(false) { }
+
+  bool IsValidFrame (int32 frame);
 
   int32 Dim() const { return feat_dim_; }
 
@@ -356,10 +356,10 @@ class OnlineFeatureMatrix {
   SubVector<BaseFloat> GetFrame(int32 frame);
 
   bool Good(); // returns true if we have at least one frame.
- private:
+private:
   void GetNextFeatures(); // called when we need more features.  Guarantees
   // to get at least one more frame, or set finished_ = true.
-  
+
   const OnlineFeatureMatrixOptions opts_;
   OnlineFeatInputItf *input_;
   int32 feat_dim_;

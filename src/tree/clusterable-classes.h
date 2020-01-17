@@ -32,9 +32,9 @@ namespace kaldi {
 
 /// ScalarClusterable clusters scalars with x^2 loss.
 class ScalarClusterable: public Clusterable {
- public:
-  ScalarClusterable(): x_(0), x2_(0), count_(0) {}
-  explicit ScalarClusterable(BaseFloat x): x_(x), x2_(x*x), count_(1) {}
+public:
+  ScalarClusterable() : x_(0), x2_(0), count_(0) {}
+  explicit ScalarClusterable(BaseFloat x) : x_(x), x2_(x*x), count_(1) {}
   virtual std::string Type() const { return "scalar"; }
   virtual BaseFloat Objf() const;
   virtual void SetZero() { count_ = x_ = x2_ = 0.0; }
@@ -51,7 +51,7 @@ class ScalarClusterable: public Clusterable {
 
   std::string Info();  // For debugging.
   BaseFloat Mean() { return (count_ != 0 ? x_/count_ : 0.0); }
-  private:
+private:
   BaseFloat x_;
   BaseFloat x2_;
   BaseFloat count_;
@@ -63,14 +63,14 @@ class ScalarClusterable: public Clusterable {
 /// GaussClusterable wraps Gaussian statistics in a form accessible
 /// to generic clustering algorithms.
 class GaussClusterable: public Clusterable {
- public:
-  GaussClusterable(): count_(0.0), var_floor_(0.0) {}
-  GaussClusterable(int32 dim, BaseFloat var_floor):
-      count_(0.0), stats_(2, dim), var_floor_(var_floor) {}
+public:
+  GaussClusterable() : count_(0.0), var_floor_(0.0) {}
+  GaussClusterable(int32 dim, BaseFloat var_floor) :
+    count_(0.0), stats_(2, dim), var_floor_(var_floor) {}
 
   GaussClusterable(const Vector<BaseFloat> &x_stats,
-                   const Vector<BaseFloat> &x2_stats,
-                   BaseFloat var_floor, BaseFloat count);
+      const Vector<BaseFloat> &x2_stats,
+      BaseFloat var_floor, BaseFloat count);
 
   virtual std::string Type() const {  return "gauss"; }
   void AddStats(const VectorBase<BaseFloat> &vec, BaseFloat weight = 1.0);
@@ -89,7 +89,7 @@ class GaussClusterable: public Clusterable {
   // The next two functions are not const-correct, because of SubVector.
   SubVector<double> x_stats() const { return stats_.Row(0); }
   SubVector<double> x2_stats() const { return stats_.Row(1); }
- private:
+private:
   double count_;
   Matrix<double> stats_; // two rows: sum, then sum-squared.
   double var_floor_;  // should be common for all objects created.
@@ -105,9 +105,9 @@ inline void GaussClusterable::SetZero() {
 }
 
 inline GaussClusterable::GaussClusterable(const Vector<BaseFloat> &x_stats,
-                                          const Vector<BaseFloat> &x2_stats,
-                                          BaseFloat var_floor, BaseFloat count):
-    count_(count), stats_(2, x_stats.Dim()), var_floor_(var_floor) {
+    const Vector<BaseFloat> &x2_stats,
+    BaseFloat var_floor, BaseFloat count) :
+  count_(count), stats_(2, x_stats.Dim()), var_floor_(var_floor) {
   stats_.Row(0).CopyFromVec(x_stats);
   stats_.Row(1).CopyFromVec(x2_stats);
 }
@@ -119,11 +119,11 @@ inline GaussClusterable::GaussClusterable(const Vector<BaseFloat> &x_stats,
 /// distances from the cluster center to each vector, times that vector's
 /// weight.
 class VectorClusterable: public Clusterable {
- public:
-  VectorClusterable(): weight_(0.0), sumsq_(0.0) {}
+public:
+  VectorClusterable() : weight_(0.0), sumsq_(0.0) {}
 
   VectorClusterable(const Vector<BaseFloat> &vector,
-                    BaseFloat weight);
+      BaseFloat weight);
 
   virtual std::string Type() const {  return "vector"; }
   // Objf is negated weighted sum of squared distances.
@@ -138,7 +138,7 @@ class VectorClusterable: public Clusterable {
   virtual Clusterable *ReadNew(std::istream &is, bool binary) const;
   virtual ~VectorClusterable() {}
 
- private:
+private:
   double weight_;  // sum of weights of the source vectors.  Never negative.
   Vector<double> stats_; // Equals the weighted sum of the source vectors.
   double sumsq_;  // Equals the sum over all sources, of weight_ * vec.vec,

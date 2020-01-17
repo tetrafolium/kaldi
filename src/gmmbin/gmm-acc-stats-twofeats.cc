@@ -32,9 +32,9 @@ int main(int argc, char *argv[]) {
   using namespace kaldi;
   try {
     const char *usage =
-        "Accumulate stats for GMM training, computing posteriors with one set of features\n"        
+        "Accumulate stats for GMM training, computing posteriors with one set of features\n"
         "but accumulating statistics with another.\n"
-        "First features are used to get posteriors, second to accumulate stats\n"        
+        "First features are used to get posteriors, second to accumulate stats\n"
         "Usage:  gmm-acc-stats-twofeats [options] <model-in> <feature1-rspecifier> <feature2-rspecifier> <posteriors-rspecifier> <stats-out>\n"
         "e.g.: \n"
         " gmm-acc-stats-twofeats 1.mdl 1.ali scp:train.scp scp:train_new.scp ark:1.ali 1.acc\n";
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
       std::string key = feature1_reader.Key();
       if (!feature2_reader.HasKey(key)) {
         KALDI_WARN << "For utterance " << key << ", second features not present.";
-        num_no2ndfeats ++;
+        num_no2ndfeats++;
       } else if (!posteriors_reader.HasKey(key)) {
         num_no_posterior++;
       } else {

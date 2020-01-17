@@ -31,20 +31,20 @@ namespace kaldi {
 //  stats.AccStatsForUtterance(extractor, mat, posterior);
 // in parallel.
 class IvectorTask {
- public:
+public:
   IvectorTask(const IvectorExtractor &extractor,
-              const Matrix<BaseFloat> &features,
-              const Posterior &posterior,
-              IvectorExtractorStats *stats): extractor_(extractor),
-                                    features_(features),
-                                    posterior_(posterior),
-                                    stats_(stats) { }
+      const Matrix<BaseFloat> &features,
+      const Posterior &posterior,
+      IvectorExtractorStats *stats) : extractor_(extractor),
+    features_(features),
+    posterior_(posterior),
+    stats_(stats) { }
 
   void operator () () {
     stats_->AccStatsForUtterance(extractor_, features_, posterior_);
   }
   ~IvectorTask() { }  // the destructor doesn't have to do anything.
- private:
+private:
   const IvectorExtractor &extractor_;
   Matrix<BaseFloat> features_; // not a reference, since features come from a
                                // Table and the reference we get from that is

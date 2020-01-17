@@ -32,12 +32,12 @@ namespace nnet3 {
 // get a sorted list of all NnetIo names in all examples in the list (will
 // normally be just the strings "input" and "output", but maybe also "ivector").
 static void GetIoNames(const std::vector<NnetExample> &src,
-                            std::vector<std::string> *names_vec) {
+    std::vector<std::string> *names_vec) {
   std::set<std::string> names;
   std::vector<NnetExample>::const_iterator iter = src.begin(), end = src.end();
   for (; iter != end; ++iter) {
     std::vector<NnetIo>::const_iterator iter2 = iter->io.begin(),
-                                         end2 = iter->io.end();
+        end2 = iter->io.end();
     for (; iter2 != end2; ++iter2)
       names.insert(iter2->name);
   }
@@ -48,17 +48,17 @@ static void GetIoNames(const std::vector<NnetExample> &src,
 // Indexes for that NnetIo (needed to correctly size the output matrix).  Also
 // make sure the dimensions are consistent for each name.
 static void GetIoSizes(const std::vector<NnetExample> &src,
-                       const std::vector<std::string> &names,
-                       std::vector<int32> *sizes) {
+    const std::vector<std::string> &names,
+    std::vector<int32> *sizes) {
   std::vector<int32> dims(names.size(), -1);  // just for consistency checking.
   sizes->clear();
   sizes->resize(names.size(), 0);
   std::vector<std::string>::const_iterator names_begin = names.begin(),
-                                             names_end = names.end();
+      names_end = names.end();
   std::vector<NnetExample>::const_iterator iter = src.begin(), end = src.end();
   for (; iter != end; ++iter) {
     std::vector<NnetIo>::const_iterator iter2 = iter->io.begin(),
-                                         end2 = iter->io.end();
+        end2 = iter->io.end();
     for (; iter2 != end2; ++iter2) {
       const NnetIo &io = *iter2;
       std::vector<std::string>::const_iterator names_iter =
@@ -86,10 +86,10 @@ static void GetIoSizes(const std::vector<NnetExample> &src,
 // Do the final merging of NnetIo, once we have obtained the names, dims and
 // sizes for each feature/supervision type.
 static void MergeIo(const std::vector<NnetExample> &src,
-                    const std::vector<std::string> &names,
-                    const std::vector<int32> &sizes,
-                    bool compress,
-                    NnetExample *merged_eg) {
+    const std::vector<std::string> &names,
+    const std::vector<int32> &sizes,
+    bool compress,
+    NnetExample *merged_eg) {
   // The total number of Indexes we have across all examples.
   int32 num_feats = names.size();
 
@@ -110,12 +110,12 @@ static void MergeIo(const std::vector<NnetExample> &src,
   }
 
   std::vector<std::string>::const_iterator names_begin = names.begin(),
-                                             names_end = names.end();
+      names_end = names.end();
   std::vector<NnetExample>::const_iterator eg_iter = src.begin(),
-    eg_end = src.end();
+      eg_end = src.end();
   for (int32 n = 0; eg_iter != eg_end; ++eg_iter, ++n) {
     std::vector<NnetIo>::const_iterator io_iter = eg_iter->io.begin(),
-      io_end = eg_iter->io.end();
+        io_end = eg_iter->io.end();
     for (; io_iter != io_end; ++io_iter) {
       const NnetIo &io = *io_iter;
       std::vector<std::string>::const_iterator names_iter =
@@ -160,8 +160,8 @@ static void MergeIo(const std::vector<NnetExample> &src,
 
 
 void MergeExamples(const std::vector<NnetExample> &src,
-                   bool compress,
-                   NnetExample *merged_eg) {
+    bool compress,
+    NnetExample *merged_eg) {
   KALDI_ASSERT(!src.empty());
   std::vector<std::string> io_names;
   GetIoNames(src, &io_names);
@@ -172,8 +172,8 @@ void MergeExamples(const std::vector<NnetExample> &src,
 }
 
 void ShiftExampleTimes(int32 t_offset,
-                       const std::vector<std::string> &exclude_names,
-                       NnetExample *eg) {
+    const std::vector<std::string> &exclude_names,
+    NnetExample *eg) {
   if (t_offset == 0)
     return;
   std::vector<NnetIo>::iterator iter = eg->io.begin(),
@@ -200,10 +200,10 @@ void ShiftExampleTimes(int32 t_offset,
 }
 
 void GetComputationRequest(const Nnet &nnet,
-                           const NnetExample &eg,
-                           bool need_model_derivative,
-                           bool store_component_stats,
-                           ComputationRequest *request) {
+    const NnetExample &eg,
+    bool need_model_derivative,
+    bool store_component_stats,
+    ComputationRequest *request) {
   request->inputs.clear();
   request->inputs.reserve(eg.io.size());
   request->outputs.clear();
@@ -235,8 +235,8 @@ void GetComputationRequest(const Nnet &nnet,
 }
 
 void WriteVectorAsChar(std::ostream &os,
-                       bool binary,
-                       const VectorBase<BaseFloat> &vec) {
+    bool binary,
+    const VectorBase<BaseFloat> &vec) {
   if (binary) {
     int32 dim = vec.Dim();
     std::vector<unsigned char> char_vec(dim);
@@ -256,8 +256,8 @@ void WriteVectorAsChar(std::ostream &os,
 }
 
 void ReadVectorAsChar(std::istream &is,
-                      bool binary,
-                      Vector<BaseFloat> *vec) {
+    bool binary,
+    Vector<BaseFloat> *vec) {
   if (binary) {
     BaseFloat scale = 1.0 / 255.0;
     std::vector<unsigned char> char_vec;
@@ -273,8 +273,8 @@ void ReadVectorAsChar(std::istream &is,
 }
 
 void RoundUpNumFrames(int32 frame_subsampling_factor,
-                      int32 *num_frames,
-                      int32 *num_frames_overlap) {
+    int32 *num_frames,
+    int32 *num_frames_overlap) {
   if (*num_frames % frame_subsampling_factor != 0) {
     int32 new_num_frames = frame_subsampling_factor *
         (*num_frames / frame_subsampling_factor + 1);
@@ -336,14 +336,14 @@ void ExampleGenerationConfig::ComputeDerived() {
 }
 
 
-UtteranceSplitter::UtteranceSplitter(const ExampleGenerationConfig &config):
-    config_(config),
-    total_num_utterances_(0), total_input_frames_(0),
-    total_frames_overlap_(0), total_num_chunks_(0),
-    total_frames_in_chunks_(0) {
+UtteranceSplitter::UtteranceSplitter(const ExampleGenerationConfig &config) :
+  config_(config),
+  total_num_utterances_(0), total_input_frames_(0),
+  total_frames_overlap_(0), total_num_chunks_(0),
+  total_frames_in_chunks_(0) {
   if (config.num_frames.empty()) {
     KALDI_ERR << "You need to call ComputeDerived() on the "
-                 "ExampleGenerationConfig().";
+      "ExampleGenerationConfig().";
   }
   InitSplitForLength();
 }
@@ -367,7 +367,7 @@ UtteranceSplitter::~UtteranceSplitter() {
     std::ostringstream os;
     os << std::setprecision(4);
     for (std::map<int32, int32>::iterator iter = chunk_size_to_count_.begin();
-         iter != chunk_size_to_count_.end(); ++iter) {
+        iter != chunk_size_to_count_.end(); ++iter) {
       int32 chunk_size = iter->first,
           num_frames = chunk_size * iter->second;
       float percent_of_total = num_frames * 100.0 / total_frames_in_chunks_;
@@ -380,7 +380,7 @@ UtteranceSplitter::~UtteranceSplitter() {
 }
 
 float UtteranceSplitter::DefaultDurationOfSplit(
-    const std::vector<int32> &split) const {
+  const std::vector<int32> &split) const {
   if (split.empty())  // not a valid split, but useful to handle this case.
     return 0.0;
   float principal_num_frames = config_.num_frames[0],
@@ -399,44 +399,44 @@ float UtteranceSplitter::DefaultDurationOfSplit(
 }
 
 /*
-  This comment describes the idea behind what InitChunkSize() is supposed to do,
-  and how it relates to the purpose of class UtteranceSplitter.
+   This comment describes the idea behind what InitChunkSize() is supposed to do,
+   and how it relates to the purpose of class UtteranceSplitter.
 
-  Class UtteranceSplitter is supposed to tell us, for a given utterance length,
-  what chunk sizes to use.  The chunk sizes it may choose are:
+   Class UtteranceSplitter is supposed to tell us, for a given utterance length,
+   what chunk sizes to use.  The chunk sizes it may choose are:
     - zero or more chunks of the 'principal' size (the first-listed value in
       --num-frames option)
     - at most two chunks of 'alternative' num-frames (meaning, any but the
       first-listed choice in the --num-frames option).
 
-  (note: an empty list of chunks is not allowed as a split).  A split is
-  a list of chunk-sizes in increasing order (we when we actually split the
-  utterance into chunks, we may, at random, reverse the order.
+   (note: an empty list of chunks is not allowed as a split).  A split is
+   a list of chunk-sizes in increasing order (we when we actually split the
+   utterance into chunks, we may, at random, reverse the order.
 
-  The choice of split to use for a given utterance-length is determined as
-  follows.  Firstly, for each split we compute a 'default duration' (see
-  DefaultDurationOfSplit()... if --num-frames-overlap is zero, this is just the
-  sum of the chunk sizes).  We then use by a cost-function that depends on
-  default-duration and the length of the utterance: the idea is that these two
-  should be as close as possible, but penalizing the default-duration being
-  larger than the utterance-length (which in the normal case of
-  --num-frames-overlap=0 would lead to gaps between the segments), twice as much
-  as the other sign of difference.
+   The choice of split to use for a given utterance-length is determined as
+   follows.  Firstly, for each split we compute a 'default duration' (see
+   DefaultDurationOfSplit()... if --num-frames-overlap is zero, this is just the
+   sum of the chunk sizes).  We then use by a cost-function that depends on
+   default-duration and the length of the utterance: the idea is that these two
+   should be as close as possible, but penalizing the default-duration being
+   larger than the utterance-length (which in the normal case of
+   --num-frames-overlap=0 would lead to gaps between the segments), twice as much
+   as the other sign of difference.
 
-  Specifically:
+   Specifically:
     cost(default_duration, utt_length) = (default_duration > utt_length ?
                                          default_duration - utt_length :
                                          2.0 * (utt_length - default_duration))
-  [but as a special case, set c to infinity if the largest chunk size in the
+   [but as a special case, set c to infinity if the largest chunk size in the
    split is longer than the utterance length; we couldn't, in that case, use
    this split for this utterance].
 
-  We want to make sure a good variety of combinations of chunk sizes are chosen
-  in case there are ties from the cost function.  For each utterance length
-  we store the set of splits, whose costs are within 2
-  of the best cost available for that utterance length.  When asked to find
-  chunks for a particular utterance of that length, we will choose randomly
-  from that pool of splits.
+   We want to make sure a good variety of combinations of chunk sizes are chosen
+   in case there are ties from the cost function.  For each utterance length
+   we store the set of splits, whose costs are within 2
+   of the best cost available for that utterance length.  When asked to find
+   chunks for a particular utterance of that length, we will choose randomly
+   from that pool of splits.
  */
 void UtteranceSplitter::InitSplitForLength() {
   int32 max_utterance_length = MaxUtteranceLength();
@@ -463,7 +463,7 @@ void UtteranceSplitter::InitSplitForLength() {
   // contains the cost for utterance-length u and split s.
 
   std::vector<std::vector<float> > costs_for_length(
-      max_utterance_length + 1);
+    max_utterance_length + 1);
   int32 num_splits = splits.size();
 
   for (int32 u = 0; u <= max_utterance_length; u++)
@@ -479,7 +479,7 @@ void UtteranceSplitter::InitSplitForLength() {
       // completely throwing out frames of data is worse than counting them
       // twice.
       float c = (default_duration > float(u) ? default_duration - float(u) :
-                 2.0 * (u - default_duration));
+          2.0 * (u - default_duration));
       if (u < max_chunk_size)  // can't fit the largest of the chunks in this
                                // utterance
         c = std::numeric_limits<float>::max();
@@ -545,12 +545,12 @@ void UtteranceSplitter::InitSplitForLength() {
 
 
 bool UtteranceSplitter::LengthsMatch(const std::string &utt,
-                                     int32 utterance_length,
-                                     int32 supervision_length,
-                                     int32 length_tolerance) const {
+    int32 utterance_length,
+    int32 supervision_length,
+    int32 length_tolerance) const {
   int32 sf = config_.frame_subsampling_factor,
       expected_supervision_length = (utterance_length + sf - 1) / sf;
-  if (std::abs(supervision_length - expected_supervision_length) 
+  if (std::abs(supervision_length - expected_supervision_length)
       <= length_tolerance) {
     return true;
   } else {
@@ -572,7 +572,7 @@ bool UtteranceSplitter::LengthsMatch(const std::string &utt,
 
 
 void UtteranceSplitter::GetChunkSizesForUtterance(
-    int32 utterance_length, std::vector<int32> *chunk_sizes) const {
+  int32 utterance_length, std::vector<int32> *chunk_sizes) const {
   KALDI_ASSERT(!splits_for_length_.empty());
   // 'primary_length' is the first-specified num-frames.
   // It's the only chunk that may be repeated an arbitrary number
@@ -661,7 +661,7 @@ void UtteranceSplitter::InitSplits(std::vector<std::vector<int32> > *splits) con
     }
   }
   for (SetType::const_iterator iter = splits_set.begin();
-       iter != splits_set.end(); ++iter)
+      iter != splits_set.end(); ++iter)
     splits->push_back(*iter);
   std::sort(splits->begin(), splits->end());  // make the order deterministic,
                                               // for consistency of output
@@ -695,8 +695,8 @@ void UtteranceSplitter::DistributeRandomlyUniform(int32 n, std::vector<int32> *v
 
 // static
 void UtteranceSplitter::DistributeRandomly(int32 n,
-                                           const std::vector<int32> &magnitudes,
-                                           std::vector<int32> *vec) {
+    const std::vector<int32> &magnitudes,
+    std::vector<int32> *vec) {
   KALDI_ASSERT(!vec->empty() && vec->size() == magnitudes.size());
   int32 size = vec->size();
   if (n < 0) {
@@ -736,9 +736,9 @@ void UtteranceSplitter::DistributeRandomly(int32 n,
 
 
 void UtteranceSplitter::GetGapSizes(int32 utterance_length,
-                                    bool enforce_subsampling_factor,
-                                    const std::vector<int32> &chunk_sizes,
-                                    std::vector<int32> *gap_sizes) const {
+    bool enforce_subsampling_factor,
+    const std::vector<int32> &chunk_sizes,
+    std::vector<int32> *gap_sizes) const {
   if (chunk_sizes.empty()) {
     gap_sizes->clear();
     return;
@@ -780,7 +780,7 @@ void UtteranceSplitter::GetGapSizes(int32 utterance_length,
 
     // note the elements of 'overlaps' will be <= 0.
     std::vector<int32> magnitudes(num_chunks - 1),
-        overlaps(num_chunks - 1);
+    overlaps(num_chunks - 1);
     // the 'magnitudes' vector will contain the minimum of the lengths of the
     // two adjacent chunks between which are are going to consider having an
     // overlap.  These will be used to assign the overlap proportional to that
@@ -814,8 +814,8 @@ void UtteranceSplitter::GetGapSizes(int32 utterance_length,
 
 
 void UtteranceSplitter::GetChunksForUtterance(
-    int32 utterance_length,
-    std::vector<ChunkTimeInfo> *chunk_info) {
+  int32 utterance_length,
+  std::vector<ChunkTimeInfo> *chunk_info) {
   std::vector<int32> chunk_sizes;
   GetChunkSizesForUtterance(utterance_length, &chunk_sizes);
   std::vector<int32> gaps(chunk_sizes.size());
@@ -829,9 +829,9 @@ void UtteranceSplitter::GetChunksForUtterance(
     info.first_frame = t;
     info.num_frames = chunk_sizes[i];
     info.left_context = (i == 0 && config_.left_context_initial >= 0 ?
-                         config_.left_context_initial : config_.left_context);
+        config_.left_context_initial : config_.left_context);
     info.right_context = (i == num_chunks - 1 && config_.right_context_final >= 0 ?
-                          config_.right_context_final : config_.right_context);
+        config_.right_context_final : config_.right_context);
     t += chunk_sizes[i];
   }
   SetOutputWeights(utterance_length, chunk_info);
@@ -843,8 +843,8 @@ void UtteranceSplitter::GetChunksForUtterance(
 }
 
 void UtteranceSplitter::AccStatsForUtterance(
-    int32 utterance_length,
-    const std::vector<ChunkTimeInfo> &chunk_info) {
+  int32 utterance_length,
+  const std::vector<ChunkTimeInfo> &chunk_info) {
   total_num_utterances_ += 1;
   total_input_frames_ += utterance_length;
 
@@ -869,8 +869,8 @@ void UtteranceSplitter::AccStatsForUtterance(
 
 
 void UtteranceSplitter::SetOutputWeights(
-    int32 utterance_length,
-    std::vector<ChunkTimeInfo> *chunk_info) const {
+  int32 utterance_length,
+  std::vector<ChunkTimeInfo> *chunk_info) const {
   int32 sf = config_.frame_subsampling_factor;
   int32 num_output_frames = (utterance_length + sf - 1) / sf;
   // num_output_frames is the number of frames of supervision.  'count[t]' will
@@ -882,8 +882,8 @@ void UtteranceSplitter::SetOutputWeights(
   for (int32 i = 0; i < num_chunks; i++) {
     ChunkTimeInfo &chunk = (*chunk_info)[i];
     for (int32 t = chunk.first_frame / sf;
-         t < (chunk.first_frame + chunk.num_frames) / sf;
-         t++)
+        t < (chunk.first_frame + chunk.num_frames) / sf;
+        t++)
       count[t]++;
   }
   for (int32 i = 0; i < num_chunks; i++) {
@@ -891,8 +891,8 @@ void UtteranceSplitter::SetOutputWeights(
     chunk.output_weights.resize(chunk.num_frames / sf);
     int32 t_start = chunk.first_frame / sf;
     for (int32 t = t_start;
-         t < (chunk.first_frame + chunk.num_frames) / sf;
-         t++)
+        t < (chunk.first_frame + chunk.num_frames) / sf;
+        t++)
       chunk.output_weights[t - t_start] = 1.0 / count[t];
   }
 }
@@ -916,7 +916,7 @@ int32 ExampleMergingConfig::IntSet::LargestValueInRange(int32 max_value) const {
 
 // static
 bool ExampleMergingConfig::ParseIntSet(const std::string &str,
-                                       ExampleMergingConfig::IntSet *int_set) {
+    ExampleMergingConfig::IntSet *int_set) {
   std::vector<std::string> split_str;
   SplitStringToVector(str, ",", false, &split_str);
   if (split_str.empty())
@@ -940,11 +940,11 @@ bool ExampleMergingConfig::ParseIntSet(const std::string &str,
 void ExampleMergingConfig::ComputeDerived() {
   if (measure_output_frames != "deprecated") {
     KALDI_WARN << "The --measure-output-frames option is deprecated "
-        "and will be ignored.";
+      "and will be ignored.";
   }
   if (discard_partial_minibatches != "deprecated") {
     KALDI_WARN << "The --discard-partial-minibatches option is deprecated "
-        "and will be ignored.";
+      "and will be ignored.";
   }
   std::vector<std::string> minibatch_size_split;
   SplitStringToVector(minibatch_size, "/", false, &minibatch_size_split);
@@ -997,13 +997,13 @@ void ExampleMergingConfig::ComputeDerived() {
 }
 
 int32 ExampleMergingConfig::MinibatchSize(int32 size_of_eg,
-                                          int32 num_available_egs,
-                                          bool input_ended) const {
+    int32 num_available_egs,
+    bool input_ended) const {
   KALDI_ASSERT(num_available_egs > 0 && size_of_eg > 0);
   int32 num_rules = rules.size();
   if (num_rules == 0)
     KALDI_ERR << "You need to call ComputeDerived() before calling "
-        "MinibatchSize().";
+      "MinibatchSize().";
   int32 min_distance = std::numeric_limits<int32>::max(),
       closest_rule_index = 0;
   for (int32 i = 0; i < num_rules; i++) {
@@ -1031,8 +1031,8 @@ int32 ExampleMergingConfig::MinibatchSize(int32 size_of_eg,
 
 
 void ExampleMergingStats::WroteExample(int32 example_size,
-                                    size_t structure_hash,
-                                    int32 minibatch_size) {
+    size_t structure_hash,
+    int32 minibatch_size) {
   std::pair<int32, size_t> p(example_size, structure_hash);
 
 
@@ -1045,8 +1045,8 @@ void ExampleMergingStats::WroteExample(int32 example_size,
 }
 
 void ExampleMergingStats::DiscardedExamples(int32 example_size,
-                                         size_t structure_hash,
-                                         int32 num_discarded) {
+    size_t structure_hash,
+    int32 num_discarded) {
   std::pair<int32, size_t> p(example_size, structure_hash);
   stats_[p].num_discarded += num_discarded;
 }
@@ -1068,7 +1068,7 @@ void ExampleMergingStats::PrintAggregateStats() const {
                                     // minibatch-size, equals number of input egs
                                     // that were not discarded.
       total_non_discarded_egs_size = 0,  // total over all minibatches of size-of-eg
-                                     // * minibatch-size.
+  // * minibatch-size.
       num_minibatches = 0,  // total number of minibatches
       num_distinct_minibatch_types = 0;  // total number of combination of
                                          // (type-of-eg, number of distinct
@@ -1123,9 +1123,9 @@ void ExampleMergingStats::PrintAggregateStats() const {
 
 void ExampleMergingStats::PrintSpecificStats() const {
   KALDI_LOG << "Merged specific eg types as follows [format: <eg-size1>="
-      "{<mb-size1>-><num-minibatches1>,<mbsize2>-><num-minibatches2>.../d=<num-discarded>}"
-      ",<egs-size2>={...},... (note,egs-size == number of input "
-      "frames including context).";
+    "{<mb-size1>-><num-minibatches1>,<mbsize2>-><num-minibatches2>.../d=<num-discarded>}"
+    ",<egs-size2>={...},... (note,egs-size == number of input "
+    "frames including context).";
   std::ostringstream os;
 
   // copy from unordered map to map to get sorting, for consistent output.
@@ -1168,9 +1168,9 @@ int32 GetNnetExampleSize(const NnetExample &a) {
 }
 
 ExampleMerger::ExampleMerger(const ExampleMergingConfig &config,
-                             NnetExampleWriter *writer):
-    finished_(false), num_egs_written_(0),
-    config_(config), writer_(writer) { }
+    NnetExampleWriter *writer) :
+  finished_(false), num_egs_written_(0),
+  config_(config), writer_(writer) { }
 
 
 void ExampleMerger::AcceptExample(NnetExample *eg) {
@@ -1239,7 +1239,7 @@ void ExampleMerger::Finish() {
     int32 eg_size = GetNnetExampleSize(*(vec[0]));
     bool input_ended = true;
     while (!vec.empty() &&
-           (minibatch_size = config_.MinibatchSize(eg_size, vec.size(),
+        (minibatch_size = config_.MinibatchSize(eg_size, vec.size(),
                                                    input_ended)) != 0) {
       // MergeExamples() expects a vector of NnetExample, not of pointers,
       // so use swap to create that without doing any real work.

@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     SequentialPosteriorReader posterior_reader(posteriors_rspecifier);
 
     TableWriter<KaldiObjectHolder<SparseMatrix<BaseFloat> > > sparse_matrix_writer(
-        sparse_matrix_wspecifier);
+      sparse_matrix_wspecifier);
 
     int32 num_done = 0;
     for (; !posterior_reader.Done(); posterior_reader.Next()) {

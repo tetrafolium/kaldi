@@ -40,9 +40,9 @@ struct SplitDiscriminativeSupervisionOptions {
   BaseFloat acoustic_scale;
 
   SplitDiscriminativeSupervisionOptions() :
-      remove_output_symbols(true), collapse_transition_ids(true),
-      remove_epsilons(true), determinize(true),
-      minimize(true), acoustic_scale(0.1) { }
+    remove_output_symbols(true), collapse_transition_ids(true),
+    remove_epsilons(true), determinize(true),
+    minimize(true), acoustic_scale(0.1) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("collapse-transition-ids", &collapse_transition_ids,
@@ -66,9 +66,9 @@ struct SplitDiscriminativeSupervisionOptions {
 };
 
 /*
-  This file contains some declarations relating to the object we use to
-  encode the supervision information for sequence training
-*/
+   This file contains some declarations relating to the object we use to
+   encode the supervision information for sequence training
+ */
 
 // struct DiscriminativeSupervision is the fully-processed information for
 // a whole utterance or (after splitting) part of an utterance.
@@ -103,8 +103,8 @@ struct DiscriminativeSupervision {
   // The denominator lattice.
   Lattice den_lat;
 
-  DiscriminativeSupervision(): weight(1.0), num_sequences(1),
-                               frames_per_sequence(-1) { }
+  DiscriminativeSupervision() : weight(1.0), num_sequences(1),
+    frames_per_sequence(-1) { }
 
   DiscriminativeSupervision(const DiscriminativeSupervision &other);
 
@@ -115,8 +115,8 @@ struct DiscriminativeSupervision {
   // Topologically sorts the lattice after copying to the supervision object.
   // Returns false when alignment or lattice is empty
   bool Initialize(const std::vector<int32> &alignment,
-                  const Lattice &lat,
-                  BaseFloat weight);
+      const Lattice &lat,
+      BaseFloat weight);
 
   void Swap(DiscriminativeSupervision *other);
 
@@ -138,14 +138,14 @@ struct DiscriminativeSupervision {
 // DiscriminativeSupervision into
 // multiple pieces corresponding to different frame-ranges.
 class DiscriminativeSupervisionSplitter {
- public:
+public:
   typedef fst::ArcTpl<LatticeWeight> LatticeArc;
   typedef fst::VectorFst<LatticeArc> Lattice;
 
   DiscriminativeSupervisionSplitter(
-      const SplitDiscriminativeSupervisionOptions &config,
-      const TransitionModel &tmodel,
-      const DiscriminativeSupervision &supervision);
+    const SplitDiscriminativeSupervisionOptions &config,
+    const TransitionModel &tmodel,
+    const DiscriminativeSupervision &supervision);
 
   // A structure used to store the forward and backward scores
   // and state times of a lattice
@@ -160,13 +160,13 @@ class DiscriminativeSupervisionSplitter {
 
   // Extracts a frame range of the supervision into 'supervision'.
   void GetFrameRange(int32 begin_frame, int32 frames_per_sequence,
-                     bool normalize,
-                     DiscriminativeSupervision *supervision) const;
+      bool normalize,
+      DiscriminativeSupervision *supervision) const;
 
   // Get the acoustic scaled denominator lattice out for debugging purposes
   inline const Lattice& DenLat() const { return den_lat_; }
 
- private:
+private:
 
   // Creates an output lattice covering frames begin_frame <= t < end_frame,
   // assuming that the corresponding state-range that we need to
@@ -176,9 +176,9 @@ class DiscriminativeSupervisionSplitter {
   // Also does post-processing (RmEpsilon, Determinize,
   // TopSort on the result).  See code for details.
   void CreateRangeLattice(const Lattice &in_lat,
-                          const LatticeInfo &scores,
-                          int32 begin_frame, int32 end_frame, bool normalize,
-                          Lattice *out_lat) const;
+      const LatticeInfo &scores,
+      int32 begin_frame, int32 end_frame, bool normalize,
+      Lattice *out_lat) const;
 
   // Config options for splitting supervision object
   const SplitDiscriminativeSupervisionOptions &config_;
@@ -211,7 +211,7 @@ class DiscriminativeSupervisionSplitter {
   // one with any given pdf-id.  This allows us to determinize and minimize
   // more completely.
   void CollapseTransitionIds(const std::vector<int32> &state_times,
-                             Lattice *lat) const;
+      Lattice *lat) const;
 
 };
 

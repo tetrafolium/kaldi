@@ -32,11 +32,11 @@ struct NnetMixupConfig {
   BaseFloat min_count;
   int32 num_mixtures;
   BaseFloat perturb_stddev;
-  
-  
-  NnetMixupConfig(): power(0.25), min_count(1000.0),
-                     num_mixtures(-1), perturb_stddev(0.01) { }
-  
+
+
+  NnetMixupConfig() : power(0.25), min_count(1000.0),
+    num_mixtures(-1), perturb_stddev(0.01) { }
+
   void Register(OptionsItf *opts) {
     opts->Register("power", &power, "Scaling factor used in determining the "
                    "number of mixture components to use for each HMM state "
@@ -48,19 +48,19 @@ struct NnetMixupConfig {
                    "#leaves in the system");
     opts->Register("perturb-stddev", &perturb_stddev, "Standard deviation used "
                    "when perturbing parameters during mixing up");
-  }  
+  }
 };
 
 /**
-  This function does something similar to Gaussian mixture splitting for
-  GMMs, except applied to the output layer of the neural network.
-  We create additional outputs, which will be summed over using a
-  SumGroupComponent.
-*/
+   This function does something similar to Gaussian mixture splitting for
+   GMMs, except applied to the output layer of the neural network.
+   We create additional outputs, which will be summed over using a
+   SumGroupComponent.
+ */
 
 void MixupNnet(const NnetMixupConfig &mixup_config,
-               Nnet *nnet);
-  
+    Nnet *nnet);
+
 
 
 } // namespace nnet2

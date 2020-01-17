@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
                                                    max_count, &ivectors);
 
       BaseFloat offset = extractor.PriorOffset();
-      for (int32 i = 0 ; i < ivectors.NumRows(); i++)
+      for (int32 i = 0; i < ivectors.NumRows(); i++)
         ivectors(i, 0) -= offset;
 
       double tot_post = TotalPosterior(posterior);

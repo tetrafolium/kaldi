@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 
     if (!read_vectors) {
       SequentialBaseFloatMatrixReader feat_reader(rspecifier);
-    
+
       for (; !feat_reader.Done(); feat_reader.Next()) {
         Matrix<double> mat(feat_reader.Value());
         if (mat.NumRows() == 0) {
@@ -103,11 +103,11 @@ int main(int argc, char *argv[]) {
         num_done++;
       }
       KALDI_LOG << "Accumulated stats from " << num_done << " feature files, "
-                << num_err << " with errors; " << count << " frames.";      
+                << num_err << " with errors; " << count << " frames.";
     } else {
       // read in vectors, not matrices
       SequentialBaseFloatVectorReader vec_reader(rspecifier);
-    
+
       for (; !vec_reader.Done(); vec_reader.Next()) {
         Vector<double> vec(vec_reader.Value());
         if (vec.Dim() == 0) {
@@ -145,13 +145,13 @@ int main(int argc, char *argv[]) {
     if (dim > full_dim)
       KALDI_ERR << "Final dimension " << dim << " is greater than feature "
                 << "dimension " << full_dim;
-    
+
     Matrix<double> P(full_dim, full_dim);
     Vector<double> s(full_dim);
-    
+
     sumsq.Eig(&s, &P);
     SortSvd(&s, &P);
-    
+
     KALDI_LOG << "Eigenvalues in PCA are " << s;
     KALDI_LOG << "Sum of PCA eigenvalues is " << s.Sum() << ", sum of kept "
               << "eigenvalues is " << s.Range(0, dim).Sum();
@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
     }
 
     Vector<double> offset(full_dim);
-    
+
     if (normalize_mean) {
       offset.AddMatVec(-1.0, transform, kNoTrans, sum, 0.0);
       transform.Resize(full_dim, full_dim + 1, kCopyData); // Add column to transform.

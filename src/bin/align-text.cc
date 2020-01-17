@@ -23,7 +23,7 @@
 #include <algorithm>
 
 bool IsNotToken(const std::string &token) {
-  return ! kaldi::IsToken(token);
+  return !kaldi::IsToken(token);
 }
 
 int main(int argc, char *argv[]) {
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 
       if (!text2_reader.HasKey(key)) {
         KALDI_WARN << "Key " << key << " is in " << text1_rspecifier
-            << ", but not in " << text2_rspecifier;
+                   << ", but not in " << text2_rspecifier;
         n_fail++;
         continue;
       }
@@ -101,13 +101,13 @@ int main(int argc, char *argv[]) {
 
       if (std::find_if(text1.begin(), text1.end(), IsNotToken) != text1.end()) {
         KALDI_ERR << "In text1, the utterance " << key << " contains unprintable characters." \
-          << "That means there is a problem with the text (such as incorrect encoding)." << std::endl;
-        return  -1;
+                  << "That means there is a problem with the text (such as incorrect encoding)." << std::endl;
+        return -1;
       }
       if (std::find_if(text2.begin(), text2.end(), IsNotToken) != text2.end()) {
         KALDI_ERR << "In text2, the utterance " << key << " contains unprintable characters." \
-          << "That means there is a problem with the text (such as incorrect encoding)." << std::endl;
-        return  -1;
+                  << "That means there is a problem with the text (such as incorrect encoding)." << std::endl;
+        return -1;
       }
 
       std::vector<std::pair<std::string, std::string> > aligned;

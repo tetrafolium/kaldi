@@ -27,8 +27,8 @@
 namespace kaldi {
 
 void AppendVectorToFeats(const Matrix<BaseFloat> &in,
-                         const Vector<BaseFloat> &vec,
-                         Matrix<BaseFloat> *out) {
+    const Vector<BaseFloat> &vec,
+    Matrix<BaseFloat> *out) {
   // Check inputs,
   KALDI_ASSERT(in.NumRows() != 0);
   // Build the output matrix,
@@ -122,26 +122,26 @@ int main(int argc, char *argv[]) {
 }
 
 /*
-  Testing:
+   Testing:
 
-cat <<EOF >1.mat
-[ 0 1 2
-  3 4 5
-  8 9 10 ]
-EOF
-cat <<EOF > 2.vec
- [ 0 1 ]
-EOF
-append-vector-to-feats --binary=false 1.mat 2.vec 3a.mat
-cat <<EOF > 3b.mat
- [ 0 1 2 0 1
+   cat <<EOF >1.mat
+   [ 0 1 2
+   3 4 5
+   8 9 10 ]
+   EOF
+   cat <<EOF > 2.vec
+   [ 0 1 ]
+   EOF
+   append-vector-to-feats --binary=false 1.mat 2.vec 3a.mat
+   cat <<EOF > 3b.mat
+   [ 0 1 2 0 1
    3 4 5 0 1
    8 9 10 0 1 ]
-EOF
-cmp <(../bin/copy-matrix 3b.mat -) <(../bin/copy-matrix 3a.mat -) || echo 'Bad!'
+   EOF
+   cmp <(../bin/copy-matrix 3b.mat -) <(../bin/copy-matrix 3a.mat -) || echo 'Bad!'
 
-append-vector-to-feats 'scp:echo foo 1.mat|' 'scp:echo foo 2.vec|' 'scp,t:echo foo 3a.mat|'
-cmp <(../bin/copy-matrix 3b.mat -) <(../bin/copy-matrix 3a.mat -) || echo 'Bad!'
+   append-vector-to-feats 'scp:echo foo 1.mat|' 'scp:echo foo 2.vec|' 'scp,t:echo foo 3a.mat|'
+   cmp <(../bin/copy-matrix 3b.mat -) <(../bin/copy-matrix 3a.mat -) || echo 'Bad!'
 
-rm {1,3?}.mat 2.vec
+   rm {1,3?}.mat 2.vec
  */

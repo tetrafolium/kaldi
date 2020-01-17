@@ -42,7 +42,7 @@ inline void DiagGmm::SetComponentWeight(int32 g, BaseFloat w) {
 template<class Real>
 void DiagGmm::SetMeans(const MatrixBase<Real> &m) {
   KALDI_ASSERT(means_invvars_.NumRows() == m.NumRows()
-    && means_invvars_.NumCols() == m.NumCols());
+      && means_invvars_.NumCols() == m.NumCols());
   means_invvars_.CopyFromMat(m);
   means_invvars_.MulElements(inv_vars_);
   valid_gconsts_ = false;
@@ -61,11 +61,11 @@ void DiagGmm::SetComponentMean(int32 g, const VectorBase<Real> &in) {
 
 template<class Real>
 void DiagGmm::SetInvVarsAndMeans(const MatrixBase<Real> &invvars,
-                                 const MatrixBase<Real> &means) {
+    const MatrixBase<Real> &means) {
   KALDI_ASSERT(means_invvars_.NumRows() == means.NumRows()
-    && means_invvars_.NumCols() == means.NumCols()
-    && inv_vars_.NumRows() == invvars.NumRows()
-    && inv_vars_.NumCols() == invvars.NumCols());
+      && means_invvars_.NumCols() == means.NumCols()
+      && inv_vars_.NumRows() == invvars.NumRows()
+      && inv_vars_.NumCols() == invvars.NumCols());
 
   inv_vars_.CopyFromMat(invvars);
   Matrix<Real> new_means_invvars(means);
@@ -77,7 +77,7 @@ void DiagGmm::SetInvVarsAndMeans(const MatrixBase<Real> &invvars,
 template<class Real>
 void DiagGmm::SetInvVars(const MatrixBase<Real> &v) {
   KALDI_ASSERT(inv_vars_.NumRows() == v.NumRows()
-    && inv_vars_.NumCols() == v.NumCols());
+      && inv_vars_.NumCols() == v.NumCols());
 
   int32 num_comp = NumGauss(), dim = Dim();
   Matrix<Real> means(num_comp, dim);

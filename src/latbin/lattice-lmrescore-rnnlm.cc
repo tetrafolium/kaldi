@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
 
     // Reads the language model.
     KaldiRnnlmWrapper rnnlm(opts, unk_prob_rspecifier,
-                            word_symbols_rxfilename, rnnlm_rxfilename);
+        word_symbols_rxfilename, rnnlm_rxfilename);
 
     // Reads and writes as compact lattice.
     SequentialCompactLatticeReader compact_lattice_reader(lats_rspecifier);
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
         fst::ScaleLattice(fst::GraphLatticeScale(lm_scale), &determinized_clat);
         if (determinized_clat.Start() == fst::kNoStateId) {
           KALDI_WARN << "Empty lattice for utterance " << key
-              << " (incompatible LM?)";
+                     << " (incompatible LM?)";
           n_fail++;
         } else {
           compact_lattice_writer.Write(key, determinized_clat);

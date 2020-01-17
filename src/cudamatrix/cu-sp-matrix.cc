@@ -37,7 +37,7 @@ namespace kaldi {
 
 template<typename Real>
 void CuSpMatrix<Real>::CopyFromMat(const CuMatrixBase<Real> &M,
-                                   SpCopyType copy_type) {
+    SpCopyType copy_type) {
   KALDI_ASSERT(this->num_rows_ == M.NumRows() &&
                this->num_rows_ == M.NumCols());
   if (this->num_rows_ == 0)
@@ -49,37 +49,37 @@ void CuSpMatrix<Real>::CopyFromMat(const CuMatrixBase<Real> &M,
     if (D == 0)
       return;
     switch (copy_type) {
-      case kTakeMeanAndCheck:
-        KALDI_ERR << "kTakeMeanAndCheck not supported!";
-      // The grid/block dimensions have been very roughly tuned for the
-      // individual cases.
-      case kTakeMean:
-        {
-          dim3 dimBlock(CU2DBLOCK, CU2DBLOCK);
-          dim3 dimGrid(n_blocks(D, CU2DBLOCK), n_blocks(D, CU2DBLOCK));
-          cuda_take_mean(dimGrid, dimBlock, M.Data(), this->data_, M.Dim());
-          CU_SAFE_CALL(cudaGetLastError());
-        }
-        break;
-      case kTakeLower:
-        {
-          int32 block_size = std::min(CU1DBLOCK, this->num_rows_);
-          dim3 dimBlock(1, block_size);
-          dim3 dimGrid(D, n_blocks(D, block_size));
-          cuda_take_lower(dimGrid, dimBlock, M.Data(), this->data_, M.Dim());
-          CU_SAFE_CALL(cudaGetLastError());
-        }
-        break;
-      case kTakeUpper:
-        {
-          dim3 dimBlock(CU2DBLOCK, CU2DBLOCK);
-          dim3 dimGrid(n_blocks(D, CU2DBLOCK), n_blocks(D, CU2DBLOCK));
-          cuda_take_upper(dimGrid, dimBlock, M.Data(), this->data_, M.Dim());
-          CU_SAFE_CALL(cudaGetLastError());
-        }
-        break;
-      default:
-        KALDI_ASSERT("Invalid argument to CuSpMatrix::CopyFromMat");
+    case kTakeMeanAndCheck:
+      KALDI_ERR << "kTakeMeanAndCheck not supported!";
+    // The grid/block dimensions have been very roughly tuned for the
+    // individual cases.
+    case kTakeMean:
+    {
+      dim3 dimBlock(CU2DBLOCK, CU2DBLOCK);
+      dim3 dimGrid(n_blocks(D, CU2DBLOCK), n_blocks(D, CU2DBLOCK));
+      cuda_take_mean(dimGrid, dimBlock, M.Data(), this->data_, M.Dim());
+      CU_SAFE_CALL(cudaGetLastError());
+    }
+    break;
+    case kTakeLower:
+    {
+      int32 block_size = std::min(CU1DBLOCK, this->num_rows_);
+      dim3 dimBlock(1, block_size);
+      dim3 dimGrid(D, n_blocks(D, block_size));
+      cuda_take_lower(dimGrid, dimBlock, M.Data(), this->data_, M.Dim());
+      CU_SAFE_CALL(cudaGetLastError());
+    }
+    break;
+    case kTakeUpper:
+    {
+      dim3 dimBlock(CU2DBLOCK, CU2DBLOCK);
+      dim3 dimGrid(n_blocks(D, CU2DBLOCK), n_blocks(D, CU2DBLOCK));
+      cuda_take_upper(dimGrid, dimBlock, M.Data(), this->data_, M.Dim());
+      CU_SAFE_CALL(cudaGetLastError());
+    }
+    break;
+    default:
+      KALDI_ASSERT("Invalid argument to CuSpMatrix::CopyFromMat");
     }
     CuDevice::Instantiate().AccuProfile("CuSpMatrix::CopyFromMat(from CuMatrixBase)", tim);
   } else
@@ -117,7 +117,7 @@ void CuSpMatrix<Real>::AddVec2(const Real alpha, const CuVectorBase<Real> &v) {
 
     CUBLAS_SAFE_CALL(cublas_spr(GetCublasHandle(), CUBLAS_FILL_MODE_UPPER, this->num_rows_, alpha, v.Data(),
                                 1, this->Data()));
-    
+
     CuDevice::Instantiate().AccuProfile("CuSpMatrix::AddVec2", tim);
   } else
 #endif
@@ -128,9 +128,9 @@ void CuSpMatrix<Real>::AddVec2(const Real alpha, const CuVectorBase<Real> &v) {
 
 template<typename Real>
 void CuSpMatrix<Real>::AddMat2(const Real alpha, const CuMatrixBase<Real> &M,
-                               MatrixTransposeType transM, const Real beta) {
+    MatrixTransposeType transM, const Real beta) {
   KALDI_ASSERT((transM == kNoTrans && this->NumRows() == M.NumRows())
-               || (transM == kTrans && this->NumRows() == M.NumCols()));
+      || (transM == kTrans && this->NumRows() == M.NumCols()));
 
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
@@ -151,7 +151,7 @@ void CuSpMatrix<Real>::AddMat2(const Real alpha, const CuMatrixBase<Real> &M,
     cublas_syrk(GetCublasHandle(), CUBLAS_FILL_MODE_UPPER, trans, this_dim, m_other_dim, alpha, M.Data(),
                 M.Stride(), beta, tmp_mat.Data(), tmp_mat.Stride());
     this->CopyFromMat(tmp_mat, kTakeLower);
-    
+
     CuDevice::Instantiate().AccuProfile("CuSpMatrix::AddMat2", tim);
   } else
 #endif
@@ -219,7 +219,7 @@ bool CuSpMatrix<Real>::IsUnit(Real tol) const {
   // definition of IsUnit and getting rid of the extra stuff inside TraceSpSp
   // that corrects for the diagonal being counted twice.
   return (TraceSpSp(*this, *this) + this->NumRows() - 2.0 * this->Trace() <=
-          tol * this->NumRows());
+         tol * this->NumRows());
 }
 
 template <class Real>

@@ -54,7 +54,7 @@ Fst<StdArc> *ReadFstKaldiGeneric(std::string rxfilename, bool throw_on_err) {
                 << kaldi::PrintableRxfilename(rxfilename);
     } else {
       KALDI_WARN << "We fail to read FST header from "
-                 << kaldi::PrintableRxfilename(rxfilename) 
+                 << kaldi::PrintableRxfilename(rxfilename)
                  << ". A NULL pointer is returned.";
       return NULL;
     }
@@ -79,8 +79,8 @@ Fst<StdArc> *ReadFstKaldiGeneric(std::string rxfilename, bool throw_on_err) {
   }
   if (!fst) {
     if(throw_on_err) {
-     KALDI_ERR << "Could not read fst from "
-               << kaldi::PrintableRxfilename(rxfilename);
+      KALDI_ERR << "Could not read fst from "
+                << kaldi::PrintableRxfilename(rxfilename);
     } else {
       KALDI_WARN << "Could not read fst from "
                  << kaldi::PrintableRxfilename(rxfilename)
@@ -92,13 +92,13 @@ Fst<StdArc> *ReadFstKaldiGeneric(std::string rxfilename, bool throw_on_err) {
 }
 
 VectorFst<StdArc> *CastOrConvertToVectorFst(Fst<StdArc> *fst) {
-  // This version currently supports ConstFst<StdArc> or VectorFst<StdArc>         
+  // This version currently supports ConstFst<StdArc> or VectorFst<StdArc>
   std::string real_type = fst->Type();
   KALDI_ASSERT(real_type == "vector" || real_type == "const");
   if (real_type == "vector") {
     return dynamic_cast<VectorFst<StdArc> *>(fst);
   } else {
-    // As the 'fst' can't cast to VectorFst, I'm creating a new 
+    // As the 'fst' can't cast to VectorFst, I'm creating a new
     // VectorFst<StdArc> initialized by 'fst', and deletes 'fst'.
     VectorFst<StdArc> *new_fst = new VectorFst<StdArc>(*fst);
     KALDI_WARN << "The 'fst' is deleted.";
@@ -114,7 +114,7 @@ void ReadFstKaldi(std::string rxfilename, fst::StdVectorFst *ofst) {
 }
 
 void WriteFstKaldi(const VectorFst<StdArc> &fst,
-                   std::string wxfilename) {
+    std::string wxfilename) {
   if (wxfilename == "") wxfilename = "-"; // interpret "" as stdout,
   // for compatibility with OpenFst conventions.
   bool write_binary = true, write_header = false;

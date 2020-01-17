@@ -28,10 +28,10 @@
 namespace kaldi {
 
 void SendPartialResult(const std::vector<int32>& words,
-                       const fst::SymbolTable *word_syms,
-                       const bool line_break,
-                       const int32 serv_sock,
-                       const sockaddr_in &client_addr) {
+    const fst::SymbolTable *word_syms,
+    const bool line_break,
+    const int32 serv_sock,
+    const sockaddr_in &client_addr) {
   KALDI_ASSERT(word_syms != NULL);
   std::stringstream sstream;
   for (size_t i = 0; i < words.size(); i++) {
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     ParseOptions po(usage);
     BaseFloat acoustic_scale = 0.1;
     int32 cmn_window = 600,
-      min_cmn_window = 100; // adds 1 second latency, only at utterance start.
+        min_cmn_window = 100; // adds 1 second latency, only at utterance start.
     int32 right_context = 4, left_context = 4;
 
     kaldi::DeltaFeaturesOptions delta_opts;
@@ -119,23 +119,23 @@ int main(int argc, char *argv[]) {
 
     std::vector<int32> silence_phones;
     if (!SplitStringToIntegers(silence_phones_str, ":", false, &silence_phones))
-        KALDI_ERR << "Invalid silence-phones string " << silence_phones_str;
+      KALDI_ERR << "Invalid silence-phones string " << silence_phones_str;
     if (silence_phones.empty())
-        KALDI_ERR << "No silence phones given!";
+      KALDI_ERR << "No silence phones given!";
 
     TransitionModel trans_model;
     AmDiagGmm am_gmm;
     {
-        bool binary;
-        Input ki(model_rxfilename, &binary);
-        trans_model.Read(ki.Stream(), binary);
-        am_gmm.Read(ki.Stream(), binary);
+      bool binary;
+      Input ki(model_rxfilename, &binary);
+      trans_model.Read(ki.Stream(), binary);
+      am_gmm.Read(ki.Stream(), binary);
     }
 
     fst::SymbolTable *word_syms = NULL;
     if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
-        KALDI_ERR << "Could not read symbol table from file "
-                    << word_syms_filename;
+      KALDI_ERR << "Could not read symbol table from file "
+                << word_syms_filename;
 
     fst::Fst<fst::StdArc> *decode_fst = ReadDecodeGraph(fst_rxfilename);
 
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
     mfcc_opts.use_energy = false;
 
     OnlineFasterDecoder decoder(*decode_fst, decoder_opts,
-                                silence_phones, trans_model);
+        silence_phones, trans_model);
     VectorFst<LatticeArc> out_fst;
     int32 feature_dim = mfcc_opts.num_ceps; // default to 13 right now.
     OnlineUdpInput udp_input(udp_port, feature_dim);
@@ -165,10 +165,10 @@ int main(int argc, char *argv[]) {
 
     // feature_reading_opts contains number of retries, batch size.
     OnlineFeatureMatrix feature_matrix(feature_reading_opts,
-                                       feat_transform);
+        feat_transform);
 
     OnlineDecodableDiagGmmScaled decodable(am_gmm, trans_model, acoustic_scale,
-                                           &feature_matrix);
+        &feature_matrix);
 
     std::cerr << std::endl << "Listening on UDP port "
               << udp_port << " ... " << std::endl;

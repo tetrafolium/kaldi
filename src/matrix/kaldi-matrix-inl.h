@@ -26,7 +26,7 @@ namespace kaldi {
 
 /// Empty constructor
 template<typename Real>
-Matrix<Real>::Matrix(): MatrixBase<Real>(NULL, 0, 0, 0) { }
+Matrix<Real>::Matrix() : MatrixBase<Real>(NULL, 0, 0, 0) { }
 
 
 template<>

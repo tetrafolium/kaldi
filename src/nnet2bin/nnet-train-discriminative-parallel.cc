@@ -40,24 +40,24 @@ int main(int argc, char *argv[]) {
         "Usage:  nnet-train-discriminative-parallel [options] <model-in> <training-examples-in> <model-out>\n"
         "e.g.:\n"
         "nnet-train-discriminative-parallel --num-threads=8 1.nnet ark:1.degs 2.nnet\n";
-    
+
     bool binary_write = true;
     std::string use_gpu = "yes";
     int32 num_threads = 1;
     NnetDiscriminativeUpdateOptions update_opts;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("num-threads", &num_threads, "Number of threads to use");
     update_opts.Register(&po);
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     std::string nnet_rxfilename = po.GetArg(1),
         examples_rspecifier = po.GetArg(2),
         nnet_wxfilename = po.GetArg(3);
@@ -71,10 +71,10 @@ int main(int argc, char *argv[]) {
       am_nnet.Read(ki.Stream(), binary_read);
     }
 
-    
+
     NnetDiscriminativeStats stats;
     SequentialDiscriminativeNnetExampleReader example_reader(
-        examples_rspecifier);
+      examples_rspecifier);
 
     NnetDiscriminativeUpdateParallel(am_nnet, trans_model,
                                      update_opts, num_threads, &example_reader,

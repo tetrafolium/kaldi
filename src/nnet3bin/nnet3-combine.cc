@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
     { // This block adds training examples to "egs".
       SequentialNnetExampleReader example_reader(
-          valid_examples_rspecifier);
+        valid_examples_rspecifier);
       for (; !example_reader.Done(); example_reader.Next())
         egs.push_back(example_reader.Value());
       KALDI_LOG << "Read " << egs.size() << " examples.";

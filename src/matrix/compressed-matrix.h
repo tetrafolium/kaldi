@@ -31,10 +31,10 @@ namespace kaldi {
 
 
 /*
-  The enum CompressionMethod is used when creating a CompressedMatrix (a lossily
-  compressed matrix) from a regular Matrix.  It dictates how we choose the
-  compressed format and how we choose the ranges of floats that are represented
-  by particular integers.
+   The enum CompressionMethod is used when creating a CompressedMatrix (a lossily
+   compressed matrix) from a regular Matrix.  It dictates how we choose the
+   compressed format and how we choose the ranges of floats that are represented
+   by particular integers.
 
     kAutomaticMethod = 1 This is the default when you don't specify the
                         compression method.  It is a shorthand for using
@@ -71,7 +71,7 @@ namespace kaldi {
     // We can add new methods here as needed: if they just imply different ways
     // of selecting the min_value and range, and a num-bytes = 1 or 2, they will
     // be trivial to implement.
-*/
+ */
 enum CompressionMethod {
   kAutomaticMethod = 1,
   kSpeechFeature = 2,
@@ -84,20 +84,20 @@ enum CompressionMethod {
 
 
 /*
-  This class does lossy compression of a matrix.  It supports various compression
-  methods, see enum CompressionMethod.
-*/
+   This class does lossy compression of a matrix.  It supports various compression
+   methods, see enum CompressionMethod.
+ */
 
 class CompressedMatrix {
- public:
-  CompressedMatrix(): data_(NULL) { }
+public:
+  CompressedMatrix() : data_(NULL) { }
 
   ~CompressedMatrix() { Clear(); }
 
   template<typename Real>
   explicit CompressedMatrix(const MatrixBase<Real> &mat,
-                            CompressionMethod method = kAutomaticMethod):
-      data_(NULL) { CopyFromMat(mat, method); }
+      CompressionMethod method = kAutomaticMethod) :
+    data_(NULL) { CopyFromMat(mat, method); }
 
   /// Initializer that can be used to select part of an existing
   /// CompressedMatrix without un-compressing and re-compressing (note: unlike
@@ -112,18 +112,18 @@ class CompressedMatrix {
   /// row_offset + num_rows > mat.NumRows(), and the result will contain
   /// repeats of the first and last rows of 'mat' as necessary.
   CompressedMatrix(const CompressedMatrix &mat,
-                   const MatrixIndexT row_offset,
-                   const MatrixIndexT num_rows,
-                   const MatrixIndexT col_offset,
-                   const MatrixIndexT num_cols,
-                   bool allow_padding = false);
+      const MatrixIndexT row_offset,
+      const MatrixIndexT num_rows,
+      const MatrixIndexT col_offset,
+      const MatrixIndexT num_cols,
+      bool allow_padding = false);
 
   void *Data() const { return this->data_; }
 
   /// This will resize *this and copy the contents of mat to *this.
   template<typename Real>
   void CopyFromMat(const MatrixBase<Real> &mat,
-                   CompressionMethod method = kAutomaticMethod);
+      CompressionMethod method = kAutomaticMethod);
 
   CompressedMatrix(const CompressedMatrix &mat);
 
@@ -136,19 +136,23 @@ class CompressedMatrix {
   /// The kTrans case uses a temporary.
   template<typename Real>
   void CopyToMat(MatrixBase<Real> *mat,
-                 MatrixTransposeType trans = kNoTrans) const;
+      MatrixTransposeType trans = kNoTrans) const;
 
   void Write(std::ostream &os, bool binary) const;
 
   void Read(std::istream &is, bool binary);
 
   /// Returns number of rows (or zero for emtpy matrix).
-  inline MatrixIndexT NumRows() const { return (data_ == NULL) ? 0 :
-      (*reinterpret_cast<GlobalHeader*>(data_)).num_rows; }
+  inline MatrixIndexT NumRows() const {
+    return (data_ == NULL) ? 0 :
+           (*reinterpret_cast<GlobalHeader*>(data_)).num_rows;
+  }
 
   /// Returns number of columns (or zero for emtpy matrix).
-  inline MatrixIndexT NumCols() const { return (data_ == NULL) ? 0 :
-      (*reinterpret_cast<GlobalHeader*>(data_)).num_cols; }
+  inline MatrixIndexT NumCols() const {
+    return (data_ == NULL) ? 0 :
+           (*reinterpret_cast<GlobalHeader*>(data_)).num_cols;
+  }
 
   /// Copies row #row of the matrix into vector v.
   /// Note: v must have same size as #cols.
@@ -165,8 +169,8 @@ class CompressedMatrix {
   /// is defined by size of provided matrix dest
   template<typename Real>
   void CopyToMat(int32 row_offset,
-                 int32 column_offset,
-                 MatrixBase<Real> *dest) const;
+      int32 column_offset,
+      MatrixBase<Real> *dest) const;
 
   void Swap(CompressedMatrix *other) { std::swap(data_, other->data_); }
 
@@ -178,7 +182,7 @@ class CompressedMatrix {
 
   friend class Matrix<float>;
   friend class Matrix<double>;
- private:
+private:
 
   // This enum describes the different compressed-data formats: these are
   // distinct from the compression methods although all of the methods apart
@@ -223,8 +227,8 @@ class CompressedMatrix {
   // This function computes the global header for compressing this data.
   template<typename Real>
   static inline void ComputeGlobalHeader(const MatrixBase<Real> &mat,
-                                         CompressionMethod method,
-                                         GlobalHeader *header);
+      CompressionMethod method,
+      GlobalHeader *header);
 
 
   // The number of bytes we need to request when allocating 'data_'.
@@ -240,33 +244,33 @@ class CompressedMatrix {
 
   template<typename Real>
   static void CompressColumn(const GlobalHeader &global_header,
-                             const Real *data, MatrixIndexT stride,
-                             int32 num_rows, PerColHeader *header,
-                             uint8 *byte_data);
+      const Real *data, MatrixIndexT stride,
+      int32 num_rows, PerColHeader *header,
+      uint8 *byte_data);
   template<typename Real>
   static void ComputeColHeader(const GlobalHeader &global_header,
-                               const Real *data, MatrixIndexT stride,
-                               int32 num_rows, PerColHeader *header);
+      const Real *data, MatrixIndexT stride,
+      int32 num_rows, PerColHeader *header);
 
   static inline uint16 FloatToUint16(const GlobalHeader &global_header,
-                                     float value);
+      float value);
 
   // this is used only in the kOneByte compression format.
   static inline uint8 FloatToUint8(const GlobalHeader &global_header,
-                                   float value);
+      float value);
 
   static inline float Uint16ToFloat(const GlobalHeader &global_header,
-                                    uint16 value);
+      uint16 value);
 
   // this is used only in the kOneByteWithColHeaders compression format.
   static inline uint8 FloatToChar(float p0, float p25,
-                                          float p75, float p100,
-                                          float value);
+      float p75, float p100,
+      float value);
 
   // this is used only in the kOneByteWithColHeaders compression format.
   static inline float CharToFloat(float p0, float p25,
-                                  float p75, float p100,
-                                  uint8 value);
+      float p75, float p100,
+      uint8 value);
 
   void *data_; // first GlobalHeader, then PerColHeader (repeated), then
   // the byte data for each column (repeated).  Note: don't intersperse

@@ -26,10 +26,10 @@
 namespace kaldi {
 
 KaldiRnnlmWrapper::KaldiRnnlmWrapper(
-    const KaldiRnnlmWrapperOpts &opts,
-    const std::string &unk_prob_rspecifier,
-    const std::string &word_symbol_table_rxfilename,
-    const std::string &rnnlm_rxfilename) {
+  const KaldiRnnlmWrapperOpts &opts,
+  const std::string &unk_prob_rspecifier,
+  const std::string &word_symbol_table_rxfilename,
+  const std::string &rnnlm_rxfilename) {
   rnnlm_.setRnnLMFile(rnnlm_rxfilename);
   rnnlm_.setRandSeed(1);
   rnnlm_.setUnkSym(opts.unk_symbol);
@@ -39,17 +39,17 @@ KaldiRnnlmWrapper::KaldiRnnlmWrapper(
   // Reads symbol table.
   fst::SymbolTable *word_symbols = NULL;
   if (!(word_symbols =
-        fst::SymbolTable::ReadText(word_symbol_table_rxfilename))) {
+      fst::SymbolTable::ReadText(word_symbol_table_rxfilename))) {
     KALDI_ERR << "Could not read symbol table from file "
-        << word_symbol_table_rxfilename;
+              << word_symbol_table_rxfilename;
   }
   label_to_word_.resize(word_symbols->NumSymbols() + 1);
   for (int32 i = 0; i < label_to_word_.size() - 1; ++i) {
     label_to_word_[i] = word_symbols->Find(i);
     if (label_to_word_[i] == "") {
       KALDI_ERR << "Could not find word for integer " << i << "in the word "
-          << "symbol table, mismatched symbol table or you have discoutinuous "
-          << "integers in your symbol table?";
+                << "symbol table, mismatched symbol table or you have discoutinuous "
+                << "integers in your symbol table?";
     }
   }
   label_to_word_[label_to_word_.size() - 1] = opts.eos_symbol;
@@ -57,9 +57,9 @@ KaldiRnnlmWrapper::KaldiRnnlmWrapper(
 }
 
 BaseFloat KaldiRnnlmWrapper::GetLogProb(
-    int32 word, const std::vector<int32> &wseq,
-    const std::vector<float> &context_in,
-    std::vector<float> *context_out) {
+  int32 word, const std::vector<int32> &wseq,
+  const std::vector<float> &context_in,
+  std::vector<float> *context_out) {
 
   std::vector<std::string> wseq_symbols(wseq.size());
   for (int32 i = 0; i < wseq_symbols.size(); ++i) {
@@ -72,7 +72,7 @@ BaseFloat KaldiRnnlmWrapper::GetLogProb(
 }
 
 RnnlmDeterministicFst::RnnlmDeterministicFst(int32 max_ngram_order,
-                                             KaldiRnnlmWrapper *rnnlm) {
+    KaldiRnnlmWrapper *rnnlm) {
   KALDI_ASSERT(rnnlm != NULL);
   max_ngram_order_ = max_ngram_order;
   rnnlm_ = rnnlm;
@@ -114,7 +114,7 @@ bool RnnlmDeterministicFst::GetArc(StateId s, Label ilabel, fst::StdArc *oarc) {
   }
 
   std::pair<const std::vector<Label>, StateId> wseq_state_pair(
-      wseq, static_cast<Label>(state_to_wseq_.size()));
+    wseq, static_cast<Label>(state_to_wseq_.size()));
 
   // Attemps to insert the current <lseq_state_pair>. If the pair already exists
   // then it returns false.

@@ -37,23 +37,23 @@ namespace kaldi {
 
 // The actual PortAudio callback - delegates to OnlinePaSource->PaCallback()
 int PaCallback(const void *input, void *output,
-               long unsigned frame_count,
-               const PaStreamCallbackTimeInfo *time_info,
-               PaStreamCallbackFlags status_flags,
-               void *user_data) {
+    long unsigned frame_count,
+    const PaStreamCallbackTimeInfo *time_info,
+    PaStreamCallbackFlags status_flags,
+    void *user_data) {
   OnlinePaSource *pa_src = reinterpret_cast<OnlinePaSource*>(user_data);
   return pa_src->Callback(input, output, frame_count, time_info, status_flags);
 }
 
 
 OnlinePaSource::OnlinePaSource(const uint32 timeout,
-                               const uint32 sample_rate,
-                               const uint32 rb_size,
-                               const uint32 report_interval)
-    : timeout_(timeout), timed_out_(false),
-      sample_rate_(sample_rate), pa_started_(false),
-      report_interval_(report_interval), nread_calls_(0),
-      noverflows_(0), samples_lost_(0) {
+    const uint32 sample_rate,
+    const uint32 rb_size,
+    const uint32 report_interval)
+  : timeout_(timeout), timed_out_(false),
+  sample_rate_(sample_rate), pa_started_(false),
+  report_interval_(report_interval), nread_calls_(0),
+  noverflows_(0), samples_lost_(0) {
   using namespace std;
 
   // Note this will work for 32bit integers but not for 64bit.
@@ -110,10 +110,10 @@ bool OnlinePaSource::Read(Vector<BaseFloat> *data) {
   if (report_interval_ != 0
       && (++nread_calls_ % report_interval_) == 0
       && noverflows_ > 0) {
-      KALDI_VLOG(1) << noverflows_
-                    << " PortAudio ring buffer overflows detected "
-                    << "and " << samples_lost_ << " sample(s) were lost";
-      samples_lost_ = noverflows_ = 0;
+    KALDI_VLOG(1) << noverflows_
+                  << " PortAudio ring buffer overflows detected "
+                  << "and " << samples_lost_ << " sample(s) were lost";
+    samples_lost_ = noverflows_ = 0;
   }
   uint32 nsamples_req = data->Dim();  // samples to request
   timed_out_ = false;
@@ -154,9 +154,9 @@ bool OnlinePaSource::Read(Vector<BaseFloat> *data) {
 
 // Accepts the data and writes it to the ring buffer
 int OnlinePaSource::Callback(const void *input, void *output,
-                             ring_buffer_size_t frame_count,
-                             const PaStreamCallbackTimeInfo *time_info,
-                             PaStreamCallbackFlags status_flags) {
+    ring_buffer_size_t frame_count,
+    const PaStreamCallbackTimeInfo *time_info,
+    PaStreamCallbackFlags status_flags) {
   if (report_interval_ != 0) {
     if (frame_count > PaUtil_GetRingBufferWriteAvailable(&pa_ringbuf_))
       ++noverflows_;

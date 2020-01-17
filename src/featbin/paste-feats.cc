@@ -28,9 +28,9 @@ namespace kaldi {
 
 // returns true if successfully appended.
 bool AppendFeats(const std::vector<Matrix<BaseFloat> > &in,
-                 std::string utt,
-                 int32 tolerance,
-                 Matrix<BaseFloat> *out) {
+    std::string utt,
+    int32 tolerance,
+    Matrix<BaseFloat> *out) {
   // Check the lengths
   int32 min_len = in[0].NumRows(),
       max_len = in[0].NumRows(),
@@ -179,26 +179,26 @@ int main(int argc, char *argv[]) {
 }
 
 /*
-  Testing:
+   Testing:
 
-cat <<EOF >1.mat
-[ 0 1 2
-  3 4 5
-  8 9 10 ]
-EOF
-cat <<EOF > 2.mat
- [ 0 1
+   cat <<EOF >1.mat
+   [ 0 1 2
+   3 4 5
+   8 9 10 ]
+   EOF
+   cat <<EOF > 2.mat
+   [ 0 1
    2 3 ]
-EOF
-paste-feats --length-tolerance=1 --binary=false 1.mat 2.mat 3a.mat
-cat <<EOF > 3b.mat
- [ 0 1 2 0 1
+   EOF
+   paste-feats --length-tolerance=1 --binary=false 1.mat 2.mat 3a.mat
+   cat <<EOF > 3b.mat
+   [ 0 1 2 0 1
    3 4 5 2 3 ]
-EOF
-cmp <(../bin/copy-matrix 3b.mat -) <(../bin/copy-matrix 3a.mat -) || echo 'Bad!'
+   EOF
+   cmp <(../bin/copy-matrix 3b.mat -) <(../bin/copy-matrix 3a.mat -) || echo 'Bad!'
 
-paste-feats --length-tolerance=1 'scp:echo foo 1.mat|' 'scp:echo foo 2.mat|' 'scp,t:echo foo 3a.mat|'
-cmp <(../bin/copy-matrix 3b.mat -) <(../bin/copy-matrix 3a.mat -) || echo 'Bad!'
+   paste-feats --length-tolerance=1 'scp:echo foo 1.mat|' 'scp:echo foo 2.mat|' 'scp,t:echo foo 3a.mat|'
+   cmp <(../bin/copy-matrix 3b.mat -) <(../bin/copy-matrix 3a.mat -) || echo 'Bad!'
 
-rm {1,2,3?}.mat
+   rm {1,2,3?}.mat
  */

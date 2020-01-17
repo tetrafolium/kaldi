@@ -22,16 +22,16 @@
 
 namespace kaldi {
 
-OnlineSpeexEncoder::OnlineSpeexEncoder(const SpeexOptions &config):
- input_finished_(false) {
+OnlineSpeexEncoder::OnlineSpeexEncoder(const SpeexOptions &config) :
+  input_finished_(false) {
   speex_frame_size_ = config.speex_bits_frame_size;
   speex_encoded_frame_size_ = config.speex_wave_frame_size;
   sample_rate_ = config.sample_rate;
 
   if(sizeof(speex_bits_) == 1) {
     KALDI_ERR << "OnlineSpeexEncoder called but Speex not installed."
-      << "You should run tools/extras/install_speex.sh first, then "
-      << "re-run configure in src/ and then make Kaldi again.\n";
+              << "You should run tools/extras/install_speex.sh first, then "
+              << "re-run configure in src/ and then make Kaldi again.\n";
   }
 
 #ifdef HAVE_SPEEX
@@ -52,7 +52,7 @@ OnlineSpeexEncoder::~OnlineSpeexEncoder() {
 }
 
 void OnlineSpeexEncoder::AcceptWaveform(
- int32 sample_rate, const VectorBase<BaseFloat> &waveform) {
+  int32 sample_rate, const VectorBase<BaseFloat> &waveform) {
   if (waveform.Dim() == 0) {
     return;   // Nothing to do.
   }
@@ -66,7 +66,7 @@ void OnlineSpeexEncoder::AcceptWaveform(
 
   Vector<BaseFloat> appended_wave;
   const VectorBase<BaseFloat> &wave_to_use = (waveform_remainder_.Dim() != 0 ?
-                                              appended_wave : waveform);
+      appended_wave : waveform);
   if (waveform_remainder_.Dim() != 0) {
     appended_wave.Resize(waveform_remainder_.Dim() +
                          waveform.Dim());
@@ -104,7 +104,7 @@ void OnlineSpeexEncoder::InputFinished() {
 }
 
 void OnlineSpeexEncoder::Encode(const VectorBase<BaseFloat> &wave,
- std::vector<char> *speex_encoder_bits) {
+    std::vector<char> *speex_encoder_bits) {
   if (wave.Dim() == 0) {
     return;
   }
@@ -115,7 +115,7 @@ void OnlineSpeexEncoder::Encode(const VectorBase<BaseFloat> &wave,
   std::vector<char> encoded_bits;
   while (to_encode > speex_encoded_frame_size_) {
     SubVector<BaseFloat> wave_frame(wave, has_encode,
-      speex_encoded_frame_size_);
+        speex_encoded_frame_size_);
     int32 nbytes = 0;
 #ifdef HAVE_SPEEX
     speex_bits_reset(&speex_bits_);
@@ -123,7 +123,7 @@ void OnlineSpeexEncoder::Encode(const VectorBase<BaseFloat> &wave,
     nbytes = speex_bits_nbytes(&speex_bits_);
     if (nbytes != speex_frame_size_) {
       KALDI_ERR << "The number of bytes of Speex encoded frame mismatch,"
-        << "expected " << speex_frame_size_ << ", got " << nbytes;
+                << "expected " << speex_frame_size_ << ", got " << nbytes;
     }
     nbytes = speex_bits_write(&speex_bits_, cbits, 200);
 #endif
@@ -159,8 +159,8 @@ OnlineSpeexDecoder::OnlineSpeexDecoder(const SpeexOptions &config) {
 
   if(sizeof(speex_bits_) == 1) {
     KALDI_ERR << "OnlineSpeexEncoder called but Speex not installed."
-      << "You should run tools/extras/install_speex.sh first, then "
-      << "re-run configure in src/ and then make Kaldi again.\n";
+              << "You should run tools/extras/install_speex.sh first, then "
+              << "re-run configure in src/ and then make Kaldi again.\n";
   }
 
 #ifdef HAVE_SPEEX
@@ -187,7 +187,7 @@ void OnlineSpeexDecoder::AcceptSpeexBits(const std::vector<char> &spx_enc_bits) 
 
   std::vector<char> appended_bits;
   const std::vector<char> &bits_to_use = (speex_bits_remainder_.size() != 0 ?
-                                              appended_bits : spx_enc_bits);
+      appended_bits : spx_enc_bits);
   if (speex_bits_remainder_.size() != 0) {
     appended_bits.insert(appended_bits.end(), speex_bits_remainder_.begin(),
                          speex_bits_remainder_.end());
@@ -208,7 +208,7 @@ void OnlineSpeexDecoder::AcceptSpeexBits(const std::vector<char> &spx_enc_bits) 
 }
 
 void OnlineSpeexDecoder::Decode(const std::vector<char> &speex_char_bits,
-                                Vector<BaseFloat> *decoded_wav) {
+    Vector<BaseFloat> *decoded_wav) {
   if (speex_char_bits.size() < speex_frame_size_) {
     return;                // Nothing to do, should never reach this
   }
@@ -219,7 +219,7 @@ void OnlineSpeexDecoder::Decode(const std::vector<char> &speex_char_bits,
   int32 to_decode = speex_char_bits.size();
   int32 has_decode = 0;
 
-  while(to_decode > speex_frame_size_){
+  while(to_decode > speex_frame_size_) {
     memcpy(cbits, &speex_char_bits[has_decode], speex_frame_size_);
 #ifdef HAVE_SPEEX
     speex_bits_read_from(&speex_bits_, cbits, speex_frame_size_);

@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
         "  phones-to-prons L_align.fst 46 47 ark:- 'ark:sym2int.pl -f 2- words.txt text|' \\\n"
         "  ark:- | prons-to-wordali ark:- \\\n"
         "    \"ark:ali-to-phones --write-lengths 1.mdl ark:1.ali ark:-|\" ark:1.wali\n";
-    
+
     ParseOptions po(usage);
     bool per_frame = false;
     po.Register("per-frame", &per_frame, "If true, write out the frame-level word alignment (else word sequence)");
@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
     std::string prons_rspecifier = po.GetArg(1),
         phone_lengths_rspecifier = po.GetArg(2),
         wordali_wspecifier = po.GetArg(3);
-        
-                
+
+
     SequentialInt32VectorVectorReader prons_reader(prons_rspecifier);
     RandomAccessInt32PairVectorReader phones_reader(phone_lengths_rspecifier);
 
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     Int32VectorWriter frame_writer(per_frame ? wordali_wspecifier : empty);
 
     int32 n_done = 0, n_err = 0;
-    
+
     for (; !prons_reader.Done(); prons_reader.Next()) {
       std::string key = prons_reader.Key();
       const std::vector<std::vector<int32> > &prons = prons_reader.Value();
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
         int32 word = prons[i][0], word_len = 0;
         for (size_t j = 1; j < prons[i].size(); j++, p++) {
           if (!(static_cast<size_t>(p) < phones.size() &&
-                prons[i][j] == phones[p].first) ) {
+              prons[i][j] == phones[p].first) ) {
             KALDI_WARN << "For key " << key << ", mismatch between prons and phones.";
             n_err++;
             continue;

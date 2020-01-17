@@ -35,8 +35,8 @@ namespace nnet3 {
     If "compress" is true, it will compress any non-sparse features in the output.
  */
 void MergeExamples(const std::vector<NnetExample> &src,
-                   bool compress,
-                   NnetExample *dest);
+    bool compress,
+    NnetExample *dest);
 
 
 /** Shifts the time-index t of everything in the "eg" by adding "t_offset" to
@@ -47,8 +47,8 @@ void MergeExamples(const std::vector<NnetExample> &src,
     normally it will contain just the single string "ivector" because we always
     leave t=0 for any ivector. */
 void ShiftExampleTimes(int32 t_offset,
-                       const std::vector<std::string> &exclude_names,
-                       NnetExample *eg);
+    const std::vector<std::string> &exclude_names,
+    NnetExample *eg);
 
 /**  This function takes a NnetExample (which should already have been
      frame-selected, if desired, and merged into a minibatch) and produces a
@@ -56,24 +56,24 @@ void ShiftExampleTimes(int32 t_offset,
      inputs; if you do, you can create/modify the ComputationRequest manually.
      Assumes that if need_model_derivative is true, you will be supplying
      derivatives w.r.t. all outputs.
-*/
+ */
 void GetComputationRequest(const Nnet &nnet,
-                           const NnetExample &eg,
-                           bool need_model_derivative,
-                           bool store_component_stats,
-                           ComputationRequest *computation_request);
+    const NnetExample &eg,
+    bool need_model_derivative,
+    bool store_component_stats,
+    ComputationRequest *computation_request);
 
 
 // Writes as unsigned char a vector 'vec' that is required to have
 // values between 0 and 1.
 void WriteVectorAsChar(std::ostream &os,
-                       bool binary,
-                       const VectorBase<BaseFloat> &vec);
+    bool binary,
+    const VectorBase<BaseFloat> &vec);
 
 // Reads data written by WriteVectorAsChar.
 void ReadVectorAsChar(std::istream &is,
-                      bool binary,
-                      Vector<BaseFloat> *vec);
+    bool binary,
+    Vector<BaseFloat> *vec);
 
 
 // Warning: after reading in the values from the command line
@@ -97,11 +97,11 @@ struct ExampleGenerationConfig {
   // frames, to be used at most once or twice per file.
   std::vector<int32> num_frames;
 
-  ExampleGenerationConfig():
-      left_context(0), right_context(0),
-      left_context_initial(-1), right_context_final(-1),
-      num_frames_overlap(0), frame_subsampling_factor(1),
-      num_frames_str("1") { }
+  ExampleGenerationConfig() :
+    left_context(0), right_context(0),
+    left_context_initial(-1), right_context_final(-1),
+    num_frames_overlap(0), frame_subsampling_factor(1),
+    num_frames_str("1") { }
 
   /// This function decodes 'num_frames_str' into 'num_frames', and ensures that
   /// the members of 'num_frames' are multiples of 'frame_subsampling_factor'.
@@ -167,7 +167,7 @@ struct ChunkTimeInfo {
 
 
 class UtteranceSplitter {
- public:
+public:
 
   UtteranceSplitter(const ExampleGenerationConfig &config);
 
@@ -179,7 +179,7 @@ class UtteranceSplitter {
   // srand()).
   // Accumulates some stats which will be printed out in the destructor.
   void GetChunksForUtterance(int32 utterance_length,
-                             std::vector<ChunkTimeInfo> *chunk_info);
+      std::vector<ChunkTimeInfo> *chunk_info);
 
 
   // This function returns true if 'supervision_length' (e.g. the length of the
@@ -189,15 +189,15 @@ class UtteranceSplitter {
   // writing config_.frame_subsampling_factor as sf, we expect
   // supervision_length = (utterance_length + sf - 1) / sf.
   bool LengthsMatch(const std::string &utt,
-                    int32 utterance_length,
-                    int32 supervision_length,
-                    int32 length_tolerance = 0) const;
+      int32 utterance_length,
+      int32 supervision_length,
+      int32 length_tolerance = 0) const;
 
   ~UtteranceSplitter();
 
   int32 ExitStatus() { return (total_frames_in_chunks_ > 0 ? 0 : 1); }
 
- private:
+private:
 
 
   void InitSplitForLength();
@@ -230,7 +230,7 @@ class UtteranceSplitter {
   // we sort the chunk-sizes because a 'split' is conceptually an
   // order-independent representation.
   void GetChunkSizesForUtterance(int32 utterance_length,
-                                 std::vector<int32> *chunk_sizes) const;
+      std::vector<int32> *chunk_sizes) const;
 
 
   // Used in GetChunksForUtterance, this function selects the 'gap sizes'
@@ -248,9 +248,9 @@ class UtteranceSplitter {
   // frames (i.e. it would require that many frames past the utterance end).
   // This will be dealt with when generating egs, by duplicating the last frame.
   void GetGapSizes(int32 utterance_length,
-                   bool enforce_subsampling_factor,
-                   const std::vector<int32> &chunk_sizes,
-                   std::vector<int32> *gap_sizes) const;
+      bool enforce_subsampling_factor,
+      const std::vector<int32> &chunk_sizes,
+      std::vector<int32> *gap_sizes) const;
 
   // this static function, used in GetGapSizes(), writes random values to a
   // vector 'vec' such the sum of those values equals n (n may be positive or
@@ -258,7 +258,7 @@ class UtteranceSplitter {
   // differ by at most one), and the location of the larger versus smaller
   // values is random. 'vec' must be nonempty.
   static void DistributeRandomlyUniform(int32 n,
-                                        std::vector<int32> *vec);
+      std::vector<int32> *vec);
 
   // this static function, used in GetGapSizes(), writes values to a vector
   // 'vec' such the sum of those values equals n (n may be positive or
@@ -266,17 +266,17 @@ class UtteranceSplitter {
   // proportional to the values in 'magnitudes', which must be positive.  'vec'
   // must be nonempty, and 'magnitudes' must be the same size as 'vec'.
   static void DistributeRandomly(int32 n,
-                                 const std::vector<int32> &magnitudes,
-                                 std::vector<int32> *vec);
+      const std::vector<int32> &magnitudes,
+      std::vector<int32> *vec);
 
   // This function is responsible for setting the 'output_weights'
   // members of the chunks.
   void SetOutputWeights(int32 utterance_length,
-                        std::vector<ChunkTimeInfo> *chunk_info) const;
+      std::vector<ChunkTimeInfo> *chunk_info) const;
 
   // Accumulate stats for diagnostics.
   void AccStatsForUtterance(int32 utterance_length,
-                            const std::vector<ChunkTimeInfo> &chunk_info);
+      const std::vector<ChunkTimeInfo> &chunk_info);
 
 
   const ExampleGenerationConfig &config_;
@@ -326,11 +326,11 @@ public:
   std::string minibatch_size;
   std::string discard_partial_minibatches;   // for back-compatibility, not used.
 
-  ExampleMergingConfig(const char *default_minibatch_size = "256"):
-      compress(false),
-      measure_output_frames("deprecated"),
-      minibatch_size(default_minibatch_size),
-      discard_partial_minibatches("deprecated") { }
+  ExampleMergingConfig(const char *default_minibatch_size = "256") :
+    compress(false),
+    measure_output_frames("deprecated"),
+    minibatch_size(default_minibatch_size),
+    discard_partial_minibatches("deprecated") { }
 
   void Register(OptionsItf *po) {
     po->Register("compress", &compress, "If true, compress the output examples "
@@ -379,11 +379,11 @@ public:
   ///  @return                   Returns the minibatch size to use in this
   ///                            situation, as specified by the configuration.
   int32 MinibatchSize(int32 size_of_eg,
-                      int32 num_available_egs,
-                      bool input_ended) const;
+      int32 num_available_egs,
+      bool input_ended) const;
 
 
- private:
+private:
   // struct IntSet is a representation of something like 16:32,64, which is a
   // nonempty list of either positive integers or ranges of positive integers.
   // Conceptually it represents a set of positive integers.
@@ -425,7 +425,7 @@ int32 GetNnetExampleSize(const NnetExample &a);
 /// were merged into minibatches, and how many examples were left over and
 /// discarded.
 class ExampleMergingStats {
- public:
+public:
   /// Users call this function to inform this class that one minibatch has been
   /// written aggregating 'minibatch_size' separate examples of original size
   /// 'example_size' (e.g. as determined by GetNnetExampleSize(), but the caller
@@ -435,19 +435,19 @@ class ExampleMergingStats {
   /// extremely unlikely eventuality that there is a hash collision, it will
   /// cause misleading stats to be printed out.
   void WroteExample(int32 example_size, size_t structure_hash,
-                    int32 minibatch_size);
+      int32 minibatch_size);
 
   /// Users call this function to inform this class that after processing all
   /// the data, for examples of original size 'example_size', 'num_discarded'
   /// examples could not be put into a minibatch and were discarded.
   void DiscardedExamples(int32 example_size, size_t structure_hash,
-                         int32 num_discarded);
+      int32 num_discarded);
 
   /// Calling this will cause a log message with information about the
   /// examples to be printed.
   void PrintStats() const;
 
- private:
+private:
   // this struct stores the stats for examples of a particular size and
   // structure.
   struct StatsForExampleSize {
@@ -456,12 +456,12 @@ class ExampleMergingStats {
     // aggregated into that minibatch), to the number of such
     // minibatches written.
     unordered_map<int32, int32> minibatch_to_num_written;
-    StatsForExampleSize(): num_discarded(0) { }
+    StatsForExampleSize() : num_discarded(0) { }
   };
 
 
   typedef unordered_map<std::pair<int32, size_t>, StatsForExampleSize,
-                        PairHasher<int32, size_t> > StatsType;
+          PairHasher<int32, size_t> > StatsType;
 
   // this maps from a pair (example_size, structure_hash) to to the stats for
   // examples with those characteristics.
@@ -478,9 +478,9 @@ class ExampleMergingStats {
 /// indexes), and outputting them in suitable minibatches
 /// as defined by ExampleMergingConfig.
 class ExampleMerger {
- public:
+public:
   ExampleMerger(const ExampleMergingConfig &config,
-                NnetExampleWriter *writer);
+      NnetExampleWriter *writer);
 
   // This function accepts an example, and if possible, writes a merged example
   // out.  The ownership of the pointer 'a' is transferred to this class when
@@ -498,7 +498,7 @@ class ExampleMerger {
   int32 ExitStatus() { Finish(); return (num_egs_written_ > 0 ? 0 : 1); }
 
   ~ExampleMerger() { Finish(); };
- private:
+private:
   // called by Finish() and AcceptExample().  Merges, updates the
   // stats, and writes.
   void WriteMinibatch(const std::vector<NnetExample> &egs);
@@ -511,9 +511,9 @@ class ExampleMerger {
 
   // Note: the "key" into the egs is the first element of the vector.
   typedef unordered_map<NnetExample*, std::vector<NnetExample*>,
-                        NnetExampleStructureHasher,
-                        NnetExampleStructureCompare> MapType;
-   MapType eg_to_egs_;
+          NnetExampleStructureHasher,
+          NnetExampleStructureCompare> MapType;
+  MapType eg_to_egs_;
 };
 
 

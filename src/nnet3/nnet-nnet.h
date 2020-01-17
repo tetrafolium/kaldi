@@ -104,8 +104,8 @@ struct NetworkNode {
 
   int32 Dim(const Nnet &nnet) const;  // Dimension that this node outputs.
 
-  NetworkNode(NodeType nt = kNone):
-      node_type(nt), dim(-1), dim_offset(-1) { u.component_index = -1; }
+  NetworkNode(NodeType nt = kNone) :
+    node_type(nt), dim(-1), dim_offset(-1) { u.component_index = -1; }
   NetworkNode(const NetworkNode &other);  // copy constructor.
   // use default assignment operator
 };
@@ -113,7 +113,7 @@ struct NetworkNode {
 
 
 class Nnet {
- public:
+public:
   // This function can be used either to initialize a new Nnet from a config
   // file, or to add to an existing Nnet, possibly replacing certain parts of
   // it.  It will die with error if something went wrong.
@@ -272,9 +272,9 @@ class Nnet {
   // node dimensions which is useful for a human reader but won't be
   // accepted as the config-file format.
   void GetConfigLines(bool include_dim,
-                      std::vector<std::string> *config_lines) const;
+      std::vector<std::string> *config_lines) const;
 
- private:
+private:
 
   void Destroy();
 
@@ -299,17 +299,17 @@ class Nnet {
   // means literally "name", but "xxx" stands in for the actual name,
   // e.g. "my-funky-component."
   static void RemoveRedundantConfigLines(int32 num_lines_initial,
-                                         std::vector<ConfigLine> *config_lines);
+      std::vector<ConfigLine> *config_lines);
 
   void ProcessComponentConfigLine(int32 initial_num_components,
-                                  ConfigLine *config);
+      ConfigLine *config);
   void ProcessComponentNodeConfigLine(int32 pass,
-                                      ConfigLine *config);
+      ConfigLine *config);
   void ProcessInputNodeConfigLine(ConfigLine *config);
   void ProcessOutputNodeConfigLine(int32 pass,
-                                   ConfigLine *config);
+      ConfigLine *config);
   void ProcessDimRangeNodeConfigLine(int32 pass,
-                                     ConfigLine *config);
+      ConfigLine *config);
 
   // This function output to "modified_node_names" a modified copy of
   // node_names_, in which all nodes which are not of type kComponent, kInput or

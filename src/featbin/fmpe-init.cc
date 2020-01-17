@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
 
     DiagGmm dgmm;
     ReadKaldiObject(dgmm_rxfilename, &dgmm);
-    
-    
+
+
     Fmpe fmpe(dgmm, opts);
 
     Output ko(fmpe_wxfilename, binary);

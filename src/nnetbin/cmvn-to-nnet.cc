@@ -29,10 +29,10 @@ int main(int argc, char *argv[]) {
     typedef kaldi::int32 int32;
 
     const char *usage =
-      "Convert cmvn-stats into <AddShift> and <Rescale> components.\n"
-      "Usage:  cmvn-to-nnet [options] <transf-in> <nnet-out>\n"
-      "e.g.:\n"
-      " cmvn-to-nnet --binary=false transf.mat nnet.mdl\n";
+        "Convert cmvn-stats into <AddShift> and <Rescale> components.\n"
+        "Usage:  cmvn-to-nnet [options] <transf-in> <nnet-out>\n"
+        "e.g.:\n"
+        " cmvn-to-nnet --binary=false transf.mat nnet.mdl\n";
 
 
     bool binary_write = false;

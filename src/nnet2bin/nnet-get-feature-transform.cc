@@ -66,8 +66,8 @@ int main(int argc, char *argv[]) {
     Matrix<BaseFloat> mat;
     TpMatrix<BaseFloat> cholesky;
     fte.Estimate(opts, &mat,
-                 (write_cholesky != "" || write_within_covar != "" ?
-                  &cholesky : NULL));
+        (write_cholesky != "" || write_within_covar != "" ?
+        &cholesky : NULL));
     WriteKaldiObject(mat, projection_wxfilename, binary);
     if (write_cholesky != "") {
       WriteKaldiObject(cholesky, write_cholesky, binary);

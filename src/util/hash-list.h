@@ -42,13 +42,13 @@
    to avoid repeated new's/deletes.
 
    See hash-list-test.cc for an example of how to use this object.
-*/
+ */
 
 
 namespace kaldi {
 
 template<class I, class T> class HashList {
- public:
+public:
   struct Elem {
     I key;
     T val;
@@ -115,13 +115,13 @@ template<class I, class T> class HashList {
   inline size_t Size() { return hash_size_; }
 
   ~HashList();
- private:
+private:
 
   struct HashBucket {
     size_t prev_bucket;  // index to next bucket (-1 if list tail).  Note:
     // list of buckets goes in opposite direction to list of Elems.
     Elem *last_elem;  // pointer to last element in this bucket (NULL if empty)
-    inline HashBucket(size_t i, Elem *e): prev_bucket(i), last_elem(e) {}
+    inline HashBucket(size_t i, Elem *e) : prev_bucket(i), last_elem(e) {}
   };
 
   Elem *list_head_;  // head of currently stored list.

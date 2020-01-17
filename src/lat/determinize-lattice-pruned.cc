@@ -41,7 +41,7 @@ namespace fst {
 // w2.  This requires that there be a total order on the weights.
 
 template<class Weight, class IntType> class LatticeDeterminizerPruned {
- public:
+public:
   // Output to Gallic acceptor (so the strings go on weights, and there is a 1-1 correspondence
   // between our states and the states in ofst.  If destroy == true, release memory as we go
   // (but we cannot output again).
@@ -64,7 +64,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
     if (nStates == 0) {
       return;
     }
-    for (StateId s = 0;s < nStates;s++) {
+    for (StateId s = 0; s < nStates; s++) {
       OutputStateId news = ofst->AddState();
       KALDI_ASSERT(news == s);
     }
@@ -75,7 +75,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
       vector<TempArc> &this_vec(this_state.arcs);
       typename vector<TempArc>::const_iterator iter = this_vec.begin(), end = this_vec.end();
 
-      for (;iter != end; ++iter) {
+      for (; iter != end; ++iter) {
         const TempArc &temp_arc(*iter);
         CompactArc new_arc;
         vector<Label> olabel_seq;
@@ -115,7 +115,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
     if (destroy)
       FreeMostMemory();
     // Add basic states-- but we will add extra ones to account for strings on output.
-    for (OutputStateId s = 0; s< nStates;s++) {
+    for (OutputStateId s = 0; s< nStates; s++) {
       OutputStateId news = ofst->AddState();
       KALDI_ASSERT(news == s);
     }
@@ -149,7 +149,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
           OutputStateId cur_state = this_state_id;
           // Have to be careful with this integer comparison (i+1 < seq.size()) because unsigned.
           // i < seq.size()-1 could fail for zero-length sequences.
-          for (size_t i = 0; i+1 < seq.size();i++) {
+          for (size_t i = 0; i+1 < seq.size(); i++) {
             // for all but the last element of seq, create new state.
             OutputStateId next_state = ofst->AddState();
             Arc arc;
@@ -185,11 +185,11 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // shallow copy.  We do it like this for memory safety, rather than
   // keeping a reference or pointer to ifst_.
   LatticeDeterminizerPruned(const ExpandedFst<Arc> &ifst,
-                            double beam,
-                            DeterminizeLatticePrunedOptions opts):
-      num_arcs_(0), num_elems_(0), ifst_(ifst.Copy()), beam_(beam), opts_(opts),
-      equal_(opts_.delta), determinized_(false),
-      minimal_hash_(3, hasher_, equal_), initial_hash_(3, hasher_, equal_) {
+      double beam,
+      DeterminizeLatticePrunedOptions opts) :
+    num_arcs_(0), num_elems_(0), ifst_(ifst.Copy()), beam_(beam), opts_(opts),
+    equal_(opts_.delta), determinized_(false),
+    minimal_hash_(3, hasher_, equal_), initial_hash_(3, hasher_, equal_) {
     KALDI_ASSERT(Weight::Properties() & kIdempotent); // this algorithm won't
     // work correctly otherwise.
   }
@@ -216,7 +216,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
     }
 
     for (typename InitialSubsetHash::iterator iter = initial_hash_.begin();
-         iter != initial_hash_.end(); ++iter)
+        iter != initial_hash_.end(); ++iter)
       delete iter->first;
     { InitialSubsetHash tmp; tmp.swap(initial_hash_); }
     for (size_t i = 0; i < output_states_.size(); i++) {
@@ -269,8 +269,8 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
 
     // the following loop covers strings present in initial_hash_.
     for (typename InitialSubsetHash::const_iterator
-             iter = initial_hash_.begin();
-         iter != initial_hash_.end(); ++iter) {
+        iter = initial_hash_.begin();
+        iter != initial_hash_.end(); ++iter) {
       const vector<Element> &vec = *(iter->first);
       Element elem = iter->second;
       AddStrings(vec, &needed_strings);
@@ -375,7 +375,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
     // all tasks and did not break out of the loop early due to reaching a memory,
     // arc or state limit.
   }
- private:
+private:
 
   typedef typename Arc::Label Label;
   typedef typename Arc::StateId StateId;  // use this when we don't know if it's input or output.
@@ -394,7 +394,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
     Weight weight;
     bool operator != (const Element &other) const {
       return (state != other.state || string != other.string ||
-              weight != other.weight);
+             weight != other.weight);
     }
     // This operator is only intended for the priority_queue in the function
     // EpsilonClosure().
@@ -430,7 +430,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // difference.
 
   class SubsetKey {
-   public:
+public:
     size_t operator ()(const vector<Element> * subset) const {  // hashes only the state and string.
       size_t hash = 0, factor = 1;
       for (typename vector<Element>::const_iterator iter= subset->begin(); iter != subset->end(); ++iter) {
@@ -445,7 +445,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // This is the equality operator on subsets.  It checks for exact match on state-id
   // and string, and approximate match on weights.
   class SubsetEqual {
-   public:
+public:
     bool operator ()(const vector<Element> * s1, const vector<Element> * s2) const {
       size_t sz = s1->size();
       KALDI_ASSERT(sz>=0);
@@ -454,20 +454,20 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
           iter1_end = s1->end(), iter2=s2->begin();
       for (; iter1 < iter1_end; ++iter1, ++iter2) {
         if (iter1->state != iter2->state ||
-           iter1->string != iter2->string ||
-            ! ApproxEqual(iter1->weight, iter2->weight, delta_)) return false;
+            iter1->string != iter2->string ||
+            !ApproxEqual(iter1->weight, iter2->weight, delta_)) return false;
       }
       return true;
     }
     float delta_;
-    SubsetEqual(float delta): delta_(delta) {}
-    SubsetEqual(): delta_(kDelta) {}
+    SubsetEqual(float delta) : delta_(delta) {}
+    SubsetEqual() : delta_(kDelta) {}
   };
 
   // Operator that says whether two Elements have the same states.
   // Used only for debug.
   class SubsetEqualStates {
-   public:
+public:
     bool operator ()(const vector<Element> * s1, const vector<Element> * s2) const {
       size_t sz = s1->size();
       KALDI_ASSERT(sz>=0);
@@ -484,7 +484,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // Define the hash type we use to map subsets (in minimal
   // representation) to OutputStateId.
   typedef unordered_map<const vector<Element>*, OutputStateId,
-                        SubsetKey, SubsetEqual> MinimalSubsetHash;
+          SubsetKey, SubsetEqual> MinimalSubsetHash;
 
   // Define the hash type we use to map subsets (in initial
   // representation) to OutputStateId, together with an
@@ -492,7 +492,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // as an OutputStateId even though it's declared as InputStateId;
   // these types are the same anyway].
   typedef unordered_map<const vector<Element>*, Element,
-                        SubsetKey, SubsetEqual> InitialSubsetHash;
+          SubsetKey, SubsetEqual> InitialSubsetHash;
 
 
   // converts the representation of the subset from canonical (all states) to
@@ -518,9 +518,9 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // out its final-weight, and puts stuff on the queue relating to its
   // transitions.
   OutputStateId MinimalToStateId(const vector<Element> &subset,
-                                 const double forward_cost) {
+      const double forward_cost) {
     typename MinimalSubsetHash::const_iterator iter
-        = minimal_hash_.find(&subset);
+      = minimal_hash_.find(&subset);
     if (iter != minimal_hash_.end()) { // Found a matching subset.
       OutputStateId state_id = iter->second;
       const OutputState &state = *(output_states_[state_id]);
@@ -550,11 +550,11 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // Given a normalized initial subset of elements (i.e. before epsilon closure),
   // compute the corresponding output-state.
   OutputStateId InitialToStateId(const vector<Element> &subset_in,
-                                 double forward_cost,
-                                 Weight *remaining_weight,
-                                 StringId *common_prefix) {
+      double forward_cost,
+      Weight *remaining_weight,
+      StringId *common_prefix) {
     typename InitialSubsetHash::const_iterator iter
-        = initial_hash_.find(&subset_in);
+      = initial_hash_.find(&subset_in);
     if (iter != initial_hash_.end()) { // Found a matching subset.
       const Element &elem = iter->second;
       *remaining_weight = elem.weight;
@@ -573,7 +573,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
     ConvertToMinimal(&subset); // remove all but emitting and final states.
 
     Element elem; // will be used to store remaining weight and string, and
-                 // OutputStateId, in initial_hash_;
+                  // OutputStateId, in initial_hash_;
     NormalizeSubset(&subset, &elem.weight, &elem.string); // normalize subset; put
     // common string and weight in "elem".  The subset is now a minimal,
     // normalized subset.
@@ -603,7 +603,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // in lattice-weight.h.
   // this is the same as that, but optimized for our data structures.
   inline int Compare(const Weight &a_w, StringId a_str,
-                     const Weight &b_w, StringId b_str) const {
+      const Weight &b_w, StringId b_str) const {
     int weight_comp = fst::Compare(a_w, b_w);
     if (weight_comp != 0) return weight_comp;
     // now comparing strings.
@@ -684,7 +684,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
           if (iter == cur_subset.end()) {
             // was no such StateId: insert and add to queue.
             next_elem.string = (arc.olabel == 0 ? elem.string :
-                                repository_.Successor(elem.string, arc.olabel));
+                repository_.Successor(elem.string, arc.olabel));
             cur_subset[next_elem.state] = next_elem;
             queue.push(next_elem);
           } else {
@@ -695,14 +695,14 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
             if (comp == 0) { // A tie on weights.  This should be a rare case;
                              // we don't optimize for it.
               next_elem.string = (arc.olabel == 0 ? elem.string :
-                                  repository_.Successor(elem.string,
+                  repository_.Successor(elem.string,
                                                         arc.olabel));
               comp = Compare(next_elem.weight, next_elem.string,
                              iter->second.weight, iter->second.string);
             }
             if(comp == 1) { // next_elem is better, so use its (weight, string)
               next_elem.string = (arc.olabel == 0 ? elem.string :
-                                  repository_.Successor(elem.string, arc.olabel));
+                  repository_.Successor(elem.string, arc.olabel));
               iter->second.string = next_elem.string;
               iter->second.weight = next_elem.weight;
               queue.push(next_elem);
@@ -746,7 +746,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
       Weight this_final_weight = Times(elem.weight, ifst_->Final(elem.state));
       StringId this_final_string = elem.string;
       if (this_final_weight != Weight::Zero() &&
-         (!is_final || Compare(this_final_weight, this_final_string,
+          (!is_final || Compare(this_final_weight, this_final_string,
                                final_weight, final_string) == 1)) { // the new
         // (weight, string) pair is more in semiring than our current
         // one.
@@ -774,8 +774,8 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // removing any common string prefix (putting it in common_str),
   // and dividing by the total weight (putting it in tot_weight).
   void NormalizeSubset(vector<Element> *elems,
-                       Weight *tot_weight,
-                       StringId *common_str) {
+      Weight *tot_weight,
+      StringId *common_str) {
     if(elems->empty()) { // just set common_str, tot_weight
       // to defaults and return...
       KALDI_WARN << "empty subset";
@@ -880,7 +880,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // "Element" member of the pair.
 
   class PairComparator {
-   public:
+public:
     inline bool operator () (const pair<Label, Element> &p1, const pair<Label, Element> &p2) {
       if (p1.first < p2.first) return true;
       else if (p1.first > p2.first) return false;
@@ -909,9 +909,9 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
       // Push back into "all_elems", elements corresponding to all
       // non-epsilon-input transitions out of all states in "minimal_subset".
       typename vector<Element>::const_iterator iter = minimal_subset.begin(), end = minimal_subset.end();
-      for (;iter != end; ++iter) {
+      for (; iter != end; ++iter) {
         const Element &elem = *iter;
-        for (ArcIterator<ExpandedFst<Arc> > aiter(*ifst_, elem.state); ! aiter.Done(); aiter.Next()) {
+        for (ArcIterator<ExpandedFst<Arc> > aiter(*ifst_, elem.state); !aiter.Done(); aiter.Next()) {
           const Arc &arc = aiter.Value();
           if (arc.ilabel != 0
               && arc.weight != Weight::Zero()) {  // Non-epsilon transition -- ignore epsilons here.
@@ -999,8 +999,8 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
     if (ifst_->Final(state) != Weight::Zero())
       isymbol_or_final_[state] = static_cast<char>(OSF_YES);
     for (ArcIterator<ExpandedFst<Arc> > aiter(*ifst_, state);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       const Arc &arc = aiter.Value();
       if (arc.ilabel != 0 && arc.weight != Weight::Zero()) {
         isymbol_or_final_[state] = static_cast<char>(OSF_YES);
@@ -1020,7 +1020,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
       double &cost = backward_costs_[s];
       cost = ConvertToCost(ifst_->Final(s));
       for (ArcIterator<ExpandedFst<Arc> > aiter(*ifst_, s);
-           !aiter.Done(); aiter.Next()) {
+          !aiter.Done(); aiter.Next()) {
         const Arc &arc = aiter.Value();
         cost = std::min(cost,
                         ConvertToCost(arc.weight) + backward_costs_[arc.nextstate]);
@@ -1066,7 +1066,7 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
          Note, we don't put anything in the initial_hash_.  The initial_hash_ is only
          a lookaside buffer anyway, so this isn't a problem-- it will get populated
          later if it needs to be.
-      */
+       */
       vector<Element> subset(1);
       subset[0].state = start_id;
       subset[0].weight = Weight::One();
@@ -1103,8 +1103,8 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
     // this is because of the priority-queue we use, that ensures that the
     // "best" path into the state will be expanded first.
     OutputState(const vector<Element> &minimal_subset,
-                double forward_cost): minimal_subset(minimal_subset),
-                                      forward_cost(forward_cost) { }
+        double forward_cost) : minimal_subset(minimal_subset),
+      forward_cost(forward_cost) { }
   };
 
   vector<OutputState*> output_states_; // All the info about the output states.
@@ -1177,9 +1177,9 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
   // storing sequences of labels.
 
   void AddStrings(const vector<Element> &vec,
-                  vector<StringId> *needed_strings) {
+      vector<StringId> *needed_strings) {
     for (typename std::vector<Element>::const_iterator iter = vec.begin();
-         iter != vec.end(); ++iter)
+        iter != vec.end(); ++iter)
       needed_strings->push_back(iter->string);
   }
 };
@@ -1191,10 +1191,10 @@ template<class Weight, class IntType> class LatticeDeterminizerPruned {
 // with identical code but different output FST types.
 template<class Weight, class IntType>
 bool DeterminizeLatticePruned(
-    const ExpandedFst<ArcTpl<Weight> >&ifst,
-    double beam,
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > >*ofst,
-    DeterminizeLatticePrunedOptions opts) {
+  const ExpandedFst<ArcTpl<Weight> >&ifst,
+  double beam,
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > >*ofst,
+  DeterminizeLatticePrunedOptions opts) {
   ofst->SetInputSymbols(ifst.InputSymbols());
   ofst->SetOutputSymbols(ifst.OutputSymbols());
   if (ifst.NumStates() == 0) {
@@ -1208,7 +1208,7 @@ bool DeterminizeLatticePruned(
 
   for (int32 iter = 0; iter < max_num_iters; iter++) {
     LatticeDeterminizerPruned<Weight, IntType> det(iter == 0 ? ifst : temp_fst,
-                                                   beam, opts);
+        beam, opts);
     double effective_beam;
     bool ans = det.Determinize(&effective_beam);
     // if it returns false it will typically still produce reasonable output,
@@ -1243,9 +1243,9 @@ bool DeterminizeLatticePruned(
 // with identical code but different output FST types.
 template<class Weight>
 bool DeterminizeLatticePruned(const ExpandedFst<ArcTpl<Weight> > &ifst,
-                              double beam,
-                              MutableFst<ArcTpl<Weight> > *ofst,
-                              DeterminizeLatticePrunedOptions opts) {
+    double beam,
+    MutableFst<ArcTpl<Weight> > *ofst,
+    DeterminizeLatticePrunedOptions opts) {
   typedef int32 IntType;
   ofst->SetInputSymbols(ifst.InputSymbols());
   ofst->SetOutputSymbols(ifst.OutputSymbols());
@@ -1260,7 +1260,7 @@ bool DeterminizeLatticePruned(const ExpandedFst<ArcTpl<Weight> > &ifst,
 
   for (int32 iter = 0; iter < max_num_iters; iter++) {
     LatticeDeterminizerPruned<Weight, IntType> det(iter == 0 ? ifst : temp_fst,
-                                                   beam, opts);
+        beam, opts);
     double effective_beam;
     bool ans = det.Determinize(&effective_beam);
     // if it returns false it will typically still
@@ -1291,8 +1291,8 @@ bool DeterminizeLatticePruned(const ExpandedFst<ArcTpl<Weight> > &ifst,
 
 template<class Weight>
 typename ArcTpl<Weight>::Label DeterminizeLatticeInsertPhones(
-    const kaldi::TransitionModel &trans_model,
-    MutableFst<ArcTpl<Weight> > *fst) {
+  const kaldi::TransitionModel &trans_model,
+  MutableFst<ArcTpl<Weight> > *fst) {
   // Define some types.
   typedef ArcTpl<Weight> Arc;
   typedef typename Arc::StateId StateId;
@@ -1305,12 +1305,12 @@ typename ArcTpl<Weight>::Label DeterminizeLatticeInsertPhones(
 
   // Insert phones here.
   for (StateIterator<MutableFst<Arc> > siter(*fst);
-       !siter.Done(); siter.Next()) {
+      !siter.Done(); siter.Next()) {
     StateId state = siter.Value();
     if (state == fst->Start())
       continue;
     for (MutableArcIterator<MutableFst<Arc> > aiter(fst, state);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       Arc arc = aiter.Value();
 
       // Note: the words are on the input symbol side and transition-id's are on
@@ -1347,8 +1347,8 @@ typename ArcTpl<Weight>::Label DeterminizeLatticeInsertPhones(
 
 template<class Weight>
 void DeterminizeLatticeDeletePhones(
-    typename ArcTpl<Weight>::Label first_phone_label,
-    MutableFst<ArcTpl<Weight> > *fst) {
+  typename ArcTpl<Weight>::Label first_phone_label,
+  MutableFst<ArcTpl<Weight> > *fst) {
   // Define some types.
   typedef ArcTpl<Weight> Arc;
   typedef typename Arc::StateId StateId;
@@ -1356,10 +1356,10 @@ void DeterminizeLatticeDeletePhones(
 
   // Delete phones here.
   for (StateIterator<MutableFst<Arc> > siter(*fst);
-       !siter.Done(); siter.Next()) {
+      !siter.Done(); siter.Next()) {
     StateId state = siter.Value();
     for (MutableArcIterator<MutableFst<Arc> > aiter(fst, state);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       Arc arc = aiter.Value();
 
       if (arc.ilabel >= first_phone_label)
@@ -1372,8 +1372,8 @@ void DeterminizeLatticeDeletePhones(
 // instantiate for type LatticeWeight
 template
 void DeterminizeLatticeDeletePhones(
-    ArcTpl<kaldi::LatticeWeight>::Label first_phone_label,
-    MutableFst<ArcTpl<kaldi::LatticeWeight> > *fst);
+  ArcTpl<kaldi::LatticeWeight>::Label first_phone_label,
+  MutableFst<ArcTpl<kaldi::LatticeWeight> > *fst);
 
 /** This function does a first pass determinization with phone symbols inserted
     at phone boundary. It uses a transition model to work out the transition-id
@@ -1385,13 +1385,13 @@ void DeterminizeLatticeDeletePhones(
     followed by another pass of determinization at the word level. It could also
     be useful for some other applications such as fMLLR estimation, confidence
     estimation, discriminative training, etc.
-*/
+ */
 template<class Weight, class IntType>
 bool DeterminizeLatticePhonePrunedFirstPass(
-    const kaldi::TransitionModel &trans_model,
-    double beam,
-    MutableFst<ArcTpl<Weight> > *fst,
-    const DeterminizeLatticePrunedOptions &opts) {
+  const kaldi::TransitionModel &trans_model,
+  double beam,
+  MutableFst<ArcTpl<Weight> > *fst,
+  const DeterminizeLatticePrunedOptions &opts) {
   // First, insert the phones.
   typename ArcTpl<Weight>::Label first_phone_label =
       DeterminizeLatticeInsertPhones(trans_model, fst);
@@ -1411,11 +1411,11 @@ bool DeterminizeLatticePhonePrunedFirstPass(
 // lattice might be modified.
 template<class Weight, class IntType>
 bool DeterminizeLatticePhonePruned(
-    const kaldi::TransitionModel &trans_model,
-    MutableFst<ArcTpl<Weight> > *ifst,
-    double beam,
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
-    DeterminizeLatticePhonePrunedOptions opts) {
+  const kaldi::TransitionModel &trans_model,
+  MutableFst<ArcTpl<Weight> > *ifst,
+  double beam,
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
+  DeterminizeLatticePhonePrunedOptions opts) {
   // Returning status.
   bool ans = true;
 
@@ -1472,22 +1472,22 @@ bool DeterminizeLatticePhonePruned(
 // will be kept as unchanged.
 template<class Weight, class IntType>
 bool DeterminizeLatticePhonePruned(
-    const kaldi::TransitionModel &trans_model,
-    const ExpandedFst<ArcTpl<Weight> > &ifst,
-    double beam,
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
-    DeterminizeLatticePhonePrunedOptions opts) {
+  const kaldi::TransitionModel &trans_model,
+  const ExpandedFst<ArcTpl<Weight> > &ifst,
+  double beam,
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
+  DeterminizeLatticePhonePrunedOptions opts) {
   VectorFst<ArcTpl<Weight> > temp_fst(ifst);
   return DeterminizeLatticePhonePruned(trans_model, &temp_fst,
                                        beam, ofst, opts);
 }
 
 bool DeterminizeLatticePhonePrunedWrapper(
-    const kaldi::TransitionModel &trans_model,
-    MutableFst<kaldi::LatticeArc> *ifst,
-    double beam,
-    MutableFst<kaldi::CompactLatticeArc> *ofst,
-    DeterminizeLatticePhonePrunedOptions opts) {
+  const kaldi::TransitionModel &trans_model,
+  MutableFst<kaldi::LatticeArc> *ifst,
+  double beam,
+  MutableFst<kaldi::CompactLatticeArc> *ofst,
+  DeterminizeLatticePhonePrunedOptions opts) {
   bool ans = true;
   Invert(ifst);
   if (ifst->Properties(fst::kTopSorted, true) == 0) {
@@ -1511,32 +1511,32 @@ bool DeterminizeLatticePhonePrunedWrapper(
 // we instantiate for a single type.
 template
 bool DeterminizeLatticePruned<kaldi::LatticeWeight>(
-    const ExpandedFst<kaldi::LatticeArc> &ifst,
-    double prune,
-    MutableFst<kaldi::CompactLatticeArc> *ofst,
-    DeterminizeLatticePrunedOptions opts);
+  const ExpandedFst<kaldi::LatticeArc> &ifst,
+  double prune,
+  MutableFst<kaldi::CompactLatticeArc> *ofst,
+  DeterminizeLatticePrunedOptions opts);
 
 template
 bool DeterminizeLatticePruned<kaldi::LatticeWeight>(
-    const ExpandedFst<kaldi::LatticeArc> &ifst,
-    double prune,
-    MutableFst<kaldi::LatticeArc> *ofst,
-    DeterminizeLatticePrunedOptions opts);
+  const ExpandedFst<kaldi::LatticeArc> &ifst,
+  double prune,
+  MutableFst<kaldi::LatticeArc> *ofst,
+  DeterminizeLatticePrunedOptions opts);
 
 template
 bool DeterminizeLatticePhonePruned<kaldi::LatticeWeight, kaldi::int32>(
-    const kaldi::TransitionModel &trans_model,
-    const ExpandedFst<kaldi::LatticeArc> &ifst,
-    double prune,
-    MutableFst<kaldi::CompactLatticeArc> *ofst,
-    DeterminizeLatticePhonePrunedOptions opts);
+  const kaldi::TransitionModel &trans_model,
+  const ExpandedFst<kaldi::LatticeArc> &ifst,
+  double prune,
+  MutableFst<kaldi::CompactLatticeArc> *ofst,
+  DeterminizeLatticePhonePrunedOptions opts);
 
 template
 bool DeterminizeLatticePhonePruned<kaldi::LatticeWeight, kaldi::int32>(
-    const kaldi::TransitionModel &trans_model,
-    MutableFst<kaldi::LatticeArc> *ifst,
-    double prune,
-    MutableFst<kaldi::CompactLatticeArc> *ofst,
-    DeterminizeLatticePhonePrunedOptions opts);
+  const kaldi::TransitionModel &trans_model,
+  MutableFst<kaldi::LatticeArc> *ifst,
+  double prune,
+  MutableFst<kaldi::CompactLatticeArc> *ofst,
+  DeterminizeLatticePhonePrunedOptions opts);
 
 }

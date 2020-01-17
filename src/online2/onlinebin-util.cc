@@ -28,7 +28,7 @@ fst::Fst<fst::StdArc> *ReadDecodeGraph(std::string filename) {
   // read decoding network FST
   Input ki(filename); // use ki.Stream() instead of is.
   if (!ki.Stream().good()) KALDI_ERR << "Could not open decoding-graph FST "
-                                      << filename;
+                                     << filename;
 
   fst::FstHeader hdr;
   if (!hdr.Read(ki.Stream(), "<unknown>")) {
@@ -58,8 +58,8 @@ fst::Fst<fst::StdArc> *ReadDecodeGraph(std::string filename) {
 
 
 void PrintPartialResult(const std::vector<int32>& words,
-                        const fst::SymbolTable *word_syms,
-                        bool line_break) {
+    const fst::SymbolTable *word_syms,
+    bool line_break) {
   KALDI_ASSERT(word_syms != NULL);
   for (size_t i = 0; i < words.size(); i++) {
     std::string word = word_syms->Find(words[i]);

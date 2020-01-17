@@ -35,9 +35,9 @@ struct PhoneAlignLatticeOptions {
   bool reorder;
   bool remove_epsilon;
   bool replace_output_symbols;
-  PhoneAlignLatticeOptions(): reorder(true),
-                              remove_epsilon(true),
-                              replace_output_symbols(false) { }
+  PhoneAlignLatticeOptions() : reorder(true),
+    remove_epsilon(true),
+    replace_output_symbols(false) { }
   void Register(OptionsItf *opts) {
     opts->Register("reorder", &reorder, "True if lattice was created from HCLG with "
                    "--reorder=true option.");
@@ -59,9 +59,9 @@ struct PhoneAlignLatticeOptions {
 /// everything was OK, false if some kind of error was detected (e.g. the
 /// "reorder" option was incorrectly specified.)
 bool PhoneAlignLattice(const CompactLattice &lat,
-                       const TransitionModel &tmodel,
-                       const PhoneAlignLatticeOptions &opts,
-                       CompactLattice *lat_out);
+    const TransitionModel &tmodel,
+    const PhoneAlignLatticeOptions &opts,
+    CompactLattice *lat_out);
 
 
 } // end namespace kaldi

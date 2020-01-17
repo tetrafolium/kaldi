@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     BaseFloat num_samples_history = 2000.0;
     BaseFloat alpha = 4.0;
     bool binary_write = true;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("rank-in", &rank_in,
@@ -59,9 +59,9 @@ int main(int argc, char *argv[]) {
     po.Register("alpha", &alpha,
                 "Parameter that affects amount of smoothing with unit matrix "
                 "in online preconditioning (larger -> more smoothing)");
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 
     std::string nnet_rxfilename = po.GetArg(1),
         nnet_wxfilename = po.GetArg(2);
-    
+
     TransitionModel trans_model;
     AmNnet am_nnet;
     {
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 
     am_nnet.GetNnet().SwitchToOnlinePreconditioning(rank_in, rank_out, update_period,
                                                     num_samples_history, alpha);
-    
+
     {
       Output ko(nnet_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);

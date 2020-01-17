@@ -31,13 +31,13 @@ namespace kaldi {
 
 
 LinearResample::LinearResample(int32 samp_rate_in_hz,
-                               int32 samp_rate_out_hz,
-                               BaseFloat filter_cutoff_hz,
-                               int32 num_zeros):
-    samp_rate_in_(samp_rate_in_hz),
-    samp_rate_out_(samp_rate_out_hz),
-    filter_cutoff_(filter_cutoff_hz),
-    num_zeros_(num_zeros) {
+    int32 samp_rate_out_hz,
+    BaseFloat filter_cutoff_hz,
+    int32 num_zeros) :
+  samp_rate_in_(samp_rate_in_hz),
+  samp_rate_out_(samp_rate_out_hz),
+  filter_cutoff_(filter_cutoff_hz),
+  num_zeros_(num_zeros) {
   KALDI_ASSERT(samp_rate_in_hz > 0.0 &&
                samp_rate_out_hz > 0.0 &&
                filter_cutoff_hz > 0.0 &&
@@ -56,7 +56,7 @@ LinearResample::LinearResample(int32 samp_rate_in_hz,
 }
 
 int64 LinearResample::GetNumOutputSamples(int64 input_num_samp,
-                                          bool flush) const {
+    bool flush) const {
   // For exact computation, we measure time in "ticks" of 1.0 / tick_freq,
   // where tick_freq is the least common multiple of samp_rate_in_ and
   // samp_rate_out_.
@@ -135,23 +135,23 @@ void LinearResample::SetIndexesAndWeights() {
 
 // inline
 void LinearResample::GetIndexes(int64 samp_out,
-                                int64 *first_samp_in,
-                                int32 *samp_out_wrapped) const {
+    int64 *first_samp_in,
+    int32 *samp_out_wrapped) const {
   // A unit is the smallest nonzero amount of time that is an exact
   // multiple of the input and output sample periods.  The unit index
   // is the answer to "which numbered unit we are in".
   int64 unit_index = samp_out / output_samples_in_unit_;
   // samp_out_wrapped is equal to samp_out % output_samples_in_unit_
   *samp_out_wrapped = static_cast<int32>(samp_out -
-                                         unit_index * output_samples_in_unit_);
+      unit_index * output_samples_in_unit_);
   *first_samp_in = first_index_[*samp_out_wrapped] +
       unit_index * input_samples_in_unit_;
 }
 
 
 void LinearResample::Resample(const VectorBase<BaseFloat> &input,
-                              bool flush,
-                              Vector<BaseFloat> *output) {
+    bool flush,
+    Vector<BaseFloat> *output) {
   int32 input_dim = input.Dim();
   int64 tot_input_samp = input_sample_offset_ + input_dim,
       tot_output_samp = GetNumOutputSamples(tot_input_samp, flush);
@@ -163,8 +163,8 @@ void LinearResample::Resample(const VectorBase<BaseFloat> &input,
   // samp_out is the index into the total output signal, not just the part
   // of it we are producing here.
   for (int64 samp_out = output_sample_offset_;
-       samp_out < tot_output_samp;
-       samp_out++) {
+      samp_out < tot_output_samp;
+      samp_out++) {
     int64 first_samp_in;
     int32 samp_out_wrapped;
     GetIndexes(samp_out, &first_samp_in, &samp_out_wrapped);
@@ -172,7 +172,7 @@ void LinearResample::Resample(const VectorBase<BaseFloat> &input,
     // first_input_index is the first index into "input" that we have a weight
     // for.
     int32 first_input_index = static_cast<int32>(first_samp_in -
-                                                 input_sample_offset_);
+        input_sample_offset_);
     BaseFloat this_output;
     if (first_input_index >= 0 &&
         first_input_index + weights.Dim() <= input_dim) {
@@ -219,7 +219,7 @@ void LinearResample::SetRemainder(const VectorBase<BaseFloat> &input) {
   int32 max_remainder_needed = ceil(samp_rate_in_ * num_zeros_ /
                                     filter_cutoff_);
   input_remainder_.Resize(max_remainder_needed);
-  for (int32 index = - input_remainder_.Dim(); index < 0; index++) {
+  for (int32 index = -input_remainder_.Dim(); index < 0; index++) {
     // we interpret "index" as an offset from the end of "input" and
     // from the end of input_remainder_.
     int32 input_index = index + input.Dim();
@@ -242,10 +242,10 @@ void LinearResample::Reset() {
     the center of the windowed filter function, and FilterFunction(t)
     returns the windowed filter function, described
     in the header as h(t) = f(t)g(t), evaluated at t.
-*/
+ */
 BaseFloat LinearResample::FilterFunc(BaseFloat t) const {
   BaseFloat window,  // raised-cosine (Hanning) window of width
-                  // num_zeros_/2*filter_cutoff_
+                     // num_zeros_/2*filter_cutoff_
       filter;  // sinc filter function
   if (fabs(t) < num_zeros_ / (2.0 * filter_cutoff_))
     window = 0.5 * (1 + cos(M_2PI * filter_cutoff_ / num_zeros_ * t));
@@ -260,17 +260,17 @@ BaseFloat LinearResample::FilterFunc(BaseFloat t) const {
 
 
 ArbitraryResample::ArbitraryResample(
-    int32 num_samples_in, BaseFloat samp_rate_in,
-    BaseFloat filter_cutoff, const Vector<BaseFloat> &sample_points,
-    int32 num_zeros):
-    num_samples_in_(num_samples_in),
-    samp_rate_in_(samp_rate_in),
-    filter_cutoff_(filter_cutoff),
-    num_zeros_(num_zeros) {
+  int32 num_samples_in, BaseFloat samp_rate_in,
+  BaseFloat filter_cutoff, const Vector<BaseFloat> &sample_points,
+  int32 num_zeros) :
+  num_samples_in_(num_samples_in),
+  samp_rate_in_(samp_rate_in),
+  filter_cutoff_(filter_cutoff),
+  num_zeros_(num_zeros) {
   KALDI_ASSERT(num_samples_in > 0 && samp_rate_in > 0.0 &&
                filter_cutoff > 0.0 &&
                filter_cutoff * 2.0 <= samp_rate_in
-               && num_zeros > 0);
+      && num_zeros > 0);
   // set up weights_ and indices_.  Please try to keep all functions short and
   SetIndexes(sample_points);
   SetWeights(sample_points);
@@ -278,7 +278,7 @@ ArbitraryResample::ArbitraryResample(
 
 
 void ArbitraryResample::Resample(const MatrixBase<BaseFloat> &input,
-                                 MatrixBase<BaseFloat> *output) const {
+    MatrixBase<BaseFloat> *output) const {
   // each row of "input" corresponds to the data to resample;
   // the corresponding row of "output" is the resampled data.
 
@@ -289,8 +289,8 @@ void ArbitraryResample::Resample(const MatrixBase<BaseFloat> &input,
   Vector<BaseFloat> output_col(output->NumRows());
   for (int32 i = 0; i < NumSamplesOut(); i++) {
     SubMatrix<BaseFloat> input_part(input, 0, input.NumRows(),
-                                    first_index_[i],
-                                    weights_[i].Dim());
+        first_index_[i],
+        weights_[i].Dim());
     const Vector<BaseFloat> &weight_vec(weights_[i]);
     output_col.AddMatVec(1.0, input_part,
                          kNoTrans, weight_vec, 0.0);
@@ -299,10 +299,10 @@ void ArbitraryResample::Resample(const MatrixBase<BaseFloat> &input,
 }
 
 void ArbitraryResample::Resample(const VectorBase<BaseFloat> &input,
-                                 VectorBase<BaseFloat> *output) const {
+    VectorBase<BaseFloat> *output) const {
   KALDI_ASSERT(input.Dim() == num_samples_in_ &&
                output->Dim() == weights_.size());
-  
+
   int32 output_dim = output->Dim();
   for (int32 i = 0; i < output_dim; i++) {
     SubVector<BaseFloat> input_part(input, first_index_[i], weights_[i].Dim());
@@ -335,7 +335,7 @@ void ArbitraryResample::SetIndexes(const Vector<BaseFloat> &sample_points) {
 void ArbitraryResample::SetWeights(const Vector<BaseFloat> &sample_points) {
   int32 num_samples_out = NumSamplesOut();
   for (int32 i = 0; i < num_samples_out; i++) {
-    for (int32 j = 0 ; j < weights_[i].Dim(); j++) {
+    for (int32 j = 0; j < weights_[i].Dim(); j++) {
       BaseFloat delta_t = sample_points(i) -
           (first_index_[i] + j) / samp_rate_in_;
       // Include at this point the factor of 1.0 / samp_rate_in_ which
@@ -349,10 +349,10 @@ void ArbitraryResample::SetWeights(const Vector<BaseFloat> &sample_points) {
     the center of the windowed filter function, and FilterFunction(t)
     returns the windowed filter function, described
     in the header as h(t) = f(t)g(t), evaluated at t.
-*/
+ */
 BaseFloat ArbitraryResample::FilterFunc(BaseFloat t) const {
   BaseFloat window,  // raised-cosine (Hanning) window of width
-                  // num_zeros_/2*filter_cutoff_
+                     // num_zeros_/2*filter_cutoff_
       filter;  // sinc filter function
   if (fabs(t) < num_zeros_ / (2.0 * filter_cutoff_))
     window = 0.5 * (1 + cos(M_2PI * filter_cutoff_ / num_zeros_ * t));
@@ -366,12 +366,12 @@ BaseFloat ArbitraryResample::FilterFunc(BaseFloat t) const {
 }
 
 void DownsampleWaveForm(BaseFloat orig_freq, const VectorBase<BaseFloat> &wave,
-                        BaseFloat new_freq, Vector<BaseFloat> *new_wave) {
+    BaseFloat new_freq, Vector<BaseFloat> *new_wave) {
   KALDI_ASSERT(new_freq < orig_freq);
   BaseFloat lowpass_cutoff = 0.99 * 0.5 * new_freq;
   int32 lowpass_filter_width = 6;
   LinearResample signal_downsampler(orig_freq, new_freq,
-                                    lowpass_cutoff, lowpass_filter_width);
+      lowpass_cutoff, lowpass_filter_width);
   signal_downsampler.Resample(wave, true, new_wave);
 }
 }  // namespace kaldi

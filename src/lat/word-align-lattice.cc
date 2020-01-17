@@ -25,14 +25,14 @@
 namespace kaldi {
 
 class LatticeWordAligner {
- public:
+public:
   typedef CompactLatticeArc::StateId StateId;
   typedef CompactLatticeArc::Label Label;
 
   class ComputationState { /// The state of the computation in which,
     /// along a single path in the lattice, we work out the word
     /// boundaries and output aligned arcs.
-   public:
+public:
 
     /// Advance the computation state by adding the symbols and weights
     /// from this arc.  We'll put the weight on the output arc; this helps
@@ -57,29 +57,29 @@ class LatticeWordAligner {
     /// Note: the "next_state" of the arc will not be set, you have to do that
     /// yourself.
     bool OutputArc(const WordBoundaryInfo &info,
-                   const TransitionModel &tmodel,
-                   CompactLatticeArc *arc_out,
-                   bool *error) {
+        const TransitionModel &tmodel,
+        CompactLatticeArc *arc_out,
+        bool *error) {
       // order of this ||-expression doesn't matter for
       // function behavior, only for efficiency, since the
       // cases are disjoint.
       return OutputNormalWordArc(info, tmodel, arc_out, error) ||
-          OutputSilenceArc(info, tmodel, arc_out, error) ||
-          OutputOnePhoneWordArc(info, tmodel, arc_out, error);
+             OutputSilenceArc(info, tmodel, arc_out, error) ||
+             OutputOnePhoneWordArc(info, tmodel, arc_out, error);
     }
 
     bool OutputSilenceArc(const WordBoundaryInfo &info,
-                          const TransitionModel &tmodel,
-                          CompactLatticeArc *arc_out,
-                          bool *error);
+        const TransitionModel &tmodel,
+        CompactLatticeArc *arc_out,
+        bool *error);
     bool OutputOnePhoneWordArc(const WordBoundaryInfo &info,
-                               const TransitionModel &tmodel,
-                               CompactLatticeArc *arc_out,
-                               bool *error);
+        const TransitionModel &tmodel,
+        CompactLatticeArc *arc_out,
+        bool *error);
     bool OutputNormalWordArc(const WordBoundaryInfo &info,
-                             const TransitionModel &tmodel,
-                             CompactLatticeArc *arc_out,
-                             bool *error);
+        const TransitionModel &tmodel,
+        CompactLatticeArc *arc_out,
+        bool *error);
 
     bool IsEmpty() { return (transition_ids_.empty() && word_labels_.empty()); }
 
@@ -101,9 +101,9 @@ class LatticeWordAligner {
     /// happen for lattices that were somehow broken, i.e.
     /// had not reached the final state.
     void OutputArcForce(const WordBoundaryInfo &info,
-                        const TransitionModel &tmodel,
-                        CompactLatticeArc *arc_out,
-                        bool *error);
+        const TransitionModel &tmodel,
+        CompactLatticeArc *arc_out,
+        bool *error);
 
     size_t Hash() const {
       VectorHasher<int32> vh;
@@ -118,15 +118,15 @@ class LatticeWordAligner {
     // Just need an arbitrary complete order.
     bool operator == (const ComputationState &other) const {
       return (transition_ids_ == other.transition_ids_
-              && word_labels_ == other.word_labels_
-              && weight_ == other.weight_);
+             && word_labels_ == other.word_labels_
+             && weight_ == other.weight_);
     }
 
-    ComputationState(): weight_(LatticeWeight::One()) { } // initial state.
-    ComputationState(const ComputationState &other):
-        transition_ids_(other.transition_ids_), word_labels_(other.word_labels_),
-        weight_(other.weight_) { }
-   private:
+    ComputationState() : weight_(LatticeWeight::One()) { } // initial state.
+    ComputationState(const ComputationState &other) :
+      transition_ids_(other.transition_ids_), word_labels_(other.word_labels_),
+      weight_(other.weight_) { }
+private:
     std::vector<int32> transition_ids_;
     std::vector<int32> word_labels_;
     LatticeWeight weight_; // contains two floats.
@@ -134,8 +134,8 @@ class LatticeWordAligner {
 
 
   struct Tuple {
-    Tuple(StateId input_state, ComputationState comp_state):
-        input_state(input_state), comp_state(comp_state) {}
+    Tuple(StateId input_state, ComputationState comp_state) :
+      input_state(input_state), comp_state(comp_state) {}
     StateId input_state;
     ComputationState comp_state;
   };
@@ -150,7 +150,7 @@ class LatticeWordAligner {
     bool operator () (const Tuple &state1, const Tuple &state2) const {
       // treat this like operator ==
       return (state1.input_state == state2.input_state
-              && state1.comp_state == state2.comp_state);
+             && state1.comp_state == state2.comp_state);
     }
   };
 
@@ -250,13 +250,13 @@ class LatticeWordAligner {
   }
 
   LatticeWordAligner(const CompactLattice &lat,
-                     const TransitionModel &tmodel,
-                     const WordBoundaryInfo &info,
-                     int32 max_states,
-                     CompactLattice *lat_out):
-      lat_(lat), tmodel_(tmodel), info_in_(info), info_(info),
-      max_states_(max_states), lat_out_(lat_out),
-      error_(false) {
+      const TransitionModel &tmodel,
+      const WordBoundaryInfo &info,
+      int32 max_states,
+      CompactLattice *lat_out) :
+    lat_(lat), tmodel_(tmodel), info_in_(info), info_(info),
+    max_states_(max_states), lat_out_(lat_out),
+    error_(false) {
     bool test = true;
     uint64 props = lat_.Properties(fst::kIDeterministic|fst::kIEpsilons, test);
     if (props != fst::kIDeterministic) {
@@ -348,8 +348,8 @@ class LatticeWordAligner {
 };
 
 bool LatticeWordAligner::ComputationState::OutputSilenceArc(
-    const WordBoundaryInfo &info, const TransitionModel &tmodel,
-    CompactLatticeArc *arc_out,  bool *error) {
+  const WordBoundaryInfo &info, const TransitionModel &tmodel,
+  CompactLatticeArc *arc_out,  bool *error) {
   if (transition_ids_.empty()) return false;
   int32 phone = tmodel.TransitionIdToPhone(transition_ids_[0]);
   if (info.TypeOfPhone(phone) != WordBoundaryInfo::kNonWordPhone) return false;
@@ -362,10 +362,10 @@ bool LatticeWordAligner::ComputationState::OutputSilenceArc(
   for (i = 0; i < len; i++) {
     int32 tid = transition_ids_[i];
     int32 this_phone = tmodel.TransitionIdToPhone(tid);
-    if (this_phone != phone && ! *error) { // error condition: should have reached final transition-id first.
+    if (this_phone != phone && !*error) {  // error condition: should have reached final transition-id first.
       *error = true;
       KALDI_WARN << "Phone changed before final transition-id found "
-          "[broken lattice or mismatched model or wrong --reorder option?]";
+        "[broken lattice or mismatched model or wrong --reorder option?]";
     }
     if (tmodel.IsFinal(tid))
       break;
@@ -377,9 +377,9 @@ bool LatticeWordAligner::ComputationState::OutputSilenceArc(
   if (i == len) return false; // we don't know if it ends here... so can't output arc.
 
   if (tmodel.TransitionIdToPhone(transition_ids_[i-1]) != phone
-      && ! *error) { // another check.
+      && !*error) {  // another check.
     KALDI_WARN << "Phone changed unexpectedly in lattice "
-        "[broken lattice or mismatched model?]";
+      "[broken lattice or mismatched model?]";
   }
   // interpret i as the number of transition-ids to consume.
   std::vector<int32> tids_out(transition_ids_.begin(), transition_ids_.begin()+i);
@@ -394,8 +394,8 @@ bool LatticeWordAligner::ComputationState::OutputSilenceArc(
 
 
 bool LatticeWordAligner::ComputationState::OutputOnePhoneWordArc(
-    const WordBoundaryInfo &info, const TransitionModel &tmodel,
-    CompactLatticeArc *arc_out,  bool *error) {
+  const WordBoundaryInfo &info, const TransitionModel &tmodel,
+  CompactLatticeArc *arc_out,  bool *error) {
   if (transition_ids_.empty()) return false;
   if (word_labels_.empty()) return false;
   int32 phone = tmodel.TransitionIdToPhone(transition_ids_[0]);
@@ -407,9 +407,9 @@ bool LatticeWordAligner::ComputationState::OutputOnePhoneWordArc(
   for (i = 0; i < len; i++) {
     int32 tid = transition_ids_[i];
     int32 this_phone = tmodel.TransitionIdToPhone(tid);
-    if (this_phone != phone && ! *error) { // error condition: should have reached final transition-id first.
+    if (this_phone != phone && !*error) {  // error condition: should have reached final transition-id first.
       KALDI_WARN << "Phone changed before final transition-id found "
-          "[broken lattice or mismatched model or wrong --reorder option?]";
+        "[broken lattice or mismatched model or wrong --reorder option?]";
       // just continue, ignoring this-- we'll probably output something...
     }
     if (tmodel.IsFinal(tid))
@@ -422,15 +422,15 @@ bool LatticeWordAligner::ComputationState::OutputOnePhoneWordArc(
   if (i == len) return false; // we don't know if it ends here... so can't output arc.
 
   if (tmodel.TransitionIdToPhone(transition_ids_[i-1]) != phone
-      && ! *error) { // another check.
+      && !*error) {  // another check.
     KALDI_WARN << "Phone changed unexpectedly in lattice "
-        "[broken lattice or mismatched model?]";
+      "[broken lattice or mismatched model?]";
     *error = true;
   }
 
   // interpret i as the number of transition-ids to consume.
   std::vector<int32> tids_out(transition_ids_.begin(),
-                              transition_ids_.begin() + i);
+      transition_ids_.begin() + i);
 
   // consumed transition ids from our internal state.
   int32 word = word_labels_[0];
@@ -448,8 +448,8 @@ bool LatticeWordAligner::ComputationState::OutputOnePhoneWordArc(
 /// This function tries to see if it can output a normal word arc--
 /// one with at least two phones in it.
 bool LatticeWordAligner::ComputationState::OutputNormalWordArc(
-    const WordBoundaryInfo &info, const TransitionModel &tmodel,
-    CompactLatticeArc *arc_out,  bool *error) {
+  const WordBoundaryInfo &info, const TransitionModel &tmodel,
+  CompactLatticeArc *arc_out,  bool *error) {
   if (transition_ids_.empty()) return false;
   if (word_labels_.empty()) return false;
   int32 begin_phone = tmodel.TransitionIdToPhone(transition_ids_[0]);
@@ -469,9 +469,9 @@ bool LatticeWordAligner::ComputationState::OutputNormalWordArc(
     for (; i < len && tmodel.IsSelfLoop(transition_ids_[i]); i++);
   if (i == len) return false;
   if (tmodel.TransitionIdToPhone(transition_ids_[i-1]) != begin_phone
-      && ! *error) { // another check.
+      && !*error) {  // another check.
     KALDI_WARN << "Phone changed unexpectedly in lattice "
-        "[broken lattice or mismatched model?]";
+      "[broken lattice or mismatched model?]";
     *error = true;
   }
   // Now keep going till we hit a word-ending phone.
@@ -498,10 +498,10 @@ bool LatticeWordAligner::ComputationState::OutputNormalWordArc(
   int32 final_phone = tmodel.TransitionIdToPhone(transition_ids_[i]);
   for (; i < len; i++) {
     int32 this_phone = tmodel.TransitionIdToPhone(transition_ids_[i]);
-    if (this_phone != final_phone && ! *error) {
+    if (this_phone != final_phone && !*error) {
       *error = true;
       KALDI_WARN << "Phone changed before final transition-id found "
-          "[broken lattice or mismatched model or wrong --reorder option?]";
+        "[broken lattice or mismatched model or wrong --reorder option?]";
     }
     if (tmodel.IsFinal(transition_ids_[i])) break;
   }
@@ -513,16 +513,16 @@ bool LatticeWordAligner::ComputationState::OutputNormalWordArc(
     while (i < len && tmodel.IsSelfLoop(transition_ids_[i])) i++;
   if (i == len) return false;
   if (tmodel.TransitionIdToPhone(transition_ids_[i-1]) != final_phone
-      && ! *error) {
+      && !*error) {
     *error = true;
     KALDI_WARN << "Phone changed while following final self-loop "
-        "[broken lattice or mismatched model or wrong --reorder option?]";
+      "[broken lattice or mismatched model or wrong --reorder option?]";
   }
 
   // OK, we're ready to output the word.
   // Interpret i as the number of transition-ids to consume.
   std::vector<int32> tids_out(transition_ids_.begin(),
-                              transition_ids_.begin() + i);
+      transition_ids_.begin() + i);
 
   // consumed transition ids from our internal state.
   int32 word = word_labels_[0];
@@ -541,17 +541,17 @@ bool LatticeWordAligner::ComputationState::OutputNormalWordArc(
 // Returns true if this vector of transition-ids could be a valid
 // word.  Note: the checks are not 100% exhaustive.
 static bool IsPlausibleWord(const WordBoundaryInfo &info,
-                            const TransitionModel &tmodel,
-                            const std::vector<int32> &transition_ids) {
+    const TransitionModel &tmodel,
+    const std::vector<int32> &transition_ids) {
   if (transition_ids.empty()) return false;
   int32 first_phone = tmodel.TransitionIdToPhone(transition_ids.front()),
       last_phone = tmodel.TransitionIdToPhone(transition_ids.back());
   if ( (info.TypeOfPhone(first_phone) == WordBoundaryInfo::kWordBeginAndEndPhone
-        && first_phone == last_phone)
-       ||
-       (info.TypeOfPhone(first_phone) == WordBoundaryInfo::kWordBeginPhone &&
-        info.TypeOfPhone(last_phone) == WordBoundaryInfo::kWordEndPhone) ) {
-    if (! info.reorder) {
+      && first_phone == last_phone)
+      ||
+      (info.TypeOfPhone(first_phone) == WordBoundaryInfo::kWordBeginPhone &&
+      info.TypeOfPhone(last_phone) == WordBoundaryInfo::kWordEndPhone) ) {
+    if (!info.reorder) {
       return (tmodel.IsFinal(transition_ids.back()));
     } else {
       int32 i = transition_ids.size() - 1;
@@ -563,8 +563,8 @@ static bool IsPlausibleWord(const WordBoundaryInfo &info,
 
 
 void LatticeWordAligner::ComputationState::OutputArcForce(
-    const WordBoundaryInfo &info, const TransitionModel &tmodel,
-    CompactLatticeArc *arc_out,  bool *error) {
+  const WordBoundaryInfo &info, const TransitionModel &tmodel,
+  CompactLatticeArc *arc_out,  bool *error) {
 
   KALDI_ASSERT(!IsEmpty());
   if (!word_labels_.empty()
@@ -573,7 +573,7 @@ void LatticeWordAligner::ComputationState::OutputArcForce(
     // and failed, so this means we didn't see the end of that
     // word.
     int32 word = word_labels_[0];
-    if (! *error && !IsPlausibleWord(info, tmodel, transition_ids_)) {
+    if (!*error && !IsPlausibleWord(info, tmodel, transition_ids_)) {
       *error = true;
       KALDI_WARN << "Invalid word at end of lattice [partial lattice, forced out?]";
     }
@@ -586,10 +586,10 @@ void LatticeWordAligner::ComputationState::OutputArcForce(
     // We won't create arcs with these word labels on, as most likely
     // this will cause errors down the road.  This is an error
     // condition anyway, in some sense.
-    if (! *error) {
+    if (!*error) {
       *error = true;
       KALDI_WARN << "Discarding word-ids at the end of a sentence, "
-          "that don't have alignments.";
+        "that don't have alignments.";
     }
     CompactLatticeWeight cw(weight_, transition_ids_);
     // This creates an epsilon arc with a weight on it, but
@@ -604,13 +604,13 @@ void LatticeWordAligner::ComputationState::OutputArcForce(
     if (info.TypeOfPhone(first_phone) == WordBoundaryInfo::kNonWordPhone) {
       // first phone is silence...
       if (first_phone != tmodel.TransitionIdToPhone(transition_ids_.back())
-          && ! *error) {
+          && !*error) {
         *error = true;
         // Phone changed-- this is a code error, because the regular OutputArc
         // should have output an arc (a silence arc) if that phone finished.
         // So we make it fatal.
         KALDI_ERR << "Broken silence arc at end of utterance (the phone "
-            "changed); code error";
+          "changed); code error";
       }
       if (!*error) { // Check that it ends at the end state of silence; error otherwise.
         int32 i = transition_ids_.size() - 1;
@@ -620,7 +620,7 @@ void LatticeWordAligner::ComputationState::OutputArcForce(
         if (!tmodel.IsFinal(transition_ids_[i])) {
           *error = true;
           KALDI_WARN << "Broken silence arc at end of utterance (does not "
-              "reach end of silence)";
+            "reach end of silence)";
         }
       }
       CompactLatticeWeight cw(weight_, transition_ids_);
@@ -630,7 +630,7 @@ void LatticeWordAligner::ComputationState::OutputArcForce(
       // Not silence phone -- treat as partial word (with no word label).
       // This is in itself an error condition, i.e. the lattice was maybe
       // forced out.
-      if (! *error) {
+      if (!*error) {
         *error = true;
         KALDI_WARN << "Partial word detected at end of utterance";
       }
@@ -660,7 +660,7 @@ void WordBoundaryInfo::SetOptions(const std::string int_list, PhoneType phone_ty
       phone_to_type.resize(phone_list[i]+1, kNoPhone);
     if (phone_to_type[phone_list[i]] != kNoPhone)
       KALDI_ERR << "Phone " << phone_list[i] << "was given two incompatible "
-          "assignments.";
+        "assignments.";
     phone_to_type[phone_list[i]] = phone_type;
   }
 }
@@ -672,7 +672,7 @@ WordBoundaryInfo::WordBoundaryInfo(const WordBoundaryInfoOpts &opts) {
   SetOptions(opts.wbegin_and_end_phones, kWordBeginAndEndPhone);
   SetOptions(opts.winternal_phones, kWordInternalPhone);
   SetOptions(opts.silence_phones, (opts.silence_has_olabels ?
-                                   kWordBeginAndEndPhone : kNonWordPhone));
+      kWordBeginAndEndPhone : kNonWordPhone));
   reorder = opts.reorder;
   silence_label = opts.silence_label;
   partial_word_label = opts.partial_word_label;
@@ -685,7 +685,7 @@ WordBoundaryInfo::WordBoundaryInfo(const WordBoundaryInfoNewOpts &opts) {
 }
 
 WordBoundaryInfo::WordBoundaryInfo(const WordBoundaryInfoNewOpts &opts,
-                                   std::string word_boundary_file) {
+    std::string word_boundary_file) {
   reorder = opts.reorder;
   silence_label = opts.silence_label;
   partial_word_label = opts.partial_word_label;
@@ -721,10 +721,10 @@ void WordBoundaryInfo::Init(std::istream &stream) {
 }
 
 bool WordAlignLattice(const CompactLattice &lat,
-                      const TransitionModel &tmodel,
-                      const WordBoundaryInfo &info,
-                      int32 max_states,
-                      CompactLattice *lat_out) {
+    const TransitionModel &tmodel,
+    const WordBoundaryInfo &info,
+    int32 max_states,
+    CompactLattice *lat_out) {
   LatticeWordAligner aligner(lat, tmodel, info, max_states, lat_out);
   return aligner.AlignLattice();
 }
@@ -732,20 +732,20 @@ bool WordAlignLattice(const CompactLattice &lat,
 
 
 class WordAlignedLatticeTester {
- public:
+public:
   WordAlignedLatticeTester(const CompactLattice &lat,
-                           const TransitionModel &tmodel,
-                           const WordBoundaryInfo &info,
-                           const CompactLattice &aligned_lat):
-      lat_(lat), tmodel_(tmodel), info_(info), aligned_lat_(aligned_lat) { }
+      const TransitionModel &tmodel,
+      const WordBoundaryInfo &info,
+      const CompactLattice &aligned_lat) :
+    lat_(lat), tmodel_(tmodel), info_(info), aligned_lat_(aligned_lat) { }
 
   void Test() {
     // First test that each aligned arc is valid.
-    typedef CompactLattice::StateId StateId ;
+    typedef CompactLattice::StateId StateId;
     for (StateId s = 0; s < aligned_lat_.NumStates(); s++) {
       for (fst::ArcIterator<CompactLattice> iter(aligned_lat_, s);
-           !iter.Done();
-           iter.Next()) {
+          !iter.Done();
+          iter.Next()) {
         TestArc(iter.Value());
       }
       if (aligned_lat_.Final(s) != CompactLatticeWeight::Zero()) {
@@ -754,10 +754,10 @@ class WordAlignedLatticeTester {
     }
     TestEquivalent();
   }
- private:
+private:
   void TestArc(const CompactLatticeArc &arc) {
-    if (! (TestArcSilence(arc) || TestArcNormalWord(arc) || TestArcOnePhoneWord(arc)
-           || TestArcEmpty(arc)))
+    if (!(TestArcSilence(arc) || TestArcNormalWord(arc) || TestArcOnePhoneWord(arc)
+        || TestArcEmpty(arc)))
       KALDI_ERR << "Invalid arc in aligned CompactLattice: "
                 << arc.ilabel << " " << arc.olabel << " " << arc.nextstate
                 << " " << arc.weight;
@@ -788,7 +788,7 @@ class WordAlignedLatticeTester {
           // transition-state.
           for (size_t j = i+1; j < tids.size(); j++) {
             if (!(tmodel_.TransitionIdToTransitionState(tids[j])
-                  == tmodel_.TransitionIdToTransitionState(tids[i]))) return false;
+                == tmodel_.TransitionIdToTransitionState(tids[i]))) return false;
           }
           return true;
         }
@@ -845,8 +845,8 @@ class WordAlignedLatticeTester {
     }
     { // middle phones.  Skip over them.
       while (i < tids.size() &&
-             info_.TypeOfPhone(tmodel_.TransitionIdToPhone(tids[i]))
-             == WordBoundaryInfo::kWordInternalPhone)
+          info_.TypeOfPhone(tmodel_.TransitionIdToPhone(tids[i]))
+          == WordBoundaryInfo::kWordInternalPhone)
         i++;
     }
     if (i == tids.size()) return false;
@@ -897,8 +897,8 @@ class WordAlignedLatticeTester {
       Project(&aligned_lat, fst::PROJECT_INPUT);
     }
 
-    if (!RandEquivalent(lat_, aligned_lat, 5/*paths*/, 1.0e+10/*delta*/, Rand()/*seed*/,
-                        200/*path length (max?)*/))
+    if (!RandEquivalent(lat_, aligned_lat, 5 /*paths*/, 1.0e+10 /*delta*/, Rand() /*seed*/,
+                        200 /*path length (max?)*/))
       KALDI_ERR << "Equivalence test failed (testing word-alignment of lattices.) "
                 << "Make sure your model and lattices match!";
   }
@@ -916,9 +916,9 @@ class WordAlignedLatticeTester {
 /// succeeded and it wasn't a forced-out lattice); otherwise the test will most
 /// likely fail.
 void TestWordAlignedLattice(const CompactLattice &lat,
-                            const TransitionModel &tmodel,
-                            const WordBoundaryInfo &info,
-                            const CompactLattice &aligned_lat) {
+    const TransitionModel &tmodel,
+    const WordBoundaryInfo &info,
+    const CompactLattice &aligned_lat) {
   WordAlignedLatticeTester t(lat, tmodel, info, aligned_lat);
   t.Test();
 }

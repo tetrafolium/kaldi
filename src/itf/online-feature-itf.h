@@ -44,12 +44,12 @@ namespace kaldi {
    can call GetFrame for any frame less than NumFramesReady(), and when
    implementing a child class you must not make assumptions about the
    order in which the user makes these calls.
-*/
-   
+ */
+
 class OnlineFeatureInterface {
- public:
+public:
   virtual int32 Dim() const = 0; /// returns the feature dimension.
-  
+
   /// Returns the total number of frames, since the start of the utterance, that
   /// are now available.  In an online-decoding context, this will likely
   /// increase with time as more data becomes available.
@@ -65,7 +65,7 @@ class OnlineFeatureInterface {
   /// many frames are in the decodable object (as it used to be, and for backward
   /// compatibility, still is, in the Decodable interface).
   virtual bool IsLastFrame(int32 frame) const = 0;
-  
+
   /// Gets the feature vector for this frame.  Before calling this for a given
   /// frame, it is assumed that you called NumFramesReady() and it returned a
   /// number greater than "frame".  Otherwise this call will likely crash with
@@ -81,20 +81,20 @@ class OnlineFeatureInterface {
   /// Virtual destructor.  Note: constructors that take another member of
   /// type OnlineFeatureInterface are not expected to take ownership of
   /// that pointer; the caller needs to keep track of that manually.
-  virtual ~OnlineFeatureInterface() { }  
-  
+  virtual ~OnlineFeatureInterface() { }
+
 };
 
 
 /// Add a virtual class for "source" features such as MFCC or PLP or pitch
 /// features.
 class OnlineBaseFeature: public OnlineFeatureInterface {
- public:
+public:
   /// This would be called from the application, when you get more wave data.
   /// Note: the sampling_rate is typically only provided so the code can assert
   /// that it matches the sampling rate expected in the options.
   virtual void AcceptWaveform(BaseFloat sampling_rate,
-                              const VectorBase<BaseFloat> &waveform) = 0;
+      const VectorBase<BaseFloat> &waveform) = 0;
 
   /// InputFinished() tells the class you won't be providing any
   /// more waveform.  This will help flush out the last few frames

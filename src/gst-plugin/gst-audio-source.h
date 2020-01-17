@@ -29,7 +29,7 @@ namespace kaldi {
 
 // OnlineAudioSourceItf implementation using a queue of Gst Buffers
 class GstBufferSource : public OnlineAudioSourceItf {
- public:
+public:
   typedef int16 SampleType;  // hardcoded 16-bit audio
 
   GstBufferSource();
@@ -43,7 +43,7 @@ class GstBufferSource : public OnlineAudioSourceItf {
 
   ~GstBufferSource();
 
- private:
+private:
 
   GAsyncQueue* buf_queue_;
   gint pos_in_current_buf_;

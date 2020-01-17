@@ -26,8 +26,8 @@ namespace kaldi {
 
 
 void FeatureTransformEstimate::Estimate(const FeatureTransformEstimateOptions &opts,
-                                        Matrix<BaseFloat> *M,
-                                        TpMatrix<BaseFloat> *C) const { 
+    Matrix<BaseFloat> *M,
+    TpMatrix<BaseFloat> *C) const {
   double count;
   Vector<double> total_mean;
   SpMatrix<double> total_covar, between_covar;
@@ -38,20 +38,20 @@ void FeatureTransformEstimate::Estimate(const FeatureTransformEstimateOptions &o
 
 // static
 void FeatureTransformEstimate::EstimateInternal(
-    const FeatureTransformEstimateOptions &opts,
-    const SpMatrix<double> &total_covar,
-    const SpMatrix<double> &between_covar,
-    const Vector<double> &total_mean,
-    Matrix<BaseFloat> *M,
-    TpMatrix<BaseFloat> *C) {
-  
+  const FeatureTransformEstimateOptions &opts,
+  const SpMatrix<double> &total_covar,
+  const SpMatrix<double> &between_covar,
+  const Vector<double> &total_mean,
+  Matrix<BaseFloat> *M,
+  TpMatrix<BaseFloat> *C) {
+
   int32 target_dim = opts.dim, dim = total_covar.NumRows();
   // Interpret zero or negative target_dim as the full dim
   if (target_dim <= 0)
     target_dim = dim;
   // between-class covar is of most rank C-1
   KALDI_ASSERT(target_dim <= dim);
-  
+
   // within-class covariance
   SpMatrix<double> wc_covar(total_covar);
   wc_covar.AddSp(-1.0, between_covar);
@@ -68,7 +68,7 @@ void FeatureTransformEstimate::EstimateInternal(
               << " to diagonal and trying again.\n";
     for (int32 i = 0; i < wc_covar.NumRows(); i++)
       wc_covar(i, i) += smooth;
-    wc_covar_sqrt.Cholesky(wc_covar);    
+    wc_covar_sqrt.Cholesky(wc_covar);
   }
   Matrix<double> wc_covar_sqrt_mat(wc_covar_sqrt);
   wc_covar_sqrt_mat.Invert();
@@ -85,15 +85,15 @@ void FeatureTransformEstimate::EstimateInternal(
 
   KALDI_LOG << "Sum of all singular values is " << svd_d.Sum();
   KALDI_LOG << "Sum of selected singular values is " <<
-      SubVector<double>(svd_d, 0, target_dim).Sum();
-  
+    SubVector<double>(svd_d, 0, target_dim).Sum();
+
   Matrix<double> lda_mat(dim, dim);
   lda_mat.AddMatMat(1.0, svd_u, kTrans, wc_covar_sqrt_mat, kNoTrans, 0.0);
 
   // finally, copy first target_dim rows to m
   M->Resize(target_dim, dim);
   M->CopyFromMat(lda_mat.Range(0, target_dim, 0, dim));
-  
+
   if (opts.within_class_factor != 1.0) {
     for (int32 i = 0; i < svd_d.Dim(); i++) {
       BaseFloat old_var = 1.0 + svd_d(i), // the total variance of that dim..
@@ -127,12 +127,12 @@ void FeatureTransformEstimate::EstimateInternal(
 }
 
 void FeatureTransformEstimateMulti::EstimateTransformPart(
-    const FeatureTransformEstimateOptions &opts,
-    const std::vector<int32> &indexes,
-    const SpMatrix<double> &total_covar,
-    const SpMatrix<double> &between_covar,
-    const Vector<double> &mean,
-    Matrix<BaseFloat> *M) const {
+  const FeatureTransformEstimateOptions &opts,
+  const std::vector<int32> &indexes,
+  const SpMatrix<double> &total_covar,
+  const SpMatrix<double> &between_covar,
+  const Vector<double> &mean,
+  Matrix<BaseFloat> *M) const {
 
   int32 full_dim = Dim(), proj_dim = indexes.size();
   Matrix<double> transform(proj_dim, full_dim); // projects from full to projected dim.
@@ -162,9 +162,9 @@ void FeatureTransformEstimateMulti::EstimateTransformPart(
 }
 
 void FeatureTransformEstimateMulti::Estimate(
-    const FeatureTransformEstimateOptions &opts,
-    const std::vector<std::vector<int32> > &indexes,
-    Matrix<BaseFloat> *M) const {
+  const FeatureTransformEstimateOptions &opts,
+  const std::vector<std::vector<int32> > &indexes,
+  Matrix<BaseFloat> *M) const {
 
   int32 input_dim = Dim(), output_dim = 0, num_transforms = indexes.size();
   for (int32 i = 0; i < num_transforms; i++) { // some input-checking.
@@ -179,7 +179,7 @@ void FeatureTransformEstimateMulti::Estimate(
 
   int32 input_dim_ext = (opts.remove_offset ? input_dim + 1 : input_dim);
   M->Resize(output_dim, input_dim_ext);
-  
+
   double count;
   Vector<double> total_mean;
   SpMatrix<double> total_covar, between_covar;
@@ -192,10 +192,10 @@ void FeatureTransformEstimateMulti::Estimate(
                           total_mean, &M_tmp);
     int32 this_output_dim = indexes[i].size();
     M->Range(cur_output_index, this_output_dim, 0, M->NumCols()).
-        CopyFromMat(M_tmp);
+    CopyFromMat(M_tmp);
     cur_output_index += this_output_dim;
   }
-  
+
 }
 
 

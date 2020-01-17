@@ -24,21 +24,21 @@
 namespace kaldi {
 
 class OptionsItf {
- public:
-  
+public:
+
   virtual void Register(const std::string &name,
-                bool *ptr, const std::string &doc) = 0; 
+      bool *ptr, const std::string &doc) = 0;
   virtual void Register(const std::string &name,
-                int32 *ptr, const std::string &doc) = 0; 
+      int32 *ptr, const std::string &doc) = 0;
   virtual void Register(const std::string &name,
-                uint32 *ptr, const std::string &doc) = 0; 
+      uint32 *ptr, const std::string &doc) = 0;
   virtual void Register(const std::string &name,
-                float *ptr, const std::string &doc) = 0; 
+      float *ptr, const std::string &doc) = 0;
   virtual void Register(const std::string &name,
-                double *ptr, const std::string &doc) = 0; 
+      double *ptr, const std::string &doc) = 0;
   virtual void Register(const std::string &name,
-                std::string *ptr, const std::string &doc) = 0; 
-  
+      std::string *ptr, const std::string &doc) = 0;
+
   virtual ~OptionsItf() {}
 };
 

@@ -38,7 +38,7 @@ AmDiagGmm::~AmDiagGmm() {
 void AmDiagGmm::Init(const DiagGmm &proto, int32 num_pdfs) {
   if (densities_.size() != 0) {
     KALDI_WARN << "Init() called on a non-empty object. Contents will be "
-        "overwritten";
+      "overwritten";
     DeletePointers(&densities_);
   }
   if (num_pdfs == 0) {
@@ -100,9 +100,9 @@ int32 AmDiagGmm::ComputeGconsts() {
 
 
 void AmDiagGmm::SplitByCount(const Vector<BaseFloat> &state_occs,
-                             int32 target_components,
-                             float perturb_factor, BaseFloat power,
-                             BaseFloat min_count) {
+    int32 target_components,
+    float perturb_factor, BaseFloat power,
+    BaseFloat min_count) {
   int32 gauss_at_start = NumGauss();
   std::vector<int32> targets;
   GetSplitTargets(state_occs, target_components, power,
@@ -123,9 +123,9 @@ void AmDiagGmm::SplitByCount(const Vector<BaseFloat> &state_occs,
 
 
 void AmDiagGmm::MergeByCount(const Vector<BaseFloat> &state_occs,
-                             int32 target_components,
-                             BaseFloat power,
-                             BaseFloat min_count) {
+    int32 target_components,
+    BaseFloat power,
+    BaseFloat min_count) {
   int32 gauss_at_start = NumGauss();
   std::vector<int32> targets;
   GetSplitTargets(state_occs, target_components,
@@ -193,9 +193,9 @@ void UbmClusteringOptions::Check() {
 }
 
 void ClusterGaussiansToUbm(const AmDiagGmm &am,
-                           const Vector<BaseFloat> &state_occs,
-                           UbmClusteringOptions opts,
-                           DiagGmm *ubm_out) {
+    const Vector<BaseFloat> &state_occs,
+    UbmClusteringOptions opts,
+    DiagGmm *ubm_out) {
   opts.Check();  // Make sure the various # of Gaussians make sense.
   if (am.NumGauss() > opts.max_am_gauss) {
     KALDI_LOG << "ClusterGaussiansToUbm: first reducing num-gauss from " << am.NumGauss()
@@ -315,7 +315,7 @@ void ClusterGaussiansToUbm(const AmDiagGmm &am,
   for (int32 clust_index = 0; clust_index < num_clust_states; clust_index++) {
     for (int32 i = gauss_clusters_out[clust_index].size()-1; i >=0; --i) {
       GaussClusterable *this_cluster = static_cast<GaussClusterable*>(
-          gauss_clusters_out[clust_index][i]);
+        gauss_clusters_out[clust_index][i]);
       BaseFloat weight = this_cluster->count();
       KALDI_ASSERT(weight > 0.0);
       tmp_weights(gauss_index) = weight;

@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     if (post_dim == 0) {
       KALDI_ERR << "You have to set the dimensionality of posteriors "
-                   "with '--post-dim=D'";
+        "with '--post-dim=D'";
     }
 
     if (ClassifyRspecifier(po.GetArg(1), NULL, NULL)

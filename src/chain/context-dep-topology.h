@@ -35,31 +35,31 @@ namespace chain {
 
 
 /**
-  The 'ContextDepTopology' object is responsible for combining the
-  'PhoneTopology' model, which describes the quasi-HMM topology for each phone,
-  and the 'PhoneContext' model, which describes how we create left-context
-  dependent phones.  It also allocates 'graph-labels' and 'output-labels'.  It
-  is analogous to 'HC' in the 'HCLG' recipe.  It's of a manageable size as an
-  FST, because we limit ourselves to left context.
+   The 'ContextDepTopology' object is responsible for combining the
+   'PhoneTopology' model, which describes the quasi-HMM topology for each phone,
+   and the 'PhoneContext' model, which describes how we create left-context
+   dependent phones.  It also allocates 'graph-labels' and 'output-labels'.  It
+   is analogous to 'HC' in the 'HCLG' recipe.  It's of a manageable size as an
+   FST, because we limit ourselves to left context.
 
-  A 'graph-label' is one-based, is sufficient to identify the logical CD-phone
-  and the label in the topology, and can also be mapped to an 'output-label'.
+   A 'graph-label' is one-based, is sufficient to identify the logical CD-phone
+   and the label in the topology, and can also be mapped to an 'output-label'.
 
-  The output-label is also one-based; it is sufficient to identify the physical
-  CD-phone and the label in the topology object, but won't let you identify
-  the monophone (because output-labels may be shared between monophones).
+   The output-label is also one-based; it is sufficient to identify the physical
+   CD-phone and the label in the topology object, but won't let you identify
+   the monophone (because output-labels may be shared between monophones).
 
-  The neural-net output is indexed by the output-label minus one (to form
-  a zero-based index).
-*/
+   The neural-net output is indexed by the output-label minus one (to form
+   a zero-based index).
+ */
 
 class ContextDepTopology {
- public:
+public:
 
   ContextDepTopology();
 
   ContextDepTopology(const PhoneTopology &topology,
-                     const PhoneContext &context);
+      const PhoneContext &context);
 
   const PhoneTopology &GetPhoneTopology() { return phone_topology_; }
 
@@ -111,7 +111,7 @@ class ContextDepTopology {
 
   void Read(std::istream &is, bool binary);
 
- private:
+private:
   PhoneTopology phone_topology_;
   PhoneContext phone_context_;
 

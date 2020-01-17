@@ -51,8 +51,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string normalization_fst_rxfilename = po.GetArg(1),
-                         examples_rspecifier = po.GetArg(2),
-                         examples_wspecifier = po.GetArg(3);
+        examples_rspecifier = po.GetArg(2),
+        examples_wspecifier = po.GetArg(3);
 
     fst::StdVectorFst normalization_fst;
     ReadFstKaldi(normalization_fst_rxfilename, &normalization_fst);

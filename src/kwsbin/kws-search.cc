@@ -48,7 +48,7 @@ StateId DecodeLabelUid(uint64 osymbol) {
 // to the KwsLexicographic FST. Structure will be kept,
 // the weights converted/recomputed
 class VectorFstToKwsLexicographicFstMapper {
- public:
+public:
   typedef fst::StdArc FromArc;
   typedef FromArc::Weight FromWeight;
   typedef KwsLexicographicArc ToArc;
@@ -59,9 +59,9 @@ class VectorFstToKwsLexicographicFstMapper {
   ToArc operator()(const FromArc &arc) const {
     return ToArc(arc.ilabel,
                  arc.olabel,
-                 (arc.weight == FromWeight::Zero() ?
-                  ToWeight::Zero() :
-                  ToWeight(arc.weight.Value(),
+               (arc.weight == FromWeight::Zero() ?
+               ToWeight::Zero() :
+               ToWeight(arc.weight.Value(),
                            StdLStdWeight::One())),
                  arc.nextstate);
   }
@@ -88,12 +88,12 @@ struct ActivePath {
 };
 
 bool GenerateActivePaths(const KwsLexicographicFst &proxy,
-                       std::vector<ActivePath> *paths,
-                       KwsLexicographicFst::StateId cur_state,
-                       std::vector<KwsLexicographicArc::Label> cur_path,
-                       KwsLexicographicArc::Weight cur_weight) {
+    std::vector<ActivePath> *paths,
+    KwsLexicographicFst::StateId cur_state,
+    std::vector<KwsLexicographicArc::Label> cur_path,
+    KwsLexicographicArc::Weight cur_weight) {
   for (fst::ArcIterator<KwsLexicographicFst> aiter(proxy, cur_state);
-       !aiter.Done(); aiter.Next()) {
+      !aiter.Done(); aiter.Next()) {
     const Arc &arc = aiter.Value();
     Weight temp_weight = Times(arc.weight, cur_weight);
 
@@ -117,11 +117,11 @@ bool GenerateActivePaths(const KwsLexicographicFst &proxy,
 }  // namespace kaldi
 
 typedef kaldi::TableWriter< kaldi::BasicVectorHolder<double> >
-                                                        VectorOfDoublesWriter;
+    VectorOfDoublesWriter;
 void OutputDetailedStatistics(const std::string &kwid,
-                        const kaldi::KwsLexicographicFst &keyword,
-                        const unordered_map<uint32, uint64> &label_decoder,
-                        VectorOfDoublesWriter *output ) {
+    const kaldi::KwsLexicographicFst &keyword,
+    const unordered_map<uint32, uint64> &label_decoder,
+    VectorOfDoublesWriter *output ) {
   std::vector<kaldi::ActivePath> paths;
 
   if (keyword.Start() == fst::kNoStateId)
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
         "Usage: kws-search [options] <index-rspecifier> <keywords-rspecifier> "
         "<results-wspecifier> [<stats_wspecifier>]\n"
         " e.g.: kws-search ark:index.idx ark:keywords.fsts "
-                           "ark:results ark:stats\n";
+        "ark:results ark:stats\n";
 
     ParseOptions po(usage);
 
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
         stats_wspecifier = po.GetOptArg(4);
 
     RandomAccessTableReader< VectorFstTplHolder<KwsLexicographicArc> >
-                                                index_reader(index_rspecifier);
+    index_reader(index_rspecifier);
     SequentialTableReader<VectorFstHolder> keyword_reader(keyword_rspecifier);
     VectorOfDoublesWriter result_writer(result_wspecifier);
     VectorOfDoublesWriter stats_writer(stats_wspecifier);
@@ -260,10 +260,10 @@ int main(int argc, char *argv[]) {
     unordered_map<uint64, uint32> label_encoder;
     unordered_map<uint32, uint64> label_decoder;
     for (StateIterator<KwsLexicographicFst> siter(index);
-                                           !siter.Done(); siter.Next()) {
+        !siter.Done(); siter.Next()) {
       StateId state_id = siter.Value();
       for (MutableArcIterator<KwsLexicographicFst>
-           aiter(&index, state_id); !aiter.Done(); aiter.Next()) {
+          aiter(&index, state_id); !aiter.Done(); aiter.Next()) {
         KwsLexicographicArc arc = aiter.Value();
         // Skip the non-final arcs
         if (index.Final(arc.nextstate) == Weight::Zero())
@@ -328,7 +328,7 @@ int main(int argc, char *argv[]) {
       double score;
       int32 tbeg, tend, uid;
       for (ArcIterator<KwsLexicographicFst>
-           aiter(result_fst, result_fst.Start()); !aiter.Done(); aiter.Next()) {
+          aiter(result_fst, result_fst.Start()); !aiter.Done(); aiter.Next()) {
         const KwsLexicographicArc &arc = aiter.Value();
 
         // We're expecting a two-state FST

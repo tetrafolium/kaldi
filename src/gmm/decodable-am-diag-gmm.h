@@ -43,16 +43,16 @@ namespace kaldi {
 /// have epsilon transitions).
 
 class DecodableAmDiagGmmUnmapped : public DecodableInterface {
- public:
+public:
   /// If you set log_sum_exp_prune to a value greater than 0 it will prune
   /// in the LogSumExp operation (larger = more exact); I suggest 5.
-  /// This is advisable if it's spending a long time doing exp 
-  /// operations. 
+  /// This is advisable if it's spending a long time doing exp
+  /// operations.
   DecodableAmDiagGmmUnmapped(const AmDiagGmm &am,
-                             const Matrix<BaseFloat> &feats,
-                             BaseFloat log_sum_exp_prune = -1.0):
+      const Matrix<BaseFloat> &feats,
+      BaseFloat log_sum_exp_prune = -1.0) :
     acoustic_model_(am), feature_matrix_(feats),
-    previous_frame_(-1), log_sum_exp_prune_(log_sum_exp_prune), 
+    previous_frame_(-1), log_sum_exp_prune_(log_sum_exp_prune),
     data_squared_(feats.NumCols()) {
     ResetLogLikeCache();
   }
@@ -63,7 +63,7 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
     return LogLikelihoodZeroBased(frame, state_index - 1);
   }
   virtual int32 NumFramesReady() const { return feature_matrix_.NumRows(); }
-  
+
   // Indices are one-based!  This is for compatibility with OpenFst.
   virtual int32 NumIndices() const { return acoustic_model_.NumPdfs(); }
 
@@ -72,7 +72,7 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
     return (frame == NumFramesReady() - 1);
   }
 
- protected:
+protected:
   void ResetLogLikeCache();
   virtual BaseFloat LogLikelihoodZeroBased(int32 frame, int32 state_index);
 
@@ -87,7 +87,7 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
     int32 hit_time;     ///< Frame for which this value is relevant
   };
   std::vector<LikelihoodCacheRecord> log_like_cache_;
- private:
+private:
   Vector<BaseFloat> data_squared_;  ///< Cache for fast likelihood calculation
 
 
@@ -96,13 +96,13 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
 
 
 class DecodableAmDiagGmm: public DecodableAmDiagGmmUnmapped {
- public:
+public:
   DecodableAmDiagGmm(const AmDiagGmm &am,
-                     const TransitionModel &tm,
-                     const Matrix<BaseFloat> &feats,
-                     BaseFloat log_sum_exp_prune = -1.0)
+      const TransitionModel &tm,
+      const Matrix<BaseFloat> &feats,
+      BaseFloat log_sum_exp_prune = -1.0)
     : DecodableAmDiagGmmUnmapped(am, feats, log_sum_exp_prune),
-      trans_model_(tm) {}
+    trans_model_(tm) {}
 
   // Note, frames are numbered from zero.
   virtual BaseFloat LogLikelihood(int32 frame, int32 tid) {
@@ -113,30 +113,30 @@ class DecodableAmDiagGmm: public DecodableAmDiagGmmUnmapped {
   virtual int32 NumIndices() const { return trans_model_.NumTransitionIds(); }
 
   const TransitionModel *TransModel() { return &trans_model_; }
- private: // want to access public to have pdf id information
+private:  // want to access public to have pdf id information
   const TransitionModel &trans_model_;  // for tid to pdf mapping
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableAmDiagGmm);
 };
 
 class DecodableAmDiagGmmScaled: public DecodableAmDiagGmmUnmapped {
- public:
+public:
   DecodableAmDiagGmmScaled(const AmDiagGmm &am,
-                           const TransitionModel &tm,
-                           const Matrix<BaseFloat> &feats,
-                           BaseFloat scale,
-                           BaseFloat log_sum_exp_prune = -1.0):
-      DecodableAmDiagGmmUnmapped(am, feats, log_sum_exp_prune), trans_model_(tm),
-      scale_(scale), delete_feats_(NULL) {}
+      const TransitionModel &tm,
+      const Matrix<BaseFloat> &feats,
+      BaseFloat scale,
+      BaseFloat log_sum_exp_prune = -1.0) :
+    DecodableAmDiagGmmUnmapped(am, feats, log_sum_exp_prune), trans_model_(tm),
+    scale_(scale), delete_feats_(NULL) {}
 
   // This version of the initializer takes ownership of the pointer
   // "feats" and will delete it when this class is destroyed.
   DecodableAmDiagGmmScaled(const AmDiagGmm &am,
-                           const TransitionModel &tm,
-                           BaseFloat scale,
-                           BaseFloat log_sum_exp_prune,
-                           Matrix<BaseFloat> *feats):
-      DecodableAmDiagGmmUnmapped(am, *feats, log_sum_exp_prune),
-      trans_model_(tm),  scale_(scale), delete_feats_(feats) {}
+      const TransitionModel &tm,
+      BaseFloat scale,
+      BaseFloat log_sum_exp_prune,
+      Matrix<BaseFloat> *feats) :
+    DecodableAmDiagGmmUnmapped(am, *feats, log_sum_exp_prune),
+    trans_model_(tm),  scale_(scale), delete_feats_(feats) {}
 
   // Note, frames are numbered from zero but transition-ids from one.
   virtual BaseFloat LogLikelihood(int32 frame, int32 tid) {
@@ -151,8 +151,8 @@ class DecodableAmDiagGmmScaled: public DecodableAmDiagGmmUnmapped {
   virtual ~DecodableAmDiagGmmScaled() {
     delete delete_feats_;
   }
-  
- private: // want to access it public to have pdf id information
+
+private:  // want to access it public to have pdf id information
   const TransitionModel &trans_model_;  // for transition-id to pdf mapping
   BaseFloat scale_;
   Matrix<BaseFloat> *delete_feats_;

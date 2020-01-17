@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
       acoustic_scale = 1.0 / inv_acoustic_scale;
 
     std::string lats_rspecifier, one_best_rspecifier,
-                times_rspecifier, ctm_wxfilename;
+        times_rspecifier, ctm_wxfilename;
 
     if (po.NumArgs() == 2) {
       lats_rspecifier = po.GetArg(1);
@@ -106,10 +106,10 @@ int main(int argc, char *argv[]) {
     // Ensure the output ctm file is not a wspecifier
     WspecifierType ctm_wx_type;
     ctm_wx_type  = ClassifyWspecifier(ctm_wxfilename, NULL, NULL, NULL);
-    if(ctm_wx_type != kNoWspecifier){
-        KALDI_ERR << "The output ctm file should not be a wspecifier. "
-          << "Please use things like 1.ctm istead of ark:-";
-        exit(1);
+    if(ctm_wx_type != kNoWspecifier) {
+      KALDI_ERR << "The output ctm file should not be a wspecifier. "
+                << "Please use things like 1.ctm istead of ark:-";
+      exit(1);
     }
 
     // Read as compact lattice.

@@ -29,9 +29,9 @@
 namespace kaldi {
 
 void LatticeAcousticRescore(const TransitionModel &trans_model,
-                            const Matrix<BaseFloat> &log_likes,
-                            const std::vector<int32> &state_times,
-                            Lattice *lat) {
+    const Matrix<BaseFloat> &log_likes,
+    const std::vector<int32> &state_times,
+    Lattice *lat) {
   kaldi::uint64 props = lat->Properties(fst::kFstProperties, false);
   if (!(props & fst::kTopSorted))
     KALDI_ERR << "Input lattice must be topologically sorted.";
@@ -44,14 +44,14 @@ void LatticeAcousticRescore(const TransitionModel &trans_model,
       time_to_state[state_times[i]].push_back(i);
     else
       KALDI_ASSERT(state_times[i] == log_likes.NumRows()
-                   && "There appears to be lattice/feature mismatch.");
+          && "There appears to be lattice/feature mismatch.");
   }
 
   for (int32 t = 0; t < log_likes.NumRows(); t++) {
     for (size_t i = 0; i < time_to_state[t].size(); i++) {
       int32 state = time_to_state[t][i];
       for (fst::MutableArcIterator<Lattice> aiter(lat, state); !aiter.Done();
-           aiter.Next()) {
+          aiter.Next()) {
         LatticeArc arc = aiter.Value();
         int32 trans_id = arc.ilabel;
         if (trans_id != 0) {  // Non-epsilon input label on arc

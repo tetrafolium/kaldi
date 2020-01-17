@@ -29,7 +29,7 @@ void MergeFullGmm(const FullGmm &src, FullGmm *dst) {
   FullGmm dst_copy;
   dst_copy.CopyFromFullGmm(*dst);
   KALDI_ASSERT(src.NumGauss() != 0 && dst_copy.NumGauss()  != 0
-               && src.Dim() == dst_copy.Dim());
+      && src.Dim() == dst_copy.Dim());
   int32 src_num_mix = src.NumGauss(), dst_num_mix = dst_copy.NumGauss(),
       num_mix = src_num_mix + dst_num_mix, dim = src.Dim();
   dst->Resize(num_mix, dim);
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
 
     FullGmm fgmm;
     Output sizes_ko(sizes_out_filename, false); // false == not binary.
-    
+
     for (int i = 3, max = po.NumArgs(); i <= max; i++) {
       std::string stats_in_filename = po.GetArg(i);
       bool binary_read;
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
       }
     }
     sizes_ko.Stream() << "\n";
-    
+
     // Write out the model
     WriteKaldiObject(fgmm, fgmm_out_filename, binary);
     KALDI_LOG << "Written merged GMM to " << fgmm_out_filename;

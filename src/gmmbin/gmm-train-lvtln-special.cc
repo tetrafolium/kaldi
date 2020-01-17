@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
                 "to be the same before and after transform.");
     po.Register("normalize-covar", &normalize_covar, "Normalize (matrix-valued) "
                 "covariance to be the same before and after transform.");
-    po.Register("weights-in", &weights_rspecifier, 
+    po.Register("weights-in", &weights_rspecifier,
                 "Can be used to take posteriors as an scp or ark file of weights "
                 "instead of giving <posteriors-rspecfier>");
 
@@ -126,8 +126,8 @@ int main(int argc, char *argv[]) {
         const Matrix<BaseFloat> &x_feats = x_reader.Value();
         const Matrix<BaseFloat> &y_feats = y_reader.Value(utt);
         if (x_feats.NumRows() != y_feats.NumRows() ||
-           x_feats.NumCols() != y_feats.NumCols() ||
-           x_feats.NumCols() != dim) {
+            x_feats.NumCols() != y_feats.NumCols() ||
+            x_feats.NumCols() != dim) {
           KALDI_ERR << "Number of rows and/or columns differs in features, or features have different dim from lvtln object";
         }
 
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
       // Here is the computation if we normalize the full covariance.
       // see the document "Notes for affine-transform-based VTLN" for explanation,
       // here: http://www.danielpovey.com/files/2010_vtln_notes.pdf
-      
+
       double T = 0.0;
       SpMatrix<double> XX(dim);  // sum of x x^t
       Vector<double> x(dim);  //  sum of x.
@@ -233,8 +233,8 @@ int main(int argc, char *argv[]) {
         const Matrix<BaseFloat> &x_feats = x_reader.Value();
         const Matrix<BaseFloat> &y_feats = y_reader.Value(utt);
         if (x_feats.NumRows() != y_feats.NumRows() ||
-           x_feats.NumCols() != y_feats.NumCols() ||
-           x_feats.NumCols() != dim) {
+            x_feats.NumCols() != y_feats.NumCols() ||
+            x_feats.NumCols() != dim) {
           KALDI_ERR << "Number of rows and/or columns differs in features, or features have different dim from lvtln object";
         }
 

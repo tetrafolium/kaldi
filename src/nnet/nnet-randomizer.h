@@ -40,7 +40,7 @@ struct NnetDataRandomizerOptions {
   int32 randomizer_seed;
   int32 minibatch_size;
 
-  NnetDataRandomizerOptions():
+  NnetDataRandomizerOptions() :
     randomizer_size(32768),
     randomizer_seed(777),
     minibatch_size(256)
@@ -62,7 +62,7 @@ struct NnetDataRandomizerOptions {
  * Generates randomly ordered vector of indices,
  */
 class RandomizerMask {
- public:
+public:
   RandomizerMask()
   { }
 
@@ -76,7 +76,7 @@ class RandomizerMask {
   /// Generate randomly ordered vector of integers 0..[mask_size -1],
   const std::vector<int32>& Generate(int32 mask_size);
 
- private:
+private:
   std::vector<int32> mask_;
 };
 
@@ -85,13 +85,13 @@ class RandomizerMask {
  * Shuffles rows of a matrix according to the indices in the mask,
  */
 class MatrixRandomizer {
- public:
-  MatrixRandomizer():
+public:
+  MatrixRandomizer() :
     data_begin_(0),
     data_end_(0)
   { }
 
-  explicit MatrixRandomizer(const NnetDataRandomizerOptions &conf):
+  explicit MatrixRandomizer(const NnetDataRandomizerOptions &conf) :
     data_begin_(0),
     data_end_(0)
   {
@@ -130,7 +130,7 @@ class MatrixRandomizer {
   /// Returns matrix-window with next mini-batch
   const CuMatrixBase<BaseFloat>& Value();
 
- private:
+private:
   CuMatrix<BaseFloat> data_;  // can be larger than 'randomizer_size'
   CuMatrix<BaseFloat> data_aux_;  // auxiliary buffer for shuffling
   CuMatrix<BaseFloat> minibatch_;  // buffer for mini-batch
@@ -146,13 +146,13 @@ class MatrixRandomizer {
 
 /// Randomizes elements of a vector according to a mask
 class VectorRandomizer {
- public:
-  VectorRandomizer():
+public:
+  VectorRandomizer() :
     data_begin_(0),
     data_end_(0)
   { }
 
-  explicit VectorRandomizer(const NnetDataRandomizerOptions &conf):
+  explicit VectorRandomizer(const NnetDataRandomizerOptions &conf) :
     data_begin_(0),
     data_end_(0)
   {
@@ -191,7 +191,7 @@ class VectorRandomizer {
   /// Returns matrix-window with next mini-batch
   const Vector<BaseFloat>& Value();
 
- private:
+private:
   Vector<BaseFloat> data_;  // can be larger than 'randomizer_size'
   Vector<BaseFloat> minibatch_;  // buffer for mini-batch
 
@@ -207,13 +207,13 @@ class VectorRandomizer {
 /// Randomizes elements of a vector according to a mask
 template<typename T>
 class StdVectorRandomizer {
- public:
-  StdVectorRandomizer():
+public:
+  StdVectorRandomizer() :
     data_begin_(0),
     data_end_(0)
   { }
 
-  explicit StdVectorRandomizer(const NnetDataRandomizerOptions &conf):
+  explicit StdVectorRandomizer(const NnetDataRandomizerOptions &conf) :
     data_begin_(0),
     data_end_(0)
   {
@@ -252,7 +252,7 @@ class StdVectorRandomizer {
   /// Returns matrix-window with next mini-batch
   const std::vector<T>& Value();
 
- private:
+private:
   std::vector<T> data_;  // can be larger than 'randomizer_size'
   std::vector<T> minibatch_;  // buffer for mini-batch
 

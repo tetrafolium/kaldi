@@ -37,9 +37,9 @@ struct ChainObjectiveInfo {
   double tot_weight;
   double tot_like;
   double tot_l2_term;
-  ChainObjectiveInfo(): tot_weight(0.0),
-                        tot_like(0.0),
-                        tot_l2_term(0.0) { }
+  ChainObjectiveInfo() : tot_weight(0.0),
+    tot_like(0.0),
+    tot_l2_term(0.0) { }
 };
 
 
@@ -52,12 +52,12 @@ struct ChainObjectiveInfo {
     need this regularization in the combination phase).
  */
 class NnetChainComputeProb {
- public:
+public:
   // does not store a reference to 'config' but does store one to 'nnet'.
   NnetChainComputeProb(const NnetComputeProbOptions &nnet_config,
-                       const chain::ChainTrainingOptions &chain_config,
-                       const fst::StdVectorFst &den_fst,
-                       const Nnet &nnet);
+      const chain::ChainTrainingOptions &chain_config,
+      const fst::StdVectorFst &den_fst,
+      const Nnet &nnet);
 
   // This version of the constructor may only be called if
   // nnet_config.store_component_stats == true and nnet_config.compute_deriv ==
@@ -65,9 +65,9 @@ class NnetChainComputeProb {
   // you should call ZeroComponentStats(nnet) first if you want the stats to be
   // zeroed first.
   NnetChainComputeProb(const NnetComputeProbOptions &nnet_config,
-                       const chain::ChainTrainingOptions &chain_config,
-                       const fst::StdVectorFst &den_fst,
-                       Nnet *nnet);
+      const chain::ChainTrainingOptions &chain_config,
+      const fst::StdVectorFst &den_fst,
+      Nnet *nnet);
 
 
   // Reset the likelihood stats, and the derivative stats (if computed).
@@ -88,9 +88,9 @@ class NnetChainComputeProb {
   const Nnet &GetDeriv() const;
 
   ~NnetChainComputeProb();
- private:
+private:
   void ProcessOutputs(const NnetChainExample &chain_eg,
-                      NnetComputer *computer);
+      NnetComputer *computer);
 
   NnetComputeProbOptions nnet_config_;
   chain::ChainTrainingOptions chain_config_;
@@ -110,9 +110,9 @@ class NnetChainComputeProb {
 /// affects batch-norm, for instance.  See also the version of RecomputeStats
 /// declared in nnet-utils.h.
 void RecomputeStats(const std::vector<NnetChainExample> &egs,
-                    const chain::ChainTrainingOptions &chain_config,
-                    const fst::StdVectorFst &den_fst,
-                    Nnet *nnet);
+    const chain::ChainTrainingOptions &chain_config,
+    const fst::StdVectorFst &den_fst,
+    Nnet *nnet);
 
 
 

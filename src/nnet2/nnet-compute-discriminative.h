@@ -30,7 +30,7 @@ namespace nnet2 {
 /* This header provides functionality for doing model updates, and computing
    gradients, using discriminative objective functions (MPFE, SMBR, MMI).
    We use the DiscriminativeNnetExample defined in nnet-example.h.
-*/
+ */
 
 struct NnetDiscriminativeUpdateOptions {
   std::string criterion; // "mmi" or "mpfe" or "smbr"
@@ -43,11 +43,11 @@ struct NnetDiscriminativeUpdateOptions {
   std::string silence_phones_str; // colon-separated list of integer ids of silence phones,
                                   // for MPE/SMBR only.
 
-  NnetDiscriminativeUpdateOptions(): criterion("smbr"), acoustic_scale(0.1),
-                                     drop_frames(false),
-                                     one_silence_class(false),
-                                     boost(0.0) { }
-  
+  NnetDiscriminativeUpdateOptions() : criterion("smbr"), acoustic_scale(0.1),
+    drop_frames(false),
+    one_silence_class(false),
+    boost(0.0) { }
+
   void Register(OptionsItf *opts) {
     opts->Register("criterion", &criterion, "Criterion, 'mmi'|'mpfe'|'smbr', "
                    "determines the objective function to use.  Should match "
@@ -62,7 +62,7 @@ struct NnetDiscriminativeUpdateOptions {
     opts->Register("silence-phones", &silence_phones_str,
                    "For MPFE or SMBR, colon-separated list of integer ids of "
                    "silence phones, e.g. 1:2:3");
-    
+
   }
 };
 
@@ -88,7 +88,7 @@ struct NnetDiscriminativeStats {
     gradient descent, otherwise (assuming you have called SetZero(true)
     on *nnet_to_update) it will compute the gradient on this data.
     If nnet_to_update_ == NULL, no backpropagation is done.
-    
+
     Note: we ignore any existing acoustic score in the lattice of "eg".
 
     For display purposes you should normalize the sum of this return value by
@@ -102,11 +102,11 @@ struct NnetDiscriminativeStats {
     values.  */
 
 void NnetDiscriminativeUpdate(const AmNnet &am_nnet,
-                              const TransitionModel &tmodel,
-                              const NnetDiscriminativeUpdateOptions &opts,
-                              const DiscriminativeNnetExample &eg,
-                              Nnet *nnet_to_update,
-                              NnetDiscriminativeStats *stats);
+    const TransitionModel &tmodel,
+    const NnetDiscriminativeUpdateOptions &opts,
+    const DiscriminativeNnetExample &eg,
+    Nnet *nnet_to_update,
+    NnetDiscriminativeStats *stats);
 
 
 } // namespace nnet2

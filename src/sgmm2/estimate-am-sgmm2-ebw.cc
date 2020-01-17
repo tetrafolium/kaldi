@@ -25,11 +25,11 @@ using std::vector;
 namespace kaldi {
 
 void EbwAmSgmm2Updater::Update(const MleAmSgmm2Accs &num_accs,
-                               const MleAmSgmm2Accs &den_accs,
-                               AmSgmm2 *model,
-                               SgmmUpdateFlagsType flags,
-                               BaseFloat *auxf_change_out,
-                               BaseFloat *count_out) {
+    const MleAmSgmm2Accs &den_accs,
+    AmSgmm2 *model,
+    SgmmUpdateFlagsType flags,
+    BaseFloat *auxf_change_out,
+    BaseFloat *count_out) {
 
   // Various quantities need to be computed at the start, before we
   // change any of the model parameters.
@@ -106,21 +106,21 @@ void EbwAmSgmm2Updater::Update(const MleAmSgmm2Accs &num_accs,
 
 
 class EbwUpdatePhoneVectorsClass: public MultiThreadable { // For multi-threaded.
- public:
+public:
   EbwUpdatePhoneVectorsClass(const EbwAmSgmm2Updater *updater,
-                             const MleAmSgmm2Accs &num_accs,
-                             const MleAmSgmm2Accs &den_accs,
-                             const std::vector<SpMatrix<double> > &H,
-                             AmSgmm2 *model,
-                             double *auxf_impr):
-      updater_(updater), num_accs_(num_accs), den_accs_(den_accs),
-      model_(model), H_(H), auxf_impr_ptr_(auxf_impr), auxf_impr_(0.0) { }
+      const MleAmSgmm2Accs &num_accs,
+      const MleAmSgmm2Accs &den_accs,
+      const std::vector<SpMatrix<double> > &H,
+      AmSgmm2 *model,
+      double *auxf_impr) :
+    updater_(updater), num_accs_(num_accs), den_accs_(den_accs),
+    model_(model), H_(H), auxf_impr_ptr_(auxf_impr), auxf_impr_(0.0) { }
 
   EbwUpdatePhoneVectorsClass(const EbwUpdatePhoneVectorsClass &other) :
-      MultiThreadable(other),
-      updater_(other.updater_), num_accs_(other.num_accs_),
-      den_accs_(other.den_accs_), model_(other.model_),
-      H_(other.H_), auxf_impr_ptr_(other.auxf_impr_ptr_), auxf_impr_(0.0) { }
+    MultiThreadable(other),
+    updater_(other.updater_), num_accs_(other.num_accs_),
+    den_accs_(other.den_accs_), model_(other.model_),
+    H_(other.H_), auxf_impr_ptr_(other.auxf_impr_ptr_), auxf_impr_(0.0) { }
 
   ~EbwUpdatePhoneVectorsClass() {
     *auxf_impr_ptr_ += auxf_impr_;
@@ -132,7 +132,7 @@ class EbwUpdatePhoneVectorsClass: public MultiThreadable { // For multi-threaded
     updater_->UpdatePhoneVectorsInternal(num_accs_, den_accs_, H_, model_,
                                          &auxf_impr_, num_threads_, thread_id_);
   }
- private:
+private:
   const EbwAmSgmm2Updater *updater_;
   const MleAmSgmm2Accs &num_accs_;
   const MleAmSgmm2Accs &den_accs_;
@@ -144,15 +144,15 @@ class EbwUpdatePhoneVectorsClass: public MultiThreadable { // For multi-threaded
 
 
 void EbwAmSgmm2Updater::ComputePhoneVecStats(
-    const MleAmSgmm2Accs &accs,
-    const AmSgmm2 &model,
-    const std::vector<SpMatrix<double> > &H,
-    int32 j1,
-    int32 m,
-    const Vector<double> &w_jm_in,
-    double gamma_jm,
-    Vector<double> *g_jm,
-    SpMatrix<double> *H_jm) {
+  const MleAmSgmm2Accs &accs,
+  const AmSgmm2 &model,
+  const std::vector<SpMatrix<double> > &H,
+  int32 j1,
+  int32 m,
+  const Vector<double> &w_jm_in,
+  double gamma_jm,
+  Vector<double> *g_jm,
+  SpMatrix<double> *H_jm) {
   Vector<double> w_jm(w_jm_in);
   if (!accs.a_.empty() && accs.a_[j1](m, 0) != 0) { // [SSGMM]
     w_jm.MulElements(accs.a_[j1].Row(m)); // multiply by "a" quantities..
@@ -176,13 +176,13 @@ void EbwAmSgmm2Updater::ComputePhoneVecStats(
 // Runs the phone vectors update for a subset of states (called
 // multi-threaded).
 void EbwAmSgmm2Updater::UpdatePhoneVectorsInternal(
-    const MleAmSgmm2Accs &num_accs,
-    const MleAmSgmm2Accs &den_accs,
-    const std::vector<SpMatrix<double> > &H,
-    AmSgmm2 *model,
-    double *auxf_impr,
-    int32 num_threads,
-    int32 thread_id) const {
+  const MleAmSgmm2Accs &num_accs,
+  const MleAmSgmm2Accs &den_accs,
+  const std::vector<SpMatrix<double> > &H,
+  AmSgmm2 *model,
+  double *auxf_impr,
+  int32 num_threads,
+  int32 thread_id) const {
 
   int32 block_size = (num_accs.num_groups_ + (num_threads-1)) / num_threads,
       j1_start = block_size * thread_id,
@@ -240,7 +240,7 @@ void EbwAmSgmm2Updater::UpdatePhoneVectorsInternal(
 
       double auxf_impr =
           ((gamma_jm_num + gamma_jm_den == 0) ? 0.0 :
-           SolveQuadraticProblem(quadratic_term,
+          SolveQuadraticProblem(quadratic_term,
                                  local_derivative,
                                  opts, &delta_v_jm));
 
@@ -259,9 +259,9 @@ void EbwAmSgmm2Updater::UpdatePhoneVectorsInternal(
 }
 
 double EbwAmSgmm2Updater::UpdatePhoneVectors(const MleAmSgmm2Accs &num_accs,
-                                             const MleAmSgmm2Accs &den_accs,
-                                             const vector< SpMatrix<double> > &H,
-                                             AmSgmm2 *model) const {
+    const MleAmSgmm2Accs &den_accs,
+    const vector< SpMatrix<double> > &H,
+    AmSgmm2 *model) const {
   KALDI_LOG << "Updating phone vectors.";
 
   double count = 0.0, auxf_impr = 0.0;
@@ -281,12 +281,12 @@ double EbwAmSgmm2Updater::UpdatePhoneVectors(const MleAmSgmm2Accs &num_accs,
 
 
 double EbwAmSgmm2Updater::UpdateM(const MleAmSgmm2Accs &num_accs,
-                                  const MleAmSgmm2Accs &den_accs,
-                                  const std::vector< SpMatrix<double> > &Q_num,
-                                  const std::vector< SpMatrix<double> > &Q_den,
-                                  const Vector<double> &gamma_num,
-                                  const Vector<double> &gamma_den,
-                                  AmSgmm2 *model) const {
+    const MleAmSgmm2Accs &den_accs,
+    const std::vector< SpMatrix<double> > &Q_num,
+    const std::vector< SpMatrix<double> > &Q_den,
+    const Vector<double> &gamma_num,
+    const Vector<double> &gamma_den,
+    AmSgmm2 *model) const {
   int32 S = model->PhoneSpaceDim(),
       D = model->FeatureDim(),
       I = model->NumGauss();
@@ -314,7 +314,7 @@ double EbwAmSgmm2Updater::UpdateM(const MleAmSgmm2Accs &num_accs,
     L.AddMat(1.0, num_accs.Y_[i]);
     L.AddMatSp(-1.0, Mi, kNoTrans, Q_num[i], 1.0);
     L.AddMat(-1.0, den_accs.Y_[i]);
-    L.AddMatSp(-1.0*-1.0, Mi, kNoTrans, Q_den[i], 1.0);
+    L.AddMatSp(-1.0* -1.0, Mi, kNoTrans, Q_den[i], 1.0);
 
     SpMatrix<double> Q(S); // This is a combination of the Q's for the numerator and denominator.
     Q.AddSp(1.0, Q_num[i]);
@@ -368,10 +368,10 @@ double EbwAmSgmm2Updater::UpdateM(const MleAmSgmm2Accs &num_accs,
 // bit more complex to implement and probably would not give much improvement
 // over this approach.
 double EbwAmSgmm2Updater::UpdateW(const MleAmSgmm2Accs &num_accs,
-                                  const MleAmSgmm2Accs &den_accs,
-                                  const Vector<double> &gamma_num,
-                                  const Vector<double> &gamma_den,
-                                  AmSgmm2 *model) {
+    const MleAmSgmm2Accs &den_accs,
+    const Vector<double> &gamma_num,
+    const Vector<double> &gamma_den,
+    AmSgmm2 *model) {
   KALDI_LOG << "Updating weight projections";
 
   int32 I = num_accs.num_gaussians_, S = num_accs.phn_space_dim_;
@@ -461,10 +461,10 @@ double EbwAmSgmm2Updater::UpdateW(const MleAmSgmm2Accs &num_accs,
 
 
 double EbwAmSgmm2Updater::UpdateU(const MleAmSgmm2Accs &num_accs,
-                                  const MleAmSgmm2Accs &den_accs,
-                                  const Vector<double> &gamma_num,
-                                  const Vector<double> &gamma_den,
-                                  AmSgmm2 *model) {
+    const MleAmSgmm2Accs &den_accs,
+    const Vector<double> &gamma_num,
+    const Vector<double> &gamma_den,
+    AmSgmm2 *model) {
   int32 T = num_accs.spk_space_dim_;
   double tot_impr = 0.0;
   for (int32 i = 0; i < num_accs.num_gaussians_; i++) {
@@ -522,10 +522,10 @@ double EbwAmSgmm2Updater::UpdateU(const MleAmSgmm2Accs &num_accs,
 
 
 double EbwAmSgmm2Updater::UpdateN(const MleAmSgmm2Accs &num_accs,
-                                  const MleAmSgmm2Accs &den_accs,
-                                  const Vector<double> &gamma_num,
-                                  const Vector<double> &gamma_den,
-                                  AmSgmm2 *model) const {
+    const MleAmSgmm2Accs &den_accs,
+    const Vector<double> &gamma_num,
+    const Vector<double> &gamma_den,
+    AmSgmm2 *model) const {
   if (num_accs.spk_space_dim_ == 0 || num_accs.R_.size() == 0 ||
       num_accs.Z_.size() == 0) {
     KALDI_ERR << "Speaker subspace dim is zero or no stats accumulated";
@@ -551,7 +551,7 @@ double EbwAmSgmm2Updater::UpdateN(const MleAmSgmm2Accs &num_accs,
     L.AddMat(1.0, num_accs.Z_[i]);
     L.AddMatSp(-1.0, Ni, kNoTrans, num_accs.R_[i], 1.0);
     L.AddMat(-1.0, den_accs.Z_[i]);
-    L.AddMatSp(-1.0*-1.0, Ni, kNoTrans, den_accs.R_[i], 1.0);
+    L.AddMatSp(-1.0* -1.0, Ni, kNoTrans, den_accs.R_[i], 1.0);
 
     SpMatrix<double> R(T); // combination of the numerator and denominator R's.
     R.AddSp(1.0, num_accs.R_[i]);
@@ -595,11 +595,11 @@ double EbwAmSgmm2Updater::UpdateN(const MleAmSgmm2Accs &num_accs,
 }
 
 double EbwAmSgmm2Updater::UpdateVars(const MleAmSgmm2Accs &num_accs,
-                                     const MleAmSgmm2Accs &den_accs,
-                                     const Vector<double> &gamma_num,
-                                     const Vector<double> &gamma_den,
-                                     const std::vector< SpMatrix<double> > &S_means,
-                                     AmSgmm2 *model) const {
+    const MleAmSgmm2Accs &den_accs,
+    const Vector<double> &gamma_num,
+    const Vector<double> &gamma_den,
+    const std::vector< SpMatrix<double> > &S_means,
+    AmSgmm2 *model) const {
   // Note: S_means contains not only the quantity S_means in the paper,
   // but also has a term - (Y_i M_i^T + M_i Y_i^T).  Plus, it is differenced
   // between numerator and denominator.  We don't calculate it here,
@@ -643,9 +643,9 @@ double EbwAmSgmm2Updater::UpdateVars(const MleAmSgmm2Accs &num_accs,
 
     // this auxf_change.
     double auxf_change = -0.5 * count *(TraceSpSp(SigmaInv, SigmaStats)
-                                        - TraceSpSp(SigmaInvOld, SigmaStats)
-                                        - SigmaInv.LogDet()
-                                        + SigmaInvOld.LogDet());
+        - TraceSpSp(SigmaInvOld, SigmaStats)
+        - SigmaInv.LogDet()
+        + SigmaInvOld.LogDet());
 
     model->SigmaInv_[i].CopyFromSp(SigmaInv);
     impr_vec(i) = auxf_change;
@@ -670,16 +670,16 @@ double EbwAmSgmm2Updater::UpdateVars(const MleAmSgmm2Accs &num_accs,
 
 
 double EbwAmSgmm2Updater::UpdateSubstateWeights(
-    const MleAmSgmm2Accs &num_accs,
-    const MleAmSgmm2Accs &den_accs,
-    AmSgmm2 *model) {
+  const MleAmSgmm2Accs &num_accs,
+  const MleAmSgmm2Accs &den_accs,
+  AmSgmm2 *model) {
   KALDI_LOG << "Updating substate mixture weights";
 
   double tot_count = 0.0, tot_impr = 0.0;
   for (int32 j2 = 0; j2 < num_accs.num_pdfs_; j2++) {
     int32 M = model->NumSubstatesForPdf(j2);
     Vector<double> num_occs(M), den_occs(M),
-        orig_weights(model->c_[j2]), weights(model->c_[j2]);
+    orig_weights(model->c_[j2]), weights(model->c_[j2]);
 
     for (int32 m = 0; m < M; m++) {
       num_occs(m) = num_accs.gamma_c_[j2](m)

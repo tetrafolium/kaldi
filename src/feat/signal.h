@@ -25,32 +25,32 @@
 
 namespace kaldi {
 
-/* 
+/*
    The following three functions are having the same functionality but
    different implementations so as the efficiency. After the convolution,
    the length of the signal will be extended to (original signal length +
    filter length - 1).
-*/
+ */
 
 /*
    This function implements a simple non-FFT-based convolution of two signals.
    It is suggested to use the FFT-based convolution function which is more
    efficient.
-*/
+ */
 void ConvolveSignals(const Vector<BaseFloat> &filter, Vector<BaseFloat> *signal);
 
 /*
    This function implements FFT-based convolution of two signals.
    However this should be an inefficient version of BlockConvolveSignals()
    as it processes the entire signal with a single FFT.
-*/
+ */
 void FFTbasedConvolveSignals(const Vector<BaseFloat> &filter, Vector<BaseFloat> *signal);
 
 /*
    This function implements FFT-based block convolution of two signals using
    overlap-add method. This is an efficient way to evaluate the discrete
    convolution of a long signal with a finite impulse response filter.
-*/
+ */
 void FFTbasedBlockConvolveSignals(const Vector<BaseFloat> &filter, Vector<BaseFloat> *signal);
 
 }  // namespace kaldi

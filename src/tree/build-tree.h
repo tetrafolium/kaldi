@@ -72,23 +72,23 @@ namespace kaldi {
  *                  or a negative value (e.g. -1) sets it to the smallest likelihood
  *                  change seen during the splitting algorithm; this typically causes
  *                  about a 20% reduction in the number of leaves.
- 
+
  * @param P [in] The central position of the phone context window, e.g. 1 for a
  *                triphone system.
  * @return  Returns a pointer to an EventMap object that is the tree.
 
-*/
+ */
 
 EventMap *BuildTree(Questions &qopts,
-                    const std::vector<std::vector<int32> > &phone_sets,
-                    const std::vector<int32> &phone2num_pdf_classes,
-                    const std::vector<bool> &share_roots,
-                    const std::vector<bool> &do_split,
-                    const BuildTreeStatsType &stats,
-                    BaseFloat thresh,
-                    int32 max_leaves,
-                    BaseFloat cluster_thresh,  // typically == thresh.  If negative, use smallest split.
-                    int32 P);
+    const std::vector<std::vector<int32> > &phone_sets,
+    const std::vector<int32> &phone2num_pdf_classes,
+    const std::vector<bool> &share_roots,
+    const std::vector<bool> &do_split,
+    const BuildTreeStatsType &stats,
+    BaseFloat thresh,
+    int32 max_leaves,
+    BaseFloat cluster_thresh,                  // typically == thresh.  If negative, use smallest split.
+    int32 P);
 
 
 /**
@@ -125,7 +125,7 @@ EventMap *BuildTree(Questions &qopts,
  *                 (generally true for non-silence phones).
  * @param stats [in] The statistics used in tree-building.
  * @param max_leaves_first [in] Maximum number of leaves it will create in first
- *                  level of decision tree. 
+ *                  level of decision tree.
  * @param max_leaves_second [in] Maximum number of leaves it will create in second
  *                  level of decision tree.  Must be > max_leaves_first.
  * @param cluster_leaves [in] Boolean value; if true, we post-cluster the leaves produced
@@ -140,19 +140,19 @@ EventMap *BuildTree(Questions &qopts,
  *                 view as cluster centers.
  * @return  Returns a pointer to an EventMap object that is the (big) tree.
 
-*/
+ */
 
 EventMap *BuildTreeTwoLevel(Questions &qopts,
-                            const std::vector<std::vector<int32> > &phone_sets,
-                            const std::vector<int32> &phone2num_pdf_classes,
-                            const std::vector<bool> &share_roots,
-                            const std::vector<bool> &do_split,
-                            const BuildTreeStatsType &stats,
-                            int32 max_leaves_first,
-                            int32 max_leaves_second,
-                            bool cluster_leaves,
-                            int32 P,
-                            std::vector<int32> *leaf_map);
+    const std::vector<std::vector<int32> > &phone_sets,
+    const std::vector<int32> &phone2num_pdf_classes,
+    const std::vector<bool> &share_roots,
+    const std::vector<bool> &do_split,
+    const BuildTreeStatsType &stats,
+    int32 max_leaves_first,
+    int32 max_leaves_second,
+    bool cluster_leaves,
+    int32 P,
+    std::vector<int32> *leaf_map);
 
 
 /// GenRandStats generates random statistics of the form used by BuildTree.
@@ -182,19 +182,19 @@ EventMap *BuildTreeTwoLevel(Questions &qopts,
 /// @param stats_out [out] The statistics that this routine outputs.
 
 void GenRandStats(int32 dim, int32 num_stats, int32 N, int32 P,
-                  const std::vector<int32> &phone_ids,
-                  const std::vector<int32> &hmm_lengths,
-                  const std::vector<bool> &is_ctx_dep,
-                  bool ensure_all_phones_covered,
-                  BuildTreeStatsType *stats_out);
+    const std::vector<int32> &phone_ids,
+    const std::vector<int32> &hmm_lengths,
+    const std::vector<bool> &is_ctx_dep,
+    bool ensure_all_phones_covered,
+    BuildTreeStatsType *stats_out);
 
 
 /// included here because it's used in some tree-building
 /// calling code.  Reads an OpenFst symbl table,
 /// discards the symbols and outputs the integers
 void ReadSymbolTableAsIntegers(std::string filename,
-                               bool include_eps,
-                               std::vector<int32> *syms);
+    bool include_eps,
+    std::vector<int32> *syms);
 
 
 
@@ -217,30 +217,30 @@ void ReadSymbolTableAsIntegers(std::string filename,
  *    @param questions_out [out] The questions (sets of phones) are output to here.
  **/
 void AutomaticallyObtainQuestions(BuildTreeStatsType &stats,
-                                  const std::vector<std::vector<int32> > &phone_sets_in,
-                                  const std::vector<int32> &all_pdf_classes_in,
-                                  int32 P,
-                                  std::vector<std::vector<int32> > *questions_out);
+    const std::vector<std::vector<int32> > &phone_sets_in,
+    const std::vector<int32> &all_pdf_classes_in,
+    int32 P,
+    std::vector<std::vector<int32> > *questions_out);
 
 /// This function clusters the phones (or some initially specified sets of phones)
 /// into sets of phones, using a k-means algorithm.  Useful, for example, in building
 /// simple models for purposes of adaptation.
 
 void KMeansClusterPhones(BuildTreeStatsType &stats,
-                         const std::vector<std::vector<int32> > &phone_sets_in,
-                         const std::vector<int32> &all_pdf_classes_in,
-                         int32 P,
-                         int32 num_classes,
-                         std::vector<std::vector<int32> > *sets_out);
+    const std::vector<std::vector<int32> > &phone_sets_in,
+    const std::vector<int32> &all_pdf_classes_in,
+    int32 P,
+    int32 num_classes,
+    std::vector<std::vector<int32> > *sets_out);
 
 /// Reads the roots file (throws on error).  Format is lines like:
 ///  "shared split 1 2 3 4",
 ///  "not-shared not-split 5",
 /// and so on.  The numbers are indexes of phones.
 void ReadRootsFile(std::istream &is,
-                   std::vector<std::vector<int32> > *phone_sets,
-                   std::vector<bool> *is_shared_root,
-                   std::vector<bool> *is_split_root);
+    std::vector<std::vector<int32> > *phone_sets,
+    std::vector<bool> *is_shared_root,
+    std::vector<bool> *is_split_root);
 
 
 /// @}

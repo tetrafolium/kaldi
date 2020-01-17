@@ -30,9 +30,9 @@ namespace attention {
 
 
 void GetAttentionDotProducts(BaseFloat alpha,
-                             const CuMatrixBase<BaseFloat> &A,
-                             const CuMatrixBase<BaseFloat> &B,
-                             CuMatrixBase<BaseFloat> *C) {
+    const CuMatrixBase<BaseFloat> &A,
+    const CuMatrixBase<BaseFloat> &B,
+    CuMatrixBase<BaseFloat> *C) {
   KALDI_ASSERT(A.NumCols() == B.NumCols() &&
                A.NumRows() == C->NumRows());
   int32 num_output_rows = A.NumRows(),
@@ -42,20 +42,20 @@ void GetAttentionDotProducts(BaseFloat alpha,
   KALDI_ASSERT(num_extra_rows > 0 && num_extra_rows % (context_dim - 1) == 0);
   int32 row_shift = num_extra_rows / (context_dim - 1);
   CuMatrix<BaseFloat> Ctrans(C->NumCols(),
-                             C->NumRows());
+      C->NumRows());
   for (int32 o = 0; o < context_dim; o++) {
     CuSubVector<BaseFloat> c_col(Ctrans, o);
     CuSubMatrix<BaseFloat> B_part(B, o * row_shift, num_output_rows,
-                                  0, input_num_cols);
+        0, input_num_cols);
     c_col.AddDiagMatMat(alpha, A, kNoTrans, B_part, kTrans, 0.0);
   }
   C->CopyFromMat(Ctrans, kTrans);
 }
 
 void ApplyScalesToOutput(BaseFloat alpha,
-                         const CuMatrixBase<BaseFloat> &B,
-                         const CuMatrixBase<BaseFloat> &C,
-                         CuMatrixBase<BaseFloat> *A) {
+    const CuMatrixBase<BaseFloat> &B,
+    const CuMatrixBase<BaseFloat> &C,
+    CuMatrixBase<BaseFloat> *A) {
   KALDI_ASSERT(A->NumCols() == B.NumCols() &&
                A->NumRows() == C.NumRows());
   int32 num_output_rows = A->NumRows(),
@@ -68,15 +68,15 @@ void ApplyScalesToOutput(BaseFloat alpha,
   for (int32 o = 0; o < context_dim; o++) {
     CuSubVector<BaseFloat> c_col(Ctrans, o);
     CuSubMatrix<BaseFloat> B_part(B, o * row_shift, num_output_rows,
-                                  0, input_num_cols);
+        0, input_num_cols);
     A->AddDiagVecMat(alpha, c_col, B_part, kNoTrans, 1.0);
   }
 }
 
 void ApplyScalesToInput(BaseFloat alpha,
-                        const CuMatrixBase<BaseFloat> &A,
-                        const CuMatrixBase<BaseFloat> &C,
-                        CuMatrixBase<BaseFloat> *B) {
+    const CuMatrixBase<BaseFloat> &A,
+    const CuMatrixBase<BaseFloat> &C,
+    CuMatrixBase<BaseFloat> *B) {
   KALDI_ASSERT(A.NumCols() == B->NumCols() &&
                A.NumRows() == C.NumRows());
   int32 num_output_rows = A.NumRows(),
@@ -89,17 +89,17 @@ void ApplyScalesToInput(BaseFloat alpha,
   for (int32 o = 0; o < context_dim; o++) {
     CuSubVector<BaseFloat> c_col(Ctrans, o);
     CuSubMatrix<BaseFloat> B_part(*B, o * row_shift, num_output_rows,
-                                  0, input_num_cols);
+        0, input_num_cols);
     B_part.AddDiagVecMat(alpha, c_col, A, kNoTrans, 1.0);
   }
 }
 
 void AttentionForward(BaseFloat key_scale,
-                      const CuMatrixBase<BaseFloat> &keys,
-                      const CuMatrixBase<BaseFloat> &queries,
-                      const CuMatrixBase<BaseFloat> &values,
-                      CuMatrixBase<BaseFloat> *c,
-                      CuMatrixBase<BaseFloat> *output) {
+    const CuMatrixBase<BaseFloat> &keys,
+    const CuMatrixBase<BaseFloat> &queries,
+    const CuMatrixBase<BaseFloat> &values,
+    CuMatrixBase<BaseFloat> *c,
+    CuMatrixBase<BaseFloat> *output) {
   // First check the dimensions and values.
   KALDI_ASSERT(key_scale > 0.0);
   int32 num_input_rows = keys.NumRows(),
@@ -110,18 +110,18 @@ void AttentionForward(BaseFloat key_scale,
   KALDI_ASSERT(num_input_rows > 0 && key_dim > 0 &&
                num_input_rows > num_output_rows &&
                context_dim > 0 &&
-               (num_input_rows - num_output_rows) % (context_dim - 1) == 0 &&
+      (num_input_rows - num_output_rows) % (context_dim - 1) == 0 &&
                values.NumRows() == num_input_rows);
   KALDI_ASSERT(c->NumRows() == num_output_rows &&
                c->NumCols() == context_dim);
   KALDI_ASSERT(output->NumRows() == num_output_rows &&
-               (output->NumCols() == value_dim ||
-                output->NumCols() == value_dim + context_dim));
+      (output->NumCols() == value_dim ||
+      output->NumCols() == value_dim + context_dim));
 
   CuSubMatrix<BaseFloat> queries_key_part(
-      queries, 0, num_output_rows,
-      0, key_dim),
-      queries_context_part(
+    queries, 0, num_output_rows,
+    0, key_dim),
+  queries_context_part(
           queries, 0, num_output_rows,
           key_dim, context_dim);
 
@@ -139,27 +139,27 @@ void AttentionForward(BaseFloat key_scale,
   // the part of the output that is weighted
   // combinations of the input values.
   CuSubMatrix<BaseFloat> output_values_part(
-      *output, 0, num_output_rows, 0, value_dim);
+    *output, 0, num_output_rows, 0, value_dim);
 
   ApplyScalesToOutput(1.0, values, *c, &output_values_part);
 
 
   if (output->NumCols() == value_dim + context_dim) {
     CuSubMatrix<BaseFloat> output_context_part(
-        *output, 0, num_output_rows, value_dim, context_dim);
+      *output, 0, num_output_rows, value_dim, context_dim);
     output_context_part.CopyFromMat(*c);
   }
 }
 
 void AttentionBackward(BaseFloat key_scale,
-                       const CuMatrixBase<BaseFloat> &keys,
-                       const CuMatrixBase<BaseFloat> &queries,
-                       const CuMatrixBase<BaseFloat> &values,
-                       const CuMatrixBase<BaseFloat> &c,
-                       const CuMatrixBase<BaseFloat> &output_deriv,
-                       CuMatrixBase<BaseFloat> *keys_deriv,
-                       CuMatrixBase<BaseFloat> *queries_deriv,
-                       CuMatrixBase<BaseFloat> *values_deriv) {
+    const CuMatrixBase<BaseFloat> &keys,
+    const CuMatrixBase<BaseFloat> &queries,
+    const CuMatrixBase<BaseFloat> &values,
+    const CuMatrixBase<BaseFloat> &c,
+    const CuMatrixBase<BaseFloat> &output_deriv,
+    CuMatrixBase<BaseFloat> *keys_deriv,
+    CuMatrixBase<BaseFloat> *queries_deriv,
+    CuMatrixBase<BaseFloat> *values_deriv) {
 
   // First check the dimensions and values.
   KALDI_ASSERT(key_scale > 0.0);
@@ -171,7 +171,7 @@ void AttentionBackward(BaseFloat key_scale,
   KALDI_ASSERT(num_input_rows > 0 && key_dim > 0 &&
                num_input_rows > num_output_rows &&
                context_dim > 0 &&
-               (num_input_rows - num_output_rows) % (context_dim - 1) == 0 &&
+      (num_input_rows - num_output_rows) % (context_dim - 1) == 0 &&
                values.NumRows() == num_input_rows);
   KALDI_ASSERT(SameDim(keys, *keys_deriv) &&
                SameDim(queries, *queries_deriv) &&
@@ -180,14 +180,14 @@ void AttentionBackward(BaseFloat key_scale,
   KALDI_ASSERT(c.NumRows() == num_output_rows &&
                c.NumCols() == context_dim);
   KALDI_ASSERT(output_deriv.NumRows() == num_output_rows &&
-               (output_deriv.NumCols() == value_dim ||
-                output_deriv.NumCols() == value_dim + context_dim));
+      (output_deriv.NumCols() == value_dim ||
+      output_deriv.NumCols() == value_dim + context_dim));
 
   CuMatrix<BaseFloat> c_deriv(num_output_rows, context_dim,
-                              kUndefined);
+      kUndefined);
 
   CuSubMatrix<BaseFloat> output_values_part_deriv(
-      output_deriv, 0, num_output_rows, 0, value_dim);
+    output_deriv, 0, num_output_rows, 0, value_dim);
   // This is the backprop w.r.t. the forward-pass statement:
   // ApplyScalesToOutput(1.0, values, *c, &output_values_part);
   GetAttentionDotProducts(1.0, output_values_part_deriv,
@@ -195,7 +195,7 @@ void AttentionBackward(BaseFloat key_scale,
 
   if (output_deriv.NumCols() == value_dim + context_dim) {
     CuSubMatrix<BaseFloat> output_deriv_context_part(
-        output_deriv, 0, num_output_rows, value_dim, context_dim);
+      output_deriv, 0, num_output_rows, value_dim, context_dim);
     // this is the backprop w.r.t. the
     // forward-pass statement: output_context_part.CopyFromMat(*c);
     c_deriv.AddMat(1.0, output_deriv_context_part);
@@ -210,12 +210,12 @@ void AttentionBackward(BaseFloat key_scale,
 
 
   CuSubMatrix<BaseFloat> queries_key_part(
-      queries, 0, num_output_rows,
-      0, key_dim),
-      queries_key_part_deriv(
+    queries, 0, num_output_rows,
+    0, key_dim),
+  queries_key_part_deriv(
           *queries_deriv, 0, num_output_rows,
           0, key_dim),
-      queries_context_part_deriv(
+  queries_context_part_deriv(
           *queries_deriv, 0, num_output_rows,
           key_dim, context_dim);
 

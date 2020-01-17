@@ -45,12 +45,12 @@ int main(int argc, char *argv[]) {
     }
 
     std::map<EventType, Clusterable*> tree_stats;
-    
+
     std::string tree_stats_wxfilename = po.GetArg(1);
 
     // A reminder on what BuildTreeStatsType is:
     // typedef std::vector<std::pair<EventType, Clusterable*> > BuildTreeStatsType;
-    
+
     for (int32 arg = 2; arg <= po.NumArgs(); arg++) {
       std::string tree_stats_rxfilename = po.GetArg(arg);
       bool binary_in;
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
       GaussClusterable example; // Lets ReadBuildTreeStats know which type to read..
       ReadBuildTreeStats(ki.Stream(), binary_in, example, &stats_array);
       for (BuildTreeStatsType::iterator iter = stats_array.begin();
-           iter != stats_array.end(); ++iter) {
+          iter != stats_array.end(); ++iter) {
         EventType e = iter->first;
         Clusterable *c = iter->second;
         std::map<EventType, Clusterable*>::iterator map_iter = tree_stats.find(e);
@@ -74,9 +74,9 @@ int main(int argc, char *argv[]) {
 
     BuildTreeStatsType stats;  // vectorized form.
 
-    for (std::map<EventType, Clusterable*>::const_iterator iter = tree_stats.begin();  
+    for (std::map<EventType, Clusterable*>::const_iterator iter = tree_stats.begin();
         iter != tree_stats.end();
-         ++iter) {
+        ++iter) {
       stats.push_back(std::make_pair(iter->first, iter->second));
     }
     tree_stats.clear();

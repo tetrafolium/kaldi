@@ -26,14 +26,14 @@ namespace nnet2 {
 // Here, "scale_params" is in blocks, with the first block
 // corresponding to nnets[0].
 static void CombineNnets(const Vector<BaseFloat> &scale_params,
-                         const std::vector<Nnet> &nnets,
-                         Nnet *dest) {
+    const std::vector<Nnet> &nnets,
+    Nnet *dest) {
   int32 num_nnets = nnets.size();
   KALDI_ASSERT(num_nnets >= 1);
   int32 num_uc = nnets[0].NumUpdatableComponents();
   KALDI_ASSERT(num_nnets * nnets[0].NumUpdatableComponents());
-  
-  
+
+
   *dest = nnets[0];
   SubVector<BaseFloat> scale_params0(scale_params, 0, num_uc);
   dest->ScaleComponents(scale_params0);
@@ -47,8 +47,8 @@ static void CombineNnets(const Vector<BaseFloat> &scale_params,
 /// either 0 ... num-models - 1 for the best individual model,
 /// or (#models) for the average of all of them.
 static int32 GetInitialModel(
-    const std::vector<NnetExample> &validation_set,
-    const std::vector<Nnet> &nnets) {
+  const std::vector<NnetExample> &validation_set,
+  const std::vector<Nnet> &nnets) {
   int32 minibatch_size = 1024;
   int32 num_nnets = static_cast<int32>(nnets.size());
   KALDI_ASSERT(!nnets.empty());
@@ -59,7 +59,7 @@ static int32 GetInitialModel(
   for (int32 n = 0; n < num_nnets; n++) {
     BaseFloat objf = ComputeNnetObjf(nnets[n], validation_set,
                                      minibatch_size) / tot_frames;
-    
+
     if (n == 0 || objf > best_objf) {
       best_objf = objf;
       best_n = n;
@@ -89,16 +89,16 @@ static int32 GetInitialModel(
 // This function chooses from among the neural nets, the one
 // which has the best validation set objective function.
 static void GetInitialScaleParams(
-    const NnetCombineConfig &combine_config,
-    const std::vector<NnetExample> &validation_set,
-    const std::vector<Nnet> &nnets,
-    Vector<double> *scale_params) {
+  const NnetCombineConfig &combine_config,
+  const std::vector<NnetExample> &validation_set,
+  const std::vector<Nnet> &nnets,
+  Vector<double> *scale_params) {
 
   int32 initial_model = combine_config.initial_model,
       num_nnets = static_cast<int32>(nnets.size());
   if (initial_model < 0 || initial_model > num_nnets)
     initial_model = GetInitialModel(validation_set, nnets);
-  
+
   KALDI_ASSERT(initial_model >= 0 && initial_model <= num_nnets);
   int32 num_uc = nnets[0].NumUpdatableComponents();
 
@@ -107,7 +107,7 @@ static void GetInitialScaleParams(
     KALDI_LOG << "Initializing with neural net with index " << initial_model;
     // At this point we're using the best of the individual neural nets.
     scale_params->Set(0.0);
-    
+
     // Set the block of parameters corresponding to the "best" of the
     // source neural nets to
     SubVector<double> best_block(*scale_params, num_uc * initial_model, num_uc);
@@ -122,21 +122,21 @@ static void GetInitialScaleParams(
 
 
 static double ComputeObjfAndGradient(
-    const std::vector<NnetExample> &validation_set,
-    const Vector<double> &scale_params,
-    const std::vector<Nnet> &nnets,
-    bool debug,
-    Vector<double> *gradient) {
+  const std::vector<NnetExample> &validation_set,
+  const Vector<double> &scale_params,
+  const std::vector<Nnet> &nnets,
+  bool debug,
+  Vector<double> *gradient) {
 
   Vector<BaseFloat> scale_params_float(scale_params);
-  
+
   Nnet nnet_combined;
   CombineNnets(scale_params_float, nnets, &nnet_combined);
-  
+
   Nnet nnet_gradient(nnet_combined);
   bool is_gradient = true;
   nnet_gradient.SetZero(is_gradient);
-  
+
   // note: "ans" is normalized by the total weight of validation frames.
   int32 batch_size = 1024;
   double ans = ComputeNnetGradient(nnet_combined,
@@ -146,7 +146,7 @@ static double ComputeObjfAndGradient(
 
   double tot_frames = validation_set.size();
   if (gradient != NULL) {
-    int32 i = 0; // index into scale_params.  
+    int32 i = 0; // index into scale_params.
     for (int32 n = 0; n < static_cast<int32>(nnets.size()); n++) {
       for (int32 j = 0; j < nnet_combined.NumComponents(); j++) {
         const UpdatableComponent *uc =
@@ -155,7 +155,7 @@ static double ComputeObjfAndGradient(
             dynamic_cast<const UpdatableComponent*>(&(nnet_gradient.GetComponent(j)));
         if (uc != NULL) {
           double dotprod = uc->DotProduct(*uc_gradient) / tot_frames;
-          (*gradient)(i) = dotprod; 
+          (*gradient)(i) = dotprod;
           i++;
         }
       }
@@ -165,14 +165,14 @@ static double ComputeObjfAndGradient(
 
   if (debug) {
     KALDI_LOG << "Double-checking gradient computation";
-    
+
     Vector<BaseFloat> manual_gradient(scale_params.Dim());
     for (int32 i = 0; i < scale_params.Dim(); i++) {
       double delta = 1.0e-04, fg = fabs((*gradient)(i));
       if (fg < 1.0e-07) fg = 1.0e-07;
       if (fg * delta < 1.0e-05)
         delta = 1.0e-05 / fg;
-      
+
       Vector<double> scale_params_temp(scale_params);
       scale_params_temp(i) += delta;
       double new_ans = ComputeObjfAndGradient(validation_set,
@@ -185,15 +185,15 @@ static double ComputeObjfAndGradient(
     KALDI_LOG << "Manually computed gradient is " << manual_gradient;
     KALDI_LOG << "Gradient we computed is " << *gradient;
   }
-  
+
   return ans;
 }
-                                   
+
 
 void CombineNnets(const NnetCombineConfig &combine_config,
-                  const std::vector<NnetExample> &validation_set,
-                  const std::vector<Nnet> &nnets,
-                  Nnet *nnet_out) {
+    const std::vector<NnetExample> &validation_set,
+    const std::vector<Nnet> &nnets,
+    Nnet *nnet_out) {
 
   Vector<double> scale_params;
 
@@ -205,7 +205,7 @@ void CombineNnets(const NnetCombineConfig &combine_config,
   int32 dim = scale_params.Dim();
   KALDI_ASSERT(dim > 0);
   Vector<double> gradient(dim);
-  
+
   double objf, initial_objf;
 
   LbfgsOptions lbfgs_options;
@@ -213,11 +213,11 @@ void CombineNnets(const NnetCombineConfig &combine_config,
   lbfgs_options.m = dim; // Store the same number of vectors as the dimension
   // itself, so this is BFGS.
   lbfgs_options.first_step_impr = combine_config.initial_impr;
-  
+
   OptimizeLbfgs<double> lbfgs(scale_params,
-                              lbfgs_options);
-  
-  for (int32 i = 0; i < combine_config.num_bfgs_iters; i++) {    
+      lbfgs_options);
+
+  for (int32 i = 0; i < combine_config.num_bfgs_iters; i++) {
     scale_params.CopyFromVec(lbfgs.GetProposedValue());
     objf = ComputeObjfAndGradient(validation_set,
                                   scale_params,
@@ -227,9 +227,9 @@ void CombineNnets(const NnetCombineConfig &combine_config,
 
     KALDI_VLOG(2) << "Iteration " << i << " scale-params = " << scale_params
                   << ", objf = " << objf << ", gradient = " << gradient;
-    
+
     if (i == 0) initial_objf = objf;
-    
+
     lbfgs.DoStep(objf, gradient);
   }
 
@@ -241,13 +241,13 @@ void CombineNnets(const NnetCombineConfig &combine_config,
             << initial_objf << " to " << objf;
 
   Matrix<BaseFloat> scale_params_mat(nnets.size(),
-                                     nnets[0].NumUpdatableComponents());
+      nnets[0].NumUpdatableComponents());
   scale_params_mat.CopyRowsFromVec(scale_params_float);
   KALDI_LOG << "Final scale factors are " << scale_params_mat;
-  
+
   CombineNnets(scale_params_float, nnets, nnet_out);
 }
- 
-  
+
+
 } // namespace nnet2
 } // namespace kaldi

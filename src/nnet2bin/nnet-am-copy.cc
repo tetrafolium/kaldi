@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     std::string learning_rates = "";
     std::string scales = "";
     std::string stats_from;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("learning-rate-factor", &learning_rate_factor,
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
                 "collapse=true; set this to false to collapse mixed types.");
 
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 
     std::string nnet_rxfilename = po.GetArg(1),
         nnet_wxfilename = po.GetArg(2);
-    
+
     TransitionModel trans_model;
     AmNnet am_nnet;
     {
@@ -119,14 +119,14 @@ int main(int argc, char *argv[]) {
       std::vector<BaseFloat> learning_rates_vec;
       if (!SplitStringToFloats(learning_rates, ":", false, &learning_rates_vec)
           || static_cast<int32>(learning_rates_vec.size()) !=
-             am_nnet.GetNnet().NumUpdatableComponents()) {
+          am_nnet.GetNnet().NumUpdatableComponents()) {
         KALDI_ERR << "Expected --learning-rates option to be a "
                   << "colon-separated string with "
                   << am_nnet.GetNnet().NumUpdatableComponents()
                   << " elements, instead got \"" << learning_rates << '"';
       }
       SubVector<BaseFloat> learning_rates_vector(&(learning_rates_vec[0]),
-                                                 learning_rates_vec.size());
+          learning_rates_vec.size());
       am_nnet.GetNnet().SetLearningRates(learning_rates_vector);
     }
 
@@ -144,10 +144,10 @@ int main(int argc, char *argv[]) {
                             "=", false,  &parts);
         if (!ConvertStringToReal(parts[1], &scale_factor)) {
           KALDI_ERR << "Unknown format for --learning-rate-scales option. "
-              << "Expected format is "
-              << "--learning-rate-scales=AffineComponent=0.1:AffineComponentPreconditioned=0.5 "
-              << "instead got "
-              << learning_rate_scales_str;
+                    << "Expected format is "
+                    << "--learning-rate-scales=AffineComponent=0.1:AffineComponentPreconditioned=0.5 "
+                    << "instead got "
+                    << learning_rate_scales_str;
         }
         learning_rate_scales.insert(std::pair<std::string, BaseFloat>(
                 parts[0], scale_factor));
@@ -160,14 +160,14 @@ int main(int argc, char *argv[]) {
       std::vector<BaseFloat> scales_vec;
       if (!SplitStringToFloats(scales, ":", false, &scales_vec)
           || static_cast<int32>(scales_vec.size()) !=
-             am_nnet.GetNnet().NumUpdatableComponents()) {
+          am_nnet.GetNnet().NumUpdatableComponents()) {
         KALDI_ERR << "Expected --scales option to be a "
                   << "colon-separated string with "
                   << am_nnet.GetNnet().NumUpdatableComponents()
                   << " elements, instead got \"" << scales << '"';
       }
       SubVector<BaseFloat> scales_vector(&(scales_vec[0]),
-                                         scales_vec.size());
+          scales_vec.size());
       am_nnet.GetNnet().ScaleComponents(scales_vector);
     }
 
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
     if (remove_preconditioning) am_nnet.GetNnet().RemovePreconditioning();
 
     if (collapse) am_nnet.GetNnet().Collapse(match_updatableness);
-    
+
     if (stats_from != "") {
       // Copy the stats associated with the layers descending from
       // NonlinearComponent.
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
       am_nnet_stats.Read(ki.Stream(), binary);
       am_nnet.GetNnet().CopyStatsFrom(am_nnet_stats.GetNnet());
     }
-    
+
     {
       Output ko(nnet_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);

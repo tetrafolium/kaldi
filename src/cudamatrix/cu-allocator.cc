@@ -65,7 +65,7 @@ static inline size_t IntegerLog2(size_t i) {
 
 //inline
 CuMemoryAllocator::MruCache& CuMemoryAllocator::GetCacheForSize(
-    size_t num_bytes) {
+  size_t num_bytes) {
   size_t bucket_index = IntegerLog2(num_bytes);
   KALDI_ASSERT(num_bytes > 0 && bucket_index < caches_.size());
   return caches_[bucket_index];
@@ -73,8 +73,8 @@ CuMemoryAllocator::MruCache& CuMemoryAllocator::GetCacheForSize(
 
 //inline
 void* CuMemoryAllocator::MallocPitchInternal(size_t row_bytes,
-                                             size_t num_rows,
-                                            size_t *pitch) {
+    size_t num_rows,
+    size_t *pitch) {
   num_system_allocations_++;
   void *ans;
   cudaError_t e;
@@ -137,24 +137,24 @@ void CuMemoryAllocator::PrintMemoryUsage() const {
             << ", in this->MallocPitch()=" << tot_time_taken_in_malloc_pitch_;
 }
 
-CuMemoryAllocator::CuMemoryAllocator(CuAllocatorOptions opts):
-    opts_(opts),
-    caches_(40),
-    cur_bytes_allocated_(0),
-    max_bytes_allocated_(0),
-    cur_bytes_used_(0),
-    max_bytes_used_(0),
-    t_(1),
-    num_user_allocations_(0),
-    num_system_allocations_(0),
-    tot_time_taken_in_cuda_malloc_(0.0),
-    tot_time_taken_in_cuda_malloc_pitch_(0.0),
-    tot_time_taken_in_cuda_free_(0.0),
-    tot_time_taken_in_malloc_pitch_(0.0) { }
+CuMemoryAllocator::CuMemoryAllocator(CuAllocatorOptions opts) :
+  opts_(opts),
+  caches_(40),
+  cur_bytes_allocated_(0),
+  max_bytes_allocated_(0),
+  cur_bytes_used_(0),
+  max_bytes_used_(0),
+  t_(1),
+  num_user_allocations_(0),
+  num_system_allocations_(0),
+  tot_time_taken_in_cuda_malloc_(0.0),
+  tot_time_taken_in_cuda_malloc_pitch_(0.0),
+  tot_time_taken_in_cuda_free_(0.0),
+  tot_time_taken_in_malloc_pitch_(0.0) { }
 
 void* CuMemoryAllocator::MallocPitch(size_t row_bytes,
-                                     size_t num_rows,
-                                     size_t *pitch) {
+    size_t num_rows,
+    size_t *pitch) {
   CuTimer tim;
   t_++;
   num_user_allocations_++;
@@ -308,7 +308,7 @@ size_t CuMemoryAllocator::MruCache::LeastRecentTime() const {
 }
 
 bool CuMemoryAllocator::MruCache::Lookup(const MemoryRequest &request,
-                                         CachedMemoryElement *output) {
+    CachedMemoryElement *output) {
   MapType::iterator iter = map_.find(request);
   if (iter == map_.end())
     return false;
@@ -325,7 +325,7 @@ bool CuMemoryAllocator::MruCache::Lookup(const MemoryRequest &request,
 }
 
 void CuMemoryAllocator::MruCache::Insert(const MemoryRequest &request,
-                                         const CachedMemoryElement &element) {
+    const CachedMemoryElement &element) {
   list_.push_back(request);
   map_[request].push_back(std::pair<CachedMemoryElement, ListIterType>(
       element,
@@ -352,12 +352,12 @@ size_t CuMemoryAllocator::MruCache::RemoveLeastRecentlyUsed() {
 }
 
 CuMemoryAllocator::MruCache& CuMemoryAllocator::MruCache::operator = (
-    const CuMemoryAllocator::MruCache &other) {
+  const CuMemoryAllocator::MruCache &other) {
   KALDI_ASSERT(other.list_.empty());
   return *this;
 }
 CuMemoryAllocator::MruCache::MruCache(
-    const CuMemoryAllocator::MruCache &other) {
+  const CuMemoryAllocator::MruCache &other) {
   KALDI_ASSERT(other.list_.empty());
 }
 

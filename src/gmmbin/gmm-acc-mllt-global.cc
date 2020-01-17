@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
         "one global GMM (e.g. a UBM)\n"
         "Usage:  gmm-acc-mllt-global [options] <gmm-in> <feature-rspecifier> <stats-out>\n"
         "e.g.: \n"
-         " gmm-acc-mllt-global 1.dubm scp:feats.scp 1.macc\n";
+        " gmm-acc-mllt-global 1.dubm scp:feats.scp 1.macc\n";
 
     ParseOptions po(usage);
     bool binary = true;
@@ -71,15 +71,15 @@ int main(int argc, char *argv[]) {
 
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
     RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier);
-    
+
     int32 num_done = 0, num_err = 0;
     for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string utt = feature_reader.Key();
-      const Matrix<BaseFloat> &mat = feature_reader.Value();      
-      
+      const Matrix<BaseFloat> &mat = feature_reader.Value();
+
       num_done++;
       BaseFloat tot_like_this_file = 0.0, tot_weight = 0.0;
-      
+
       if (gselect_rspecifier == "") {
         for (int32 i = 0; i < mat.NumRows(); i++) {
           tot_like_this_file += mllt_accs.AccumulateFromGmm(gmm, mat.Row(i), 1.0);
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
           num_err++;
           continue;
         }
-        
+
         for (int32 i = 0; i < mat.NumRows(); i++) {
           tot_like_this_file += mllt_accs.AccumulateFromGmmPreselect(
               gmm, gselect[i], mat.Row(i), 1.0);
@@ -115,9 +115,9 @@ int main(int argc, char *argv[]) {
         KALDI_LOG << "Avg like per frame so far is "
                   << (tot_like/tot_t);
     }
-  
+
     KALDI_LOG << "Done " << num_done << " files. ";
-    
+
     KALDI_LOG << "Overall avg like per frame (Gaussian only) = "
               << (tot_like/tot_t) << " over " << tot_t << " frames.";
 

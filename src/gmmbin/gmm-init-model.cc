@@ -33,35 +33,35 @@ namespace kaldi {
 
 /// InitAmGmm initializes the GMM with one Gaussian per state.
 void InitAmGmm(const BuildTreeStatsType &stats,
-               const EventMap &to_pdf_map,
-               AmDiagGmm *am_gmm,
-               const TransitionModel &trans_model,
-               BaseFloat var_floor) {
+    const EventMap &to_pdf_map,
+    AmDiagGmm *am_gmm,
+    const TransitionModel &trans_model,
+    BaseFloat var_floor) {
   // Get stats split by tree-leaf ( == pdf):
   std::vector<BuildTreeStatsType> split_stats;
   SplitStatsByMap(stats, to_pdf_map, &split_stats);
 
   split_stats.resize(to_pdf_map.MaxResult() + 1); // ensure that
   // if the last leaf had no stats, this vector still has the right size.
-  
+
   // Make sure each leaf has stats.
   for (size_t i = 0; i < split_stats.size(); i++) {
     if (split_stats[i].empty()) {
       std::vector<int32> bad_pdfs(1, i), bad_phones;
       GetPhonesForPdfs(trans_model, bad_pdfs, &bad_phones);
       std::ostringstream ss;
-      for (int32 idx = 0; idx < bad_phones.size(); idx ++)
+      for (int32 idx = 0; idx < bad_phones.size(); idx++)
         ss << bad_phones[idx] << ' ';
-      KALDI_WARN << "Tree has pdf-id " << i 
-          << " with no stats; corresponding phone list: " << ss.str();
+      KALDI_WARN << "Tree has pdf-id " << i
+                 << " with no stats; corresponding phone list: " << ss.str();
       /*
-        This probably means you have phones that were unseen in training 
-        and were not shared with other phones in the roots file. 
-        You should modify your roots file as necessary to fix this.
-        (i.e. share that phone with a similar but seen phone on one line 
-        of the roots file). Be sure to regenerate roots.int from roots.txt, 
-        if using s5 scripts. To work out the phone, search for 
-        pdf-id  i  in the output of show-transitions (for this model). */
+         This probably means you have phones that were unseen in training
+         and were not shared with other phones in the roots file.
+         You should modify your roots file as necessary to fix this.
+         (i.e. share that phone with a similar but seen phone on one line
+         of the roots file). Be sure to regenerate roots.int from roots.txt,
+         if using s5 scripts. To work out the phone, search for
+         pdf-id  i  in the output of show-transitions (for this model). */
     }
   }
   std::vector<Clusterable*> summed_stats;
@@ -78,9 +78,9 @@ void InitAmGmm(const BuildTreeStatsType &stats,
       std::vector<int32> bad_pdfs(1, i), bad_phones;
       GetPhonesForPdfs(trans_model, bad_pdfs, &bad_phones);
       std::ostringstream ss;
-      for (int32 idx = 0; idx < bad_phones.size(); idx ++)
+      for (int32 idx = 0; idx < bad_phones.size(); idx++)
         ss << bad_phones[idx] << ' ';
-      KALDI_WARN << "Very small count for state " << i << ": " 
+      KALDI_WARN << "Very small count for state " << i << ": "
                  << count << "; corresponding phone list: " << ss.str();
     }
   }
@@ -90,10 +90,10 @@ void InitAmGmm(const BuildTreeStatsType &stats,
 
 /// Get state occupation counts.
 void GetOccs(const BuildTreeStatsType &stats,
-             const EventMap &to_pdf_map,
-             Vector<BaseFloat> *occs) {
+    const EventMap &to_pdf_map,
+    Vector<BaseFloat> *occs) {
 
-    // Get stats split by tree-leaf ( == pdf):
+  // Get stats split by tree-leaf ( == pdf):
   std::vector<BuildTreeStatsType> split_stats;
   SplitStatsByMap(stats, to_pdf_map, &split_stats);
   if (split_stats.size() != to_pdf_map.MaxResult()+1) {
@@ -114,13 +114,13 @@ void GetOccs(const BuildTreeStatsType &stats,
 /// defined as: has the largest count in common from the tree stats.
 
 void InitAmGmmFromOld(const BuildTreeStatsType &stats,
-                      const EventMap &to_pdf_map,
-                      int32 N,  // context-width
-                      int32 P,  // central-position
-                      const std::string &old_tree_rxfilename,
-                      const std::string &old_model_rxfilename,
-                      BaseFloat var_floor,
-                      AmDiagGmm *am_gmm) {
+    const EventMap &to_pdf_map,
+    int32 N,                    // context-width
+    int32 P,                    // central-position
+    const std::string &old_tree_rxfilename,
+    const std::string &old_model_rxfilename,
+    BaseFloat var_floor,
+    AmDiagGmm *am_gmm) {
 
   AmDiagGmm old_am_gmm;
   ContextDependency old_tree;
@@ -165,7 +165,7 @@ void InitAmGmmFromOld(const BuildTreeStatsType &stats,
   delete avg_stats;
   avg_stats = NULL;
   avg_stats_gc = NULL;
-  
+
   const EventMap &old_map = old_tree.ToPdfMap();
 
   KALDI_ASSERT(am_gmm->NumPdfs() == 0);
@@ -179,7 +179,7 @@ void InitAmGmmFromOld(const BuildTreeStatsType &stats,
     bool ret = ConvertStats(N, P, oldN, oldP, &my_stats);
     if (!ret)
       KALDI_ERR << "InitAmGmmFromOld: old system has wider context "
-          "so cannot convert stats.";
+        "so cannot convert stats.";
     // oldpdf_to_count works out a map from old pdf-id to count (for stats
     // that align to this "new" pdf... we'll use it to work out the old pdf-id
     // that's "closest" in stats overlap to this new pdf ("pdf").
@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
                 "occupancies to.");
     po.Register("var-floor", &var_floor, "Variance floor used while "
                 "initializing Gaussians");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 4 && po.NumArgs() != 6) {
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
     const EventMap &to_pdf = ctx_dep.ToPdfMap();  // not owned here.
 
     TransitionModel trans_model(ctx_dep, topo);
-    
+
     // Now, the summed_stats will be used to initialize the GMM.
     AmDiagGmm am_gmm;
     if (old_tree_filename.empty())
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
       am_gmm.Write(ko.Stream(), binary);
     }
     KALDI_LOG << "Wrote model.";
-    
+
     DeleteBuildTreeStats(&stats);
   } catch(const std::exception &e) {
     std::cerr << e.what();

@@ -66,7 +66,7 @@ void TransitionModel::ComputeTuplesIsHmm(const ContextDependencyInterface &ctx_d
   for (int32 pdf = 0; pdf < static_cast<int32>(pdf_info.size()); pdf++) {
     for (size_t j = 0; j < pdf_info[pdf].size(); j++) {
       int32 phone = pdf_info[pdf][j].first,
-            pdf_class = pdf_info[pdf][j].second;
+          pdf_class = pdf_info[pdf][j].second;
       const std::vector<int32> &state_vec = to_hmm_state_list[std::make_pair(phone, pdf_class)];
       KALDI_ASSERT(!state_vec.empty());
       // state_vec is a list of the possible HMM-states that emit this
@@ -125,15 +125,15 @@ void TransitionModel::ComputeTuplesNotHmm(const ContextDependencyInterface &ctx_
     int32 phone = phones[i];
     for (int32 j = 0; j < static_cast<int32>(pdf_info[phone].size()); j++) {
       int32 pdf_class = pdf_class_pairs[phone][j].first,
-            self_loop_pdf_class = pdf_class_pairs[phone][j].second;
+          self_loop_pdf_class = pdf_class_pairs[phone][j].second;
       const std::vector<int32> &state_vec =
-              to_hmm_state_list[phone][std::make_pair(pdf_class, self_loop_pdf_class)];
+          to_hmm_state_list[phone][std::make_pair(pdf_class, self_loop_pdf_class)];
       KALDI_ASSERT(!state_vec.empty());
       for (size_t k = 0; k < state_vec.size(); k++) {
         int32 hmm_state = state_vec[k];
         for (size_t m = 0; m < pdf_info[phone][j].size(); m++) {
           int32 pdf = pdf_info[phone][j][m].first,
-            self_loop_pdf = pdf_info[phone][j][m].second;
+              self_loop_pdf = pdf_info[phone][j][m].second;
           tuples_.push_back(Tuple(phone, hmm_state, pdf, self_loop_pdf));
         }
       }
@@ -187,7 +187,7 @@ void TransitionModel::InitializeProbs() {
     BaseFloat prob = entry[tuple.hmm_state].transitions[trans_index].second;
     if (prob <= 0.0)
       KALDI_ERR << "TransitionModel::InitializeProbs, zero "
-          "probability [should remove that entry in the topology]";
+        "probability [should remove that entry in the topology]";
     if (prob > 1.0)
       KALDI_WARN << "TransitionModel::InitializeProbs, prob greater than one.";
     log_probs_(trans_id) = Log(prob);
@@ -232,7 +232,7 @@ bool TransitionModel::IsHmm() const {
 }
 
 TransitionModel::TransitionModel(const ContextDependencyInterface &ctx_dep,
-                                 const HmmTopology &hmm_topo): topo_(hmm_topo) {
+    const HmmTopology &hmm_topo) : topo_(hmm_topo) {
   // First thing is to get all possible tuples.
   ComputeTuples(ctx_dep);
   ComputeDerived();
@@ -282,7 +282,7 @@ int32 TransitionModel::TransitionStateToForwardPdf(int32 trans_state) const {
 }
 
 int32 TransitionModel::TransitionStateToForwardPdfClass(
-    int32 trans_state) const {
+  int32 trans_state) const {
   KALDI_ASSERT(static_cast<size_t>(trans_state) <= tuples_.size());
   const Tuple &t = tuples_[trans_state-1];
   const HmmTopology::TopologyEntry &entry = topo_.TopologyForPhone(t.phone);
@@ -292,7 +292,7 @@ int32 TransitionModel::TransitionStateToForwardPdfClass(
 
 
 int32 TransitionModel::TransitionStateToSelfLoopPdfClass(
-    int32 trans_state) const {
+  int32 trans_state) const {
   KALDI_ASSERT(static_cast<size_t>(trans_state) <= tuples_.size());
   const Tuple &t = tuples_[trans_state-1];
   const HmmTopology::TopologyEntry &entry = topo_.TopologyForPhone(t.phone);
@@ -341,7 +341,7 @@ bool TransitionModel::IsFinal(int32 trans_id) const {
   // return true if the transition goes to the final state of the
   // topology entry.
   return (entry[tuple.hmm_state].transitions[trans_index].first + 1 ==
-          static_cast<int32>(entry.size()));
+         static_cast<int32>(entry.size()));
 }
 
 
@@ -462,9 +462,9 @@ BaseFloat TransitionModel::GetTransitionLogProbIgnoringSelfLoops(int32 trans_id)
 
 // stats are counts/weights, indexed by transition-id.
 void TransitionModel::MleUpdate(const Vector<double> &stats,
-                                const MleTransitionUpdateConfig &cfg,
-                                BaseFloat *objf_impr_out,
-                                BaseFloat *count_out) {
+    const MleTransitionUpdateConfig &cfg,
+    BaseFloat *objf_impr_out,
+    BaseFloat *count_out) {
   if (cfg.share_for_pdfs) {
     MleUpdateShared(stats, cfg, objf_impr_out, count_out);
     return;
@@ -501,7 +501,7 @@ void TransitionModel::MleUpdate(const Vector<double> &stats,
         for (int32 tidx = 0; tidx < n; tidx++) {
           if (new_probs(tidx) == cfg.floor) num_floored++;
           double objf_change = counts(tidx) * (Log(new_probs(tidx))
-                                               - Log(old_probs(tidx)));
+              - Log(old_probs(tidx)));
           objf_impr_sum += objf_change;
         }
         // Commit updated values.
@@ -519,7 +519,7 @@ void TransitionModel::MleUpdate(const Vector<double> &stats,
             << " frames. ";
   KALDI_LOG <<  num_floored << " probabilities floored, " << num_skipped
             << " out of " << NumTransitionStates() << " transition-states "
-      "skipped due to insuffient data (it is normal to have some skipped.)";
+    "skipped due to insuffient data (it is normal to have some skipped.)";
   if (objf_impr_out) *objf_impr_out = objf_impr_sum;
   if (count_out) *count_out = count_sum;
   ComputeDerivedOfProbs();
@@ -528,9 +528,9 @@ void TransitionModel::MleUpdate(const Vector<double> &stats,
 
 // stats are counts/weights, indexed by transition-id.
 void TransitionModel::MapUpdate(const Vector<double> &stats,
-                                const MapTransitionUpdateConfig &cfg,
-                                BaseFloat *objf_impr_out,
-                                BaseFloat *count_out) {
+    const MapTransitionUpdateConfig &cfg,
+    BaseFloat *objf_impr_out,
+    BaseFloat *count_out) {
   KALDI_ASSERT(cfg.tau > 0.0);
   if (cfg.share_for_pdfs) {
     MapUpdateShared(stats, cfg, objf_impr_out, count_out);
@@ -560,7 +560,7 @@ void TransitionModel::MapUpdate(const Vector<double> &stats,
       // Compute objf change
       for (int32 tidx = 0; tidx < n; tidx++) {
         double objf_change = counts(tidx) * (Log(new_probs(tidx))
-                                             - Log(old_probs(tidx)));
+            - Log(old_probs(tidx)));
         objf_impr_sum += objf_change;
       }
       // Commit updated values.
@@ -586,9 +586,9 @@ void TransitionModel::MapUpdate(const Vector<double> &stats,
 /// --share-for-pdfs=true.  We share the transitions for all states that
 /// share the same pdf.
 void TransitionModel::MleUpdateShared(const Vector<double> &stats,
-                                      const MleTransitionUpdateConfig &cfg,
-                                      BaseFloat *objf_impr_out,
-                                      BaseFloat *count_out) {
+    const MleTransitionUpdateConfig &cfg,
+    BaseFloat *objf_impr_out,
+    BaseFloat *count_out) {
   KALDI_ASSERT(cfg.share_for_pdfs);
 
   BaseFloat count_sum = 0.0, objf_impr_sum = 0.0;
@@ -606,8 +606,8 @@ void TransitionModel::MleUpdateShared(const Vector<double> &stats,
   }
   std::map<int32, std::set<int32> >::iterator map_iter;
   for (map_iter = pdf_to_tstate.begin();
-       map_iter != pdf_to_tstate.end();
-       ++map_iter) {
+      map_iter != pdf_to_tstate.end();
+      ++map_iter) {
     // map_iter->first is pdf-id... not needed.
     const std::set<int32> &tstates = map_iter->second;
     KALDI_ASSERT(!tstates.empty());
@@ -617,13 +617,13 @@ void TransitionModel::MleUpdateShared(const Vector<double> &stats,
     if (n > 1) { // Only update if >1 transition...
       Vector<double> counts(n);
       for (std::set<int32>::const_iterator iter = tstates.begin();
-           iter != tstates.end();
-           ++iter) {
+          iter != tstates.end();
+          ++iter) {
         int32 tstate = *iter;
         if (NumTransitionIndices(tstate) != n)
           KALDI_ERR << "Mismatch in #transition indices: you cannot "
-              "use the --share-for-pdfs option with this topology "
-              "and sharing scheme.";
+            "use the --share-for-pdfs option with this topology "
+            "and sharing scheme.";
         for (int32 tidx = 0; tidx < n; tidx++) {
           int32 tid = PairToTransitionId(tstate, tidx);
           counts(tidx) += stats(tid);
@@ -653,13 +653,13 @@ void TransitionModel::MleUpdateShared(const Vector<double> &stats,
         for (int32 tidx = 0; tidx < n; tidx++) {
           if (new_probs(tidx) == cfg.floor) num_floored++;
           double objf_change = counts(tidx) * (Log(new_probs(tidx))
-                                               - Log(old_probs(tidx)));
+              - Log(old_probs(tidx)));
           objf_impr_sum += objf_change;
         }
         // Commit updated values.
         for (std::set<int32>::const_iterator iter = tstates.begin();
-             iter != tstates.end();
-             ++iter) {
+            iter != tstates.end();
+            ++iter) {
           int32 tstate = *iter;
           for (int32 tidx = 0; tidx < n; tidx++) {
             int32 tid = PairToTransitionId(tstate, tidx);
@@ -685,9 +685,9 @@ void TransitionModel::MleUpdateShared(const Vector<double> &stats,
 /// --share-for-pdfs=true.  We share the transitions for all states that
 /// share the same pdf.
 void TransitionModel::MapUpdateShared(const Vector<double> &stats,
-                                      const MapTransitionUpdateConfig &cfg,
-                                      BaseFloat *objf_impr_out,
-                                      BaseFloat *count_out) {
+    const MapTransitionUpdateConfig &cfg,
+    BaseFloat *objf_impr_out,
+    BaseFloat *count_out) {
   KALDI_ASSERT(cfg.share_for_pdfs);
 
   BaseFloat count_sum = 0.0, objf_impr_sum = 0.0;
@@ -704,8 +704,8 @@ void TransitionModel::MapUpdateShared(const Vector<double> &stats,
   }
   std::map<int32, std::set<int32> >::iterator map_iter;
   for (map_iter = pdf_to_tstate.begin();
-       map_iter != pdf_to_tstate.end();
-       ++map_iter) {
+      map_iter != pdf_to_tstate.end();
+      ++map_iter) {
     // map_iter->first is pdf-id... not needed.
     const std::set<int32> &tstates = map_iter->second;
     KALDI_ASSERT(!tstates.empty());
@@ -715,13 +715,13 @@ void TransitionModel::MapUpdateShared(const Vector<double> &stats,
     if (n > 1) { // Only update if >1 transition...
       Vector<double> counts(n);
       for (std::set<int32>::const_iterator iter = tstates.begin();
-           iter != tstates.end();
-           ++iter) {
+          iter != tstates.end();
+          ++iter) {
         int32 tstate = *iter;
         if (NumTransitionIndices(tstate) != n)
           KALDI_ERR << "Mismatch in #transition indices: you cannot "
-              "use the --share-for-pdfs option with this topology "
-              "and sharing scheme.";
+            "use the --share-for-pdfs option with this topology "
+            "and sharing scheme.";
         for (int32 tidx = 0; tidx < n; tidx++) {
           int32 tid = PairToTransitionId(tstate, tidx);
           counts(tidx) += stats(tid);
@@ -745,13 +745,13 @@ void TransitionModel::MapUpdateShared(const Vector<double> &stats,
       // Compute objf change
       for (int32 tidx = 0; tidx < n; tidx++) {
         double objf_change = counts(tidx) * (Log(new_probs(tidx))
-                                             - Log(old_probs(tidx)));
+            - Log(old_probs(tidx)));
         objf_impr_sum += objf_change;
       }
       // Commit updated values.
       for (std::set<int32>::const_iterator iter = tstates.begin();
-           iter != tstates.end();
-           ++iter) {
+          iter != tstates.end();
+          ++iter) {
         int32 tstate = *iter;
         for (int32 tidx = 0; tidx < n; tidx++) {
           int32 tid = PairToTransitionId(tstate, tidx);
@@ -799,8 +799,8 @@ int32 TransitionModel::TransitionIdToHmmState(int32 trans_id) const {
 }
 
 void TransitionModel::Print(std::ostream &os,
-                            const std::vector<std::string> &phone_names,
-                            const Vector<double> *occs) {
+    const std::vector<std::string> &phone_names,
+    const Vector<double> *occs) {
   if (occs != NULL)
     KALDI_ASSERT(occs->Dim() == NumPdfs());
   bool is_hmm = IsHmm();
@@ -841,8 +841,8 @@ void TransitionModel::Print(std::ostream &os,
 }
 
 bool GetPdfsForPhones(const TransitionModel &trans_model,
-                      const std::vector<int32> &phones,
-                      std::vector<int32> *pdfs) {
+    const std::vector<int32> &phones,
+    std::vector<int32> *pdfs) {
   KALDI_ASSERT(IsSortedAndUniq(phones));
   KALDI_ASSERT(pdfs != NULL);
   pdfs->clear();
@@ -858,17 +858,17 @@ bool GetPdfsForPhones(const TransitionModel &trans_model,
   for (int32 tstate = 1; tstate <= trans_model.NumTransitionStates(); tstate++)
     if ((std::binary_search(pdfs->begin(), pdfs->end(),
                           trans_model.TransitionStateToForwardPdf(tstate)) ||
-         std::binary_search(pdfs->begin(), pdfs->end(),
+        std::binary_search(pdfs->begin(), pdfs->end(),
                           trans_model.TransitionStateToSelfLoopPdf(tstate)))
-       && !std::binary_search(phones.begin(), phones.end(),
+        && !std::binary_search(phones.begin(), phones.end(),
                               trans_model.TransitionStateToPhone(tstate)))
       return false;
   return true;
 }
 
 bool GetPhonesForPdfs(const TransitionModel &trans_model,
-                     const std::vector<int32> &pdfs,
-                     std::vector<int32> *phones) {
+    const std::vector<int32> &pdfs,
+    std::vector<int32> *phones) {
   KALDI_ASSERT(IsSortedAndUniq(pdfs));
   KALDI_ASSERT(phones != NULL);
   phones->clear();
@@ -886,7 +886,7 @@ bool GetPhonesForPdfs(const TransitionModel &trans_model,
                            trans_model.TransitionStateToPhone(tstate))
         && !(std::binary_search(pdfs.begin(), pdfs.end(),
                                trans_model.TransitionStateToForwardPdf(tstate)) &&
-             std::binary_search(pdfs.begin(), pdfs.end(),
+        std::binary_search(pdfs.begin(), pdfs.end(),
                                trans_model.TransitionStateToSelfLoopPdf(tstate))) )
       return false;
   return true;
@@ -894,8 +894,8 @@ bool GetPhonesForPdfs(const TransitionModel &trans_model,
 
 bool TransitionModel::Compatible(const TransitionModel &other) const {
   return (topo_ == other.topo_ && tuples_ == other.tuples_ &&
-          state2id_ == other.state2id_ && id2state_ == other.id2state_
-          && num_pdfs_ == other.num_pdfs_);
+         state2id_ == other.state2id_ && id2state_ == other.id2state_
+         && num_pdfs_ == other.num_pdfs_);
 }
 
 bool TransitionModel::IsSelfLoop(int32 trans_id) const {
@@ -907,7 +907,7 @@ bool TransitionModel::IsSelfLoop(int32 trans_id) const {
   const HmmTopology::TopologyEntry &entry = topo_.TopologyForPhone(phone);
   KALDI_ASSERT(static_cast<size_t>(hmm_state) < entry.size());
   return (static_cast<size_t>(trans_index) < entry[hmm_state].transitions.size()
-          && entry[hmm_state].transitions[trans_index].first == hmm_state);
+         && entry[hmm_state].transitions[trans_index].first == hmm_state);
 }
 
 } // End namespace kaldi

@@ -27,7 +27,7 @@
 
 
 /** @brief Write equally spaced alignments of utterances (to get training started).
-*/
+ */
 int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
@@ -78,12 +78,12 @@ int main(int argc, char *argv[]) {
       if (!ReadIntegerVectorSimple(disambig_rxfilename, &disambig_syms))
         KALDI_ERR << "fstcomposecontext: Could not read disambiguation symbols from "
                   << disambig_rxfilename;
-    
+
     TrainingGraphCompiler gc(trans_model,
-                             ctx_dep,
-                             lex_fst,
-                             disambig_syms,
-                             gc_opts);
+        ctx_dep,
+        lex_fst,
+        disambig_syms,
+        gc_opts);
 
     lex_fst = NULL;  // we gave ownership to gc.
 

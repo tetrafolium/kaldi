@@ -37,26 +37,26 @@ namespace kaldi {
 // the reference arguments at the beginning are not const as the style guide
 // requires, but are best viewed as inputs.
 void ProcessUtterance(const AmSgmm2 &am_sgmm,
-                      const TransitionModel &trans_model,
-                      double log_prune,
-                      double acoustic_scale,
-                      const Matrix<BaseFloat> &features,
-                      RandomAccessInt32VectorVectorReader &gselect_reader,
-                      RandomAccessBaseFloatVectorReaderMapped &spkvecs_reader,
-                      const fst::SymbolTable *word_syms,
-                      const std::string &utt,
-                      bool determinize,
-                      bool allow_partial,
-                      Int32VectorWriter *alignments_writer,
-                      Int32VectorWriter *words_writer,
-                      CompactLatticeWriter *compact_lattice_writer,
-                      LatticeWriter *lattice_writer,
-                      LatticeFasterDecoder *decoder, // Takes ownership of this.
-                      double *like_sum,
-                      int64 *frame_sum,
-                      int32 *num_done,
-                      int32 *num_err,
-                      TaskSequencer<DecodeUtteranceLatticeFasterClass> *sequencer) {
+    const TransitionModel &trans_model,
+    double log_prune,
+    double acoustic_scale,
+    const Matrix<BaseFloat> &features,
+    RandomAccessInt32VectorVectorReader &gselect_reader,
+    RandomAccessBaseFloatVectorReaderMapped &spkvecs_reader,
+    const fst::SymbolTable *word_syms,
+    const std::string &utt,
+    bool determinize,
+    bool allow_partial,
+    Int32VectorWriter *alignments_writer,
+    Int32VectorWriter *words_writer,
+    CompactLatticeWriter *compact_lattice_writer,
+    LatticeWriter *lattice_writer,
+    LatticeFasterDecoder *decoder,                   // Takes ownership of this.
+    double *like_sum,
+    int64 *frame_sum,
+    int32 *num_done,
+    int32 *num_err,
+    TaskSequencer<DecodeUtteranceLatticeFasterClass> *sequencer) {
   using fst::Fst;
   using std::vector;
 
@@ -162,14 +162,14 @@ int main(int argc, char *argv[]) {
         alignment_wspecifier = po.GetOptArg(6);
 
     double tot_like = 0.0;
-    kaldi::int64 frame_count = 0;    
+    kaldi::int64 frame_count = 0;
     int num_done = 0, num_err = 0;
     Timer timer;
     Fst<StdArc> *decode_fst = NULL;
     fst::SymbolTable *word_syms = NULL;
-    
+
     TaskSequencer<DecodeUtteranceLatticeFasterClass> sequencer(
-        sequencer_config);
+      sequencer_config);
     TransitionModel trans_model;
     kaldi::AmSgmm2 am_sgmm;
     {
@@ -181,25 +181,25 @@ int main(int argc, char *argv[]) {
 
     CompactLatticeWriter compact_lattice_writer;
     LatticeWriter lattice_writer;
-    
-    bool determinize = decoder_opts.determinize_lattice;    
-    if (! (determinize ? compact_lattice_writer.Open(lattice_wspecifier)
-           : lattice_writer.Open(lattice_wspecifier)))
+
+    bool determinize = decoder_opts.determinize_lattice;
+    if (!(determinize ? compact_lattice_writer.Open(lattice_wspecifier)
+        : lattice_writer.Open(lattice_wspecifier)))
       KALDI_ERR << "Could not open table for writing lattices: "
                 << lattice_wspecifier;
 
     Int32VectorWriter words_writer(words_wspecifier);
     Int32VectorWriter alignment_writer(alignment_wspecifier);
 
-    if (word_syms_filename != "") 
+    if (word_syms_filename != "")
       if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
         KALDI_ERR << "Could not read symbol table from file "
                   << word_syms_filename;
 
     RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier);
     RandomAccessBaseFloatVectorReaderMapped spkvecs_reader(spkvecs_rspecifier,
-                                                           utt2spk_rspecifier);
-        
+        utt2spk_rspecifier);
+
     if (ClassifyRspecifier(fst_in_str, NULL, NULL) == kNoRspecifier) { // a single FST.
       SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
       // It's important that we initialize decode_fst after feature_reader, as it
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
       // lot of virtual memory.
       decode_fst = fst::ReadFstKaldiGeneric(fst_in_str);
       timer.Reset(); // exclude graph loading time.
-      
+
       {
         for (; !feature_reader.Done(); feature_reader.Next()) {
           string utt = feature_reader.Key();
@@ -234,7 +234,7 @@ int main(int argc, char *argv[]) {
       }
     } else { // We have different FSTs for different utterances.
       SequentialTableReader<fst::VectorFstHolder> fst_reader(fst_in_str);
-      RandomAccessBaseFloatMatrixReader feature_reader(feature_rspecifier);          
+      RandomAccessBaseFloatMatrixReader feature_reader(feature_rspecifier);
       for (; !fst_reader.Done(); fst_reader.Next()) {
         std::string utt = fst_reader.Key();
         if (!feature_reader.HasKey(utt)) {
@@ -267,10 +267,10 @@ int main(int argc, char *argv[]) {
       }
     }
     sequencer.Wait(); // Wait till all tasks are done.
-    
-    delete decode_fst; 
+
+    delete decode_fst;
     delete word_syms;
-    
+
     double elapsed = timer.Elapsed();
     KALDI_LOG << "Decoded with " << sequencer_config.num_threads << " threads.";
     KALDI_LOG << "Time taken [excluding initialization] "<< elapsed

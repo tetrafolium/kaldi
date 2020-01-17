@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
         "\n"
         "Usage:  nnet-compute [options] <raw-nnet-in> <feature-rspecifier> "
         "<feature-or-loglikes-wspecifier>\n";
-    
+
     bool apply_log = false;
     bool pad_input = true;
     ParseOptions po(usage);
@@ -49,26 +49,26 @@ int main(int argc, char *argv[]) {
     po.Register("pad-input", &pad_input, "If true, duplicate the first and last frames "
                 "of input features as required for temporal context, to prevent #frames "
                 "of output being less than those of input.");
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     std::string raw_nnet_rxfilename = po.GetArg(1),
         features_rspecifier = po.GetArg(2),
         features_or_loglikes_wspecifier = po.GetArg(3);
 
     Nnet nnet;
     ReadKaldiObject(raw_nnet_rxfilename, &nnet);
-    
+
     int64 num_done = 0, num_frames = 0;
     SequentialBaseFloatCuMatrixReader feature_reader(features_rspecifier);
     BaseFloatCuMatrixWriter writer(features_or_loglikes_wspecifier);
-    
-    for (; !feature_reader.Done();  feature_reader.Next()) {
+
+    for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string utt = feature_reader.Key();
       const CuMatrix<BaseFloat> &feats = feature_reader.Value();
 
@@ -91,10 +91,10 @@ int main(int argc, char *argv[]) {
       num_frames += feats.NumRows();
       num_done++;
     }
-    
+
     KALDI_LOG << "Processed " << num_done << " feature files, "
               << num_frames << " frames of input were processed.";
-    
+
     return (num_done == 0 ? 1 : 0);
   } catch(const std::exception &e) {
     std::cerr << e.what() << '\n';

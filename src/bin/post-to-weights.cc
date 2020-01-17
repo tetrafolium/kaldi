@@ -26,7 +26,7 @@
 int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
-    typedef kaldi::int32 int32;  
+    typedef kaldi::int32 int32;
 
     const char *usage =
         "Turn posteriors into per-frame weights (typically most useful after\n"
@@ -34,23 +34,23 @@ int main(int argc, char *argv[]) {
         "See also: weight-silence-post, post-to-pdf-post, post-to-phone-post\n"
         "post-to-feats, get-post-on-ali\n"
         "Usage: post-to-weights <post-rspecifier> <weights-wspecifier>\n";
-    
-    ParseOptions po(usage); 
+
+    ParseOptions po(usage);
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
     }
-      
+
     std::string post_rspecifier = po.GetArg(1),
         weights_wspecifier = po.GetArg(2);
 
     SequentialPosteriorReader posterior_reader(post_rspecifier);
-    BaseFloatVectorWriter weights_writer(weights_wspecifier); 
-    
+    BaseFloatVectorWriter weights_writer(weights_wspecifier);
+
     int32 num_done = 0;
-    
+
     for (; !posterior_reader.Done(); posterior_reader.Next()) {
       std::string key = posterior_reader.Key();
       const Posterior &posterior = posterior_reader.Value();

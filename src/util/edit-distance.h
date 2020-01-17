@@ -34,7 +34,7 @@ namespace kaldi {
 // Compute the edit-distance between two strings.
 template<class T>
 int32 LevenshteinEditDistance(const std::vector<T> &a,
-                              const std::vector<T> &b);
+    const std::vector<T> &b);
 
 
 // edit distance calculation with conventional method.
@@ -43,8 +43,8 @@ int32 LevenshteinEditDistance(const std::vector<T> &a,
 // before the following procedure conducted.
 template<class T>
 int32 LevenshteinEditDistance(const std::vector<T> &ref,
-                              const std::vector<T> &hyp,
-                              int32 *ins, int32 *del, int32 *sub);
+    const std::vector<T> &hyp,
+    int32 *ins, int32 *del, int32 *sub);
 
 // This version of the edit-distance computation outputs the alignment
 // between the two.  This is a vector of pairs of (symbol a, symbol b).
@@ -55,9 +55,9 @@ int32 LevenshteinEditDistance(const std::vector<T> &ref,
 
 template<class T>
 int32 LevenshteinAlignment(const std::vector<T> &a,
-                           const std::vector<T> &b,
-                           T eps_symbol,
-                           std::vector<std::pair<T, T> > *output);
+    const std::vector<T> &b,
+    T eps_symbol,
+    std::vector<std::pair<T, T> > *output);
 
 }  // end namespace kaldi
 

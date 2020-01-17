@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 
     { // This block adds training examples to "egs".
       SequentialNnetChainExampleReader example_reader(
-          valid_examples_rspecifier);
+        valid_examples_rspecifier);
       for (; !example_reader.Done(); example_reader.Next())
         egs.push_back(example_reader.Value());
       KALDI_LOG << "Read " << egs.size() << " examples.";
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 
     int32 num_nnets = po.NumArgs() - 3;
     NnetChainCombiner combiner(combine_config, chain_config,
-                               num_nnets, egs, den_fst, nnet);
+        num_nnets, egs, den_fst, nnet);
 
     for (int32 n = 1; n < num_nnets; n++) {
       std::string this_nnet_rxfilename = po.GetArg(n + 2);

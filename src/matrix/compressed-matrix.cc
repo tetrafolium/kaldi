@@ -30,14 +30,14 @@ MatrixIndexT CompressedMatrix::DataSize(const GlobalHeader &header) {
   DataFormat format = static_cast<DataFormat>(header.format);
   if (format == kOneByteWithColHeaders) {
     return sizeof(GlobalHeader) +
-        header.num_cols * (sizeof(PerColHeader) + header.num_rows);
+           header.num_cols * (sizeof(PerColHeader) + header.num_rows);
   } else if (format == kTwoByte) {
     return sizeof(GlobalHeader) +
-        2 * header.num_rows * header.num_cols;
+           2 * header.num_rows * header.num_cols;
   } else {
     KALDI_ASSERT(format == kOneByte);
     return sizeof(GlobalHeader) +
-        header.num_rows * header.num_cols;
+           header.num_rows * header.num_cols;
   }
 }
 
@@ -55,26 +55,26 @@ void CompressedMatrix::Scale(float alpha) {
 
 template<typename Real>  // static inline
 void CompressedMatrix::ComputeGlobalHeader(
-    const MatrixBase<Real> &mat, CompressionMethod method,
-    GlobalHeader *header) {
+  const MatrixBase<Real> &mat, CompressionMethod method,
+  GlobalHeader *header) {
   if (method == kAutomaticMethod) {
     if (mat.NumRows() > 8) method = kSpeechFeature;
     else method = kTwoByteAuto;
   }
 
   switch (method) {
-    case kSpeechFeature:
-      header->format = static_cast<int32>(kOneByteWithColHeaders);  // 1.
-      break;
-    case kTwoByteAuto: case kTwoByteSignedInteger:
-      header->format = static_cast<int32>(kTwoByte);  // 2.
-      break;
-    case kOneByteAuto: case kOneByteUnsignedInteger: case kOneByteZeroOne:
-      header->format = static_cast<int32>(kOneByte);  // 3.
-      break;
-    default:
-      KALDI_ERR << "Invalid compression type: "
-                << static_cast<int32>(method);
+  case kSpeechFeature:
+    header->format = static_cast<int32>(kOneByteWithColHeaders);    // 1.
+    break;
+  case kTwoByteAuto: case kTwoByteSignedInteger:
+    header->format = static_cast<int32>(kTwoByte);    // 2.
+    break;
+  case kOneByteAuto: case kOneByteUnsignedInteger: case kOneByteZeroOne:
+    header->format = static_cast<int32>(kOneByte);    // 3.
+    break;
+  default:
+    KALDI_ERR << "Invalid compression type: "
+              << static_cast<int32>(method);
   }
 
   header->num_rows = mat.NumRows();
@@ -82,43 +82,43 @@ void CompressedMatrix::ComputeGlobalHeader(
 
   // Now compute 'min_value' and 'range'.
   switch (method) {
-    case kSpeechFeature: case kTwoByteAuto: case kOneByteAuto: {
-      float min_value = mat.Min(), max_value = mat.Max();
-      // ensure that max_value is strictly greater than min_value, even if matrix is
-      // constant; this avoids crashes in ComputeColHeader when compressing speech
-      // featupres.
-      if (max_value == min_value)
-        max_value = min_value + (1.0 + fabs(min_value));
-      KALDI_ASSERT(min_value - min_value == 0 &&
+  case kSpeechFeature: case kTwoByteAuto: case kOneByteAuto: {
+    float min_value = mat.Min(), max_value = mat.Max();
+    // ensure that max_value is strictly greater than min_value, even if matrix is
+    // constant; this avoids crashes in ComputeColHeader when compressing speech
+    // featupres.
+    if (max_value == min_value)
+      max_value = min_value + (1.0 + fabs(min_value));
+    KALDI_ASSERT(min_value - min_value == 0 &&
                    max_value - max_value == 0 &&
                    "Cannot compress a matrix with Nan's or Inf's");
 
-      header->min_value = min_value;
-      header->range = max_value - min_value;
+    header->min_value = min_value;
+    header->range = max_value - min_value;
 
-      // we previously checked that max_value != min_value, so their
-      // difference should be nonzero.
-      KALDI_ASSERT(header->range > 0.0);
-      break;
-    }
-    case kTwoByteSignedInteger: {
-      header->min_value = -32768.0;
-      header->range = 65535.0;
-      break;
-    }
-    case kOneByteUnsignedInteger: {
-      header->min_value = 0.0;
-      header->range = 255.0;
-      break;
-    }
-    case kOneByteZeroOne: {
-      header->min_value = 0.0;
-      header->range = 1.0;
-      break;
-    }
-    default:
-      KALDI_ERR << "Unknown compression method = "
-                << static_cast<int32>(method);
+    // we previously checked that max_value != min_value, so their
+    // difference should be nonzero.
+    KALDI_ASSERT(header->range > 0.0);
+    break;
+  }
+  case kTwoByteSignedInteger: {
+    header->min_value = -32768.0;
+    header->range = 65535.0;
+    break;
+  }
+  case kOneByteUnsignedInteger: {
+    header->min_value = 0.0;
+    header->range = 255.0;
+    break;
+  }
+  case kOneByteZeroOne: {
+    header->min_value = 0.0;
+    header->range = 1.0;
+    break;
+  }
+  default:
+    KALDI_ERR << "Unknown compression method = "
+              << static_cast<int32>(method);
   }
   KALDI_COMPILE_TIME_ASSERT(sizeof(*header) == 20);  // otherwise
   // something weird is happening and our code probably won't work or
@@ -127,7 +127,7 @@ void CompressedMatrix::ComputeGlobalHeader(
 
 template<typename Real>
 void CompressedMatrix::CopyFromMat(
-    const MatrixBase<Real> &mat, CompressionMethod method) {
+  const MatrixBase<Real> &mat, CompressionMethod method) {
   if (data_ != NULL) {
     delete [] static_cast<float*>(data_);  // call delete [] because was allocated with new float[]
     data_ = NULL;
@@ -148,7 +148,7 @@ void CompressedMatrix::CopyFromMat(
   if (format == kOneByteWithColHeaders) {
     PerColHeader *header_data =
         reinterpret_cast<PerColHeader*>(static_cast<char*>(data_) +
-                                        sizeof(GlobalHeader));
+        sizeof(GlobalHeader));
     uint8 *byte_data =
         reinterpret_cast<uint8*>(header_data + global_header.num_cols);
 
@@ -164,7 +164,7 @@ void CompressedMatrix::CopyFromMat(
     }
   } else if (format == kTwoByte) {
     uint16 *data = reinterpret_cast<uint16*>(static_cast<char*>(data_) +
-                                             sizeof(GlobalHeader));
+        sizeof(GlobalHeader));
     int32 num_rows = mat.NumRows(), num_cols = mat.NumCols();
     for (int32 r = 0; r < num_rows; r++) {
       const Real *row_data = mat.RowData(r);
@@ -175,7 +175,7 @@ void CompressedMatrix::CopyFromMat(
   } else {
     KALDI_ASSERT(format == kOneByte);
     uint8 *data = reinterpret_cast<uint8*>(static_cast<char*>(data_) +
-                                           sizeof(GlobalHeader));
+        sizeof(GlobalHeader));
     int32 num_rows = mat.NumRows(), num_cols = mat.NumCols();
     for (int32 r = 0; r < num_rows; r++) {
       const Real *row_data = mat.RowData(r);
@@ -189,20 +189,20 @@ void CompressedMatrix::CopyFromMat(
 // Instantiate the template for float and double.
 template
 void CompressedMatrix::CopyFromMat(const MatrixBase<float> &mat,
-                                   CompressionMethod method);
+    CompressionMethod method);
 
 template
 void CompressedMatrix::CopyFromMat(const MatrixBase<double> &mat,
-                                   CompressionMethod method);
+    CompressionMethod method);
 
 
 CompressedMatrix::CompressedMatrix(
-    const CompressedMatrix &cmat,
-    const MatrixIndexT row_offset,
-    const MatrixIndexT num_rows,
-    const MatrixIndexT col_offset,
-    const MatrixIndexT num_cols,
-    bool allow_padding): data_(NULL) {
+  const CompressedMatrix &cmat,
+  const MatrixIndexT row_offset,
+  const MatrixIndexT num_rows,
+  const MatrixIndexT col_offset,
+  const MatrixIndexT num_cols,
+  bool allow_padding) : data_(NULL) {
   int32 old_num_rows = cmat.NumRows(), old_num_cols = cmat.NumCols();
 
   if (old_num_rows == 0) {
@@ -221,7 +221,7 @@ CompressedMatrix::CompressedMatrix(
   if (num_rows == 0 || num_cols == 0) { return; }
 
   bool padding_is_used = (row_offset < 0 ||
-                          row_offset + num_rows > old_num_rows);
+      row_offset + num_rows > old_num_rows);
 
   GlobalHeader new_global_header;
   KALDI_COMPILE_TIME_ASSERT(sizeof(new_global_header) == 20);
@@ -246,10 +246,10 @@ CompressedMatrix::CompressedMatrix(
         reinterpret_cast<PerColHeader*>(old_global_header + 1);
     uint8 *old_byte_data =
         reinterpret_cast<uint8*>(old_per_col_header +
-                                 old_global_header->num_cols);
+        old_global_header->num_cols);
     PerColHeader *new_per_col_header =
         reinterpret_cast<PerColHeader*>(
-            reinterpret_cast<GlobalHeader*>(data_) + 1);
+      reinterpret_cast<GlobalHeader*>(data_) + 1);
 
     memcpy(new_per_col_header, old_per_col_header + col_offset,
            sizeof(PerColHeader) * num_cols);
@@ -323,7 +323,7 @@ CompressedMatrix::CompressedMatrix(
     // memory (the elements take more space but there will be
     // no per-column headers).
     Matrix<float> temp(this->NumRows(), this->NumCols(),
-                       kUndefined);
+        kUndefined);
     this->CopyToMat(&temp);
     CompressedMatrix temp_cmat(temp, kTwoByteAuto);
     this->Swap(&temp_cmat);
@@ -345,8 +345,8 @@ template
 CompressedMatrix& CompressedMatrix::operator =(const MatrixBase<double> &mat);
 
 inline uint16 CompressedMatrix::FloatToUint16(
-    const GlobalHeader &global_header,
-    float value) {
+  const GlobalHeader &global_header,
+  float value) {
   float f = (value - global_header.min_value) /
       global_header.range;
   if (f > 1.0) f = 1.0;  // Note: this should not happen.
@@ -357,8 +357,8 @@ inline uint16 CompressedMatrix::FloatToUint16(
 
 
 inline uint8 CompressedMatrix::FloatToUint8(
-    const GlobalHeader &global_header,
-    float value) {
+  const GlobalHeader &global_header,
+  float value) {
   float f = (value - global_header.min_value) /
       global_header.range;
   if (f > 1.0) f = 1.0;  // Note: this should not happen.
@@ -369,18 +369,18 @@ inline uint8 CompressedMatrix::FloatToUint8(
 
 
 inline float CompressedMatrix::Uint16ToFloat(
-    const GlobalHeader &global_header,
-    uint16 value) {
+  const GlobalHeader &global_header,
+  uint16 value) {
   // the constant 1.52590218966964e-05 is 1/65535.
   return global_header.min_value
-      + global_header.range * 1.52590218966964e-05F * value;
+         + global_header.range * 1.52590218966964e-05F * value;
 }
 
 template<typename Real>  // static
 void CompressedMatrix::ComputeColHeader(
-    const GlobalHeader &global_header,
-    const Real *data, MatrixIndexT stride,
-    int32 num_rows, CompressedMatrix::PerColHeader *header) {
+  const GlobalHeader &global_header,
+  const Real *data, MatrixIndexT stride,
+  int32 num_rows, CompressedMatrix::PerColHeader *header) {
   KALDI_ASSERT(num_rows > 0);
   std::vector<Real> sdata(num_rows); // the sorted data.
   for (size_t i = 0, size = sdata.size(); i < size; i++)
@@ -455,8 +455,8 @@ void CompressedMatrix::ComputeColHeader(
 
 // static
 inline uint8 CompressedMatrix::FloatToChar(
-    float p0, float p25, float p75, float p100,
-    float value) {
+  float p0, float p25, float p75, float p100,
+  float value) {
   int ans;
   if (value < p25) {  // range [ p0, p25 ) covered by
     // characters 0 .. 64.  We round to the closest int.
@@ -488,8 +488,8 @@ inline uint8 CompressedMatrix::FloatToChar(
 
 // static
 inline float CompressedMatrix::CharToFloat(
-    float p0, float p25, float p75, float p100,
-    uint8 value) {
+  float p0, float p25, float p75, float p100,
+  uint8 value) {
   if (value <= 64) {
     return p0 + (p25 - p0) * value * (1/64.0);
   } else if (value <= 192) {
@@ -502,10 +502,10 @@ inline float CompressedMatrix::CharToFloat(
 
 template<typename Real>  // static
 void CompressedMatrix::CompressColumn(
-    const GlobalHeader &global_header,
-    const Real *data, MatrixIndexT stride,
-    int32 num_rows, CompressedMatrix::PerColHeader *header,
-    uint8 *byte_data) {
+  const GlobalHeader &global_header,
+  const Real *data, MatrixIndexT stride,
+  int32 num_rows, CompressedMatrix::PerColHeader *header,
+  uint8 *byte_data) {
   ComputeColHeader(global_header, data, stride,
                    num_rows, header);
 
@@ -555,7 +555,7 @@ void CompressedMatrix::Write(std::ostream &os, bool binary) const {
     // In text mode, just use the same format as a regular matrix.
     // This is not compressed.
     Matrix<BaseFloat> temp_mat(this->NumRows(), this->NumCols(),
-                               kUndefined);
+        kUndefined);
     this->CopyToMat(&temp_mat);
     temp_mat.Write(os, binary);
   }
@@ -612,7 +612,7 @@ void CompressedMatrix::Read(std::istream &is, bool binary) {
 
 template<typename Real>
 void CompressedMatrix::CopyToMat(MatrixBase<Real> *mat,
-                                 MatrixTransposeType trans) const {
+    MatrixTransposeType trans) const {
   if (trans == kTrans) {
     Matrix<Real> temp(this->NumCols(), this->NumRows());
     CopyToMat(&temp, kNoTrans);
@@ -634,7 +634,7 @@ void CompressedMatrix::CopyToMat(MatrixBase<Real> *mat,
   if (format == kOneByteWithColHeaders) {
     PerColHeader *per_col_header = reinterpret_cast<PerColHeader*>(h+1);
     uint8 *byte_data = reinterpret_cast<uint8*>(per_col_header +
-                                                h->num_cols);
+        h->num_cols);
     for (int32 i = 0; i < num_cols; i++, per_col_header++) {
       float p0 = Uint16ToFloat(*h, per_col_header->percentile_0),
           p25 = Uint16ToFloat(*h, per_col_header->percentile_25),
@@ -672,14 +672,14 @@ void CompressedMatrix::CopyToMat(MatrixBase<Real> *mat,
 // Instantiate the template for float and double.
 template
 void CompressedMatrix::CopyToMat(MatrixBase<float> *mat,
-                                 MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 template
 void CompressedMatrix::CopyToMat(MatrixBase<double> *mat,
-                                 MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 
 template<typename Real>
 void CompressedMatrix::CopyRowToVec(MatrixIndexT row,
-                                    VectorBase<Real> *v) const {
+    VectorBase<Real> *v) const {
   KALDI_ASSERT(row < this->NumRows());
   KALDI_ASSERT(row >= 0);
   KALDI_ASSERT(v->Dim() == this->NumCols());
@@ -689,10 +689,10 @@ void CompressedMatrix::CopyRowToVec(MatrixIndexT row,
   if (format == kOneByteWithColHeaders) {
     PerColHeader *per_col_header = reinterpret_cast<PerColHeader*>(h+1);
     uint8 *byte_data = reinterpret_cast<uint8*>(per_col_header +
-                                                h->num_cols);
+        h->num_cols);
     byte_data += row;  // point to first value we are interested in
     for (int32 i = 0; i < h->num_cols;
-         i++, per_col_header++, byte_data += h->num_rows) {
+        i++, per_col_header++, byte_data += h->num_rows) {
       float p0 = Uint16ToFloat(*h, per_col_header->percentile_0),
           p25 = Uint16ToFloat(*h, per_col_header->percentile_25),
           p75 = Uint16ToFloat(*h, per_col_header->percentile_75),
@@ -722,7 +722,7 @@ void CompressedMatrix::CopyRowToVec(MatrixIndexT row,
 
 template<typename Real>
 void CompressedMatrix::CopyColToVec(MatrixIndexT col,
-                                    VectorBase<Real> *v) const {
+    VectorBase<Real> *v) const {
   KALDI_ASSERT(col < this->NumCols());
   KALDI_ASSERT(col >= 0);
   KALDI_ASSERT(v->Dim() == this->NumRows());
@@ -733,7 +733,7 @@ void CompressedMatrix::CopyColToVec(MatrixIndexT col,
   if (format == kOneByteWithColHeaders) {
     PerColHeader *per_col_header = reinterpret_cast<PerColHeader*>(h+1);
     uint8 *byte_data = reinterpret_cast<uint8*>(per_col_header +
-                                                h->num_cols);
+        h->num_cols);
     byte_data += col*h->num_rows;  // point to first value in the column we want
     per_col_header += col;
     float p0 = Uint16ToFloat(*h, per_col_header->percentile_0),
@@ -776,8 +776,8 @@ CompressedMatrix::CopyRowToVec(MatrixIndexT, VectorBase<float> *) const;
 
 template<typename Real>
 void CompressedMatrix::CopyToMat(int32 row_offset,
-                                 int32 col_offset,
-                                 MatrixBase<Real> *dest) const {
+    int32 col_offset,
+    MatrixBase<Real> *dest) const {
   KALDI_PARANOID_ASSERT(row_offset < this->NumRows());
   KALDI_PARANOID_ASSERT(col_offset < this->NumCols());
   KALDI_PARANOID_ASSERT(row_offset >= 0);
@@ -793,7 +793,7 @@ void CompressedMatrix::CopyToMat(int32 row_offset,
   if (format == kOneByteWithColHeaders) {
     PerColHeader *per_col_header = reinterpret_cast<PerColHeader*>(h+1);
     uint8 *byte_data = reinterpret_cast<uint8*>(per_col_header +
-                                                h->num_cols);
+        h->num_cols);
 
     uint8 *start_of_subcol = byte_data+row_offset;  // skip appropriate
     // number of columns
@@ -802,8 +802,8 @@ void CompressedMatrix::CopyToMat(int32 row_offset,
     per_col_header += col_offset;  // skip the appropriate number of headers
 
     for (int32 i = 0;
-         i < tgt_cols;
-         i++, per_col_header++, start_of_subcol+=num_rows) {
+        i < tgt_cols;
+        i++, per_col_header++, start_of_subcol+=num_rows) {
       byte_data = start_of_subcol;
       float p0 = Uint16ToFloat(*h, per_col_header->percentile_0),
           p25 = Uint16ToFloat(*h, per_col_header->percentile_25),
@@ -843,11 +843,11 @@ void CompressedMatrix::CopyToMat(int32 row_offset,
 
 // instantiate the templates.
 template void CompressedMatrix::CopyToMat(int32,
-                                          int32,
-                                          MatrixBase<float> *dest) const;
+    int32,
+    MatrixBase<float> *dest) const;
 template void CompressedMatrix::CopyToMat(int32,
-                                          int32,
-                                          MatrixBase<double> *dest) const;
+    int32,
+    MatrixBase<double> *dest) const;
 
 void CompressedMatrix::Clear() {
   if (data_ != NULL) {
@@ -856,7 +856,7 @@ void CompressedMatrix::Clear() {
   }
 }
 
-CompressedMatrix::CompressedMatrix(const CompressedMatrix &mat): data_(NULL) {
+CompressedMatrix::CompressedMatrix(const CompressedMatrix &mat) : data_(NULL) {
   *this = mat; // use assignment operator.
 }
 

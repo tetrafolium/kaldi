@@ -83,12 +83,12 @@ template<typename T> class OtherReal { };  // useful in reading+writing routines
                                            // to switch double and float.
 /// A specialized class for switching from float to double.
 template<> class OtherReal<float> {
- public:
+public:
   typedef double Real;
 };
 /// A specialized class for switching from double to float.
 template<> class OtherReal<double> {
- public:
+public:
   typedef float Real;
 };
 

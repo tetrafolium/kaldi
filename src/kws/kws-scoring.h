@@ -30,8 +30,8 @@
 namespace kaldi {
 
 class KwsTerm {
- public:
-  KwsTerm():
+public:
+  KwsTerm() :
     utt_id_(0),
     kw_id_(""),
     start_time_(0),
@@ -69,7 +69,7 @@ class KwsTerm {
   inline float score() const  {return score_;}
   inline void set_score(float score) {score_ = score;}
 
- private:
+private:
   int utt_id_;
   std::string kw_id_;
   int start_time_;  // in frames
@@ -96,7 +96,7 @@ struct AlignedTermsPair {
 // Container class for the ref-hyp pairs
 class KwsAlignment {
   friend class KwsTermsAligner;
- public:
+public:
   // TODO(jtrmal):  implement reading/writing CSV
   // void ReadCsv();
   void WriteCsv(std::iostream &os, const float frames_per_sec);
@@ -107,7 +107,7 @@ class KwsAlignment {
   inline AlignedTerms::const_iterator end() const {return alignment_.end();}
   inline int size() const {return alignment_.size(); }
 
- private:
+private:
   //  sequence of touples ref, hyp, score
   //  either (in the sense of exlusive OR) of which can be
   //  empty (i.e .valid() will return false)
@@ -129,12 +129,12 @@ struct KwsTermsAlignerOptions {
                      // match during alignment process
                      // Default: 50 frames (usually 0.5 seconds)
 
-  inline KwsTermsAlignerOptions(): max_distance(50) {}
+  inline KwsTermsAlignerOptions() : max_distance(50) {}
   void Register(OptionsItf *opts);
 };
 
 class KwsTermsAligner {
- public:
+public:
   void AddRef(const KwsTerm &ref) {
     refs_[ref.utt_id()][ref.kw_id()].push_back(ref);
     nof_refs_++;
@@ -156,7 +156,7 @@ class KwsTermsAligner {
   // Score the quality of a match between ref and hyp
   virtual float AlignerScore(const KwsTerm &ref, const KwsTerm &hyp);
 
- private:
+private:
   typedef std::vector<KwsTerm> TermArray;
   typedef std::vector<KwsTerm>::iterator TermIterator;
   typedef unordered_map<int, bool> TermUseMap;
@@ -174,8 +174,8 @@ class KwsTermsAligner {
 
   // Find the next adept for best match to hyp.
   TermIterator FindNextRef(const KwsTerm &hyp,
-                           const TermIterator &prev,
-                           const TermIterator &last);
+      const TermIterator &prev,
+      const TermIterator &last);
   // A quick test if it's even worth to attempt to look
   // for a ref for the given term -- checks if the combination
   // of utt_id and kw_id exists in the reference.
@@ -219,7 +219,7 @@ struct TwvMetricsOptions {
 class TwvMetricsStats;
 
 class TwvMetrics {
- public:
+public:
   explicit TwvMetrics(const TwvMetricsOptions &opts);
   ~TwvMetrics();
 
@@ -240,10 +240,10 @@ class TwvMetrics {
   // and most of the computations are shared between
   // getting MTWV and OTWV, so we compute them at he same time
   void GetOracleMeasures(float *final_mtwv,
-                         float *final_mtwv_threshold,
-                         float *final_otwv);
+      float *final_mtwv_threshold,
+      float *final_otwv);
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(TwvMetrics);
 
   float audio_duration_;

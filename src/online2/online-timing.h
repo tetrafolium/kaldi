@@ -39,13 +39,13 @@ class OnlineTimer;
 /// which will enable the Print() function to print out the averate real-time
 /// factor and average delay per utterance.  See class OnlineTimer.
 class OnlineTimingStats {
- public:
+public:
   OnlineTimingStats();
   /// Here, if "online == false" we take into account that the setup was used in
   /// not-really-online mode where the chunk length was the whole file.  We need
   /// to change the way we interpret the stats and print results, in this case.
   void Print(bool online = true);
- protected:
+protected:
   friend class OnlineTimer;
   int32 num_utts_;
   // all times are in seconds.
@@ -86,7 +86,7 @@ class OnlineTimingStats {
 /// call was the length of the utterance.
 
 class OnlineTimer {
- public:
+public:
   OnlineTimer(const std::string &utterance_id);
 
   /// The call to SleepUntil(t) will sleep until cur_utterance_length seconds
@@ -95,10 +95,10 @@ class OnlineTimer {
   void SleepUntil(double cur_utterance_length);
 
   /// The call to WaitUntil(t) simulates the effect of sleeping until
-  /// cur_utterance_length seconds after this object was initialized; 
+  /// cur_utterance_length seconds after this object was initialized;
   /// but instead of actually sleeping, it increases a counter.
   void WaitUntil(double cur_utterance_length);
-  
+
   /// This call, which should be made after decoding is done,
   /// writes the stats to the object that accumulates them.
   void OutputStats(OnlineTimingStats *stats);
@@ -106,8 +106,8 @@ class OnlineTimer {
   /// Returns the simulated time elapsed in seconds since the timer was started;
   /// this equals waited_ plus the real time elapsed.
   double Elapsed();
-  
- private:
+
+private:
   std::string utterance_id_;
   Timer timer_;
   // all times are in seconds.

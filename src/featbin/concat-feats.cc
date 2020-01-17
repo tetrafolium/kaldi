@@ -30,10 +30,10 @@ namespace kaldi {
    to form a longer set. The length of the output will be equal
    to the sum of lengths of the inputs but the dimension will be
    the same to the inputs.
-*/
+ */
 
 void ConcatFeats(const std::vector<Matrix<BaseFloat> > &in,
-                 Matrix<BaseFloat> *out) {
+    Matrix<BaseFloat> *out) {
   KALDI_ASSERT(in.size() >= 1);
   int32 tot_len = in[0].NumRows(),
       dim = in[0].NumCols();

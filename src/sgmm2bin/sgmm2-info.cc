@@ -64,13 +64,13 @@ int main(int argc, char *argv[]) {
         cout.setf(ios::left);
         cout << "\nModel file: " << model_in_filename << endl;
         cout << " SGMM information:\n"
-          << setw(40) << "  # of HMM states" << am_sgmm.NumPdfs() << endl
-          << setw(40) << "  # of Gaussians per state" << am_sgmm.NumGauss() << endl
-          << setw(40) << "  Dimension of phone vector space"
-          << am_sgmm.PhoneSpaceDim() << endl
-          << setw(40) << "  Dimension of speaker vector space"
-          << am_sgmm.SpkSpaceDim() << endl
-          << setw(40) << "  Dimension of feature vectors"
+             << setw(40) << "  # of HMM states" << am_sgmm.NumPdfs() << endl
+             << setw(40) << "  # of Gaussians per state" << am_sgmm.NumGauss() << endl
+             << setw(40) << "  Dimension of phone vector space"
+             << am_sgmm.PhoneSpaceDim() << endl
+             << setw(40) << "  Dimension of speaker vector space"
+             << am_sgmm.SpkSpaceDim() << endl
+             << setw(40) << "  Dimension of feature vectors"
              << am_sgmm.FeatureDim() << endl;
         int32 total_mixweights = 0;
         for (int32 j2 = 0; j2 < am_sgmm.NumPdfs(); j2++) {
@@ -87,21 +87,21 @@ int main(int argc, char *argv[]) {
         for (int32 j1 = 0; j1 < am_sgmm.NumGroups(); j1++) {
           total_substates += am_sgmm.NumSubstatesForGroup(j1);
         }
-        cout << setw(40) << "  Total # of substates " << total_substates << endl;        
+        cout << setw(40) << "  Total # of substates " << total_substates << endl;
         cout << "\nTransition model information:\n"
              << setw(40) << " # of HMM states" << trans_model.NumPdfs() << endl
              << setw(40) << " # of transition states"
              << trans_model.NumTransitionStates() << endl;
-          int32 total_indices = 0;
-          for (int32 s = 0; s < trans_model.NumTransitionStates(); s++) {
-            total_indices += trans_model.NumTransitionIndices(s);
-            if (trans_detailed) {
-              cout << "  # of transition ids for state " << setw(8) << s
-                   << trans_model.NumTransitionIndices(s) << endl;
-            }
+        int32 total_indices = 0;
+        for (int32 s = 0; s < trans_model.NumTransitionStates(); s++) {
+          total_indices += trans_model.NumTransitionIndices(s);
+          if (trans_detailed) {
+            cout << "  # of transition ids for state " << setw(8) << s
+                 << trans_model.NumTransitionIndices(s) << endl;
           }
-          cout << setw(40) << "  Total # of transition ids " << total_indices
-               << endl;
+        }
+        cout << setw(40) << "  Total # of transition ids " << total_indices
+             << endl;
       }
     }
 

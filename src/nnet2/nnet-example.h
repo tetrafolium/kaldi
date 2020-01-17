@@ -40,13 +40,13 @@ struct NnetExample {
   /// Top-level index is the frame index; then for each frame, a list of pdf-ids
   /// each with its weight.
   /// In some contexts, we will require that labels.size() == 1.
-  std::vector<std::vector<std::pair<int32, BaseFloat> > > labels;  
-  
+  std::vector<std::vector<std::pair<int32, BaseFloat> > > labels;
+
   /// The input data, with NumRows() >= labels.size() + left_context; it
   /// includes features to the left and right as needed for the temporal context
   /// of the network.  The features corresponding to labels[0] would be in
   /// the row with index equal to left_context.
-  CompressedMatrix input_frames; 
+  CompressedMatrix input_frames;
 
   /// The number of frames of left context (we can work out the #frames
   /// of right context from input_frames.NumRows(), labels.size(), and this).
@@ -55,8 +55,8 @@ struct NnetExample {
   /// The speaker-specific input, if any, or an empty vector if
   /// we're not using this features.  We'll append this to the
   /// features for each of the frames.
-  Vector<BaseFloat> spk_info; 
-  
+  Vector<BaseFloat> spk_info;
+
   void Write(std::ostream &os, bool binary) const;
   void Read(std::istream &is, bool binary);
 
@@ -74,11 +74,11 @@ struct NnetExample {
   /// can't provide the requested context we won't crash but will provide as
   /// much as we can, although in this case we'll print a warning (once).
   NnetExample(const NnetExample &input,
-              int32 start_frame,
-              int32 num_frames,
-              int32 left_context,
-              int32 right_context);
-  
+      int32 start_frame,
+      int32 num_frames,
+      int32 left_context,
+      int32 right_context);
+
   /// Set the label of this frame of this example to the specified pdf_id with
   /// the specified weight.
   void SetLabelSingle(int32 frame, int32 pdf_id, BaseFloat weight = 1.0);
@@ -97,7 +97,7 @@ typedef RandomAccessTableReader<KaldiObjectHolder<NnetExample > > RandomAccessNn
 /** This class stores neural net training examples to be used in
     multi-threaded training.  */
 class ExamplesRepository {
- public:
+public:
   /// The following function is called by the code that reads in the examples,
   /// with a batch of examples.  [It will empty the vector "examples").
   void AcceptExamples(std::vector<NnetExample> *examples);
@@ -105,15 +105,15 @@ class ExamplesRepository {
   /// The following function is called by the code that reads in the examples,
   /// when we're done reading examples.
   void ExamplesDone();
-  
+
   /// This function is called by the code that does the training.  It gets the
   /// training examples, and if they are available, puts them in "examples" and
   /// returns true.  It returns false when there are no examples left and
   /// ExamplesDone() has been called.
   bool ProvideExamples(std::vector<NnetExample> *examples);
-  
-  ExamplesRepository(): empty_semaphore_(1), done_(false) { }
- private:
+
+  ExamplesRepository() : empty_semaphore_(1), done_(false) { }
+private:
   Semaphore full_semaphore_;
   Semaphore empty_semaphore_;
 
@@ -136,16 +136,16 @@ class ExamplesRepository {
 struct DiscriminativeNnetExample {
   /// The weight we assign to this example;
   /// this will typically be one, but we include it
-  /// for the sake of generality.  
-  BaseFloat weight; 
+  /// for the sake of generality.
+  BaseFloat weight;
 
   /// The numerator alignment
-  std::vector<int32> num_ali; 
+  std::vector<int32> num_ali;
 
   /// The denominator lattice.  Note: any acoustic
   /// likelihoods in the denominator lattice will be
   /// recomputed at the time we train.
-  CompactLattice den_lat; 
+  CompactLattice den_lat;
 
   /// The input data-- typically with a number of frames [NumRows()] larger than
   /// labels.size(), because it includes features to the left and right as
@@ -162,27 +162,27 @@ struct DiscriminativeNnetExample {
   /// #frames of right context from input_frames.NumRows(), num_ali.size(), and
   /// this).
   int32 left_context;
-  
+
 
   /// spk_info contains any component of the features that varies slowly or not
   /// at all with time (and hence, we would lose little by averaging it over
   /// time and storing the average).  We'll append this to each of the input
   /// features, if used.
-  Vector<BaseFloat> spk_info; 
+  Vector<BaseFloat> spk_info;
 
   void Check() const; // will crash if invalid.
-  
+
   void Write(std::ostream &os, bool binary) const;
   void Read(std::istream &is, bool binary);
 };
 
 // Yes, the length of typenames is getting out of hand.
 typedef TableWriter<KaldiObjectHolder<DiscriminativeNnetExample > >
-   DiscriminativeNnetExampleWriter;
+    DiscriminativeNnetExampleWriter;
 typedef SequentialTableReader<KaldiObjectHolder<DiscriminativeNnetExample > >
-   SequentialDiscriminativeNnetExampleReader;
+    SequentialDiscriminativeNnetExampleReader;
 typedef RandomAccessTableReader<KaldiObjectHolder<DiscriminativeNnetExample > >
-   RandomAccessDiscriminativeNnetExampleReader;
+    RandomAccessDiscriminativeNnetExampleReader;
 
 
 }

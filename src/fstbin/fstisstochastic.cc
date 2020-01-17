@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 
     bool ans;
     StdArc::Weight min, max;
-    if (test_in_log)  ans = IsStochasticFstInLog(*fst, delta, &min, &max);
+    if (test_in_log) ans = IsStochasticFstInLog(*fst, delta, &min, &max);
     else ans = IsStochasticFst(*fst, delta, &min, &max);
 
     std::cout << min.Value() << " " << max.Value() << '\n';

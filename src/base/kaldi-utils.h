@@ -52,7 +52,7 @@
 #  define KALDI_MEMALIGN_FREE(x) _aligned_free(x)
 #else
 #  define KALDI_MEMALIGN(align, size, pp_orig) \
-     (!posix_memalign(pp_orig, align, size) ? *(pp_orig) : NULL)
+  (!posix_memalign(pp_orig, align, size) ? *(pp_orig) : NULL)
 #  define KALDI_MEMALIGN_FREE(x) free(x)
 #endif
 
@@ -88,29 +88,29 @@ void Sleep(float seconds);
 }
 
 #define KALDI_SWAP8(a) { \
-  int t = (reinterpret_cast<char*>(&a))[0];\
-          (reinterpret_cast<char*>(&a))[0]=(reinterpret_cast<char*>(&a))[7];\
-          (reinterpret_cast<char*>(&a))[7]=t;\
-      t = (reinterpret_cast<char*>(&a))[1];\
-          (reinterpret_cast<char*>(&a))[1]=(reinterpret_cast<char*>(&a))[6];\
-          (reinterpret_cast<char*>(&a))[6]=t;\
-      t = (reinterpret_cast<char*>(&a))[2];\
-          (reinterpret_cast<char*>(&a))[2]=(reinterpret_cast<char*>(&a))[5];\
-          (reinterpret_cast<char*>(&a))[5]=t;\
-      t = (reinterpret_cast<char*>(&a))[3];\
-          (reinterpret_cast<char*>(&a))[3]=(reinterpret_cast<char*>(&a))[4];\
-          (reinterpret_cast<char*>(&a))[4]=t;}
+    int t = (reinterpret_cast<char*>(&a))[0]; \
+    (reinterpret_cast<char*>(&a))[0]=(reinterpret_cast<char*>(&a))[7]; \
+    (reinterpret_cast<char*>(&a))[7]=t; \
+    t = (reinterpret_cast<char*>(&a))[1]; \
+    (reinterpret_cast<char*>(&a))[1]=(reinterpret_cast<char*>(&a))[6]; \
+    (reinterpret_cast<char*>(&a))[6]=t; \
+    t = (reinterpret_cast<char*>(&a))[2]; \
+    (reinterpret_cast<char*>(&a))[2]=(reinterpret_cast<char*>(&a))[5]; \
+    (reinterpret_cast<char*>(&a))[5]=t; \
+    t = (reinterpret_cast<char*>(&a))[3]; \
+    (reinterpret_cast<char*>(&a))[3]=(reinterpret_cast<char*>(&a))[4]; \
+    (reinterpret_cast<char*>(&a))[4]=t;}
 #define KALDI_SWAP4(a) { \
-  int t = (reinterpret_cast<char*>(&a))[0];\
-          (reinterpret_cast<char*>(&a))[0]=(reinterpret_cast<char*>(&a))[3];\
-          (reinterpret_cast<char*>(&a))[3]=t;\
-      t = (reinterpret_cast<char*>(&a))[1];\
-          (reinterpret_cast<char*>(&a))[1]=(reinterpret_cast<char*>(&a))[2];\
-          (reinterpret_cast<char*>(&a))[2]=t;}
+    int t = (reinterpret_cast<char*>(&a))[0]; \
+    (reinterpret_cast<char*>(&a))[0]=(reinterpret_cast<char*>(&a))[3]; \
+    (reinterpret_cast<char*>(&a))[3]=t; \
+    t = (reinterpret_cast<char*>(&a))[1]; \
+    (reinterpret_cast<char*>(&a))[1]=(reinterpret_cast<char*>(&a))[2]; \
+    (reinterpret_cast<char*>(&a))[2]=t;}
 #define KALDI_SWAP2(a) { \
-  int t = (reinterpret_cast<char*>(&a))[0];\
-          (reinterpret_cast<char*>(&a))[0]=(reinterpret_cast<char*>(&a))[1];\
-          (reinterpret_cast<char*>(&a))[1]=t;}
+    int t = (reinterpret_cast<char*>(&a))[0]; \
+    (reinterpret_cast<char*>(&a))[0]=(reinterpret_cast<char*>(&a))[1]; \
+    (reinterpret_cast<char*>(&a))[1]=t;}
 
 
 // Makes copy constructor and operator= private.
@@ -120,7 +120,7 @@ void Sleep(float seconds);
 
 template<bool B> class KaldiCompileTimeAssert { };
 template<> class KaldiCompileTimeAssert<true> {
- public:
+public:
   static inline void Check() { }
 };
 
@@ -128,11 +128,11 @@ template<> class KaldiCompileTimeAssert<true> {
 
 #define KALDI_ASSERT_IS_INTEGER_TYPE(I) \
   KaldiCompileTimeAssert<std::numeric_limits<I>::is_specialized \
-                 && std::numeric_limits<I>::is_integer>::Check()
+      && std::numeric_limits<I>::is_integer>::Check()
 
 #define KALDI_ASSERT_IS_FLOATING_TYPE(F) \
   KaldiCompileTimeAssert<std::numeric_limits<F>::is_specialized \
-                && !std::numeric_limits<F>::is_integer>::Check()
+      && !std::numeric_limits<F>::is_integer>::Check()
 
 #ifdef _MSC_VER
 #define KALDI_STRCASECMP _stricmp

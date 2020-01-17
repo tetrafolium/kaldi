@@ -55,18 +55,18 @@ struct PlpOptions {
                     // sqrt(2) on C0 to be the same as HTK.
 
   PlpOptions() : mel_opts(23),
-                 // default number of mel-banks for the PLP computation; this
-                 // seems to be common for 16kHz-sampled data. For 8kHz-sampled
-                 // data, 15 may be better.
-                 lpc_order(12),
-                 num_ceps(13),
-                 use_energy(true),
-                 energy_floor(0.0),  // not in log scale: a small value e.g. 1.0e-10
-                 raw_energy(true),
-                 compress_factor(0.33333),
-                 cepstral_lifter(22),
-                 cepstral_scale(1.0),
-                 htk_compat(false) {}
+    // default number of mel-banks for the PLP computation; this
+    // seems to be common for 16kHz-sampled data. For 8kHz-sampled
+    // data, 15 may be better.
+    lpc_order(12),
+    num_ceps(13),
+    use_energy(true),
+    energy_floor(0.0),               // not in log scale: a small value e.g. 1.0e-10
+    raw_energy(true),
+    compress_factor(0.33333),
+    cepstral_lifter(22),
+    cepstral_scale(1.0),
+    htk_compat(false) {}
 
   void Register(OptionsItf *opts) {
     frame_opts.Register(opts);
@@ -97,7 +97,7 @@ struct PlpOptions {
 
 /// This is the new-style interface to the PLP computation.
 class PlpComputer {
- public:
+public:
   typedef PlpOptions Options;
   explicit PlpComputer(const PlpOptions &opts);
   PlpComputer(const PlpComputer &other);
@@ -130,14 +130,14 @@ class PlpComputer {
        vector as a workspace, which is why it's a non-const pointer.
      @param [out] feature  Pointer to a vector of size this->Dim(), to which
          the computed feature will be written.
-  */
+   */
   void Compute(BaseFloat signal_log_energy,
-               BaseFloat vtln_warp,
-               VectorBase<BaseFloat> *signal_frame,
-               VectorBase<BaseFloat> *feature);
+      BaseFloat vtln_warp,
+      VectorBase<BaseFloat> *signal_frame,
+      VectorBase<BaseFloat> *feature);
 
   ~PlpComputer();
- private:
+private:
 
   const MelBanks *GetMelBanks(BaseFloat vtln_warp);
 

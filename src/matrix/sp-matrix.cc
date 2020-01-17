@@ -55,8 +55,8 @@ void SpMatrix<Real>::Swap(SpMatrix<Real> *other) {
 
 template<typename Real>
 void SpMatrix<Real>::SymPosSemiDefEig(VectorBase<Real> *s,
-                                      MatrixBase<Real> *P,
-                                      Real tolerance) const {
+    MatrixBase<Real> *P,
+    Real tolerance) const {
   Eig(s, P);
   Real max = s->Max(), min = s->Min();
   KALDI_ASSERT(-min <= tolerance * max);
@@ -110,60 +110,60 @@ void SpMatrix<Real>::ApplyPow(Real power) {
 
 template<typename Real>
 void SpMatrix<Real>::CopyFromMat(const MatrixBase<Real> &M,
-                                 SpCopyType copy_type) {
+    SpCopyType copy_type) {
   KALDI_ASSERT(this->NumRows() == M.NumRows() && M.NumRows() == M.NumCols());
   MatrixIndexT D = this->NumRows();
 
   switch (copy_type) {
-    case kTakeMeanAndCheck:
-      {
-        Real good_sum = 0.0, bad_sum = 0.0;
-        for (MatrixIndexT i = 0; i < D; i++) {
-          for (MatrixIndexT j = 0; j < i; j++) {
-            Real a = M(i, j), b = M(j, i), avg = 0.5*(a+b), diff = 0.5*(a-b);
-            (*this)(i, j) = avg;
-            good_sum += std::abs(avg);
-            bad_sum += std::abs(diff);
-          }
-          good_sum += std::abs(M(i, i));
-          (*this)(i, i) = M(i, i);
-        }
-        if (bad_sum > 0.01 * good_sum) {
-          KALDI_ERR << "SpMatrix::Copy(), source matrix is not symmetric: "
-                    << bad_sum <<  ">" << good_sum;
-        }
-        break;
+  case kTakeMeanAndCheck:
+  {
+    Real good_sum = 0.0, bad_sum = 0.0;
+    for (MatrixIndexT i = 0; i < D; i++) {
+      for (MatrixIndexT j = 0; j < i; j++) {
+        Real a = M(i, j), b = M(j, i), avg = 0.5*(a+b), diff = 0.5*(a-b);
+        (*this)(i, j) = avg;
+        good_sum += std::abs(avg);
+        bad_sum += std::abs(diff);
       }
-    case kTakeMean:
-      {
-        for (MatrixIndexT i = 0; i < D; i++) {
-          for (MatrixIndexT j = 0; j < i; j++) {
-            (*this)(i, j) = 0.5*(M(i, j) + M(j, i));
-          }
-          (*this)(i, i) = M(i, i);
-        }
-        break;
+      good_sum += std::abs(M(i, i));
+      (*this)(i, i) = M(i, i);
+    }
+    if (bad_sum > 0.01 * good_sum) {
+      KALDI_ERR << "SpMatrix::Copy(), source matrix is not symmetric: "
+                << bad_sum <<  ">" << good_sum;
+    }
+    break;
+  }
+  case kTakeMean:
+  {
+    for (MatrixIndexT i = 0; i < D; i++) {
+      for (MatrixIndexT j = 0; j < i; j++) {
+        (*this)(i, j) = 0.5*(M(i, j) + M(j, i));
       }
-    case kTakeLower:
-      { // making this one a bit more efficient.
-        const Real *src = M.Data();
-        Real *dest = this->data_;
-        MatrixIndexT stride = M.Stride();
-        for (MatrixIndexT i = 0; i < D; i++) {
-          for (MatrixIndexT j = 0; j <= i; j++)
-            dest[j] = src[j];
-          dest += i + 1;
-          src += stride;
-        }
-      }
-      break;
-    case kTakeUpper:
-      for (MatrixIndexT i = 0; i < D; i++)
-        for (MatrixIndexT j = 0; j <= i; j++)
-          (*this)(i, j) = M(j, i);
-      break;
-    default:
-      KALDI_ASSERT("Invalid argument to SpMatrix::CopyFromMat");
+      (*this)(i, i) = M(i, i);
+    }
+    break;
+  }
+  case kTakeLower:
+  {     // making this one a bit more efficient.
+    const Real *src = M.Data();
+    Real *dest = this->data_;
+    MatrixIndexT stride = M.Stride();
+    for (MatrixIndexT i = 0; i < D; i++) {
+      for (MatrixIndexT j = 0; j <= i; j++)
+        dest[j] = src[j];
+      dest += i + 1;
+      src += stride;
+    }
+  }
+  break;
+  case kTakeUpper:
+    for (MatrixIndexT i = 0; i < D; i++)
+      for (MatrixIndexT j = 0; j <= i; j++)
+        (*this)(i, j) = M(j, i);
+    break;
+  default:
+    KALDI_ASSERT("Invalid argument to SpMatrix::CopyFromMat");
   }
 }
 
@@ -196,19 +196,19 @@ void  SpMatrix<Real>::AddDiagVec(const Real alpha, const VectorBase<OtherReal> &
 // instantiate the template above.
 template
 void SpMatrix<float>::AddDiagVec(const float alpha,
-                                 const VectorBase<double> &v);
+    const VectorBase<double> &v);
 
 template
 void SpMatrix<double>::AddDiagVec(const double alpha,
-                                  const VectorBase<float> &v);
+    const VectorBase<float> &v);
 
 template
 void SpMatrix<float>::AddDiagVec(const float alpha,
-                                 const VectorBase<float> &v);
+    const VectorBase<float> &v);
 
 template
 void SpMatrix<double>::AddDiagVec(const double alpha,
-                                  const VectorBase<double> &v);
+    const VectorBase<double> &v);
 
 template<>
 template<>
@@ -224,7 +224,7 @@ void SpMatrix<Real>::Invert(Real *logdet, Real *det_sign, bool need_inverse) {
   Real *p_work;  // workspace for the lapack function
   void *temp;
   if ((p_work = static_cast<Real*>(
-          KALDI_MEMALIGN(16, sizeof(Real) * rows, &temp))) == NULL) {
+        KALDI_MEMALIGN(16, sizeof(Real) * rows, &temp))) == NULL) {
     delete[] p_ipiv;
     throw std::bad_alloc();
   }
@@ -310,7 +310,7 @@ void SpMatrix<Real>::Invert(Real *logdet, Real *det_sign, bool need_inverse) {
 
 template<typename Real>
 void SpMatrix<Real>::InvertDouble(Real *logdet, Real *det_sign,
-                                  bool inverse_needed) {
+    bool inverse_needed) {
   SpMatrix<double> dmat(*this);
   double logdet_tmp, det_sign_tmp;
   dmat.Invert(logdet ? &logdet_tmp : NULL,
@@ -393,8 +393,8 @@ Real TraceSpMat(const SpMatrix<Real> &A, const MatrixBase<Real> &B) {
   Real ans = (Real)0.0;
   const Real *Aptr = A.Data(), *Bptr = B.Data();
   MatrixIndexT bStride = B.Stride();
-  for (MatrixIndexT r = 0;r < R;r++) {
-    for (MatrixIndexT c = 0;c < r;c++) {
+  for (MatrixIndexT r = 0; r < R; r++) {
+    for (MatrixIndexT c = 0; c < r; c++) {
       // ans += A(r, c) * (B(r, c) + B(c, r));
       ans += *(Aptr++) * (Bptr[r*bStride + c] + Bptr[c*bStride + r]);
     }
@@ -413,12 +413,12 @@ double TraceSpMat(const SpMatrix<double> &A, const MatrixBase<double> &B);
 
 template<typename Real>
 Real TraceMatSpMat(const MatrixBase<Real> &A, MatrixTransposeType transA,
-                   const SpMatrix<Real> &B, const MatrixBase<Real> &C,
-                   MatrixTransposeType transC) {
-  KALDI_ASSERT((transA == kTrans?A.NumCols():A.NumRows()) ==
-               (transC == kTrans?C.NumRows():C.NumCols()) &&
-               (transA == kTrans?A.NumRows():A.NumCols()) == B.NumRows() &&
-               (transC == kTrans?C.NumCols():C.NumRows()) == B.NumRows() &&
+    const SpMatrix<Real> &B, const MatrixBase<Real> &C,
+    MatrixTransposeType transC) {
+  KALDI_ASSERT((transA == kTrans ? A.NumCols() : A.NumRows()) ==
+      (transC == kTrans ? C.NumRows() : C.NumCols()) &&
+      (transA == kTrans ? A.NumRows() : A.NumCols()) == B.NumRows() &&
+      (transC == kTrans ? C.NumCols() : C.NumRows()) == B.NumRows() &&
                "TraceMatSpMat: arguments have wrong dimension.");
   Matrix<Real> tmp(B.NumRows(), B.NumRows());
   tmp.AddMatMat(1.0, C, transC, A, transA, 0.0);  // tmp = C * A.
@@ -427,38 +427,38 @@ Real TraceMatSpMat(const MatrixBase<Real> &A, MatrixTransposeType transA,
 
 template
 float TraceMatSpMat(const MatrixBase<float> &A, MatrixTransposeType transA,
-                    const SpMatrix<float> &B, const MatrixBase<float> &C,
-                    MatrixTransposeType transC);
+    const SpMatrix<float> &B, const MatrixBase<float> &C,
+    MatrixTransposeType transC);
 template
 double TraceMatSpMat(const MatrixBase<double> &A, MatrixTransposeType transA,
-                     const SpMatrix<double> &B, const MatrixBase<double> &C,
-                     MatrixTransposeType transC);
+    const SpMatrix<double> &B, const MatrixBase<double> &C,
+    MatrixTransposeType transC);
 
 template<typename Real>
 Real TraceMatSpMatSp(const MatrixBase<Real> &A, MatrixTransposeType transA,
-                     const SpMatrix<Real> &B, const MatrixBase<Real> &C,
-                     MatrixTransposeType transC, const SpMatrix<Real> &D) {
-  KALDI_ASSERT((transA == kTrans ?A.NumCols():A.NumRows() == D.NumCols()) &&
-               (transA == kTrans ? A.NumRows():A.NumCols() == B.NumRows()) &&
-               (transC == kTrans ? A.NumCols():A.NumRows() == B.NumCols()) &&
-               (transC == kTrans ? A.NumRows():A.NumCols() == D.NumRows()) &&
+    const SpMatrix<Real> &B, const MatrixBase<Real> &C,
+    MatrixTransposeType transC, const SpMatrix<Real> &D) {
+  KALDI_ASSERT((transA == kTrans ? A.NumCols() : A.NumRows() == D.NumCols()) &&
+      (transA == kTrans ? A.NumRows() : A.NumCols() == B.NumRows()) &&
+      (transC == kTrans ? A.NumCols() : A.NumRows() == B.NumCols()) &&
+      (transC == kTrans ? A.NumRows() : A.NumCols() == D.NumRows()) &&
                "KALDI_ERR: TraceMatSpMatSp: arguments have mismatched dimension.");
   // Could perhaps optimize this more depending on dimensions of quantities.
-  Matrix<Real> tmpAB(transA == kTrans ? A.NumCols():A.NumRows(), B.NumCols());
+  Matrix<Real> tmpAB(transA == kTrans ? A.NumCols() : A.NumRows(), B.NumCols());
   tmpAB.AddMatSp(1.0, A, transA, B, 0.0);
-  Matrix<Real> tmpCD(transC == kTrans ? C.NumCols():C.NumRows(), D.NumCols());
+  Matrix<Real> tmpCD(transC == kTrans ? C.NumCols() : C.NumRows(), D.NumCols());
   tmpCD.AddMatSp(1.0, C, transC, D, 0.0);
   return TraceMatMat(tmpAB, tmpCD, kNoTrans);
 }
 
 template
 float TraceMatSpMatSp(const MatrixBase<float> &A, MatrixTransposeType transA,
-                      const SpMatrix<float> &B, const MatrixBase<float> &C,
-                      MatrixTransposeType transC, const SpMatrix<float> &D);
+    const SpMatrix<float> &B, const MatrixBase<float> &C,
+    MatrixTransposeType transC, const SpMatrix<float> &D);
 template
 double TraceMatSpMatSp(const MatrixBase<double> &A, MatrixTransposeType transA,
-                       const SpMatrix<double> &B, const MatrixBase<double> &C,
-                       MatrixTransposeType transC, const SpMatrix<double> &D);
+    const SpMatrix<double> &B, const MatrixBase<double> &C,
+    MatrixTransposeType transC, const SpMatrix<double> &D);
 
 
 template<typename Real>
@@ -483,7 +483,7 @@ bool SpMatrix<Real>::IsUnit(Real cutoff) const {
   for (MatrixIndexT i = 0; i < R; i++)
     for (MatrixIndexT j = 0; j <= i; j++)
       max = std::max(max, static_cast<Real>(std::abs((*this)(i, j) -
-                                                     (i == j ? 1.0 : 0.0))));
+              (i == j ? 1.0 : 0.0))));
   return (max <= cutoff);
 }
 
@@ -534,7 +534,7 @@ bool SpMatrix<Real>::ApproxEqual(const SpMatrix<Real> &other, float tol) const {
 // function Floor: A = Floor(B, alpha * C) ... see tutorial document.
 template<typename Real>
 int SpMatrix<Real>::ApplyFloor(const SpMatrix<Real> &C, Real alpha,
-                               bool verbose) {
+    bool verbose) {
   MatrixIndexT dim = this->NumRows();
   int nfloored = 0;
   KALDI_ASSERT(C.NumRows() == dim);
@@ -633,9 +633,9 @@ void SolverOptions::Check() const {
 }
 
 template<> double SolveQuadraticProblem(const SpMatrix<double> &H,
-                                        const VectorBase<double> &g,
-                                        const SolverOptions &opts,
-                                        VectorBase<double> *x) {
+    const VectorBase<double> &g,
+    const SolverOptions &opts,
+    VectorBase<double> *x) {
   KALDI_ASSERT(H.NumRows() == g.Dim() && g.Dim() == x->Dim() && x->Dim() != 0);
   opts.Check();
   MatrixIndexT dim = x->Dim();
@@ -695,7 +695,7 @@ template<> double SolveQuadraticProblem(const SpMatrix<double> &H,
   xhat.CopyFromVec(delta);
   if (opts.optimize_delta) xhat.AddVec(1.0, *x);  // xhat = x + delta.
   double auxf_before = VecVec(g, *x) - 0.5 * VecSpVec(*x, H, *x),
-         auxf_after = VecVec(g, xhat) - 0.5 * VecSpVec(xhat, H, xhat);
+      auxf_after = VecVec(g, xhat) - 0.5 * VecSpVec(xhat, H, xhat);
   if (auxf_after < auxf_before) {  // Reject change.
     if (auxf_after < auxf_before - 1.0e-10 && opts.print_debug_output)
       KALDI_WARN << "Optimizing vector auxiliary function for "
@@ -710,9 +710,9 @@ template<> double SolveQuadraticProblem(const SpMatrix<double> &H,
 }
 
 template<> float SolveQuadraticProblem(const SpMatrix<float> &H,
-                                       const VectorBase<float> &g,
-                                       const SolverOptions &opts,
-                                       VectorBase<float> *x) {
+    const VectorBase<float> &g,
+    const SolverOptions &opts,
+    VectorBase<float> *x) {
   KALDI_ASSERT(H.NumRows() == g.Dim() && g.Dim() == x->Dim() && x->Dim() != 0);
   SpMatrix<double> Hd(H);
   Vector<double> gd(g);
@@ -727,13 +727,13 @@ template<> float SolveQuadraticProblem(const SpMatrix<float> &H,
 template<typename Real>
 Real
 SolveQuadraticMatrixProblem(const SpMatrix<Real> &Q,
-                            const MatrixBase<Real> &Y,
-                            const SpMatrix<Real> &SigmaInv,
-                            const SolverOptions &opts,
-                            MatrixBase<Real> *M) {
+    const MatrixBase<Real> &Y,
+    const SpMatrix<Real> &SigmaInv,
+    const SolverOptions &opts,
+    MatrixBase<Real> *M) {
   KALDI_ASSERT(Q.NumRows() == M->NumCols() &&
                SigmaInv.NumRows() == M->NumRows() && Y.NumRows() == M->NumRows()
-               && Y.NumCols() == M->NumCols() && M->NumCols() != 0);
+      && Y.NumCols() == M->NumCols() && M->NumCols() != 0);
   opts.Check();
   MatrixIndexT rows = M->NumRows(), cols = M->NumCols();
   if (Q.IsZero(0.0)) {
@@ -825,12 +825,12 @@ SolveQuadraticMatrixProblem(const SpMatrix<Real> &Q,
 
 template<typename Real>
 Real SolveDoubleQuadraticMatrixProblem(const MatrixBase<Real> &G,
-                                       const SpMatrix<Real> &P1,
-                                       const SpMatrix<Real> &P2,
-                                       const SpMatrix<Real> &Q1,
-                                       const SpMatrix<Real> &Q2,
-                                       const SolverOptions &opts,
-                                       MatrixBase<Real> *M) {
+    const SpMatrix<Real> &P1,
+    const SpMatrix<Real> &P2,
+    const SpMatrix<Real> &Q1,
+    const SpMatrix<Real> &Q2,
+    const SolverOptions &opts,
+    MatrixBase<Real> *M) {
   KALDI_ASSERT(Q1.NumRows() == M->NumCols() && P1.NumRows() == M->NumRows() &&
                G.NumRows() == M->NumRows() && G.NumCols() == M->NumCols() &&
                M->NumCols() != 0 && Q2.NumRows() == M->NumCols() &&
@@ -888,9 +888,9 @@ Real SolveDoubleQuadraticMatrixProblem(const MatrixBase<Real> &G,
       if (new_objf < old_objf) {
         if (new_objf < old_objf - 1.0e-05) {
           KALDI_WARN << "In double quadratic matrix problem: objective "
-              "function decreasing during optimization of " << opts.name
-              << ", " << old_objf << "->" << new_objf << ", change is "
-              << (new_objf - old_objf);
+            "function decreasing during optimization of " << opts.name
+                     << ", " << old_objf << "->" << new_objf << ", change is "
+                     << (new_objf - old_objf);
           KALDI_ERR << "Auxiliary function decreasing."; // Will be caught.
         } else {  // Reset to old value, didn't improve (very close to optimum).
           MdashNew.Row(n).CopyFromVec(MdashOld.Row(n));
@@ -900,8 +900,8 @@ Real SolveDoubleQuadraticMatrixProblem(const MatrixBase<Real> &G,
     }
     catch (...) {
       KALDI_WARN << "Matrix inversion or optimization failed during double "
-          "quadratic problem, solving for" << opts.name
-          << ": trying more stable approach.";
+        "quadratic problem, solving for" << opts.name
+                 << ": trying more stable approach.";
       objf_impr += SolveQuadraticProblem(Qsum, gdash_n, opts, &mdash_n);
     }
   }
@@ -920,7 +920,7 @@ void SpMatrix<float>::AddVec2(const float alpha, const VectorBase<float> &v) {
 
 template<class Real>
 void SpMatrix<Real>::AddVec2Sp(const Real alpha, const VectorBase<Real> &v,
-                               const SpMatrix<Real> &S, const Real beta) {
+    const SpMatrix<Real> &S, const Real beta) {
   KALDI_ASSERT(v.Dim() == this->NumRows() && S.NumRows() == this->NumRows());
   const Real *Sdata = S.Data();
   const Real *vdata = v.Data();
@@ -962,7 +962,7 @@ void SpMatrix<double>::AddVec2(const double alpha, const VectorBase<float> &v);
 
 template<typename Real>
 Real VecSpVec(const VectorBase<Real> &v1, const SpMatrix<Real> &M,
-              const VectorBase<Real> &v2) {
+    const VectorBase<Real> &v2) {
   MatrixIndexT D = M.NumRows();
   KALDI_ASSERT(v1.Dim() == D && v1.Dim() == v2.Dim());
   Vector<Real> tmp_vec(D);
@@ -972,16 +972,16 @@ Real VecSpVec(const VectorBase<Real> &v1, const SpMatrix<Real> &M,
 
 template
 float VecSpVec(const VectorBase<float> &v1, const SpMatrix<float> &M,
-               const VectorBase<float> &v2);
+    const VectorBase<float> &v2);
 template
 double VecSpVec(const VectorBase<double> &v1, const SpMatrix<double> &M,
-                const VectorBase<double> &v2);
+    const VectorBase<double> &v2);
 
 
 template<typename Real>
 void SpMatrix<Real>::AddMat2Sp(
-    const Real alpha, const MatrixBase<Real> &M,
-    MatrixTransposeType transM, const SpMatrix<Real> &A, const Real beta) {
+  const Real alpha, const MatrixBase<Real> &M,
+  MatrixTransposeType transM, const SpMatrix<Real> &A, const Real beta) {
   if (transM == kNoTrans) {
     KALDI_ASSERT(M.NumCols() == A.NumRows() && M.NumRows() == this->num_rows_);
   } else {
@@ -1024,11 +1024,11 @@ void SpMatrix<Real>::AddMat2Sp(
 
 template<typename Real>
 void SpMatrix<Real>::AddSmat2Sp(
-    const Real alpha, const MatrixBase<Real> &M,
-    MatrixTransposeType transM, const SpMatrix<Real> &A,
-    const Real beta) {
+  const Real alpha, const MatrixBase<Real> &M,
+  MatrixTransposeType transM, const SpMatrix<Real> &A,
+  const Real beta) {
   KALDI_ASSERT((transM == kNoTrans && M.NumCols() == A.NumRows()) ||
-               (transM == kTrans && M.NumRows() == A.NumRows()));
+      (transM == kTrans && M.NumRows() == A.NumRows()));
   if (transM == kNoTrans) {
     KALDI_ASSERT(M.NumCols() == A.NumRows() && M.NumRows() == this->num_rows_);
   } else {
@@ -1079,15 +1079,15 @@ void SpMatrix<Real>::AddSmat2Sp(
 
 template<typename Real>
 void SpMatrix<Real>::AddMat2Vec(const Real alpha,
-                                const MatrixBase<Real> &M,
-                                MatrixTransposeType transM,
-                                const VectorBase<Real> &v,
-                                const Real beta) {
+    const MatrixBase<Real> &M,
+    MatrixTransposeType transM,
+    const VectorBase<Real> &v,
+    const Real beta) {
   this->Scale(beta);
   KALDI_ASSERT((transM == kNoTrans && this->NumRows() == M.NumRows() &&
-                M.NumCols() == v.Dim()) ||
-               (transM == kTrans && this->NumRows() == M.NumCols() &&
-                M.NumRows() == v.Dim()));
+      M.NumCols() == v.Dim()) ||
+      (transM == kTrans && this->NumRows() == M.NumCols() &&
+      M.NumRows() == v.Dim()));
 
   if (transM == kNoTrans) {
     const Real *Mdata = M.Data(), *vdata = v.Data();
@@ -1108,9 +1108,9 @@ void SpMatrix<Real>::AddMat2Vec(const Real alpha,
 
 template<typename Real>
 void SpMatrix<Real>::AddMat2(const Real alpha, const MatrixBase<Real> &M,
-                             MatrixTransposeType transM, const Real beta)  {
+    MatrixTransposeType transM, const Real beta)  {
   KALDI_ASSERT((transM == kNoTrans && this->NumRows() == M.NumRows())
-               || (transM == kTrans && this->NumRows() == M.NumCols()));
+      || (transM == kTrans && this->NumRows() == M.NumCols()));
 
   // Cblas has no function *sprk (i.e. symmetric packed rank-k update), so we
   // use as temporary storage a regular matrix of which we only access its lower
@@ -1137,15 +1137,15 @@ void SpMatrix<Real>::AddMat2(const Real alpha, const MatrixBase<Real> &M,
 
 template<typename Real>
 void SpMatrix<Real>::AddTp2Sp(const Real alpha, const TpMatrix<Real> &T,
-                              MatrixTransposeType transM, const SpMatrix<Real> &A,
-                              const Real beta) {
+    MatrixTransposeType transM, const SpMatrix<Real> &A,
+    const Real beta) {
   Matrix<Real> Tmat(T);
   AddMat2Sp(alpha, Tmat, transM, A, beta);
 }
 
 template<typename Real>
 void SpMatrix<Real>::AddVecVec(const Real alpha, const VectorBase<Real> &v,
-                               const VectorBase<Real> &w) {
+    const VectorBase<Real> &w) {
   int32 dim = this->NumRows();
   KALDI_ASSERT(dim == v.Dim() && dim == w.Dim() && dim > 0);
   cblas_Xspr2(dim, alpha, v.Data(), 1, w.Data(), 1, this->data_);
@@ -1154,7 +1154,7 @@ void SpMatrix<Real>::AddVecVec(const Real alpha, const VectorBase<Real> &v,
 
 template<typename Real>
 void SpMatrix<Real>::AddTp2(const Real alpha, const TpMatrix<Real> &T,
-                            MatrixTransposeType transM, const Real beta) {
+    MatrixTransposeType transM, const Real beta) {
   Matrix<Real> Tmat(T);
   AddMat2(alpha, Tmat, transM, beta);
 }
@@ -1182,34 +1182,34 @@ float TraceSpSpLower(const SpMatrix<float> &A, const SpMatrix<float> &B);
 
 // Instantiate the template above.
 template float SolveQuadraticMatrixProblem(const SpMatrix<float> &Q,
-                                           const MatrixBase<float> &Y,
-                                           const SpMatrix<float> &SigmaInv,
-                                           const SolverOptions &opts,
-                                           MatrixBase<float> *M);
+    const MatrixBase<float> &Y,
+    const SpMatrix<float> &SigmaInv,
+    const SolverOptions &opts,
+    MatrixBase<float> *M);
 template double SolveQuadraticMatrixProblem(const SpMatrix<double> &Q,
-                                            const MatrixBase<double> &Y,
-                                            const SpMatrix<double> &SigmaInv,
-                                            const SolverOptions &opts,
-                                            MatrixBase<double> *M);
+    const MatrixBase<double> &Y,
+    const SpMatrix<double> &SigmaInv,
+    const SolverOptions &opts,
+    MatrixBase<double> *M);
 
 // Instantiate the template above.
 template float SolveDoubleQuadraticMatrixProblem(
-    const MatrixBase<float> &G,
-    const SpMatrix<float> &P1,
-    const SpMatrix<float> &P2,
-    const SpMatrix<float> &Q1,
-    const SpMatrix<float> &Q2,
-    const SolverOptions &opts,
-    MatrixBase<float> *M);
+  const MatrixBase<float> &G,
+  const SpMatrix<float> &P1,
+  const SpMatrix<float> &P2,
+  const SpMatrix<float> &Q1,
+  const SpMatrix<float> &Q2,
+  const SolverOptions &opts,
+  MatrixBase<float> *M);
 
 template double SolveDoubleQuadraticMatrixProblem(
-    const MatrixBase<double> &G,
-    const SpMatrix<double> &P1,
-    const SpMatrix<double> &P2,
-    const SpMatrix<double> &Q1,
-    const SpMatrix<double> &Q2,
-    const SolverOptions &opts,
-    MatrixBase<double> *M);
+  const MatrixBase<double> &G,
+  const SpMatrix<double> &P1,
+  const SpMatrix<double> &P2,
+  const SpMatrix<double> &Q1,
+  const SpMatrix<double> &Q2,
+  const SolverOptions &opts,
+  MatrixBase<double> *M);
 
 
 

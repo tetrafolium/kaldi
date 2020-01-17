@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
         "metric vector that is 1.0 per dimension if the features identical,\n"
         "and <1.0 otherwise, and an average overall similarity value.\n"
         "\n"
-    "Usage: compare-feats [options] <in-rspecifier1> <in-rspecifier2>\n"
+        "Usage: compare-feats [options] <in-rspecifier1> <in-rspecifier2>\n"
         "e.g.: compare-feats ark:1.ark ark:2.ark\n";
 
     ParseOptions po(usage);
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     BaseFloat threshold = 0.99;
     po.Register("threshold", &threshold, "Similarity threshold, affects "
                 "return status");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string rspecifier1 = po.GetArg(1), rspecifier2 = po.GetArg(2);
-    
+
     int32 num_done = 0, num_err = 0, Dim = 0;
     Vector<double> prod1, prod2, cross_prod, similarity_metric;
     double overall_similarity = 0;
@@ -82,17 +82,17 @@ int main(int argc, char *argv[]) {
         num_err++;
         continue;
       }
-      
-      if (num_done == 0){
+
+      if (num_done == 0) {
         Dim=feat1.NumCols();
         prod1.Resize(Dim);
         prod2.Resize(Dim);
         cross_prod.Resize(Dim);
         similarity_metric.Resize(Dim);
       }
-      
+
       Vector<BaseFloat> feat1_col(feat1.NumRows()), feat2_col(feat2.NumRows());
-      for (MatrixIndexT i = 0; i < feat1.NumCols(); i++){
+      for (MatrixIndexT i = 0; i < feat1.NumCols(); i++) {
         feat1_col.CopyColFromMat(feat1, i);
         feat2_col.CopyColFromMat(feat2, i);
         prod1(i) += VecVec(feat1_col, feat1_col);
@@ -140,6 +140,6 @@ int main(int argc, char *argv[]) {
 
 
 /*
-  tested with:
-compare-feats 'ark:echo foo [ 1.0 2.0 ]|' 'ark:echo foo [ 1.0 2.0 ]|'
-*/
+   tested with:
+   compare-feats 'ark:echo foo [ 1.0 2.0 ]|' 'ark:echo foo [ 1.0 2.0 ]|'
+ */

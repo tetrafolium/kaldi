@@ -1,7 +1,7 @@
 // sgmm2/fmllr-sgmm2.cc
 
 // Copyright 2009-2012   Saarland University (author: Arnab Ghoshal)
-//                       Johns Hopkins University (author: Daniel Povey)    
+//                       Johns Hopkins University (author: Daniel Povey)
 
 // See ../../COPYING for clarification regarding multiple authors
 //
@@ -29,8 +29,8 @@ using std::vector;
 namespace kaldi {
 
 static void ApplyPreXformToGradient(const Sgmm2FmllrGlobalParams &globals,
-                                    const Matrix<BaseFloat> &gradient_in,
-                                    Matrix<BaseFloat> *gradient_out) {
+    const Matrix<BaseFloat> &gradient_in,
+    Matrix<BaseFloat> *gradient_out) {
   // Eq. (B.14): P' = A_{inv}^T P {W_{pre}^+}^T
   int32 dim = gradient_in.NumRows();
   Matrix<BaseFloat> Wpre_plus(dim + 1, dim + 1, kSetZero);
@@ -43,8 +43,8 @@ static void ApplyPreXformToGradient(const Sgmm2FmllrGlobalParams &globals,
 }
 
 static void ApplyInvPreXformToChange(const Sgmm2FmllrGlobalParams &globals,
-                                     const Matrix<BaseFloat> &delta_in,
-                                     Matrix<BaseFloat> *delta_out) {
+    const Matrix<BaseFloat> &delta_in,
+    Matrix<BaseFloat> *delta_out) {
   // Eq. (B.25): \Delta = A_{inv} \Delta' W_{pre}^+
   int32 dim = delta_in.NumRows();
   Matrix<BaseFloat> Wpre_plus(dim + 1, dim + 1, kSetZero);
@@ -57,8 +57,8 @@ static void ApplyInvPreXformToChange(const Sgmm2FmllrGlobalParams &globals,
 }
 
 static void ApplyHessianXformToGradient(const Sgmm2FmllrGlobalParams &globals,
-                                        const Matrix<BaseFloat> &gradient_in,
-                                        Matrix<BaseFloat> *gradient_out) {
+    const Matrix<BaseFloat> &gradient_in,
+    Matrix<BaseFloat> *gradient_out) {
   int32 dim = gradient_in.NumRows();
   const Vector<BaseFloat> &D = globals.mean_scatter_;
   if (D.Min() <= 0.0)
@@ -70,7 +70,7 @@ static void ApplyHessianXformToGradient(const Sgmm2FmllrGlobalParams &globals,
       // Eq. (B.16)
       (*gradient_out)(c, r) = gradient_in(c, r) / std::sqrt(1 + D(r) -
           1 / (1 + D(c))) - gradient_in(r, c) / ((1 + D(c)) *
-              std::sqrt(1 + D(r) - 1 / (1 + D(c))));
+          std::sqrt(1 + D(r) - 1 / (1 + D(c))));
     }
     // Eq. (B.17) & (B.18)
     (*gradient_out)(r, r) = gradient_in(r, r) / std::sqrt(2 + D(r));
@@ -79,8 +79,8 @@ static void ApplyHessianXformToGradient(const Sgmm2FmllrGlobalParams &globals,
 }
 
 static void ApplyInvHessianXformToChange(const Sgmm2FmllrGlobalParams &globals,
-                                         const Matrix<BaseFloat> &delta_in,
-                                         Matrix<BaseFloat> *delta_out) {
+    const Matrix<BaseFloat> &delta_in,
+    Matrix<BaseFloat> *delta_out) {
   int32 dim = delta_in.NumRows();
   const Vector<BaseFloat> &D = globals.mean_scatter_;
   if (D.Min() <= 0.0)
@@ -154,10 +154,10 @@ void FmllrSgmm2Accs::Init(int32 dim, int32 num_gaussians) {
 }
 
 BaseFloat FmllrSgmm2Accs::Accumulate(const AmSgmm2 &model,
-                                     const VectorBase<BaseFloat> &data,
-                                     const Sgmm2PerFrameDerivedVars &frame_vars,
-                                     int32 pdf_index, BaseFloat weight,
-                                     Sgmm2PerSpkDerivedVars *spk) {
+    const VectorBase<BaseFloat> &data,
+    const Sgmm2PerFrameDerivedVars &frame_vars,
+    int32 pdf_index, BaseFloat weight,
+    Sgmm2PerSpkDerivedVars *spk) {
   // Calulate Gaussian posteriors and collect statistics
   Matrix<BaseFloat> posteriors;
   BaseFloat log_like = model.ComponentPosteriors(frame_vars, pdf_index,
@@ -169,12 +169,12 @@ BaseFloat FmllrSgmm2Accs::Accumulate(const AmSgmm2 &model,
 }
 
 void FmllrSgmm2Accs::AccumulateFromPosteriors(
-    const AmSgmm2 &model,
-    const Sgmm2PerSpkDerivedVars &spk,
-    const VectorBase<BaseFloat> &data,
-    const vector<int32> &gselect,
-    const Matrix<BaseFloat> &posteriors,
-    int32 j2) {
+  const AmSgmm2 &model,
+  const Sgmm2PerSpkDerivedVars &spk,
+  const VectorBase<BaseFloat> &data,
+  const vector<int32> &gselect,
+  const Matrix<BaseFloat> &posteriors,
+  int32 j2) {
   Vector<double> var_scaled_mean(dim_), extended_data(dim_+1);
   extended_data.Range(0, dim_).CopyFromVec(data);
   extended_data(dim_) = 1.0;
@@ -227,9 +227,9 @@ void FmllrSgmm2Accs::AccumulateForFmllrSubspace(const AmSgmm2 &sgmm,
 
 
 BaseFloat FmllrSgmm2Accs::FmllrObjGradient(const AmSgmm2 &sgmm,
-                                          const Matrix<BaseFloat> &xform,
-                                          Matrix<BaseFloat> *grad_out,
-                                          Matrix<BaseFloat> *G_out) const {
+    const Matrix<BaseFloat> &xform,
+    Matrix<BaseFloat> *grad_out,
+    Matrix<BaseFloat> *G_out) const {
   int32 dim = sgmm.FeatureDim(),
       num_gauss = sgmm.NumGauss();
   KALDI_ASSERT(stats_.G_.size() == static_cast<size_t>(num_gauss));
@@ -284,11 +284,11 @@ void FmllrSgmm2Accs::Read(std::istream &in, bool binary, bool add) {
 
 
 static BaseFloat CalcFmllrStepSize(const AffineXformStats &stats,
-                                   const AmSgmm2 &sgmm,
-                                   const MatrixBase<BaseFloat> &Delta,
-                                   const MatrixBase<BaseFloat> &A,
-                                   const Matrix<BaseFloat> &G,
-                                   int32 max_iters) {
+    const AmSgmm2 &sgmm,
+    const MatrixBase<BaseFloat> &Delta,
+    const MatrixBase<BaseFloat> &A,
+    const Matrix<BaseFloat> &G,
+    int32 max_iters) {
   int32 dim = sgmm.FeatureDim();
   Matrix<double> Delta_d(Delta);
   Matrix<double> G_d(G);
@@ -296,7 +296,7 @@ static BaseFloat CalcFmllrStepSize(const AffineXformStats &stats,
 
   // Eq. (B.28): m = tr(\Delta K^T) - tr(\Delta S^T)
   BaseFloat m = TraceMatMat(Delta_d, stats.K_, kTrans)
-                    - TraceMatMat(Delta_d, G_d, kTrans);
+      - TraceMatMat(Delta_d, G_d, kTrans);
   // Eq. (B.29): n = \sum_i tr(\Delta \Sigma_{i}^{-1} \Delta S_{i})
   BaseFloat n = 0;
   SpMatrix<double> inv_covar;
@@ -354,10 +354,10 @@ static BaseFloat CalcFmllrStepSize(const AffineXformStats &stats,
 
 
 bool FmllrSgmm2Accs::Update(const AmSgmm2 &sgmm,
-                           const Sgmm2FmllrGlobalParams &globals,
-                           const Sgmm2FmllrConfig &opts,
-                           Matrix<BaseFloat> *out_xform,
-                           BaseFloat *frame_count, BaseFloat *auxf_out) const {
+    const Sgmm2FmllrGlobalParams &globals,
+    const Sgmm2FmllrConfig &opts,
+    Matrix<BaseFloat> *out_xform,
+    BaseFloat *frame_count, BaseFloat *auxf_out) const {
   BaseFloat auxf_improv = 0.0, logdet = 0.0;
   KALDI_ASSERT(out_xform->NumRows() == dim_ && out_xform->NumCols() == dim_+1);
   BaseFloat mincount = (globals.HasBasis() ?
@@ -370,8 +370,8 @@ bool FmllrSgmm2Accs::Update(const AmSgmm2 &sgmm,
     KALDI_ERR << "Must set up pre-transforms before estimating FMLLR.";
 
   KALDI_VLOG(1) << "Mincount = " << mincount << "; Basis: "
-                << std::string(globals.HasBasis()? "yes; " : "no; ")
-                << "Using subspace: " << std::string(using_subspace? "yes; "
+                << std::string(globals.HasBasis() ? "yes; " : "no; ")
+                << "Using subspace: " << std::string(using_subspace ? "yes; "
                     : "no; ");
 
   int32 num_bases = 0;
@@ -379,7 +379,7 @@ bool FmllrSgmm2Accs::Update(const AmSgmm2 &sgmm,
     KALDI_ASSERT(globals.fmllr_bases_.size() != 0);
     int32 max_bases = std::min(static_cast<int32>(globals.fmllr_bases_.size()),
                                opts.num_fmllr_bases);
-    num_bases = (opts.bases_occ_scale <= 0.0)? max_bases :
+    num_bases = (opts.bases_occ_scale <= 0.0) ? max_bases :
         std::min(max_bases, static_cast<int32>(std::floor(opts.bases_occ_scale
                                                           * stats_.beta_)));
     KALDI_VLOG(1) << "Have " << stats_.beta_ << " frames for speaker: Using "
@@ -399,14 +399,14 @@ bool FmllrSgmm2Accs::Update(const AmSgmm2 &sgmm,
 
       // For diagnostic purposes
       KALDI_VLOG(3) << "Iter " << iter << ": Auxiliary function = "
-          << (auxf_new / stats_.beta_) << " per frame over " << stats_.beta_
-          << " frames";
+                    << (auxf_new / stats_.beta_) << " per frame over " << stats_.beta_
+                    << " frames";
 
       if (iter > 0) {
         // For diagnostic purposes
         KALDI_VLOG(2) << "Iter " << iter << ": Auxiliary function improvement: "
-            << ((auxf_new - auxf_old) / stats_.beta_) << " per frame over "
-            << (stats_.beta_) << " frames";
+                      << ((auxf_new - auxf_old) / stats_.beta_) << " per frame over "
+                      << (stats_.beta_) << " frames";
         auxf_improv += auxf_new - auxf_old;
       }
 
@@ -479,8 +479,8 @@ bool FmllrSgmm2Accs::Update(const AmSgmm2 &sgmm,
         // contain the updated value
 
         KALDI_VLOG(2) << "Iter " << iter << ": Auxiliary function improvement: "
-            << ((auxf_new - auxf_old) / stats_.beta_) << " per frame over "
-            << (stats_.beta_) << " frames";
+                      << ((auxf_new - auxf_old) / stats_.beta_) << " per frame over "
+                      << (stats_.beta_) << " frames";
         auxf_improv += auxf_new - auxf_old;
       }
     }
@@ -488,15 +488,15 @@ bool FmllrSgmm2Accs::Update(const AmSgmm2 &sgmm,
     auxf_improv /= (stats_.beta_ + 1.0e-10);
 
     KALDI_LOG << "Auxiliary function improvement for FMLLR = " << auxf_improv
-        << " per frame over " << stats_.beta_ << " frames. Log-determinant = "
-        << logdet;
+              << " per frame over " << stats_.beta_ << " frames. Log-determinant = "
+              << logdet;
     return true;
   } else {
     KALDI_ASSERT(stats_.beta_ < mincount);
 //    std::cerr.precision(10);
 //    std::cerr.setf(std::ios::fixed,std::ios::floatfield);
     KALDI_WARN << "Not updating FMLLR because count is " << stats_.beta_
-        << " < " << (mincount);
+               << " < " << (mincount);
     if (auxf_out != NULL) *auxf_out = 0.0;
     return false;
   }  // Do not use the transform if it does not have enough counts
@@ -504,8 +504,8 @@ bool FmllrSgmm2Accs::Update(const AmSgmm2 &sgmm,
 }
 
 void EstimateSgmm2FmllrSubspace(const SpMatrix<double> &fmllr_grad_scatter,
-                               int32 num_fmllr_bases, int32 feat_dim,
-                               Sgmm2FmllrGlobalParams *globals, double min_eig) {
+    int32 num_fmllr_bases, int32 feat_dim,
+    Sgmm2FmllrGlobalParams *globals, double min_eig) {
   KALDI_ASSERT(num_fmllr_bases > 0 && feat_dim > 0);
   if (num_fmllr_bases >  feat_dim * (feat_dim + 1)) {
     num_fmllr_bases = feat_dim * (feat_dim + 1);
@@ -517,7 +517,7 @@ void EstimateSgmm2FmllrSubspace(const SpMatrix<double> &fmllr_grad_scatter,
 
   Vector<double> s(fmllr_grad_scatter.NumRows());
   Matrix<double> U(fmllr_grad_scatter.NumRows(),
-                      fmllr_grad_scatter.NumRows());
+      fmllr_grad_scatter.NumRows());
   try {
     fmllr_grad_scatter.Eig(&s, &U);
     SortSvd(&s, &U);  // in case was not exactly sorted.

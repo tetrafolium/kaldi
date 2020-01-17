@@ -46,17 +46,17 @@ struct NnetTrainerOptions {
   NnetOptimizeOptions optimize_config;
   NnetComputeOptions compute_config;
   CachingOptimizingCompilerOptions compiler_config;
-  NnetTrainerOptions():
-      zero_component_stats(true),
-      store_component_stats(true),
-      print_interval(100),
-      debug_computation(false),
-      momentum(0.0),
-      l2_regularize_factor(1.0),
-      backstitch_training_scale(0.0),
-      backstitch_training_interval(1),
-      binary_write_cache(true),
-      max_param_change(2.0) { }
+  NnetTrainerOptions() :
+    zero_component_stats(true),
+    store_component_stats(true),
+    print_interval(100),
+    debug_computation(false),
+    momentum(0.0),
+    l2_regularize_factor(1.0),
+    backstitch_training_scale(0.0),
+    backstitch_training_interval(1),
+    binary_write_cache(true),
+    max_param_change(2.0) { }
   void Register(OptionsItf *opts) {
     opts->Register("store-component-stats", &store_component_stats,
                    "If true, store activations and derivatives for nonlinear "
@@ -128,31 +128,31 @@ struct ObjectiveFunctionInfo {
   double tot_objf_this_phase;
   double tot_aux_objf_this_phase;
 
-  ObjectiveFunctionInfo():
-      current_phase(0),
-      minibatches_this_phase(0),
-      tot_weight(0.0), tot_objf(0.0), tot_aux_objf(0.0),
-      tot_weight_this_phase(0.0), tot_objf_this_phase(0.0),
-      tot_aux_objf_this_phase(0.0) { }
+  ObjectiveFunctionInfo() :
+    current_phase(0),
+    minibatches_this_phase(0),
+    tot_weight(0.0), tot_objf(0.0), tot_aux_objf(0.0),
+    tot_weight_this_phase(0.0), tot_objf_this_phase(0.0),
+    tot_aux_objf_this_phase(0.0) { }
 
   // This function updates the stats and, if the phase has just changed,
   // prints a message indicating progress.  The phase equals
   // minibatch_counter / minibatches_per_phase.  Its only function is to
   // control how frequently we print logging messages.
   void UpdateStats(const std::string &output_name,
-                   int32 minibatches_per_phase,
-                   int32 minibatch_counter,
-                   BaseFloat this_minibatch_weight,
-                   BaseFloat this_minibatch_tot_objf,
-                   BaseFloat this_minibatch_tot_aux_objf = 0.0);
+      int32 minibatches_per_phase,
+      int32 minibatch_counter,
+      BaseFloat this_minibatch_weight,
+      BaseFloat this_minibatch_tot_objf,
+      BaseFloat this_minibatch_tot_aux_objf = 0.0);
 
   // Prints stats for the current phase.
   // Note: 'phase' will normally be this->current_phase + 1, but may under
   // unusual circumstances (e.g. multilingual training, where not all outputs
   // are seen on all minibatches) be larger than that.
   void PrintStatsForThisPhase(const std::string &output_name,
-                              int32 minibatches_per_phase,
-                              int32 phase) const;
+      int32 minibatches_per_phase,
+      int32 phase) const;
   // Prints total stats, and returns true if total stats' weight was nonzero.
   bool PrintTotalStats(const std::string &output_name) const;
 };
@@ -171,9 +171,9 @@ struct ObjectiveFunctionInfo {
     last time).
  */
 class NnetTrainer {
- public:
+public:
   NnetTrainer(const NnetTrainerOptions &config,
-              Nnet *nnet);
+      Nnet *nnet);
 
   // train on one minibatch.
   void Train(const NnetExample &eg);
@@ -186,20 +186,20 @@ class NnetTrainer {
   void PrintMaxChangeStats() const;
 
   ~NnetTrainer();
- private:
+private:
   // The internal function for doing one step of conventional SGD training.
   void TrainInternal(const NnetExample &eg,
-                     const NnetComputation &computation);
+      const NnetComputation &computation);
 
   // The internal function for doing one step of backstitch training. Depending
   // on whether is_backstitch_step1 is true, It could be either the first
   // (backward) step, or the second (forward) step of backstitch.
   void TrainInternalBackstitch(const NnetExample &eg,
-                               const NnetComputation &computation,
-                               bool is_backstitch_step1);
+      const NnetComputation &computation,
+      bool is_backstitch_step1);
 
   void ProcessOutputs(bool is_backstitch_step2, const NnetExample &eg,
-                      NnetComputer *computer);
+      NnetComputer *computer);
 
   const NnetTrainerOptions config_;
   Nnet *nnet_;
@@ -232,24 +232,24 @@ class NnetTrainer {
    supplies its derivative to the NnetComputation object.
    See also the function ComputeAccuracy(), declared in nnet-diagnostics.h.
 
-  @param [in]  supervision   A GeneralMatrix, typically derived from a NnetExample,
+   @param [in]  supervision   A GeneralMatrix, typically derived from a NnetExample,
                              containing the supervision posteriors or features.
-  @param [in] objective_type The objective function type: kLinear = output *
+   @param [in] objective_type The objective function type: kLinear = output *
                              supervision, or kQuadratic = -0.5 * (output -
                              supervision)^2.  kLinear is used for softmax
                              objectives; the network contains a LogSoftmax
                              layer which correctly normalizes its output.
-  @param [in] output_name    The name of the output node (e.g. "output"), used to
+   @param [in] output_name    The name of the output node (e.g. "output"), used to
                              look up the output in the NnetComputer object.
 
-  @param [in] supply_deriv   If this is true, this function will compute the
+   @param [in] supply_deriv   If this is true, this function will compute the
                              derivative of the objective function and supply it
                              to the network using the function
                              NnetComputer::AcceptOutputDeriv
-  @param [in,out] computer   The NnetComputer object, from which we get the
+   @param [in,out] computer   The NnetComputer object, from which we get the
                              output using GetOutput and to which we may supply
                              the derivatives using AcceptOutputDeriv.
-  @param [out] tot_weight    The total weight of the training examples.  In the
+   @param [out] tot_weight    The total weight of the training examples.  In the
                              kLinear case, this is the sum of the supervision
                              matrix; in the kQuadratic case, it is the number of
                              rows of the supervision matrix.  In order to make
@@ -258,16 +258,16 @@ class NnetTrainer {
                              possible for the supervision matrix to have an
                              extra column containing weights.  At the moment,
                              this is not supported.
-  @param [out] tot_objf      The total objective function; divide this by the
+   @param [out] tot_objf      The total objective function; divide this by the
                              tot_weight to get the normalized objective function.
-*/
+ */
 void ComputeObjectiveFunction(const GeneralMatrix &supervision,
-                              ObjectiveType objective_type,
-                              const std::string &output_name,
-                              bool supply_deriv,
-                              NnetComputer *computer,
-                              BaseFloat *tot_weight,
-                              BaseFloat *tot_objf);
+    ObjectiveType objective_type,
+    const std::string &output_name,
+    bool supply_deriv,
+    NnetComputer *computer,
+    BaseFloat *tot_weight,
+    BaseFloat *tot_objf);
 
 
 

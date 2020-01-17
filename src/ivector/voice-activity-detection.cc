@@ -25,8 +25,8 @@
 namespace kaldi {
 
 void ComputeVadEnergy(const VadEnergyOptions &opts,
-                      const MatrixBase<BaseFloat> &feats,
-                      Vector<BaseFloat> *output_voiced) {
+    const MatrixBase<BaseFloat> &feats,
+    Vector<BaseFloat> *output_voiced) {
   int32 T = feats.NumRows();
   output_voiced->Resize(T);
   if (T == 0) {
@@ -35,13 +35,13 @@ void ComputeVadEnergy(const VadEnergyOptions &opts,
   }
   Vector<BaseFloat> log_energy(T);
   log_energy.CopyColFromMat(feats, 0); // column zero is log-energy.
-  
+
   BaseFloat energy_threshold = opts.vad_energy_threshold;
   if (opts.vad_energy_mean_scale != 0.0) {
     KALDI_ASSERT(opts.vad_energy_mean_scale > 0.0);
     energy_threshold += opts.vad_energy_mean_scale * log_energy.Sum() / T;
   }
-  
+
   KALDI_ASSERT(opts.vad_frames_context >= 0);
   KALDI_ASSERT(opts.vad_proportion_threshold > 0.0 &&
                opts.vad_proportion_threshold < 1.0);
@@ -60,6 +60,6 @@ void ComputeVadEnergy(const VadEnergyOptions &opts,
     else
       (*output_voiced)(t) = 0.0;
   }
-}  
+}
 
 }

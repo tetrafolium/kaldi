@@ -28,8 +28,8 @@ namespace kaldi {
 namespace kws_internal {
 
 class KwTermLower {
- public:
-  explicit KwTermLower(const int threshold): threshold_(threshold) {}
+public:
+  explicit KwTermLower(const int threshold) : threshold_(threshold) {}
 
   bool operator() (const KwsTerm &left, const KwsTerm &right) {
     if ( (left.start_time() + threshold_) < right.start_time() ) {
@@ -39,13 +39,13 @@ class KwTermLower {
     }
   }
 
- private:
-    const int threshold_;
+private:
+  const int threshold_;
 };
 
 class KwTermEqual {
- public:
-  KwTermEqual(const int max_distance, const KwsTerm &inst):
+public:
+  KwTermEqual(const int max_distance, const KwsTerm &inst) :
     max_distance_(max_distance), inst_(inst) {}
 
   bool operator() (const KwsTerm &left, const KwsTerm &right) {
@@ -73,9 +73,9 @@ class KwTermEqual {
     return (*this)(inst_, right);
   }
 
- private:
-    const int max_distance_;
-    const KwsTerm inst_;
+private:
+  const int max_distance_;
+  const KwsTerm inst_;
 };
 
 
@@ -87,20 +87,20 @@ struct KwScoreStats {
   int32 nof_unseen;
   int32 nof_targets;
 
-  KwScoreStats(): nof_corr(0),
-                  nof_fa(0),
-                  nof_misses(0),
-                  nof_corr_ndet(0),
-                  nof_unseen(0),
-                  nof_targets(0) {}
+  KwScoreStats() : nof_corr(0),
+    nof_fa(0),
+    nof_misses(0),
+    nof_corr_ndet(0),
+    nof_unseen(0),
+    nof_targets(0) {}
 };
 
 struct ThrSweepStats {
   int32 nof_corr;
   int32 nof_fa;
 
-  ThrSweepStats(): nof_corr(0),
-                   nof_fa(0) {}
+  ThrSweepStats() : nof_corr(0),
+    nof_fa(0) {}
 };
 
 typedef unordered_map <float, ThrSweepStats> SweepThresholdStats;
@@ -116,7 +116,7 @@ void KwsTermsAlignerOptions::Register(OptionsItf *opts) {
                  "to be considered as a potential match");
 }
 
-KwsTermsAligner::KwsTermsAligner(const KwsTermsAlignerOptions &opts):
+KwsTermsAligner::KwsTermsAligner(const KwsTermsAlignerOptions &opts) :
   opts_(opts),
   nof_refs_(0),
   nof_hyps_(0) { }
@@ -166,7 +166,7 @@ void KwsTermsAligner::FillUnmatchedRefs(KwsAlignment *ali) {
     for (KwIndex kw = refs_[utt_id].begin(); kw != refs_[utt_id].end(); ++kw) {
       std::string kw_id = kw->first;
       for (TermIterator term = refs_[utt_id][kw_id].begin();
-                        term != refs_[utt_id][kw_id].end(); ++term ) {
+          term != refs_[utt_id][kw_id].end(); ++term ) {
         int idx = term - refs_[utt_id][kw_id].begin();
         if (!used_ref_terms_[utt_id][kw_id][idx]) {
           AlignedTermsPair missed_hyp;
@@ -191,7 +191,7 @@ int KwsTermsAligner::FindBestRefIndex(const KwsTerm &term) {
 
   TermIterator it = FindNextRef(term, start_mark, end_mark);
   if (it == end_mark) {
-    return  -1;
+    return -1;
   }
 
   int   best_ref_idx = -1;
@@ -226,25 +226,25 @@ bool KwsTermsAligner::RefExistsMaybe(const KwsTerm &term) {
 
 
 KwsTermsAligner::TermIterator KwsTermsAligner::FindNextRef(
-                                          const KwsTerm &ref,
-                                          const TermIterator &prev,
-                                          const TermIterator &last) {
+  const KwsTerm &ref,
+  const TermIterator &prev,
+  const TermIterator &last) {
   return std::find_if(prev, last,
       kws_internal::KwTermEqual(opts_.max_distance, ref));
 }
 
 float KwsTermsAligner::AlignerScore(const KwsTerm &ref, const KwsTerm &hyp) {
   float overlap = std::min(ref.end_time(), hyp.end_time())
-                  - std::max(ref.start_time(), hyp.start_time());
+      - std::max(ref.start_time(), hyp.start_time());
   float join = std::max(ref.end_time(), hyp.end_time())
-               - std::min(ref.start_time(), hyp.start_time());
+      - std::min(ref.start_time(), hyp.start_time());
   return static_cast<float>(overlap) / join;
 }
 
 void KwsAlignment::WriteCsv(std::iostream &os, const float frames_per_sec) {
   AlignedTerms::const_iterator it = begin();
   os << "language,file,channel,termid,term,ref_bt,ref_et,"
-    << "sys_bt,sys_et,sys_score,sys_decision,alignment\n";
+     << "sys_bt,sys_et,sys_score,sys_decision,alignment\n";
 
   while ( it != end() ) {
     int file = it->ref.valid() ? it->ref.utt_id() : it->hyp.utt_id();
@@ -254,22 +254,22 @@ void KwsAlignment::WriteCsv(std::iostream &os, const float frames_per_sec) {
     int channel = 1;
 
     os << lang << ","
-      << file << ","
-      << channel << ","
-      << termid << ","
-      << term << ",";
+       << file << ","
+       << channel << ","
+       << termid << ","
+       << term << ",";
 
     if (it->ref.valid()) {
       os << it->ref.start_time() / static_cast<float>(frames_per_sec) << ","
-        << it->ref.end_time() / static_cast<float>(frames_per_sec) << ",";
+         << it->ref.end_time() / static_cast<float>(frames_per_sec) << ",";
     } else {
       os << "," << ",";
     }
     if (it->hyp.valid()) {
       os << it->hyp.start_time() / static_cast<float>(frames_per_sec) << ","
-        << it->hyp.end_time() / static_cast<float>(frames_per_sec) << ","
-        << it->hyp.score() << ","
-        << (it->hyp.score() >= 0.5 ? "YES" : "NO") << ",";
+         << it->hyp.end_time() / static_cast<float>(frames_per_sec) << ","
+         << it->hyp.score() << ","
+         << (it->hyp.score() >= 0.5 ? "YES" : "NO") << ",";
     } else {
       os << "," << "," << "," << ",";
     }
@@ -287,12 +287,12 @@ void KwsAlignment::WriteCsv(std::iostream &os, const float frames_per_sec) {
 }
 
 
-TwvMetricsOptions::TwvMetricsOptions(): cost_fa(0.1f),
-                                        value_corr(1.0f),
-                                        prior_probability(1e-4f),
-                                        score_threshold(0.5f),
-                                        sweep_step(0.05f),
-                                        audio_duration(0.0f) {}
+TwvMetricsOptions::TwvMetricsOptions() : cost_fa(0.1f),
+  value_corr(1.0f),
+  prior_probability(1e-4f),
+  score_threshold(0.5f),
+  sweep_step(0.05f),
+  audio_duration(0.0f) {}
 
 void TwvMetricsOptions::Register(OptionsItf *opts) {
   opts->Register("cost-fa", &cost_fa,
@@ -311,21 +311,21 @@ void TwvMetricsOptions::Register(OptionsItf *opts) {
 }
 
 class TwvMetricsStats {
- public:
+public:
   kws_internal::KwScoreStats global_keyword_stats;
   kws_internal::KwStats keyword_stats;
   kws_internal::PerKwSweepStats otwv_sweep_cache;
   std::list<float> sweep_threshold_values;
 };
 
-TwvMetrics::TwvMetrics(const TwvMetricsOptions &opts):
+TwvMetrics::TwvMetrics(const TwvMetricsOptions &opts) :
   audio_duration_(opts.audio_duration),
   atwv_decision_threshold_(opts.score_threshold),
   beta_(opts.beta()) {
   stats_ = new TwvMetricsStats();
   if (opts.sweep_step > 0.0) {
     for (float i=0.0; i <= 1; i+=opts.sweep_step) {
-       stats_->sweep_threshold_values.push_back(i);
+      stats_->sweep_threshold_values.push_back(i);
     }
   }
 }
@@ -335,8 +335,8 @@ TwvMetrics::~TwvMetrics() {
 }
 
 void TwvMetrics::AddEvent(const KwsTerm &ref,
-                          const KwsTerm &hyp,
-                          float ali_score) {
+    const KwsTerm &hyp,
+    float ali_score) {
   if (ref.valid() && hyp.valid()) {
     RefAndHypSeen(hyp.kw_id(), hyp.score());
   } else if (hyp.valid()) {
@@ -411,7 +411,7 @@ float TwvMetrics::Atwv() {
   float atwv = 0;
 
   for (KwIterator it = stats_->keyword_stats.begin();
-                  it != stats_->keyword_stats.end(); ++it ) {
+      it != stats_->keyword_stats.end(); ++it ) {
     if (it->second.nof_targets == 0) {
       continue;
     }
@@ -432,7 +432,7 @@ float TwvMetrics::Stwv() {
   float stwv = 0;
 
   for (KwIterator it = stats_->keyword_stats.begin();
-                  it != stats_->keyword_stats.end(); ++it ) {
+      it != stats_->keyword_stats.end(); ++it ) {
     if (it->second.nof_targets == 0) {
       continue;
     }
@@ -446,8 +446,8 @@ float TwvMetrics::Stwv() {
 }
 
 void TwvMetrics::GetOracleMeasures(float *final_mtwv,
-                                  float *final_mtwv_threshold,
-                                  float *final_otwv) {
+    float *final_mtwv_threshold,
+    float *final_otwv) {
   typedef kws_internal::KwStats::iterator KwIterator;
 
   int32 nof_kw = 0;
@@ -455,7 +455,7 @@ void TwvMetrics::GetOracleMeasures(float *final_mtwv,
 
   unordered_map<float, double> mtwv_sweep;
   for (KwIterator it = stats_->keyword_stats.begin();
-                  it != stats_->keyword_stats.end(); ++it ) {
+      it != stats_->keyword_stats.end(); ++it ) {
     if (it->second.nof_targets == 0) {
       continue;
     }
@@ -479,7 +479,7 @@ void TwvMetrics::GetOracleMeasures(float *final_mtwv,
         local_otwv_threshold = decision_threshold;
       }
       mtwv_sweep[decision_threshold] = twv / (nof_kw + 1.0) +
-            mtwv_sweep[decision_threshold] * (nof_kw)/(nof_kw + 1.0);
+          mtwv_sweep[decision_threshold] * (nof_kw)/(nof_kw + 1.0);
     }
     KALDI_ASSERT(local_otwv_threshold >= 0);
     otwv = otwv * (nof_kw)/(nof_kw + 1.0) + local_otwv / (nof_kw + 1.0);

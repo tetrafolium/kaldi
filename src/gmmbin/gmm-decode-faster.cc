@@ -35,7 +35,7 @@ fst::Fst<fst::StdArc> *ReadNetwork(std::string filename) {
   // read decoding network FST
   Input ki(filename); // use ki.Stream() instead of is.
   if (!ki.Stream().good()) KALDI_ERR << "Could not open decoding-graph FST "
-                                      << filename;
+                                     << filename;
   fst::FstHeader hdr;
   if (!hdr.Read(ki.Stream(), "<unknown>")) {
     KALDI_ERR << "Reading FST: error reading FST header.";
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     ParseOptions po(usage);
     bool allow_partial = true;
     BaseFloat acoustic_scale = 0.1;
-    
+
     std::string word_syms_filename;
     FasterDecoderOptions decoder_opts;
     decoder_opts.Register(&po, true);  // true == include obscure settings.
@@ -117,10 +117,10 @@ int main(int argc, char *argv[]) {
     CompactLatticeWriter clat_writer(lattice_wspecifier);
 
     fst::SymbolTable *word_syms = NULL;
-    if (word_syms_filename != "") 
+    if (word_syms_filename != "")
       if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
         KALDI_ERR << "Could not read symbol table from file "
-                   << word_syms_filename;
+                  << word_syms_filename;
 
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
 
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
     // large process: the page-table entries are duplicated, which requires a
     // lot of virtual memory.
     fst::Fst<fst::StdArc> *decode_fst = ReadNetwork(fst_rxfilename);
-    
+
     BaseFloat tot_like = 0.0;
     kaldi::int64 frame_count = 0;
     int num_success = 0, num_fail = 0;
@@ -149,13 +149,13 @@ int main(int argc, char *argv[]) {
       }
 
       DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model, features,
-                                             acoustic_scale);
+          acoustic_scale);
       decoder.Decode(&gmm_decodable);
 
       fst::VectorFst<LatticeArc> decoded;  // linear FST.
 
       if ( (allow_partial || decoder.ReachedFinal())
-           && decoder.GetBestPath(&decoded) ) {
+          && decoder.GetBestPath(&decoded) ) {
         if (!decoder.ReachedFinal())
           KALDI_WARN << "Decoder did not reach end-state, "
                      << "outputting partial traceback since --allow-partial=true";
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
         words_writer.Write(key, words);
         if (alignment_writer.IsOpen())
           alignment_writer.Write(key, alignment);
-          
+
         if (lattice_wspecifier != "") {
           // We'll write the lattice without acoustic scaling.
           if (acoustic_scale != 0.0)
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
           ConvertLattice(decoded, &clat, true);
           clat_writer.Write(key, clat);
         }
-          
+
         if (word_syms != NULL) {
           std::cerr << key << ' ';
           for (size_t i = 0; i < words.size(); i++) {
@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
     KALDI_LOG << "Overall log-likelihood per frame is " << (tot_like/frame_count) << " over "
               << frame_count<<" frames.";
 
-    delete word_syms;    
+    delete word_syms;
     delete decode_fst;
     return (num_success != 0 ? 0 : 1);
   } catch(const std::exception &e) {

@@ -32,9 +32,9 @@ namespace kaldi {
 /// reading a single Real value from the device.
 template<typename Real>
 class CuValue {
- public:
-  CuValue(Real *data): data_(data) { }
-  CuValue(const CuValue &other): data_(other.data_) { }
+public:
+  CuValue(Real *data) : data_(data) { }
+  CuValue(const CuValue &other) : data_(other.data_) { }
 
   inline CuValue operator = (const CuValue<Real> &other) {
 #if HAVE_CUDA == 1
@@ -48,7 +48,7 @@ class CuValue {
       return *this;
     }
   }
-  
+
   inline Real operator = (Real r) { // assignment from Real
 #if HAVE_CUDA == 1
     if (CuDevice::Instantiate().Enabled()) {
@@ -63,20 +63,20 @@ class CuValue {
   }
 
   inline Real operator += (Real r) { return (*this = r + Real(*this)); }
-    
+
 
   inline operator Real () const { // assignment to Real
 #if HAVE_CUDA == 1
-  if (CuDevice::Instantiate().Enabled()) {
-    Real value;
-    CU_SAFE_CALL(cudaMemcpy(&value, data_,
+    if (CuDevice::Instantiate().Enabled()) {
+      Real value;
+      CU_SAFE_CALL(cudaMemcpy(&value, data_,
                             sizeof(Real), cudaMemcpyDeviceToHost));
-    return value;
-  } else
+      return value;
+    } else
 #endif
     return *data_;
   }
- private:
+private:
   Real *data_;
 }; // class CuValue<Real>
 

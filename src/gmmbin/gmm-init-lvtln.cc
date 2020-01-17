@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     // We'll set the transforms separately using gmm-train-lvtln-special
     LinearVtln lvtln(dim, num_classes, default_class);
     WriteKaldiObject(lvtln, lvtln_wxfilename, binary);
-    
+
     KALDI_LOG << "Initialized LVTLN object and wrote it to "
               << PrintableWxfilename(lvtln_wxfilename);
     return 0;

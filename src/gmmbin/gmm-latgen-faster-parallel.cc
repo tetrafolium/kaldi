@@ -94,10 +94,10 @@ int main(int argc, char *argv[]) {
     bool determinize = latgen_config.determinize_lattice;
     CompactLatticeWriter compact_lattice_writer;
     LatticeWriter lattice_writer;
-    if (! (determinize ? compact_lattice_writer.Open(lattice_wspecifier)
-           : lattice_writer.Open(lattice_wspecifier)))
+    if (!(determinize ? compact_lattice_writer.Open(lattice_wspecifier)
+        : lattice_writer.Open(lattice_wspecifier)))
       KALDI_ERR << "Could not open table for writing lattices: "
-                 << lattice_wspecifier;
+                << lattice_wspecifier;
 
     Int32VectorWriter words_writer(words_wspecifier);
 
@@ -107,13 +107,13 @@ int main(int argc, char *argv[]) {
     if (word_syms_filename != "")
       if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
         KALDI_ERR << "Could not read symbol table from file "
-                   << word_syms_filename;
+                  << word_syms_filename;
 
     double tot_like = 0.0;
     kaldi::int64 frame_count = 0;
     int num_done = 0, num_err = 0;
     Fst<StdArc> *decode_fst = NULL; // only used if there is a single
-                                          // decoding graph.
+    // decoding graph.
 
     TaskSequencer<DecodeUtteranceLatticeFasterClass> sequencer(sequencer_config);
 

@@ -29,7 +29,7 @@ namespace nnet3 {
 
 /** @file
     This file contains various routines that are useful in test code.
-*/
+ */
 struct NnetGenerationOptions {
   bool allow_context;
   bool allow_nonlinearity;
@@ -45,31 +45,31 @@ struct NnetGenerationOptions {
   // will be set to this value.
   int32 output_dim;
 
-  NnetGenerationOptions():
-      allow_context(true),
-      allow_nonlinearity(true),
-      allow_recursion(true),
-      allow_clockwork(true),
-      allow_multiple_inputs(true),
-      allow_multiple_outputs(false),
-      allow_final_nonlinearity(true),
-      allow_use_of_x_dim(true),
-      allow_ivector(false),
-      allow_statistics_pooling(true),
-      output_dim(-1) { }
+  NnetGenerationOptions() :
+    allow_context(true),
+    allow_nonlinearity(true),
+    allow_recursion(true),
+    allow_clockwork(true),
+    allow_multiple_inputs(true),
+    allow_multiple_outputs(false),
+    allow_final_nonlinearity(true),
+    allow_use_of_x_dim(true),
+    allow_ivector(false),
+    allow_statistics_pooling(true),
+    output_dim(-1) { }
 };
 
 /** Generates a sequence of at least one config files, output as strings, where
     the first in the sequence is the initial nnet, and the remaining ones may do
     things like add layers.  */
 void GenerateConfigSequence(const NnetGenerationOptions &opts,
-                            std::vector<std::string> *configs);
+    std::vector<std::string> *configs);
 
 /// Generate a config string with a composite component composed only
 /// of block affine, repeated affine, and natural gradient repeated affine
 /// components.
 void GenerateConfigSequenceCompositeBlock(const NnetGenerationOptions &opts,
-                                          std::vector<std::string> *configs);
+    std::vector<std::string> *configs);
 
 /**  This function computes an example computation request, for testing purposes.
      The "Simple" in the name means that it currently only supports neural nets
@@ -80,11 +80,11 @@ void GenerateConfigSequenceCompositeBlock(const NnetGenerationOptions &opts,
      stop crashes with statistics-pooling/statistics-extraction components),
      this function always generates computation-requests where at least 3
      successive frames of input are requested.
-*/
+ */
 void ComputeExampleComputationRequestSimple(
-    const Nnet &nnet,
-    ComputationRequest *request,
-    std::vector<Matrix<BaseFloat> > *inputs);
+  const Nnet &nnet,
+  ComputationRequest *request,
+  std::vector<Matrix<BaseFloat> > *inputs);
 
 Component *GenerateRandomSimpleComponent();
 
@@ -94,8 +94,8 @@ Component *GenerateRandomSimpleComponent();
     parameters differ.  E.g. set threshold to 1.0e-05 (it's a relative
     threshold, applied per component). */
 bool NnetParametersAreIdentical(const Nnet &nnet1,
-                                const Nnet &nnet2,
-                                BaseFloat threshold);
+    const Nnet &nnet2,
+    BaseFloat threshold);
 
 
 /** Low-level function that generates an nnet training example.  By "simple" we
@@ -104,20 +104,20 @@ bool NnetParametersAreIdentical(const Nnet &nnet1,
     ivector_dim <= 0).  This function generates exactly "left_context" or
     "right_context" frames of context on the left and right respectively. */
 void GenerateSimpleNnetTrainingExample(
-    int32 num_supervised_frames,
-    int32 left_context,
-    int32 right_context,
-    int32 input_dim,
-    int32 output_dim,
-    int32 ivector_dim,
-    NnetExample *example);
+  int32 num_supervised_frames,
+  int32 left_context,
+  int32 right_context,
+  int32 input_dim,
+  int32 output_dim,
+  int32 ivector_dim,
+  NnetExample *example);
 
 
 /// Returns true if the examples are approximately equal (only intended to be
 /// used in testing).
 bool ExampleApproxEqual(const NnetExample &eg1,
-                        const NnetExample &eg2,
-                        BaseFloat delta);
+    const NnetExample &eg2,
+    BaseFloat delta);
 
 } // namespace nnet3
 } // namespace kaldi

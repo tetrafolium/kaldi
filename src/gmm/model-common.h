@@ -53,7 +53,7 @@ enum SgmmUpdateFlags {  /// The letters correspond to the variable names.
   kSgmmSpeakerProjections          = 0x020,  /// N
   kSgmmTransitions                 = 0x040,  /// t .. not really part of SGMM.
   kSgmmSpeakerWeightProjections    = 0x080,  /// u [ for SSGMM ]
-  kSgmmAll                         = 0x0FF   /// a (won't normally use this).  
+  kSgmmAll                         = 0x0FF   /// a (won't normally use this).
 };
 
 typedef uint16 SgmmUpdateFlagsType;  ///< Bitwise OR of the above flags.
@@ -83,10 +83,10 @@ SgmmWriteFlagsType StringToSgmmWriteFlags(std::string str);
 /// The vector "targets" will be resized to the appropriate dimension;
 /// its value at input is ignored.
 void GetSplitTargets(const Vector<BaseFloat> &state_occs,
-                     int32 target_components,
-                     BaseFloat power,
-                     BaseFloat min_count,
-                     std::vector<int32> *targets);
+    int32 target_components,
+    BaseFloat power,
+    BaseFloat min_count,
+    std::vector<int32> *targets);
 
 }  // End namespace kaldi
 

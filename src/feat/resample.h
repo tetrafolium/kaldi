@@ -40,7 +40,7 @@ namespace kaldi {
 
 /**
    \file[resample.h]
-   
+
    This header contains declarations of classes for resampling signals.  The
    normal cases of resampling a signal are upsampling and downsampling
    (increasing and decreasing the sample rate of a signal, respectively),
@@ -51,7 +51,7 @@ namespace kaldi {
    The input signal is always evenly spaced, say sampled with frequency S, and
    we assume the original signal was band-limited to S/2 or lower.  The n'th
    input sample x_n (with n = 0, 1, ...) is interpreted as the original
-   signal's value at time n/S.  
+   signal's value at time n/S.
 
    For resampling, it is convenient to view the input signal as a
    continuous function x(t) of t, where each sample x_n becomes a delta function
@@ -65,7 +65,7 @@ namespace kaldi {
    rectangular filter with cutoff C is the sinc function,
    \f[         f(t) = 2C sinc(2Ct),                   \f]
    where sinc is the normalized sinc function \f$ sinc(t) = sin(pi t) / (pi t) \f$, with
-  \f$  sinc(0) = 1 \f$.  This is not a practical filter, though, because it has
+   \f$  sinc(0) = 1 \f$.  This is not a practical filter, though, because it has
    infinite support.  At the cost of less-than-perfect rolloff, we can choose
    a suitable windowing function g(t), and use f(t) g(t) as the filter.  For
    a windowing function we choose raised-cosine (Hanning) window with support
@@ -73,15 +73,15 @@ namespace kaldi {
    means we window the sinc function out to its first zero on the left and right,
    w = 2 means the second zero, and so on; we normally choose w to be at least two.
    We call this num_zeros, not w, in the code.
-   
+
    Convolving the signal x(t) with this windowed filter h(t) = f(t)g(t) and evaluating the resulting
    signal s(t) at an arbitrary time t is easy: we have
     \f[          s(t) = 1/S \sum_n x_n h(t - n/S)        \f].
    (note: the sign of t - n/S might be wrong, but it doesn't matter as the filter
    and window are symmetric).
    This is true for arbitrary values of t.  What the class ArbitraryResample does
-   is to allow you to evaluate the signal for specified values of t.  
-*/
+   is to allow you to evaluate the signal for specified values of t.
+ */
 
 
 /**
@@ -90,15 +90,15 @@ namespace kaldi {
    don't have to be linearly spaced.  The low-pass filter cutoff
    "filter_cutoff_hz" should be less than half the sample rate;
    "num_zeros" should probably be at least two preferably more; higher numbers give
-   sharper filters but will be less efficient. 
-*/
+   sharper filters but will be less efficient.
+ */
 class ArbitraryResample {
- public:
+public:
   ArbitraryResample(int32 num_samples_in,
-                    BaseFloat samp_rate_hz,
-                    BaseFloat filter_cutoff_hz,
-                    const Vector<BaseFloat> &sample_points_secs,
-                    int32 num_zeros);
+      BaseFloat samp_rate_hz,
+      BaseFloat filter_cutoff_hz,
+      const Vector<BaseFloat> &sample_points_secs,
+      int32 num_zeros);
 
   int32 NumSamplesIn() const { return num_samples_in_; }
 
@@ -110,13 +110,13 @@ class ArbitraryResample {
   /// input.NumCols() should equal NumSamplesIn()
   /// and output.NumCols() should equal NumSamplesOut().
   void Resample(const MatrixBase<BaseFloat> &input,
-                MatrixBase<BaseFloat> *output) const;
+      MatrixBase<BaseFloat> *output) const;
 
   /// This version of the Resample function processes just
   /// one vector.
   void Resample(const VectorBase<BaseFloat> &input,
-                VectorBase<BaseFloat> *output) const;  
- private:
+      VectorBase<BaseFloat> *output) const;
+private:
   void SetIndexes(const Vector<BaseFloat> &sample_points);
 
   void SetWeights(const Vector<BaseFloat> &sample_points);
@@ -142,10 +142,10 @@ class ArbitraryResample {
 
    We require that the input and output sampling rate be specified as
    integers, as this is an easy way to specify that their ratio be rational.
-*/
+ */
 
 class LinearResample {
- public:
+public:
   /// Constructor.  We make the input and output sample rates integers, because
   /// we are going to need to find a common divisor.  This should just remind
   /// you that they need to be integers.  The filter cutoff needs to be less
@@ -153,9 +153,9 @@ class LinearResample {
   /// controls the sharpness of the filter, more == sharper but less efficient.
   /// We suggest around 4 to 10 for normal use.
   LinearResample(int32 samp_rate_in_hz,
-                 int32 samp_rate_out_hz,
-                 BaseFloat filter_cutoff_hz,
-                 int32 num_zeros);
+      int32 samp_rate_out_hz,
+      BaseFloat filter_cutoff_hz,
+      int32 num_zeros);
 
   /// This function does the resampling.  If you call it with flush == true and
   /// you have never called it with flush == false, it just resamples the input
@@ -175,8 +175,8 @@ class LinearResample {
   /// have internal state; you can remove this by calling Reset().
   /// Empty input is acceptable.
   void Resample(const VectorBase<BaseFloat> &input,
-                bool flush,
-                Vector<BaseFloat> *output);
+      bool flush,
+      Vector<BaseFloat> *output);
 
   /// Calling the function Reset() resets the state of the object prior to
   /// processing a new signal; it is only necessary if you have called
@@ -185,7 +185,7 @@ class LinearResample {
   /// Resample(x, y, true) for the last piece.  Call it unnecessarily between
   /// signals will not do any harm.
   void Reset();
- private:
+private:
   /// This function outputs the number of output samples we will output
   /// for a signal with "input_num_samp" input samples.  If flush == true,
   /// we return the largest n such that
@@ -202,8 +202,8 @@ class LinearResample {
   /// and to *samp_out_wrapped the index into weights_ where we can get the
   /// corresponding weights on the input.
   inline void GetIndexes(int64 samp_out,
-                         int64 *first_samp_in,
-                         int32 *samp_out_wrapped) const;
+      int64 *first_samp_in,
+      int32 *samp_out_wrapped) const;
 
   void SetRemainder(const VectorBase<BaseFloat> &input);
 
@@ -261,7 +261,7 @@ class LinearResample {
 /// equal to (pass-band-freq - stop-band-freq).
 /// Also the cutoff frequency is equal to (pass-band-freq - stop-band-freq).
 void DownsampleWaveForm(BaseFloat orig_freq, const VectorBase<BaseFloat> &wave,
-                        BaseFloat new_freq, Vector<BaseFloat> *new_wave);
+    BaseFloat new_freq, Vector<BaseFloat> *new_wave);
 
 /// @} End of "addtogroup feat"
 }  // namespace kaldi

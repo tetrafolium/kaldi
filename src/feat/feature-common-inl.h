@@ -27,17 +27,17 @@ namespace kaldi {
 
 template <class F>
 void OfflineFeatureTpl<F>::ComputeFeatures(
-    const VectorBase<BaseFloat> &wave,
-    BaseFloat sample_freq,
-    BaseFloat vtln_warp,
-    Matrix<BaseFloat> *output) {
+  const VectorBase<BaseFloat> &wave,
+  BaseFloat sample_freq,
+  BaseFloat vtln_warp,
+  Matrix<BaseFloat> *output) {
   KALDI_ASSERT(output != NULL);
   BaseFloat new_sample_freq = computer_.GetFrameOptions().samp_freq;
   if (sample_freq == new_sample_freq)
     Compute(wave, vtln_warp, output);
   else {
     if (new_sample_freq < sample_freq) {
-      if (! computer_.GetFrameOptions().allow_downsample)
+      if (!computer_.GetFrameOptions().allow_downsample)
         KALDI_ERR << "Waveform and config sample Frequency mismatch: "
                   << sample_freq << " .vs " << new_sample_freq
                   << " ( use --allow_downsample=true option to allow "
@@ -59,10 +59,10 @@ void OfflineFeatureTpl<F>::ComputeFeatures(
 
 template <class F>
 void OfflineFeatureTpl<F>::ComputeFeatures(
-    const VectorBase<BaseFloat> &wave,
-    BaseFloat sample_freq,
-    BaseFloat vtln_warp,
-    Matrix<BaseFloat> *output) const {
+  const VectorBase<BaseFloat> &wave,
+  BaseFloat sample_freq,
+  BaseFloat vtln_warp,
+  Matrix<BaseFloat> *output) const {
   OfflineFeatureTpl<F> temp(*this);
   // This const version of ComputeFeatures() is a wrapper that
   // calls the non-const ComputeFeatures() on a temporary object
@@ -73,9 +73,9 @@ void OfflineFeatureTpl<F>::ComputeFeatures(
 
 template <class F>
 void OfflineFeatureTpl<F>::Compute(
-    const VectorBase<BaseFloat> &wave,
-    BaseFloat vtln_warp,
-    Matrix<BaseFloat> *output) {
+  const VectorBase<BaseFloat> &wave,
+  BaseFloat vtln_warp,
+  Matrix<BaseFloat> *output) {
   KALDI_ASSERT(output != NULL);
   int32 rows_out = NumFrames(wave.Dim(), computer_.GetFrameOptions()),
       cols_out = computer_.Dim();
@@ -90,7 +90,7 @@ void OfflineFeatureTpl<F>::Compute(
     BaseFloat raw_log_energy = 0.0;
     ExtractWindow(0, wave, r, computer_.GetFrameOptions(),
                   feature_window_function_, &window,
-                  (use_raw_log_energy ? &raw_log_energy : NULL));
+        (use_raw_log_energy ? &raw_log_energy : NULL));
 
     SubVector<BaseFloat> output_row(*output, r);
     computer_.Compute(raw_log_energy, vtln_warp, &window, &output_row);
@@ -99,9 +99,9 @@ void OfflineFeatureTpl<F>::Compute(
 
 template <class F>
 void OfflineFeatureTpl<F>::Compute(
-    const VectorBase<BaseFloat> &wave,
-    BaseFloat vtln_warp,
-    Matrix<BaseFloat> *output) const {
+  const VectorBase<BaseFloat> &wave,
+  BaseFloat vtln_warp,
+  Matrix<BaseFloat> *output) const {
   OfflineFeatureTpl<F> temp(*this);
   // call the non-const version of Compute() on a temporary copy of this object.
   // This is a workaround for const-ness that may sometimes be useful in

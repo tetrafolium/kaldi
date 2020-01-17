@@ -31,11 +31,11 @@ using std::vector;
 namespace kaldi {
 
 void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
-                            const Sgmm2GauPost &gpost,
-                            const TransitionModel &trans_model,
-                            const AmSgmm2 &am_sgmm,
-                            Sgmm2PerSpkDerivedVars *spk_vars,
-                            MleSgmm2SpeakerAccs *spk_stats) {
+    const Sgmm2GauPost &gpost,
+    const TransitionModel &trans_model,
+    const AmSgmm2 &am_sgmm,
+    Sgmm2PerSpkDerivedVars *spk_vars,
+    MleSgmm2SpeakerAccs *spk_stats) {
   kaldi::Sgmm2PerFrameDerivedVars per_frame_vars;
 
   for (size_t i = 0; i < gpost.size(); i++) {
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
             continue;
           }
           const Sgmm2GauPost &gpost = gpost_reader.Value(utt);
-          
+
           AccumulateForUtterance(feats, gpost, trans_model, am_sgmm,
                                  &spk_vars, &spk_stats);
           num_done++;
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
             KALDI_WARN << "Cannot find speaker vector for " << utt;
           }
         }  // else spk_vars is "empty"
-        
+
         num_done++;
         spk_stats.Clear();
 

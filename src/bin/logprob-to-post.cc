@@ -25,7 +25,7 @@
 #include "hmm/hmm-utils.h"
 #include "hmm/posterior.h"
 
-/* Convert a matrix of log-probabilities 
+/* Convert a matrix of log-probabilities
    to something of type Posterior, i.e. for each utterance, a
    vector<vector<pair<int32, BaseFloat> > >, which is a sparse representation
    of the probabilities.
@@ -34,7 +34,7 @@
    default) a pseudo-random thing where you preserve the expectation, e.g.
    if the threshold is 0.01 and the value is 0.001, it will be zero with
    probability 0.9 and 0.01 with probability 0.1.
-*/
+ */
 
 int main(int argc, char *argv[]) {
   using namespace kaldi;
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
         " nnet-logprob [args] | logprob-to-post ark:- ark:1.post\n"
         "Caution: in this particular example, the output would be posteriors of pdf-ids,\n"
         "rather than transition-ids (c.f. post-to-pdf-post)\n";
-    
+
     ParseOptions po(usage);
 
     BaseFloat min_post = 0.01;
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
                 "ones are pruned).  Also see --random-prune");
     po.Register("random-prune", &random_prune, "If true, prune posteriors with a "
                 "randomized method that preserves expectations.");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {

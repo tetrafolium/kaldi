@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
         " sorted from best to worst.\n"
         "Usage: gmm-global-get-post [options] <model-in> <feature-rspecifier> <post-wspecifier>\n"
         "e.g.: gmm-global-get-post --n=20 1.gmm \"ark:feature-command |\" \"ark,t:|gzip -c >post.1.gz\"\n";
-    
+
     ParseOptions po(usage);
     int32 num_post = 50;
     BaseFloat min_post = 0.0;
@@ -66,13 +66,13 @@ int main(int argc, char *argv[]) {
                  << "only has " << num_gauss << ", returning this many. ";
       num_post = num_gauss;
     }
-    
+
     double tot_like = 0.0;
     kaldi::int64 tot_t = 0;
-    
+
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
     PosteriorWriter post_writer(post_wspecifier);
-    
+
     int32 num_done = 0, num_err = 0;
     for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string utt = feature_reader.Key();
@@ -90,9 +90,9 @@ int main(int argc, char *argv[]) {
         continue;
       }
       vector<vector<int32> > gselect(T);
-      
+
       Matrix<BaseFloat> loglikes;
-      
+
       gmm.LogLikelihoods(feats, &loglikes);
 
       Posterior post(T);
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
     KALDI_LOG << "Done " << num_done << " files, " << num_err
               << " with errors, average UBM log-likelihood is "
               << (tot_like/tot_t) << " over " << tot_t << " frames.";
-    
+
     if (num_done != 0) return 0;
     else return 1;
   } catch(const std::exception &e) {

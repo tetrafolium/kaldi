@@ -46,14 +46,14 @@ struct NnetRescaleConfig {
   // ensure stability).
   BaseFloat min_change; // minimum change on any one iteration (controls
   // termination
-  
-  NnetRescaleConfig(): target_avg_deriv(0.2),
-                       target_first_layer_avg_deriv(0.3),
-                       target_last_layer_avg_deriv(0.1),
-                       num_iters(10),
-                       delta(0.01),
-                       max_change(0.2), min_change(1.0e-05) { }
-  
+
+  NnetRescaleConfig() : target_avg_deriv(0.2),
+    target_first_layer_avg_deriv(0.3),
+    target_last_layer_avg_deriv(0.1),
+    num_iters(10),
+    delta(0.01),
+    max_change(0.2), min_change(1.0e-05) { }
+
   void Register(OptionsItf *opts) {
     opts->Register("target-avg-deriv", &target_avg_deriv, "Target average derivative "
                    "for hidden layers that are the not the first or last hidden layer "
@@ -65,13 +65,13 @@ struct NnetRescaleConfig {
                    "Target average derivative for the last hidden layer, if "
                    "#hid-layers > 1"
                    "(as fraction of maximum derivative of the nonlinearity)");
-  }  
+  }
 };
 
 void RescaleNnet(const NnetRescaleConfig &rescale_config,
-                 const std::vector<NnetExample> &examples,
-                 Nnet *nnet);
-  
+    const std::vector<NnetExample> &examples,
+    Nnet *nnet);
+
 
 
 } // namespace nnet2

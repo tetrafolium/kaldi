@@ -28,7 +28,7 @@ namespace kaldi {
 
 
 int64 FirstSampleOfFrame(int32 frame,
-                         const FrameExtractionOptions &opts) {
+    const FrameExtractionOptions &opts) {
   int64 frame_shift = opts.WindowShift();
   if (opts.snip_edges) {
     return frame * frame_shift;
@@ -40,8 +40,8 @@ int64 FirstSampleOfFrame(int32 frame,
 }
 
 int32 NumFrames(int64 num_samples,
-                const FrameExtractionOptions &opts,
-                bool flush) {
+    const FrameExtractionOptions &opts,
+    bool flush) {
   int64 frame_shift = opts.WindowShift();
   int64 frame_length = opts.WindowSize();
   if (opts.snip_edges) {
@@ -123,7 +123,7 @@ FeatureWindowFunction::FeatureWindowFunction(const FrameExtractionOptions &opts)
       window(i) = 1.0;
     } else if (opts.window_type == "blackman") {
       window(i) = opts.blackman_coeff - 0.5*cos(a * i_fl) +
-        (0.5 - opts.blackman_coeff) * cos(2 * a * i_fl);
+          (0.5 - opts.blackman_coeff) * cos(2 * a * i_fl);
     } else {
       KALDI_ERR << "Invalid window type " << opts.window_type;
     }
@@ -131,9 +131,9 @@ FeatureWindowFunction::FeatureWindowFunction(const FrameExtractionOptions &opts)
 }
 
 void ProcessWindow(const FrameExtractionOptions &opts,
-                   const FeatureWindowFunction &window_function,
-                   VectorBase<BaseFloat> *window,
-                   BaseFloat *log_energy_pre_window) {
+    const FeatureWindowFunction &window_function,
+    VectorBase<BaseFloat> *window,
+    BaseFloat *log_energy_pre_window) {
   int32 frame_length = opts.WindowSize();
   KALDI_ASSERT(window->Dim() == frame_length);
 
@@ -160,12 +160,12 @@ void ProcessWindow(const FrameExtractionOptions &opts,
 // padded size.  It does mean subtraction, pre-emphasis and dithering as
 // requested.
 void ExtractWindow(int64 sample_offset,
-                   const VectorBase<BaseFloat> &wave,
-                   int32 f,  // with 0 <= f < NumFrames(feats, opts)
-                   const FrameExtractionOptions &opts,
-                   const FeatureWindowFunction &window_function,
-                   Vector<BaseFloat> *window,
-                   BaseFloat *log_energy_pre_window) {
+    const VectorBase<BaseFloat> &wave,
+    int32 f,                 // with 0 <= f < NumFrames(feats, opts)
+    const FrameExtractionOptions &opts,
+    const FeatureWindowFunction &window_function,
+    Vector<BaseFloat> *window,
+    BaseFloat *log_energy_pre_window) {
   KALDI_ASSERT(sample_offset >= 0 && wave.Dim() != 0);
   int32 frame_length = opts.WindowSize(),
       frame_length_padded = opts.PaddedWindowSize();
@@ -204,7 +204,7 @@ void ExtractWindow(int64 sample_offset,
         // dim -> dim - 1, dim + 1 -> dim - 2.
         // the code supports repeated reflections, although this
         // would only be needed in pathological cases.
-        if (s_in_wave < 0) s_in_wave = - s_in_wave - 1;
+        if (s_in_wave < 0) s_in_wave = -s_in_wave - 1;
         else s_in_wave = 2 * wave_dim - 1 - s_in_wave;
       }
       (*window)(s) = wave(s_in_wave);
@@ -220,8 +220,8 @@ void ExtractWindow(int64 sample_offset,
 }
 
 void ExtractWaveformRemainder(const VectorBase<BaseFloat> &wave,
-                              const FrameExtractionOptions &opts,
-                              Vector<BaseFloat> *wave_remainder) {
+    const FrameExtractionOptions &opts,
+    Vector<BaseFloat> *wave_remainder) {
   int32 frame_shift = opts.WindowShift();
   int32 num_frames = NumFrames(wave.Dim(), opts);
   // offset is the amount at the start that has been extracted.

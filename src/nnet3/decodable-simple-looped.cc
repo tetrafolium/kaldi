@@ -26,17 +26,17 @@ namespace nnet3 {
 
 
 DecodableNnetSimpleLoopedInfo::DecodableNnetSimpleLoopedInfo(
-    const NnetSimpleLoopedComputationOptions &opts,
-    Nnet *nnet):
-    opts(opts), nnet(*nnet) {
+  const NnetSimpleLoopedComputationOptions &opts,
+  Nnet *nnet) :
+  opts(opts), nnet(*nnet) {
   Init(opts, nnet);
 }
 
 DecodableNnetSimpleLoopedInfo::DecodableNnetSimpleLoopedInfo(
-    const NnetSimpleLoopedComputationOptions &opts,
-    const Vector<BaseFloat> &priors,
-    Nnet *nnet):
-    opts(opts), nnet(*nnet), log_priors(priors) {
+  const NnetSimpleLoopedComputationOptions &opts,
+  const Vector<BaseFloat> &priors,
+  Nnet *nnet) :
+  opts(opts), nnet(*nnet), log_priors(priors) {
   if (log_priors.Dim() != 0)
     log_priors.ApplyLog();
   Init(opts, nnet);
@@ -44,9 +44,9 @@ DecodableNnetSimpleLoopedInfo::DecodableNnetSimpleLoopedInfo(
 
 
 DecodableNnetSimpleLoopedInfo::DecodableNnetSimpleLoopedInfo(
-    const NnetSimpleLoopedComputationOptions &opts,
-    AmNnetSimple *am_nnet):
-    opts(opts), nnet(am_nnet->GetNnet()), log_priors(am_nnet->Priors()) {
+  const NnetSimpleLoopedComputationOptions &opts,
+  AmNnetSimple *am_nnet) :
+  opts(opts), nnet(am_nnet->GetNnet()), log_priors(am_nnet->Priors()) {
   if (log_priors.Dim() != 0)
     log_priors.ApplyLog();
   Init(opts, &(am_nnet->GetNnet()));
@@ -54,8 +54,8 @@ DecodableNnetSimpleLoopedInfo::DecodableNnetSimpleLoopedInfo(
 
 
 void DecodableNnetSimpleLoopedInfo::Init(
-    const NnetSimpleLoopedComputationOptions &opts,
-    Nnet *nnet) {
+  const NnetSimpleLoopedComputationOptions &opts,
+  Nnet *nnet) {
   opts.Check();
   KALDI_ASSERT(IsSimpleNnet(*nnet));
   has_ivectors = (nnet->InputDim("ivector") > 0);
@@ -93,36 +93,36 @@ void DecodableNnetSimpleLoopedInfo::Init(
 
 
 DecodableNnetSimpleLooped::DecodableNnetSimpleLooped(
-    const DecodableNnetSimpleLoopedInfo &info,
-    const MatrixBase<BaseFloat> &feats,
-    const VectorBase<BaseFloat> *ivector,
-    const MatrixBase<BaseFloat> *online_ivectors,
-    int32 online_ivector_period):
-    info_(info),
-    computer_(info_.opts.compute_config, info_.computation,
-              info_.nnet, NULL),  // NULL is 'nnet_to_update'
-    feats_(feats),
-    ivector_(ivector), online_ivector_feats_(online_ivectors),
-    online_ivector_period_(online_ivector_period),
-    num_chunks_computed_(0),
-    current_log_post_subsampled_offset_(-1) {
+  const DecodableNnetSimpleLoopedInfo &info,
+  const MatrixBase<BaseFloat> &feats,
+  const VectorBase<BaseFloat> *ivector,
+  const MatrixBase<BaseFloat> *online_ivectors,
+  int32 online_ivector_period) :
+  info_(info),
+  computer_(info_.opts.compute_config, info_.computation,
+      info_.nnet, NULL),          // NULL is 'nnet_to_update'
+  feats_(feats),
+  ivector_(ivector), online_ivector_feats_(online_ivectors),
+  online_ivector_period_(online_ivector_period),
+  num_chunks_computed_(0),
+  current_log_post_subsampled_offset_(-1) {
   num_subsampled_frames_ =
       (feats_.NumRows() + info_.opts.frame_subsampling_factor - 1) /
       info_.opts.frame_subsampling_factor;
   KALDI_ASSERT(!(ivector != NULL && online_ivectors != NULL));
   KALDI_ASSERT(!(online_ivectors != NULL && online_ivector_period <= 0 &&
-                 "You need to set the --online-ivector-period option!"));
+      "You need to set the --online-ivector-period option!"));
 }
 
 
 void DecodableNnetSimpleLooped::GetOutputForFrame(
-    int32 subsampled_frame, VectorBase<BaseFloat> *output) {
-    KALDI_ASSERT(subsampled_frame >= current_log_post_subsampled_offset_ &&
+  int32 subsampled_frame, VectorBase<BaseFloat> *output) {
+  KALDI_ASSERT(subsampled_frame >= current_log_post_subsampled_offset_ &&
                  "Frames must be accessed in order.");
-    while (subsampled_frame >= current_log_post_subsampled_offset_ +
-                            current_log_post_.NumRows())
-      AdvanceChunk();
-    output->CopyFromVec(current_log_post_.Row(
+  while (subsampled_frame >= current_log_post_subsampled_offset_ +
+      current_log_post_.NumRows())
+    AdvanceChunk();
+  output->CopyFromVec(current_log_post_.Row(
         subsampled_frame - current_log_post_subsampled_offset_));
 }
 
@@ -148,18 +148,18 @@ void DecodableNnetSimpleLooped::AdvanceChunk() {
     end_input_frame = begin_input_frame + info_.frames_per_chunk;
   }
   CuMatrix<BaseFloat> feats_chunk(end_input_frame - begin_input_frame,
-                                  feats_.NumCols(), kUndefined);
+      feats_.NumCols(), kUndefined);
 
   int32 num_features = feats_.NumRows();
   if (begin_input_frame >= 0 && end_input_frame <= num_features) {
     SubMatrix<BaseFloat> this_feats(feats_,
-                                    begin_input_frame,
-                                    end_input_frame - begin_input_frame,
-                                    0, feats_.NumCols());
+        begin_input_frame,
+        end_input_frame - begin_input_frame,
+        0, feats_.NumCols());
     feats_chunk.CopyFromMat(this_feats);
   } else {
     Matrix<BaseFloat> this_feats(end_input_frame - begin_input_frame,
-                                 feats_.NumCols());
+        feats_.NumCols());
     for (int32 r = begin_input_frame; r < end_input_frame; r++) {
       int32 input_frame = r;
       if (input_frame < 0) input_frame = 0;
@@ -176,8 +176,8 @@ void DecodableNnetSimpleLooped::AdvanceChunk() {
     // all but the 1st chunk should have 1 iVector, but no need
     // to assume this.
     int32 num_ivectors = (num_chunks_computed_ == 0 ?
-			  info_.request1.inputs[1].indexes.size() :
-			  info_.request2.inputs[1].indexes.size());
+        info_.request1.inputs[1].indexes.size() :
+        info_.request2.inputs[1].indexes.size());
     KALDI_ASSERT(num_ivectors > 0);
 
     Vector<BaseFloat> ivector;
@@ -187,7 +187,7 @@ void DecodableNnetSimpleLooped::AdvanceChunk() {
     // iVector from as large 't' as possible will be better.
     GetCurrentIvector(end_input_frame, &ivector);
     Matrix<BaseFloat> ivectors(num_ivectors,
-			       ivector.Dim());
+        ivector.Dim());
     ivectors.CopyRowsFromVec(ivector);
     CuMatrix<BaseFloat> cu_ivectors(ivectors);
     computer_.AcceptInput("ivector", &cu_ivectors);
@@ -225,7 +225,7 @@ void DecodableNnetSimpleLooped::AdvanceChunk() {
 
 
 void DecodableNnetSimpleLooped::GetCurrentIvector(int32 input_frame,
-                                                  Vector<BaseFloat> *ivector) {
+    Vector<BaseFloat> *ivector) {
   if (!info_.has_ivectors)
     return;
   if (ivector_ != NULL) {
@@ -245,17 +245,17 @@ void DecodableNnetSimpleLooped::GetCurrentIvector(int32 input_frame,
 
 
 DecodableAmNnetSimpleLooped::DecodableAmNnetSimpleLooped(
-    const DecodableNnetSimpleLoopedInfo &info,
-    const TransitionModel &trans_model,
-    const MatrixBase<BaseFloat> &feats,
-    const VectorBase<BaseFloat> *ivector,
-    const MatrixBase<BaseFloat> *online_ivectors,
-    int32 online_ivector_period):
-    decodable_nnet_(info, feats, ivector, online_ivectors, online_ivector_period),
-    trans_model_(trans_model) { }
+  const DecodableNnetSimpleLoopedInfo &info,
+  const TransitionModel &trans_model,
+  const MatrixBase<BaseFloat> &feats,
+  const VectorBase<BaseFloat> *ivector,
+  const MatrixBase<BaseFloat> *online_ivectors,
+  int32 online_ivector_period) :
+  decodable_nnet_(info, feats, ivector, online_ivectors, online_ivector_period),
+  trans_model_(trans_model) { }
 
 BaseFloat DecodableAmNnetSimpleLooped::LogLikelihood(int32 frame,
-                                                     int32 transition_id) {
+    int32 transition_id) {
   int32 pdf_id = trans_model_.TransitionIdToPdf(transition_id);
   return decodable_nnet_.GetOutput(frame, pdf_id);
 }

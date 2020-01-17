@@ -52,8 +52,8 @@ struct QuestionsForKey {  // Configuration class associated with a particular ke
   std::vector<std::vector<EventValueType> > initial_questions;
   RefineClustersOptions refine_opts;  // if refine_opts.max_iter == 0,
   // we just pick from the initial questions.
-  
-  QuestionsForKey(int32 num_iters = 5): refine_opts(num_iters, 2) {
+
+  QuestionsForKey(int32 num_iters = 5) : refine_opts(num_iters, 2) {
     // refine_cfg with 5 iters and top-n = 2 (this is no restriction because
     // RefineClusters called with 2 clusters; would get set to that anyway as
     // it's the only possible value for 2 clusters).  User has to add questions.
@@ -61,7 +61,7 @@ struct QuestionsForKey {  // Configuration class associated with a particular ke
   }
 
   void Check() const {
-    for (size_t i = 0;i < initial_questions.size();i++) KALDI_ASSERT(IsSorted(initial_questions[i]));
+    for (size_t i = 0; i < initial_questions.size(); i++) KALDI_ASSERT(IsSorted(initial_questions[i]));
   }
 
   void Write(std::ostream &os, bool binary) const;
@@ -75,7 +75,7 @@ struct QuestionsForKey {  // Configuration class associated with a particular ke
 /// likelihood. It is perhaps a bit more than an options class, as it contains the
 /// actual questions.
 class Questions {  // careful, this is a class.
- public:
+public:
   const QuestionsForKey &GetQuestionsOf(EventKeyType key) const {
     std::map<EventKeyType, size_t>::const_iterator iter;
     if ( (iter = key_idx_.find(key)) == key_idx_.end()) {
@@ -120,7 +120,7 @@ class Questions {  // careful, this is a class.
 
   void Write(std::ostream &os, bool binary) const;
   void Read(std::istream &is, bool binary);
- private:
+private:
   std::vector<QuestionsForKey*> key_options_;
   std::map<EventKeyType, size_t> key_idx_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(Questions);

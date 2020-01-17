@@ -37,7 +37,7 @@ namespace nnet2 {
 
    For ReLU (rectified linear) units, it identifies neurons that are always zero
    or close to zero, re-randomizes the corresponding parameters, increasing the bias.
-*/
+ */
 
 struct NnetFixConfig {
   BaseFloat min_average_deriv; // Minimum average derivative that we allow,
@@ -49,8 +49,8 @@ struct NnetFixConfig {
   // the exceed the bounds above
   BaseFloat relu_bias_change; // Change in bias for relus that are usually close to zero.
 
-  NnetFixConfig(): min_average_deriv(0.1), max_average_deriv(0.75),
-                   parameter_factor(2.0), relu_bias_change(1.0) { }
+  NnetFixConfig() : min_average_deriv(0.1), max_average_deriv(0.75),
+    parameter_factor(2.0), relu_bias_change(1.0) { }
   void Register(OptionsItf *opts) {
     opts->Register("min-average-deriv", &min_average_deriv, "Miniumum derivative, "
                    "averaged over the training data, that we allow for a nonlinearity,"

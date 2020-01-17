@@ -105,15 +105,15 @@ int main(int argc, char *argv[]) {
     bool determinize = config.determinize_lattice;
     CompactLatticeWriter compact_lattice_writer;
     LatticeWriter lattice_writer;
-    if (! (determinize ? compact_lattice_writer.Open(lattice_wspecifier)
-           : lattice_writer.Open(lattice_wspecifier)))
+    if (!(determinize ? compact_lattice_writer.Open(lattice_wspecifier)
+        : lattice_writer.Open(lattice_wspecifier)))
       KALDI_ERR << "Could not open table for writing lattices: "
-                 << lattice_wspecifier;
+                << lattice_wspecifier;
 
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
     RandomAccessBaseFloatVectorReaderMapped ivector_reader(
-        ivector_rspecifier, utt2spk_rspecifier);
+      ivector_rspecifier, utt2spk_rspecifier);
 
     Int32VectorWriter words_writer(words_wspecifier);
     Int32VectorWriter alignment_writer(alignment_wspecifier);
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
     if (word_syms_filename != "")
       if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
         KALDI_ERR << "Could not read symbol table from file "
-                   << word_syms_filename;
+                  << word_syms_filename;
 
     double tot_like = 0.0;
     kaldi::int64 frame_count = 0;
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
     // objects.  It takes a pointer to am_nnet because if it has iVectors it has
     // to modify the nnet to accept iVectors at intervals.
     DecodableNnetSimpleLoopedInfo decodable_info(decodable_opts,
-                                                 &am_nnet);
+        &am_nnet);
 
 
     if (ClassifyRspecifier(fst_in_str, NULL, NULL) == kNoRspecifier) {
@@ -176,8 +176,8 @@ int main(int argc, char *argv[]) {
 
 
           DecodableAmNnetSimpleLooped nnet_decodable(
-              decodable_info, trans_model, features, ivector, online_ivectors,
-              online_ivector_period);
+            decodable_info, trans_model, features, ivector, online_ivectors,
+            online_ivector_period);
 
           double like;
           if (DecodeUtteranceLatticeFaster(
@@ -235,8 +235,8 @@ int main(int argc, char *argv[]) {
         }
 
         DecodableAmNnetSimpleLooped nnet_decodable(
-            decodable_info, trans_model, features, ivector, online_ivectors,
-            online_ivector_period);
+          decodable_info, trans_model, features, ivector, online_ivectors,
+          online_ivector_period);
 
         double like;
         if (DecodeUtteranceLatticeFaster(

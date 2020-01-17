@@ -110,27 +110,27 @@ struct PitchExtractionOptions {
   // chunking, which is useful for testing purposes.
   bool nccf_ballast_online;
   bool snip_edges;
-  PitchExtractionOptions():
-      samp_freq(16000),
-      frame_shift_ms(10.0),
-      frame_length_ms(25.0),
-      preemph_coeff(0.0),
-      min_f0(50),
-      max_f0(400),
-      soft_min_f0(10.0),
-      penalty_factor(0.1),
-      lowpass_cutoff(1000),
-      resample_freq(4000),
-      delta_pitch(0.005),
-      nccf_ballast(7000),
-      lowpass_filter_width(1),
-      upsample_filter_width(5),
-      max_frames_latency(0),
-      frames_per_chunk(0),
-      simulate_first_pass_online(false),
-      recompute_frame(500),
-      nccf_ballast_online(false),
-      snip_edges(true) { }
+  PitchExtractionOptions() :
+    samp_freq(16000),
+    frame_shift_ms(10.0),
+    frame_length_ms(25.0),
+    preemph_coeff(0.0),
+    min_f0(50),
+    max_f0(400),
+    soft_min_f0(10.0),
+    penalty_factor(0.1),
+    lowpass_cutoff(1000),
+    resample_freq(4000),
+    delta_pitch(0.005),
+    nccf_ballast(7000),
+    lowpass_filter_width(1),
+    upsample_filter_width(5),
+    max_frames_latency(0),
+    frames_per_chunk(0),
+    simulate_first_pass_online(false),
+    recompute_frame(500),
+    nccf_ballast_online(false),
+    snip_edges(true) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("sample-frequency", &samp_freq,
@@ -233,19 +233,19 @@ struct ProcessPitchOptions {
   bool add_raw_log_pitch;
 
   ProcessPitchOptions() :
-      pitch_scale(2.0),
-      pov_scale(2.0),
-      pov_offset(0.0),
-      delta_pitch_scale(10.0),
-      delta_pitch_noise_stddev(0.005),
-      normalization_left_context(75),
-      normalization_right_context(75),
-      delta_window(2),
-      delay(0),
-      add_pov_feature(true),
-      add_normalized_log_pitch(true),
-      add_delta_pitch(true),
-      add_raw_log_pitch(false) { }
+    pitch_scale(2.0),
+    pov_scale(2.0),
+    pov_offset(0.0),
+    delta_pitch_scale(10.0),
+    delta_pitch_noise_stddev(0.005),
+    normalization_left_context(75),
+    normalization_right_context(75),
+    delta_window(2),
+    delay(0),
+    add_pov_feature(true),
+    add_normalized_log_pitch(true),
+    add_delta_pitch(true),
+    add_raw_log_pitch(false) { }
 
 
   void Register(ParseOptions *opts) {
@@ -298,7 +298,7 @@ class OnlinePitchFeatureImpl;
 // Note: to start on a new waveform, just construct a new version
 // of this object.
 class OnlinePitchFeature: public OnlineBaseFeature {
- public:
+public:
   explicit OnlinePitchFeature(const PitchExtractionOptions &opts);
 
   virtual int32 Dim() const { return 2; /* (NCCF, pitch) */ }
@@ -314,13 +314,13 @@ class OnlinePitchFeature: public OnlineBaseFeature {
   virtual void GetFrame(int32 frame, VectorBase<BaseFloat> *feat);
 
   virtual void AcceptWaveform(BaseFloat sampling_rate,
-                              const VectorBase<BaseFloat> &waveform);
+      const VectorBase<BaseFloat> &waveform);
 
   virtual void InputFinished();
 
   virtual ~OnlinePitchFeature();
 
- private:
+private:
   OnlinePitchFeatureImpl *impl_;
 };
 
@@ -330,7 +330,7 @@ class OnlinePitchFeature: public OnlineBaseFeature {
 /// kinds of outputs, using the default options it will be (pov-feature,
 /// normalized-log-pitch, delta-log-pitch).
 class OnlineProcessPitch: public OnlineFeatureInterface {
- public:
+public:
   virtual int32 Dim() const { return dim_; }
 
   virtual bool IsLastFrame(int32 frame) const {
@@ -353,9 +353,9 @@ class OnlineProcessPitch: public OnlineFeatureInterface {
 
   // Does not take ownership of "src".
   OnlineProcessPitch(const ProcessPitchOptions &opts,
-                     OnlineFeatureInterface *src);
+      OnlineFeatureInterface *src);
 
- private:
+private:
   enum { kRawFeatureDim = 2};  // anonymous enum to define a constant.
                                // kRawFeatureDim defines the dimension
                                // of the input: (nccf, pitch)
@@ -372,8 +372,8 @@ class OnlineProcessPitch: public OnlineFeatureInterface {
     double sum_pov;            // sum of pov over relevant range
     double sum_log_pitch_pov;  // sum of log(pitch) * pov over relevant range
 
-    NormalizationStats(): cur_num_frames(-1), input_finished(false),
-                          sum_pov(0.0), sum_log_pitch_pov(0.0) { }
+    NormalizationStats() : cur_num_frames(-1), input_finished(false),
+      sum_pov(0.0), sum_log_pitch_pov(0.0) { }
   };
 
   std::vector<BaseFloat> delta_feature_noise_;
@@ -398,9 +398,9 @@ class OnlineProcessPitch: public OnlineFeatureInterface {
 
   /// Computes the normalization window sizes.
   inline void GetNormalizationWindow(int32 frame,
-                                     int32 src_frames_ready,
-                                     int32 *window_begin,
-                                     int32 *window_end) const;
+      int32 src_frames_ready,
+      int32 *window_begin,
+      int32 *window_end) const;
 
   /// Makes sure the entry in normalization_stats_ for this frame is up to date;
   /// called from GetNormalizedLogPitchFeature.
@@ -415,8 +415,8 @@ class OnlineProcessPitch: public OnlineFeatureInterface {
 /// have as many rows as there are frames, and two columns corresponding to
 /// (NCCF, pitch)
 void ComputeKaldiPitch(const PitchExtractionOptions &opts,
-                       const VectorBase<BaseFloat> &wave,
-                       Matrix<BaseFloat> *output);
+    const VectorBase<BaseFloat> &wave,
+    Matrix<BaseFloat> *output);
 
 /// This function processes the raw (NCCF, pitch) quantities computed by
 /// ComputeKaldiPitch, and processes them into features.  By default it will
@@ -429,8 +429,8 @@ void ComputeKaldiPitch(const PitchExtractionOptions &opts,
 /// --add-raw-log-pitch determine which features we create; by default we create
 /// the first three.
 void ProcessPitch(const ProcessPitchOptions &opts,
-                  const MatrixBase<BaseFloat> &input,
-                  Matrix<BaseFloat> *output);
+    const MatrixBase<BaseFloat> &input,
+    Matrix<BaseFloat> *output);
 
 /// This function combines ComputeKaldiPitch and ProcessPitch.  The reason
 /// why we need a separate function to do this is in order to be able to
@@ -440,9 +440,9 @@ void ProcessPitch(const ProcessPitchOptions &opts,
 /// i.e. max_frames_latency, frames_per_chunk, simulate_first_pass_online,
 /// recompute_frame.
 void ComputeAndProcessKaldiPitch(const PitchExtractionOptions &pitch_opts,
-                                 const ProcessPitchOptions &process_opts,
-                                 const VectorBase<BaseFloat> &wave,
-                                 Matrix<BaseFloat> *output);
+    const ProcessPitchOptions &process_opts,
+    const VectorBase<BaseFloat> &wave,
+    Matrix<BaseFloat> *output);
 
 
 /// @} End of "addtogroup feat"

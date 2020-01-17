@@ -31,14 +31,14 @@
 namespace kaldi {
 
 bool CompareInterval(const Interval &i1,
-                     const Interval &i2) {
+    const Interval &i2) {
   return (i1.Start() < i2.Start() ? true :
-          i1.Start() > i2.Start() ? false:
-          i1.End() < i2.End() ? true: false);
+         i1.Start() > i2.Start() ? false :
+         i1.End() < i2.End() ? true : false);
 }
 
 bool ClusterLattice(CompactLattice *clat,
-                    const std::vector<int32> &state_times) {
+    const std::vector<int32> &state_times) {
   using namespace fst;
   typedef CompactLattice::StateId StateId;
 
@@ -48,10 +48,10 @@ bool ClusterLattice(CompactLattice *clat,
   // Step 1: Iterate over the lattice to get the arcs
   StateId max_id = 0;
   for (StateIterator<CompactLattice> siter(*clat); !siter.Done();
-                                                    siter.Next()) {
+      siter.Next()) {
     StateId state_id = siter.Value();
     for (ArcIterator<CompactLattice> aiter(*clat, state_id); !aiter.Done();
-                                                             aiter.Next()) {
+        aiter.Next()) {
       CompactLatticeArc arc = aiter.Value();
       if (state_id >= state_times.size() || arc.nextstate >= state_times.size())
         return false;
@@ -89,10 +89,10 @@ bool ClusterLattice(CompactLattice *clat,
   //   each arc to the cluster-head (as identified in Step 2) which
   //   has the most temporal overlap with the current arc.
   for (StateIterator<CompactLattice> siter(*clat); !siter.Done();
-                                                   siter.Next()) {
+      siter.Next()) {
     CompactLatticeArc::StateId state_id = siter.Value();
     for (MutableArcIterator<CompactLattice> aiter(clat, state_id);
-                                            !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       CompactLatticeArc arc = aiter.Value();
       // We don't cluster the epsilon arcs
       if (arc.ilabel == 0)
@@ -118,7 +118,7 @@ bool ClusterLattice(CompactLattice *clat,
 
 
 class CompactLatticeToKwsProductFstMapper {
- public:
+public:
   typedef CompactLatticeArc FromArc;
   typedef CompactLatticeWeight FromWeight;
   typedef KwsProductArc ToArc;
@@ -129,13 +129,13 @@ class CompactLatticeToKwsProductFstMapper {
   ToArc operator()(const FromArc &arc) const {
     return ToArc(arc.ilabel,
                  arc.olabel,
-                 (arc.weight == FromWeight::Zero() ?
-                  ToWeight::Zero() :
-                  ToWeight(arc.weight.Weight().Value1()
+               (arc.weight == FromWeight::Zero() ?
+               ToWeight::Zero() :
+               ToWeight(arc.weight.Weight().Value1()
                            +arc.weight.Weight().Value2(),
-                           (arc.weight.Weight() == LatticeWeight::Zero() ?
-                            StdXStdprimeWeight::Zero() :
-                            StdXStdprimeWeight::One()))),
+               (arc.weight.Weight() == LatticeWeight::Zero() ?
+               StdXStdprimeWeight::Zero() :
+               StdXStdprimeWeight::One()))),
                  arc.nextstate);
   }
 
@@ -158,9 +158,9 @@ class CompactLatticeToKwsProductFstMapper {
 
 
 bool CreateFactorTransducer(const CompactLattice &clat,
-                            const std::vector<int32> &state_times,
-                            int32 utterance_id,
-                            KwsProductFst *factor_transducer) {
+    const std::vector<int32> &state_times,
+    int32 utterance_id,
+    KwsProductFst *factor_transducer) {
   using namespace fst;
   typedef KwsProductArc::StateId StateId;
 
@@ -185,10 +185,10 @@ bool CreateFactorTransducer(const CompactLattice &clat,
   // transitions and final weight at any state is equal to One() (push only the
   // negated log-prob, not the alignments)
   for (StateIterator<KwsProductFst>
-       siter(*factor_transducer); !siter.Done(); siter.Next()) {
+      siter(*factor_transducer); !siter.Done(); siter.Next()) {
     KwsProductArc::StateId state_id = siter.Value();
     for (MutableArcIterator<KwsProductFst>
-         aiter(factor_transducer, state_id); !aiter.Done(); aiter.Next()) {
+        aiter(factor_transducer, state_id); !aiter.Done(); aiter.Next()) {
       KwsProductArc arc = aiter.Value();
       BaseFloat w = arc.weight.Value1().Value();
       w += beta[state_id] - beta[arc.nextstate];
@@ -263,8 +263,8 @@ bool CreateFactorTransducer(const CompactLattice &clat,
 }
 
 void RemoveLongSilences(int32 max_silence_frames,
-                        const std::vector<int32> &state_times,
-                        KwsProductFst *factor_transducer) {
+    const std::vector<int32> &state_times,
+    KwsProductFst *factor_transducer) {
   using namespace fst;
   typedef KwsProductArc::StateId StateId;
 
@@ -276,7 +276,7 @@ void RemoveLongSilences(int32 max_silence_frames,
     if (s == ss)
       continue;
     for (MutableArcIterator<KwsProductFst>
-         aiter(factor_transducer, s); !aiter.Done(); aiter.Next()) {
+        aiter(factor_transducer, s); !aiter.Done(); aiter.Next()) {
       KwsProductArc arc = aiter.Value();
       // Skip arcs end with the final state
       if (factor_transducer->Final(arc.nextstate) != KwsProductWeight::Zero())
@@ -301,8 +301,8 @@ void RemoveLongSilences(int32 max_silence_frames,
 
 template<class Arc>
 static void DifferenceWrapper(const fst::VectorFst<Arc> &fst1,
-                              const fst::VectorFst<Arc> &fst2,
-                              fst::VectorFst<Arc> *difference) {
+    const fst::VectorFst<Arc> &fst2,
+    fst::VectorFst<Arc> *difference) {
   using namespace fst;
   if (!fst2.Properties(kAcceptor, true)) {
     // make it an acceptor by encoding the weights.

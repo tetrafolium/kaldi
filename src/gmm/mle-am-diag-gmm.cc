@@ -39,7 +39,7 @@ AccumAmDiagGmm::~AccumAmDiagGmm() {
 }
 
 void AccumAmDiagGmm::Init(const AmDiagGmm &model,
-                              GmmFlagsType flags) {
+    GmmFlagsType flags) {
   DeletePointers(&gmm_accumulators_);  // in case was non-empty when called.
   gmm_accumulators_.resize(model.NumPdfs(), NULL);
   for (int32 i = 0; i < model.NumPdfs(); i++) {
@@ -49,7 +49,7 @@ void AccumAmDiagGmm::Init(const AmDiagGmm &model,
 }
 
 void AccumAmDiagGmm::Init(const AmDiagGmm &model,
-                              int32 dim, GmmFlagsType flags) {
+    int32 dim, GmmFlagsType flags) {
   KALDI_ASSERT(dim > 0);
   DeletePointers(&gmm_accumulators_);  // in case was non-empty when called.
   gmm_accumulators_.resize(model.NumPdfs(), NULL);
@@ -67,8 +67,8 @@ void AccumAmDiagGmm::SetZero(GmmFlagsType flags) {
 }
 
 BaseFloat AccumAmDiagGmm::AccumulateForGmm(
-    const AmDiagGmm &model, const VectorBase<BaseFloat> &data,
-    int32 gmm_index, BaseFloat weight) {
+  const AmDiagGmm &model, const VectorBase<BaseFloat> &data,
+  int32 gmm_index, BaseFloat weight) {
   KALDI_ASSERT(static_cast<size_t>(gmm_index) < gmm_accumulators_.size());
   BaseFloat log_like =
       gmm_accumulators_[gmm_index]->AccumulateFromDiag(model.GetPdf(gmm_index),
@@ -79,11 +79,11 @@ BaseFloat AccumAmDiagGmm::AccumulateForGmm(
 }
 
 BaseFloat AccumAmDiagGmm::AccumulateForGmmTwofeats(
-    const AmDiagGmm &model,
-    const VectorBase<BaseFloat> &data1,
-    const VectorBase<BaseFloat> &data2,
-    int32 gmm_index,
-    BaseFloat weight) {
+  const AmDiagGmm &model,
+  const VectorBase<BaseFloat> &data1,
+  const VectorBase<BaseFloat> &data2,
+  int32 gmm_index,
+  BaseFloat weight) {
   KALDI_ASSERT(static_cast<size_t>(gmm_index) < gmm_accumulators_.size());
   const DiagGmm &gmm = model.GetPdf(gmm_index);
   AccumDiagGmm &acc = *(gmm_accumulators_[gmm_index]);
@@ -98,16 +98,16 @@ BaseFloat AccumAmDiagGmm::AccumulateForGmmTwofeats(
 
 
 void AccumAmDiagGmm::AccumulateFromPosteriors(
-    const AmDiagGmm &model, const VectorBase<BaseFloat> &data,
-    int32 gmm_index, const VectorBase<BaseFloat> &posteriors) {
+  const AmDiagGmm &model, const VectorBase<BaseFloat> &data,
+  int32 gmm_index, const VectorBase<BaseFloat> &posteriors) {
   KALDI_ASSERT(gmm_index >= 0 && gmm_index < NumAccs());
   gmm_accumulators_[gmm_index]->AccumulateFromPosteriors(data, posteriors);
   total_frames_ += posteriors.Sum();
 }
 
 void AccumAmDiagGmm::AccumulateForGaussian(
-    const AmDiagGmm &am, const VectorBase<BaseFloat> &data,
-    int32 gmm_index, int32 gauss_index, BaseFloat weight) {
+  const AmDiagGmm &am, const VectorBase<BaseFloat> &data,
+  int32 gmm_index, int32 gauss_index, BaseFloat weight) {
   KALDI_ASSERT(gmm_index >= 0 && gmm_index < NumAccs());
   KALDI_ASSERT(gauss_index >= 0
       && gauss_index < am.GetPdf(gmm_index).NumGauss());
@@ -115,7 +115,7 @@ void AccumAmDiagGmm::AccumulateForGaussian(
 }
 
 void AccumAmDiagGmm::Read(std::istream &in_stream, bool binary,
-                          bool add) {
+    bool add) {
   int32 num_pdfs;
   ExpectToken(in_stream, binary, "<NUMPDFS>");
   ReadBasicType(in_stream, binary, &num_pdfs);
@@ -123,7 +123,7 @@ void AccumAmDiagGmm::Read(std::istream &in_stream, bool binary,
   if (!add || (add && gmm_accumulators_.empty())) {
     gmm_accumulators_.resize(num_pdfs, NULL);
     for (std::vector<AccumDiagGmm*>::iterator it = gmm_accumulators_.begin(),
-             end = gmm_accumulators_.end(); it != end; ++it) {
+        end = gmm_accumulators_.end(); it != end; ++it) {
       delete *it;
       *it = new AccumDiagGmm();
       (*it)->Read(in_stream, binary, add);
@@ -134,7 +134,7 @@ void AccumAmDiagGmm::Read(std::istream &in_stream, bool binary,
                 << (gmm_accumulators_.size()) << " vs. "
                 << (num_pdfs);
     for (std::vector<AccumDiagGmm*>::iterator it = gmm_accumulators_.begin(),
-             end = gmm_accumulators_.end(); it != end; ++it)
+        end = gmm_accumulators_.end(); it != end; ++it)
       (*it)->Read(in_stream, binary, add);
   }
   // TODO(arnab): Bad hack! Need to make this self-delimiting.
@@ -143,10 +143,10 @@ void AccumAmDiagGmm::Read(std::istream &in_stream, bool binary,
     double like, frames;
     ExpectToken(in_stream, binary, "<total_like>");
     ReadBasicType(in_stream, binary, &like);
-    total_log_like_ = (add)? total_log_like_ + like : like;
+    total_log_like_ = (add) ? total_log_like_ + like : like;
     ExpectToken(in_stream, binary, "<total_frames>");
     ReadBasicType(in_stream, binary, &frames);
-    total_frames_ = (add)? total_frames_ + frames : frames;
+    total_frames_ = (add) ? total_frames_ + frames : frames;
   }
 }
 
@@ -185,11 +185,11 @@ void ResizeModel (int32 dim, AmDiagGmm *am_gmm) {
 }
 
 void MleAmDiagGmmUpdate (const MleDiagGmmOptions &config,
-                         const AccumAmDiagGmm &am_diag_gmm_acc,
-                         GmmFlagsType flags,
-                         AmDiagGmm *am_gmm,
-                         BaseFloat *obj_change_out,
-                         BaseFloat *count_out) {
+    const AccumAmDiagGmm &am_diag_gmm_acc,
+    GmmFlagsType flags,
+    AmDiagGmm *am_gmm,
+    BaseFloat *obj_change_out,
+    BaseFloat *count_out) {
   if (am_diag_gmm_acc.Dim() != am_gmm->Dim()) {
     KALDI_ASSERT(am_diag_gmm_acc.Dim() != 0);
     KALDI_WARN << "Dimensions of accumulator " << am_diag_gmm_acc.Dim()
@@ -197,7 +197,7 @@ void MleAmDiagGmmUpdate (const MleDiagGmmOptions &config,
                << " GMM and setting to zero-mean, unit-variance.";
     ResizeModel(am_diag_gmm_acc.Dim(), am_gmm);
   }
-  
+
   KALDI_ASSERT(am_gmm != NULL);
   KALDI_ASSERT(am_diag_gmm_acc.NumAccs() == am_gmm->NumPdfs());
   if (obj_change_out != NULL) *obj_change_out = 0.0;
@@ -209,7 +209,7 @@ void MleAmDiagGmmUpdate (const MleDiagGmmOptions &config,
   for (int32 i = 0; i < am_diag_gmm_acc.NumAccs(); i++) {
     BaseFloat obj_change, count;
     int32 elems_floored, gauss_floored, gauss_removed;
-    
+
     MleDiagGmmUpdate(config, am_diag_gmm_acc.GetAcc(i), flags,
                      &(am_gmm->GetPdf(i)),
                      &obj_change, &count, &elems_floored,
@@ -235,11 +235,11 @@ void MleAmDiagGmmUpdate (const MleDiagGmmOptions &config,
 
 
 void MapAmDiagGmmUpdate (const MapDiagGmmOptions &config,
-                         const AccumAmDiagGmm &am_diag_gmm_acc,
-                         GmmFlagsType flags,
-                         AmDiagGmm *am_gmm,
-                         BaseFloat *obj_change_out,
-                         BaseFloat *count_out) {
+    const AccumAmDiagGmm &am_diag_gmm_acc,
+    GmmFlagsType flags,
+    AmDiagGmm *am_gmm,
+    BaseFloat *obj_change_out,
+    BaseFloat *count_out) {
   KALDI_ASSERT(am_gmm != NULL && am_diag_gmm_acc.Dim() == am_gmm->Dim() &&
                am_diag_gmm_acc.NumAccs() == am_gmm->NumPdfs());
   if (obj_change_out != NULL) *obj_change_out = 0.0;
@@ -279,7 +279,7 @@ void AccumAmDiagGmm::Scale(BaseFloat scale) {
 void AccumAmDiagGmm::Add(BaseFloat scale, const AccumAmDiagGmm &other) {
   total_frames_ += scale * other.total_frames_;
   total_log_like_ += scale * other.total_log_like_;
-  
+
   int32 num_accs = NumAccs();
   KALDI_ASSERT(num_accs == other.NumAccs());
   for (int32 i = 0; i < num_accs; i++)

@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     }
 
     WriteKaldiObject(stats, stats_wxfilename, binary);
-    
+
     KALDI_LOG << "Summed " << (po.NumArgs()-1) << " fMPE stats and wrote to "
               << stats_wxfilename;
     return 0;

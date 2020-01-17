@@ -30,22 +30,22 @@ namespace kaldi {
 
 // Parses a decision tree file and outputs its description in GraphViz format
 class TreeRenderer {
- public:
+public:
   const static int32 kEdgeWidth; // normal width of the edges and state contours
   const static int32 kEdgeWidthQuery; // edge and state width when in query
   const static std::string kEdgeColor; // normal color for states and edges
   const static std::string kEdgeColorQuery; // edge and state color when in query
 
   TreeRenderer(std::istream &is, bool binary, std::ostream &os,
-               fst::SymbolTable &phone_syms, bool use_tooltips)
-      : phone_syms_(phone_syms), is_(is), out_(os), binary_(binary),
-        N_(-1), use_tooltips_(use_tooltips), next_id_(0) {}
+      fst::SymbolTable &phone_syms, bool use_tooltips)
+    : phone_syms_(phone_syms), is_(is), out_(os), binary_(binary),
+    N_(-1), use_tooltips_(use_tooltips), next_id_(0) {}
 
   // Renders the tree and if the "query" parameter is not NULL
   // a distinctly colored trace corresponding to the event.
   void Render(const EventType *query);
 
- private:
+private:
   // Looks-up the next token from the stream and invokes
   // the appropriate render method to visualize it
   void RenderSubTree(const EventType *query, int32 id);
@@ -63,7 +63,7 @@ class TreeRenderer {
   // Makes a comma-separated string from the elements of a set of identifiers
   // If the identifiers represent phones, their symbolic representations are used
   std::string MakeEdgeLabel(const EventKeyType &key,
-                            const ConstIntegerSet<EventValueType> &intset);
+      const ConstIntegerSet<EventValueType> &intset);
 
   // Writes the GraphViz representation of a non-leaf node to the out stream
   // A question about a phone from the context window or about pdf-class

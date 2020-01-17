@@ -46,14 +46,14 @@ namespace kaldi {
  * in UNIX sockets.
  */
 class TcpServer {
- public:
+public:
   TcpServer();
   ~TcpServer();
 
   bool Listen(int32 port);  //start listening on a given port
   int32 Accept();  //accept a client and return its descriptor
 
- private:
+private:
   struct sockaddr_in h_addr_;
   int32 server_desc_;
 };
@@ -80,12 +80,12 @@ int32 main(int argc, char *argv[]) {
 
     const char *usage =
         "Starts a TCP server that receives RAW audio and outputs aligned words.\n"
-            "A sample client can be found in: onlinebin/online-audio-client\n\n"
-            "Usage: online-audio-server-decode-faster [options] model-in "
-            "fst-in word-symbol-table silence-phones word_boundary_file tcp-port [lda-matrix-in]\n\n"
-            "example: online-audio-server-decode-faster --verbose=1 --rt-min=0.5 --rt-max=3.0 --max-active=6000\n"
-            "--beam=72.0 --acoustic-scale=0.0769 final.mdl graph/HCLG.fst graph/words.txt '1:2:3:4:5'\n"
-            "graph/word_boundary.int 5000 final.mat\n\n";
+        "A sample client can be found in: onlinebin/online-audio-client\n\n"
+        "Usage: online-audio-server-decode-faster [options] model-in "
+        "fst-in word-symbol-table silence-phones word_boundary_file tcp-port [lda-matrix-in]\n\n"
+        "example: online-audio-server-decode-faster --verbose=1 --rt-min=0.5 --rt-max=3.0 --max-active=6000\n"
+        "--beam=72.0 --acoustic-scale=0.0769 final.mdl graph/HCLG.fst graph/words.txt '1:2:3:4:5'\n"
+        "graph/word_boundary.int 5000 final.mat\n\n";
 
     ParseOptions po(usage);
     BaseFloat acoustic_scale = 0.1;
@@ -141,7 +141,7 @@ int32 main(int argc, char *argv[]) {
       return 0;
 
     std::cout << "Reading LDA matrix: " << lda_mat_rspecifier << "..."
-        << std::endl;
+              << std::endl;
     Matrix < BaseFloat > lda_transform;
     if (lda_mat_rspecifier != "") {
       bool binary_in;
@@ -150,7 +150,7 @@ int32 main(int argc, char *argv[]) {
     }
 
     std::cout << "Reading acoustic model: " << model_rspecifier << "..."
-        << std::endl;
+              << std::endl;
     TransitionModel trans_model;
     AmDiagGmm am_gmm;
     {
@@ -161,14 +161,14 @@ int32 main(int argc, char *argv[]) {
     }
 
     std::cout << "Reading word list: " << word_syms_filename << "..."
-        << std::endl;
+              << std::endl;
     fst::SymbolTable *word_syms = NULL;
     if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
       KALDI_ERR << "Could not read symbol table from file "
-          << word_syms_filename;
+                << word_syms_filename;
 
     std::cout << "Reading word boundary file: " << word_boundary_file << "..."
-        << std::endl;
+              << std::endl;
     WordBoundaryInfo info(opts, word_boundary_file);
 
     std::cout << "Reading FST: " << fst_rspecifier << "..." << std::endl;
@@ -207,11 +207,11 @@ int32 main(int argc, char *argv[]) {
 
       //re-initalizing decoder for each utterance
       OnlineFasterDecoder decoder(*decode_fst, decoder_opts, silence_phones,
-                                  trans_model);
+          trans_model);
 
       Mfcc mfcc(mfcc_opts);
       FeInput fe_input(au_src, &mfcc, frame_length * (16000 / 1000),
-                       mfcc_frame_shift * (16000 / 1000));  //we always assume 16 kHz Fs on input
+          mfcc_frame_shift * (16000 / 1000));               //we always assume 16 kHz Fs on input
       OnlineCmnInput cmn_input(&fe_input, cmn_window, min_cmn_window);
       OnlineFeatInputItf *feat_transform = 0;
       if (lda_mat_rspecifier != "") {
@@ -227,7 +227,7 @@ int32 main(int argc, char *argv[]) {
       OnlineFeatureMatrix feature_matrix(feature_reading_opts, feat_transform);
 
       OnlineDecodableDiagGmmScaled decodable(am_gmm, trans_model,
-                                             acoustic_scale, &feature_matrix);
+          acoustic_scale, &feature_matrix);
 
       clock_t start = clock();
       int32 decoder_offset = 0;
@@ -277,7 +277,7 @@ int32 main(int argc, char *argv[]) {
 
             std::stringstream sstr;
             sstr << "RESULT:NUM=" << words_num << ",FORMAT=WSE,RECO-DUR=" << dur
-                << ",INPUT-DUR=" << input_dur;
+                 << ",INPUT-DUR=" << input_dur;
 
             WriteLine(client_socket, sstr.str());
 
@@ -355,7 +355,7 @@ bool TcpServer::Listen(int32 port) {
 
   int32 flag = 1;
   int32 len = sizeof(int32);
-  if( setsockopt(server_desc_, SOL_SOCKET, SO_REUSEADDR, &flag, len) == -1){
+  if( setsockopt(server_desc_, SOL_SOCKET, SO_REUSEADDR, &flag, len) == -1) {
     KALDI_ERR << "Cannot set socket options!\n";
     return false;
   }

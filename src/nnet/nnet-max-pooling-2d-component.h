@@ -39,8 +39,8 @@ namespace nnet1 {
  * Our pooling supports overlaps, overlaps occur when (pool_step_ < pool_size_).
  */
 class MaxPooling2DComponent : public Component {
- public:
-  MaxPooling2DComponent(int32 dim_in, int32 dim_out):
+public:
+  MaxPooling2DComponent(int32 dim_in, int32 dim_out) :
     Component(dim_in, dim_out),
     fmap_x_len_(0), fmap_y_len_(0),
     pool_x_len_(0), pool_y_len_(0),
@@ -125,7 +125,7 @@ class MaxPooling2DComponent : public Component {
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // useful dims
     int32 num_input_fmaps = input_dim_ / (fmap_x_len_ * fmap_y_len_);
     int out_fmap_cnt = 0;
@@ -135,13 +135,13 @@ class MaxPooling2DComponent : public Component {
         st = (m * fmap_y_len_ + n) * num_input_fmaps;
         CuSubMatrix<BaseFloat> pool(
           out->ColRange(out_fmap_cnt * num_input_fmaps, num_input_fmaps)
-        );
+          );
         pool.Set(-1e20);  // reset (large neg value)
         for (int32 i = 0; i < pool_x_len_; i++) {
           for (int32 j = 0; j < pool_y_len_; j++) {
             int32 c = 0;
             c = st + i * (num_input_fmaps * fmap_y_len_)
-                   + j * num_input_fmaps;
+                + j * num_input_fmaps;
             pool.Max(in.ColRange(c, num_input_fmaps));
           }
         }
@@ -151,9 +151,9 @@ class MaxPooling2DComponent : public Component {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // useful dims
     int32 num_input_fmaps = input_dim_ / (fmap_x_len_ * fmap_y_len_);
     int32 inp_fmap_size = fmap_x_len_ * fmap_y_len_;
@@ -177,18 +177,18 @@ class MaxPooling2DComponent : public Component {
           for (int32 j = 0; j < pool_y_len_; j++) {
             int32 c = 0;
             c = st + i * (num_input_fmaps * fmap_y_len_)
-                   + j * num_input_fmaps;
+                + j * num_input_fmaps;
             //
             CuSubMatrix<BaseFloat> in_p(in.ColRange(c, num_input_fmaps));
             CuSubMatrix<BaseFloat> out_p(
               out.ColRange(out_fmap_cnt*num_input_fmaps, num_input_fmaps)
-            );
+              );
             //
 
             CuSubMatrix<BaseFloat> tgt(in_diff->ColRange(c, num_input_fmaps));
             CuMatrix<BaseFloat> src(
               out_diff.ColRange(out_fmap_cnt*num_input_fmaps, num_input_fmaps)
-            );
+              );
 
             CuMatrix<BaseFloat> mask;
             in_p.EqualElementMask(out_p, &mask);
@@ -213,10 +213,10 @@ class MaxPooling2DComponent : public Component {
     }
   }
 
- private:
+private:
   int32 fmap_x_len_, fmap_y_len_,
-        pool_x_len_, pool_y_len_,
-        pool_x_step_, pool_y_step_;
+      pool_x_len_, pool_y_len_,
+      pool_x_step_, pool_y_step_;
 };
 
 }  // namespace nnet1

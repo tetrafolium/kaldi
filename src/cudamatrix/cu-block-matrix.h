@@ -49,23 +49,23 @@ namespace kaldi {
 
 template<typename Real>
 class CuBlockMatrix {
- public:
+public:
   friend class CuMatrixBase<Real>;
-  
+
   CuBlockMatrix();
 
   CuBlockMatrix(const std::vector<CuMatrix<Real> > &data);
 
   ~CuBlockMatrix() { Destroy(); }
-  
+
   /// Copy constructor
-  CuBlockMatrix(const CuBlockMatrix &other); 
+  CuBlockMatrix(const CuBlockMatrix &other);
 
   /// Assignment operator
-  CuBlockMatrix &operator= (const CuBlockMatrix &other); 
+  CuBlockMatrix &operator= (const CuBlockMatrix &other);
 
   void Write(std::ostream &os, bool binary) const;
-  
+
   void Read(std::istream &is, bool binary);
 
   MatrixIndexT NumRows() const { return num_rows_; }
@@ -73,13 +73,13 @@ class CuBlockMatrix {
   MatrixIndexT NumCols() const { return data_.num_cols_; }
 
   MatrixIndexT NumBlocks() const { return block_data_.size(); }
-  
+
   // Returns max num-columns of any block
-  MatrixIndexT MaxBlockCols() const ;
+  MatrixIndexT MaxBlockCols() const;
 
   // Returns max num-rows of any block
   MatrixIndexT MaxBlockRows() const;
-    
+
   const CuSubMatrix<Real> Block(MatrixIndexT b) const;
 
   CuSubMatrix<Real> Block(MatrixIndexT b); // return CuMatrixBase to disallow resizes.
@@ -89,9 +89,9 @@ class CuBlockMatrix {
   /// the block structure of the *this matrix.  The transA and transB parameters
   /// can be used to substitute A^T for A and B^T for B, respectively.
   void AddMatMat(BaseFloat alpha,
-                 const CuMatrix<Real> &A, MatrixTransposeType transA,
-                 const CuMatrix<Real> &B, MatrixTransposeType transB,
-                 BaseFloat beta);
+      const CuMatrix<Real> &A, MatrixTransposeType transA,
+      const CuMatrix<Real> &B, MatrixTransposeType transB,
+      BaseFloat beta);
 
 
   /// Copies elements within the block structure from matrix M, discarding others.
@@ -105,8 +105,8 @@ class CuBlockMatrix {
   void NormalizeColumns();
 
   void Swap(CuBlockMatrix *other);
-  
- protected:
+
+protected:
   CuMatrix<Real> data_; // This is a single matrix into which
   // we pack all the blocks (possibly with spaces left over)
 
@@ -116,13 +116,13 @@ class CuBlockMatrix {
     MatrixIndexT row_offset;
     MatrixIndexT col_offset;
   };
-  
+
 
 #if HAVE_CUDA == 1
   const CuBlockMatrixData* CuData() const { return cu_data_; }
 #endif
- private:
-  
+private:
+
   /// If using GPU and cu_data_ != NULL, free cu_data_ and set it to NULL
   void FreeCudaData();
   /// If using GPU, allocate and set cu_data_ on the GPU to reflect "data_".
@@ -133,7 +133,7 @@ class CuBlockMatrix {
   void Destroy();
 
   std::vector<BlockMatrixData> block_data_;
-  
+
   MatrixIndexT num_rows_; // sum of num_rows of elements of block_data_.
 #if HAVE_CUDA == 1
   CuBlockMatrixData *cu_data_; // We store the pointers and some additional info

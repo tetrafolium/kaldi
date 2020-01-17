@@ -59,22 +59,22 @@ namespace nnet3 {
    That's done in the optimization code.
  */
 void CompileLooped(const Nnet &nnet,
-                   const NnetOptimizeOptions &optimize_opts,
-                   const ComputationRequest &request1,
-                   const ComputationRequest &request2,
-                   const ComputationRequest &request3,
-                   NnetComputation *computation);
+    const NnetOptimizeOptions &optimize_opts,
+    const ComputationRequest &request1,
+    const ComputationRequest &request2,
+    const ComputationRequest &request3,
+    NnetComputation *computation);
 
 /*
-  This function gives you a suitable chunk size, which is the smallest number >=
-  'advised_chunk_size' that is an exact multiple of nnet.Modulus() and
-  frame_subsampling_factor.  This will ensure that all the chunks have the same
-  structure, which makes compiling the looped computation a little more
-  straightforward.
+   This function gives you a suitable chunk size, which is the smallest number >=
+   'advised_chunk_size' that is an exact multiple of nnet.Modulus() and
+   frame_subsampling_factor.  This will ensure that all the chunks have the same
+   structure, which makes compiling the looped computation a little more
+   straightforward.
  */
 int32 GetChunkSize(const Nnet &nnet,
-                   int32 frame_subsampling_factor,
-                   int32 advised_chunk_size);
+    int32 frame_subsampling_factor,
+    int32 advised_chunk_size);
 
 /**
    This function modifies the descriptors in the neural network to change the
@@ -96,17 +96,17 @@ int32 GetChunkSize(const Nnet &nnet,
 
  */
 void ModifyNnetIvectorPeriod(int32 ivector_period,
-                             Nnet *nnet);
+    Nnet *nnet);
 
 /**
-  This function creates computation request suitable for giving to ComputeLooped().
-  It's intended for use with a 'simple' nnet (one satisfying IsSimpleNnet()), and this
-  basically means that the inputs must be named "input" and possibly "ivector",
-  and that there is an output named "output", and that those are the ones you
-  care about (it won't generate any other outputs or use any other inputs).
+   This function creates computation request suitable for giving to ComputeLooped().
+   It's intended for use with a 'simple' nnet (one satisfying IsSimpleNnet()), and this
+   basically means that the inputs must be named "input" and possibly "ivector",
+   and that there is an output named "output", and that those are the ones you
+   care about (it won't generate any other outputs or use any other inputs).
 
-  If you want to use looped computation for different types of neural net, you
-  should use the deeper interface, CompileLooped().
+   If you want to use looped computation for different types of neural net, you
+   should use the deeper interface, CompileLooped().
 
    @param [in] nnet   The neural net this computation request is to be used with.
                This is used to check whether the neural net accepts iVectors,
@@ -151,17 +151,17 @@ void ModifyNnetIvectorPeriod(int32 ivector_period,
                Caution: none of the inputs and outputs should overlap.
    @param [out] request3  The third of the 3 requests that this function generates.
                 It will be the same as request2, except for a time offset.
-*/
+ */
 void CreateLoopedComputationRequestSimple(const Nnet &nnet,
-                                          int32 chunk_size,
-                                          int32 frame_subsampling_factor,
-                                          int32 ivector_period,
-                                          int32 extra_left_context_begin,
-                                          int32 extra_right_context,
-                                          int32 num_sequences,
-                                          ComputationRequest *request1,
-                                          ComputationRequest *request2,
-                                          ComputationRequest *request3);
+    int32 chunk_size,
+    int32 frame_subsampling_factor,
+    int32 ivector_period,
+    int32 extra_left_context_begin,
+    int32 extra_right_context,
+    int32 num_sequences,
+    ComputationRequest *request1,
+    ComputationRequest *request2,
+    ComputationRequest *request3);
 
 
 

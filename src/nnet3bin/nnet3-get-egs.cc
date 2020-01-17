@@ -31,15 +31,15 @@ namespace nnet3 {
 
 
 static bool ProcessFile(const GeneralMatrix &feats,
-                        const MatrixBase<BaseFloat> *ivector_feats,
-                        int32 ivector_period,
-                        const Posterior &pdf_post,
-                        const std::string &utt_id,
-                        bool compress,
-                        int32 num_pdfs,
-                        int32 length_tolerance,
-                        UtteranceSplitter *utt_splitter,
-                        NnetExampleWriter *example_writer) {
+    const MatrixBase<BaseFloat> *ivector_feats,
+    int32 ivector_period,
+    const Posterior &pdf_post,
+    const std::string &utt_id,
+    bool compress,
+    int32 num_pdfs,
+    int32 length_tolerance,
+    UtteranceSplitter *utt_splitter,
+    NnetExampleWriter *example_writer) {
   int32 num_input_frames = feats.NumRows();
   if (!utt_splitter->LengthsMatch(utt_id, num_input_frames,
                                   static_cast<int32>(pdf_post.size()),
@@ -115,7 +115,7 @@ static bool ProcessFile(const GeneralMatrix &feats,
       if (t < pdf_post.size())
         labels[i] = pdf_post[t];
       for (std::vector<std::pair<int32, BaseFloat> >::iterator
-               iter = labels[i].begin(); iter != labels[i].end(); ++iter)
+          iter = labels[i].begin(); iter != labels[i].end(); ++iter)
         iter->second *= chunk.output_weights[i];
     }
 
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
 
     bool compress = true;
     int32 num_pdfs = -1, length_tolerance = 100,
-        targets_length_tolerance = 2,  
+        targets_length_tolerance = 2,
         online_ivector_period = 1;
 
     ExampleGenerationConfig eg_config;  // controls num-frames,
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
                 "--online-ivectors option");
     po.Register("length-tolerance", &length_tolerance, "Tolerance for "
                 "difference in num-frames between feat and ivector matrices");
-    po.Register("targets-length-tolerance", &targets_length_tolerance, 
+    po.Register("targets-length-tolerance", &targets_length_tolerance,
                 "Tolerance for "
                 "difference in num-frames (after subsampling) between "
                 "feature matrix and posterior");
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
     RandomAccessPosteriorReader pdf_post_reader(pdf_post_rspecifier);
     NnetExampleWriter example_writer(examples_wspecifier);
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
 
     int32 num_err = 0;
 
@@ -250,8 +250,8 @@ int main(int argc, char *argv[]) {
 
         if (online_ivector_feats != NULL &&
             (abs(feats.NumRows() - (online_ivector_feats->NumRows() *
-                                    online_ivector_period)) > length_tolerance
-             || online_ivector_feats->NumRows() == 0)) {
+            online_ivector_period)) > length_tolerance
+            || online_ivector_feats->NumRows() == 0)) {
           KALDI_WARN << "Length difference between feats " << feats.NumRows()
                      << " and iVectors " << online_ivector_feats->NumRows()
                      << "exceeds tolerance " << length_tolerance;
@@ -260,7 +260,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (!ProcessFile(feats, online_ivector_feats, online_ivector_period,
-                         pdf_post, key, compress, num_pdfs, 
+                         pdf_post, key, compress, num_pdfs,
                          targets_length_tolerance,
                          &utt_splitter, &example_writer))
           num_err++;
@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
     }
     if (num_err > 0)
       KALDI_WARN << num_err << " utterances had errors and could "
-          "not be processed.";
+        "not be processed.";
     // utt_splitter prints stats in its destructor.
     return utt_splitter.ExitStatus();
   } catch(const std::exception &e) {

@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         "Usage:  nnet-am-info [options] <nnet-in>\n"
         "e.g.:\n"
         " nnet-am-info 1.nnet\n";
-        
+
     ParseOptions po(usage);
 
     bool print_learning_rates = false;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
                 "colon-separated list of the learning rates for each updatable "
                 "layer, suitable to give to nnet-am-copy as the argument to"
                 "--learning-rates.");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 1) {
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string nnet_rxfilename = po.GetArg(1);
-    
+
     TransitionModel trans_model;
     AmNnet am_nnet;
     {
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
       std::cout << am_nnet.Info();
       KALDI_LOG << "Printed info about " << nnet_rxfilename;
     }
-    
+
   } catch(const std::exception &e) {
     std::cerr << e.what() << '\n';
     return -1;

@@ -29,36 +29,36 @@ namespace nnet2 {
 /* This header provides functionality for doing forward computation and
    backpropagation for whole chunks of features, e.g. whole utterances.  The
    code in nnet-update.h is designed for sample-by-sample computation.
-*/
+ */
 
 
 /**
-  Does the basic neural net computation, on a sequence of data (e.g.
-  an utterance).  If pad_input==true we'll pad the input with enough
-  frames of context, and the output will be a matrix of #frames by
-  the output-dim of the network, typically representing state-level
-  posteriors.   If pad_input==false we won't do this and the
-  output will have a lower #frames than the input; we lose
-  nnet.LeftContext() at the left and nnet.RightContext() at the
-  output.
-*/
+   Does the basic neural net computation, on a sequence of data (e.g.
+   an utterance).  If pad_input==true we'll pad the input with enough
+   frames of context, and the output will be a matrix of #frames by
+   the output-dim of the network, typically representing state-level
+   posteriors.   If pad_input==false we won't do this and the
+   output will have a lower #frames than the input; we lose
+   nnet.LeftContext() at the left and nnet.RightContext() at the
+   output.
+ */
 void NnetComputation(const Nnet &nnet,
-                     const CuMatrixBase<BaseFloat> &input,  // features
-                     bool pad_input,
-                     CuMatrixBase<BaseFloat> *output); // posteriors.
+    const CuMatrixBase<BaseFloat> &input,                   // features
+    bool pad_input,
+    CuMatrixBase<BaseFloat> *output);                  // posteriors.
 /**
-  Does the basic neural net computation, on a sequence of data (e.g.
-  an utterance).  This variant of NnetComputation chunks the input
-  according to chunk_size and does the posterior computation chunk 
-  by chunk.  This allows the computation to be performed on the GPU
-  when the input matrix is very large.  Input is padded with enough
-  frames of context so that the output will be a matrix with 
-  input.NumRows().
-*/
+   Does the basic neural net computation, on a sequence of data (e.g.
+   an utterance).  This variant of NnetComputation chunks the input
+   according to chunk_size and does the posterior computation chunk
+   by chunk.  This allows the computation to be performed on the GPU
+   when the input matrix is very large.  Input is padded with enough
+   frames of context so that the output will be a matrix with
+   input.NumRows().
+ */
 void NnetComputationChunked(const Nnet &nnet,
-                     const Matrix<BaseFloat> &input,  // features
-                     int32 chunk_size,
-                     Matrix<BaseFloat> *output); // posteriors.
+    const Matrix<BaseFloat> &input,                   // features
+    int32 chunk_size,
+    Matrix<BaseFloat> *output);                  // posteriors.
 
 /** Does the neural net computation and backprop, given input and labels.
     Note: if pad_input==true the number of rows of input should be the
@@ -69,13 +69,13 @@ void NnetComputationChunked(const Nnet &nnet,
     on *nnet_to_update) it will compute the gradient on this data.
     Returns the total objective function summed over the frames, times
     the utterance weight.
-*/
+ */
 BaseFloat NnetGradientComputation(const Nnet &nnet,
-                                  const MatrixBase<BaseFloat> &input,
-                                  bool pad_input,
-                                  BaseFloat utterance_weight,
-                                  const std::vector<int32> &labels,
-                                  Nnet *nnet_to_update);
+    const MatrixBase<BaseFloat> &input,
+    bool pad_input,
+    BaseFloat utterance_weight,
+    const std::vector<int32> &labels,
+    Nnet *nnet_to_update);
 
 
 

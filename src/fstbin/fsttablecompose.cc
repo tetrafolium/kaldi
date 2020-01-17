@@ -28,16 +28,16 @@
 
 
 /*
-  cd ~/tmpdir
-  while true; do
+   cd ~/tmpdir
+   while true; do
     fstrand  | fstarcsort --sort_type=olabel > 1.fst; fstrand | fstarcsort > 2.fst
     fstcompose 1.fst 2.fst > 3a.fst
     fsttablecompose 1.fst 2.fst > 3b.fst
     fstequivalent --random=true 3a.fst 3b.fst || echo "Test failed"
     echo -n "."
-  done
+   done
 
-*/
+ */
 
 int main(int argc, char *argv[]) {
   try {
@@ -45,14 +45,14 @@ int main(int argc, char *argv[]) {
     using namespace fst;
     using kaldi::int32;
     /*
-      fsttablecompose should always give equivalent results to compose,
-      but it is more efficient for certain kinds of inputs.
-      In particular, it is useful when, say, the left FST has states
-      that typically either have epsilon olabels, or
-      one transition out for each of the possible symbols (as the
-      olabel).  The same with the input symbols of the right-hand FST
-      is possible.
-    */
+       fsttablecompose should always give equivalent results to compose,
+       but it is more efficient for certain kinds of inputs.
+       In particular, it is useful when, say, the left FST has states
+       that typically either have epsilon olabels, or
+       one transition out for each of the possible symbols (as the
+       olabel).  The same with the input symbols of the right-hand FST
+       is possible.
+     */
 
     const char *usage =
         "Composition algorithm [between two FSTs of standard type, in tropical\n"
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
                 "match, one of: \"left\" or \"right\".");
     po.Register("compose-filter", &compose_filter, "Composition filter to use, "
                 "one of: \"alt_sequence\", \"auto\", \"match\", \"sequence\"");
-    
+
     po.Read(argc, argv);
 
     if (match_side == "left") {
@@ -89,9 +89,9 @@ int main(int argc, char *argv[]) {
       opts.filter_type = ALT_SEQUENCE_FILTER;
     } else if (compose_filter == "auto") {
       opts.filter_type = AUTO_FILTER;
-    } else  if (compose_filter == "match") {
+    } else if (compose_filter == "match") {
       opts.filter_type = MATCH_FILTER;
-    } else  if (compose_filter == "sequence") {
+    } else if (compose_filter == "sequence") {
       opts.filter_type = SEQUENCE_FILTER;
     } else {
       KALDI_ERR << "Invalid compose-filter option: " << compose_filter;
@@ -118,10 +118,10 @@ int main(int argc, char *argv[]) {
         (ClassifyWspecifier(fst_out_str, NULL, NULL, NULL) != kNoWspecifier);
     if (is_table_out != (is_table_1 || is_table_2))
       KALDI_ERR << "Incompatible combination of archives and files";
-    
+
     if (!is_table_1 && !is_table_2) { // Only dealing with files...
       VectorFst<StdArc> *fst1 = ReadFstKaldi(fst1_in_str);
-      
+
       VectorFst<StdArc> *fst2 = ReadFstKaldi(fst2_in_str);
 
       // Checks if <fst1> is olabel sorted and <fst2> is ilabel sorted.
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
       if (fst2->Properties(fst::kILabelSorted, true) == 0) {
         KALDI_WARN << "The second FST is not ilabel sorted.";
       }
-      
+
       VectorFst<StdArc> composed_fst;
 
       TableCompose(*fst1, *fst2, &composed_fst, opts);
@@ -142,10 +142,10 @@ int main(int argc, char *argv[]) {
       WriteFstKaldi(composed_fst, fst_out_str);
       return 0;
     } else if (!is_table_1 && is_table_2
-               && opts.table_match_type == MATCH_OUTPUT) {
+        && opts.table_match_type == MATCH_OUTPUT) {
       // second arg is an archive, and match-side=left (default).
       TableComposeCache<Fst<StdArc> > cache(opts);
-      VectorFst<StdArc> *fst1 = ReadFstKaldi(fst1_in_str);      
+      VectorFst<StdArc> *fst1 = ReadFstKaldi(fst1_in_str);
       SequentialTableReader<VectorFstHolder> fst2_reader(fst2_in_str);
       TableWriter<VectorFstHolder> fst_writer(fst_out_str);
       int32 n_done = 0;
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
           n_err++;
         } else {
           const VectorFst<StdArc> &fst1(fst1_reader.Value()),
-              &fst2(fst2_reader.Value(key));
+          &fst2(fst2_reader.Value(key));
           VectorFst<StdArc> result;
           TableCompose(fst1, fst2, &result, opts);
           if (result.NumStates() == 0) {

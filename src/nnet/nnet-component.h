@@ -41,8 +41,8 @@ namespace nnet1 {
  * the formulas are implemented in descendant classes (AffineTransform,Sigmoid,Softmax,...).
  */
 class Component {
- /// Component type identification mechanism,
- public:
+  /// Component type identification mechanism,
+public:
   /// Types of Components,
   typedef enum {
     kUnknown = 0x0,
@@ -103,9 +103,9 @@ class Component {
   /// Converts marker to component type (case insensitive),
   static ComponentType MarkerToType(const std::string &s);
 
- /// Generic interface of a component,
- public:
-  Component(int32 input_dim, int32 output_dim):
+  /// Generic interface of a component,
+public:
+  Component(int32 input_dim, int32 output_dim) :
     input_dim_(input_dim),
     output_dim_(output_dim)
   { }
@@ -145,9 +145,9 @@ class Component {
   /// Perform backward-pass propagation 'out_diff' -> 'in_diff'.
   /// Note: 'in' and 'out' will be used only sometimes...
   void Backpropagate(const CuMatrixBase<BaseFloat> &in,
-                     const CuMatrixBase<BaseFloat> &out,
-                     const CuMatrixBase<BaseFloat> &out_diff,
-                     CuMatrix<BaseFloat> *in_diff);
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrix<BaseFloat> *in_diff);
 
   /// Initialize component from a line in config file,
   static Component* Init(const std::string &conf_line);
@@ -165,20 +165,20 @@ class Component {
   virtual std::string InfoGradient() const { return ""; }
 
 
- /// Abstract interface for propagation/backpropagation
- protected:
+  /// Abstract interface for propagation/backpropagation
+protected:
   /// Forward pass transformation (to be implemented by descending class...)
   virtual void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                            CuMatrixBase<BaseFloat> *out) = 0;
+      CuMatrixBase<BaseFloat> *out) = 0;
 
   /// Backward pass transformation (to be implemented by descending class...)
   virtual void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                                const CuMatrixBase<BaseFloat> &out,
-                                const CuMatrixBase<BaseFloat> &out_diff,
-                                CuMatrixBase<BaseFloat> *in_diff) = 0;
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) = 0;
 
- /// Virtual interface for initialization and I/O,
- protected:
+  /// Virtual interface for initialization and I/O,
+protected:
   /// Initialize internal data of a component
   virtual void InitData(std::istream &is) { }
 
@@ -188,17 +188,17 @@ class Component {
   /// Writes the component content
   virtual void WriteData(std::ostream &os, bool binary) const { }
 
- /// Data members,
- protected:
+  /// Data members,
+protected:
   int32 input_dim_;  ///< Dimension of the input of the Component,
   int32 output_dim_;  ///< Dimension of the output of the Component,
 
- /// Private members (descending classes cannot call this),
- private:
+  /// Private members (descending classes cannot call this),
+private:
   /// Create a new intance of component,
   static Component* NewComponentOfType(
     ComponentType t, int32 input_dim, int32 output_dim
-  );
+    );
 };
 
 
@@ -209,8 +209,8 @@ class Component {
  * are separate, and should be stored by ::WriteData(...),
  */
 class UpdatableComponent : public Component {
- public:
-  UpdatableComponent(int32 input_dim, int32 output_dim):
+public:
+  UpdatableComponent(int32 input_dim, int32 output_dim) :
     Component(input_dim, output_dim),
     learn_rate_coef_(1.0),
     bias_learn_rate_coef_(1.0)
@@ -238,7 +238,7 @@ class UpdatableComponent : public Component {
 
   /// Compute gradient and update parameters,
   virtual void Update(const CuMatrixBase<BaseFloat> &input,
-                      const CuMatrixBase<BaseFloat> &diff) = 0;
+      const CuMatrixBase<BaseFloat> &diff) = 0;
 
   /// Set the training options to the component,
   virtual void SetTrainOptions(const NnetTrainOptions &opts) {
@@ -263,7 +263,7 @@ class UpdatableComponent : public Component {
   /// Initialize the content of the component by the 'line' from the prototype,
   virtual void InitData(std::istream &is) = 0;
 
- protected:
+protected:
   /// Option-class with training hyper-parameters,
   NnetTrainOptions opts_;
 
@@ -282,8 +282,8 @@ class UpdatableComponent : public Component {
  * for recurrent networks, which are trained with parallel sequences.
  */
 class MultistreamComponent : public UpdatableComponent {
- public:
-  MultistreamComponent(int32 input_dim, int32 output_dim):
+public:
+  MultistreamComponent(int32 input_dim, int32 output_dim) :
     UpdatableComponent(input_dim, output_dim)
   { }
 
@@ -303,7 +303,7 @@ class MultistreamComponent : public UpdatableComponent {
   virtual void ResetStreams(const std::vector<int32>& stream_reset_flag)
   { }
 
- protected:
+protected:
   std::vector<int32> sequence_lengths_;
 };
 
@@ -312,7 +312,7 @@ class MultistreamComponent : public UpdatableComponent {
  * Inline methods for ::Component,
  */
 inline void Component::Propagate(const CuMatrixBase<BaseFloat> &in,
-                                 CuMatrix<BaseFloat> *out) {
+    CuMatrix<BaseFloat> *out) {
   // Check the dims
   if (input_dim_ != in.NumCols()) {
     KALDI_ERR << "Non-matching dims on the input of " << TypeToMarker(GetType())
@@ -326,9 +326,9 @@ inline void Component::Propagate(const CuMatrixBase<BaseFloat> &in,
 }
 
 inline void Component::Backpropagate(const CuMatrixBase<BaseFloat> &in,
-                                     const CuMatrixBase<BaseFloat> &out,
-                                     const CuMatrixBase<BaseFloat> &out_diff,
-                                     CuMatrix<BaseFloat> *in_diff) {
+    const CuMatrixBase<BaseFloat> &out,
+    const CuMatrixBase<BaseFloat> &out_diff,
+    CuMatrix<BaseFloat> *in_diff) {
   // Check the dims,
   if (OutputDim() != out_diff.NumCols()) {
     KALDI_ERR << "Non-matching dims! Component output dim " << OutputDim()

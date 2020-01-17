@@ -39,7 +39,7 @@ struct RegtreeMllrOptions {
   /// If 'false', generate transforms for each baseclass.
   bool use_regtree;
 
-  RegtreeMllrOptions(): min_count(1000.0), use_regtree(true) { }
+  RegtreeMllrOptions() : min_count(1000.0), use_regtree(true) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("mllr-min-count", &min_count,
@@ -51,7 +51,7 @@ struct RegtreeMllrOptions {
 
 /// An MLLR mean transformation is an affine transformation of Gaussian means.
 class RegtreeMllrDiagGmm {
- public:
+public:
   RegtreeMllrDiagGmm() {}
 
   /// Allocates memory for transform matrix & bias vector
@@ -65,7 +65,7 @@ class RegtreeMllrDiagGmm {
 
   /// Get all the transformed means for a given pdf.
   void GetTransformedMeans(const RegressionTree &regtree, const AmDiagGmm &am,
-                           int32 pdf_index, MatrixBase<BaseFloat> *out) const;
+      int32 pdf_index, MatrixBase<BaseFloat> *out) const;
 
   void Write(std::ostream &out_stream, bool binary) const;
   void Read(std::istream &in_stream, bool binary);
@@ -79,7 +79,7 @@ class RegtreeMllrDiagGmm {
     return xform_matrices_;
   }
 
- private:
+private:
   /// Transform matrices: size() = num_xforms_
   std::vector< Matrix<BaseFloat> > xform_matrices_;
   int32 num_xforms_;  ///< Number of transforms == xform_matrices_.size()
@@ -92,7 +92,7 @@ class RegtreeMllrDiagGmm {
 };
 
 inline void RegtreeMllrDiagGmm::SetParameters(const MatrixBase<BaseFloat> &mat,
-                                              int32 regclass) {
+    int32 regclass) {
   xform_matrices_[regclass].CopyFromMat(mat, kNoTrans);
 }
 
@@ -101,7 +101,7 @@ inline void RegtreeMllrDiagGmm::SetParameters(const MatrixBase<BaseFloat> &mat,
  *  densities.
  */
 class RegtreeMllrDiagGmmAccs {
- public:
+public:
   RegtreeMllrDiagGmmAccs() {}
   ~RegtreeMllrDiagGmmAccs() { DeletePointers(&baseclass_stats_); }
 
@@ -111,20 +111,20 @@ class RegtreeMllrDiagGmmAccs {
   /// Accumulate stats for a single GMM in the model; returns log likelihood.
   /// This does not work with multiple feature transforms.
   BaseFloat AccumulateForGmm(const RegressionTree &regtree,
-                             const AmDiagGmm &am,
-                             const VectorBase<BaseFloat> &data,
-                             int32 pdf_index, BaseFloat weight);
+      const AmDiagGmm &am,
+      const VectorBase<BaseFloat> &data,
+      int32 pdf_index, BaseFloat weight);
 
   /// Accumulate stats for a single Gaussian component in the model.
   void AccumulateForGaussian(const RegressionTree &regtree,
-                             const AmDiagGmm &am,
-                             const VectorBase<BaseFloat> &data,
-                             int32 pdf_index, int32 gauss_index,
-                             BaseFloat weight);
+      const AmDiagGmm &am,
+      const VectorBase<BaseFloat> &data,
+      int32 pdf_index, int32 gauss_index,
+      BaseFloat weight);
 
   void Update(const RegressionTree &regtree, const RegtreeMllrOptions &opts,
-              RegtreeMllrDiagGmm *out_mllr, BaseFloat *auxf_impr,
-              BaseFloat *t) const;
+      RegtreeMllrDiagGmm *out_mllr, BaseFloat *auxf_impr,
+      BaseFloat *t) const;
 
   void Write(std::ostream &out_stream, bool binary) const;
   void Read(std::istream &in_stream, bool binary, bool add);
@@ -136,7 +136,7 @@ class RegtreeMllrDiagGmmAccs {
     return baseclass_stats_;
   }
 
- private:
+private:
   /// Per-baseclass stats; used for accumulation
   std::vector<AffineXformStats*> baseclass_stats_;
   int32 num_baseclasses_;    ///< Number of baseclasses
@@ -144,20 +144,20 @@ class RegtreeMllrDiagGmmAccs {
 
   /// Returns the MLLR objective function for a given transform and baseclass.
   BaseFloat MllrObjFunction(const Matrix<BaseFloat> &xform,
-                            int32 bclass_id) const;
+      int32 bclass_id) const;
 
   // Cannot have copy constructor and assigment operator
   KALDI_DISALLOW_COPY_AND_ASSIGN(RegtreeMllrDiagGmmAccs);
 };
 
 typedef TableWriter< KaldiObjectHolder<RegtreeMllrDiagGmm> >
-            RegtreeMllrDiagGmmWriter;
+    RegtreeMllrDiagGmmWriter;
 typedef RandomAccessTableReader< KaldiObjectHolder<RegtreeMllrDiagGmm> >
-            RandomAccessRegtreeMllrDiagGmmReader;
+    RandomAccessRegtreeMllrDiagGmmReader;
 typedef RandomAccessTableReaderMapped< KaldiObjectHolder<RegtreeMllrDiagGmm> >
-            RandomAccessRegtreeMllrDiagGmmReaderMapped;
+    RandomAccessRegtreeMllrDiagGmmReaderMapped;
 typedef SequentialTableReader< KaldiObjectHolder<RegtreeMllrDiagGmm> >
-            RegtreeMllrDiagGmmSeqReader;
+    RegtreeMllrDiagGmmSeqReader;
 
 }  // namespace kaldi
 

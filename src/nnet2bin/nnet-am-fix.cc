@@ -47,13 +47,13 @@ int main(int argc, char *argv[]) {
 
     bool binary_write = true;
     NnetFixConfig config;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     config.Register(&po);
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     std::string nnet_rxfilename = po.GetArg(1),
         nnet_wxfilename = po.GetArg(2);
-    
+
     TransitionModel trans_model;
     AmNnet am_nnet;
     {
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     }
 
     FixNnet(config, &am_nnet.GetNnet());
-    
+
     {
       Output ko(nnet_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);

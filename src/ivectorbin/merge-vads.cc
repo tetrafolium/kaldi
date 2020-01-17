@@ -41,9 +41,9 @@ namespace kaldi {
      1 0 0
      1 1 1
      1 2 1
-*/
+ */
 void PrepareMap(const std::string map_rxfilename,
-  unordered_map<std::pair<int32, int32>, int32, PairHasher<int32> > *map) {
+    unordered_map<std::pair<int32, int32>, int32, PairHasher<int32> > *map) {
   Input map_input(map_rxfilename);
 
   // If a map file isn't specified, provide an obvious mapping.  The
@@ -73,8 +73,8 @@ void PrepareMap(const std::string map_rxfilename,
                   << line;
       }
       int32 label1 = std::atoi(fields[0].c_str()),
-            label2 = std::atoi(fields[1].c_str()),
-            result_label = std::atoi(fields[2].c_str());
+          label2 = std::atoi(fields[1].c_str()),
+          result_label = std::atoi(fields[2].c_str());
       (*map)[std::pair<int32, int32>(label1, label2)] = result_label;
     }
   }
@@ -87,20 +87,20 @@ int main(int argc, char *argv[]) {
   typedef kaldi::int32 int32;
   try {
     const char *usage =
-      "This program merges two archives of per-frame weights representing\n"
-      "voice activity decisions.  By default, the program assumes that the\n"
-      "input vectors consist of floats that are 0.0 if a frame is judged\n"
-      "as nonspeech and 1.0 if it is considered speech.  The default\n"
-      "behavior produces a frame-level decision of 1.0 if both input frames\n"
-      "are 1.0, and 0.0 otherwise.  Additional classes (e.g., 2.0 for music)\n"
-      "can be handled using the \"map\" option.\n"
-      "\n"
-      "Usage: merge-vads [options] <vad-rspecifier-1> <vad-rspecifier-2>\n"
-      "    <vad-wspecifier>\n"
-      "e.g.: merge-vads [options] scp:vad_energy.scp scp:vad_gmm.scp\n"
-      "    ark:vad.ark\n"
-      "See also: compute-vad-from-frame-likes, compute-vad, ali-to-post,\n"
-      "post-to-weights\n";
+        "This program merges two archives of per-frame weights representing\n"
+        "voice activity decisions.  By default, the program assumes that the\n"
+        "input vectors consist of floats that are 0.0 if a frame is judged\n"
+        "as nonspeech and 1.0 if it is considered speech.  The default\n"
+        "behavior produces a frame-level decision of 1.0 if both input frames\n"
+        "are 1.0, and 0.0 otherwise.  Additional classes (e.g., 2.0 for music)\n"
+        "can be handled using the \"map\" option.\n"
+        "\n"
+        "Usage: merge-vads [options] <vad-rspecifier-1> <vad-rspecifier-2>\n"
+        "    <vad-wspecifier>\n"
+        "e.g.: merge-vads [options] scp:vad_energy.scp scp:vad_gmm.scp\n"
+        "    ark:vad.ark\n"
+        "See also: compute-vad-from-frame-likes, compute-vad, ali-to-post,\n"
+        "post-to-weights\n";
 
     ParseOptions po(usage);
     std::string map_rxfilename;
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
     BaseFloatVectorWriter vad_writer(po.GetArg(3));
 
     int32 num_done = 0, num_err = 0;
-    for (;!first_vad_reader.Done(); first_vad_reader.Next()) {
+    for (; !first_vad_reader.Done(); first_vad_reader.Next()) {
       std::string utt = first_vad_reader.Key();
       Vector<BaseFloat> vad1(first_vad_reader.Value());
       if (!second_vad_reader.HasKey(utt)) {
@@ -138,9 +138,9 @@ int main(int argc, char *argv[]) {
       Vector<BaseFloat> vad_result(vad1.Dim());
       for (int32 i = 0; i < vad1.Dim(); i++) {
         std::pair<int32, int32> key(static_cast<int32>(vad1(i)),
-          static_cast<int32>(vad2(i)));
+            static_cast<int32>(vad2(i)));
         unordered_map<std::pair<int32, int32>, int32,
-          PairHasher<int32> >::const_iterator iter = map.find(key);
+            PairHasher<int32> >::const_iterator iter = map.find(key);
         if (iter == map.end()) {
           KALDI_ERR << "Map is missing combination "
                     << vad1(i) << " and " << vad2(i);

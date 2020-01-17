@@ -30,15 +30,15 @@ namespace nnet2 {
 
 
 static void ProcessFile(const MatrixBase<BaseFloat> &feats,
-                        const Posterior &pdf_post,
-                        const std::string &utt_id,
-                        int32 left_context,
-                        int32 right_context,
-                        int32 num_frames,
-                        int32 const_feat_dim,
-                        int64 *num_frames_written,
-                        int64 *num_egs_written,
-                        NnetExampleWriter *example_writer) {
+    const Posterior &pdf_post,
+    const std::string &utt_id,
+    int32 left_context,
+    int32 right_context,
+    int32 num_frames,
+    int32 const_feat_dim,
+    int64 *num_frames_written,
+    int64 *num_egs_written,
+    NnetExampleWriter *example_writer) {
   KALDI_ASSERT(feats.NumRows() == static_cast<int32>(pdf_post.size()));
   int32 feat_dim = feats.NumCols();
   KALDI_ASSERT(const_feat_dim < feat_dim);
@@ -61,7 +61,7 @@ static void ProcessFile(const MatrixBase<BaseFloat> &feats,
       if (t2 < 0) t2 = 0;
       if (t2 >= feats.NumRows()) t2 = feats.NumRows() - 1;
       SubVector<BaseFloat> src(feats.Row(t2), 0, basic_feat_dim),
-          dest(input_frames, j + left_context);
+      dest(input_frames, j + left_context);
       dest.CopyFromVec(src);
       if (const_feat_dim > 0) {
         SubVector<BaseFloat> src(feats.Row(t2), basic_feat_dim, const_feat_dim);
@@ -74,7 +74,7 @@ static void ProcessFile(const MatrixBase<BaseFloat> &feats,
     for (int32 j = 0; j < this_num_frames; j++)
       eg.labels[j] = pdf_post[t + j];
     eg.input_frames = input_frames;  // Copy to CompressedMatrix.
-    
+
     std::ostringstream os;
     os << utt_id << "-" << t;
 
@@ -114,11 +114,11 @@ int main(int argc, char *argv[]) {
         "   ark:- \n"
         "Note: the --left-context and --right-context would be derived from\n"
         "the output of nnet-info.";
-        
-    
+
+
     int32 left_context = 0, right_context = 0,
         num_frames = 1, const_feat_dim = 0;
-    
+
     ParseOptions po(usage);
     po.Register("left-context", &left_context, "Number of frames of left "
                 "context the neural net requires.");
@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
     po.Register("const-feat-dim", &const_feat_dim, "If specified, the last "
                 "const-feat-dim dimensions of the feature input are treated as "
                 "constant over the context window (so are not spliced)");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 3) {
@@ -145,10 +145,10 @@ int main(int argc, char *argv[]) {
     SequentialBaseFloatMatrixReader feat_reader(feature_rspecifier);
     RandomAccessPosteriorReader pdf_post_reader(pdf_post_rspecifier);
     NnetExampleWriter example_writer(examples_wspecifier);
-    
+
     int32 num_done = 0, num_err = 0;
     int64 num_frames_written = 0, num_egs_written = 0;
-    
+
     for (; !feat_reader.Done(); feat_reader.Next()) {
       std::string key = feat_reader.Key();
       const Matrix<BaseFloat> &feats = feat_reader.Value();

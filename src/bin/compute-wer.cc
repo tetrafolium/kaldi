@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
                 "  \"present\" means score those we have transcriptions for\n"
                 "  \"all\" means treat absent transcriptions as empty\n"
                 "  \"strict\" means die if all in ref not also in hyp");
-    
+
     bool dummy = false;
     po.Register("text", &dummy, "Deprecated option! Keeping for compatibility reasons.");
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     // Both text and integers are loaded as vector of strings,
     SequentialTokenVectorReader ref_reader(ref_rspecifier);
     RandomAccessTokenVectorReader hyp_reader(hyp_rspecifier);
-    
+
     // Main loop, accumulate WER stats,
     for (; !ref_reader.Done(); ref_reader.Next()) {
       std::string key = ref_reader.Key();
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
       if (!hyp_reader.HasKey(key)) {
         if (mode == "strict")
           KALDI_ERR << "No hypothesis for key " << key << " and strict "
-              "mode specifier.";
+            "mode specifier.";
         num_absent_sents++;
         if (mode == "present")  // do not score this one.
           continue;
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
               << num_del << " del, " << num_sub << " sub ]"
               << (num_absent_sents != 0 ? " [PARTIAL]" : "") << '\n';
     std::cout << "%SER " << std::fixed << percent_ser <<  " [ "
-               << sent_errs << " / " << num_sent << " ]\n";
+              << sent_errs << " / " << num_sent << " ]\n";
     std::cout << "Scored " << num_sent << " sentences, "
               << num_absent_sents << " not present in hyp.\n";
 

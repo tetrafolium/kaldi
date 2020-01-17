@@ -30,10 +30,10 @@ namespace kaldi {
 namespace nnet3 {
 
 class NnetLdaStatsAccumulator {
- public:
+public:
   NnetLdaStatsAccumulator(BaseFloat rand_prune,
-                          const Nnet &nnet):
-      rand_prune_(rand_prune), nnet_(nnet), compiler_(nnet) { }
+      const Nnet &nnet) :
+    rand_prune_(rand_prune), nnet_(nnet), compiler_(nnet) { }
 
   void AccStats(const NnetExample &eg) {
     ComputationRequest request;
@@ -61,9 +61,9 @@ class NnetLdaStatsAccumulator {
                 << stats_wxfilename;
     }
   }
- private:
+private:
   void AccStatsFromOutput(const NnetExample &eg,
-                          const CuMatrixBase<BaseFloat> &nnet_output) {
+      const CuMatrixBase<BaseFloat> &nnet_output) {
     BaseFloat rand_prune = rand_prune_;
     const NnetIo *output_supervision = NULL;
     for (size_t i = 0; i < eg.io.size(); i++)

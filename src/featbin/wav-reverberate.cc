@@ -25,11 +25,11 @@
 namespace kaldi {
 
 /*
-   This function is to repeatedly concatenate signal1 by itself 
+   This function is to repeatedly concatenate signal1 by itself
    to match the length of signal2 and add the two signals together.
-*/
+ */
 void AddVectorsOfUnequalLength(const VectorBase<BaseFloat> &signal1,
-                                     Vector<BaseFloat> *signal2) {
+    Vector<BaseFloat> *signal2) {
   for (int32 po = 0; po < signal2->Dim(); po += signal1.Dim()) {
     int32 block_length = signal1.Dim();
     if (signal2->Dim() - po < block_length) block_length = signal2->Dim() - po;
@@ -40,9 +40,9 @@ void AddVectorsOfUnequalLength(const VectorBase<BaseFloat> &signal1,
 /*
    This function is to add signal1 to signal2 starting at the offset of signal2
    This will not extend the length of signal2.
-*/
+ */
 void AddVectorsWithOffset(const Vector<BaseFloat> &signal1, int32 offset,
-                                             Vector<BaseFloat> *signal2) {
+    Vector<BaseFloat> *signal2) {
   int32 add_length = std::min(signal2->Dim() - offset, signal1.Dim());
   if (add_length > 0)
     signal2->Range(offset, add_length).AddVec(1.0, signal1.Range(0, add_length));
@@ -53,16 +53,16 @@ BaseFloat MaxAbsolute(const Vector<BaseFloat> &vector) {
   return std::max(std::abs(vector.Max()), std::abs(vector.Min()));
 }
 
-/* 
-   Early reverberation component of the signal is composed of reflections 
-   within 0.05 seconds of the direct path signal (assumed to be the peak of 
-   the room impulse response). This function returns the energy in 
-   this early reverberation component of the signal. 
+/*
+   Early reverberation component of the signal is composed of reflections
+   within 0.05 seconds of the direct path signal (assumed to be the peak of
+   the room impulse response). This function returns the energy in
+   this early reverberation component of the signal.
    The input parameters to this function are the room impulse response, the signal
    and their sampling frequency respectively.
-*/
+ */
 BaseFloat ComputeEarlyReverbEnergy(const Vector<BaseFloat> &rir, const Vector<BaseFloat> &signal,
-                                   BaseFloat samp_freq) {
+    BaseFloat samp_freq) {
   int32 peak_index = 0;
   rir.Max(&peak_index);
   KALDI_VLOG(1) << "peak index is " << peak_index;
@@ -89,9 +89,9 @@ BaseFloat ComputeEarlyReverbEnergy(const Vector<BaseFloat> &rir, const Vector<Ba
    the sampling frequency and the signal respectively.
    The length of the signal will be extended to (original signal length +
    rir length - 1) after the reverberation.
-*/
+ */
 float DoReverberation(const Vector<BaseFloat> &rir, BaseFloat samp_freq,
-                        Vector<BaseFloat> *signal) {
+    Vector<BaseFloat> *signal) {
   float signal_power = ComputeEarlyReverbEnergy(rir, *signal, samp_freq);
   FFTbasedBlockConvolveSignals(rir, signal);
   return signal_power;
@@ -100,10 +100,10 @@ float DoReverberation(const Vector<BaseFloat> &rir, BaseFloat samp_freq,
 /*
    The noise will be scaled before the addition
    to match the given signal-to-noise ratio (SNR).
-*/
+ */
 void AddNoise(Vector<BaseFloat> *noise, BaseFloat snr_db,
-                BaseFloat time, BaseFloat samp_freq,
-                BaseFloat signal_power, Vector<BaseFloat> *signal) {
+    BaseFloat time, BaseFloat samp_freq,
+    BaseFloat signal_power, Vector<BaseFloat> *signal) {
   float noise_power = VecVec(*noise, *noise) / noise->Dim();
   float scale_factor = sqrt(pow(10, -snr_db / 10) * signal_power / noise_power);
   noise->Scale(scale_factor);
@@ -115,9 +115,9 @@ void AddNoise(Vector<BaseFloat> *noise, BaseFloat snr_db,
 
 /*
    This function converts comma-spearted string into float vector.
-*/
+ */
 void ReadCommaSeparatedCommand(const std::string &s,
-                                std::vector<BaseFloat> *v) {
+    std::vector<BaseFloat> *v) {
   std::vector<std::string> split_string;
   SplitStringToVector(s, ",", true, &split_string);
   for (size_t i = 0; i < split_string.size(); i++) {
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
     if (multi_channel_output) {
       if (rir_channel != 0 || noise_channel != 0)
         KALDI_WARN << "options for --rir-channel and --noise-channel"
-                      "are ignored as --multi-channel-output is true.";
+          "are ignored as --multi-channel-output is true.";
     }
 
     std::string input_wave_file = po.GetArg(1);
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
     const Matrix<BaseFloat> &input_matrix = input_wave.Data();
     BaseFloat samp_freq_input = input_wave.SampFreq();
     int32 num_samp_input = input_matrix.NumCols(),  // #samples in the input
-          num_input_channel = input_matrix.NumRows();  // #channels in the input
+        num_input_channel = input_matrix.NumRows();    // #channels in the input
     KALDI_VLOG(1) << "sampling frequency of input: " << samp_freq_input
                   << " #samples: " << num_samp_input
                   << " #channel: " << num_input_channel;
@@ -248,7 +248,7 @@ int main(int argc, char *argv[]) {
     Matrix<BaseFloat> rir_matrix;
     BaseFloat samp_freq_rir = samp_freq_input;
     int32 num_samp_rir = 0,
-          num_rir_channel = 0;
+        num_rir_channel = 0;
     if (!rir_file.empty()) {
       WaveData rir_wave;
       {
@@ -273,7 +273,7 @@ int main(int argc, char *argv[]) {
     if (!additive_signals.empty()) {
       if (snrs.empty() || start_times.empty())
         KALDI_ERR << "--additive-signals option requires "
-                     "--snrs and --start-times to be set.";
+          "--snrs and --start-times to be set.";
       std::vector<std::string> split_string;
       SplitStringToVector(additive_signals, ",", true, &split_string);
       for (size_t i = 0; i < split_string.size(); i++) {
@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
         BaseFloat samp_freq = additive_signal_wave.SampFreq();
         KALDI_ASSERT(samp_freq == samp_freq_input);
         int32 num_samp = additive_signal_matrix.NumCols(),
-              num_channel = additive_signal_matrix.NumRows();
+            num_channel = additive_signal_matrix.NumRows();
         KALDI_VLOG(1) << "sampling frequency of additive signal: " << samp_freq
                       << " #samples: " << num_samp
                       << " #channel: " << num_channel;
@@ -312,8 +312,8 @@ int main(int argc, char *argv[]) {
     int32 shift_index = 0;
     int32 num_output_channels = (multi_channel_output ? num_rir_channel : 1);
     int32 num_samp_output = (duration > 0 ? samp_freq_input * duration :
-                              (shift_output ? num_samp_input :
-                                              num_samp_input + num_samp_rir - 1));
+        (shift_output ? num_samp_input :
+        num_samp_input + num_samp_rir - 1));
     Matrix<BaseFloat> out_matrix(num_output_channels, num_samp_output);
 
     for (int32 output_channel = 0; output_channel < num_output_channels; output_channel++) {
@@ -331,7 +331,7 @@ int main(int argc, char *argv[]) {
         rir.Scale(1.0 / (1 << 15));
         early_energy = DoReverberation(rir, samp_freq_rir, &input);
         if (shift_output) {
-          // find the position of the peak of the impulse response 
+          // find the position of the peak of the impulse response
           // and shift the output waveform by this amount
           rir.Max(&shift_index);
         }

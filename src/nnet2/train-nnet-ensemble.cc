@@ -32,9 +32,9 @@ static inline Int32Pair MakePair(int32 first, int32 second) {
 }
 
 NnetEnsembleTrainer::NnetEnsembleTrainer(
-    const NnetEnsembleTrainerConfig &config,
-    std::vector<Nnet*> nnet_ensemble):
-    config_(config), nnet_ensemble_(nnet_ensemble) {
+  const NnetEnsembleTrainerConfig &config,
+  std::vector<Nnet*> nnet_ensemble) :
+  config_(config), nnet_ensemble_(nnet_ensemble) {
   beta_ = config_.beta;
   num_phases_ = 0;
   bool first_time = true;
@@ -49,7 +49,7 @@ void NnetEnsembleTrainer::TrainOnExample(const NnetExample &value) {
 
 void NnetEnsembleTrainer::TrainOneMinibatch() {
   KALDI_ASSERT(!buffer_.empty());
-  
+
   int32 num_states = nnet_ensemble_[0]->GetComponent(nnet_ensemble_[0]->NumComponents() - 1).OutputDim();
   // average of posteriors matrix, storing averaged outputs of net ensemble.
   CuMatrix<BaseFloat> post_avg(buffer_.size(), num_states);
@@ -66,7 +66,7 @@ void NnetEnsembleTrainer::TrainOneMinibatch() {
     post_avg.AddMat(1.0, post_mat[i]);
   }
 
-  // calculate the interpolated posterios as new supervision labels, and also 
+  // calculate the interpolated posterios as new supervision labels, and also
   // collect the indices of the original supervision labels for later use (calc. objf.).
   std::vector<MatrixElement<BaseFloat> > sv_labels;
   std::vector<Int32Pair > sv_labels_ind;
@@ -77,8 +77,8 @@ void NnetEnsembleTrainer::TrainOneMinibatch() {
                  "Currently this code only supports single-frame egs.");
     const std::vector<std::pair<int32,BaseFloat> > &labels = buffer_[m].labels[0];
     for (size_t i = 0; i < labels.size(); i++) {
-      MatrixElement<BaseFloat> 
-          tmp = {m, labels[i].first, labels[i].second};
+      MatrixElement<BaseFloat>
+      tmp = {m, labels[i].first, labels[i].second};
       sv_labels.push_back(tmp);
       sv_labels_ind.push_back(MakePair(m, labels[i].first));
     }
@@ -88,7 +88,7 @@ void NnetEnsembleTrainer::TrainOneMinibatch() {
   post_avg.AddElements(1.0, sv_labels);
 
   // calculate the deriv, do backprop, and calculate the objf.
-  for (int32 i = 0; i < nnet_ensemble_.size(); i++) {  
+  for (int32 i = 0; i < nnet_ensemble_.size(); i++) {
     CuMatrix<BaseFloat> tmp_deriv(post_mat[i]);
     post_mat[i].ApplyLog();
     std::vector<BaseFloat> log_post_correct;

@@ -34,9 +34,9 @@ int main(int argc, char *argv[]) {
         "e.g.:\n"
         " gmm-global-info 1.dubm\n"
         "See also: gmm-info, am-info\n";
-    
+
     ParseOptions po(usage);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 1) {

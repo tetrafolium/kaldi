@@ -40,16 +40,16 @@ curandStatus_t curandGenerateUniformWrap(curandGenerator_t gen, double *ptr, siz
 /// Wrapper of curandGenerateNormal(), curandGenerateNormalDouble(),
 template<typename Real>
 curandStatus_t curandGenerateNormalWrap(
-    curandGenerator_t gen, Real *ptr, size_t num);
+  curandGenerator_t gen, Real *ptr, size_t num);
 //
 template<>
 curandStatus_t curandGenerateNormalWrap<float>(
-    curandGenerator_t gen, float *ptr, size_t num) {
+  curandGenerator_t gen, float *ptr, size_t num) {
   return curandGenerateNormal(gen, ptr, num, 0.0 /*mean*/, 1.0 /*stddev*/);
 }
 template<>
 curandStatus_t curandGenerateNormalWrap<double>(
-    curandGenerator_t gen, double *ptr, size_t num) {
+  curandGenerator_t gen, double *ptr, size_t num) {
   return curandGenerateNormalDouble(gen, ptr, num, 0.0 /*mean*/, 1.0 /*stddev*/);
 }
 /// End of wrappers.
@@ -67,7 +67,7 @@ void CuRand<Real>::RandUniform(CuMatrixBase<Real> *tgt) {
     // (because when memory is nearly exhausted, the stride of CudaMallocPitch
     // may vary).
     CuMatrix<Real> tmp(tgt->NumRows(), tgt->NumCols(), kUndefined,
-                       kStrideEqualNumCols);
+        kStrideEqualNumCols);
     CU_SAFE_CALL(curandGenerateUniformWrap(gen_, tmp.Data(), tmp.NumRows() * tmp.Stride()));
     tgt->CopyFromMat(tmp);
     CuDevice::Instantiate().AccuProfile(__func__, tim);
@@ -122,7 +122,7 @@ void CuRand<Real>::RandGaussian(CuMatrixBase<Real> *tgt) {
     // may vary).
     MatrixIndexT num_cols_even = tgt->NumCols() + (tgt->NumCols() % 2); // + 0 or 1,
     CuMatrix<Real> tmp(tgt->NumRows(), num_cols_even, kUndefined,
-                       kStrideEqualNumCols);
+        kStrideEqualNumCols);
     CU_SAFE_CALL(curandGenerateNormalWrap(gen_, tmp.Data(), tmp.NumRows()*tmp.Stride()));
     tgt->CopyFromMat(tmp.ColRange(0,tgt->NumCols()));
     CuDevice::Instantiate().AccuProfile(__func__, tim);
@@ -149,7 +149,7 @@ void CuRand<Real>::RandGaussian(CuMatrix<Real> *tgt) {
       // CudaMallocPitch may vary).
       MatrixIndexT num_cols_even = tgt->NumCols() + (tgt->NumCols() % 2); // + 0 or 1,
       CuMatrix<Real> tmp(tgt->NumRows(), num_cols_even, kUndefined,
-                         kStrideEqualNumCols);
+          kStrideEqualNumCols);
       CU_SAFE_CALL(curandGenerateNormalWrap(gen_, tmp.Data(),
                                             tmp.NumRows() * tmp.Stride()));
       tgt->CopyFromMat(tmp.ColRange(0,tgt->NumCols()));
@@ -203,7 +203,7 @@ void CuRand<Real>::AddGaussNoise(CuMatrix<Real> *tgt, Real gscale) {
   // Use the option kStrideEqualNumCols to ensure consistency (because when
   // memory is nearly exhausted, the stride of CudaMallocPitch may vary).
   CuMatrix<Real> tmp(tgt->NumRows(), tgt->NumCols(),
-                     kUndefined, kStrideEqualNumCols);
+      kUndefined, kStrideEqualNumCols);
   this->RandGaussian(&tmp);
   tgt->AddMat(gscale, tmp);
 }

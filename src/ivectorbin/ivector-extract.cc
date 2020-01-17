@@ -30,22 +30,22 @@ namespace kaldi {
 // that this program does.  The work happens in the operator (), the
 // output happens in the destructor.
 class IvectorExtractTask {
- public:
+public:
   IvectorExtractTask(const IvectorExtractor &extractor,
-                     std::string utt,
-                     const Matrix<BaseFloat> &feats,
-                     const Posterior &posterior,
-                     BaseFloatVectorWriter *writer,
-                     double *tot_auxf_change):
-      extractor_(extractor), utt_(utt), feats_(feats), posterior_(posterior),
-      writer_(writer), tot_auxf_change_(tot_auxf_change) { }
+      std::string utt,
+      const Matrix<BaseFloat> &feats,
+      const Posterior &posterior,
+      BaseFloatVectorWriter *writer,
+      double *tot_auxf_change) :
+    extractor_(extractor), utt_(utt), feats_(feats), posterior_(posterior),
+    writer_(writer), tot_auxf_change_(tot_auxf_change) { }
 
   void operator () () {
     bool need_2nd_order_stats = false;
 
     IvectorExtractorUtteranceStats utt_stats(extractor_.NumGauss(),
-                                             extractor_.FeatDim(),
-                                             need_2nd_order_stats);
+        extractor_.FeatDim(),
+        need_2nd_order_stats);
 
     utt_stats.AccStats(feats_, posterior_);
 
@@ -78,7 +78,7 @@ class IvectorExtractTask {
                   << " was " << ivector_.Norm(2.0);
     writer_->Write(utt_, Vector<BaseFloat>(ivector_));
   }
- private:
+private:
   const IvectorExtractor &extractor_;
   std::string utt_;
   Matrix<BaseFloat> feats_;
@@ -90,12 +90,12 @@ class IvectorExtractTask {
 };
 
 int32 RunPerSpeaker(const std::string &ivector_extractor_rxfilename,
-                   const IvectorEstimationOptions &opts,
-                   bool compute_objf_change,
-                   const std::string &spk2utt_rspecifier,
-                   const std::string &feature_rspecifier,
-                   const std::string &posterior_rspecifier,
-                   const std::string &ivector_wspecifier) {
+    const IvectorEstimationOptions &opts,
+    bool compute_objf_change,
+    const std::string &spk2utt_rspecifier,
+    const std::string &feature_rspecifier,
+    const std::string &posterior_rspecifier,
+    const std::string &ivector_wspecifier) {
   IvectorExtractor extractor;
   ReadKaldiObject(ivector_extractor_rxfilename, &extractor);
   SequentialTokenVectorReader spk2utt_reader(spk2utt_rspecifier);
@@ -114,8 +114,8 @@ int32 RunPerSpeaker(const std::string &ivector_extractor_rxfilename,
     bool need_2nd_order_stats = false;
 
     IvectorExtractorUtteranceStats utt_stats(extractor.NumGauss(),
-                                             extractor.FeatDim(),
-                                             need_2nd_order_stats);
+        extractor.FeatDim(),
+        need_2nd_order_stats);
 
     for (size_t i = 0; i < utts.size(); i++) {
       const std::string &utt = utts[i];

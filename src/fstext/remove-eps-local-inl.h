@@ -34,7 +34,7 @@ struct ReweightPlusDefault {
 
 struct ReweightPlusLogArc {
   inline TropicalWeight operator () (const TropicalWeight &a,
-                                     const TropicalWeight &b) {
+      const TropicalWeight &b) {
     LogWeight a_log(a.Value()), b_log(b.Value());
     return TropicalWeight(Plus(a_log, b_log).Value());
   }
@@ -48,9 +48,9 @@ class RemoveEpsLocalClass {
   typedef typename Arc::Label Label;
   typedef typename Arc::Weight Weight;
 
- public:
-  RemoveEpsLocalClass(MutableFst<Arc> *fst):
-      fst_(fst) {
+public:
+  RemoveEpsLocalClass(MutableFst<Arc> *fst) :
+    fst_(fst) {
     if (fst_->Start() == kNoStateId) return;  // empty.
     non_coacc_state_ = fst_->AddState();
     InitNumArcs();
@@ -61,7 +61,7 @@ class RemoveEpsLocalClass {
     assert(CheckNumArcs());
     Connect(fst);  // remove inaccessible states.
   }
- private:
+private:
   MutableFst<Arc> *fst_;
   StateId non_coacc_state_;  //  use this to delete arcs: make it nextstate
   vector<StateId> num_arcs_in_;   // The number of arcs into the state, plus one
@@ -95,7 +95,7 @@ class RemoveEpsLocalClass {
     num_arcs_in_[fst_->Start()]++;  // count start as trans in.
     for (StateId s = 0; s < num_states; s++) {
       if (fst_->Final(s) != Weight::Zero())
-      num_arcs_out_[s]++;  // count final as transition.
+        num_arcs_out_[s]++; // count final as transition.
       for (ArcIterator<MutableFst<Arc> > aiter(*fst_, s); !aiter.Done(); aiter.Next()) {
         num_arcs_in_[aiter.Value().nextstate]++;
         num_arcs_out_[s]++;
@@ -151,8 +151,8 @@ class RemoveEpsLocalClass {
     aiter.SetValue(arc);
 
     for (MutableArcIterator<MutableFst<Arc> > aiter_next(fst_, arc.nextstate);
-         !aiter_next.Done();
-         aiter_next.Next()) {
+        !aiter_next.Done();
+        aiter_next.Next()) {
       Arc nextarc = aiter_next.Value();
       if (nextarc.nextstate != non_coacc_state_) {
         nextarc.weight = Divide(nextarc.weight, reweight, DIVIDE_LEFT);

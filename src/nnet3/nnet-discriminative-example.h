@@ -80,10 +80,10 @@ struct NnetDiscriminativeSupervision {
   // consistent with how you numbered your inputs), and 'frame_skip' would be 1
   // in a vanilla setup, but 3 in the case of 'chain' models
   NnetDiscriminativeSupervision(const std::string &name,
-                                const discriminative::DiscriminativeSupervision &supervision,
-                                const VectorBase<BaseFloat> &deriv_weights,
-                                int32 first_frame,
-                                int32 frame_skip);
+      const discriminative::DiscriminativeSupervision &supervision,
+      const VectorBase<BaseFloat> &deriv_weights,
+      int32 first_frame,
+      int32 frame_skip);
 
   NnetDiscriminativeSupervision(const NnetDiscriminativeSupervision &other);
 
@@ -134,7 +134,7 @@ struct NnetDiscriminativeExample {
 /// without looking at the value of the features.  It will be used in combining
 /// egs into batches of all similar structure.
 struct NnetDiscriminativeExampleStructureHasher {
-  size_t operator () (const NnetDiscriminativeExample &eg) const noexcept ;
+  size_t operator () (const NnetDiscriminativeExample &eg) const noexcept;
   // We also provide a version of this that works from pointers.
   size_t operator () (const NnetDiscriminativeExample *eg) const noexcept {
     return (*this)(*eg);
@@ -146,36 +146,36 @@ struct NnetDiscriminativeExampleStructureHasher {
 /// NnetDiscriminativeExample without looking at the value of the features.
 struct NnetDiscriminativeExampleStructureCompare {
   bool operator () (const NnetDiscriminativeExample &a,
-                    const NnetDiscriminativeExample &b) const;
+      const NnetDiscriminativeExample &b) const;
   // We also provide a version of this that works from pointers.
   bool operator () (const NnetDiscriminativeExample *a,
-                    const NnetDiscriminativeExample *b) const {
+      const NnetDiscriminativeExample *b) const {
     return (*this)(*a, *b);
   }
 };
 
 
 /**
-  Appends the given vector of examples (which must be non-empty) into
-  a single output example.
-  Intended to be used when forming minibatches for neural net training. If
-  'compress' it compresses the output features (recommended to save disk
-  space).
+   Appends the given vector of examples (which must be non-empty) into
+   a single output example.
+   Intended to be used when forming minibatches for neural net training. If
+   'compress' it compresses the output features (recommended to save disk
+   space).
 
-  Note: the input is left as it was at the start, but it is temporarily
-  changed inside the function; this is a trick to allow us to use the
-  MergeExamples() routine while avoiding having to rewrite code.
-*/
+   Note: the input is left as it was at the start, but it is temporarily
+   changed inside the function; this is a trick to allow us to use the
+   MergeExamples() routine while avoiding having to rewrite code.
+ */
 void MergeDiscriminativeExamples(
-    std::vector<NnetDiscriminativeExample> *input,
-    bool compress,
-    NnetDiscriminativeExample *output);
+  std::vector<NnetDiscriminativeExample> *input,
+  bool compress,
+  NnetDiscriminativeExample *output);
 
 // called from MergeDiscriminativeExamples, this function merges the Supervision
 // objects into one.  Requires (and checks) that they all have the same name.
 void MergeSupervision(
-    const std::vector<const NnetDiscriminativeSupervision*> &inputs,
-    NnetDiscriminativeSupervision *output);
+  const std::vector<const NnetDiscriminativeSupervision*> &inputs,
+  NnetDiscriminativeSupervision *output);
 
 
 /** Shifts the time-index t of everything in the input of "eg" by adding
@@ -193,8 +193,8 @@ void MergeSupervision(
     subsampling factor is worked out from the time spacing between the indexes
     in the output.  */
 void ShiftDiscriminativeExampleTimes(int32 frame_shift,
-                                    const std::vector<std::string> &exclude_names,
-                                    NnetDiscriminativeExample *eg);
+    const std::vector<std::string> &exclude_names,
+    NnetDiscriminativeExample *eg);
 
 /**  This function takes a NnetDiscriminativeExample and produces a
      ComputationRequest.
@@ -202,14 +202,14 @@ void ShiftDiscriminativeExampleTimes(int32 frame_shift,
      can create the ComputationRequest manually.  Assumes that if
      need_model_derivative is true, you will be supplying derivatives w.r.t. all
      outputs.
-*/
+ */
 void GetDiscriminativeComputationRequest(const Nnet &nnet,
-                                         const NnetDiscriminativeExample &eg,
-                                         bool need_model_derivative,
-                                         bool store_component_stats,
-                                         bool use_xent_regularization,
-                                         bool use_xent_derivative,
-                                         ComputationRequest *computation_request);
+    const NnetDiscriminativeExample &eg,
+    bool need_model_derivative,
+    bool store_component_stats,
+    bool use_xent_regularization,
+    bool use_xent_derivative,
+    ComputationRequest *computation_request);
 
 typedef TableWriter<KaldiObjectHolder<NnetDiscriminativeExample > > NnetDiscriminativeExampleWriter;
 typedef SequentialTableReader<KaldiObjectHolder<NnetDiscriminativeExample > > SequentialNnetDiscriminativeExampleReader;
@@ -226,9 +226,9 @@ int32 GetDiscriminativeNnetExampleSize(const NnetDiscriminativeExample &a);
 /// same strucure (i.e. the same input and output indexes), and outputting them
 /// in suitable minibatches as defined by ExampleMergingConfig.
 class DiscriminativeExampleMerger {
- public:
+public:
   DiscriminativeExampleMerger(const ExampleMergingConfig &config,
-                              NnetDiscriminativeExampleWriter *writer);
+      NnetDiscriminativeExampleWriter *writer);
 
   // This function accepts an example, and if possible, writes a merged example
   // out.  The ownership of the pointer 'a' is transferred to this class when
@@ -246,7 +246,7 @@ class DiscriminativeExampleMerger {
   int32 ExitStatus() { Finish(); return (num_egs_written_ > 0 ? 0 : 1); }
 
   ~DiscriminativeExampleMerger() { Finish(); };
- private:
+private:
   // called by Finish() and AcceptExample().  Merges, updates the stats, and
   // writes.  The 'egs' is non-const only because the egs are temporarily
   // changed inside MergeDiscriminativeEgs.  The pointer 'egs' is still owned
@@ -261,10 +261,10 @@ class DiscriminativeExampleMerger {
 
   // Note: the "key" into the egs is the first element of the vector.
   typedef unordered_map<NnetDiscriminativeExample*,
-                        std::vector<NnetDiscriminativeExample*>,
-                        NnetDiscriminativeExampleStructureHasher,
-                        NnetDiscriminativeExampleStructureCompare> MapType;
-   MapType eg_to_egs_;
+          std::vector<NnetDiscriminativeExample*>,
+          NnetDiscriminativeExampleStructureHasher,
+          NnetDiscriminativeExampleStructureCompare> MapType;
+  MapType eg_to_egs_;
 };
 
 

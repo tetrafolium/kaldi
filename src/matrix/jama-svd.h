@@ -63,8 +63,8 @@ namespace kaldi {
 
 template<typename Real>
 bool MatrixBase<Real>::JamaSvd(VectorBase<Real> *s_in,
-                               MatrixBase<Real> *U_in,
-                               MatrixBase<Real> *V_in) {  //  Destructive!
+    MatrixBase<Real> *U_in,
+    MatrixBase<Real> *V_in) {                             //  Destructive!
   KALDI_ASSERT(s_in != NULL && U_in != this && V_in != this);
   int wantu = (U_in != NULL), wantv = (V_in != NULL);
   Matrix<Real> Utmp, Vtmp;
@@ -123,14 +123,14 @@ bool MatrixBase<Real>::JamaSvd(VectorBase<Real> *s_in,
         Real t = cblas_Xdot(m - k, adata + astride*k + k, astride,
                             adata + astride*k + j, astride);
         /*for (i = k; i < m; i++) {
-          t += adata[i*astride + k]*adata[i*astride + j];  //   A(i, k)*A(i, j); // 3
-          }*/
+           t += adata[i*astride + k]*adata[i*astride + j];  //   A(i, k)*A(i, j); // 3
+           }*/
         t = -t/A(k, k);
         cblas_Xaxpy(m - k, t, adata + k*astride + k, astride,
                     adata + k*astride + j, astride);
         /*for (i = k; i < m; i++) {
-          adata[i*astride + j] += t*adata[i*astride + k];  // A(i, j) += t*A(i, k); // 5
-          }*/
+           adata[i*astride + j] += t*adata[i*astride + k];  // A(i, j) += t*A(i, k); // 5
+           }*/
       }
 
       // Place the k-th row of A into e for the
@@ -183,9 +183,9 @@ bool MatrixBase<Real>::JamaSvd(VectorBase<Real> *s_in,
           cblas_Xaxpy(m - (k+1), t, workdata + (k+1), 1,
                       adata + (k+1)*astride + j, astride);
           /*
-          for (i = k+1; i < m; i++) {
-            adata[i*astride + j] += t*workdata[i];  // A(i, j) += t*work(i); // 5
-            }*/
+             for (i = k+1; i < m; i++) {
+             adata[i*astride + j] += t*workdata[i];  // A(i, j) += t*work(i); // 5
+             }*/
         }
       }
       if (wantv) {
@@ -234,8 +234,8 @@ bool MatrixBase<Real>::JamaSvd(VectorBase<Real> *s_in,
           cblas_Xaxpy(m - k, t, udata + ustride*k + k, ustride,
                       udata + k*ustride + j, ustride);
           /*for (i = k; i < m; i++) {
-            udata[i*ustride + j] += t*udata[i*ustride + k];  // U(i, j) += t*U(i, k); // 4
-            }*/
+             udata[i*ustride + j] += t*udata[i*ustride + k];  // U(i, j) += t*U(i, k); // 4
+             }*/
         }
         for (i = k; i < m; i++ ) {
           U(i, k) = -U(i, k);
@@ -260,17 +260,17 @@ bool MatrixBase<Real>::JamaSvd(VectorBase<Real> *s_in,
       if ((k < nrt) & (e(k) != 0.0)) {
         for (j = k+1; j < nu; j++) {
           Real t = cblas_Xdot(n - (k+1), vdata + (k+1)*vstride + k, vstride,
-                              vdata + (k+1)*vstride + j, vstride); 
+                              vdata + (k+1)*vstride + j, vstride);
           /*Real t (0.0);
-          for (i = k+1; i < n; i++) {
-            t += vdata[i*vstride + k]*vdata[i*vstride + j];  // t += V(i, k)*V(i, j); // 7
-            }*/
+             for (i = k+1; i < n; i++) {
+             t += vdata[i*vstride + k]*vdata[i*vstride + j];  // t += V(i, k)*V(i, j); // 7
+             }*/
           t = -t/V(k+1, k);
           cblas_Xaxpy(n - (k+1), t, vdata + (k+1)*vstride + k, vstride,
                       vdata + (k+1)*vstride + j, vstride);
           /*for (i = k+1; i < n; i++) {
-            vdata[i*vstride + j] += t*vdata[i*vstride + k];  // V(i, j) += t*V(i, k); // 7
-            }*/
+             vdata[i*vstride + j] += t*vdata[i*vstride + k];  // V(i, j) += t*V(i, k); // 7
+             }*/
         }
       }
       for (i = 0; i < n; i++) {
@@ -295,8 +295,8 @@ bool MatrixBase<Real>::JamaSvd(VectorBase<Real> *s_in,
   // that's a bit less negative than -126.  If we get convergence
   // failure in float only, this may mean that we have to make the
   // -120 value less negative.
-  Real tiny(pow(2.0, sizeof(Real) == 4 ? -120.0: -966.0 ));
-  
+  Real tiny(pow(2.0, sizeof(Real) == 4 ? -120.0 : -966.0 ));
+
   while (p > 0) {
     int k = 0;
     int kase = 0;
@@ -340,7 +340,7 @@ bool MatrixBase<Real>::JamaSvd(VectorBase<Real> *s_in,
           break;
         }
         Real t( (ks != p ? std::abs(e(ks)) : 0.) +
-                (ks != k+1 ? std::abs(e(ks-1)) : 0.));
+            (ks != k+1 ? std::abs(e(ks-1)) : 0.));
         if (std::abs(s(ks)) <= tiny + eps*t)  {
           s(ks) = 0.0;
           break;
@@ -361,164 +361,164 @@ bool MatrixBase<Real>::JamaSvd(VectorBase<Real> *s_in,
 
     switch (kase) {
 
-      // Deflate negligible s(p).
+    // Deflate negligible s(p).
 
-      case 1: {
-        Real f(e(p-2));
-        e(p-2) = 0.0;
-        for (j = p-2; j >= k; j--) {
-          Real t( hypot(s(j), f));
-          Real cs(s(j)/t);
-          Real sn(f/t);
-          s(j) = t;
-          if (j != k) {
-            f = -sn*e(j-1);
-            e(j-1) = cs*e(j-1);
-          }
-          if (wantv) {
-            for (i = 0; i < n; i++) {
-              t = cs*V(i, j) + sn*V(i, p-1);
-              V(i, p-1) = -sn*V(i, j) + cs*V(i, p-1);
-              V(i, j) = t;
-            }
+    case 1: {
+      Real f(e(p-2));
+      e(p-2) = 0.0;
+      for (j = p-2; j >= k; j--) {
+        Real t( hypot(s(j), f));
+        Real cs(s(j)/t);
+        Real sn(f/t);
+        s(j) = t;
+        if (j != k) {
+          f = -sn*e(j-1);
+          e(j-1) = cs*e(j-1);
+        }
+        if (wantv) {
+          for (i = 0; i < n; i++) {
+            t = cs*V(i, j) + sn*V(i, p-1);
+            V(i, p-1) = -sn*V(i, j) + cs*V(i, p-1);
+            V(i, j) = t;
           }
         }
       }
-        break;
+    }
+    break;
 
-        // Split at negligible s(k).
+    // Split at negligible s(k).
 
-      case 2: {
-        Real f(e(k-1));
-        e(k-1) = 0.0;
-        for (j = k; j < p; j++) {
-          Real t(hypot(s(j), f));
-          Real cs( s(j)/t);
-          Real sn(f/t);
-          s(j) = t;
-          f = -sn*e(j);
-          e(j) = cs*e(j);
-          if (wantu) {
-            for (i = 0; i < m; i++) {
-              t = cs*U(i, j) + sn*U(i, k-1);
-              U(i, k-1) = -sn*U(i, j) + cs*U(i, k-1);
-              U(i, j) = t;
-            }
+    case 2: {
+      Real f(e(k-1));
+      e(k-1) = 0.0;
+      for (j = k; j < p; j++) {
+        Real t(hypot(s(j), f));
+        Real cs( s(j)/t);
+        Real sn(f/t);
+        s(j) = t;
+        f = -sn*e(j);
+        e(j) = cs*e(j);
+        if (wantu) {
+          for (i = 0; i < m; i++) {
+            t = cs*U(i, j) + sn*U(i, k-1);
+            U(i, k-1) = -sn*U(i, j) + cs*U(i, k-1);
+            U(i, j) = t;
           }
         }
       }
-        break;
+    }
+    break;
 
-        // Perform one qr step.
+    // Perform one qr step.
 
-      case 3: {
+    case 3: {
 
-        // Calculate the shift.
+      // Calculate the shift.
 
-        Real scale = std::max(std::max(std::max(std::max(
+      Real scale = std::max(std::max(std::max(std::max(
             std::abs(s(p-1)), std::abs(s(p-2))), std::abs(e(p-2))),
                                        std::abs(s(k))), std::abs(e(k)));
-        Real sp = s(p-1)/scale;
-        Real spm1 = s(p-2)/scale;
-        Real epm1 = e(p-2)/scale;
-        Real sk = s(k)/scale;
-        Real ek = e(k)/scale;
-        Real b = ((spm1 + sp)*(spm1 - sp) + epm1*epm1)/2.0;
-        Real c = (sp*epm1)*(sp*epm1);
-        Real shift = 0.0;
-        if ((b != 0.0) || (c != 0.0)) {
-          shift = std::sqrt(b*b + c);
-          if (b < 0.0) {
-            shift = -shift;
-          }
-          shift = c/(b + shift);
+      Real sp = s(p-1)/scale;
+      Real spm1 = s(p-2)/scale;
+      Real epm1 = e(p-2)/scale;
+      Real sk = s(k)/scale;
+      Real ek = e(k)/scale;
+      Real b = ((spm1 + sp)*(spm1 - sp) + epm1*epm1)/2.0;
+      Real c = (sp*epm1)*(sp*epm1);
+      Real shift = 0.0;
+      if ((b != 0.0) || (c != 0.0)) {
+        shift = std::sqrt(b*b + c);
+        if (b < 0.0) {
+          shift = -shift;
         }
-        Real f = (sk + sp)*(sk - sp) + shift;
-        Real g = sk*ek;
-
-        // Chase zeros.
-
-        for (j = k; j < p-1; j++) {
-          Real t = hypot(f, g);
-          Real cs = f/t;
-          Real sn = g/t;
-          if (j != k) {
-            e(j-1) = t;
-          }
-          f = cs*s(j) + sn*e(j);
-          e(j) = cs*e(j) - sn*s(j);
-          g = sn*s(j+1);
-          s(j+1) = cs*s(j+1);
-          if (wantv) {
-            cblas_Xrot(n, vdata + j, vstride, vdata + j+1, vstride, cs, sn);
-            /*for (i = 0; i < n; i++) {
-              t = cs*vdata[i*vstride + j] + sn*vdata[i*vstride + j+1];  // t = cs*V(i, j) + sn*V(i, j+1);         // 13
-              vdata[i*vstride + j+1] = -sn*vdata[i*vstride + j] + cs*vdata[i*vstride + j+1];  // V(i, j+1) = -sn*V(i, j) + cs*V(i, j+1); // 5
-              vdata[i*vstride + j] = t;  // V(i, j) = t; // 4
-              }*/
-          }
-          t = hypot(f, g);
-          cs = f/t;
-          sn = g/t;
-          s(j) = t;
-          f = cs*e(j) + sn*s(j+1);
-          s(j+1) = -sn*e(j) + cs*s(j+1);
-          g = sn*e(j+1);
-          e(j+1) = cs*e(j+1);
-          if (wantu && (j < m-1)) {
-            cblas_Xrot(m, udata + j, ustride, udata + j+1, ustride, cs, sn);
-            /*for (i = 0; i < m; i++) {
-              t = cs*udata[i*ustride + j] + sn*udata[i*ustride + j+1];  // t = cs*U(i, j) + sn*U(i, j+1); // 7
-              udata[i*ustride + j+1] = -sn*udata[i*ustride + j] +cs*udata[i*ustride + j+1];  // U(i, j+1) = -sn*U(i, j) + cs*U(i, j+1); // 8
-              udata[i*ustride + j] = t;  // U(i, j) = t; // 1
-              }*/
-          }
-        }
-        e(p-2) = f;
-        iter = iter + 1;
+        shift = c/(b + shift);
       }
-        break;
+      Real f = (sk + sp)*(sk - sp) + shift;
+      Real g = sk*ek;
 
-        // Convergence.
+      // Chase zeros.
 
-      case 4: {
-
-        // Make the singular values positive.
-
-        if (s(k) <= 0.0) {
-          s(k) = (s(k) < 0.0 ? -s(k) : 0.0);
-          if (wantv) {
-            for (i = 0; i <= pp; i++) {
-              V(i, k) = -V(i, k);
-            }
-          }
+      for (j = k; j < p-1; j++) {
+        Real t = hypot(f, g);
+        Real cs = f/t;
+        Real sn = g/t;
+        if (j != k) {
+          e(j-1) = t;
         }
-
-        // Order the singular values.
-
-        while (k < pp) {
-          if (s(k) >= s(k+1)) {
-            break;
-          }
-          Real t = s(k);
-          s(k) = s(k+1);
-          s(k+1) = t;
-          if (wantv && (k < n-1)) {
-            for (i = 0; i < n; i++) {
-              t = V(i, k+1); V(i, k+1) = V(i, k); V(i, k) = t;
-            }
-          }
-          if (wantu && (k < m-1)) {
-            for (i = 0; i < m; i++) {
-              t = U(i, k+1); U(i, k+1) = U(i, k); U(i, k) = t;
-            }
-          }
-          k++;
+        f = cs*s(j) + sn*e(j);
+        e(j) = cs*e(j) - sn*s(j);
+        g = sn*s(j+1);
+        s(j+1) = cs*s(j+1);
+        if (wantv) {
+          cblas_Xrot(n, vdata + j, vstride, vdata + j+1, vstride, cs, sn);
+          /*for (i = 0; i < n; i++) {
+             t = cs*vdata[i*vstride + j] + sn*vdata[i*vstride + j+1];  // t = cs*V(i, j) + sn*V(i, j+1);         // 13
+             vdata[i*vstride + j+1] = -sn*vdata[i*vstride + j] + cs*vdata[i*vstride + j+1];  // V(i, j+1) = -sn*V(i, j) + cs*V(i, j+1); // 5
+             vdata[i*vstride + j] = t;  // V(i, j) = t; // 4
+             }*/
         }
-        iter = 0;
-        p--;
+        t = hypot(f, g);
+        cs = f/t;
+        sn = g/t;
+        s(j) = t;
+        f = cs*e(j) + sn*s(j+1);
+        s(j+1) = -sn*e(j) + cs*s(j+1);
+        g = sn*e(j+1);
+        e(j+1) = cs*e(j+1);
+        if (wantu && (j < m-1)) {
+          cblas_Xrot(m, udata + j, ustride, udata + j+1, ustride, cs, sn);
+          /*for (i = 0; i < m; i++) {
+             t = cs*udata[i*ustride + j] + sn*udata[i*ustride + j+1];  // t = cs*U(i, j) + sn*U(i, j+1); // 7
+             udata[i*ustride + j+1] = -sn*udata[i*ustride + j] +cs*udata[i*ustride + j+1];  // U(i, j+1) = -sn*U(i, j) + cs*U(i, j+1); // 8
+             udata[i*ustride + j] = t;  // U(i, j) = t; // 1
+             }*/
+        }
       }
-        break;
+      e(p-2) = f;
+      iter = iter + 1;
+    }
+    break;
+
+    // Convergence.
+
+    case 4: {
+
+      // Make the singular values positive.
+
+      if (s(k) <= 0.0) {
+        s(k) = (s(k) < 0.0 ? -s(k) : 0.0);
+        if (wantv) {
+          for (i = 0; i <= pp; i++) {
+            V(i, k) = -V(i, k);
+          }
+        }
+      }
+
+      // Order the singular values.
+
+      while (k < pp) {
+        if (s(k) >= s(k+1)) {
+          break;
+        }
+        Real t = s(k);
+        s(k) = s(k+1);
+        s(k+1) = t;
+        if (wantv && (k < n-1)) {
+          for (i = 0; i < n; i++) {
+            t = V(i, k+1); V(i, k+1) = V(i, k); V(i, k) = t;
+          }
+        }
+        if (wantu && (k < m-1)) {
+          for (i = 0; i < m; i++) {
+            t = U(i, k+1); U(i, k+1) = U(i, k); U(i, k) = t;
+          }
+        }
+        k++;
+      }
+      iter = 0;
+      p--;
+    }
+    break;
     }
   }
   return true;

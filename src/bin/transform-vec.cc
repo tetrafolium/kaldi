@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         "\n"
         "Usage: transform-vec [options] <transform-rxfilename> <feats-rspecifier> <feats-wspecifier>\n"
         "See also: transform-feats, est-pca\n";
-    
+
     ParseOptions po(usage);
 
     po.Read(argc, argv);
@@ -50,12 +50,12 @@ int main(int argc, char *argv[]) {
 
     SequentialBaseFloatVectorReader vec_reader(vec_rspecifier);
     BaseFloatVectorWriter vec_writer(vec_wspecifier);
-    
+
     Matrix<BaseFloat> transform;
     ReadKaldiObject(transform_rxfilename, &transform);
 
     int32 num_done = 0;
-    
+
     for (; !vec_reader.Done(); vec_reader.Next()) {
       std::string key = vec_reader.Key();
       const Vector<BaseFloat> &vec(vec_reader.Value());
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
       int32 transform_rows = transform.NumRows(),
           transform_cols = transform.NumCols(),
           vec_dim = vec.Dim();
-      
+
       Vector<BaseFloat> vec_out(transform_rows);
 
       if (transform_cols == vec_dim) {
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     }
 
     KALDI_LOG << "Applied transform to " << num_done << " vectors.";
-    
+
     return (num_done != 0 ? 0 : 1);
   } catch(const std::exception &e) {
     std::cerr << e.what();

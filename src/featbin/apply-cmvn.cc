@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
       SequentialGeneralMatrixReader reader(feat_rspecifier);
       GeneralMatrixWriter writer(feat_wspecifier);
       kaldi::int32 num_done = 0;
-      for (;!reader.Done(); reader.Next()) {
+      for (; !reader.Done(); reader.Next()) {
         writer.Write(reader.Key(), reader.Value());
         num_done++;
       }
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
       std::string cmvn_rspecifier = cmvn_rspecifier_or_rxfilename;
 
       RandomAccessDoubleMatrixReaderMapped cmvn_reader(cmvn_rspecifier,
-                                                       utt2spk_rspecifier);
+          utt2spk_rspecifier);
 
       for (; !feat_reader.Done(); feat_reader.Next()) {
         std::string utt = feat_reader.Key();
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
       if (!skip_dims.empty())
         FakeStatsForSomeDims(skip_dims, &cmvn_stats);
 
-      for (;!feat_reader.Done(); feat_reader.Next()) {
+      for (; !feat_reader.Done(); feat_reader.Next()) {
         std::string utt = feat_reader.Key();
         Matrix<BaseFloat> feat(feat_reader.Value());
         if (norm_means) {

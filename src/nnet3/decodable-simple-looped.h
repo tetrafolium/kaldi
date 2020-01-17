@@ -51,12 +51,12 @@ struct NnetSimpleLoopedComputationOptions {
   bool debug_computation;
   NnetOptimizeOptions optimize_config;
   NnetComputeOptions compute_config;
-  NnetSimpleLoopedComputationOptions():
-      extra_left_context_initial(0),
-      frame_subsampling_factor(1),
-      frames_per_chunk(20),
-      acoustic_scale(0.1),
-      debug_computation(false) { }
+  NnetSimpleLoopedComputationOptions() :
+    extra_left_context_initial(0),
+    frame_subsampling_factor(1),
+    frames_per_chunk(20),
+    acoustic_scale(0.1),
+    debug_computation(false) { }
 
   void Check() const {
     KALDI_ASSERT(extra_left_context_initial >= 0 &&
@@ -100,24 +100,24 @@ struct NnetSimpleLoopedComputationOptions {
    a const reference to this class, that has been previously initialized.
  */
 class DecodableNnetSimpleLoopedInfo  {
- public:
+public:
   // The constructor takes a non-const pointer to 'nnet' because it may have to
   // modify it to be able to take multiple iVectors.
   DecodableNnetSimpleLoopedInfo(const NnetSimpleLoopedComputationOptions &opts,
-                                Nnet *nnet);
+      Nnet *nnet);
 
   // This constructor takes the priors from class AmNnetSimple (so it can divide by
   // them).
   DecodableNnetSimpleLoopedInfo(const NnetSimpleLoopedComputationOptions &opts,
-                                AmNnetSimple *nnet);
+      AmNnetSimple *nnet);
 
   // this constructor is for use in testing.
   DecodableNnetSimpleLoopedInfo(const NnetSimpleLoopedComputationOptions &opts,
-                                const Vector<BaseFloat> &priors,
-                                Nnet *nnet);
+      const Vector<BaseFloat> &priors,
+      Nnet *nnet);
 
   void Init(const NnetSimpleLoopedComputationOptions &opts,
-            Nnet *nnet);
+      Nnet *nnet);
 
   const NnetSimpleLoopedComputationOptions &opts;
 
@@ -154,12 +154,12 @@ class DecodableNnetSimpleLoopedInfo  {
 };
 
 /*
-  This class handles the neural net computation; it's mostly accessed
-  via other wrapper classes.
+   This class handles the neural net computation; it's mostly accessed
+   via other wrapper classes.
 
-  It can accept just input features, or input features plus iVectors.  */
+   It can accept just input features, or input features plus iVectors.  */
 class DecodableNnetSimpleLooped {
- public:
+public:
   /**
      This constructor takes features as input, and you can either supply a
      single iVector input, estimated in batch-mode ('ivector'), or 'online'
@@ -180,12 +180,12 @@ class DecodableNnetSimpleLooped {
      @param [in] online_ivector_period If you are using iVectors estimated 'online'
                         (i.e. if online_ivectors != NULL) gives the periodicity
                         (in frames) with which the iVectors are estimated.
-  */
+   */
   DecodableNnetSimpleLooped(const DecodableNnetSimpleLoopedInfo &info,
-                            const MatrixBase<BaseFloat> &feats,
-                            const VectorBase<BaseFloat> *ivector = NULL,
-                            const MatrixBase<BaseFloat> *online_ivectors = NULL,
-                            int32 online_ivector_period = 1);
+      const MatrixBase<BaseFloat> &feats,
+      const VectorBase<BaseFloat> *ivector = NULL,
+      const MatrixBase<BaseFloat> *online_ivectors = NULL,
+      int32 online_ivector_period = 1);
 
 
   // returns the number of frames of likelihoods.  The same as feats_.NumRows()
@@ -200,7 +200,7 @@ class DecodableNnetSimpleLooped {
   // you're expected to call this, and GetOutput(), in an order of increasing
   // frames.  If you deviate from this, one of these calls may crash.
   void GetOutputForFrame(int32 subsampled_frame,
-                         VectorBase<BaseFloat> *output);
+      VectorBase<BaseFloat> *output);
 
   // Gets the output for a particular frame and pdf_id, with
   // 0 <= subsampled_frame < NumFrames(),
@@ -209,25 +209,25 @@ class DecodableNnetSimpleLooped {
     KALDI_ASSERT(subsampled_frame >= current_log_post_subsampled_offset_ &&
                  "Frames must be accessed in order.");
     while (subsampled_frame >= current_log_post_subsampled_offset_ +
-                            current_log_post_.NumRows())
+        current_log_post_.NumRows())
       AdvanceChunk();
     return current_log_post_(subsampled_frame -
                              current_log_post_subsampled_offset_,
                              pdf_id);
   }
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableNnetSimpleLooped);
 
   // This function does the computation for the next chunk.
   void AdvanceChunk();
 
   void AdvanceChunkInternal(const MatrixBase<BaseFloat> &input_feats,
-                            const VectorBase<BaseFloat> &ivector);
+      const VectorBase<BaseFloat> &ivector);
 
   // Gets the iVector for the specified frame., if we are
   // using iVectors (else does nothing).
   void GetCurrentIvector(int32 input_frame,
-                         Vector<BaseFloat> *ivector);
+      Vector<BaseFloat> *ivector);
 
   // returns dimension of the provided iVectors if supplied, or 0 otherwise.
   int32 GetIvectorDim() const;
@@ -265,7 +265,7 @@ class DecodableNnetSimpleLooped {
 };
 
 class DecodableAmNnetSimpleLooped: public DecodableInterface {
- public:
+public:
   /**
      This constructor takes features as input, and you can either supply a
      single iVector input, estimated in batch-mode ('ivector'), or 'online'
@@ -293,13 +293,13 @@ class DecodableAmNnetSimpleLooped: public DecodableInterface {
      @param [in] online_ivector_period If you are using iVectors estimated 'online'
                         (i.e. if online_ivectors != NULL) gives the periodicity
                         (in frames) with which the iVectors are estimated.
-  */
+   */
   DecodableAmNnetSimpleLooped(const DecodableNnetSimpleLoopedInfo &info,
-                              const TransitionModel &trans_model,
-                              const MatrixBase<BaseFloat> &feats,
-                              const VectorBase<BaseFloat> *ivector = NULL,
-                              const MatrixBase<BaseFloat> *online_ivectors = NULL,
-                              int32 online_ivector_period = 1);
+      const TransitionModel &trans_model,
+      const MatrixBase<BaseFloat> &feats,
+      const VectorBase<BaseFloat> *ivector = NULL,
+      const MatrixBase<BaseFloat> *online_ivectors = NULL,
+      int32 online_ivector_period = 1);
 
 
   virtual BaseFloat LogLikelihood(int32 frame, int32 transition_id);
@@ -315,7 +315,7 @@ class DecodableAmNnetSimpleLooped: public DecodableInterface {
     return (frame == NumFramesReady() - 1);
   }
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableAmNnetSimpleLooped);
   DecodableNnetSimpleLooped decodable_nnet_;
   const TransitionModel &trans_model_;

@@ -40,8 +40,8 @@ struct AccumulateTreeStatsOptions {
   bool collapse_pdf_classes;
   int context_width;
   int central_position;
-  AccumulateTreeStatsOptions(): var_floor(0.01), context_width(3),
-                                central_position(1) { }
+  AccumulateTreeStatsOptions() : var_floor(0.01), context_width(3),
+    central_position(1) { }
 
 
   void Register(OptionsItf *opts) {
@@ -75,22 +75,22 @@ struct AccumulateTreeStatsInfo {
 /// new GaussClusterable* pointers in "stats" will be allocated with "new".
 
 void AccumulateTreeStats(const TransitionModel &trans_model,
-                         const AccumulateTreeStatsInfo &info,
-                         const std::vector<int32> &alignment,
-                         const Matrix<BaseFloat> &features,
-                         std::map<EventType, GaussClusterable*> *stats);
+    const AccumulateTreeStatsInfo &info,
+    const std::vector<int32> &alignment,
+    const Matrix<BaseFloat> &features,
+    std::map<EventType, GaussClusterable*> *stats);
 
 
 
 /*** Read a mapping from one phone set to another.  The phone map file has lines
- of the form <old-phone> <new-phone>, where both entries are integers, usually
- nonzero (but this is not enforced).  This program will crash if the input is
- invalid, e.g. there are multiple inconsistent entries for the same old phone.
- The output vector "phone_map" will be indexed by old-phone and will contain
- the corresponding new-phone, or -1 for any entry that was not defined. */
+   of the form <old-phone> <new-phone>, where both entries are integers, usually
+   nonzero (but this is not enforced).  This program will crash if the input is
+   invalid, e.g. there are multiple inconsistent entries for the same old phone.
+   The output vector "phone_map" will be indexed by old-phone and will contain
+   the corresponding new-phone, or -1 for any entry that was not defined. */
 
 void ReadPhoneMap(std::string phone_map_rxfilename,
-                  std::vector<int32> *phone_map);
+    std::vector<int32> *phone_map);
 
 
 

@@ -34,7 +34,7 @@ void GetSeenPhones(BuildTreeStatsType &stats, int P, std::vector<int32> *phones_
   // shouldn't matter what position).
 
   std::set<int32> phones_set;
-  for (size_t i = 0 ; i < stats.size(); i++) {
+  for (size_t i = 0; i < stats.size(); i++) {
     const EventType &evec = stats[i].first;
     for (size_t j = 0; j < evec.size(); j++) {
       if (evec[j].first == P) {  // "key" is position P
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
                 "leaves in second-level decision tree.");
     po.Register("cluster-leaves", &cluster_leaves, "If true, do a post-clustering"
                 " of the leaves of the final decision tree.");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 6) {
@@ -165,9 +165,9 @@ int main(int argc, char *argv[]) {
 
     {
       Output ko(map_out_filename, binary);
-      WriteIntegerVector(ko.Stream(), binary, mapping); 
+      WriteIntegerVector(ko.Stream(), binary, mapping);
     }
-    
+
     {  // This block is just doing some checks.
 
       std::vector<int32> all_phones;
@@ -204,7 +204,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::cerr << "Wrote tree and mapping\n";
-    
+
     DeleteBuildTreeStats(&stats);
   } catch(const std::exception &e) {
     std::cerr << e.what();

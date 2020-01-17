@@ -60,8 +60,8 @@ namespace nnet3 {
  */
 
 void SplitLocations(
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    std::vector<std::vector<std::pair<int32, int32> > > *split_lists);
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  std::vector<std::vector<std::pair<int32, int32> > > *split_lists);
 
 
 /**
@@ -80,18 +80,18 @@ void SplitLocations(
           e.g. the list [ 6 6 6 1 5 5 5 ] has this property, but [ 1 2 1 ] does not.
           (however, -1's are not subject to this limitation, so [ -1 4 -1 ] satisfies
           the property).
-  This function ensures this property by first calling SplitLocations, and then
-  doing further splitting as necessary to ensure the property.  However, if as a result
-  it needs to split any given initially-split list into more than 2 sub-lists, it will
-  print a warning (once per process).  If we have to split into too many lists it
-  will generate inefficient computations, and we will need to extend the backprop
-  code to support more general types of operation.
-  If all elements of submat_lists are empty, the output split_lists will be
-  the empty vector.
+   This function ensures this property by first calling SplitLocations, and then
+   doing further splitting as necessary to ensure the property.  However, if as a result
+   it needs to split any given initially-split list into more than 2 sub-lists, it will
+   print a warning (once per process).  If we have to split into too many lists it
+   will generate inefficient computations, and we will need to extend the backprop
+   code to support more general types of operation.
+   If all elements of submat_lists are empty, the output split_lists will be
+   the empty vector.
  */
 void SplitLocationsBackward(
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    std::vector<std::vector<std::pair<int32, int32> > > *split_lists);
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  std::vector<std::vector<std::pair<int32, int32> > > *split_lists);
 
 
 /** If it is the case for some i >= 0 that all the .first elements of
@@ -99,9 +99,9 @@ void SplitLocationsBackward(
    .second elements into "second_values", and return true.  Otherwise return
    false and the outputs are don't-cares. */
 bool ConvertToIndexes(
-    const std::vector<std::pair<int32, int32> > &location_vector,
-    int32 *first_value,
-    std::vector<int32> *second_values);
+  const std::vector<std::pair<int32, int32> > &location_vector,
+  int32 *first_value,
+  std::vector<int32> *second_values);
 
 /** This function returns true if for each integer i != -1, all the indexes j at
     which indexes[j] == i are consecutive with no gaps (more formally: if j1 <
@@ -113,7 +113,7 @@ bool ConvertToIndexes(
     indexes[j] == i for all j such that (*reverse_indexes)[i].first <= j && j <
     (*reverse_indexes)[i].second. */
 bool HasContiguousProperty(const std::vector<int32> &indexes,
-                           std::vector<std::pair<int32, int32> > *reverse_indexes);
+    std::vector<std::pair<int32, int32> > *reverse_indexes);
 
 
 /** This function takes a vector of indexes and splits it up into as separate
@@ -128,17 +128,17 @@ bool HasContiguousProperty(const std::vector<int32> &indexes,
     If 'indexes' is empty or only contains -1's, 'indexes_out' will be empty.
  */
 void EnsureContiguousProperty(
-    const std::vector<int32> &indexes,
-    std::vector<std::vector<int32> > *indexes_out);
+  const std::vector<int32> &indexes,
+  std::vector<std::vector<int32> > *indexes_out);
 
 /**
    This function outputs a sorted, unique list of the 't' values that are
    encountered in the provided list of Indexes
    If 't' values equal to kNoTime are encountered, they are ignored and
    are not output.
-*/
+ */
 void GetTList(const std::vector<Index> &indexes,
-              std::vector<int32> *t_values);
+    std::vector<int32> *t_values);
 
 
 /**
@@ -146,16 +146,16 @@ void GetTList(const std::vector<Index> &indexes,
    encountered in the provided list of Indexes
    If 't' values equal to kNoTime are encountered, they are ignored and
    are not output.
-*/
+ */
 void GetTList(const std::vector<Index> &indexes,
-              std::vector<int32> *t_values);
+    std::vector<int32> *t_values);
 
 /**
    This function outputs a unique, lexicographically sorted list of the pairs of
    (n, x) values that are encountered in the provided list of Indexes.
-*/
+ */
 void GetNxList(const std::vector<Index> &indexes,
-               std::vector<std::pair<int32, int32> > *pairs);
+    std::vector<std::pair<int32, int32> > *pairs);
 
 
 } // namespace nnet3

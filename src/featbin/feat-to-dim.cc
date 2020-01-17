@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
         "id.\n"
         "Usage: feat-to-dim [options] <feat-rspecifier> (<dim-wspecifier>|<dim-wxfilename>)\n"
         "e.g.: feat-to-dim scp:feats.scp -\n";
-    
+
     ParseOptions po(usage);
 
     po.Read(argc, argv);
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     std::string wspecifier_or_wxfilename = po.GetArg(2);
 
     SequentialBaseFloatMatrixReader kaldi_reader(rspecifier);
-      
+
     if (ClassifyWspecifier(wspecifier_or_wxfilename, NULL, NULL, NULL)
         != kNoWspecifier) {
       Int32Writer dim_writer(wspecifier_or_wxfilename);

@@ -26,14 +26,14 @@ namespace kaldi {
 namespace chain {
 
 void ComputeChainObjfAndDeriv(const ChainTrainingOptions &opts,
-                              const DenominatorGraph &den_graph,
-                              const Supervision &supervision,
-                              const CuMatrixBase<BaseFloat> &nnet_output,
-                              BaseFloat *objf,
-                              BaseFloat *l2_term,
-                              BaseFloat *weight,
-                              CuMatrixBase<BaseFloat> *nnet_output_deriv,
-                              CuMatrixBase<BaseFloat> *xent_output_deriv) {
+    const DenominatorGraph &den_graph,
+    const Supervision &supervision,
+    const CuMatrixBase<BaseFloat> &nnet_output,
+    BaseFloat *objf,
+    BaseFloat *l2_term,
+    BaseFloat *weight,
+    CuMatrixBase<BaseFloat> *nnet_output_deriv,
+    CuMatrixBase<BaseFloat> *xent_output_deriv) {
   BaseFloat num_logprob_weighted;
   if (nnet_output_deriv)
     nnet_output_deriv->SetZero();
@@ -55,8 +55,8 @@ void ComputeChainObjfAndDeriv(const ChainTrainingOptions &opts,
     }
   }
   DenominatorComputation denominator(opts, den_graph,
-                                     supervision.num_sequences,
-                                     nnet_output);
+      supervision.num_sequences,
+      nnet_output);
 
   BaseFloat den_logprob = denominator.Forward();
   bool ok = true;
@@ -88,8 +88,8 @@ void ComputeChainObjfAndDeriv(const ChainTrainingOptions &opts,
   // of 'incorrect' pdf-ids.
   if (GetVerboseLevel() >= 1 && nnet_output_deriv != NULL) {
     int32 tot_frames = nnet_output_deriv->NumRows(),
- frames_per_sequence = supervision.frames_per_sequence,
-       num_sequences = supervision.num_sequences;
+        frames_per_sequence = supervision.frames_per_sequence,
+        num_sequences = supervision.num_sequences;
     CuVector<BaseFloat> row_products(tot_frames);
     row_products.AddDiagMat2(1.0, *nnet_output_deriv, kNoTrans, 0.0);
     Vector<BaseFloat> row_products_cpu(row_products);

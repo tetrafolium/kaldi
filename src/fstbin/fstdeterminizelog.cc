@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
         "Usage:  fstdeterminizelog [in.fst [out.fst] ]\n"
         "\n"
         "See also fstdeterminizestar\n";
-    
+
     ParseOptions po(usage);
     po.Read(argc, argv);
 

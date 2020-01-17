@@ -55,18 +55,18 @@ namespace kaldi {
 /// This function assumes that any acoustic scaling you want to apply,
 /// has already been applied.
 BaseFloat SentenceLevelConfidence(const CompactLattice &clat,
-                                  int32 *num_paths,
-                                  std::vector<int32> *best_sentence,
-                                  std::vector<int32> *second_best_sentence);
+    int32 *num_paths,
+    std::vector<int32> *best_sentence,
+    std::vector<int32> *second_best_sentence);
 
 
 /// This version of SentenceLevelConfidence takes as input a state-level lattice.
 /// It needs to determinize it first, but it does so in a "smart" way that only generates
 /// about as many output paths as it needs.
 BaseFloat SentenceLevelConfidence(const Lattice &lat,
-                                  int32 *num_paths,
-                                  std::vector<int32> *best_sentence,
-                                  std::vector<int32> *second_best_sentence);
+    int32 *num_paths,
+    std::vector<int32> *best_sentence,
+    std::vector<int32> *second_best_sentence);
 
 
 

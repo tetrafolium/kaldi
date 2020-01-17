@@ -53,7 +53,7 @@ struct ArpaLine {
 // the relative address of different LmStates, and then put everything into one
 // block in memory.
 class LmState {
- public:
+public:
   union ChildType {
     // If child is not the final order, we keep the pointer to its LmState.
     LmState* state;
@@ -64,16 +64,16 @@ class LmState {
 
   struct ChildrenVectorLessThan {
     bool operator()(
-        const std::pair<int32, union ChildType>& lhs,
-        const std::pair<int32, union ChildType>& rhs) const {
+      const std::pair<int32, union ChildType>& lhs,
+      const std::pair<int32, union ChildType>& rhs) const {
       return lhs.first < rhs.first;
     }
   };
 
   LmState(const bool is_unigram, const bool is_child_final_order,
-          const float logprob, const float backoff_logprob) :
-      is_unigram_(is_unigram), is_child_final_order_(is_child_final_order),
-      logprob_(logprob), backoff_logprob_(backoff_logprob) {}
+      const float logprob, const float backoff_logprob) :
+    is_unigram_(is_unigram), is_child_final_order_(is_child_final_order),
+    logprob_(logprob), backoff_logprob_(backoff_logprob) {}
 
   void SetMyAddress(const int64 address) {
     my_address_ = address;
@@ -146,7 +146,7 @@ class LmState {
     }
   }
 
- private:
+private:
   // Unigram states will have LmStates even if they are leaves, therefore we
   // need to note when this is a unigram or not.
   bool is_unigram_;
@@ -175,9 +175,9 @@ class LmState {
 // Class to build ConstArpaLm from Arpa format language model. It relies on the
 // auxiliary class LmState above.
 class ConstArpaLmBuilder : public ArpaFileParser {
- public:
+public:
   explicit ConstArpaLmBuilder(ArpaParseOptions options)
-      : ArpaFileParser(options, NULL) {
+    : ArpaFileParser(options, NULL) {
     ngram_order_ = 0;
     num_words_ = 0;
     overflow_buffer_size_ = 0;
@@ -191,7 +191,7 @@ class ConstArpaLmBuilder : public ArpaFileParser {
 
   ~ConstArpaLmBuilder() {
     unordered_map<std::vector<int32>,
-                  LmState*, VectorHasher<int32> >::iterator iter;
+        LmState*, VectorHasher<int32> >::iterator iter;
     for (iter = seq_to_state_.begin(); iter != seq_to_state_.end(); ++iter) {
       delete iter->second;
     }
@@ -207,26 +207,26 @@ class ConstArpaLmBuilder : public ArpaFileParser {
 
   void SetMaxAddressOffset(const int32 max_address_offset) {
     KALDI_WARN << "You are changing <max_address_offset_>; the default should "
-        << "not be changed unless you are in testing mode.";
+               << "not be changed unless you are in testing mode.";
     max_address_offset_ = max_address_offset;
   }
 
- protected:
+protected:
   // ArpaFileParser overrides.
   virtual void HeaderAvailable();
   virtual void ConsumeNGram(const NGram& ngram);
   virtual void ReadComplete();
 
- private:
+private:
   struct WordsAndLmStatePairLessThan {
     bool operator()(
-        const std::pair<std::vector<int32>*, LmState*>& lhs,
-        const std::pair<std::vector<int32>*, LmState*>& rhs) const {
+      const std::pair<std::vector<int32>*, LmState*>& lhs,
+      const std::pair<std::vector<int32>*, LmState*>& rhs) const {
       return *(lhs.first) < *(rhs.first);
     }
   };
 
- private:
+private:
   // Indicating if ConstArpaLm has been built or not.
   bool is_built_;
 
@@ -261,7 +261,7 @@ class ConstArpaLmBuilder : public ArpaFileParser {
 
   // Hash table from word sequences to LmStates.
   unordered_map<std::vector<int32>,
-                LmState*, VectorHasher<int32> > seq_to_state_;
+      LmState*, VectorHasher<int32> > seq_to_state_;
 };
 
 void ConstArpaLmBuilder::HeaderAvailable() {
@@ -302,7 +302,7 @@ void ConstArpaLmBuilder::ConsumeNGram(const NGram &ngram) {
   if (cur_order > 1) {
     std::vector<int32> hist(ngram.words.begin(), ngram.words.end() - 1);
     unordered_map<std::vector<int32>,
-                  LmState*, VectorHasher<int32> >::iterator hist_iter;
+        LmState*, VectorHasher<int32> >::iterator hist_iter;
     hist_iter = seq_to_state_.find(hist);
     if (hist_iter == seq_to_state_.end()) {
       std::ostringstream ss;
@@ -358,7 +358,7 @@ void ConstArpaLmBuilder::ReadComplete() {
   // Vector for holding the sorted LmStates.
   std::vector<std::pair<std::vector<int32>*, LmState*> > sorted_vec;
   unordered_map<std::vector<int32>,
-                LmState*, VectorHasher<int32> >::iterator iter;
+      LmState*, VectorHasher<int32> >::iterator iter;
   for (iter = seq_to_state_.begin(); iter != seq_to_state_.end(); ++iter) {
     if (iter->second->MemSize() > 0) {
       sorted_vec.push_back(
@@ -488,9 +488,9 @@ void ConstArpaLmBuilder::Write(std::ostream &os, bool binary) const {
 
   // Creates ConstArpaLm.
   ConstArpaLm const_arpa_lm(
-      Options().bos_symbol, Options().eos_symbol, Options().unk_symbol,
-      ngram_order_, num_words_, overflow_buffer_size_, lm_states_size_,
-      unigram_states_, overflow_buffer_, lm_states_);
+    Options().bos_symbol, Options().eos_symbol, Options().unk_symbol,
+    ngram_order_, num_words_, overflow_buffer_size_, lm_states_size_,
+    unigram_states_, overflow_buffer_, lm_states_);
   const_arpa_lm.Write(os, binary);
 }
 
@@ -656,7 +656,7 @@ void ConstArpaLm::ReadInternal(std::istream &is, bool binary) {
   KALDI_ASSERT(bos_symbol_ < num_words_ && bos_symbol_ > 0);
   KALDI_ASSERT(eos_symbol_ < num_words_ && eos_symbol_ > 0);
   KALDI_ASSERT(unk_symbol_ < num_words_ &&
-               (unk_symbol_ > 0 || unk_symbol_ == -1));
+      (unk_symbol_ > 0 || unk_symbol_ == -1));
   lm_states_end_ = lm_states_ + lm_states_size_ - 1;
   memory_assigned_ = true;
   initialized_ = true;
@@ -712,7 +712,7 @@ void ConstArpaLm::ReadInternalOldFormat(std::istream &is, bool binary) {
   KALDI_ASSERT(bos_symbol_ < num_words_ && bos_symbol_ > 0);
   KALDI_ASSERT(eos_symbol_ < num_words_ && eos_symbol_ > 0);
   KALDI_ASSERT(unk_symbol_ < num_words_ &&
-               (unk_symbol_ > 0 || unk_symbol_ == -1));
+      (unk_symbol_ > 0 || unk_symbol_ == -1));
   lm_states_end_ = lm_states_ + lm_states_size_ - 1;
   memory_assigned_ = true;
   initialized_ = true;
@@ -746,7 +746,7 @@ bool ConstArpaLm::HistoryStateExists(const std::vector<int32>& hist) const {
 }
 
 float ConstArpaLm::GetNgramLogprob(const int32 word,
-                                   const std::vector<int32>& hist) const {
+    const std::vector<int32>& hist) const {
   KALDI_ASSERT(initialized_);
 
   // If the history size plus one is larger than <ngram_order_>, remove the old
@@ -781,7 +781,7 @@ float ConstArpaLm::GetNgramLogprob(const int32 word,
 }
 
 float ConstArpaLm::GetNgramLogprobRecurse(
-    const int32 word, const std::vector<int32>& hist) const {
+  const int32 word, const std::vector<int32>& hist) const {
   KALDI_ASSERT(initialized_);
   KALDI_ASSERT(hist.size() + 1 <= ngram_order_);
 
@@ -847,7 +847,7 @@ int32* ConstArpaLm::GetLmState(const std::vector<int32>& seq) const {
 }
 
 bool ConstArpaLm::GetChildInfo(const int32 word,
-                               int32* parent, int32* child_info) const {
+    int32* parent, int32* child_info) const {
   KALDI_ASSERT(initialized_);
 
   KALDI_ASSERT(parent != NULL);
@@ -880,9 +880,9 @@ bool ConstArpaLm::GetChildInfo(const int32 word,
 }
 
 void ConstArpaLm::DecodeChildInfo(const int32 child_info,
-                                  int32* parent,
-                                  int32** child_lm_state,
-                                  float* logprob) const {
+    int32* parent,
+    int32** child_lm_state,
+    float* logprob) const {
   KALDI_ASSERT(initialized_);
 
   KALDI_ASSERT(logprob != NULL);
@@ -909,8 +909,8 @@ void ConstArpaLm::DecodeChildInfo(const int32 child_info,
 }
 
 void ConstArpaLm::WriteArpaRecurse(int32* lm_state,
-                                   const std::vector<int32>& seq,
-                                   std::vector<ArpaLine> *output) const {
+    const std::vector<int32>& seq,
+    std::vector<ArpaLine> *output) const {
   if (lm_state == NULL) return;
 
   KALDI_ASSERT(lm_state >= lm_states_);
@@ -1011,7 +1011,7 @@ void ConstArpaLm::WriteArpa(std::ostream &os) const {
 }
 
 ConstArpaLmDeterministicFst::ConstArpaLmDeterministicFst(
-    const ConstArpaLm& lm) : lm_(lm) {
+  const ConstArpaLm& lm) : lm_(lm) {
   // Creates a history state for <s>.
   std::vector<Label> bos_state(1, lm_.BosSymbol());
   state_to_wseq_.push_back(bos_state);
@@ -1028,7 +1028,7 @@ fst::StdArc::Weight ConstArpaLmDeterministicFst::Final(StateId s) {
 }
 
 bool ConstArpaLmDeterministicFst::GetArc(StateId s,
-                                         Label ilabel, fst::StdArc *oarc) {
+    Label ilabel, fst::StdArc *oarc) {
   // At this point, we should have created the state.
   KALDI_ASSERT(static_cast<size_t>(s) < state_to_wseq_.size());
   std::vector<Label> wseq = state_to_wseq_[s];
@@ -1051,7 +1051,7 @@ bool ConstArpaLmDeterministicFst::GetArc(StateId s,
   }
 
   std::pair<const std::vector<Label>, StateId> wseq_state_pair(
-      wseq, static_cast<Label>(state_to_wseq_.size()));
+    wseq, static_cast<Label>(state_to_wseq_.size()));
 
   // Attemps to insert the current <wseq_state_pair>. If the pair already exists
   // then it returns false.
@@ -1072,8 +1072,8 @@ bool ConstArpaLmDeterministicFst::GetArc(StateId s,
 }
 
 bool BuildConstArpaLm(const ArpaParseOptions& options,
-                      const std::string& arpa_rxfilename,
-                      const std::string& const_arpa_wxfilename) {
+    const std::string& arpa_rxfilename,
+    const std::string& const_arpa_wxfilename) {
   ConstArpaLmBuilder lm_builder(options);
   KALDI_LOG << "Reading " << arpa_rxfilename;
   ReadKaldiObject(arpa_rxfilename, &lm_builder);

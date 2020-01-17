@@ -117,16 +117,16 @@ struct MleAmSgmm2Options {
  *  parameters
  */
 class MleAmSgmm2Accs {
- public:
+public:
   explicit MleAmSgmm2Accs(BaseFloat rand_prune = 1.0e-05)
-      : total_frames_(0.0), total_like_(0.0), feature_dim_(0),
-        phn_space_dim_(0), spk_space_dim_(0), num_gaussians_(0),
-        num_pdfs_(0), num_groups_(0), rand_prune_(rand_prune) {}
+    : total_frames_(0.0), total_like_(0.0), feature_dim_(0),
+    phn_space_dim_(0), spk_space_dim_(0), num_gaussians_(0),
+    num_pdfs_(0), num_groups_(0), rand_prune_(rand_prune) {}
 
   MleAmSgmm2Accs(const AmSgmm2 &model, SgmmUpdateFlagsType flags,
-                 bool have_spk_vecs,
-                 BaseFloat rand_prune = 1.0e-05)
-      : total_frames_(0.0), total_like_(0.0), rand_prune_(rand_prune) {
+      bool have_spk_vecs,
+      BaseFloat rand_prune = 1.0e-05)
+    : total_frames_(0.0), total_like_(0.0), rand_prune_(rand_prune) {
     ResizeAccumulators(model, flags, have_spk_vecs);
   }
 
@@ -144,29 +144,29 @@ class MleAmSgmm2Accs {
   /// Resizes the accumulators to the correct sizes given the model. The flags
   /// argument controls which accumulators to resize.
   void ResizeAccumulators(const AmSgmm2 &model, SgmmUpdateFlagsType flags,
-                          bool have_spk_vecs);
+      bool have_spk_vecs);
 
   /// Returns likelihood.
   BaseFloat Accumulate(const AmSgmm2 &model,
-                       const Sgmm2PerFrameDerivedVars &frame_vars,
-                       int32 pdf_index, // == j2.
-                       BaseFloat weight,
-                       Sgmm2PerSpkDerivedVars *spk_vars);
+      const Sgmm2PerFrameDerivedVars &frame_vars,
+      int32 pdf_index,                  // == j2.
+      BaseFloat weight,
+      Sgmm2PerSpkDerivedVars *spk_vars);
 
   /// Returns count accumulated (may differ from posteriors.Sum()
   /// due to weight pruning).
   BaseFloat AccumulateFromPosteriors(const AmSgmm2 &model,
-                                     const Sgmm2PerFrameDerivedVars &frame_vars,
-                                     const Matrix<BaseFloat> &posteriors,
-                                     int32 pdf_index, // == j2.
-                                     Sgmm2PerSpkDerivedVars *spk_vars);
+      const Sgmm2PerFrameDerivedVars &frame_vars,
+      const Matrix<BaseFloat> &posteriors,
+      int32 pdf_index,                                // == j2.
+      Sgmm2PerSpkDerivedVars *spk_vars);
 
   /// Accumulates global stats for the current speaker (if applicable).  If
   /// flags contains kSgmmSpeakerProjections (N), or
   /// kSgmmSpeakerWeightProjections (u), must call this after finishing the
   /// speaker's data.
   void CommitStatsForSpk(const AmSgmm2 &model,
-                         const Sgmm2PerSpkDerivedVars &spk_vars);
+      const Sgmm2PerSpkDerivedVars &spk_vars);
 
   /// Accessors
   void GetStateOccupancies(Vector<BaseFloat> *occs) const;
@@ -176,7 +176,7 @@ class MleAmSgmm2Accs {
   int32 NumGroups() const { return num_groups_; } // returns J1
   int32 NumGauss() const { return num_gaussians_; }
 
- private:
+private:
   /// The stats which are not tied to any state.
   /// Stats Y_{i} for phonetic-subspace projections M; Dim is [I][D][S].
   std::vector< Matrix<double> > Y_;
@@ -244,31 +244,31 @@ class MleAmSgmm2Accs {
  *  Contains the functions needed to update the SGMM parameters.
  */
 class MleAmSgmm2Updater {
- public:
+public:
   explicit MleAmSgmm2Updater(const MleAmSgmm2Options &options)
-      : options_(options) {}
+    : options_(options) {}
   void Reconfigure(const MleAmSgmm2Options &options) {
     options_ = options;
   }
 
   void Update(const MleAmSgmm2Accs &accs,
-              AmSgmm2 *model,
-              SgmmUpdateFlagsType flags);
+      AmSgmm2 *model,
+      SgmmUpdateFlagsType flags);
 
- private:
+private:
   friend class UpdateWClass;
   friend class UpdatePhoneVectorsClass;
   friend class EbwEstimateAmSgmm2;
 
   ///  Compute the Q_i quantities (Eq. 64).
   static void ComputeQ(const MleAmSgmm2Accs &accs,
-                       const AmSgmm2 &model,
-                       std::vector< SpMatrix<double> > *Q);
+      const AmSgmm2 &model,
+      std::vector< SpMatrix<double> > *Q);
 
   /// Compute the S_means quantities, minus sum: (Y_i M_i^T + M_i Y_I^T).
   static void ComputeSMeans(const MleAmSgmm2Accs &accs,
-                            const AmSgmm2 &model,
-                            std::vector< SpMatrix<double> > *S_means);
+      const AmSgmm2 &model,
+      std::vector< SpMatrix<double> > *S_means);
   friend class EbwAmSgmm2Updater;
 
   MleAmSgmm2Options options_;
@@ -276,66 +276,66 @@ class MleAmSgmm2Updater {
   // Called from UpdatePhoneVectors; updates a subset of states
   // (relates to multi-threading).
   void UpdatePhoneVectorsInternal(const MleAmSgmm2Accs &accs,
-                                  const std::vector<SpMatrix<double> > &H,
-                                  const std::vector<Matrix<double> > &log_a,
-                                  AmSgmm2 *model,
-                                  double *auxf_impr,
-                                  int32 num_threads,
-                                  int32 thread_id) const;
+      const std::vector<SpMatrix<double> > &H,
+      const std::vector<Matrix<double> > &log_a,
+      AmSgmm2 *model,
+      double *auxf_impr,
+      int32 num_threads,
+      int32 thread_id) const;
 
   double UpdatePhoneVectors(const MleAmSgmm2Accs &accs,
-                            const std::vector<SpMatrix<double> > &H,
-                            const std::vector<Matrix<double> > &log_a,
-                            AmSgmm2 *model) const;
+      const std::vector<SpMatrix<double> > &H,
+      const std::vector<Matrix<double> > &log_a,
+      AmSgmm2 *model) const;
 
   double UpdateM(const MleAmSgmm2Accs &accs,
-                 const std::vector< SpMatrix<double> > &Q,
-                 const Vector<double> &gamma_i,
-                 AmSgmm2 *model);
+      const std::vector< SpMatrix<double> > &Q,
+      const Vector<double> &gamma_i,
+      AmSgmm2 *model);
 
   void RenormalizeV(const MleAmSgmm2Accs &accs, AmSgmm2 *model,
-                    const Vector<double> &gamma_i,
-                    const std::vector<SpMatrix<double> > &H);
+      const Vector<double> &gamma_i,
+      const std::vector<SpMatrix<double> > &H);
 
   double UpdateN(const MleAmSgmm2Accs &accs, const Vector<double> &gamma_i,
-                 AmSgmm2 *model);
+      AmSgmm2 *model);
   void RenormalizeN(const MleAmSgmm2Accs &accs, const Vector<double> &gamma_i,
-                    AmSgmm2 *model);
+      AmSgmm2 *model);
   double UpdateVars(const MleAmSgmm2Accs &accs,
-                    const std::vector< SpMatrix<double> > &S_means,
-                    const Vector<double> &gamma_i,
-                    AmSgmm2 *model);
+      const std::vector< SpMatrix<double> > &S_means,
+      const Vector<double> &gamma_i,
+      AmSgmm2 *model);
   // Update for the phonetic-subspace weight projections w_i
   double UpdateW(const MleAmSgmm2Accs &accs,
-                 const std::vector<Matrix<double> > &log_a,
-                 const Vector<double> &gamma_i,
-                 AmSgmm2 *model);
+      const std::vector<Matrix<double> > &log_a,
+      const Vector<double> &gamma_i,
+      AmSgmm2 *model);
   // Update for the speaker-subspace weight projections u_i [SSGMM]
   double UpdateU(const MleAmSgmm2Accs &accs, const Vector<double> &gamma_i,
-                 AmSgmm2 *model);
+      AmSgmm2 *model);
 
   /// Called, multithreaded, inside UpdateW
   static
   void UpdateWGetStats(const MleAmSgmm2Accs &accs,
-                       const AmSgmm2 &model,
-                       const Matrix<double> &w,
-                       const std::vector<Matrix<double> > &log_a,
-                       Matrix<double> *F_i,
-                       Matrix<double> *g_i,
-                       double *tot_like,
-                       int32 num_threads,
-                       int32 thread_id);
+      const AmSgmm2 &model,
+      const Matrix<double> &w,
+      const std::vector<Matrix<double> > &log_a,
+      Matrix<double> *F_i,
+      Matrix<double> *g_i,
+      double *tot_like,
+      int32 num_threads,
+      int32 thread_id);
 
   double UpdateSubstateWeights(const MleAmSgmm2Accs &accs,
-                               AmSgmm2 *model);
+      AmSgmm2 *model);
 
   static void ComputeLogA(const MleAmSgmm2Accs &accs,
-                          std::vector<Matrix<double> > *log_a); // [SSGMM]
+      std::vector<Matrix<double> > *log_a);                     // [SSGMM]
 
   void ComputeMPrior(AmSgmm2 *model);  // TODO(arnab): Maybe make this static?
   double MapUpdateM(const MleAmSgmm2Accs &accs,
-                    const std::vector< SpMatrix<double> > &Q,
-                    const Vector<double> &gamma_i, AmSgmm2 *model);
+      const std::vector< SpMatrix<double> > &Q,
+      const Vector<double> &gamma_i, AmSgmm2 *model);
 
   KALDI_DISALLOW_COPY_AND_ASSIGN(MleAmSgmm2Updater);
   MleAmSgmm2Updater() {}  // Prevent unconfigured updater.
@@ -352,49 +352,49 @@ class MleAmSgmm2Updater {
  */
 
 class MleSgmm2SpeakerAccs {
- public:
+public:
   /// Initialize the object.  Error if speaker subspace not set up.
   MleSgmm2SpeakerAccs(const AmSgmm2 &model,
-                      BaseFloat rand_prune_ = 1.0e-05);
+      BaseFloat rand_prune_ = 1.0e-05);
 
   /// Clear the statistics.
   void Clear();
 
   /// Accumulate statistics.  Returns per-frame log-likelihood.
   BaseFloat Accumulate(const AmSgmm2 &model,
-                       const Sgmm2PerFrameDerivedVars &frame_vars,
-                       int32 pdf_index,
-                       BaseFloat weight,
-                       Sgmm2PerSpkDerivedVars *spk_vars);
+      const Sgmm2PerFrameDerivedVars &frame_vars,
+      int32 pdf_index,
+      BaseFloat weight,
+      Sgmm2PerSpkDerivedVars *spk_vars);
 
   /// Accumulate statistics, given posteriors.  Returns total
   /// count accumulated, which may differ from posteriors.Sum()
   /// due to randomized pruning.
   BaseFloat AccumulateFromPosteriors(const AmSgmm2 &model,
-                                     const Sgmm2PerFrameDerivedVars &frame_vars,
-                                     const Matrix<BaseFloat> &posteriors,
-                                     int32 pdf_index,
-                                     Sgmm2PerSpkDerivedVars *spk_vars);
+      const Sgmm2PerFrameDerivedVars &frame_vars,
+      const Matrix<BaseFloat> &posteriors,
+      int32 pdf_index,
+      Sgmm2PerSpkDerivedVars *spk_vars);
 
   /// Update speaker vector.  If v_s was empty, will assume it started as zero
   /// and will resize it to the speaker-subspace size.
   void Update(const AmSgmm2 &model,
-              BaseFloat min_count,  // e.g. 100
-              Vector<BaseFloat> *v_s,
-              BaseFloat *objf_impr_out,
-              BaseFloat *count_out);
+      BaseFloat min_count,          // e.g. 100
+      Vector<BaseFloat> *v_s,
+      BaseFloat *objf_impr_out,
+      BaseFloat *count_out);
 
- private:
+private:
   // Update without speaker-dependent weights (vectors u_i),
   // i.e. not symmetric SGMM (SSGMM)
   void UpdateNoU(Vector<BaseFloat> *v_s,
-                 BaseFloat *objf_impr_out,
-                 BaseFloat *count_out);
+      BaseFloat *objf_impr_out,
+      BaseFloat *count_out);
   // Update for SSGMM
   void UpdateWithU(const AmSgmm2 &model,
-                   Vector<BaseFloat> *v_s,
-                   BaseFloat *objf_impr_out,
-                   BaseFloat *count_out);
+      Vector<BaseFloat> *v_s,
+      BaseFloat *objf_impr_out,
+      BaseFloat *count_out);
 
 
   /// Statistics for speaker adaptation (vectors), stored per-speaker.
@@ -423,27 +423,27 @@ class MleSgmm2SpeakerAccs {
 // computing, in parallel, the F_i and g_i quantities used in the updates of
 // w_i.
 class UpdateWClass: public MultiThreadable {
- public:
+public:
   UpdateWClass(const MleAmSgmm2Accs &accs,
-               const AmSgmm2 &model,
-               const Matrix<double> &w,
-               const std::vector<Matrix<double> > &log_a,
-               Matrix<double> *F_i,
-               Matrix<double> *g_i,
-               double *tot_like):
-      accs_(accs), model_(model), w_(w), log_a_(log_a),
-      F_i_ptr_(F_i), g_i_ptr_(g_i), tot_like_ptr_(tot_like) {
+      const AmSgmm2 &model,
+      const Matrix<double> &w,
+      const std::vector<Matrix<double> > &log_a,
+      Matrix<double> *F_i,
+      Matrix<double> *g_i,
+      double *tot_like) :
+    accs_(accs), model_(model), w_(w), log_a_(log_a),
+    F_i_ptr_(F_i), g_i_ptr_(g_i), tot_like_ptr_(tot_like) {
     tot_like_ = 0.0;
     F_i_.Resize(F_i->NumRows(), F_i->NumCols());
     g_i_.Resize(g_i->NumRows(), g_i->NumCols());
   }
 
   UpdateWClass(const UpdateWClass &other) :
-      MultiThreadable(other),
-      accs_(other.accs_), model_(other.model_), w_(other.w_),
-      log_a_(other.log_a_), F_i_ptr_(other.F_i_ptr_), g_i_ptr_(other.g_i_ptr_),
-      F_i_(other.F_i_), g_i_(other.g_i_), tot_like_ptr_(other.tot_like_ptr_),
-      tot_like_(0.0) { }
+    MultiThreadable(other),
+    accs_(other.accs_), model_(other.model_), w_(other.w_),
+    log_a_(other.log_a_), F_i_ptr_(other.F_i_ptr_), g_i_ptr_(other.g_i_ptr_),
+    F_i_(other.F_i_), g_i_(other.g_i_), tot_like_ptr_(other.tot_like_ptr_),
+    tot_like_(0.0) { }
 
   ~UpdateWClass() {
     F_i_ptr_->AddMat(1.0, F_i_, kNoTrans);
@@ -458,7 +458,7 @@ class UpdateWClass: public MultiThreadable {
                                       &F_i_, &g_i_, &tot_like_,
                                       num_threads_, thread_id_);
   }
- private:
+private:
   const MleAmSgmm2Accs &accs_;
   const AmSgmm2 &model_;
   const Matrix<double> &w_;

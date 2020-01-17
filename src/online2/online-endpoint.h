@@ -91,13 +91,13 @@ struct OnlineEndpointRule {
   BaseFloat min_utterance_length;
   // The values set in the initializer will probably never be used.
   OnlineEndpointRule(bool must_contain_nonsilence = true,
-                     BaseFloat min_trailing_silence = 1.0,
-                     BaseFloat max_relative_cost = std::numeric_limits<BaseFloat>::infinity(),
-                     BaseFloat min_utterance_length = 0.0):
-      must_contain_nonsilence(must_contain_nonsilence),
-      min_trailing_silence(min_trailing_silence),
-      max_relative_cost(max_relative_cost),
-      min_utterance_length(min_utterance_length) { }
+      BaseFloat min_trailing_silence = 1.0,
+      BaseFloat max_relative_cost = std::numeric_limits<BaseFloat>::infinity(),
+      BaseFloat min_utterance_length = 0.0) :
+    must_contain_nonsilence(must_contain_nonsilence),
+    min_trailing_silence(min_trailing_silence),
+    max_relative_cost(max_relative_cost),
+    min_utterance_length(min_utterance_length) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("must-contain-nonsilence", &must_contain_nonsilence,
@@ -148,12 +148,12 @@ struct OnlineEndpointConfig {
   /// anything else.
   OnlineEndpointRule rule5;
 
-  OnlineEndpointConfig():
-      rule1(false, 5.0, std::numeric_limits<BaseFloat>::infinity(), 0.0),
-      rule2(true, 0.5, 2.0, 0.0),
-      rule3(true, 1.0, 8.0, 0.0),
-      rule4(true, 2.0, std::numeric_limits<BaseFloat>::infinity(), 0.0),
-      rule5(false, 0.0, std::numeric_limits<BaseFloat>::infinity(), 20.0) { }
+  OnlineEndpointConfig() :
+    rule1(false, 5.0, std::numeric_limits<BaseFloat>::infinity(), 0.0),
+    rule2(true, 0.5, 2.0, 0.0),
+    rule3(true, 1.0, 8.0, 0.0),
+    rule4(true, 2.0, std::numeric_limits<BaseFloat>::infinity(), 0.0),
+    rule5(false, 0.0, std::numeric_limits<BaseFloat>::infinity(), 20.0) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("endpoint.silence-phones", &silence_phones, "List of phones "
@@ -176,10 +176,10 @@ struct OnlineEndpointConfig {
 /// rules thinks we should terminate decoding.  Note: in verbose
 /// mode it will print logging information when returning true.
 bool EndpointDetected(const OnlineEndpointConfig &config,
-                      int32 num_frames_decoded,
-                      int32 trailing_silence_frames,
-                      BaseFloat frame_shift_in_seconds,
-                      BaseFloat final_relative_cost);
+    int32 num_frames_decoded,
+    int32 trailing_silence_frames,
+    BaseFloat frame_shift_in_seconds,
+    BaseFloat final_relative_cost);
 
 
 
@@ -191,17 +191,17 @@ class LatticeFasterOnlineDecoder;
 /// BestPathEnd() and TraceBackOneLink() functions of LatticeFasterOnlineDecoder
 /// to do this efficiently.
 int32 TrailingSilenceLength(const TransitionModel &tmodel,
-                            const std::string &silence_phones,
-                            const LatticeFasterOnlineDecoder &decoder);
+    const std::string &silence_phones,
+    const LatticeFasterOnlineDecoder &decoder);
 
 
 /// This is a higher-level convenience function that works out the
 /// arguments to the EndpointDetected function above, from the decoder.
 bool EndpointDetected(
-    const OnlineEndpointConfig &config,
-    const TransitionModel &tmodel,
-    BaseFloat frame_shift_in_seconds,
-    const LatticeFasterOnlineDecoder &decoder);
+  const OnlineEndpointConfig &config,
+  const TransitionModel &tmodel,
+  BaseFloat frame_shift_in_seconds,
+  const LatticeFasterOnlineDecoder &decoder);
 
 
 

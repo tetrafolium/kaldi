@@ -37,8 +37,8 @@ int32 IndexOfSoftmaxLayer(const Nnet &nnet) {
 }
 
 void InsertComponents(const Nnet &src_nnet,
-                      int32 c_to_insert, // component-index before which to insert.
-                      Nnet *dest_nnet) {
+    int32 c_to_insert,                   // component-index before which to insert.
+    Nnet *dest_nnet) {
   KALDI_ASSERT(c_to_insert >= 0 && c_to_insert <= dest_nnet->NumComponents());
   int32 c_tot = dest_nnet->NumComponents() + src_nnet.NumComponents();
   std::vector<Component*> components(c_tot);
@@ -56,8 +56,8 @@ void InsertComponents(const Nnet &src_nnet,
 
 
 void ReplaceLastComponents(const Nnet &src_nnet,
-                           int32 num_to_remove,
-                           Nnet *dest_nnet) {
+    int32 num_to_remove,
+    Nnet *dest_nnet) {
   KALDI_ASSERT(num_to_remove >= 0 && num_to_remove <= dest_nnet->NumComponents());
   int32 c_orig = dest_nnet->NumComponents() - num_to_remove;
 

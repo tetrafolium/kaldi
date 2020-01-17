@@ -35,7 +35,7 @@ struct NnetTrainOptions {
   BaseFloat l1_penalty;
 
   // default values
-  NnetTrainOptions():
+  NnetTrainOptions() :
     learn_rate(0.008),
     momentum(0.0),
     l2_penalty(0.0),
@@ -72,7 +72,7 @@ struct RbmTrainOptions {
   BaseFloat l2_penalty;
 
   // default values
-  RbmTrainOptions():
+  RbmTrainOptions() :
     learn_rate(0.4),
     momentum(0.5),
     momentum_max(0.9),

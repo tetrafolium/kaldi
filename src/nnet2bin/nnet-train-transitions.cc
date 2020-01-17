@@ -26,9 +26,9 @@
 namespace kaldi {
 namespace nnet2 {
 void SetPriors(const TransitionModel &tmodel,
-               const Vector<double> &transition_accs,
-               double prior_floor,
-               AmNnet *am_nnet) {
+    const Vector<double> &transition_accs,
+    double prior_floor,
+    AmNnet *am_nnet) {
   KALDI_ASSERT(tmodel.NumPdfs() == am_nnet->NumPdfs());
   Vector<BaseFloat> pdf_counts(tmodel.NumPdfs());
   KALDI_ASSERT(transition_accs(0) == 0.0); // There is
@@ -44,7 +44,7 @@ void SetPriors(const TransitionModel &tmodel,
   pdf_counts.ApplyFloor(prior_floor);
   pdf_counts.Scale(1.0 / pdf_counts.Sum()); // normalize again.
   am_nnet->SetPriors(pdf_counts);
-}               
+}
 
 
 } // namespace nnet2
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         "Usage:  nnet-train-transitions [options] <nnet-in> <alignments-rspecifier> <nnet-out>\n"
         "e.g.:\n"
         " nnet-train-transitions 1.nnet \"ark:gunzip -c ali.*.gz|\" 2.nnet\n";
-    
+
     bool binary_write = true;
     bool set_priors = true; // Also set the per-pdf priors in the model.
     BaseFloat prior_floor = 5.0e-06; // The default was previously 1e-8, but
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
                                      // seemed to be the smallest prior of the
                                      // "seen" pdf-ids in one run.
     MleTransitionUpdateConfig transition_update_config;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("set-priors", &set_priors, "If true, also set priors in neural "
@@ -80,9 +80,9 @@ int main(int argc, char *argv[]) {
     po.Register("prior-floor", &prior_floor, "When setting priors, floor for "
                 "priors");
     transition_update_config.Register(&po);
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
     std::string nnet_rxfilename = po.GetArg(1),
         ali_rspecifier = po.GetArg(2),
         nnet_wxfilename = po.GetArg(3);
-    
+
     TransitionModel trans_model;
     AmNnet am_nnet;
     {
@@ -100,13 +100,13 @@ int main(int argc, char *argv[]) {
       trans_model.Read(ki.Stream(), binary_read);
       am_nnet.Read(ki.Stream(), binary_read);
     }
-    
+
     Vector<double> transition_accs;
     trans_model.InitStats(&transition_accs);
 
     int32 num_done = 0;
     SequentialInt32VectorReader ali_reader(ali_rspecifier);
-    for (; ! ali_reader.Done(); ali_reader.Next()) {
+    for (; !ali_reader.Done(); ali_reader.Next()) {
       const std::vector<int32> alignment(ali_reader.Value());
       for (size_t i = 0; i < alignment.size(); i++) {
         int32 tid = alignment[i];
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
       KALDI_LOG << "Setting priors of pdfs in the model.";
       SetPriors(trans_model, transition_accs, prior_floor, &am_nnet);
     }
-    
+
     {
       Output ko(nnet_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);

@@ -39,27 +39,27 @@ namespace nnet2 {
 /// It is mostly a wrapper for
 /// a class NnetUpdater that's defined in nnet-update.cc, but we
 /// don't want to expose that complexity at this level.
-/// Note: this function 
+/// Note: this function
 /// If &nnet == nnet_to_update, it assumes we're doing SGD and does
 /// something like Hogwild; otherwise it assumes we're computing a
 /// gradient and it sums up the gradients.
 /// The return value is the total log-prob summed over the #frames. It also
 /// outputs the #frames into "num_frames".
 double DoBackpropParallel(const Nnet &nnet,
-                          int32 minibatch_size,
-                          SequentialNnetExampleReader *example_reader,
-                          double *tot_weight,
-                          Nnet *nnet_to_update);
+    int32 minibatch_size,
+    SequentialNnetExampleReader *example_reader,
+    double *tot_weight,
+    Nnet *nnet_to_update);
 
 
 /// This version of DoBackpropParallel takes a vector of examples, and will
-/// typically be used to compute the exact gradient. 
+/// typically be used to compute the exact gradient.
 double DoBackpropParallel(const Nnet &nnet,
-                          int32 minibatch_size,
-                          int32 num_threads,
-                          const std::vector<NnetExample> &examples,
-                          double *num_frames,
-                          Nnet *nnet_to_update);
+    int32 minibatch_size,
+    int32 num_threads,
+    const std::vector<NnetExample> &examples,
+    double *num_frames,
+    Nnet *nnet_to_update);
 
 
 
@@ -69,11 +69,11 @@ double DoBackpropParallel(const Nnet &nnet,
 /// version (that takes a vector) is currently the only one we need
 /// to do this with.
 inline double ComputeNnetObjfParallel(
-    const Nnet &nnet,
-    int32 minibatch_size,
-    int32 num_threads,
-    const std::vector<NnetExample> &examples,
-    double *num_frames) {
+  const Nnet &nnet,
+  int32 minibatch_size,
+  int32 num_threads,
+  const std::vector<NnetExample> &examples,
+  double *num_frames) {
   return DoBackpropParallel(nnet, minibatch_size, num_threads,
                             examples, num_frames, NULL);
 }

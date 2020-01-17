@@ -40,16 +40,16 @@ int main(int argc, char *argv[]) {
         "\n"
         "Usage: lattice-1best [options] <lattice-rspecifier> <lattice-wspecifier>\n"
         " e.g.: lattice-1best --acoustic-scale=0.1 ark:1.lats ark:1best.lats\n";
-      
+
     ParseOptions po(usage);
     BaseFloat acoustic_scale = 1.0;
     BaseFloat lm_scale = 1.0;
-    
+
     po.Register("acoustic-scale", &acoustic_scale,
                 "Scaling factor for acoustic likelihoods");
     po.Register("lm-scale", &lm_scale,
                 "Scaling factor for language model scores.");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -61,9 +61,9 @@ int main(int argc, char *argv[]) {
         lats_wspecifier = po.GetArg(2);
 
     SequentialCompactLatticeReader clat_reader(lats_rspecifier);
-    
+
     // Write as compact lattice.
-    CompactLatticeWriter compact_1best_writer(lats_wspecifier); 
+    CompactLatticeWriter compact_1best_writer(lats_wspecifier);
 
     int32 n_done = 0, n_err = 0;
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 
       CompactLattice best_path;
       CompactLatticeShortestPath(clat, &best_path);
-      
+
       if (best_path.Start() == fst::kNoStateId) {
         KALDI_WARN << "Possibly empty lattice for utterance-id " << key
                    << "(no output)";

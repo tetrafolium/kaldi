@@ -33,9 +33,9 @@ int main(int argc, char *argv[]) {
         "Usage:  fgmm-global-info [options] <gmm>\n"
         "e.g.:\n"
         " fgmm-global-info 1.ubm\n";
-    
+
     ParseOptions po(usage);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 1) {

@@ -45,9 +45,9 @@ int main(int argc, char *argv[]) {
         "id (e.g. utt_id_a), outputting a lattice for each.\n"
         "Usage:  nbest-to-lattice <nbest-rspecifier> <lattices-wspecifier>\n"
         " e.g.: nbest-to-lattice ark:1.nbest ark:1.lats\n";
-      
+
     ParseOptions po(usage);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 
 
     SequentialCompactLatticeReader compact_nbest_reader(nbest_rspecifier);
-    CompactLatticeWriter compact_lattice_writer(lats_wspecifier); 
+    CompactLatticeWriter compact_lattice_writer(lats_wspecifier);
 
     int32 n_nbest_done = 0, n_utt_done = 0;
 
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
       std::string utt_id;
       if (!GetUtteranceId(nbest_id, &utt_id)) {
         KALDI_ERR << "Invalid n-best id " << nbest_id << ": make sure you "
-            "are giving N-bests to nbest-to-lattice.";
+          "are giving N-bests to nbest-to-lattice.";
       }
       if (utt_id != cur_utt_id) { // change in utterance.
         if (cur_utt_id != "") {
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
 
     if (cur_utt_id != "")
       compact_lattice_writer.Write(cur_utt_id, cur_union);
-    
+
     KALDI_LOG << "Done joining n-best into lattices for "
               << n_utt_done << " utterances, with on average "
               << (n_nbest_done/static_cast<BaseFloat>(n_utt_done))

@@ -130,10 +130,10 @@ void AffineXformStats::Add(const AffineXformStats &other) {
 }
 
 bool ComposeTransforms(const Matrix<BaseFloat> &a, const Matrix<BaseFloat> &b,
-                       bool b_is_affine,
-                       Matrix<BaseFloat> *c) {
+    bool b_is_affine,
+    Matrix<BaseFloat> *c) {
   if (b.NumRows() == 0 || a.NumCols() == 0) {
-    KALDI_WARN  << "Empty matrix in ComposeTransforms";
+    KALDI_WARN << "Empty matrix in ComposeTransforms";
     return false;
   }
   if (a.NumCols() == b.NumRows()) {
@@ -166,7 +166,7 @@ bool ComposeTransforms(const Matrix<BaseFloat> &a, const Matrix<BaseFloat> &b,
 }
 
 void ApplyAffineTransform(const MatrixBase<BaseFloat> &xform,
-                          VectorBase<BaseFloat> *vec) {
+    VectorBase<BaseFloat> *vec) {
   int32 dim = xform.NumRows();
   KALDI_ASSERT(dim > 0 && xform.NumCols() == dim+1 && vec->Dim() == dim);
   Vector<BaseFloat> tmp(dim+1);

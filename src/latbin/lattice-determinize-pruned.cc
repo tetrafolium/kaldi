@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 
     // depth stats (for diagnostics).
     double sum_depth_in = 0.0,
-          sum_depth_out = 0.0, sum_t = 0.0;
+        sum_depth_out = 0.0, sum_t = 0.0;
 
     if (acoustic_scale == 0.0)
       KALDI_ERR << "Do not use a zero acoustic scale (cannot be inverted)";
@@ -92,20 +92,20 @@ int main(int argc, char *argv[]) {
       fst::ScaleLattice(fst::AcousticLatticeScale(acoustic_scale), &lat);
       if (!TopSort(&lat)) {
         KALDI_WARN << "Could not topologically sort lattice: this probably means it"
-            " has bad properties e.g. epsilon cycles.  Your LM or lexicon might "
-            "be broken, e.g. LM with epsilon cycles or lexicon with empty words.";
+          " has bad properties e.g. epsilon cycles.  Your LM or lexicon might "
+          "be broken, e.g. LM with epsilon cycles or lexicon with empty words.";
       }
       fst::ArcSort(&lat, fst::ILabelCompare<LatticeArc>());
       CompactLattice det_clat;
       if (!DeterminizeLatticePruned(lat, beam, &det_clat, opts)) {
         KALDI_WARN << "For key " << key << ", determinization did not succeed"
-            "(partial output will be pruned tighter than the specified beam.)";
+          "(partial output will be pruned tighter than the specified beam.)";
         n_warn++;
       }
       fst::Connect(&det_clat);
       if (det_clat.NumStates() == 0) {
         KALDI_WARN << "For key " << key << ", determinized and trimmed lattice "
-            "was empty.";
+          "was empty.";
         n_warn++;
       }
       if (minimize) {

@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     bool binary_write = true;
     int32 mixup = 0;
     BaseFloat perturb_factor = 0.01;
-    std::string update_flags_str = "mvw"; 
+    std::string update_flags_str = "mvw";
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("update-flags", &update_flags_str, "Which GMM parameters will be "

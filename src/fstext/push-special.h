@@ -27,15 +27,15 @@
 namespace fst {
 
 /*
-  This function does weight-pushing, in the log semiring,
-  but in a special way, such that any "leftover weight" after pushing
-  gets distributed evenly along the FST, and doesn't end up either
-  at the start or at the end.  Basically it pushes the weights such
-  that the total weight of each state (i.e. the sum of the arc
-  probabilities plus the final-prob) is the same for all states.
-*/
+   This function does weight-pushing, in the log semiring,
+   but in a special way, such that any "leftover weight" after pushing
+   gets distributed evenly along the FST, and doesn't end up either
+   at the start or at the end.  Basically it pushes the weights such
+   that the total weight of each state (i.e. the sum of the arc
+   probabilities plus the final-prob) is the same for all states.
+ */
 void PushSpecial(VectorFst<StdArc> *fst,
-                 float delta = kDelta);
+    float delta = kDelta);
 
 }
 

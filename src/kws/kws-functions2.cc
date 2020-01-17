@@ -34,11 +34,11 @@ namespace kaldi {
 // (fst must be an acceptor).
 template<class Arc>
 static void ReplaceSymbolWithEpsilon(typename Arc::Label symbol,
-                                     fst::VectorFst<Arc> *fst) {
+    fst::VectorFst<Arc> *fst) {
   typedef typename Arc::StateId StateId;
   for (StateId s = 0; s < fst->NumStates(); s++) {
     for (fst::MutableArcIterator<fst::VectorFst<Arc> > aiter(fst, s);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       Arc arc = aiter.Value();
       KALDI_ASSERT(arc.ilabel == arc.olabel);
       if (arc.ilabel == symbol) {
@@ -51,7 +51,7 @@ static void ReplaceSymbolWithEpsilon(typename Arc::Label symbol,
 }
 
 void DoFactorMerging(KwsProductFst *factor_transducer,
-                     KwsLexicographicFst *index_transducer) {
+    KwsLexicographicFst *index_transducer) {
   using namespace fst;
   typedef KwsProductFst::Arc::Label Label;
 
@@ -102,7 +102,7 @@ void DoFactorDisambiguation(KwsLexicographicFst *index_transducer) {
   StateId ns = index_transducer->NumStates();
   for (StateId s = 0; s < ns; s++) {
     for (MutableArcIterator<KwsLexicographicFst>
-         aiter(index_transducer, s); !aiter.Done(); aiter.Next()) {
+        aiter(index_transducer, s); !aiter.Done(); aiter.Next()) {
       KwsLexicographicArc arc = aiter.Value();
       if (index_transducer->Final(arc.nextstate) != KwsLexicographicWeight::Zero())
         arc.ilabel = s;
@@ -114,8 +114,8 @@ void DoFactorDisambiguation(KwsLexicographicFst *index_transducer) {
 }
 
 void OptimizeFactorTransducer(KwsLexicographicFst *index_transducer,
-                              int32 max_states,
-                              bool allow_partial) {
+    int32 max_states,
+    bool allow_partial) {
   using namespace fst;
   KwsLexicographicFst ifst = *index_transducer;
   EncodeMapper<KwsLexicographicArc> encoder(kEncodeLabels, ENCODE);
@@ -124,13 +124,13 @@ void OptimizeFactorTransducer(KwsLexicographicFst *index_transducer,
   if (allow_partial) {
     DeterminizeStar(ifst, index_transducer, kDelta, NULL, max_states, true);
   } else {
-      try {
-        DeterminizeStar(ifst, index_transducer, kDelta, NULL, max_states,
+    try {
+      DeterminizeStar(ifst, index_transducer, kDelta, NULL, max_states,
                         false);
-      } catch(const std::exception &e) {
-        KALDI_WARN << e.what();
-        *index_transducer = ifst;
-      }
+    } catch(const std::exception &e) {
+      KALDI_WARN << e.what();
+      *index_transducer = ifst;
+    }
   }
   KALDI_VLOG(2) << "OptimizeFactorTransducer: minimization...";
   Minimize(index_transducer, static_cast<KwsLexicographicFst *>(NULL), fst::kDelta, true);

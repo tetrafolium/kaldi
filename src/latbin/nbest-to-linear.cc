@@ -75,8 +75,8 @@ int main(int argc, char *argv[]) {
 
       if (!GetLinearSymbolSequence(lat, &ilabels, &olabels, &weight)) {
         KALDI_WARN << "Lattice/nbest for key " << key << " had wrong format: "
-            "note, this program expects input with one path, e.g. from "
-            "lattice-to-nbest.";
+          "note, this program expects input with one path, e.g. from "
+          "lattice-to-nbest.";
         n_err++;
       } else {
         if (ali_wspecifier != "") ali_writer.Write(key, ilabels);

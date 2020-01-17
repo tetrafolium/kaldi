@@ -41,8 +41,8 @@ namespace nnet1 {
  * Can be used in 'per-sentence' training and multi-stream training.
  */
 class RecurrentComponent : public MultistreamComponent {
- public:
-  RecurrentComponent(int32 input_dim, int32 output_dim):
+public:
+  RecurrentComponent(int32 input_dim, int32 output_dim) :
     MultistreamComponent(input_dim, output_dim)
   { }
 
@@ -84,20 +84,20 @@ class RecurrentComponent : public MultistreamComponent {
       std::string token;
       int first_char = PeekToken(is, binary);
       switch (first_char) {
-        case 'G': ExpectToken(is, binary, "<GradClip>");
-          ReadBasicType(is, binary, &grad_clip_);
-          break;
-        case 'D': ExpectToken(is, binary, "<DiffClip>");
-          ReadBasicType(is, binary, &diff_clip_);
-          break;
-        case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
-          ReadBasicType(is, binary, &learn_rate_coef_);
-          break;
-        case 'B': ExpectToken(is, binary, "<BiasLearnRateCoef>");
-          ReadBasicType(is, binary, &bias_learn_rate_coef_);
-          break;
-        default: ReadToken(is, false, &token);
-          KALDI_ERR << "Unknown token: " << token;
+      case 'G': ExpectToken(is, binary, "<GradClip>");
+        ReadBasicType(is, binary, &grad_clip_);
+        break;
+      case 'D': ExpectToken(is, binary, "<DiffClip>");
+        ReadBasicType(is, binary, &diff_clip_);
+        break;
+      case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
+        ReadBasicType(is, binary, &learn_rate_coef_);
+        break;
+      case 'B': ExpectToken(is, binary, "<BiasLearnRateCoef>");
+        ReadBasicType(is, binary, &bias_learn_rate_coef_);
+        break;
+      default: ReadToken(is, false, &token);
+        KALDI_ERR << "Unknown token: " << token;
       }
     }
 
@@ -126,8 +126,8 @@ class RecurrentComponent : public MultistreamComponent {
 
   int32 NumParams() const {
     return w_forward_.NumRows() * w_forward_.NumCols() +
-      w_recurrent_.NumRows() * w_recurrent_.NumCols() +
-      bias_.Dim();
+           w_recurrent_.NumRows() * w_recurrent_.NumCols() +
+           bias_.Dim();
   }
 
   void GetGradient(VectorBase<BaseFloat>* gradient) const {
@@ -183,29 +183,29 @@ class RecurrentComponent : public MultistreamComponent {
 
   std::string Info() const {
     return std::string("  ") +
-      "\n  w_forward_  "   + MomentStatistics(w_forward_) +
-      "\n  w_recurrent_  " + MomentStatistics(w_recurrent_) +
-      "\n  bias_  "        + MomentStatistics(bias_);
+           "\n  w_forward_  "   + MomentStatistics(w_forward_) +
+           "\n  w_recurrent_  " + MomentStatistics(w_recurrent_) +
+           "\n  bias_  "        + MomentStatistics(bias_);
   }
 
   std::string InfoGradient() const {
     return std::string("") +
-      "( learn_rate_coef " + ToString(learn_rate_coef_) +
-      ", bias_learn_rate_coef " + ToString(bias_learn_rate_coef_) +
-      ", grad-clip " + ToString(grad_clip_) +
-      ", diff-clip " + ToString(diff_clip_) + " )" +
-      "\n  Gradients:" +
-      "\n  w_forward_corr_  "   + MomentStatistics(w_forward_corr_) +
-      "\n  w_recurrent_corr_  "   + MomentStatistics(w_recurrent_corr_) +
-      "\n  bias_corr_  "     + MomentStatistics(bias_corr_) +
-      "\n  Forward-pass:" +
-      "\n  out_  " + MomentStatistics(out_) +
-      "\n  Backward-pass:" +
-      "\n  out_diff_bptt_  " + MomentStatistics(out_diff_bptt_);
+           "( learn_rate_coef " + ToString(learn_rate_coef_) +
+           ", bias_learn_rate_coef " + ToString(bias_learn_rate_coef_) +
+           ", grad-clip " + ToString(grad_clip_) +
+           ", diff-clip " + ToString(diff_clip_) + " )" +
+           "\n  Gradients:" +
+           "\n  w_forward_corr_  "   + MomentStatistics(w_forward_corr_) +
+           "\n  w_recurrent_corr_  "   + MomentStatistics(w_recurrent_corr_) +
+           "\n  bias_corr_  "     + MomentStatistics(bias_corr_) +
+           "\n  Forward-pass:" +
+           "\n  out_  " + MomentStatistics(out_) +
+           "\n  Backward-pass:" +
+           "\n  out_diff_bptt_  " + MomentStatistics(out_diff_bptt_);
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
 
 
     KALDI_ASSERT(in.NumRows() % NumStreams() == 0);
@@ -241,9 +241,9 @@ class RecurrentComponent : public MultistreamComponent {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
 
     int32 T = in.NumRows() / NumStreams();
     int32 S = NumStreams();
@@ -288,7 +288,7 @@ class RecurrentComponent : public MultistreamComponent {
   }
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     int32 T = input.NumRows() / NumStreams();
     int32 S = NumStreams();
 
@@ -317,7 +317,7 @@ class RecurrentComponent : public MultistreamComponent {
     bias_.AddVec(-lr * bias_learn_rate_coef_, bias_corr_);
   }
 
- private:
+private:
 
   BaseFloat grad_clip_;  ///< Clipping of the update,
   BaseFloat diff_clip_;  ///< Clipping in the BPTT loop,

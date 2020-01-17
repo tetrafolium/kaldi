@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 
     // depth stats (for diagnostics).
     double sum_depth_in = 0.0,
-          sum_depth_out = 0.0, sum_t = 0.0;
+        sum_depth_out = 0.0, sum_t = 0.0;
 
     if (acoustic_scale == 0.0)
       KALDI_ERR << "Do not use a zero acoustic scale (cannot be inverted)";
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
       if (!DeterminizeLatticePhonePrunedWrapper(
               trans_model, &lat, beam, &det_clat, opts)) {
         KALDI_WARN << "For key " << key << ", determinization did not succeed"
-            "(partial output will be pruned tighter than the specified beam.)";
+          "(partial output will be pruned tighter than the specified beam.)";
         n_warn++;
       }
 

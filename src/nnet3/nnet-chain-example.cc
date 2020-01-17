@@ -38,8 +38,8 @@ void NnetChainSupervision::Write(std::ostream &os, bool binary) const {
 
 bool NnetChainSupervision::operator == (const NnetChainSupervision &other) const {
   return name == other.name && indexes == other.indexes &&
-      supervision == other.supervision &&
-      deriv_weights.ApproxEqual(other.deriv_weights);
+         supervision == other.supervision &&
+         deriv_weights.ApproxEqual(other.deriv_weights);
 }
 
 void NnetChainSupervision::Read(std::istream &is, bool binary) {
@@ -87,11 +87,11 @@ void NnetChainSupervision::CheckDim() const {
   }
 }
 
-NnetChainSupervision::NnetChainSupervision(const NnetChainSupervision &other):
-    name(other.name),
-    indexes(other.indexes),
-    supervision(other.supervision),
-    deriv_weights(other.deriv_weights) { CheckDim(); }
+NnetChainSupervision::NnetChainSupervision(const NnetChainSupervision &other) :
+  name(other.name),
+  indexes(other.indexes),
+  supervision(other.supervision),
+  deriv_weights(other.deriv_weights) { CheckDim(); }
 
 void NnetChainSupervision::Swap(NnetChainSupervision *other) {
   name.swap(other->name);
@@ -103,14 +103,14 @@ void NnetChainSupervision::Swap(NnetChainSupervision *other) {
 }
 
 NnetChainSupervision::NnetChainSupervision(
-    const std::string &name,
-    const chain::Supervision &supervision,
-    const VectorBase<BaseFloat> &deriv_weights,
-    int32 first_frame,
-    int32 frame_skip):
-    name(name),
-    supervision(supervision),
-    deriv_weights(deriv_weights) {
+  const std::string &name,
+  const chain::Supervision &supervision,
+  const VectorBase<BaseFloat> &deriv_weights,
+  int32 first_frame,
+  int32 frame_skip) :
+  name(name),
+  supervision(supervision),
+  deriv_weights(deriv_weights) {
   // note: this will set the 'x' index to zero.
   indexes.resize(supervision.num_sequences *
                  supervision.frames_per_sequence);
@@ -184,15 +184,15 @@ void NnetChainExample::Compress() {
   for (; iter != end; ++iter) iter->features.Compress();
 }
 
-NnetChainExample::NnetChainExample(const NnetChainExample &other):
-    inputs(other.inputs), outputs(other.outputs) { }
+NnetChainExample::NnetChainExample(const NnetChainExample &other) :
+  inputs(other.inputs), outputs(other.outputs) { }
 
 
 // called from MergeChainExamplesInternal, this function merges the Supervision
 // objects into one.  Requires (and checks) that they all have the same name.
 static void MergeSupervision(
-    const std::vector<const NnetChainSupervision*> &inputs,
-    NnetChainSupervision *output) {
+  const std::vector<const NnetChainSupervision*> &inputs,
+  NnetChainSupervision *output) {
   int32 num_inputs = inputs.size(),
       num_indexes = 0;
   for (int32 n = 0; n < num_inputs; n++) {
@@ -257,8 +257,8 @@ static void MergeSupervision(
 
 
 void MergeChainExamples(bool compress,
-                        std::vector<NnetChainExample> *input,
-                        NnetChainExample *output) {
+    std::vector<NnetChainExample> *input,
+    NnetChainExample *output) {
   int32 num_examples = input->size();
   KALDI_ASSERT(num_examples > 0);
   // we temporarily make the input-features in 'input' look like regular NnetExamples,
@@ -291,12 +291,12 @@ void MergeChainExamples(bool compress,
 }
 
 void GetChainComputationRequest(const Nnet &nnet,
-                                const NnetChainExample &eg,
-                                bool need_model_derivative,
-                                bool store_component_stats,
-                                bool use_xent_regularization,
-                                bool use_xent_derivative,
-                                ComputationRequest *request) {
+    const NnetChainExample &eg,
+    bool need_model_derivative,
+    bool store_component_stats,
+    bool use_xent_regularization,
+    bool use_xent_derivative,
+    ComputationRequest *request) {
   request->inputs.clear();
   request->inputs.reserve(eg.inputs.size());
   request->outputs.clear();
@@ -337,7 +337,7 @@ void GetChainComputationRequest(const Nnet &nnet,
       size_t cur_size = request->outputs.size();
       request->outputs.resize(cur_size + 1);
       IoSpecification &io_spec = request->outputs[cur_size - 1],
-          &io_spec_xent = request->outputs[cur_size];
+      &io_spec_xent = request->outputs[cur_size];
       // the IoSpecification for the -xent output is the same
       // as for the regular output, except for its name which has
       // the -xent suffix (and the has_deriv member may differ).
@@ -354,8 +354,8 @@ void GetChainComputationRequest(const Nnet &nnet,
 }
 
 void ShiftChainExampleTimes(int32 frame_shift,
-                            const std::vector<std::string> &exclude_names,
-                            NnetChainExample *eg) {
+    const std::vector<std::string> &exclude_names,
+    NnetChainExample *eg) {
   std::vector<NnetIo>::iterator input_iter = eg->inputs.begin(),
       input_end = eg->inputs.end();
   for (; input_iter != input_end; ++input_iter) {
@@ -401,7 +401,7 @@ void ShiftChainExampleTimes(int32 frame_shift,
 
 
 size_t NnetChainExampleStructureHasher::operator () (
-    const NnetChainExample &eg) const noexcept {
+  const NnetChainExample &eg) const noexcept {
   // these numbers were chosen at random from a list of primes.
   NnetIoStructureHasher io_hasher;
   size_t size = eg.inputs.size(), ans = size * 35099;
@@ -418,8 +418,8 @@ size_t NnetChainExampleStructureHasher::operator () (
 }
 
 bool NnetChainExampleStructureCompare::operator () (
-    const NnetChainExample &a,
-    const NnetChainExample &b) const {
+  const NnetChainExample &a,
+  const NnetChainExample &b) const {
   NnetIoStructureCompare io_compare;
   if (a.inputs.size() != b.inputs.size() ||
       a.outputs.size() != b.outputs.size())
@@ -454,9 +454,9 @@ int32 GetNnetChainExampleSize(const NnetChainExample &a) {
 
 
 ChainExampleMerger::ChainExampleMerger(const ExampleMergingConfig &config,
-                                       NnetChainExampleWriter *writer):
-    finished_(false), num_egs_written_(0),
-    config_(config), writer_(writer) { }
+    NnetChainExampleWriter *writer) :
+  finished_(false), num_egs_written_(0),
+  config_(config), writer_(writer) { }
 
 
 void ChainExampleMerger::AcceptExample(NnetChainExample *eg) {
@@ -491,7 +491,7 @@ void ChainExampleMerger::AcceptExample(NnetChainExample *eg) {
 }
 
 void ChainExampleMerger::WriteMinibatch(
-    std::vector<NnetChainExample> *egs) {
+  std::vector<NnetChainExample> *egs) {
   KALDI_ASSERT(!egs->empty());
   int32 eg_size = GetNnetChainExampleSize((*egs)[0]);
   NnetChainExampleStructureHasher eg_hasher;
@@ -526,7 +526,7 @@ void ChainExampleMerger::Finish() {
     int32 eg_size = GetNnetChainExampleSize(*(vec[0]));
     bool input_ended = true;
     while (!vec.empty() &&
-           (minibatch_size = config_.MinibatchSize(eg_size, vec.size(),
+        (minibatch_size = config_.MinibatchSize(eg_size, vec.size(),
                                                    input_ended)) != 0) {
       // MergeChainExamples() expects a vector of
       // NnetChainExample, not of pointers, so use swap to create that

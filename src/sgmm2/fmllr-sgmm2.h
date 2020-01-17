@@ -89,13 +89,13 @@ inline void Sgmm2FmllrConfig::Register(OptionsItf *opts) {
  *  Global adaptation parameters.
  */
 class Sgmm2FmllrGlobalParams {
- public:
+public:
   void Init(const AmSgmm2 &sgmm, const Vector<BaseFloat> &state_occs);
   void Write(std::ostream &out_stream, bool binary) const;
   void Read(std::istream &in_stream, bool binary);
   bool IsEmpty() const {
     return (pre_xform_.NumRows() == 0 || inv_xform_.NumRows() == 0 ||
-            mean_scatter_.Dim() == 0);
+           mean_scatter_.Dim() == 0);
   }
   bool HasBasis() const { return fmllr_bases_.size() != 0; }
 
@@ -110,7 +110,7 @@ class Sgmm2FmllrGlobalParams {
 };
 
 inline void Sgmm2FmllrGlobalParams::Init(const AmSgmm2 &sgmm,
-                                        const Vector<BaseFloat> &state_occs) {
+    const Vector<BaseFloat> &state_occs) {
   sgmm.ComputeFmllrPreXform(state_occs, &pre_xform_, &inv_xform_,
                             &mean_scatter_);
 }
@@ -120,7 +120,7 @@ inline void Sgmm2FmllrGlobalParams::Init(const AmSgmm2 &sgmm,
  *  estimate of FMLLR transforms for a subspace GMM acoustic model.
  */
 class FmllrSgmm2Accs {
- public:
+public:
   FmllrSgmm2Accs() : dim_(-1) {}
   ~FmllrSgmm2Accs() {}
 
@@ -135,43 +135,43 @@ class FmllrSgmm2Accs {
   /// The 'data' argument is not FMLLR-transformed and is needed in addition
   /// to the the 'frame_vars' since the latter only contains a copy of the
   /// transformed feature vector.
-  BaseFloat Accumulate(const AmSgmm2 &sgmm,                       
-                       const VectorBase<BaseFloat> &data,
-                       const Sgmm2PerFrameDerivedVars &frame_vars,
-                       int32 state_index,
-                       BaseFloat weight,
-                       Sgmm2PerSpkDerivedVars *spk);
+  BaseFloat Accumulate(const AmSgmm2 &sgmm,
+      const VectorBase<BaseFloat> &data,
+      const Sgmm2PerFrameDerivedVars &frame_vars,
+      int32 state_index,
+      BaseFloat weight,
+      Sgmm2PerSpkDerivedVars *spk);
 
   void AccumulateFromPosteriors(const AmSgmm2 &sgmm,
-                                const Sgmm2PerSpkDerivedVars &spk,
-                                const VectorBase<BaseFloat> &data,
-                                const std::vector<int32> &gauss_select,
-                                const Matrix<BaseFloat> &posteriors,
-                                int32 state_index);
+      const Sgmm2PerSpkDerivedVars &spk,
+      const VectorBase<BaseFloat> &data,
+      const std::vector<int32> &gauss_select,
+      const Matrix<BaseFloat> &posteriors,
+      int32 state_index);
 
   void AccumulateForFmllrSubspace(const AmSgmm2 &sgmm,
-                                  const Sgmm2FmllrGlobalParams &fmllr_globals,
-                                  SpMatrix<double> *grad_scatter);
+      const Sgmm2FmllrGlobalParams &fmllr_globals,
+      SpMatrix<double> *grad_scatter);
 
   BaseFloat FmllrObjGradient(const AmSgmm2 &sgmm,
-                             const Matrix<BaseFloat> &xform,
-                             Matrix<BaseFloat> *grad_out,
-                             Matrix<BaseFloat> *G_out) const;
+      const Matrix<BaseFloat> &xform,
+      Matrix<BaseFloat> *grad_out,
+      Matrix<BaseFloat> *G_out) const;
 
   /// Computes the FMLLR transform from the accumulated stats, using the
   /// pre-transforms in fmllr_globals. Expects the transform matrix out_xform
   /// to be initialized to the correct size. Returns true if the transform was
   /// updated (i.e. had enough counts).
   bool Update(const AmSgmm2 &model,
-              const Sgmm2FmllrGlobalParams &fmllr_globals,
-              const Sgmm2FmllrConfig &opts, Matrix<BaseFloat> *out_xform,
-              BaseFloat *frame_count, BaseFloat *auxf_improv) const;
+      const Sgmm2FmllrGlobalParams &fmllr_globals,
+      const Sgmm2FmllrConfig &opts, Matrix<BaseFloat> *out_xform,
+      BaseFloat *frame_count, BaseFloat *auxf_improv) const;
 
   /// Accessors
   int32 Dim() const { return dim_; }
   const AffineXformStats &stats() const { return stats_; }
 
- private:
+private:
   AffineXformStats stats_;  ///< Accumulated stats
   int32 dim_;  ///< Dimension of feature vectors
 
@@ -184,9 +184,9 @@ class FmllrSgmm2Accs {
 /// The actual number of bases may be less than 'num_fmllr_bases' depending
 /// on the feature dimension and number of eigenvalues greater than 'min_eig'.
 void EstimateSgmm2FmllrSubspace(const SpMatrix<double> &fmllr_grad_scatter,
-                               int32 num_fmllr_bases, int32 feat_dim,
-                               Sgmm2FmllrGlobalParams *fmllr_globals,
-                               double min_eig = 0.0);
+    int32 num_fmllr_bases, int32 feat_dim,
+    Sgmm2FmllrGlobalParams *fmllr_globals,
+    double min_eig = 0.0);
 
 }  // namespace kaldi
 

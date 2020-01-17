@@ -92,8 +92,8 @@ namespace fst {
    representation" and hence the "minimal representation" will be the same.  We
    can use this to reduce compute.  Note that if two initial representations are
    different, this does not preclude the other representations from being the same.
-   
-*/   
+
+ */
 
 struct DeterminizeLatticeOptions {
   float delta; // A small offset used to measure equality of weights.
@@ -101,9 +101,9 @@ struct DeterminizeLatticeOptions {
   // when the algorithm's (approximate) memory consumption crosses this threshold.
   int max_loop; // If >0, can be used to detect non-determinizable input
   // (a case that wouldn't be caught by max_mem).
-  DeterminizeLatticeOptions(): delta(kDelta),
-                               max_mem(-1),
-                               max_loop(-1) { }
+  DeterminizeLatticeOptions() : delta(kDelta),
+    max_mem(-1),
+    max_loop(-1) { }
 };
 
 /**
@@ -118,10 +118,10 @@ struct DeterminizeLatticeOptions {
     does not use exceptions).  This is mainly useful for debug.  */
 template<class Weight, class IntType>
 bool DeterminizeLattice(
-    const Fst<ArcTpl<Weight> > &ifst,
-    MutableFst<ArcTpl<Weight> > *ofst,
-    DeterminizeLatticeOptions opts = DeterminizeLatticeOptions(),
-    bool *debug_ptr = NULL);
+  const Fst<ArcTpl<Weight> > &ifst,
+  MutableFst<ArcTpl<Weight> > *ofst,
+  DeterminizeLatticeOptions opts = DeterminizeLatticeOptions(),
+  bool *debug_ptr = NULL);
 
 
 /*  This is a version of DeterminizeLattice with a slightly more "natural" output format,
@@ -130,13 +130,13 @@ bool DeterminizeLattice(
     More efficient if ifst is arc-sorted on input label.
     If the #arcs gets more than max_arcs, it will throw std::runtime_error (otherwise
     this code does not use exceptions).  This is mainly useful for debug.
-*/
+ */
 template<class Weight, class IntType>
 bool DeterminizeLattice(
-    const Fst<ArcTpl<Weight> >&ifst,
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
-    DeterminizeLatticeOptions opts = DeterminizeLatticeOptions(),
-    bool *debug_ptr = NULL);
+  const Fst<ArcTpl<Weight> >&ifst,
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *ofst,
+  DeterminizeLatticeOptions opts = DeterminizeLatticeOptions(),
+  bool *debug_ptr = NULL);
 
 
 

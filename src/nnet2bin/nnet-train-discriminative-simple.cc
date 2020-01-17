@@ -39,24 +39,24 @@ int main(int argc, char *argv[]) {
         "Usage:  nnet-train-discriminative-simple [options] <model-in> <training-examples-in> <model-out>\n"
         "e.g.:\n"
         "nnet-train-discriminative-simple 1.nnet ark:1.degs 2.nnet\n";
-    
+
     bool binary_write = true;
     std::string use_gpu = "yes";
     NnetDiscriminativeUpdateOptions update_opts;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("use-gpu", &use_gpu,
                 "yes|no|optional|wait, only has effect if compiled with CUDA");
     update_opts.Register(&po);
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
     }
-    
+
 #if HAVE_CUDA==1
     CuDevice::Instantiate().SelectGpuId(use_gpu);
 #endif
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
         am_nnet.Read(ki.Stream(), binary_read);
       }
 
-    
+
       NnetDiscriminativeStats stats;
       SequentialDiscriminativeNnetExampleReader example_reader(examples_rspecifier);
 
@@ -89,11 +89,11 @@ int main(int argc, char *argv[]) {
           if (GetVerboseLevel() >= 2) {
             stats.Print(update_opts.criterion);
           }
-        }          
+        }
       }
 
       stats.Print(update_opts.criterion);
-        
+
       {
         Output ko(nnet_wxfilename, binary_write);
         trans_model.Write(ko.Stream(), binary_write);

@@ -18,7 +18,7 @@
 // limitations under the License.
 
 /** @brief Sums the pdf vectors to counts, this is used to obtain prior counts for hybrid decoding.
-*/
+ */
 #include "base/kaldi-common.h"
 #include "util/common-utils.h"
 #include "fst/fstlib.h"
@@ -160,10 +160,10 @@ int main(int argc, char *argv[]) {
       // load the symbol table
       fst::SymbolTable *elem_syms = NULL;
       if (symbol_table_filename != "") {
-          elem_syms = fst::SymbolTable::ReadText(symbol_table_filename);
-          if (!elem_syms)
-            KALDI_ERR << "Could not read symbol table from file "
-                      << symbol_table_filename;
+        elem_syms = fst::SymbolTable::ReadText(symbol_table_filename);
+        if (!elem_syms)
+          KALDI_ERR << "Could not read symbol table from file "
+                    << symbol_table_filename;
       }
 
       // sort the counts
@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
            << static_cast<float>(sorted_counts[i].first) / sum << "),\t"
            << sorted_counts[i].second << "\t"
            << (elem_syms != NULL ? "(" +
-                           elem_syms->Find(sorted_counts[i].second) + ")" : "")
+        elem_syms->Find(sorted_counts[i].second) + ")" : "")
            << std::endl;
       }
       os << "\n#total " << sum

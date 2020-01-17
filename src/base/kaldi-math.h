@@ -154,7 +154,7 @@ inline float RandUniform(struct RandomState* state = NULL) {
 
 inline float RandGauss(struct RandomState* state = NULL) {
   return static_cast<float>(sqrtf (-2 * Log(RandUniform(state)))
-                            * cosf(2*M_PI*RandUniform(state)));
+         * cosf(2*M_PI*RandUniform(state)));
 }
 
 // Returns poisson-distributed random number.  Uses Knuth's algorithm.
@@ -172,12 +172,12 @@ void RandGauss2(double *a, double *b, RandomState *state = NULL);
 // that we typically use to prune posteriors.
 template<class Float>
 inline Float RandPrune(Float post, BaseFloat prune_thresh,
-                       struct RandomState* state = NULL) {
+    struct RandomState* state = NULL) {
   KALDI_ASSERT(prune_thresh >= 0.0);
   if (post == 0.0 || std::abs(post) >= prune_thresh)
     return post;
   return (post >= 0 ? 1.0 : -1.0) *
-      (RandUniform(state) <= fabs(post)/prune_thresh ? prune_thresh : 0.0);
+         (RandUniform(state) <= fabs(post)/prune_thresh ? prune_thresh : 0.0);
 }
 
 
@@ -260,7 +260,7 @@ inline float LogSub(float x, float y) {
 
 /// return abs(a - b) <= relative_tolerance * (abs(a)+abs(b)).
 static inline bool ApproxEqual(float a, float b,
-                               float relative_tolerance = 0.001) {
+    float relative_tolerance = 0.001) {
   // a==b handles infinities.
   if (a == b) return true;
   float diff = std::abs(a-b);
@@ -271,7 +271,7 @@ static inline bool ApproxEqual(float a, float b,
 
 /// assert abs(a - b) <= relative_tolerance * (abs(a)+abs(b))
 static inline void AssertEqual(float a, float b,
-                               float relative_tolerance = 0.001) {
+    float relative_tolerance = 0.001) {
   // a==b handles infinities.
   KALDI_ASSERT(ApproxEqual(a, b, relative_tolerance));
 }

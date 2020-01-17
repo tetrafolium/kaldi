@@ -24,23 +24,23 @@ namespace kaldi {
 namespace nnet3 {
 
 DecodableNnetLoopedOnlineBase::DecodableNnetLoopedOnlineBase(
-    const DecodableNnetSimpleLoopedInfo &info,
-    OnlineFeatureInterface *input_features,
-    OnlineFeatureInterface *ivector_features):
-    num_chunks_computed_(0),
-    current_log_post_subsampled_offset_(-1),
-    info_(info),
-    input_features_(input_features),
-    ivector_features_(ivector_features),
-    computer_(info_.opts.compute_config, info_.computation,
-              info_.nnet, NULL) {   // NULL is 'nnet_to_update'
+  const DecodableNnetSimpleLoopedInfo &info,
+  OnlineFeatureInterface *input_features,
+  OnlineFeatureInterface *ivector_features) :
+  num_chunks_computed_(0),
+  current_log_post_subsampled_offset_(-1),
+  info_(info),
+  input_features_(input_features),
+  ivector_features_(ivector_features),
+  computer_(info_.opts.compute_config, info_.computation,
+      info_.nnet, NULL) {           // NULL is 'nnet_to_update'
   // Check that feature dimensions match.
   KALDI_ASSERT(input_features_ != NULL);
   int32 nnet_input_dim = info_.nnet.InputDim("input"),
       nnet_ivector_dim = info_.nnet.InputDim("ivector"),
-        feat_input_dim = input_features_->Dim(),
+      feat_input_dim = input_features_->Dim(),
       feat_ivector_dim = (ivector_features_ != NULL ?
-                          ivector_features_->Dim() : -1);
+      ivector_features_->Dim() : -1);
   if (nnet_input_dim != feat_input_dim) {
     KALDI_ERR << "Input feature dimension mismatch: got " << feat_input_dim
               << " but network expects " << nnet_input_dim;
@@ -73,7 +73,7 @@ int32 DecodableNnetLoopedOnlineBase::NumFramesReady() const {
     int32 non_subsampled_output_frames_ready =
         std::max<int32>(0, features_ready - info_.frames_right_context);
     int32 num_chunks_ready = non_subsampled_output_frames_ready /
-                             info_.frames_per_chunk;
+        info_.frames_per_chunk;
     // note: the division by the frame subsampling factor 'sf' below
     // doesn't need any attention to rounding because info_.frames_per_chunk
     // is always a multiple of 'sf' (see 'frames_per_chunk = GetChunksize..."
@@ -86,7 +86,7 @@ int32 DecodableNnetLoopedOnlineBase::NumFramesReady() const {
 // note: the frame-index argument is on the output of the network, i.e. after any
 // subsampling, so we call it 'subsampled_frame'.
 bool DecodableNnetLoopedOnlineBase::IsLastFrame(
-    int32 subsampled_frame) const {
+  int32 subsampled_frame) const {
   // To understand this code, compare it with the code of NumFramesReady(),
   // it follows the same structure.
   int32 features_ready = input_features_->NumFramesReady();
@@ -104,7 +104,7 @@ bool DecodableNnetLoopedOnlineBase::IsLastFrame(
   if (!input_finished)
     return false;
   int32 sf = info_.opts.frame_subsampling_factor,
-     num_subsampled_frames_ready = (features_ready + sf - 1) / sf;
+      num_subsampled_frames_ready = (features_ready + sf - 1) / sf;
   return (subsampled_frame == num_subsampled_frames_ready - 1);
 }
 
@@ -147,7 +147,7 @@ void DecodableNnetLoopedOnlineBase::AdvanceChunk() {
   CuMatrix<BaseFloat> feats_chunk;
   { // this block sets 'feats_chunk'.
     Matrix<BaseFloat> this_feats(end_input_frame - begin_input_frame,
-                                 input_features_->Dim());
+        input_features_->Dim());
     for (int32 i = begin_input_frame; i < end_input_frame; i++) {
       SubVector<BaseFloat> this_row(this_feats, i - begin_input_frame);
       int32 input_frame = i;
@@ -166,8 +166,8 @@ void DecodableNnetLoopedOnlineBase::AdvanceChunk() {
     // all but the 1st chunk should have 1 iVector, but there is no need to
     // assume this.
     int32 num_ivectors = (num_chunks_computed_ == 0 ?
-			  info_.request1.inputs[1].indexes.size() :
-			  info_.request2.inputs[1].indexes.size());
+        info_.request1.inputs[1].indexes.size() :
+        info_.request2.inputs[1].indexes.size());
     KALDI_ASSERT(num_ivectors > 0);
 
     Vector<BaseFloat> ivector(ivector_features_->Dim());
@@ -178,7 +178,7 @@ void DecodableNnetLoopedOnlineBase::AdvanceChunk() {
     // iVector from as large 't' as possible will be better.
 
     int32 most_recent_input_frame = num_feature_frames_ready - 1,
-      num_ivector_frames_ready = ivector_features_->NumFramesReady();
+        num_ivector_frames_ready = ivector_features_->NumFramesReady();
 
     if (num_ivector_frames_ready > 0) {
       int32 ivector_frame_to_use = std::min<int32>(
@@ -192,7 +192,7 @@ void DecodableNnetLoopedOnlineBase::AdvanceChunk() {
 
     // note: we expect num_ivectors to be 1 in practice.
     Matrix<BaseFloat> ivectors(num_ivectors,
-			       ivector.Dim());
+        ivector.Dim());
     ivectors.CopyRowsFromVec(ivector);
     CuMatrix<BaseFloat> cu_ivectors;
     cu_ivectors.Swap(&ivectors);
@@ -230,7 +230,7 @@ void DecodableNnetLoopedOnlineBase::AdvanceChunk() {
 }
 
 BaseFloat DecodableNnetLoopedOnline::LogLikelihood(int32 subsampled_frame,
-                                                    int32 index) {
+    int32 index) {
   EnsureFrameIsComputed(subsampled_frame);
   // note: we index by 'inde
   return current_log_post_(
@@ -240,7 +240,7 @@ BaseFloat DecodableNnetLoopedOnline::LogLikelihood(int32 subsampled_frame,
 
 
 BaseFloat DecodableAmNnetLoopedOnline::LogLikelihood(int32 subsampled_frame,
-                                                    int32 index) {
+    int32 index) {
   EnsureFrameIsComputed(subsampled_frame);
   return current_log_post_(
       subsampled_frame - current_log_post_subsampled_offset_,

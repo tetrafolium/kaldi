@@ -45,7 +45,7 @@ namespace kaldi {
    \f[   vout[m] \leftarrow \sum_{n = 0}^{N-1} vin[i] exp( -2pi m n / N )  \f]
 
    If "backward" it does the Inverse Discrete Fourier Transform (IDFT)
-   *WITHOUT THE FACTOR 1/N*,
+ * WITHOUT THE FACTOR 1/N*,
    i.e.:
    \f[   vout[m] <-- \sum_{n = 0}^{N-1} vin[i] exp(  2pi m n / N )   \f]
    [note the sign difference on the 2 pi for the backward one.]
@@ -68,7 +68,7 @@ template<typename Real> void ComplexFft (VectorBase<Real> *v, bool forward, Vect
 /// transform in an inefficient way.  It is mainly included for testing purposes.
 /// See comment for ComplexFft to describe the input and outputs and what it does.
 template<typename Real> void ComplexFt (const VectorBase<Real> &in,
-                                     VectorBase<Real> *out, bool forward);
+    VectorBase<Real> *out, bool forward);
 
 /// RealFft is a fourier transform of real inputs.  Internally it uses
 /// ComplexFft.  The input dimension N must be even.  If forward == true,
@@ -108,12 +108,12 @@ template<typename Real> void ComputeDctMatrix(Matrix<Real> *M);
 
 /// ComplexMul implements, inline, the complex multiplication b *= a.
 template<typename Real> inline void ComplexMul(const Real &a_re, const Real &a_im,
-                                            Real *b_re, Real *b_im);
+    Real *b_re, Real *b_im);
 
 /// ComplexMul implements, inline, the complex operation c += (a * b).
 template<typename Real> inline void ComplexAddProduct(const Real &a_re, const Real &a_im,
-                                                   const Real &b_re, const Real &b_im,
-                                                   Real *c_re, Real *c_im);
+    const Real &b_re, const Real &b_im,
+    Real *c_re, Real *c_im);
 
 
 /// ComplexImExp implements a <-- exp(i x), inline.
@@ -138,14 +138,14 @@ template<typename Real> inline void ComplexImExp(Real x, Real *a_re, Real *a_im)
     @param exact [in] If true, does the exact computation; if false, does
          a much faster (but almost exact) computation based on the Lanczos
          method.
-*/
+ */
 
 template<typename Real>
 void ComputePca(const MatrixBase<Real> &X,
-                MatrixBase<Real> *U,
-                MatrixBase<Real> *A,
-                bool print_eigs = false,
-                bool exact = true);
+    MatrixBase<Real> *U,
+    MatrixBase<Real> *A,
+    bool print_eigs = false,
+    bool exact = true);
 
 
 
@@ -153,15 +153,15 @@ void ComputePca(const MatrixBase<Real> &X,
 // *minus += max(0, -(a b^T)).
 template<typename Real>
 void AddOuterProductPlusMinus(Real alpha,
-                              const VectorBase<Real> &a,
-                              const VectorBase<Real> &b,
-                              MatrixBase<Real> *plus,
-                              MatrixBase<Real> *minus);
+    const VectorBase<Real> &a,
+    const VectorBase<Real> &b,
+    MatrixBase<Real> *plus,
+    MatrixBase<Real> *minus);
 
 template<typename Real1, typename Real2>
 inline void AssertSameDim(const MatrixBase<Real1> &mat1, const MatrixBase<Real2> &mat2) {
   KALDI_ASSERT(mat1.NumRows() == mat2.NumRows()
-               && mat1.NumCols() == mat2.NumCols());
+      && mat1.NumCols() == mat2.NumCols());
 }
 
 

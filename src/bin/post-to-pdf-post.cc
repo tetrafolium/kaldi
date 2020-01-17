@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
         posteriors_rspecifier = po.GetArg(2),
         posteriors_wspecifier = po.GetArg(3);
 
-    TransitionModel trans_model;    
+    TransitionModel trans_model;
     {
       bool binary_in;
       Input ki(model_rxfilename, &binary_in);
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     int32 num_done = 0;
     SequentialPosteriorReader posterior_reader(posteriors_rspecifier);
     PosteriorWriter posterior_writer(posteriors_wspecifier);
-    
+
     for (; !posterior_reader.Done(); posterior_reader.Next()) {
       const kaldi::Posterior &posterior = posterior_reader.Value();
       kaldi::Posterior pdf_posterior;

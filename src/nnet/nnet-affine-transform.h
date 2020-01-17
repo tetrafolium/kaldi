@@ -31,8 +31,8 @@ namespace kaldi {
 namespace nnet1 {
 
 class AffineTransform : public UpdatableComponent {
- public:
-  AffineTransform(int32 dim_in, int32 dim_out):
+public:
+  AffineTransform(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out),
     linearity_(dim_out, dim_in), bias_(dim_out),
     linearity_corr_(dim_out, dim_in), bias_corr_(dim_out),
@@ -52,8 +52,8 @@ class AffineTransform : public UpdatableComponent {
     while (is >> std::ws, !is.eof()) {
       ReadToken(is, false, &token);
       /**/ if (token == "<ParamStddev>") ReadBasicType(is, false, &param_stddev);
-      else if (token == "<BiasMean>")    ReadBasicType(is, false, &bias_mean);
-      else if (token == "<BiasRange>")   ReadBasicType(is, false, &bias_range);
+      else if (token == "<BiasMean>") ReadBasicType(is, false, &bias_mean);
+      else if (token == "<BiasRange>") ReadBasicType(is, false, &bias_range);
       else if (token == "<LearnRateCoef>") ReadBasicType(is, false, &learn_rate_coef_);
       else if (token == "<BiasLearnRateCoef>") ReadBasicType(is, false, &bias_learn_rate_coef_);
       else if (token == "<MaxNorm>") ReadBasicType(is, false, &max_norm_);
@@ -77,19 +77,19 @@ class AffineTransform : public UpdatableComponent {
     while ('<' == Peek(is, binary)) {
       int first_char = PeekToken(is, binary);
       switch (first_char) {
-        case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
-          ReadBasicType(is, binary, &learn_rate_coef_);
-          break;
-        case 'B': ExpectToken(is, binary, "<BiasLearnRateCoef>");
-          ReadBasicType(is, binary, &bias_learn_rate_coef_);
-          break;
-        case 'M': ExpectToken(is, binary, "<MaxNorm>");
-          ReadBasicType(is, binary, &max_norm_);
-          break;
-        default:
-          std::string token;
-          ReadToken(is, false, &token);
-          KALDI_ERR << "Unknown token: " << token;
+      case 'L': ExpectToken(is, binary, "<LearnRateCoef>");
+        ReadBasicType(is, binary, &learn_rate_coef_);
+        break;
+      case 'B': ExpectToken(is, binary, "<BiasLearnRateCoef>");
+        ReadBasicType(is, binary, &bias_learn_rate_coef_);
+        break;
+      case 'M': ExpectToken(is, binary, "<MaxNorm>");
+        ReadBasicType(is, binary, &max_norm_);
+        break;
+      default:
+        std::string token;
+        ReadToken(is, false, &token);
+        KALDI_ERR << "Unknown token: " << token;
       }
     }
     // Read the data (data follow the tokens),
@@ -144,23 +144,23 @@ class AffineTransform : public UpdatableComponent {
 
   std::string Info() const {
     return std::string("\n  linearity") +
-      MomentStatistics(linearity_) +
-      ", lr-coef " + ToString(learn_rate_coef_) +
-      ", max-norm " + ToString(max_norm_) +
-      "\n  bias" + MomentStatistics(bias_) +
-      ", lr-coef " + ToString(bias_learn_rate_coef_);
+           MomentStatistics(linearity_) +
+           ", lr-coef " + ToString(learn_rate_coef_) +
+           ", max-norm " + ToString(max_norm_) +
+           "\n  bias" + MomentStatistics(bias_) +
+           ", lr-coef " + ToString(bias_learn_rate_coef_);
   }
   std::string InfoGradient() const {
     return std::string("\n  linearity_grad") +
-      MomentStatistics(linearity_corr_) +
-      ", lr-coef " + ToString(learn_rate_coef_) +
-      ", max-norm " + ToString(max_norm_) +
-      "\n  bias_grad" + MomentStatistics(bias_corr_) +
-      ", lr-coef " + ToString(bias_learn_rate_coef_);
+           MomentStatistics(linearity_corr_) +
+           ", lr-coef " + ToString(learn_rate_coef_) +
+           ", max-norm " + ToString(max_norm_) +
+           "\n  bias_grad" + MomentStatistics(bias_corr_) +
+           ", lr-coef " + ToString(bias_learn_rate_coef_);
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // precopy bias
     out->AddVecToRows(1.0, bias_, 0.0);
     // multiply by weights^t
@@ -168,16 +168,16 @@ class AffineTransform : public UpdatableComponent {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // multiply error derivative by weights
     in_diff->AddMatMat(1.0, out_diff, kNoTrans, linearity_, kNoTrans, 0.0);
   }
 
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     // we use following hyperparameters from the option class
     const BaseFloat lr = opts_.learn_rate * learn_rate_coef_;
     const BaseFloat lr_bias = opts_.learn_rate * bias_learn_rate_coef_;
@@ -231,7 +231,7 @@ class AffineTransform : public UpdatableComponent {
     linearity_.CopyFromMat(linearity);
   }
 
- private:
+private:
   CuMatrix<BaseFloat> linearity_;
   CuVector<BaseFloat> bias_;
 

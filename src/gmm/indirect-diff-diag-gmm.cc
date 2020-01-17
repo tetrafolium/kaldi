@@ -23,11 +23,11 @@ namespace kaldi {
 
 
 void GetSingleStatsDerivative(
-    double ml_count, double ml_x_stats, double ml_x2_stats,
-    double disc_count, double disc_x_stats, double disc_x2_stats,
-    double model_mean, double model_var, BaseFloat min_variance,
-    double *ml_x_stats_deriv, double *ml_x2_stats_deriv) {
-  
+  double ml_count, double ml_x_stats, double ml_x2_stats,
+  double disc_count, double disc_x_stats, double disc_x2_stats,
+  double model_mean, double model_var, BaseFloat min_variance,
+  double *ml_x_stats_deriv, double *ml_x2_stats_deriv) {
+
   double model_inv_var = 1.0/model_var,
       model_inv_var_sq = model_inv_var*model_inv_var,
       model_mean_sq = model_mean*model_mean;
@@ -41,8 +41,8 @@ void GetSingleStatsDerivative(
   double diff_wrt_model_mean = (1.0/model_var) * (disc_x_stats - model_mean*disc_count),
       diff_wrt_model_var =
       0.5 * ((disc_x2_stats - 2*model_mean*disc_x_stats + disc_count*model_mean_sq)
-             * model_inv_var_sq
-             - disc_count*model_inv_var);
+      * model_inv_var_sq
+      - disc_count*model_inv_var);
 
   double stats_mean = ml_x_stats / ml_count,
       stats_var = ml_x2_stats / ml_count - (ml_x_stats / ml_count)*(ml_x_stats / ml_count);
@@ -64,7 +64,7 @@ void GetSingleStatsDerivative(
   // If the model and the stats were actually the same (e.g. we had been doing ML updates),
   // then all this is equivalent to what was in the original fMPE paper.  It's just
   // extended to make sense outside of that scenario where you're doing ML.
-  
+
   double diff_wrt_stats_mean = diff_wrt_model_mean; // This comes from eq. 1 above.
   double diff_wrt_stats_var;
   if (model_var <= min_variance*1.01) {
@@ -92,12 +92,12 @@ void GetSingleStatsDerivative(
 // The function for just one GMM.  We don't export it as it's not currently
 // needed outside this file.
 void GetStatsDerivative(const DiagGmm &gmm,
-                        const AccumDiagGmm &num_acc,
-                        const AccumDiagGmm &den_acc,
-                        const AccumDiagGmm &ml_acc,
-                        BaseFloat min_variance,
-                        BaseFloat min_gaussian_occupancy,
-                        AccumDiagGmm *out_accs) {
+    const AccumDiagGmm &num_acc,
+    const AccumDiagGmm &den_acc,
+    const AccumDiagGmm &ml_acc,
+    BaseFloat min_variance,
+    BaseFloat min_gaussian_occupancy,
+    AccumDiagGmm *out_accs) {
   out_accs->Resize(gmm, kGmmAll);
   int32 num_gauss = gmm.NumGauss(), dim = gmm.Dim();
   KALDI_ASSERT(num_gauss == num_acc.NumGauss() && dim == num_acc.Dim());
@@ -107,9 +107,9 @@ void GetStatsDerivative(const DiagGmm &gmm,
   KALDI_ASSERT(num_gauss == ml_acc.NumGauss() && dim == ml_acc.Dim());
 
   KALDI_ASSERT((ml_acc.Flags() & (kGmmMeans|kGmmVariances)) ==
-               (kGmmMeans|kGmmVariances));
+      (kGmmMeans|kGmmVariances));
   KALDI_ASSERT((num_acc.Flags() & (kGmmMeans|kGmmVariances)) ==
-               (kGmmMeans|kGmmVariances));
+      (kGmmMeans|kGmmVariances));
   DiagGmmNormal gmm_normal(gmm);
 
   // if have_den_stats == false, we assume the num and den have been
@@ -121,7 +121,7 @@ void GetStatsDerivative(const DiagGmm &gmm,
     double num_count = num_acc.occupancy()(gauss),
         den_count = den_acc.occupancy()(gauss),
         ml_count = ml_acc.occupancy()(gauss);
-    
+
     if (ml_count <= min_gaussian_occupancy) {
       // This Gaussian won't be updated since has small count
       KALDI_WARN << "Skipping Gaussian because very small ML count: (num,den,ml) = "
@@ -155,12 +155,12 @@ void GetStatsDerivative(const DiagGmm &gmm,
 }
 
 void GetStatsDerivative(const AmDiagGmm &gmm,
-                        const AccumAmDiagGmm &num_accs, // for MMI, would equal ml accs.
-                        const AccumAmDiagGmm &den_accs,
-                        const AccumAmDiagGmm &ml_accs,
-                        BaseFloat min_variance,
-                        BaseFloat min_gaussian_occupancy,
-                        AccumAmDiagGmm *out_accs) {
+    const AccumAmDiagGmm &num_accs,                     // for MMI, would equal ml accs.
+    const AccumAmDiagGmm &den_accs,
+    const AccumAmDiagGmm &ml_accs,
+    BaseFloat min_variance,
+    BaseFloat min_gaussian_occupancy,
+    AccumAmDiagGmm *out_accs) {
   out_accs->Init(gmm, kGmmAll);
   int32 num_pdfs = gmm.NumPdfs();
   KALDI_ASSERT(num_accs.NumAccs() == num_pdfs);
@@ -170,26 +170,26 @@ void GetStatsDerivative(const AmDiagGmm &gmm,
     GetStatsDerivative(gmm.GetPdf(pdf), num_accs.GetAcc(pdf), den_accs.GetAcc(pdf),
                        ml_accs.GetAcc(pdf), min_variance, min_gaussian_occupancy,
                        &(out_accs->GetAcc(pdf)));
-  
+
 }
 
 
 void DoRescalingUpdate(const AccumDiagGmm &old_ml_acc,
-                       const AccumDiagGmm &new_ml_acc,
-                       BaseFloat min_variance,
-                       BaseFloat min_gaussian_occupancy,
-                       DiagGmm *gmm,
-                       double *tot_count,
-                       double *tot_divergence) {
+    const AccumDiagGmm &new_ml_acc,
+    BaseFloat min_variance,
+    BaseFloat min_gaussian_occupancy,
+    DiagGmm *gmm,
+    double *tot_count,
+    double *tot_divergence) {
   int32 num_gauss = gmm->NumGauss(), dim = gmm->Dim();
   KALDI_ASSERT(old_ml_acc.NumGauss() == num_gauss &&
                old_ml_acc.Dim() == dim);
   KALDI_ASSERT(new_ml_acc.NumGauss() == num_gauss &&
                new_ml_acc.Dim() == dim);
   KALDI_ASSERT((old_ml_acc.Flags() & (kGmmMeans|kGmmVariances)) ==
-               (kGmmMeans|kGmmVariances));
+      (kGmmMeans|kGmmVariances));
   KALDI_ASSERT((new_ml_acc.Flags() & (kGmmMeans|kGmmVariances)) ==
-               (kGmmMeans|kGmmVariances));
+      (kGmmMeans|kGmmVariances));
 
   DiagGmmNormal gmm_normal(*gmm);
   for (int32 gauss = 0; gauss < num_gauss; gauss++) {
@@ -214,10 +214,10 @@ void DoRescalingUpdate(const AccumDiagGmm &old_ml_acc,
           new_model_mean = old_model_mean + new_ml_mean - old_ml_mean,
           new_model_var = std::max(static_cast<double>(min_variance),
                                    old_model_var * new_ml_var / old_ml_var);
-      double divergence = 
+      double divergence =
           0.5 *(((new_model_mean-old_model_mean)*(new_model_mean-old_model_mean) +
-                 new_model_var - old_model_var)/old_model_var +
-                Log(old_model_var / new_model_var));
+          new_model_var - old_model_var)/old_model_var +
+          Log(old_model_var / new_model_var));
       if (divergence < 0.0)
         KALDI_WARN << "Negative divergence " << divergence;
       *tot_divergence += divergence * new_ml_count;
@@ -230,10 +230,10 @@ void DoRescalingUpdate(const AccumDiagGmm &old_ml_acc,
 
 
 void DoRescalingUpdate(const AccumAmDiagGmm &old_ml_accs,
-                       const AccumAmDiagGmm &new_ml_accs,
-                       BaseFloat min_variance,
-                       BaseFloat min_gaussian_occupancy,
-                       AmDiagGmm *am_gmm) {
+    const AccumAmDiagGmm &new_ml_accs,
+    BaseFloat min_variance,
+    BaseFloat min_gaussian_occupancy,
+    AmDiagGmm *am_gmm) {
   int32 num_pdfs = am_gmm->NumPdfs();
   KALDI_ASSERT(old_ml_accs.NumAccs() == num_pdfs);
   KALDI_ASSERT(new_ml_accs.NumAccs() == num_pdfs);

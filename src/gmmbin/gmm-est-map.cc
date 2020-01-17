@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
     typedef kaldi::int32 int32;
-    
+
     const char *usage =
         "Do Maximum A Posteriori re-estimation of GMM-based acoustic model\n"
         "Usage:  gmm-est-map [options] <model-in> <stats-in> <model-out>\n"
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
       bool binary = false;
       WriteKaldiObject(state_occs, occs_out_filename, binary);
     }
-    
+
     {
       Output ko(model_out_filename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);

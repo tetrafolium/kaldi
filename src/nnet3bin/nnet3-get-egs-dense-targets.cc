@@ -32,15 +32,15 @@ namespace nnet3 {
 
 
 static bool ProcessFile(const GeneralMatrix &feats,
-                        const MatrixBase<BaseFloat> *ivector_feats,
-                        int32 ivector_period,
-                        const MatrixBase<BaseFloat> &targets,
-                        const std::string &utt_id,
-                        bool compress,
-                        int32 num_targets,
-                        int32 length_tolerance,
-                        UtteranceSplitter *utt_splitter,
-                        NnetExampleWriter *example_writer) {
+    const MatrixBase<BaseFloat> *ivector_feats,
+    int32 ivector_period,
+    const MatrixBase<BaseFloat> &targets,
+    const std::string &utt_id,
+    bool compress,
+    int32 num_targets,
+    int32 length_tolerance,
+    UtteranceSplitter *utt_splitter,
+    NnetExampleWriter *example_writer) {
   int32 num_input_frames = feats.NumRows();
   if (!utt_splitter->LengthsMatch(utt_id, num_input_frames,
                                   targets.NumRows(),
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
 
     bool compress = true;
     int32 num_targets = -1, length_tolerance = 100,
-        targets_length_tolerance = 2,  
+        targets_length_tolerance = 2,
         online_ivector_period = 1;
 
     ExampleGenerationConfig eg_config;  // controls num-frames,
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
                 "--online-ivectors option");
     po.Register("length-tolerance", &length_tolerance, "Tolerance for "
                 "difference in num-frames between feat and ivector matrices");
-    po.Register("targets-length-tolerance", &targets_length_tolerance, 
+    po.Register("targets-length-tolerance", &targets_length_tolerance,
                 "Tolerance for "
                 "difference in num-frames (after subsampling) between "
                 "feature and target matrices");
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
     RandomAccessBaseFloatMatrixReader matrix_reader(matrix_rspecifier);
     NnetExampleWriter example_writer(examples_wspecifier);
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
 
     int32 num_err = 0;
 
@@ -252,8 +252,8 @@ int main(int argc, char *argv[]) {
 
         if (online_ivector_feats != NULL &&
             (abs(feats.NumRows() - (online_ivector_feats->NumRows() *
-                                    online_ivector_period)) > length_tolerance
-             || online_ivector_feats->NumRows() == 0)) {
+            online_ivector_period)) > length_tolerance
+            || online_ivector_feats->NumRows() == 0)) {
           KALDI_WARN << "Length difference between feats " << feats.NumRows()
                      << " and iVectors " << online_ivector_feats->NumRows()
                      << "exceeds tolerance " << length_tolerance;
@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (!ProcessFile(feats, online_ivector_feats, online_ivector_period,
-                         target_matrix, key, compress, num_targets, 
+                         target_matrix, key, compress, num_targets,
                          targets_length_tolerance,
                          &utt_splitter, &example_writer))
           num_err++;
@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
     }
     if (num_err > 0)
       KALDI_WARN << num_err << " utterances had errors and could "
-          "not be processed.";
+        "not be processed.";
     // utt_splitter prints stats in its destructor.
     return utt_splitter.ExitStatus();
   } catch(const std::exception &e) {

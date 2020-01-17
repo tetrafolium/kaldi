@@ -46,14 +46,14 @@ cublasOperation_t KaldiTransToCuTrans(MatrixTransposeType kaldi_trans) {
 }
 
 void GetBlockSizesForSimpleMatrixOperation(int32 num_rows,
-                                           int32 num_cols,
-                                           dim3 *dimGrid,
-                                           dim3 *dimBlock) {
+    int32 num_cols,
+    dim3 *dimGrid,
+    dim3 *dimBlock) {
   KALDI_ASSERT(num_rows > 0 && num_cols > 0);
   int32 col_blocksize = 64, row_blocksize = 4;
   while (col_blocksize > 1 &&
-         (num_cols + (num_cols / 2) <= col_blocksize ||
-          num_rows > 65535 * row_blocksize)) {
+      (num_cols + (num_cols / 2) <= col_blocksize ||
+      num_rows > 65535 * row_blocksize)) {
     col_blocksize /= 2;
     row_blocksize *= 2;
   }
@@ -70,16 +70,16 @@ void GetBlockSizesForSimpleMatrixOperation(int32 num_rows,
 
 const char* cublasGetStatusString(cublasStatus_t status) {
   switch(status) {
-    case CUBLAS_STATUS_SUCCESS:           return "CUBLAS_STATUS_SUCCESS";
-    case CUBLAS_STATUS_NOT_INITIALIZED:   return "CUBLAS_STATUS_NOT_INITIALIZED";
-    case CUBLAS_STATUS_ALLOC_FAILED:      return "CUBLAS_STATUS_ALLOC_FAILED";
-    case CUBLAS_STATUS_INVALID_VALUE:     return "CUBLAS_STATUS_INVALID_VALUE";
-    case CUBLAS_STATUS_ARCH_MISMATCH:     return "CUBLAS_STATUS_ARCH_MISMATCH";
-    case CUBLAS_STATUS_MAPPING_ERROR:     return "CUBLAS_STATUS_MAPPING_ERROR";
-    case CUBLAS_STATUS_EXECUTION_FAILED:  return "CUBLAS_STATUS_EXECUTION_FAILED";
-    case CUBLAS_STATUS_INTERNAL_ERROR:    return "CUBLAS_STATUS_INTERNAL_ERROR";
-    case CUBLAS_STATUS_NOT_SUPPORTED:     return "CUBLAS_STATUS_NOT_SUPPORTED";
-    case CUBLAS_STATUS_LICENSE_ERROR:     return "CUBLAS_STATUS_LICENSE_ERROR";
+  case CUBLAS_STATUS_SUCCESS:           return "CUBLAS_STATUS_SUCCESS";
+  case CUBLAS_STATUS_NOT_INITIALIZED:   return "CUBLAS_STATUS_NOT_INITIALIZED";
+  case CUBLAS_STATUS_ALLOC_FAILED:      return "CUBLAS_STATUS_ALLOC_FAILED";
+  case CUBLAS_STATUS_INVALID_VALUE:     return "CUBLAS_STATUS_INVALID_VALUE";
+  case CUBLAS_STATUS_ARCH_MISMATCH:     return "CUBLAS_STATUS_ARCH_MISMATCH";
+  case CUBLAS_STATUS_MAPPING_ERROR:     return "CUBLAS_STATUS_MAPPING_ERROR";
+  case CUBLAS_STATUS_EXECUTION_FAILED:  return "CUBLAS_STATUS_EXECUTION_FAILED";
+  case CUBLAS_STATUS_INTERNAL_ERROR:    return "CUBLAS_STATUS_INTERNAL_ERROR";
+  case CUBLAS_STATUS_NOT_SUPPORTED:     return "CUBLAS_STATUS_NOT_SUPPORTED";
+  case CUBLAS_STATUS_LICENSE_ERROR:     return "CUBLAS_STATUS_LICENSE_ERROR";
   }
   return "CUBLAS_STATUS_UNKNOWN_ERROR";
 }

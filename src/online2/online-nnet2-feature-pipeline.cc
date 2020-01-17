@@ -23,8 +23,8 @@
 namespace kaldi {
 
 OnlineNnet2FeaturePipelineInfo::OnlineNnet2FeaturePipelineInfo(
-    const OnlineNnet2FeaturePipelineConfig &config):
-    silence_weighting_config(config.silence_weighting_config) {
+  const OnlineNnet2FeaturePipelineConfig &config) :
+  silence_weighting_config(config.silence_weighting_config) {
   if (config.feature_type == "mfcc" || config.feature_type == "plp" ||
       config.feature_type == "fbank") {
     feature_type = config.feature_type;
@@ -77,8 +77,8 @@ OnlineNnet2FeaturePipelineInfo::OnlineNnet2FeaturePipelineInfo(
 }
 
 OnlineNnet2FeaturePipeline::OnlineNnet2FeaturePipeline(
-    const OnlineNnet2FeaturePipelineInfo &info):
-    info_(info) {
+  const OnlineNnet2FeaturePipelineInfo &info) :
+  info_(info) {
   if (info_.feature_type == "mfcc") {
     base_feature_ = new OnlineMfcc(info_.mfcc_opts);
   } else if (info_.feature_type == "plp") {
@@ -124,12 +124,12 @@ int32 OnlineNnet2FeaturePipeline::NumFramesReady() const {
 }
 
 void OnlineNnet2FeaturePipeline::GetFrame(int32 frame,
-                                          VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   return final_feature_->GetFrame(frame, feat);
 }
 
 void OnlineNnet2FeaturePipeline::SetAdaptationState(
-    const OnlineIvectorExtractorAdaptationState &adaptation_state) {
+  const OnlineIvectorExtractorAdaptationState &adaptation_state) {
   if (info_.use_ivectors) {
     ivector_feature_->SetAdaptationState(adaptation_state);
   }
@@ -137,7 +137,7 @@ void OnlineNnet2FeaturePipeline::SetAdaptationState(
 }
 
 void OnlineNnet2FeaturePipeline::GetAdaptationState(
-    OnlineIvectorExtractorAdaptationState *adaptation_state) const {
+  OnlineIvectorExtractorAdaptationState *adaptation_state) const {
   if (info_.use_ivectors) {
     ivector_feature_->GetAdaptationState(adaptation_state);
   }
@@ -161,8 +161,8 @@ OnlineNnet2FeaturePipeline::~OnlineNnet2FeaturePipeline() {
 }
 
 void OnlineNnet2FeaturePipeline::AcceptWaveform(
-    BaseFloat sampling_rate,
-    const VectorBase<BaseFloat> &waveform) {
+  BaseFloat sampling_rate,
+  const VectorBase<BaseFloat> &waveform) {
   base_feature_->AcceptWaveform(sampling_rate, waveform);
   if (pitch_)
     pitch_->AcceptWaveform(sampling_rate, waveform);

@@ -36,9 +36,9 @@ int main(int argc, char *argv[]) {
         "Remove state-sequences from lattice weights\n"
         "Usage: lattice-rmali [options] lattice-rspecifier lattice-wspecifier\n"
         " e.g.: lattice-rmali  ark:1.lats ark:proj.lats\n";
-      
+
     ParseOptions po(usage);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -48,14 +48,14 @@ int main(int argc, char *argv[]) {
 
     std::string lats_rspecifier = po.GetArg(1),
         lats_wspecifier = po.GetArg(2);
-    
+
     SequentialCompactLatticeReader lattice_reader(lats_rspecifier);
-    
+
     // Write as compact lattice.
-    CompactLatticeWriter compact_lattice_writer(lats_wspecifier); 
+    CompactLatticeWriter compact_lattice_writer(lats_wspecifier);
 
     int32 n_done = 0; // there is no failure mode, barring a crash.
-    
+
     for (; !lattice_reader.Done(); lattice_reader.Next()) {
       std::string key = lattice_reader.Key();
       CompactLattice clat = lattice_reader.Value();

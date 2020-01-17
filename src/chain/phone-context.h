@@ -34,30 +34,30 @@ namespace chain {
 
 
 /**
-  The 'PhoneContext' object is responsible for mapping phones in left-context to
-  cd-phones (context-dependent phones).  In the 'chain' models, we only support
-  left-context, in order to make phone-level discriminative training
-  sufficiently efficient.  The 'PhoneContext' model represents all the
-  information we need to know about the phonetic-context decision tree (so after
-  building the decision tree, we can build the PhoneContext object and then
-  discard the tree).
+   The 'PhoneContext' object is responsible for mapping phones in left-context to
+   cd-phones (context-dependent phones).  In the 'chain' models, we only support
+   left-context, in order to make phone-level discriminative training
+   sufficiently efficient.  The 'PhoneContext' model represents all the
+   information we need to know about the phonetic-context decision tree (so after
+   building the decision tree, we can build the PhoneContext object and then
+   discard the tree).
 
-  There two types of cd-phones: cd-phones, and physical cd-phones.  The logical
-  ones can be mapped to physical.  The logical cd-phones are the ones that we
-  actually put in the graph, which will enable us to work out the phone sequence
-  (assuming the topology is 'alignable', which it normally will be).  Logical
-  cd-phones are mappable to the (mono) phone; the physical ones are less
-  detailed, and can't necessarily be mapped to the monophones.
+   There two types of cd-phones: cd-phones, and physical cd-phones.  The logical
+   ones can be mapped to physical.  The logical cd-phones are the ones that we
+   actually put in the graph, which will enable us to work out the phone sequence
+   (assuming the topology is 'alignable', which it normally will be).  Logical
+   cd-phones are mappable to the (mono) phone; the physical ones are less
+   detailed, and can't necessarily be mapped to the monophones.
 
-  Note that the PhoneTopology and PhoneContext will be incorporated as data
-  members in the ContextDependentTopology model, which contains information
-  about topology and context, and also controls the allocation of output-ids
-  (which are indexes into the neural net output, and roughly correspond to
-  context-dependent states in a conventional HMM-based system).
-*/
+   Note that the PhoneTopology and PhoneContext will be incorporated as data
+   members in the ContextDependentTopology model, which contains information
+   about topology and context, and also controls the allocation of output-ids
+   (which are indexes into the neural net output, and roughly correspond to
+   context-dependent states in a conventional HMM-based system).
+ */
 
 class PhoneContext: public fst::DeterministicOnDemandFst<fst::StdArc> {
- public:
+public:
   /*  First, members that relate to the base class.   */
 
   // repeat the typedefs (they're not inherited automatically; we could inherit
@@ -152,7 +152,7 @@ class PhoneContext: public fst::DeterministicOnDemandFst<fst::StdArc> {
   // for each phone, and then calling ComposeDeterministicOnDemand(f, *this,
   // output).
   void GetAsFst(fst::VectorFst<fst::StdArc>* output) const;
- private:
+private:
   void Check();
   // Sets up the cd_phone_to_phone_ array.
   void ComputeCdPhoneToPhone();

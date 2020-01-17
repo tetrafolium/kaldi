@@ -28,31 +28,31 @@
 namespace fst {
 
 /*
-  Process the states in reverse topological order.
-  For each state, compute a hash-value that will be the same for states
-  that can be combined.  Then for each pair of states with the
-  same hash value, check that the "to-states" map to the
-  same equivalence class and that the weights are sufficiently similar.
-*/
-  
+   Process the states in reverse topological order.
+   For each state, compute a hash-value that will be the same for states
+   that can be combined.  Then for each pair of states with the
+   same hash value, check that the "to-states" map to the
+   same equivalence class and that the weights are sufficiently similar.
+ */
+
 template<class Weight, class IntType> class CompactLatticeMinimizer {
- public:
+public:
   typedef CompactLatticeWeightTpl<Weight, IntType> CompactWeight;
   typedef ArcTpl<CompactWeight> CompactArc;
   typedef typename CompactArc::StateId StateId;
   typedef typename CompactArc::Label Label;
   typedef size_t HashType;
-  
+
   CompactLatticeMinimizer(MutableFst<CompactArc> *clat,
-                          float delta = fst::kDelta):
-      clat_(clat), delta_(delta) { }
+      float delta = fst::kDelta) :
+    clat_(clat), delta_(delta) { }
 
   bool Minimize() {
     if (clat_->Properties(kTopSorted, true) == 0) {
       if (!TopSort(clat_)) {
         KALDI_WARN << "Topological sorting of state-level lattice failed "
-            "(probably your lexicon has empty words or your LM has epsilon cycles; this "
-            " is a bad idea.)";
+          "(probably your lexicon has empty words or your LM has epsilon cycles; this "
+          " is a bad idea.)";
         return false;
       }
     }
@@ -61,17 +61,17 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
     ModifyModel();
     return true;
   }
-  
+
   static HashType ConvertStringToHashValue(const std::vector<IntType> &vec) {
     const HashType prime = 53281;
     kaldi::VectorHasher<IntType> h;
     HashType ans = static_cast<HashType>(h(vec));
-    if (ans == 0)  ans = prime;
+    if (ans == 0) ans = prime;
     // We don't allow a zero answer, as this can cause too many values to be the
     // same.
     return ans;
   }
-  
+
   static void InitHashValue(const CompactWeight &final_weight, HashType *h) {
     const HashType prime1 = 33317, prime2 = 607; // it's pretty random.
     if (final_weight == CompactWeight::Zero()) *h = prime1;
@@ -82,9 +82,9 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
   // insensitive to the order in which it's called, as the order of the arcs
   // won't necessarily be the same for different equivalent states.
   static void UpdateHashValueForTransition(const CompactWeight &weight,
-                                           Label label,
-                                           HashType &next_state_hash,
-                                           HashType *h) {
+      Label label,
+      HashType &next_state_hash,
+      HashType *h) {
     const HashType prime1 = 1447, prime2 = 51907;
     if (label == 0) label = prime2; // Zeros will cause problems.
     *h += prime1 * label *
@@ -102,7 +102,7 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
       HashType this_hash;
       InitHashValue(clat_->Final(s), &this_hash);
       for (ArcIterator<MutableFst<CompactArc> > aiter(*clat_, s);
-           !aiter.Done(); aiter.Next()) {
+          !aiter.Done(); aiter.Next()) {
         const CompactArc &arc = aiter.Value();
         HashType next_hash;
         if (arc.nextstate > s) {
@@ -112,7 +112,7 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
                        "Lattice not topologically sorted [code error]");
           next_hash = 1;
           KALDI_WARN << "Minimizing lattice with self-loops "
-              "(lattices should not have self-loops)";
+            "(lattices should not have self-loops)";
         }
         UpdateHashValueForTransition(arc.weight, arc.ilabel,
                                      next_hash, &this_hash);
@@ -141,7 +141,7 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
     }
   };
 
-  
+
   // This function works out whether s and t are equivalent, assuming
   // we have already partitioned all topologically-later states into
   // equivalence classes (i.e. set up state_map_).
@@ -157,7 +157,7 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
       std::vector<CompactArc> &arcs = (iter == 0 ? s_arcs : t_arcs);
       arcs.reserve(clat_->NumArcs(s));
       for (ArcIterator<MutableFst<CompactArc> > aiter(*clat_, state);
-           !aiter.Done(); aiter.Next()) {
+          !aiter.Done(); aiter.Next()) {
         CompactArc arc = aiter.Value();
         if (arc.nextstate == state) {
           // This is a special case for states that have self-loops.  If two
@@ -186,28 +186,28 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
     }
     return true;
   }
-  
+
   void ComputeStateMap() {
     // We have to compute the state mapping in reverse topological order also,
     // since the equivalence test relies on later states being already sorted
     // out into equivalence classes (by state_map_).
     StateId num_states = clat_->NumStates();
     unordered_map<HashType, std::vector<StateId> > hash_groups_;
-    
+
     for (StateId s = 0; s < num_states; s++)
       hash_groups_[state_hashes_[s]].push_back(s);
 
     state_map_.resize(num_states);
     for (StateId s = 0; s < num_states; s++)
       state_map_[s] = s; // Default mapping.
-    
+
 
     { // This block is just diagnostic.
       typedef typename unordered_map<HashType,
               std::vector<StateId> >::const_iterator HashIter;
       size_t max_size = 0;
       for (HashIter iter = hash_groups_.begin(); iter != hash_groups_.end();
-           ++iter)
+          ++iter)
         max_size = std::max(max_size, iter->second.size());
       if (max_size > 1000) {
         KALDI_WARN << "Largest equivalence group (using hash) is " << max_size
@@ -232,7 +232,7 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
     }
   }
 
-  void ModifyModel() {    
+  void ModifyModel() {
     // Modifies the model according to state_map_;
 
     StateId num_removed = 0;
@@ -243,14 +243,14 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
     KALDI_VLOG(3) << "Removing " << num_removed << " of "
                   << num_states << " states.";
     if (num_removed == 0) return; // Nothing to do.
-    
+
     clat_->SetStart(state_map_[clat_->Start()]);
 
     for (StateId s = 0; s < num_states; s++) {
       if (state_map_[s] != s)
         continue; // There is no point modifying states we're removing.
       for (MutableArcIterator<MutableFst<CompactArc> > aiter(clat_, s);
-           !aiter.Done(); aiter.Next()) {
+          !aiter.Done(); aiter.Next()) {
         CompactArc arc = aiter.Value();
         StateId mapped_nextstate = state_map_[arc.nextstate];
         if (mapped_nextstate != arc.nextstate) {
@@ -261,7 +261,7 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
     }
     fst::Connect(clat_);
   }
- private:
+private:
   MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *clat_;
   float delta_;
   std::vector<HashType> state_hashes_;
@@ -272,8 +272,8 @@ template<class Weight, class IntType> class CompactLatticeMinimizer {
 
 template<class Weight, class IntType>
 bool MinimizeCompactLattice(
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *clat,
-    float delta) {
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *clat,
+  float delta) {
   CompactLatticeMinimizer<Weight, IntType> minimizer(clat, delta);
   return minimizer.Minimize();
 }
@@ -281,7 +281,7 @@ bool MinimizeCompactLattice(
 // Instantiate for CompactLattice type.
 template
 bool MinimizeCompactLattice<kaldi::LatticeWeight, kaldi::int32>(
-    MutableFst<kaldi::CompactLatticeArc> *clat, float delta);
-  
+  MutableFst<kaldi::CompactLatticeArc> *clat, float delta);
+
 
 }  // namespace fst

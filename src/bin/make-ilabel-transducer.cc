@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     if (old2new_map_wxfilename != "")
       if (!WriteIntegerVectorSimple(old2new_map_wxfilename, old2new_mapping))
         KALDI_ERR << "Error writing map from old to new symbols to "
-                   << PrintableWxfilename(old2new_map_wxfilename);
+                  << PrintableWxfilename(old2new_map_wxfilename);
 
     std::vector<std::vector<int32> > new_ilabels;
     KALDI_ASSERT(old2new_mapping.size() != 0);
@@ -110,9 +110,9 @@ int main(int argc, char *argv[]) {
           new_disambig.push_back(new_idx);
         }
       }
-      if (! WriteIntegerVectorSimple(disambig_wxfilename, new_disambig)) {
+      if (!WriteIntegerVectorSimple(disambig_wxfilename, new_disambig)) {
         KALDI_ERR << "Could not write disambiguation symbols to "
-                   << kaldi::PrintableWxfilename(disambig_wxfilename);
+                  << kaldi::PrintableWxfilename(disambig_wxfilename);
       }
     }
 
@@ -127,8 +127,8 @@ int main(int argc, char *argv[]) {
 
     if (!map_fst.Write(fst_out_filename)) {
       KALDI_ERR << "Error writing output fst to "
-                 << (fst_out_filename == "" ? " standard output "
-                     : fst_out_filename);
+                << (fst_out_filename == "" ? " standard output "
+      : fst_out_filename);
     }
     return 0;
   } catch(const std::exception &e) {

@@ -31,7 +31,7 @@ namespace fst {
 // to the Tropical semiring.
 template <class T>
 class ArcticWeightTpl : public FloatWeightTpl<T> {
- public:
+public:
   using FloatWeightTpl<T>::Value;
 
   typedef ArcticWeightTpl<T> ReverseWeight;
@@ -43,10 +43,12 @@ class ArcticWeightTpl : public FloatWeightTpl<T> {
   ArcticWeightTpl(const ArcticWeightTpl<T> &w) : FloatWeightTpl<T>(w) {}
 
   static const ArcticWeightTpl<T> Zero() {
-    return ArcticWeightTpl<T>(-numeric_limits<T>::infinity()); }
+    return ArcticWeightTpl<T>(-numeric_limits<T>::infinity());
+  }
 
   static const ArcticWeightTpl<T> One() {
-    return ArcticWeightTpl<T>(0.0F); }
+    return ArcticWeightTpl<T>(0.0F);
+  }
 
   static const string &Type() {
     static const string type = string("arctic") +
@@ -76,7 +78,7 @@ class ArcticWeightTpl : public FloatWeightTpl<T> {
 
   static uint64 Properties() {
     return kLeftSemiring | kRightSemiring | kCommutative |
-        kPath | kIdempotent;
+           kPath | kIdempotent;
   }
 };
 
@@ -85,23 +87,23 @@ typedef ArcticWeightTpl<float> ArcticWeight;
 
 template <class T>
 inline ArcticWeightTpl<T> Plus(const ArcticWeightTpl<T> &w1,
-                                 const ArcticWeightTpl<T> &w2) {
+    const ArcticWeightTpl<T> &w2) {
   return w1.Value() > w2.Value() ? w1 : w2;
 }
 
 inline ArcticWeightTpl<float> Plus(const ArcticWeightTpl<float> &w1,
-                                     const ArcticWeightTpl<float> &w2) {
+    const ArcticWeightTpl<float> &w2) {
   return Plus<float>(w1, w2);
 }
 
 inline ArcticWeightTpl<double> Plus(const ArcticWeightTpl<double> &w1,
-                                      const ArcticWeightTpl<double> &w2) {
+    const ArcticWeightTpl<double> &w2) {
   return Plus<double>(w1, w2);
 }
 
 template <class T>
 inline ArcticWeightTpl<T> Times(const ArcticWeightTpl<T> &w1,
-                                  const ArcticWeightTpl<T> &w2) {
+    const ArcticWeightTpl<T> &w2) {
   T f1 = w1.Value(), f2 = w2.Value();
   if (f1 == -numeric_limits<T>::infinity())
     return w1;
@@ -112,19 +114,19 @@ inline ArcticWeightTpl<T> Times(const ArcticWeightTpl<T> &w1,
 }
 
 inline ArcticWeightTpl<float> Times(const ArcticWeightTpl<float> &w1,
-                                      const ArcticWeightTpl<float> &w2) {
+    const ArcticWeightTpl<float> &w2) {
   return Times<float>(w1, w2);
 }
 
 inline ArcticWeightTpl<double> Times(const ArcticWeightTpl<double> &w1,
-                                       const ArcticWeightTpl<double> &w2) {
+    const ArcticWeightTpl<double> &w2) {
   return Times<double>(w1, w2);
 }
 
 template <class T>
 inline ArcticWeightTpl<T> Divide(const ArcticWeightTpl<T> &w1,
-                                   const ArcticWeightTpl<T> &w2,
-                                   DivideType typ = DIVIDE_ANY) {
+    const ArcticWeightTpl<T> &w2,
+    DivideType typ = DIVIDE_ANY) {
   T f1 = w1.Value(), f2 = w2.Value();
   if (f2 == -numeric_limits<T>::infinity())
     return numeric_limits<T>::quiet_NaN();
@@ -135,14 +137,14 @@ inline ArcticWeightTpl<T> Divide(const ArcticWeightTpl<T> &w1,
 }
 
 inline ArcticWeightTpl<float> Divide(const ArcticWeightTpl<float> &w1,
-                                       const ArcticWeightTpl<float> &w2,
-                                       DivideType typ = DIVIDE_ANY) {
+    const ArcticWeightTpl<float> &w2,
+    DivideType typ = DIVIDE_ANY) {
   return Divide<float>(w1, w2, typ);
 }
 
 inline ArcticWeightTpl<double> Divide(const ArcticWeightTpl<double> &w1,
-                                        const ArcticWeightTpl<double> &w2,
-                                        DivideType typ = DIVIDE_ANY) {
+    const ArcticWeightTpl<double> &w2,
+    DivideType typ = DIVIDE_ANY) {
   return Divide<double>(w1, w2, typ);
 }
 

@@ -122,12 +122,12 @@ int main(int argc, char *argv[]) {
       // this compiler object allows caching of computations across
       // different utterances.
       CachingOptimizingCompiler compiler(am_nnet.GetNnet(),
-                                         decodable_opts.optimize_config);
+          decodable_opts.optimize_config);
 
       RandomAccessBaseFloatMatrixReader online_ivector_reader(
-          online_ivector_rspecifier);
+        online_ivector_rspecifier);
       RandomAccessBaseFloatVectorReaderMapped ivector_reader(
-          ivector_rspecifier, utt2spk_rspecifier);
+        ivector_rspecifier, utt2spk_rspecifier);
 
 
       SequentialTableReader<fst::VectorFstHolder> fst_reader(fst_rspecifier);
@@ -184,9 +184,9 @@ int main(int argc, char *argv[]) {
         }
 
         DecodableAmNnetSimple nnet_decodable(
-            decodable_opts, trans_model, am_nnet,
-            features, ivector, online_ivectors,
-            online_ivector_period, &compiler);
+          decodable_opts, trans_model, am_nnet,
+          features, ivector, online_ivectors,
+          online_ivector_period, &compiler);
 
         AlignUtteranceWrapper(align_config, utt,
                               decodable_opts.acoustic_scale,

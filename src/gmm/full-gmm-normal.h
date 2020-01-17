@@ -43,7 +43,7 @@ class FullGmm;
  *  not have any extra methods that are not needed.
  */
 class FullGmmNormal {
- public:
+public:
   /// Empty constructor.
   FullGmmNormal() { }
 

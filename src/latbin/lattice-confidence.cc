@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     using fst::VectorFst;
     using fst::StdArc;
     typedef StdArc::StateId StateId;
-    
+
     const char *usage =
         "Compute sentence-level lattice confidence measures for each lattice.\n"
         "The output is simly the difference between the total costs of the best and\n"
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
                 "If true, read CompactLattice format; else, read Lattice format "
                 "(necessary for state-level lattices that were written in that "
                 "format).");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -70,20 +70,20 @@ int main(int argc, char *argv[]) {
 
     std::string lats_rspecifier = po.GetArg(1);
     std::string confidence_wspecifier = po.GetArg(2);
-    
+
     BaseFloatWriter confidence_writer(confidence_wspecifier);
-    
+
     // Output this instead of infinity; I/O for infinity can be problematic.
-    const BaseFloat max_output = 1.0e+10; 
-    
+    const BaseFloat max_output = 1.0e+10;
+
     int64 num_done = 0, num_empty = 0,
         num_one_sentence = 0, num_same_sentence = 0;
     double sum_neg_exp = 0.0;
-    
-    
+
+
     if (read_compact_lattice) {
       SequentialCompactLatticeReader clat_reader(lats_rspecifier);
-      
+
       for (; !clat_reader.Done(); clat_reader.Next()) {
         CompactLattice clat = clat_reader.Value();
         std::string key = clat_reader.Key();
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
       }
     } else {
       SequentialLatticeReader lat_reader(lats_rspecifier);
-      
+
       for (; !lat_reader.Done(); lat_reader.Next()) {
         Lattice lat = lat_reader.Value();
         std::string key = lat_reader.Key();
@@ -151,14 +151,14 @@ int main(int argc, char *argv[]) {
         confidence_writer.Write(key, confidence);
       }
     }
-        
+
     KALDI_LOG << "Done " << num_done << " lattices, of which "
               << num_one_sentence << " contained only one sentence. "
               << num_empty << " were equivalent to the empty lattice.";
     if (num_done != 0)
       KALDI_LOG << "Average confidence (averaged in negative-log space) is "
                 << -Log(sum_neg_exp / num_done);
-    
+
     if (num_same_sentence != 0) {
       KALDI_WARN << num_same_sentence << " lattices had the same sentence on "
                  << "different paths (likely an error)";

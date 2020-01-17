@@ -51,9 +51,9 @@ int main(int argc, char *argv[]) {
     int32 insert_at = -1;
     BaseFloat stddev_factor = 0.1;
     int32 srand_seed = 0;
-    
+
     ParseOptions po(usage);
-    
+
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("randomize-next-component", &randomize_next_component,
                 "If true, randomize the parameters of the next component after "
@@ -65,10 +65,10 @@ int main(int argc, char *argv[]) {
                 "deviation when randomizing next component (only relevant if "
                 "--randomize-next-component=true");
     po.Register("srand", &srand_seed, "Seed for random number generator");
-    
+
     po.Read(argc, argv);
     srand(srand_seed);
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     std::string nnet_rxfilename = po.GetArg(1),
         raw_nnet_rxfilename = po.GetArg(2),
         nnet_wxfilename = po.GetArg(3);
-    
+
     TransitionModel trans_model;
     AmNnet am_nnet;
     {
@@ -93,12 +93,12 @@ int main(int argc, char *argv[]) {
     if (insert_at == -1) {
       if ((insert_at = IndexOfSoftmaxLayer(am_nnet.GetNnet())) == -1)
         KALDI_ERR << "We don't know where to insert the new components: "
-            "the neural net doesn't have exactly one softmax component, "
-            "and you didn't use the --insert-at option.";
+          "the neural net doesn't have exactly one softmax component, "
+          "and you didn't use the --insert-at option.";
       insert_at--; // we want to insert before the linearity before
       // the softmax layer.
     }
-    
+
     // This function is declared in nnet-functions.h
     InsertComponents(src_nnet,
                      insert_at,
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
                 << stddev;
     }
 
-   
+
     {
       Output ko(nnet_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);

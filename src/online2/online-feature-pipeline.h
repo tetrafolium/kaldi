@@ -110,12 +110,12 @@ struct OnlineFeaturePipelineCommandLineConfig {
 /// way with two config files, is to make it easier to configure from code as
 /// well as from the command line.
 struct OnlineFeaturePipelineConfig {
-  OnlineFeaturePipelineConfig():
-      feature_type("mfcc"), add_pitch(false), add_deltas(true),
-      splice_feats(false) { }
+  OnlineFeaturePipelineConfig() :
+    feature_type("mfcc"), add_pitch(false), add_deltas(true),
+    splice_feats(false) { }
 
   OnlineFeaturePipelineConfig(
-      const OnlineFeaturePipelineCommandLineConfig &cmdline_config);
+    const OnlineFeaturePipelineCommandLineConfig &cmdline_config);
 
   BaseFloat FrameShiftInSeconds() const;
 
@@ -130,7 +130,7 @@ struct OnlineFeaturePipelineConfig {
   bool add_pitch;
   PitchExtractionOptions pitch_opts;  // Options for pitch extraction, if done.
   ProcessPitchOptions pitch_process_opts;  // Options for pitch
-                                                   // processing
+  // processing
 
   OnlineCmvnOptions cmvn_opts;  // Options for online CMN/CMVN computation.
 
@@ -155,7 +155,7 @@ struct OnlineFeaturePipelineConfig {
 /// and fMLLR in order to do adaptation, it's hard to make this completely
 /// generic.
 class OnlineFeaturePipeline: public OnlineFeatureInterface {
- public:
+public:
   explicit OnlineFeaturePipeline(const OnlineFeaturePipelineConfig &cfg);
 
   /// Member functions from OnlineFeatureInterface:
@@ -166,7 +166,7 @@ class OnlineFeaturePipeline: public OnlineFeatureInterface {
 
   // This is supplied for debug purposes.
   void GetAsMatrix(Matrix<BaseFloat> *feats);
-  
+
   void FreezeCmvn();  // stop it from moving further (do this when you start
                       // using fMLLR). This will crash if NumFramesReady() == 0.
 
@@ -179,7 +179,7 @@ class OnlineFeaturePipeline: public OnlineFeatureInterface {
   /// just copy it).   sampling_rate is necessary just to assert
   /// it equals what's in the config.
   void AcceptWaveform(BaseFloat sampling_rate,
-                      const VectorBase<BaseFloat> &waveform);
+      const VectorBase<BaseFloat> &waveform);
 
   BaseFloat FrameShiftInSeconds() const {
     return config_.FrameShiftInSeconds();
@@ -209,13 +209,13 @@ class OnlineFeaturePipeline: public OnlineFeatureInterface {
 
   virtual ~OnlineFeaturePipeline();
 
- private:
+private:
   /// The following constructor is used internally in the New() function;
   /// it has the same effect as initializing from just "cfg", but avoids
   /// re-reading the LDA transform from disk.
   OnlineFeaturePipeline(const OnlineFeaturePipelineConfig &cfg,
-                        const Matrix<BaseFloat> &lda_mat,
-                        const Matrix<BaseFloat> &global_cmvn_stats);
+      const Matrix<BaseFloat> &lda_mat,
+      const Matrix<BaseFloat> &global_cmvn_stats);
 
   /// Init() is to be called from the constructor; it assumes the pointer
   /// members are all uninitialized but config_ and lda_mat_ are

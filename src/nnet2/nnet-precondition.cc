@@ -24,9 +24,9 @@ namespace nnet2 {
 
 /// See below for comment.
 void PreconditionDirections(const CuMatrixBase<BaseFloat> &R,
-                            double lambda,
-                            CuMatrixBase<BaseFloat> *P) {
-  
+    double lambda,
+    CuMatrixBase<BaseFloat> *P) {
+
   int32 N = R.NumRows(), D = R.NumCols();
   KALDI_ASSERT(SameDim(R, *P) && N > 0);
   if (N == 1) {
@@ -36,7 +36,7 @@ void PreconditionDirections(const CuMatrixBase<BaseFloat> &R,
     return;
   }
   CuMatrixBase<BaseFloat> &Q = *P;
-  
+
   if (N >= D) {
     // Compute G = (\lambda I + 1/(N-1) R^T R)^{-1} by direct inversion.
     // G <-- lambda I.
@@ -82,7 +82,7 @@ void PreconditionDirections(const CuMatrixBase<BaseFloat> &R,
   for (int32 n = 0; n < N; n++) {
     CuSubVector<BaseFloat> r(R, n), q(Q, n);
     BaseFloat gamma = VecVec(r, q), // gamma_n = r_n^T q_n.
-               beta = 1 + gamma / (N - 1 - gamma);
+        beta = 1 + gamma / (N - 1 - gamma);
     if (!(gamma >= 0.0 && beta > 0.0)) {
       KALDI_ERR << "Bad values encountered in preconditioning: gamma = " << gamma
                 << ", beta = " << beta;
@@ -112,9 +112,9 @@ void PreconditionDirections(const CuMatrixBase<BaseFloat> &R,
 
 
 void PreconditionDirectionsAlpha(
-    const CuMatrixBase<BaseFloat> &R,
-    double alpha,
-    CuMatrixBase<BaseFloat> *P) {
+  const CuMatrixBase<BaseFloat> &R,
+  double alpha,
+  CuMatrixBase<BaseFloat> *P) {
   KALDI_ASSERT(alpha > 0.0);
   // probably does not really make sense.
   double t = TraceMatMat(R, R, kTrans), floor = 1.0e-20;
@@ -136,9 +136,9 @@ void PreconditionDirectionsAlpha(
 
 
 void PreconditionDirectionsAlphaRescaled(
-    const CuMatrixBase<BaseFloat> &R,
-    double alpha,
-    CuMatrixBase<BaseFloat> *P) {
+  const CuMatrixBase<BaseFloat> &R,
+  double alpha,
+  CuMatrixBase<BaseFloat> *P) {
   KALDI_ASSERT(alpha > 0.0); // alpha > 1.0
   // probably does not really make sense.
   double t = TraceMatMat(R, R, kTrans), floor = 1.0e-20;
@@ -166,12 +166,12 @@ void PreconditionDirectionsAlphaRescaled(
 } // namespace kaldi
 
 /*
-  Notes for an idea on preconditioning.
-  update is of form:
+   Notes for an idea on preconditioning.
+   update is of form:
      params += learning_rate * input_row * output_deriv'
-  want to precondition by fisher-like matrix in each of (the input dim and the
-  output dim).
-  [note: in this method we'll pretend the chunk-weights are all one.
+   want to precondition by fisher-like matrix in each of (the input dim and the
+   output dim).
+   [note: in this method we'll pretend the chunk-weights are all one.
    It shouldn't really matter, it's only preconditioning.]
 
    The first observation is, if we do:
@@ -194,91 +194,91 @@ void PreconditionDirectionsAlphaRescaled(
    Let the total scatter be
 
     S =  \sum_n r_n r_n^T
-  where the sum is taken over the minibatch, and
+   where the sum is taken over the minibatch, and
    S_n = S - r_n  r_n^T
-  i.e. the scatter with this sample removed.
-  Let F_n be the normalized version of this, dividing by the #samples.
+   i.e. the scatter with this sample removed.
+   Let F_n be the normalized version of this, dividing by the #samples.
    F_n = 1/(N-1) S_n
-  where N is the minibatch size (so N-1 is excluding the current sample).
- We're going to want to invert F_n, so we need to make it positive definite.
+   where N is the minibatch size (so N-1 is excluding the current sample).
+   We're going to want to invert F_n, so we need to make it positive definite.
 
-  We're going to define G_n as a smoothed form of the estimated Fisher matrix
-  for this batch:
+   We're going to define G_n as a smoothed form of the estimated Fisher matrix
+   for this batch:
    G_n = F_n + \lambda_n I
-  where I is the identity.  A suitable formula for \lambda_n is to define
-  a small constant \alpha (say, \alpha=0.1), and let
-  
+   where I is the identity.  A suitable formula for \lambda_n is to define
+   a small constant \alpha (say, \alpha=0.1), and let
+
    \lambda_n =  (\alpha/dim(F)) trace(F_n) .
 
-  In practice (although we lost strict convergence guarantees) it will be easier
-  to set a global \lambda, to:
+   In practice (although we lost strict convergence guarantees) it will be easier
+   to set a global \lambda, to:
 
    \lambda  =  (\alpha/dim(S)) trace(S)
             = (\alpha/(R.NumRows()*R.NumCols()) * trace(R^T R)).
-  
-  This is an easy way to set it.  Let's define P_n as the inverse of G_n.  This
-  is what we'll be multiplying the input values by:
+
+   This is an easy way to set it.  Let's define P_n as the inverse of G_n.  This
+   is what we'll be multiplying the input values by:
 
     P_n = G_n^{-1} = (F_n + \lambda_n I)^{-1}
 
-  First, let's define an uncorrected "global" Fisher matrix
+   First, let's define an uncorrected "global" Fisher matrix
     F = (1/(N-1)) S_n,
-  and G = F^{-1}.
-  If we let R be the matrix each of whose rows is one of the r_n,
-  then
+   and G = F^{-1}.
+   If we let R be the matrix each of whose rows is one of the r_n,
+   then
     S = R^T R, and
    F = 1/(N-1) R^T R
 
            G = (F + \lambda I)^{-1}
              = (1/(N-1) R^T R + \lambda I)^{-1}
-Using the Woodbury formula,
+   Using the Woodbury formula,
      G  = (1/\lambda) I  - (1/\lambda^2) R^T M R
-where
-  M = ((N-1) I + 1/\lambda R R^T)^{-1}
-(and this inversion for M is actually done as an inversion, in a lower
- dimension such as 250, versus the actual dimension which might be 1000).
+   where
+   M = ((N-1) I + 1/\lambda R R^T)^{-1}
+   (and this inversion for M is actually done as an inversion, in a lower
+   dimension such as 250, versus the actual dimension which might be 1000).
 
-Let's assume \lambda is a constant, i.e. there is no \lambda_n.
-We can get it from the previous minibatch.
+   Let's assume \lambda is a constant, i.e. there is no \lambda_n.
+   We can get it from the previous minibatch.
 
- We want to compute
+   We want to compute
 
     G_n = F_n^{-1} = (F - 1/(N-1) r_n r_n^T)^{-1}
 
- and using the Sherman-Morrison formula, this may be written as:
+   and using the Sherman-Morrison formula, this may be written as:
 
    G_n = G  +  \alpha_n q_n q_n^T  # Caution: \alpha_n has nothing to do with \alpha.
 
- where q_n = G r_n, and
+   where q_n = G r_n, and
 
- \alpha_n =  1/( (N-1) (1 - 1/(N-1) r_n^T q_n) )
+   \alpha_n =  1/( (N-1) (1 - 1/(N-1) r_n^T q_n) )
           =  1 / (N - 1 - r_n^T q_n)
 
-  We'll want to compute this efficiently.  For each r_n we'll want to compute
+   We'll want to compute this efficiently.  For each r_n we'll want to compute
 
- p_n =  G_n r_n
+   p_n =  G_n r_n
 
- which will correspond to the direction we update in.
- We'll use
+   which will correspond to the direction we update in.
+   We'll use
 
-  p_n = G r_n + \alpha_n q_n q_n^T r_n
+   p_n = G r_n + \alpha_n q_n q_n^T r_n
 
-  and since q_n = G r_n, both terms in this equation point in
-  the same direction, and we can write this as:
+   and since q_n = G r_n, both terms in this equation point in
+   the same direction, and we can write this as:
 
-  p_n = \beta_n q_n,
+   p_n = \beta_n q_n,
 
-  where, defining \gamma_n = r_n^T q_n, we have
+   where, defining \gamma_n = r_n^T q_n, we have
 
-  \beta_n = 1 + \gamma_n \alpha_n 
+   \beta_n = 1 + \gamma_n \alpha_n
           = 1  +  \gamma_n / ((N-1) (1 - \gamma_n/(N-1)))
           = 1  +  \gamma_n / (N - 1 - \gamma_n)
-  
-*/
+
+ */
 
 /*
 
-  SUMMARY:
+   SUMMARY:
    let the input features (we can extend these with a 1 for the bias term) be
    a matrix R, each row of which corresponds to a training example r_n
 
@@ -291,40 +291,40 @@ We can get it from the previous minibatch.
    The following computation obtains P:
 
    \lambda <-- (\alpha/N) \trace(R R^T).   # 0 < \alpha <= 1 is a global constant, e.g.
-                                           # \alpha = 0.1, but should try different
-                                           # values, this will be important (note: if the
-                                           # minibatch size is >= the dimension (N >= D),
-                                           # then we can let \alpha be quite small, e.g.
-                                           # 0.001.
+ # \alpha = 0.1, but should try different
+ # values, this will be important (note: if the
+ # minibatch size is >= the dimension (N >= D),
+ # then we can let \alpha be quite small, e.g.
+ # 0.001.
 
    if N >= D, then
-     # compute G by direct inversion.
+ # compute G by direct inversion.
      G <-- (\lambda I  +  1/(N-1) R^T R)^{-1}
      Q <-- R G.
    else   # number of samples is less than dimension, use
-          # morrison-Woodbury formula, it's more efficient.
-      # We'd first compute:
-      # L <-- ((N-1) I + 1/\lambda R R^T)
-      # (note: L is something that appears in the morrison-Woodbury expansion of G)
-      # M <-- L^{-1}
-      # Note: G is  1/\lambda I  -  (1/\lambda^2) R^T M R
-      # We're doing Q <-- R G, which is:
-      # Q <-- 1/\lambda R - (1/\lambda^2) R (R^T M R)
-      # It's more efficient in this case to left-multiply R
-      # by something, i.e. bracket as:
-      # Q <-- 1/\lambda R - (1/\lambda^2) (R R^T M) R
-      # so let's write it as
-      # Q <-- S R, with
-      # S = 1/\lambda I - 1/\lambda^2 R R^T M
-      #   = 1/\lambda (I - 1/\lambda R R^T M)
-      # Now, -1/\lambda R R^T = (N-1) I - L, and L M = I, so
-      # S = 1/\lambda (I  + ((N-1) I - L) M)
-      #   = (N-1)/\lambda M
-      # and we can get rid of that scalar earlier on:
-      # if we let L' = \lambda/(N-1) L, so that
-      # L' = (lambda I + 1/(N-1) R R^T)
-      # then
-      # S = (\lambda I + 1/(N-1) R R^T)^{-1}. 
+ # morrison-Woodbury formula, it's more efficient.
+ # We'd first compute:
+ # L <-- ((N-1) I + 1/\lambda R R^T)
+ # (note: L is something that appears in the morrison-Woodbury expansion of G)
+ # M <-- L^{-1}
+ # Note: G is  1/\lambda I  -  (1/\lambda^2) R^T M R
+ # We're doing Q <-- R G, which is:
+ # Q <-- 1/\lambda R - (1/\lambda^2) R (R^T M R)
+ # It's more efficient in this case to left-multiply R
+ # by something, i.e. bracket as:
+ # Q <-- 1/\lambda R - (1/\lambda^2) (R R^T M) R
+ # so let's write it as
+ # Q <-- S R, with
+ # S = 1/\lambda I - 1/\lambda^2 R R^T M
+ #   = 1/\lambda (I - 1/\lambda R R^T M)
+ # Now, -1/\lambda R R^T = (N-1) I - L, and L M = I, so
+ # S = 1/\lambda (I  + ((N-1) I - L) M)
+ #   = (N-1)/\lambda M
+ # and we can get rid of that scalar earlier on:
+ # if we let L' = \lambda/(N-1) L, so that
+ # L' = (lambda I + 1/(N-1) R R^T)
+ # then
+ # S = (\lambda I + 1/(N-1) R R^T)^{-1}.
 
       S <-- (\lambda I + 1/(N-1) R R^T)^{-1}.
       Q <-- S R
@@ -335,18 +335,18 @@ We can get it from the previous minibatch.
    Next we work out for each n:
      \gamma_n = r_n^T q_n     # This should be nonnegative!  Check this.
       \beta_n = 1  +  \gamma_n / (N - 1 - \gamma_n)  # This should be positive; check this.
-  For each n, we'll do (for the corresponding rows of P and Q):
+   For each n, we'll do (for the corresponding rows of P and Q):
      p_n <-- \beta_n q_n.
-  In practice, we'd do this computation in-place, with P and Q using the
-  same memory.
+   In practice, we'd do this computation in-place, with P and Q using the
+   same memory.
 
-  If we're being paranoid, we should verify that
+   If we're being paranoid, we should verify that
 
    p_n = (\lambda I  +  1/(N-1) \sum_{m != n} r_n r_n^T)^{-1} r_n.
 
-  This is exact mathematically, but there could be differences due to roundoff,
-  and if \alpha is quite small, these differences could be substantial.
-  
+   This is exact mathematically, but there could be differences due to roundoff,
+   and if \alpha is quite small, these differences could be substantial.
+
  */
-    
+
 

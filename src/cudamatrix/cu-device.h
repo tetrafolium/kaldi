@@ -44,8 +44,8 @@ class CuTimer;
  * responsible for CUBLAS initilalisation, collects profiling info
  */
 class CuDevice {
- // Singleton object (there should only be one instantiated per program)
- public:
+  // Singleton object (there should only be one instantiated per program)
+public:
   ~CuDevice();
   static inline CuDevice& Instantiate() { return global_device_; }
 
@@ -132,7 +132,7 @@ class CuDevice {
     return old_mode;
   }
 
- private:
+private:
   CuDevice();
   CuDevice(CuDevice&); // Disallow.
   CuDevice &operator=(CuDevice&);  // Disallow.
@@ -193,8 +193,8 @@ class CuDevice {
 // an unnecessary system call if the verbose level is 0 and you
 // won't be accumulating the timing stats.
 class CuTimer: public Timer {
- public:
-  CuTimer(): Timer(GetVerboseLevel() >= 1) { }
+public:
+  CuTimer() : Timer(GetVerboseLevel() >= 1) { }
 };
 
 // This function is declared as a more convenient way to get the CUDA device handle for use

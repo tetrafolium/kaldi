@@ -21,28 +21,28 @@
 
 
 /*
-// THE WAVE FORMAT IS SPECIFIED IN:
-// https:// ccrma.stanford.edu/courses/422/projects/WaveFormat/
-//
-//
-//
-//  RIFF
-//  |
-//  WAVE
-//  |    \    \   \
-//  fmt_ data ... data
-//
-//
-//  Riff is a general container, which usually contains one WAVE chunk
-//  each WAVE chunk has header sub-chunk 'fmt_'
-//  and one or more data sub-chunks 'data'
-//
-//  [Note from Dan: to say that the wave format was ever "specified" anywhere is
-//   not quite right.  The guy who invented the wave format attempted to create
-//   a formal specification but it did not completely make sense.  And there
-//   doesn't seem to be a consensus on what makes a valid wave file,
-//   particularly where the accuracy of header information is concerned.]
-*/
+   // THE WAVE FORMAT IS SPECIFIED IN:
+   // https:// ccrma.stanford.edu/courses/422/projects/WaveFormat/
+   //
+   //
+   //
+   //  RIFF
+   //  |
+   //  WAVE
+   //  |    \    \   \
+   //  fmt_ data ... data
+   //
+   //
+   //  Riff is a general container, which usually contains one WAVE chunk
+   //  each WAVE chunk has header sub-chunk 'fmt_'
+   //  and one or more data sub-chunks 'data'
+   //
+   //  [Note from Dan: to say that the wave format was ever "specified" anywhere is
+   //   not quite right.  The guy who invented the wave format attempted to create
+   //   a formal specification but it did not completely make sense.  And there
+   //   doesn't seem to be a consensus on what makes a valid wave file,
+   //   particularly where the accuracy of header information is concerned.]
+ */
 
 
 #ifndef KALDI_FEAT_WAVE_READER_H_
@@ -63,9 +63,9 @@ const BaseFloat kWaveSampleMax = 32768.0;
 
 /// This class reads and hold wave file header information.
 class WaveInfo {
- public:
+public:
   WaveInfo() : samp_freq_(0), samp_count_(0),
-               num_channels_(0), reverse_bytes_(0) {}
+    num_channels_(0), reverse_bytes_(0) {}
 
   /// Is stream size unknown? Duration and SampleCount not valid if true.
   bool IsStreamed() const { return samp_count_ < 0; }
@@ -95,7 +95,7 @@ class WaveInfo {
   /// On success 'is' will be positioned at the beginning of wave data.
   void Read(std::istream &is);
 
- private:
+private:
   BaseFloat samp_freq_;
   int32 samp_count_;     // 0 if empty, -1 if undefined length.
   uint8 num_channels_;
@@ -104,9 +104,9 @@ class WaveInfo {
 
 /// This class's purpose is to read in Wave files.
 class WaveData {
- public:
+public:
   WaveData(BaseFloat samp_freq, const MatrixBase<BaseFloat> &data)
-      : data_(data), samp_freq_(samp_freq) {}
+    : data_(data), samp_freq_(samp_freq) {}
 
   WaveData() : samp_freq_(0.0) {}
 
@@ -143,7 +143,7 @@ class WaveData {
     std::swap(samp_freq_, other->samp_freq_);
   }
 
- private:
+private:
   static const uint32 kBlockSize = 1024 * 1024;  // Use 1M bytes.
   Matrix<BaseFloat> data_;
   BaseFloat samp_freq_;
@@ -156,7 +156,7 @@ class WaveData {
 // it by pretending to read in the wave data in text mode after failing to find
 // the \0B header, but that would have been a little ugly.
 class WaveHolder {
- public:
+public:
   typedef WaveData T;
 
   static bool Write(std::ostream &os, bool binary, const T &t) {
@@ -184,7 +184,7 @@ class WaveHolder {
     t_.CopyFrom(other.t_);
     return *this;
   }
-  WaveHolder(const WaveHolder &other): t_(other.t_) {}
+  WaveHolder(const WaveHolder &other) : t_(other.t_) {}
 
   WaveHolder() {}
 
@@ -208,14 +208,14 @@ class WaveHolder {
     return false;
   }
 
- private:
+private:
   T t_;
 };
 
 // This is like WaveHolder but when you just want the metadata-
 // it leaves the actual data undefined, it doesn't read it.
 class WaveInfoHolder {
- public:
+public:
   typedef WaveInfo T;
 
   void Clear() { info_ = WaveInfo(); }
@@ -238,7 +238,7 @@ class WaveInfoHolder {
     return false;
   }
 
- private:
+private:
   WaveInfo info_;
 };
 

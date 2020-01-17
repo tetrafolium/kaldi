@@ -24,16 +24,16 @@
 namespace kaldi {
 
 SingleUtteranceNnet2Decoder::SingleUtteranceNnet2Decoder(
-    const OnlineNnet2DecodingConfig &config,
-    const TransitionModel &tmodel,
-    const nnet2::AmNnet &model,
-    const fst::Fst<fst::StdArc> &fst,
-    OnlineFeatureInterface *feature_pipeline):
-    config_(config),
-    feature_pipeline_(feature_pipeline),
-    tmodel_(tmodel),
-    decodable_(model, tmodel, config.decodable_opts, feature_pipeline),
-    decoder_(fst, config.decoder_opts) {
+  const OnlineNnet2DecodingConfig &config,
+  const TransitionModel &tmodel,
+  const nnet2::AmNnet &model,
+  const fst::Fst<fst::StdArc> &fst,
+  OnlineFeatureInterface *feature_pipeline) :
+  config_(config),
+  feature_pipeline_(feature_pipeline),
+  tmodel_(tmodel),
+  decodable_(model, tmodel, config.decodable_opts, feature_pipeline),
+  decoder_(fst, config.decoder_opts) {
   decoder_.InitDecoding();
 }
 
@@ -50,7 +50,7 @@ int32 SingleUtteranceNnet2Decoder::NumFramesDecoded() const {
 }
 
 void SingleUtteranceNnet2Decoder::GetLattice(bool end_of_utterance,
-                                             CompactLattice *clat) const {
+    CompactLattice *clat) const {
   if (NumFramesDecoded() == 0)
     KALDI_ERR << "You cannot get a lattice if you decoded no frames.";
   Lattice raw_lat;
@@ -65,15 +65,15 @@ void SingleUtteranceNnet2Decoder::GetLattice(bool end_of_utterance,
 }
 
 void SingleUtteranceNnet2Decoder::GetBestPath(bool end_of_utterance,
-                                              Lattice *best_path) const {
+    Lattice *best_path) const {
   decoder_.GetBestPath(best_path, end_of_utterance);
 }
 
 bool SingleUtteranceNnet2Decoder::EndpointDetected(
-    const OnlineEndpointConfig &config) {
+  const OnlineEndpointConfig &config) {
   return kaldi::EndpointDetected(config, tmodel_,
                                  feature_pipeline_->FrameShiftInSeconds(),
-                                 decoder_);  
+                                 decoder_);
 }
 
 

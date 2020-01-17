@@ -37,8 +37,8 @@
 namespace kaldi {
 
 template<typename Real>
-CuTpMatrix<Real>::CuTpMatrix(const CuMatrixBase<Real> &orig, MatrixTransposeType trans):
-    CuPackedMatrix<Real>(orig.NumRows(), kUndefined) {
+CuTpMatrix<Real>::CuTpMatrix(const CuMatrixBase<Real> &orig, MatrixTransposeType trans) :
+  CuPackedMatrix<Real>(orig.NumRows(), kUndefined) {
   KALDI_ASSERT(orig.NumRows() == orig.NumCols());
   this->CopyFromMat(orig, trans);
 }
@@ -71,10 +71,10 @@ void CuTpMatrix<Real>::Invert() {
     int dim = this->NumRows();
     Real alpha = 1.0;
     cuda_set_diag(dimGrid, dimBlock, tmp.Data(), alpha, tmp.Dim());
-    CU_SAFE_CALL(cudaGetLastError());        
+    CU_SAFE_CALL(cudaGetLastError());
     CuMatrix<Real> tmp2(dim, dim);
     tmp2.CopyFromTp(*this);
-    CUBLAS_SAFE_CALL(cublas_trsm(GetCublasHandle(), dim, dim, alpha, tmp2.Data(), tmp2.Dim().stride, 
+    CUBLAS_SAFE_CALL(cublas_trsm(GetCublasHandle(), dim, dim, alpha, tmp2.Data(), tmp2.Dim().stride,
       tmp.Data(), tmp.Dim().stride));
     this->CopyFromMat(tmp, kNoTrans);
     CuDevice::Instantiate().AccuProfile(__func__, tim);
@@ -87,7 +87,7 @@ void CuTpMatrix<Real>::Invert() {
 
 template<typename Real>
 void CuTpMatrix<Real>::CopyFromMat(const CuMatrixBase<Real> &M,
-                                   MatrixTransposeType Trans) {
+    MatrixTransposeType Trans) {
 #if HAVE_CUDA==1
   if (CuDevice::Instantiate().Enabled()) {
     MatrixIndexT num_rows = this->num_rows_;

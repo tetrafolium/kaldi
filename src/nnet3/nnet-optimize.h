@@ -54,24 +54,24 @@ struct NnetOptimizeOptions {
   // looped computation that turns a linear computation into a loop.
   bool optimize_looped_computation;
 
-  NnetOptimizeOptions():
-      optimize(true),
-      consolidate_model_update(true),
-      propagate_in_place(true),
-      backprop_in_place(true),
-      optimize_row_ops(true),
-      convert_addition(true),
-      remove_assignments(true),
-      allow_left_merge(true),
-      allow_right_merge(true),
-      initialize_undefined(true),
-      move_sizing_commands(true),
-      allocate_from_other(true),
-      min_deriv_time(std::numeric_limits<int32>::min()),
-      max_deriv_time(std::numeric_limits<int32>::max()),
-      max_deriv_time_relative(std::numeric_limits<int32>::max()),
-      snip_row_ops(true),
-      optimize_looped_computation(false) { }
+  NnetOptimizeOptions() :
+    optimize(true),
+    consolidate_model_update(true),
+    propagate_in_place(true),
+    backprop_in_place(true),
+    optimize_row_ops(true),
+    convert_addition(true),
+    remove_assignments(true),
+    allow_left_merge(true),
+    allow_right_merge(true),
+    initialize_undefined(true),
+    move_sizing_commands(true),
+    allocate_from_other(true),
+    min_deriv_time(std::numeric_limits<int32>::min()),
+    max_deriv_time(std::numeric_limits<int32>::max()),
+    max_deriv_time_relative(std::numeric_limits<int32>::max()),
+    snip_row_ops(true),
+    optimize_looped_computation(false) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("optimize", &optimize, "Set this to false to turn off all "
@@ -160,9 +160,9 @@ int32 MaxOutputTimeInRequest(const ComputationRequest &request);
                          modifies it in-place.
  */
 void Optimize(const NnetOptimizeOptions &config,
-              const Nnet &nnet,
-              int32 max_output_time_in_request,
-              NnetComputation *computation);
+    const Nnet &nnet,
+    int32 max_output_time_in_request,
+    NnetComputation *computation);
 
 // Hash function for ComputationRequest. It converts
 // ComputationRequest to hash code by looking at input
@@ -173,9 +173,9 @@ struct ComputationRequestHasher {
 
 // Equality function for ComputationRequest pointer
 struct ComputationRequestPtrEqual {
- public:
+public:
   bool operator() (const ComputationRequest* cr1,
-                   const ComputationRequest* cr2) const {
+      const ComputationRequest* cr2) const {
     return (*cr1) == (*cr2);
   }
 };
@@ -186,9 +186,9 @@ struct CachingOptimizingCompilerOptions {
   bool use_shortcut;
   int32 cache_capacity;
 
-  CachingOptimizingCompilerOptions():
-      use_shortcut(true),
-      cache_capacity(64) { }
+  CachingOptimizingCompilerOptions() :
+    use_shortcut(true),
+    cache_capacity(64) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("use-shortcut", &use_shortcut,
@@ -208,16 +208,16 @@ struct CachingOptimizingCompilerOptions {
 /// and also ensures that if the ComputationRequest is identical to the previous
 /// one, the compilation process is not repeated.
 class CachingOptimizingCompiler {
- public:
+public:
   CachingOptimizingCompiler(const Nnet &nnet,
-                            const CachingOptimizingCompilerOptions config =
-                            CachingOptimizingCompilerOptions());
+      const CachingOptimizingCompilerOptions config =
+      CachingOptimizingCompilerOptions());
 
   /// Note: nnet is retained as a const reference but opt_config is copied.
   CachingOptimizingCompiler(const Nnet &nnet,
-                            const NnetOptimizeOptions &opt_config,
-                            const CachingOptimizingCompilerOptions config =
-                            CachingOptimizingCompilerOptions());
+      const NnetOptimizeOptions &opt_config,
+      const CachingOptimizingCompilerOptions config =
+      CachingOptimizingCompilerOptions());
 
   ~CachingOptimizingCompiler();
   /// Does the compilation and returns a const pointer to
@@ -227,7 +227,7 @@ class CachingOptimizingCompiler {
   const NnetComputation* Compile(const ComputationRequest &request);
   void ReadCache(std::istream &is, bool binary);
   void WriteCache(std::ostream &os, bool binary) const;
- private:
+private:
 
   // This function just implements the work of Compile(); it's made a separate
   // function for the convenience of the timer code, to avoid it being called
@@ -277,9 +277,9 @@ class CachingOptimizingCompiler {
   // access_queue_). Used for fast lookup of previously compiled computations.
   // All pointers are owned here.
   typedef unordered_map<const ComputationRequest*,
-                        std::pair<const NnetComputation*, AqType::iterator>,
-                        ComputationRequestHasher,
-                        ComputationRequestPtrEqual> CacheType;
+          std::pair<const NnetComputation*, AqType::iterator>,
+          ComputationRequestHasher,
+          ComputationRequestPtrEqual> CacheType;
   CacheType computation_cache_;
 
   // seconds spent in various phases of compilation-- for diagnostic messages
@@ -295,7 +295,7 @@ class CachingOptimizingCompiler {
   // request at the end of the queue, and purges the least-recently-accessed
   // request from the queue and the cache if the capacity is reached.
   void UpdateCache(const ComputationRequest *request,
-                   const NnetComputation *computation);
+      const NnetComputation *computation);
   // This function updates the recently accessed queue.
   void UpdateAccessQueue(CacheType::iterator &cit);
 };
@@ -332,28 +332,28 @@ class CachingOptimizingCompiler {
 /// now become unnecessary-- e.g. operations that do the backprop through
 /// Descriptors.
 void LimitDerivativeTimes(const Nnet &nnet,
-                          const ComputationRequest &request,
-                          const NnetOptimizeOptions &opts,
-                          NnetComputation *computation);
+    const ComputationRequest &request,
+    const NnetOptimizeOptions &opts,
+    NnetComputation *computation);
 
 /// This consolidates the model-update parts of the backprop into larger
 /// operations (applicable mostly to recurrent setups)-- internally it uses
 /// class ModelUpdateConsolidator.  Will fail if called a
 /// second time.
 void ConsolidateModelUpdate(const Nnet &nnet,
-                            NnetComputation *computation);
+    NnetComputation *computation);
 
 /// This converts addition operations (things with Add in their names) to
 /// copy operations (things with Copy in their names).  This is both slightly
 /// more efficient,
 void ConvertAdditionToAssignment(const Nnet &nnet,
-                                 NnetComputation *computation);
+    NnetComputation *computation);
 
 
 /// This wraps class VariableMergingOptimizer in a simplified interface.
 void VariableMergingOptimization(const NnetOptimizeOptions &config,
-                                 const Nnet &nnet,
-                                 NnetComputation *computation);
+    const Nnet &nnet,
+    NnetComputation *computation);
 
 
 /// This optimization function changes, where possible, matrix initializations
@@ -369,7 +369,7 @@ void MoveSizingCommands(const Nnet &nnet, NnetComputation *computation);
 /// later allocate another matrix of the same size; and replaces them
 /// with commands of type kAllocFromOther or kAllocFromOtherZeroed.
 void RemoveUnnecessaryAllocation(const Nnet &nnet,
-                                 NnetComputation *computation);
+    NnetComputation *computation);
 
 
 /// This optimization puts the input operations (kAcceptInput) and output
@@ -381,7 +381,7 @@ void RemoveUnnecessaryAllocation(const Nnet &nnet,
 /// call computer.Run() between the individual AcceptInput() and GetOutput()
 /// function calls.
 void ConsolidateIoOperations(const Nnet &nnet,
-                             NnetComputation *computation);
+    NnetComputation *computation);
 
 
 

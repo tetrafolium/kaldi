@@ -26,10 +26,10 @@ namespace nnet2 {
 
 
 NnetUpdater::NnetUpdater(const Nnet &nnet,
-                         Nnet *nnet_to_update):
-    nnet_(nnet), nnet_to_update_(nnet_to_update) {
+    Nnet *nnet_to_update) :
+  nnet_(nnet), nnet_to_update_(nnet_to_update) {
 }
- 
+
 
 
 void NnetUpdater::FormatInput(const std::vector<NnetExample> &data) {
@@ -44,8 +44,8 @@ void NnetUpdater::FormatInput(const std::vector<NnetExample> &data) {
 }
 
 double NnetUpdater::ComputeForMinibatch(
-    const std::vector<NnetExample> &data,
-    double *tot_accuracy) {
+  const std::vector<NnetExample> &data,
+  double *tot_accuracy) {
 
   FormatInput(data);
   Propagate();
@@ -61,8 +61,8 @@ double NnetUpdater::ComputeForMinibatch(
 // form of ComputeForMinibatch for when the input data has
 // already been formatted as a single matrix.
 double NnetUpdater::ComputeForMinibatch(const std::vector<NnetExample> &data,
-                                        Matrix<BaseFloat> *formatted_data,
-                                        double *tot_accuracy) {
+    Matrix<BaseFloat> *formatted_data,
+    double *tot_accuracy) {
   { // accept the formatted input.  This replaces the call to FormatInput().
     int32 num_chunks = data.size();
     KALDI_ASSERT(formatted_data->NumRows() ==
@@ -73,7 +73,7 @@ double NnetUpdater::ComputeForMinibatch(const std::vector<NnetExample> &data,
     // the next command avoids the Swap() command ever copying GPU->CPU in case
     // an instance of this class is used more than once (which it isn't in
     // practice).
-    forward_data_[0].Resize(0, 0);  
+    forward_data_[0].Resize(0, 0);
     forward_data_[0].Swap(formatted_data); // Copy to GPU, if being used.
     nnet_.ComputeChunkInfo(1 + nnet_.LeftContext() + nnet_.RightContext(),
                            data.size(), &chunk_info_out_);
@@ -89,14 +89,14 @@ double NnetUpdater::ComputeForMinibatch(const std::vector<NnetExample> &data,
 
 
 void NnetUpdater::GetOutput(CuMatrix<BaseFloat> *output) {
-  int32 num_components = nnet_.NumComponents(); 
-  KALDI_ASSERT(forward_data_.size() == nnet_.NumComponents() + 1); 
+  int32 num_components = nnet_.NumComponents();
+  KALDI_ASSERT(forward_data_.size() == nnet_.NumComponents() + 1);
   *output = forward_data_[num_components];
 }
 
 void NnetUpdater::Propagate() {
   static int32 num_times_printed = 0;
-        
+
   int32 num_components = nnet_.NumComponents();
   for (int32 c = 0; c < num_components; c++) {
     const Component &component = nnet_.GetComponent(c);
@@ -114,7 +114,7 @@ void NnetUpdater::Propagate() {
       KALDI_VLOG(3) << "Stddev of data for component " << c
                     << " for this minibatch is "
                     << (TraceMatMat(forward_data_[c], forward_data_[c], kTrans) /
-                        (forward_data_[c].NumRows() * forward_data_[c].NumCols()));
+      (forward_data_[c].NumRows() * forward_data_[c].NumCols()));
       num_times_printed++;
     }
     if (!need_last_output)
@@ -123,9 +123,9 @@ void NnetUpdater::Propagate() {
 }
 
 double NnetUpdater::ComputeObjfAndDeriv(
-    const std::vector<NnetExample> &data,
-    CuMatrix<BaseFloat> *deriv,
-    double *tot_accuracy) const {
+  const std::vector<NnetExample> &data,
+  CuMatrix<BaseFloat> *deriv,
+  double *tot_accuracy) const {
   BaseFloat tot_objf = 0.0, tot_weight = 0.0;
   int32 num_components = nnet_.NumComponents();
   int32 num_chunks = data.size();
@@ -149,9 +149,9 @@ double NnetUpdater::ComputeObjfAndDeriv(
 
   if (tot_accuracy != NULL)
     *tot_accuracy = ComputeTotAccuracy(data);
-  
+
   deriv->CompObjfAndDeriv(sv_labels, output, &tot_objf, &tot_weight);
-  
+
   KALDI_VLOG(4) << "Objective function is " << (tot_objf/tot_weight) << " over "
                 << tot_weight << " samples (weighted).";
   return tot_objf;
@@ -159,14 +159,14 @@ double NnetUpdater::ComputeObjfAndDeriv(
 
 
 double NnetUpdater::ComputeTotAccuracy(
-    const std::vector<NnetExample> &data) const {
+  const std::vector<NnetExample> &data) const {
   BaseFloat tot_accuracy = 0.0;
   int32 num_components = nnet_.NumComponents();
   const CuMatrix<BaseFloat> &output(forward_data_[num_components]);
   KALDI_ASSERT(output.NumRows() == static_cast<int32>(data.size()));
   CuArray<int32> best_pdf(output.NumRows());
   std::vector<int32> best_pdf_cpu;
-  
+
   output.FindRowMaxId(&best_pdf);
   best_pdf.CopyToVec(&best_pdf_cpu);
 
@@ -188,15 +188,15 @@ double NnetUpdater::ComputeTotAccuracy(
 void NnetUpdater::Backprop(CuMatrix<BaseFloat> *deriv) const {
   // We assume ComputeObjfAndDeriv has already been called.
   for (int32 c = nnet_.NumComponents() - 1;
-       c >= nnet_.FirstUpdatableComponent(); c--) {
+      c >= nnet_.FirstUpdatableComponent(); c--) {
     const Component &component = nnet_.GetComponent(c);
     Component *component_to_update = (nnet_to_update_ == NULL ? NULL :
-                                      &(nnet_to_update_->GetComponent(c)));
+        &(nnet_to_update_->GetComponent(c)));
     const CuMatrix<BaseFloat> &input = forward_data_[c],
-        &output = forward_data_[c+1];
+    &output = forward_data_[c+1];
     CuMatrix<BaseFloat> input_deriv(input.NumRows(), input.NumCols());
     const CuMatrix<BaseFloat> &output_deriv(*deriv);
-    component.Backprop(chunk_info_out_[c], chunk_info_out_[c+1], input, output,                       
+    component.Backprop(chunk_info_out_[c], chunk_info_out_[c+1], input, output,
                        output_deriv, component_to_update,
                        &input_deriv);
     input_deriv.Swap(deriv);
@@ -205,41 +205,41 @@ void NnetUpdater::Backprop(CuMatrix<BaseFloat> *deriv) const {
 
 
 void FormatNnetInput(const Nnet &nnet,
-                     const std::vector<NnetExample> &data,
-                     Matrix<BaseFloat> *input_mat) {
+    const std::vector<NnetExample> &data,
+    Matrix<BaseFloat> *input_mat) {
   KALDI_ASSERT(data.size() > 0);
   int32 num_splice = 1 + nnet.RightContext() + nnet.LeftContext();
   KALDI_ASSERT(data[0].input_frames.NumRows() >= num_splice);
-  
+
   int32 feat_dim = data[0].input_frames.NumCols(),
-         spk_dim = data[0].spk_info.Dim(),
-         tot_dim = feat_dim + spk_dim; // we append these at the neural net
+      spk_dim = data[0].spk_info.Dim(),
+      tot_dim = feat_dim + spk_dim;    // we append these at the neural net
                                        // input... note, spk_dim might be 0.
   KALDI_ASSERT(tot_dim == nnet.InputDim());
   KALDI_ASSERT(data[0].left_context >= nnet.LeftContext());
   int32 ignore_frames = data[0].left_context - nnet.LeftContext(); // If
   // the NnetExample has more left-context than we need, ignore some.
   // this may happen in settings where we increase the amount of context during
-  // training, e.g. by adding layers that require more context.  
+  // training, e.g. by adding layers that require more context.
 
   int32 num_chunks = data.size();
-  
+
   input_mat->Resize(num_splice * num_chunks,
                     tot_dim, kUndefined);
-  
+
   for (int32 chunk = 0; chunk < num_chunks; chunk++) {
     SubMatrix<BaseFloat> dest(*input_mat,
-                              chunk * num_splice, num_splice,
-                              0, feat_dim);
+        chunk * num_splice, num_splice,
+        0, feat_dim);
 
     Matrix<BaseFloat> full_src(data[chunk].input_frames);
     SubMatrix<BaseFloat> src(full_src, ignore_frames, num_splice, 0, feat_dim);
-                             
+
     dest.CopyFromMat(src);
     if (spk_dim != 0) {
       SubMatrix<BaseFloat> spk_dest(*input_mat,
-                                    chunk * num_splice, num_splice,
-                                    feat_dim, spk_dim);
+          chunk * num_splice, num_splice,
+          feat_dim, spk_dim);
       spk_dest.CopyRowsFromVec(data[chunk].spk_info);
     }
   }
@@ -256,16 +256,16 @@ BaseFloat TotalNnetTrainingWeight(const std::vector<NnetExample> &egs) {
 
 
 double ComputeNnetObjf(const Nnet &nnet,
-                       const std::vector<NnetExample> &examples,
-                       double *tot_accuracy) {
+    const std::vector<NnetExample> &examples,
+    double *tot_accuracy) {
   NnetUpdater updater(nnet, NULL);
   return updater.ComputeForMinibatch(examples, tot_accuracy);
 }
 
 double DoBackprop(const Nnet &nnet,
-                  const std::vector<NnetExample> &examples,
-                  Nnet *nnet_to_update,
-                  double *tot_accuracy) {
+    const std::vector<NnetExample> &examples,
+    Nnet *nnet_to_update,
+    double *tot_accuracy) {
   if (nnet_to_update == NULL)
     return ComputeNnetObjf(nnet, examples, tot_accuracy);
   try {
@@ -279,15 +279,15 @@ double DoBackprop(const Nnet &nnet,
 
 // version of DoBackprop that takes already-formatted examples.
 double DoBackprop(const Nnet &nnet,
-                  const std::vector<NnetExample> &examples,
-                  Matrix<BaseFloat> *examples_formatted,
-                  Nnet *nnet_to_update,
-                  double *tot_accuracy) {
+    const std::vector<NnetExample> &examples,
+    Matrix<BaseFloat> *examples_formatted,
+    Nnet *nnet_to_update,
+    double *tot_accuracy) {
   if (nnet_to_update == NULL) {
     KALDI_WARN << "Was not expecting to reach this code path "
                << "(wastefully formatting data twice)";
     return ComputeNnetObjf(nnet, examples, tot_accuracy);
- } try {
+  } try {
     NnetUpdater updater(nnet, nnet_to_update);
     return updater.ComputeForMinibatch(examples,
                                        examples_formatted,
@@ -300,23 +300,23 @@ double DoBackprop(const Nnet &nnet,
 
 
 double ComputeNnetGradient(
-    const Nnet &nnet,
-    const std::vector<NnetExample> &validation_set,
-    int32 batch_size,
-    Nnet *gradient) {
+  const Nnet &nnet,
+  const std::vector<NnetExample> &validation_set,
+  int32 batch_size,
+  Nnet *gradient) {
   bool treat_as_gradient = true;
   gradient->SetZero(treat_as_gradient);
   std::vector<NnetExample> batch;
   batch.reserve(batch_size);
   double tot_objf = 0.0;
   for (int32 start_pos = 0;
-       start_pos < static_cast<int32>(validation_set.size());
-       start_pos += batch_size) {
+      start_pos < static_cast<int32>(validation_set.size());
+      start_pos += batch_size) {
     batch.clear();
     for (int32 i = start_pos;
-         i < std::min(start_pos + batch_size,
+        i < std::min(start_pos + batch_size,
                       static_cast<int32>(validation_set.size()));
-         i++) {
+        i++) {
       batch.push_back(validation_set[i]);
     }
     tot_objf += DoBackprop(nnet,
@@ -327,10 +327,10 @@ double ComputeNnetGradient(
 }
 
 double ComputeNnetObjf(
-    const Nnet &nnet,
-    const std::vector<NnetExample> &validation_set,
-    int32 batch_size,
-    double *tot_accuracy) {
+  const Nnet &nnet,
+  const std::vector<NnetExample> &validation_set,
+  int32 batch_size,
+  double *tot_accuracy) {
   double tot_accuracy_tmp;
   if (tot_accuracy)
     *tot_accuracy = 0.0;
@@ -338,13 +338,13 @@ double ComputeNnetObjf(
   batch.reserve(batch_size);
   double tot_objf = 0.0;
   for (int32 start_pos = 0;
-       start_pos < static_cast<int32>(validation_set.size());
-       start_pos += batch_size) {
+      start_pos < static_cast<int32>(validation_set.size());
+      start_pos += batch_size) {
     batch.clear();
     for (int32 i = start_pos;
-         i < std::min(start_pos + batch_size,
+        i < std::min(start_pos + batch_size,
                       static_cast<int32>(validation_set.size()));
-         i++) {
+        i++) {
       batch.push_back(validation_set[i]);
     }
     tot_objf += ComputeNnetObjf(nnet, batch,
@@ -355,7 +355,7 @@ double ComputeNnetObjf(
   return tot_objf;
 }
 
-  
-  
+
+
 } // namespace nnet2
 } // namespace kaldi

@@ -25,12 +25,12 @@ namespace nnet2 {
 
 
 class NnetExampleBackgroundReader {
- public:
+public:
   NnetExampleBackgroundReader(int32 minibatch_size,
-                              Nnet *nnet,
-                              SequentialNnetExampleReader *reader):
-      minibatch_size_(minibatch_size), nnet_(nnet), reader_(reader),
-      finished_(false) {
+      Nnet *nnet,
+      SequentialNnetExampleReader *reader) :
+    minibatch_size_(minibatch_size), nnet_(nnet), reader_(reader),
+    finished_(false) {
     // When this class is created, it spawns a thread which calls ReadExamples()
     // in the background. Below, Run is the static class-member function.
     thread_ = std::thread(Run, this);
@@ -102,8 +102,8 @@ class NnetExampleBackgroundReader {
   // true if it got some, and false if there was no more available.
   // It is an error if you call this function after it has returned false.
   bool GetNextMinibatch(std::vector<NnetExample> *examples,
-                        Matrix<BaseFloat> *formatted_examples,
-                        double *total_weight) {
+      Matrix<BaseFloat> *formatted_examples,
+      double *total_weight) {
     KALDI_ASSERT(!finished_);
     // wait until examples_ and formatted_examples_ have been created by
     // the background thread.
@@ -125,7 +125,7 @@ class NnetExampleBackgroundReader {
     }
   }
 
- private:
+private:
   int32 minibatch_size_;
   Nnet *nnet_;
   SequentialNnetExampleReader *reader_;
@@ -145,14 +145,14 @@ class NnetExampleBackgroundReader {
 
 
 int64 TrainNnetSimple(const NnetSimpleTrainerConfig &config,
-                      Nnet *nnet,
-                      SequentialNnetExampleReader *reader,
-                      double *tot_weight_ptr,
-                      double *tot_logprob_ptr) {
+    Nnet *nnet,
+    SequentialNnetExampleReader *reader,
+    double *tot_weight_ptr,
+    double *tot_logprob_ptr) {
   int64 num_egs_processed = 0;
   double tot_weight = 0.0, tot_logprob = 0.0;
   NnetExampleBackgroundReader background_reader(config.minibatch_size,
-                                                nnet, reader);
+      nnet, reader);
   KALDI_ASSERT(config.minibatches_per_phase > 0);
   while (true) {
     // Iterate over phases.  A phase of training is just a certain number of
