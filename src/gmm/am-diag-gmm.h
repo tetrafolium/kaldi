@@ -168,10 +168,10 @@ struct UbmClusteringOptions {
     : ubm_num_gauss(400), reduce_state_factor(0.2),
     intermediate_num_gauss(4000), cluster_varfloor(0.01),
     max_am_gauss(20000) {}
-  UbmClusteringOptions(int32 ncomp, BaseFloat red, int32 interm_gauss,
+  UbmClusteringOptions(int32 ncomp, BaseFloat red, int32 interim_gauss,
       BaseFloat vfloor, int32 max_am_gauss)
     : ubm_num_gauss(ncomp), reduce_state_factor(red),
-    intermediate_num_gauss(interm_gauss), cluster_varfloor(vfloor),
+    intermediate_num_gauss(interim_gauss), cluster_varfloor(vfloor),
     max_am_gauss(max_am_gauss) {}
   void Register(OptionsItf *opts) {
     std::string module = "UbmClusteringOptions: ";

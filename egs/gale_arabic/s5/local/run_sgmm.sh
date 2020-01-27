@@ -54,7 +54,7 @@ for n in 1 2 3 4; do
   exp/sgmm_5a_mmi_b0.1/decode exp/sgmm_5a_mmi_b0.1/decode$n
 done
 
-echo SGMM succedded
+echo SGMM succeeded
 exit 0
 
 

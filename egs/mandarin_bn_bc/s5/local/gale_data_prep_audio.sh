@@ -63,7 +63,7 @@ done
 
 #clean
 rm -fr $galeData/id$$ $galeData/wav$$
-echo "$0: data prep audio succeded"
+echo "$0: data prep audio succeeded"
 
 exit 0
 

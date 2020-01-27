@@ -1988,7 +1988,7 @@ public:
     }
   }
 
-  // Called by the child-class virutal Close() functions; does the
+  // Called by the child-class virtual Close() functions; does the
   // shared parts of the cleanup.
   bool CloseInternal() {
     if (!this->IsOpen())

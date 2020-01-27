@@ -81,7 +81,7 @@ cp $langdir/words.txt $kwsdatadir/words.txt
 cat $l1_lexicon | sed 's/\s/ /g' > $kwsdatadir/tmp/L1.tmp.lex
 if $case_insensitive; then
   echo "$0: Running case insensitive processing"
-  echo "$0: Using ICU with transofrm \"$icu_transform\""
+  echo "$0: Using ICU with transform \"$icu_transform\""
 
   # Processing words.txt
   cat $kwsdatadir/words.txt |\
@@ -151,7 +151,7 @@ cat $kwsdatadir/tmp/L2.tmp.lex | cut -d ' ' -f 1 |\
   while (<L>) {
     chomp;
     @col = split;
-    @col >= 2 || die "Too few columsn in \"$_\".\n";
+    @col >= 2 || die "Too few columns in \"$_\".\n";
     $w = $col[0];
     $w_p = $_;
     if (defined($lex1{$w})) {
@@ -164,7 +164,7 @@ cat $kwsdatadir/tmp/L2.tmp.lex | cut -d ' ' -f 1 |\
   while (<STDIN>) {
     chomp;
     @col = split;
-    @col >= 2 || die "Too few columsn in \"$_\".\n";
+    @col >= 2 || die "Too few columns in \"$_\".\n";
     $w = $col[0];
     $w_p = $_;
     if (defined($lex1{$w})) {
@@ -257,7 +257,7 @@ cat $datadir/segments | \
   }' > $kwsdatadir/utter_id
 
 # Map utterance to the names that will appear in the rttm file. You have 
-# to modify the commands below accoring to your rttm file
+# to modify the commands below according to your rttm file
 cat $datadir/segments | awk '{print $1" "$2}' |\
   sort | uniq > $kwsdatadir/utter_map;
 

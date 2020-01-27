@@ -344,7 +344,7 @@ void GetIlabelMapping (const std::vector<std::vector<int32> > &ilabel_info_old,
   /// out the logical-to-physical mapping.  Each time we handle a phone
   /// in context, we see if its (central-phone, pdf-sequence) has already
   /// been seen; if yes, we map to the original phone-sequence, if no,
-  /// we create a new "phyiscal-HMM" and there is no mapping.
+  /// we create a new "physical-HMM" and there is no mapping.
   std::map<std::pair<int32, std::vector<int32> >, int32 >
   pair_to_physical;
 

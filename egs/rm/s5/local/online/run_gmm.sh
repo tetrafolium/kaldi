@@ -51,7 +51,7 @@ steps/online/decode.sh --per-utt true --config conf/decode.config \
 # %WER 1.92 [ 241 / 12533, 28 ins, 39 del, 174 sub ] exp/tri3b_mmi/decode/wer_4
 
 
-# You can ignore the folowing; these were when I was debugging a difference between the
+# You can ignore the following; these were when I was debugging a difference between the
 # online and non-online decoding, the commands may be useful as examples.
 # cat exp/tri3b_online/decode/log/decode.*.log  | grep _ | grep -v LOG | grep -v gz | sort > foo
 # cat exp/tri3b_online/decode_endpointing/log/decode.*.log  | grep _ | grep -v LOG | grep -v gz | sort > bar

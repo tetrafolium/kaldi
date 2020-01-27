@@ -202,7 +202,7 @@ exit 0;
 #fi
 
 
-# By default we do not build systems adapted to sessions for AMI in distant scnearios
+# By default we do not build systems adapted to sessions for AMI in distant scenarios
 # as this does not help a lot (around 1%), but one can do this by running below code:
 exit 0;
 

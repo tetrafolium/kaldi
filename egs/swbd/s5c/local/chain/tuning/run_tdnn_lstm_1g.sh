@@ -3,7 +3,7 @@
 # 1g is like 1e, but reducing decay-time from 20 to 15, to see if
 # it reduces the difference between regular and looped decoding.
 #
-# There doesn't seem to be a very consistent difference betwen 1e and 1g.
+# There doesn't seem to be a very consistent difference between 1e and 1g.
 
 
 # exp/chain/tdnn_lstm_1g_sp: num-iters=262 nj=3..16 num-params=39.6M dim=40+100->6042 combine=-0.083->-0.076 xent:train/valid[173,261,final]=(-1.09,-0.929,-0.938/-1.15,-1.04,-1.05) logprob:train/valid[173,261,final]=(-0.089,-0.066,-0.067/-0.102,-0.089,-0.090)

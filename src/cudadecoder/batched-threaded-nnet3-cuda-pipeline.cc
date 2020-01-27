@@ -893,7 +893,7 @@ void BatchedThreadedNnet3CudaPipeline::ExecuteWorker(int threadId) {
           // Adjust channel state for all completed decodes
           RemoveCompletedChannels(cuda_decoder, channel_state, decodables,
                                   tasks);
-          // do loop repeates until we meet drain size or run out of work
+          // do loop repeats until we meet drain size or run out of work
         } while (config_.max_batch_size - channel_state.channels.size() <
             config_.batch_drain_size &&
             channel_state.channels.size() > 0);

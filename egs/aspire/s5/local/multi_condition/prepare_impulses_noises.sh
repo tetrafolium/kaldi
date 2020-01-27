@@ -55,7 +55,7 @@ lines = open(input_file).readlines();
 num_lines = len(lines)
 num_jobs = int(math.ceil(num_lines/ float(num_lines_per_file)))
 
-# filtering commands into seperate task files
+# filtering commands into separate task files
 for i in xrange(1, num_jobs+1) :
   cur_lines = map(lambda index: lines[index], range(i - 1, num_lines , num_jobs))
   file = open("{0}.{1}{2}".format(file_base_name, i, ext), 'w')

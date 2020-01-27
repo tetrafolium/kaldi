@@ -52,7 +52,7 @@ if [ $stage -le 3 ]; then
     utils/create_split_dir.pl /export/b0{1,3,7,9}/$USER/kaldi-data/mfcc/multi-en-$date/s5/$mfccdir/storage $mfccdir/storage
   fi
 
-  # the 100k_nodup directory is copied seperately, as
+  # the 100k_nodup directory is copied separately, as
   # we want to use exp/${multi}/${gmm}_ali_100k_nodup for lda_mllt training
   # the main train directory might be speed_perturbed
   for dataset in $train_set $multi/train_100k_nodup; do

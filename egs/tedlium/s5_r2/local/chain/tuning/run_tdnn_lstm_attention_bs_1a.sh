@@ -2,7 +2,7 @@
 
 # tdnn_lstm_attention_bs_1a is like tdnn_lstm_1v (i.e. it uses backstitch)
 # except we replace the last LSTM layer with an attention layer
-# (excatly like we do in run_tdnn_lstm_attention_1a.sh)
+# (exactly like we do in run_tdnn_lstm_attention_1a.sh)
 
 # local/chain/compare_wer_general.sh --looped exp/chain_cleaned/tdnn_lstm1e_sp_bi \
 #                                   exp/chain_cleaned/tdnn_lstm_attend1a_sp_bi \

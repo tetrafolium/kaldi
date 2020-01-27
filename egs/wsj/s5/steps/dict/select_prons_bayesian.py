@@ -22,7 +22,7 @@ def GetArgs():
         "prior-mean and prior-count-tot) and observed counts from the pron-stats file, "
         "we can compute posterior for each pron, and select candidates with highest"
         "posteriors, until we hit user-specified variants-prob-mass/counts thresholds."
-        "The outputs are: a file specifiying posteriors of all candidate (pron_posteriors),"
+        "The outputs are: a file specifying posteriors of all candidate (pron_posteriors),"
         "a learned lexicon for words out of the ref. vocab (learned_lexicon_oov),"
         "and a lexicon_edits file containing suggested modifications of prons, for"
         "words within the ref. vocab (ref_lexicon_edits).",
@@ -120,7 +120,7 @@ def GetArgs():
         metavar="<lexicon-edits>",
         type=str,
         help=
-        "Output file containing human-readable & editable pronounciation info (and the"
+        "Output file containing human-readable & editable pronunciation info (and the"
         "accept/reject decision made by our algorithm) for those words in ref. vocab,"
         "to which any change has been recommended. The info for each word is like:"
         "------------ an 4086.0 --------------"

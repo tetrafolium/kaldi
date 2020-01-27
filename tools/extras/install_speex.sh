@@ -19,7 +19,7 @@
 #
 # Note: This script installs Speex in a non-standard position and leads the test 
 # procedure of Speex give out errors. Those errors will not influence the 
-# installation acutally. So you can ignore them and call Speex's library correctly.
+# installation actually. So you can ignore them and call Speex's library correctly.
 # I just let it be like this at this moment, and may add a patch to resolve this
 # later.
 

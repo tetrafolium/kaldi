@@ -211,7 +211,7 @@ for x in exp/nnet2_online/nnet_a_gpu_online/decode_*; do grep WER $x/wer_* | uti
 %WER 10.02 [ 825 / 8234, 166 ins, 88 del, 571 sub ] exp/nnet2_online/nnet_a_gpu_online/decode_tgpr_dev93/wer_12
 %WER 6.91 [ 390 / 5643, 103 ins, 15 del, 272 sub ] exp/nnet2_online/nnet_a_gpu_online/decode_tgpr_eval92/wer_10
 
-# Below is as above, but decoding each utterance separately.  It actualy seems slightly better,
+# Below is as above, but decoding each utterance separately.  It actually seems slightly better,
 # which is counterintuitive.
 for x in exp/nnet2_online/nnet_a_gpu_online/decode_*; do grep WER $x/wer_* | utils/best_wer.sh; done | grep  utt
 %WER 7.55 [ 622 / 8234, 57 ins, 109 del, 456 sub ] exp/nnet2_online/nnet_a_gpu_online/decode_bd_tgpr_dev93_utt/wer_13

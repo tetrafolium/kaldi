@@ -105,7 +105,7 @@ elif grep 'transform-feats --utt2spk' $srcdir/log/acc.0.1.log 2>/dev/null; then
 fi
 
 ## Calculate FMLLR pre-transforms if needed. We are doing this here since this
-## step is requried by models both with and without speaker vectors
+## step is required by models both with and without speaker vectors
 if $use_fmllr; then
   if [ ! -f $srcdir/final.fmllr_mdl ] || [ $srcdir/final.fmllr_mdl -ot $srcdir/final.mdl ]; then
     echo "$0: computing pre-transform for fMLLR computation."

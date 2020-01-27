@@ -695,7 +695,7 @@ private:
   BaseFloat cell_diff_clip_; ///< Clipping of 'cell-derivatives' accumulated over CEC (per-frame),
   BaseFloat grad_clip_;  ///< Clipping of the updates,
 
-  // buffer for transfering state across batches,
+  // buffer for transferring state across batches,
   CuMatrix<BaseFloat> prev_nnet_state_;
 
   // feed-forward connections: from x to [g, i, f, o]

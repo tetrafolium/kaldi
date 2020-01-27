@@ -7,7 +7,7 @@
 # This script rescores lattices with KALDI RNNLM.
 # It uses a simple n-gram approximation to limit the search space;
 # A faster and more accurate way to rescore is at rnnlm/lmrescore_pruned.sh
-# which is more prefered
+# which is more preferred
 
 # Begin configuration section.
 cmd=run.pl

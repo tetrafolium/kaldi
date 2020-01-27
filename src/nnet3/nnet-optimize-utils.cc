@@ -4496,7 +4496,7 @@ bool ComputationLoopedOptimizer::Optimize() {
 
   // Find a representation of the matrices of the computation as pairs
   // (unique_id, time_offset) that are more amenable to finding
-  // matrices that represet lists of Cindexes that differ only by
+  // matrices that represents lists of Cindexes that differ only by
   // a time offset.
   std::vector<std::pair<int32, int32> > matrix_to_pair;
   CreateMatrixPairs(*computation_, &matrix_to_pair);

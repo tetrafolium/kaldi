@@ -30,7 +30,7 @@ if [ $# -ne 0 ]; then
     echo "    --eval_decodedir <eval-decode-dir>    # eval set decoding directory"
     echo "    --dev_datadir <dev-data-dir>          # dev set data directory"
     echo "    --eval_datadir <eval-data-dir>        # eval set data directory"
-    echo "    --min_lmwt <int>                      # minumum LM-weight for lattice rescoring "
+    echo "    --min_lmwt <int>                      # minimum LM-weight for lattice rescoring "
     echo "    --max_lmwt <int>                      # maximum LM-weight for lattice rescoring "
     
     exit 1;

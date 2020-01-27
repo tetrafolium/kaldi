@@ -100,7 +100,7 @@ else
   fi
 fi
 
-echo "Downloads of AMI corpus completed succesfully."
+echo "Downloads of AMI corpus completed successfully."
 exit 0;
 
 

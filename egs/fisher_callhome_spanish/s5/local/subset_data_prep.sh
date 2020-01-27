@@ -126,7 +126,7 @@ if [ $stage -le 2 ]; then
   #now handle the exceptions, find a cleaner way to do this?
   sed 's:<foreign langenglish::g' | \
   sed 's:</foreign::g' | \
-  sed -r 's:<[/]?foreing\s*\w*>::g' | \
+  sed -r 's:<[/]?foreign\s*\w*>::g' | \
   sed 's:</b::g' | \
   sed 's:<foreign langengullís>::g' | \
   sed 's:foreign>::g' | \

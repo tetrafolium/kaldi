@@ -51,7 +51,7 @@ cat $dir/transcripts.am | tr [:blank:] '\n' | sort -u > $dir/wlist.txt &
 
 
 
-# Because training data is read aloud, there are many occurences of the same
+# Because training data is read aloud, there are many occurrences of the same
 # sentence and bias towards the domain. Make a version where  
 # the sentences are unique to reduce bias.
 local/norm_dk/format_text.sh lm $dir/lmsents.norm > $dir/transcripts.txt
@@ -101,8 +101,8 @@ rm -f $dir/Wtemp_*
 
 cat $dir/plist.txt | tr '^%,=:_|#$12;-?!' ' ' | tr "'" " " | perl -pe 's/\(..\)|\-|\~//g' | perl -pe 's// /g' | perl -pe 's/^ +| +$//g' | tr -s ' ' > $dir/plist2.txt
 
-# Map phones with few occurences (Y, L, J, z, U, T, "Z" and x) to 
-# phones with many occurences (y, l, y, s, w, t, dZ and dZ respectively)
+# Map phones with few occurrences (Y, L, J, z, U, T, "Z" and x) to 
+# phones with many occurrences (y, l, y, s, w, t, dZ and dZ respectively)
 cat $dir/plist2.txt | tr 'BYLJzUT*Q' 'bylyswtRg' | perl -pe 's/d Z/dZ/g' | perl -pe 's/a I/aI/g' | perl -pe 's/ ?x ?| Z ?|Z / dZ /g' > $dir/plist3.txt
 
 # Create lexicon.txt and put it in data/local/dict

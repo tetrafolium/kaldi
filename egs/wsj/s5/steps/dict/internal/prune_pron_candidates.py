@@ -30,7 +30,7 @@ def GetArgs():
         "pron_stats",
         metavar="<pron-stats>",
         type=str,
-        help="File containing soft-counts of pronounciation candidates; "
+        help="File containing soft-counts of pronunciation candidates; "
         "each line must be <soft-counts> <word> <phones>")
     parser.add_argument(
         "lexicon_phonetic_decoding",

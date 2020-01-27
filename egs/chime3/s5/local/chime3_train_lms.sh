@@ -92,7 +92,7 @@ fi
 # train a large n-gram language model
 lm_suffix=${order}gkn_5k
 if [ -f $dir/lm_${lm_suffix}.arpa.gz ]; then
-  echo "A $order-gram language model aready exists and is not constructed again"
+  echo "A $order-gram language model already exists and is not constructed again"
   echo "To reconstruct, remove $dir/$dir/lm_${lm_suffix}.arpa.gz first"
 else
   echo "Training a $order-gram language model"

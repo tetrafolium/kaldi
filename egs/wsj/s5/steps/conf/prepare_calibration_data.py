@@ -70,7 +70,7 @@ word_filter = {
     wrd_id: bool(int(filter))
     for (wrd, wrd_id, filter, length, other_feats) in word_feats
 }
-# Prepare the lenght dict,
+# Prepare the length dict,
 word_length = {
     wrd_id: float(length)
     for (wrd, wrd_id, filter, length, other_feats) in word_feats

@@ -43,7 +43,7 @@ help_message="Usage: "$(basename $0)" [options] <data-dir> <graph-dir|lang-dir> 
      or:  "$(basename $0)" data/test data/lang exp/tri1/decode exp/tri2/decode:18 exp/tri3/decode:13 exp/combine
 Options:
   --cmd (run.pl|queue.pl...)      # specify how to run the sub-processes.
-  --min-lmwt INT                  # minumum LM-weight for lattice rescoring 
+  --min-lmwt INT                  # minimum LM-weight for lattice rescoring 
   --max-lmwt INT                  # maximum LM-weight for lattice rescoring
   --lat-weights STR               # colon-separated string of lattice weights
   --cmd (run.pl|queue.pl...)      # specify how to run the sub-processes.

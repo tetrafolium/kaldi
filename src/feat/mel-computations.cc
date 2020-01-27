@@ -263,7 +263,7 @@ void ComputeLifterCoeffs(BaseFloat Q, VectorBase<BaseFloat> *coeffs) {
 // pTmp - temporal place [n]
 // pAC - autocorrelation coefficients [n + 1]
 // pLP - linear prediction coefficients [n] (predicted_sn = sum_1^P{a[i-1] * s[n-i]}})
-//       F(z) = 1 / (1 - A(z)), 1 is not stored in the demoninator
+//       F(z) = 1 / (1 - A(z)), 1 is not stored in the denominator
 BaseFloat Durbin(int n, const BaseFloat *pAC, BaseFloat *pLP, BaseFloat *pTmp) {
   BaseFloat ki;                // reflection coefficient
   int i;

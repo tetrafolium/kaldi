@@ -138,7 +138,7 @@ cat $datadir/segments | \
   }' > $kwsdatadir/utter_id
 
 # Map utterance to the names that will appear in the rttm file. You have 
-# to modify the commands below accoring to your rttm file
+# to modify the commands below according to your rttm file
 cat $datadir/segments | awk '{print $1" "$2}' | sort | uniq > $kwsdatadir/utter_map;
 
 echo "Kws data preparation succeeded"

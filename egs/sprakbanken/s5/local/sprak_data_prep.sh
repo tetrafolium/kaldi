@@ -48,7 +48,7 @@ if [ ! -d $dir/download/0611 ]; then
     # Note: rename "da 0611 test" to "da_0611_test" for this to work
     mv $dir/download/"da 0611 test" $dir/download/0611
     wait     
-    echo "Corpus unpacked succesfully."
+    echo "Corpus unpacked successfully."
 fi
 
 
@@ -91,7 +91,7 @@ python $local/sprak2kaldi.py $dir/download/0611/Stasjon05 $dir/corpus_processed/
 # Create the LM training data 
 # Test and dev data is disjoint from training data, so we use those transcripts)
 
-# Because training data is read aloud, there are many occurences of the same
+# Because training data is read aloud, there are many occurrences of the same
 # sentence and bias towards the domain. Make a version where  
 # the sentences are unique to reduce bias.
 

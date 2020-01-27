@@ -51,7 +51,7 @@ model=$modeldir/g2p.model.final
 cp $wordlist $output/wordlist.orig.txt
 
 if [ ! -z $icu_transform ] ; then
-  #we have to keep a correspondence map A -> trasnform(A)
+  #we have to keep a correspondence map A -> transform(A)
   paste \
     <(cat $output/wordlist.orig.txt | uconv -f $encoding -t $encoding -x $icu_transform) \
     $output/wordlist.orig.txt \

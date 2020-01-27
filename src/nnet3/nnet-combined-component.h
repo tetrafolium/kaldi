@@ -240,7 +240,7 @@ private:
   // based initialization.
 
   CuVector<BaseFloat> bias_params_;
-  // the filter-specific bias vector (i.e., there is a seperate bias added
+  // the filter-specific bias vector (i.e., there is a separate bias added
   // to the output of each filter).
 
   void InputToInputPatches(const CuMatrixBase<BaseFloat>& in,

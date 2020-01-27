@@ -16,7 +16,7 @@ if [ -f ./path.sh ]; then . ./path.sh; fi
 # mentioned in the README.
 
 # TO DO: you will need to choose the size of training set you want.
-# Here we select according to an upper threshhold on Matching Error
+# Here we select according to an upper threshold on Matching Error
 # Rate from the lightly supervised alignment.  When using all the
 # training shows, this will give you training data speech segments of
 # approximate lengths listed below:

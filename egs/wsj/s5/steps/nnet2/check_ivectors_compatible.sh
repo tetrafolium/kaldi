@@ -29,12 +29,12 @@ if [ ! -z "$id_a" ] && [ ! -z "${id_b}" ] ; then
   fi
 elif [ -z "$id_a" ] && [ -z "${id_b}" ] ; then
     echo >&2 "$0: WARNING: The directories do not contain iVector ID."
-    echo >&2 "$0: WARNING: That means it's you who's reponsible for keeping "
+    echo >&2 "$0: WARNING: That means it's you who's responsible for keeping "
     echo >&2 "$0: WARNING: the directories compatible"
     exit 0
 else
     echo >&2 "$0: WARNING: One of the directories do not contain iVector ID."
-    echo >&2 "$0: WARNING: That means it's you who's reponsible for keeping "
+    echo >&2 "$0: WARNING: That means it's you who's responsible for keeping "
     echo >&2 "$0: WARNING: the directories compatible"
     exit 0
 fi

@@ -129,7 +129,7 @@ public:
     kl_stats_.CopyFromMat(mat);
   }
 
-  /// Accumulate the statistics for KL-HMM paramter estimation,
+  /// Accumulate the statistics for KL-HMM parameter estimation,
   void Accumulate(const Matrix<BaseFloat> &posteriors,
       const std::vector<int32> &alignment) {
     KALDI_ASSERT(posteriors.NumRows() == alignment.size());

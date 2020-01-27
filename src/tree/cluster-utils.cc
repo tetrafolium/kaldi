@@ -963,7 +963,7 @@ BaseFloat ClusterKMeansOnce(const std::vector<Clusterable*> &points,
     Clusterable *all_stats = SumClusterable(*clusters_out);
     ans = SumClusterableObjf(*clusters_out) - all_stats->Objf();  // improvement just from the random
     // initialization.
-    if (ans < -0.01 && ans < -0.01 * fabs(all_stats->Objf())) {  // something bad happend.
+    if (ans < -0.01 && ans < -0.01 * fabs(all_stats->Objf())) {  // something bad happened.
       KALDI_WARN << "ClusterKMeans: objective function after random assignment to clusters is worse than in single cluster: "<< (all_stats->Objf()) << " changed by " << ans << ".  Perhaps your stats class has the wrong properties?";
     }
     delete all_stats;

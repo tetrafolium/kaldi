@@ -58,7 +58,7 @@ local/gale_data_prep_split.sh $galeData  || exit 1;
 local/gale_prep_dict.sh || exit 1;
 
 
-#prepare the langauge resources
+#prepare the language resources
 utils/prepare_lang.sh data/local/dict "<UNK>" data/local/lang data/lang   || exit 1;
 
 # LM training
@@ -160,7 +160,7 @@ done | sort -n -r -k2 > RESULTS.$USER.$time # to make sure you keep the results 
 local/split_wer.sh $galeData > RESULTS.details.$USER.$time
  
 
-echo training succedded
+echo training succeeded
 exit 0
 
 

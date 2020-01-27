@@ -5,7 +5,7 @@
 # This script generates subword text form word text.
 # For example, <noise> internatioal -> <noise> inter@@ nation@@ al
 # @@ here is the separator indicate the poisition of subword in word.
-# Subword directly followed by separator can only appear at he begining or middle of word.
+# Subword directly followed by separator can only appear at he beginning or middle of word.
 # "<noise>" here can be reserved if added to the option "--glossaries"
 
 # Begin configuration section
@@ -20,7 +20,7 @@ echo "$0 $@"
 if [ $# -ne 3 ]; then
   echo "Usage: utils/prepare_subword_text.sh <word-text> <pair_code> <subword-text>"
   echo "e.g.: utils/prepare_subword_text.sh data/train/text data/local/pair_code.txt data/train/text_subword"
-  echo "    --seperator <separator>         # default: @@"
+  echo "    --separator <separator>         # default: @@"
   echo "    --glossaries <reserved-words>   # glossaries are words reserved"
   exit 1;
 fi

@@ -444,7 +444,7 @@ void ApplyModelTransformToStats(const MatrixBase<BaseFloat> &xform,
   //  y_i -> x_i = (y_i - b_i) / d_i
   // the corresponding mean transform to speaker-space is the same:
   //  mu_i -> (mu_i - b_i) / d_i
-  // and the transfrom on the variances is:
+  // and the transform on the variances is:
   //  sigma_i^2 -> sigma_i^2 / d_i^2,
   // so on inverse variance this becomes:
   //  (1/sigma_i^2) -> (1/sigma_i^2) * d_i^2.

@@ -330,7 +330,7 @@ int main(int argc, char *argv[]) {
       // while denominator likelihood contains graph scores.
       // The result is offset at the MMI-objective.
       // However the offset is constant for given alignment,
-      // so it does not change accross epochs.
+      // so it does not change across epochs.
 
       // Sum the den-posteriors under the correct path,
       post_on_ali = 0.0;

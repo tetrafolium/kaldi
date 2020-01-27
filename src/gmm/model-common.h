@@ -75,7 +75,7 @@ SgmmWriteFlagsType StringToSgmmWriteFlags(std::string str);
 /// according to a power rule (e.g. typically power = 0.2).
 /// Returns targets for number of mixture components (Gaussians,
 /// or sub-states), allocating the Gaussians or whatever according
-/// to a power of occupancy in order to acheive the total supplied
+/// to a power of occupancy in order to achieve the total supplied
 /// "target".  During splitting we ensure that
 /// each Gaussian [or sub-state] would get a count of at least
 /// "min-count", assuming counts were evenly distributed between

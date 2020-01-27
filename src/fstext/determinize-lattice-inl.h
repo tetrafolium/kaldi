@@ -1064,7 +1064,7 @@ public:
       ProcessTransition(output_state, ilabel, &this_subset);
     }
     all_elems.clear(); // as it's a class variable-- want it to stay
-    // emtpy.
+    // empty.
   }
 
 

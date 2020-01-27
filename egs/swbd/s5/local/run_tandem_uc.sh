@@ -279,7 +279,7 @@ steps/tandem/decode.sh --nj 30 --cmd "$decode_cmd" --config conf/decode_tandem.c
   --transform-dir exp/tandem2uc-tri5a/decode_eval2000 \
   exp/tandem2uc-tri5a/graph data/eval2000 $bndata/eval2000 exp/tandem2uc-tri5a_mmi_b0.1/decode_eval2000 || exit 1;
 
-# The fmmi_mmi training is not in the TANDEM scritps
+# The fmmi_mmi training is not in the TANDEM scripts
 #
 #steps/tandem/train_diag_ubm.sh --silence-weight 0.5 --nj 40 --cmd "$train_cmd" \
 #  700 data/train_100k_nodup data/lang exp/tandem2uc-tri5a_ali_100k_nodup exp/tandem2uc-tri5a_dubm

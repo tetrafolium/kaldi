@@ -124,7 +124,7 @@ if [ $stage -le 2 ]; then
 fi
 
 
-# Stages below are really just to satifsy your curiosity; the output is the same
+# Stages below are really just to satisfy your curiosity; the output is the same
 # as that of find_bad_utts.sh.
 
 if [ $stage -le 3 ]; then

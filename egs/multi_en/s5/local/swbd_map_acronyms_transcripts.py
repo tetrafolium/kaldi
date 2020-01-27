@@ -10,7 +10,7 @@
 ###########################################################################################
 
 # convert acronyms in swbd transcript to fisher convention
-# accoring to first two columns in the input acronyms mapping
+# according to first two columns in the input acronyms mapping
 
 import argparse
 import re

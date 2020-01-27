@@ -222,7 +222,7 @@ static void gst_online_gmm_decode_faster_class_init(GstOnlineGmmDecodeFasterClas
 
 /* initialize the new element
  * instantiate pads and add them to element
- * set pad calback functions
+ * set pad callback functions
  * initialize instance structure
  */
 static void
@@ -264,7 +264,7 @@ gst_online_gmm_decode_faster_init(GstOnlineGmmDecodeFaster * filter) {
   filter->simple_options_->Register("cmn-window", &(filter->cmn_window_),
                                     "Number of feat. vectors used in the running average CMN calculation");
   filter->simple_options_->Register("min-cmn-window", &filter->min_cmn_window_,
-                                    "Minumum CMN window used at start of decoding (adds "
+                                    "Minimum CMN window used at start of decoding (adds "
                                       "latency only at start)");
 
 

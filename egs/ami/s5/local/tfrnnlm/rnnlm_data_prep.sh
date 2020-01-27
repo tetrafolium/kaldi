@@ -13,7 +13,7 @@
 
 # 3. $dir/unk.probs : this file provides information for distributing OOS probs
 #    among all the OOS words, in rnnlm-rescoring.  If provided, the
-#    probability for <OOS> would be porportionally distributed among all OOS words
+#    probability for <OOS> would be proportionally distributed among all OOS words
 #
 #    It is called unk.probs to be consistent with rnnlm-rescoring scripts with
 #    Mikolov's and Yandex's toolkits, but you could simply provide the count instead, as

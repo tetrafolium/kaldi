@@ -205,7 +205,7 @@ if (o.pitch_dim > 0):
     f_pitch.write('</NnetProto>\n')
     f_pitch.close()
 
-    # paralell part
+    # parallel part
     vector = ''
     for i in range(1, inputdim_of_cnn, feat_raw_dim + o.pitch_dim):
         vector += '%d:1:%d ' % (i, i + feat_raw_dim - 1)

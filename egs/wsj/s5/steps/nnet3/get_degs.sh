@@ -388,7 +388,7 @@ function shuffle {
        $n=int(rand()*$bufsz); print $A[$n]; $A[$n] = $A[$bufsz-1]; pop @A; }}
        @A = shuffle(@A); print @A; '
 }
-# funtion/pseudo-command to put input lines round robin to command line args.
+# function/pseudo-command to put input lines round robin to command line args.
 function round_robin {
   perl -e '@F=(); foreach $a (@ARGV) { my $f; open($f, ">$a") || die "opening file $a"; push @F, $f; }
          $N=@F; $N>0||die "No output files"; $n=0;

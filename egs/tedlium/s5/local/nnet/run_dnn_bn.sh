@@ -206,5 +206,5 @@ if [ $stage -le 9 ]; then
   done
 fi 
 
-echo $0 successs.
+echo $0 successes.
 exit 0

@@ -626,7 +626,7 @@ def get_realign_iters(realign_times, num_iters, num_jobs_initial,
     """ Takes the realign_times string and identifies the approximate
         iterations at which realignments have to be done.
 
-    realign_times is a space seperated string of values between 0 and 1
+    realign_times is a space separated string of values between 0 and 1
     """
 
     realign_iters = []

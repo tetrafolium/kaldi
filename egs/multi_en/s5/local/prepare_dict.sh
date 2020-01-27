@@ -4,7 +4,7 @@
 #           2017  Xiaohui Zhang
 # Apache License 2.0
 
-# This script first prepares switchboard lexicon and CMUDict + tedlium combined lexicon (refered as cmudict later on for simplicity).
+# This script first prepares switchboard lexicon and CMUDict + tedlium combined lexicon (referred as cmudict later on for simplicity).
 # Then it maps phones in switchboard lexicon to cmudict and merge these two lexicons to produce the final lexicon data/local/dict_combined.
 # After phone mapping, all alternative pronunciations from switchboard lexicon are included.
 
@@ -71,11 +71,11 @@ bash ${dir}/substitute.sh > ${dir}/lexicon_swbd_unique_cmuphones.txt || exit 1;
 utils/filter_scp.pl --exclude ${dir}/lexicon_swbd_unique.txt \
   ${swbd_dir}/lexicon.txt | grep -v '\[*\]' | grep -v '<unk>' > ${dir}/lexicon_swbd1.txt || exit 1;
 
-# Find words that have same pronounciation in both dictionaries - common lines
+# Find words that have same pronunciation in both dictionaries - common lines
 filter_common ${cmudict_dir}/lexicon.txt \
   ${dir}/lexicon_swbd1.txt > ${dir}/lexicon_re_match_pron.txt || exit 1;
 
-# Find words in swbd lexicon that have different pronounciation from cmudict - different lines
+# Find words in swbd lexicon that have different pronunciation from cmudict - different lines
 filter_different ${dir}/lexicon_re_match_pron.txt \
   ${dir}/lexicon_swbd1.txt > ${dir}/lexicon_swbd2.txt || exit 1;
 

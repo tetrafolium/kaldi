@@ -283,7 +283,7 @@ def encode(orig,
 
 def recursive_split(segment, bpe_codes, vocab, separator, final=False):
     """Recursively split segment into smaller units (by reversing BPE merges)
-    until all units are either in-vocabulary, or cannot be split futher."""
+    until all units are either in-vocabulary, or cannot be split further."""
 
     try:
         if final:

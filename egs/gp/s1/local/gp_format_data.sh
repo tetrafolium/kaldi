@@ -156,7 +156,7 @@ done
 # Convert the different available language models to FSTs, and create separate 
 # decoding configurations for each. -- This is very Edinburgh specific.
 
-# TODO(arnab): The core formatting is done in a format_lm fucntion inside this 
+# TODO(arnab): The core formatting is done in a format_lm function inside this 
 # script, which will be common across setups, so it can probably be taken out 
 # and put as a separate script in the utils directory.
 gp_format_lms_edin.sh data

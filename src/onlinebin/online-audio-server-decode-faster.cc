@@ -108,7 +108,7 @@ int32 main(int argc, char *argv[]) {
         "cmn-window", &cmn_window,
         "Number of feat. vectors used in the running average CMN calculation");
     po.Register("min-cmn-window", &min_cmn_window,
-                "Minumum CMN window used at start of decoding (adds "
+                "Minimum CMN window used at start of decoding (adds "
                 "latency only at start)");
     po.Register("frame-shift", &frame_shift,
                 "Time in seconds between frames.\n");

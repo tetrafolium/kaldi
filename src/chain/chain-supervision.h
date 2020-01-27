@@ -413,7 +413,7 @@ bool AddWeightToSupervisionFst(const fst::StdVectorFst &normalization_fst,
 /// allow epsilons-- not because they are hard to handle but because in this
 /// context we don't expect them.  This function also expects that the input fst
 /// will have the property that the state times are in nondecreasing order (as
-/// SortBreadthFirstSearch() will accomplish for FSTs satsifying the other
+/// SortBreadthFirstSearch() will accomplish for FSTs satisfying the other
 /// properties we mentioned).  This just happens to be something we enforce
 /// while creating these FSTs.
 ///

@@ -60,7 +60,7 @@ void CompressedAffineXformStats::CopyFromAffineXformStats(
     PrepareOneG(input.G_[i], beta_, &this_row);
     ExtractOneG(this_row, beta_, &Gi_tmp);
 
-    // At this stage we use the difference betwen Gi and Gi_tmp to
+    // At this stage we use the difference between Gi and Gi_tmp to
     // make a correction to K_.
     Vector<double> old_g_row(dim+1), new_g_row(dim+1);
     old_g_row.CopyRowFromSp(input.G_[i], i); // i'th row of old G_i.

@@ -52,13 +52,13 @@ namespace nnet1 {
  * where one matrix corresponds to single patch-position,
  * where all the filters get applied.
  *
- * The type of convolution is controled by hyperparameters:
+ * The type of convolution is controlled by hyperparameters:
  * patch_dim_     ... frequency axis size of the patch
  * patch_step_    ... size of shift in the convolution
  * patch_stride_  ... shift for 2nd dim of a patch
  *                    (i.e. frame length before splicing)
  *
- * Due to convolution same weights are used repeateadly,
+ * Due to convolution same weights are used repeatedly,
  * the final gradient is a sum of all position-specific
  * gradients (the sum was found better than averaging).
  *

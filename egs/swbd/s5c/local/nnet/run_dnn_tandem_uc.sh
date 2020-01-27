@@ -108,7 +108,7 @@ dev_bn=data-$(basename $nnet)/eval2000
 if [ $stage -le 6 ]; then
   # eval2000,
   steps/nnet/make_bn_feats.sh --cmd "$train_cmd" --nj 20 $dev_bn $dev $nnet $dev_bn/log $dev_bn/data
-  # trainig,
+  # training,
   steps/nnet/make_bn_feats.sh --cmd "$train_cmd --max-jobs-run 50" --nj 200 $train_bn $train $nnet $train_bn/log $train_bn/data
   # For further GMM training, we have to produce cmvn statistics even if not used!!!
   steps/compute_cmvn_stats.sh $dev_bn $dev_bn/log $dev_bn/data

@@ -379,7 +379,7 @@ void ComposeCompactLatticeDeterministic(
 
 /// This function computes the mapping from the pair
 /// (frame-index, transition-id) to the pair
-/// (sum-of-acoustic-scores, num-of-occurences) over all occurences of the
+/// (sum-of-acoustic-scores, num-of-occurrences) over all occurrences of the
 /// transition-id in that frame.
 /// frame-index in the lattice.
 /// This function is useful for retaining the acoustic scores in a
@@ -393,13 +393,13 @@ void ComposeCompactLatticeDeterministic(
 ///   @param [out] acoustic_scores
 ///                     Pointer to a map from the pair (frame-index,
 ///                     transition-id) to a pair (sum-of-acoustic-scores,
-///                     num-of-occurences).
+///                     num-of-occurrences).
 ///                     Usually the acoustic scores for a pdf-id (and hence
 ///                     transition-id) on a frame will be the same for all the
-///                     occurences of the pdf-id in that frame.
+///                     occurrences of the pdf-id in that frame.
 ///                     But if not, we will take the average of the acoustic
 ///                     scores. Hence, we store both the sum-of-acoustic-scores
-///                     and the num-of-occurences of the transition-id in that
+///                     and the num-of-occurrences of the transition-id in that
 ///                     frame.
 void ComputeAcousticScoresMap(
   const Lattice &lat,
@@ -411,8 +411,8 @@ void ComputeAcousticScoresMap(
 ///
 ///   @param [in] acoustic_scores
 ///                      A map from the pair (frame-index, transition-id) to a
-///                      pair (sum-of-acoustic-scores, num-of-occurences) of
-///                      the occurences of the transition-id in that frame.
+///                      pair (sum-of-acoustic-scores, num-of-occurrences) of
+///                      the occurrences of the transition-id in that frame.
 ///                      See the comments for ComputeAcousticScoresMap for
 ///                      details.
 ///   @param [out] lat   Pointer to the output lattice.

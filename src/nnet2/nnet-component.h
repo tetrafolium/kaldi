@@ -1372,7 +1372,7 @@ public:
   virtual std::string Type() const { return "DctComponent"; }
   virtual std::string Info() const;
   //dim = dimension of vector being processed
-  //dct_dim = effective lenght of DCT, i.e. how many compoments will be kept
+  //dct_dim = effective length of DCT, i.e. how many compoments will be kept
   void Init(int32 dim, int32 dct_dim, bool reorder, int32 keep_dct_dim=0);
   // InitFromString takes numeric options
   // dim, dct-dim, and (optionally) reorder={true,false}, keep-dct-dim
@@ -1688,7 +1688,7 @@ private:
  * The convolution is done over whole axis with same filter
  * coefficients, i.e. we don't use separate filters for different
  * 'regions' of frequency axis. Due to convolution, same weights are
- * used repeateadly, the final gradient is a sum of all
+ * used repeatedly, the final gradient is a sum of all
  * position-specific gradients (the sum was found better than
  * averaging).
  *
@@ -1699,7 +1699,7 @@ private:
  * one matrix corresponds to single patch-position, where all the
  * filters get applied.
  *
- * The type of convolution is controled by hyperparameters:
+ * The type of convolution is controlled by hyperparameters:
  * patch_dim_     ... frequency axis size of the patch
  * patch_step_    ... size of shift in the convolution
  * patch_stride_  ... shift for 2nd dim of a patch

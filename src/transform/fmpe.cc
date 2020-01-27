@@ -215,7 +215,7 @@ void Fmpe::ApplyProjection(const MatrixBase<BaseFloat> &feat_in,
 
   if (!optimize) { // Why do we keep this un-optimized code around?
     // For clarity, so you can see what's going on, and for easier
-    // comparision with ApplyProjectionReverse which is similar to this
+    // comparison with ApplyProjectionReverse which is similar to this
     // un-optimized segment.  Both un-optimized and optimized versions
     // should give identical transforms (up to tiny roundoff differences).
     for (size_t i = 0; i < all_posts.size(); i++) {

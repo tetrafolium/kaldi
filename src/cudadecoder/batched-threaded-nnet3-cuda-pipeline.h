@@ -229,11 +229,11 @@ private:
       raw_data.Resize(rows * cols, kUndefined);
 
       if (stride == cols) {
-        // contigious so use one large memory copy
+        // contagious so use one large memory copy
         memcpy(raw_data.Data(), wave_data_in.Data().Data(),
               rows * cols * sizeof(BaseFloat));
       } else {
-        // data is not contigious so we need to copy one row at a time
+        // data is not contagious so we need to copy one row at a time
         for (int i = 0; i < rows; i++) {
           memcpy(raw_data.Data() + i * cols, wave_data_in.Data().RowData(i),
                 cols * sizeof(BaseFloat));

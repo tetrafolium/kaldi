@@ -106,9 +106,9 @@ BASE_TO_PRESENTATION = {
     '\u0627': ('\uFE8D', '', '', '\uFE8E'),
     # ARABIC LETTER BEH
     '\u0628': ('\uFE8F', '\uFE91', '\uFE92', '\uFE90'),
-    # ARABIC LETTER TEH MARBUTA
+    # ARABIC LETTER THE MARBUTA
     '\u0629': ('\uFE93', '', '', '\uFE94'),
-    # ARABIC LETTER TEH
+    # ARABIC LETTER THE
     '\u062A': ('\uFE95', '\uFE97', '\uFE98', '\uFE96'),
     # ARABIC LETTER THEH
     '\u062B': ('\uFE99', '\uFE9B', '\uFE9C', '\uFE9A'),

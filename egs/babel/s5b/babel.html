@@ -104,7 +104,7 @@
  probability mass of our language model to these words.  Our method is
  "backwards", in that we first generate the phonetic sequences, and then
  work out the spellings.  The improvement this gives is extremely variable.
- For Bengali and Assamese, it makes essentialy no difference.  But for Zulu
+ For Bengali and Assamese, it makes essentially no difference.  But for Zulu
  LimitedLP using the development keywords on the development data, it improved
  the Kaldi-only ATWV from 0.20 to 0.28.
 
@@ -123,7 +123,7 @@
  Our basic features are standard 13-dimensional PLP features.  To these we
  append 3-dimensional features derived from our "Kaldi" pitch tracker, giving a
  16-dimensional "base feature".  Our pitch tracker and the configuration we used
- are described in <a href="#7">[7]</a>.  These features were extremly helpful on tonal languages:
+ are described in <a href="#7">[7]</a>.  These features were extremely helpful on tonal languages:
  on Cantonese and Vietnamese last year, our tests showed as much as 6% absolute
  WER improvement compared with no pitch features.  In general our new "Kaldi"
  pitch features give us about twice as much improvement as our old features from
@@ -224,7 +224,7 @@ and reversing it to produce something like <br>
  We use g2p to generate a list of the top few likely spellings for each of the generated
  pronunciations.  We take  the pronunciations we generated and the probabilities of their spellings,
  and convert them into a list of words with probabilities on the words, and a list of
- pronunciations for each word with asociated pronunciation probabilities.  This is the output
+ pronunciations for each word with associated pronunciation probabilities.  This is the output
  of the lexicon expansion and it is used to create the lexicon and language model that we
  decode with.
 <p>

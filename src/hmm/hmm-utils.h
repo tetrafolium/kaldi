@@ -223,7 +223,7 @@ void AddTransitionProbs(const TransitionModel &trans_model,
 
 
 /// Returns a transducer from pdfs plus one (input) to  transition-ids (output).
-/// Currenly of use only for testing.
+/// Currently of use only for testing.
 fst::VectorFst<fst::StdArc>*
 GetPdfToTransitionIdTransducer(const TransitionModel &trans_model);
 

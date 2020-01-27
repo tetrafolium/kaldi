@@ -30,7 +30,7 @@ with open(args.features_file, 'r', encoding="utf-8") as f:
     has_length = False
     idx = 0
     match_feats = {}
-    inital_feats = {}
+    initial_feats = {}
     final_feats = {}
     word_feats = {}
     for line in f:
@@ -74,10 +74,10 @@ with open(args.features_file, 'r', encoding="utf-8") as f:
                              format(fields[2]))
                 word_feats[fields[2]] = 1
             elif fields[1] == "initial":
-                if fields[2] in inital_feats:
+                if fields[2] in initial_feats:
                     sys.exit(sys.argv[0] + ": duplicated initial feature: {0}".
                              format(fields[2]))
-                inital_feats[fields[2]] = 1
+                initial_feats[fields[2]] = 1
             elif fields[1] == "final":
                 if fields[2] in final_feats:
                     sys.exit(sys.argv[0] + ": duplicated final feature: {0}".

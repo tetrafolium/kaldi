@@ -3,7 +3,7 @@
 # This script functions as a wrapper of a bash command that uses GPUs.
 #
 # It sets the CUDA_VISIBLE_DEVICES variable so that it limits the number of GPUs
-# used for programs. It is neccesary for running a job on the grid if the job
+# used for programs. It is necessary for running a job on the grid if the job
 # would automatically grabs all resources available on the system, e.g. a
 # TensorFlow program.
 

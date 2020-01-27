@@ -77,12 +77,12 @@ ConvolutionComponent::ConvolutionComponent(
   is_gradient_ = false;
 }
 
-// aquire input dim
+// acquire input dim
 int32 ConvolutionComponent::InputDim() const {
   return input_x_dim_ * input_y_dim_ * input_z_dim_;
 }
 
-// aquire output dim
+// acquire output dim
 int32 ConvolutionComponent::OutputDim() const {
   int32 num_x_steps = (1 + (input_x_dim_ - filt_x_dim_) / filt_x_step_);
   int32 num_y_steps = (1 + (input_y_dim_ - filt_y_dim_) / filt_y_step_);
@@ -690,7 +690,7 @@ void ConvolutionComponent::UnVectorize(const VectorBase<BaseFloat> &params) {
   bias_params_.CopyFromVec(params.Range(num_filter_params, bias_params_.Dim()));
 }
 
-// aquire input dim
+// acquire input dim
 int32 MaxpoolingComponent::InputDim() const {
   return input_x_dim_ * input_y_dim_ * input_z_dim_;
 }
@@ -707,7 +707,7 @@ MaxpoolingComponent::MaxpoolingComponent(
   pool_y_step_(component.pool_y_step_),
   pool_z_step_(component.pool_z_step_) { }
 
-// aquire output dim
+// acquire output dim
 int32 MaxpoolingComponent::OutputDim() const {
   int32 num_pools_x = 1 + (input_x_dim_ - pool_x_size_) / pool_x_step_;
   int32 num_pools_y = 1 + (input_y_dim_ - pool_y_size_) / pool_y_step_;

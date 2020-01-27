@@ -526,7 +526,7 @@ class Descriptor {
 public:
   int32 Dim(const Nnet &nnet) const;
 
-  // The Parse method is used for reading a config-file-style represenation.
+  // The Parse method is used for reading a config-file-style representation.
   // Internally this uses class GeneralDescriptor to read and normalize the
   // input.  Assumes the input has already been tokenized into an array of
   // strings by DescriptorTokenize(); it moves the begin-pointer "next_token" to
@@ -610,7 +610,7 @@ struct GeneralDescriptor {
   enum DescriptorType { kAppend, kSum, kFailover, kIfDefined, kOffset, kSwitch,
                         kRound, kReplaceIndex, kScale, kConst, kNodeName };
 
-  // The Parse method is used for reading a config-file-style represenation.
+  // The Parse method is used for reading a config-file-style representation.
   // Assumes the input has already been tokenized into an array of strings, and
   // it moves the begin-pointer "next_token" to account for token that it
   // consumes.  Calls KALDI_ERR on error.  The list of tokens should be

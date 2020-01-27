@@ -201,7 +201,7 @@ if [ $stage -le 8 ]; then
   relu-renorm-layer name=tdnn5 input=Append(-3,3) dim=1024
   relu-renorm-layer name=tdnn6 input=Append(-7,2) dim=1024
   relu-renorm-layer name=tdnn_bn dim=$bnf_dim
-  # adding the layers for diffrent language's output
+  # adding the layers for different language's output
 EOF
   # added separate outptut layer and softmax for all languages.
   for lang_index in `seq 0 $[$num_langs-1]`;do

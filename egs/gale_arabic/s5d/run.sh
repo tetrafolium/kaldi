@@ -156,5 +156,5 @@ if [ $stage -le 10 ] && $run_rnnlm; then
   local/rnnlm/run_tdnn_lstm.sh
 fi
 
-echo "$0: training succedded"
+echo "$0: training succeeded"
 exit 0

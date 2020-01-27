@@ -71,7 +71,7 @@ function format_lms () {
 
 PROG=`basename $0`;
 usage="Usage: $PROG data_dir\n
- Convert ARPA-format language models to FSTs for GlobalPhone langauges.\n
+ Convert ARPA-format language models to FSTs for GlobalPhone languages.\n
  (Currently converts for German, Portuguese, Spanish & Swedish).\n";
 
 if [ $# -ne 1 ]; then

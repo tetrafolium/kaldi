@@ -245,7 +245,7 @@ cat $dict_dir/lexicon-ch/ch-char-dict.txt |\
 local/create_oov_char_lexicon.pl $dict_dir/lexicon-ch/ch-char-dict-mp.txt \
   $dict_dir/lexicon-ch/words-ch-oov.txt > $dict_dir/lexicon-ch/lexicon-ch-oov.txt || exit 1;
 
-# seperate multiple prons for Chinese OOV lexicon
+# separate multiple prons for Chinese OOV lexicon
 cat $dict_dir/lexicon-ch/lexicon-ch-oov.txt |\
   perl -e '
   my @entry;

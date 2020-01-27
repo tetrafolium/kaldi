@@ -652,7 +652,7 @@ void FindOrphanNodes(const Nnet &nnet, std::vector<int32> *nodes) {
 //    values are pruned out until the Total energy (Sum of squares) of the pruned set
 //     of parameters is just above (Energy-threshold * Total init energy). The values which
 //      are pruned away are replaced with 0 in the Singularity matrix
-//      and the Weights matrix after SVD is derived with shrinked dimensions.
+//      and the Weights matrix after SVD is derived with shrunk dimensions.
 //
 // 2. Shrinkage-threshold : If the Shrinkage ratio of the SVD refactored Weights matrix
 //       is higher than Shrinkage-threshold for any of the Tdnn layers,

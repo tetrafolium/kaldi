@@ -67,7 +67,7 @@ def FindOpenParanthesisPosition(string):
         string_index -= 1
 
     raise Exception(
-        "Malformed string: Could not find opening paranthesis\n\t{0}".format(
+        "Malformed string: Could not find opening parenthesis\n\t{0}".format(
             string))
 
 

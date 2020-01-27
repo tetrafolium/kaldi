@@ -17,7 +17,7 @@ logger.addHandler(handler)
 
 
 def GetArgs():
-    # we add compulsary arguments as named arguments for readability
+    # we add compulsory arguments as named arguments for readability
     parser = argparse.ArgumentParser(
         description=""" """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)

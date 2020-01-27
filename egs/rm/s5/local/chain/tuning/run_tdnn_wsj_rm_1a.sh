@@ -24,7 +24,7 @@ xent_regularize=0.1
 # configs for transfer learning
 src_mdl=../../wsj/s5/exp/chain/tdnn1d_sp/final.mdl # Input chain model
                                                    # trained on source dataset (wsj).
-                                                   # This model is transfered to the target domain.
+                                                   # This model is transferred to the target domain.
 
 src_mfcc_config=../../wsj/s5/conf/mfcc_hires.conf # mfcc config used to extract higher dim
                                                   # mfcc features for ivector and DNN training
@@ -35,7 +35,7 @@ src_ivec_extractor_dir=  # Source ivector extractor dir used to extract ivector 
 
 common_egs_dir=
 primary_lr_factor=0.25 # The learning-rate factor for transferred layers from source
-                       # model. e.g. if 0, the paramters transferred from source model
+                       # model. e.g. if 0, the parameters transferred from source model
                        # are fixed.
                        # The learning-rate factor for new added layers is 1.0.
 

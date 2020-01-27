@@ -895,7 +895,7 @@ public:
 
 
   // ProcessTransitions processes emitting transitions (transitions with
-  // ilabels) out of this subset of states.  It actualy only creates records
+  // ilabels) out of this subset of states.  It actually only creates records
   // ("Task") that get added to the queue.  The transitions will be processed in
   // priority order from Determinize().  This function soes not consider final
   // states.  Partitions the emitting transitions up by ilabel (by sorting on

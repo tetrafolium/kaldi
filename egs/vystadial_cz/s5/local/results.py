@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
     min_dev = c.fetchall()
 
-    # remove duplicates: duplicates if equal mimimum wer in dev set
+    # remove duplicates: duplicates if equal minimum wer in dev set
     min_dev_un = [(e, lm, lmw) for (
         (e, lm),
         lmw) in list(dict([((e, lm), lmw) for e, lm, lmw in min_dev]).items())]

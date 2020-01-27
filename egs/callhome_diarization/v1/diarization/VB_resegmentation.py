@@ -162,7 +162,7 @@ def main():
         '--alphaQInit',
         type=float,
         default=100.0,
-        help='Dirichlet concentraion parameter for initializing q')
+        help='Dirichlet concentration parameter for initializing q')
     parser.add_argument(
         '--sparsityThr',
         type=float,
@@ -207,7 +207,7 @@ def main():
         '--initialize',
         type=int,
         default=1,
-        help='Whether to initalize the speaker posterior')
+        help='Whether to initialize the speaker posterior')
 
     args = parser.parse_args()
     print(args)

@@ -121,7 +121,7 @@ def find_and_replace_unks(old_lm_lines, max_ngrams, skip_rows):
 
 
 def read_old_lm():
-    print("Reading ARPA LM frome input stream .. ", file=sys.stderr)
+    print("Reading ARPA LM from input stream .. ", file=sys.stderr)
 
     with io.TextIOWrapper(
             sys.stdin.buffer, encoding="latin-1") as input_stream:

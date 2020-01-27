@@ -124,7 +124,7 @@ if [[ ! -f $dir/HCLG.fst || $dir/HCLG.fst -ot $dir/HCLGa.fst ]]; then
 fi
 
 # keep a copy of the lexicon and a list of silence phones with HCLG...
-# this means we can decode without refrence to the $lang directory.
+# this means we can decode without reference to the $lang directory.
 cp $lang/words.txt $dir/
 cp $lang/silphones.csl $dir/
 

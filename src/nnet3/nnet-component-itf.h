@@ -497,7 +497,7 @@ public:
   // and max-change values from 'other'.
   void SetUpdatableConfigs(const UpdatableComponent &other);
 
-  /// freezes/unfreezes NaturalGradient updates, if applicable (to be overriden
+  /// freezes/unfreezes NaturalGradient updates, if applicable (to be overridden
   /// by components that use Natural Gradient).
   virtual void FreezeNaturalGradient(bool freeze) { }
 

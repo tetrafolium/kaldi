@@ -1498,7 +1498,7 @@ static void CreateIndexes(const std::vector<std::pair<int32, int32> > &n_x_pairs
 /**
    This function modifies 'indexes' by, for any Indexes which was not present in
    'ref_indexes', setting the 't' value to kNoTime.  This will cause the nnet3
-   framework to ignore such Indexes for certain purposes, it supresses certain
+   framework to ignore such Indexes for certain purposes, it suppresses certain
    error conditions that would otherwise happen from inserting unnecessary
    indexes into the input and output.
  */

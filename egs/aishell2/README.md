@@ -18,7 +18,7 @@ Currently we release AISHELL2-2018A-EVAL, containing:
 
 Both sets are available across the three channel conditions.
 
-One of interest can download the sets from [here](http://www.aishelltech.com/aishell_eval). Note that we may update and release other evaluation sets on the website later, targeting on different applications and senarios.
+One of interest can download the sets from [here](http://www.aishelltech.com/aishell_eval). Note that we may update and release other evaluation sets on the website later, targeting on different applications and scenarios.
 
 ## 2. RECIPE
 Based on Kaldi standard system, AISHELL-2 provides a self-contained Mandarin ASR recipe, with:

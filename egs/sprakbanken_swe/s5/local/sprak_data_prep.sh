@@ -59,7 +59,7 @@ if [ ! -d $dir/download/0468 ]; then
     tar -xzf $dir/download/sve.16khz.0468.tar.gz -C $dir/download/0468    
 
      
-    echo "Corpus unpacked succesfully."
+    echo "Corpus unpacked successfully."
 fi
 
 sph2pipe=$(which sph2pipe) || sph2pipe=$KALDI_ROOT/tools/sph2pipe_v2.5/sph2pipe

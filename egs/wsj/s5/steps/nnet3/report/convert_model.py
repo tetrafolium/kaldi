@@ -337,10 +337,10 @@ def get_stdout_from_command(command):
 def read_component(s, pos):
     """Reads a component starting at position 'pos' in the string 's'.  At this position,
        there is expected to be a component type, e.g. <RectifiedLinearComponent>, and this
-       funtion will read until after the end-marker, e.g. </RectifiedLinearComponent>,
+       function will read until after the end-marker, e.g. </RectifiedLinearComponent>,
        or if this fails for some reason, until the next instance of <ComponentName>.
 
-       This funtion returns the pair (d, new_pos) where d is a dict from
+       This function returns the pair (d, new_pos) where d is a dict from
        element-name to object (e.g. d['params'] might contain a matrix), and
        new_pos is the position in the string after reading this component in.
        Returns (None, new_pos) if something went wrong.

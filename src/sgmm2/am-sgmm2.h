@@ -47,7 +47,7 @@ namespace kaldi {
 
    We'll use the acronym SSGMM to refer to the Symmetric SGMM, and we'll mark in
    the code with "[SSGMM]" things that relate to it.  The technical report
-   describes an extention to the originally described model where we have
+   describes an extension to the originally described model where we have
    speaker-dependent mixture weights.  These are implemented here.  Note: we only
    implement the "more efficient" version of the update for the speaker
    projection vectors \u_i.  There is also an ICASSP paper that describes the

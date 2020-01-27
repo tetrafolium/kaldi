@@ -10,7 +10,7 @@
 #      segments with a lot of alignment errors. These are identified using
 #      find_bad_utt.sh
 
-# these are results with a slighly different min_seg_len=2secs and an older steps/cleanup/combine_short_segments.sh script
+# these are results with a slightly different min_seg_len=2secs and an older steps/cleanup/combine_short_segments.sh script
 # also the trees for these results were built with min_seg_len=2 utterances, I moved tree building stage prior to segment
 # combination, as I don't think it is affected by the minor change in alignments.
 # Current experiments show that max-wer setting is not helpful when --use-ihm-ali=true

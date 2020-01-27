@@ -25,7 +25,7 @@
 # number. The third component (PATCH) is determined by counting how many
 # commits there are that are newer than than the last commit modifiying
 # src/.version. If there are uncommitted changes in the src/ directory, then
-# the version string is extended with a suffix (~N) specifiying the number of
+# the version string is extended with a suffix (~N) specifying the number of
 # files with uncommitted changes. The last component of the version string is
 # the abbreviated hash of the HEAD commit. If git history is not available or
 # if the file src/.short_version exists, then the version string defaults to

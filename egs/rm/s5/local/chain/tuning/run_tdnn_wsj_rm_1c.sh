@@ -45,7 +45,7 @@ phone_lm_scales="1,10" # comma-separated list of positive integer multiplicities
 # model and dirs for source model used for transfer learning
 src_mdl=../../wsj/s5/exp/chain/tdnn1d_sp/final.mdl # input chain model
                                                     # trained on source dataset (wsj) and
-                                                    # this model is transfered to the target domain.
+                                                    # this model is transferred to the target domain.
 
 src_mfcc_config=../../wsj/s5/conf/mfcc_hires.conf # mfcc config used to extract higher dim
                                                   # mfcc features used for ivector training

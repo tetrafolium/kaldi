@@ -30,7 +30,7 @@ fi
 # trunk/egs/swbd/s5 (rev. 1841). The major differences are that everything is
 # made lowercase since SRILM has an option to make the data lowercase, but not
 # uppercase. [It is easy to change since SRILM uses the awk tolower function,
-# but I prefered not to change SRILM]. The prefix in the names of the data
+# but I preferred not to change SRILM]. The prefix in the names of the data
 # processing scripts are changed to swbd1_ from swbd_p1_ since Switchboard-1
 # Release 2 (LDC97S62) has two phases marked as p1_ and p2_ in the data. We
 # are using both and so p1_ prefix in the scripts is confusing. There are a

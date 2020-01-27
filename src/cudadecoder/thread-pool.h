@@ -137,7 +137,7 @@ auto ThreadPool::enqueue(ThreadPoolPriority priority, F &&f, Args && ... args)
           (*func)();
         };
     long long task_fifo_id = task_counter--;
-    // The following if will temporarly break the FIFO order
+    // The following if will temporary break the FIFO order
     // (leading to a perf drop for a few seconds)
     // But it should trigger in ~50 million years
     if (task_counter == 0) task_counter = LONG_MAX;

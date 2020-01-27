@@ -246,7 +246,7 @@ void MatrixBase<Real>::SymAddMat2(const Real alpha,
   /// ATLAS library. To overcome this, the AddMatMat function, which calls
   /// cblas_Xgemm(...) rather than cblas_Xsyrk(...), is used in this special
   /// sitation.
-  /// Wei Shi: Note this bug is observerd for single precision matrix
+  /// Wei Shi: Note this bug is observed for single precision matrix
   /// on a 64-bit machine
 #ifdef HAVE_ATLAS
   if (transA == kTrans && num_rows_ >= 56) {
@@ -1646,7 +1646,7 @@ SubMatrix<Real>::SubMatrix(const MatrixBase<Real> &M,
                static_cast<UnsignedMatrixIndexT>(M.num_rows_ - ro) &&
                static_cast<UnsignedMatrixIndexT>(c) <=
                static_cast<UnsignedMatrixIndexT>(M.num_cols_ - co));
-  // point to the begining of window
+  // point to the beginning of window
   MatrixBase<Real>::num_rows_ = r;
   MatrixBase<Real>::num_cols_ = c;
   MatrixBase<Real>::stride_ = M.Stride();

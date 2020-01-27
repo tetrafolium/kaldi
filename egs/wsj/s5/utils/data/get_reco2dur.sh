@@ -11,8 +11,8 @@
 # utt2dur file (it first tries interrogating the headers, and if this fails, it reads the wave
 # files in entirely.)
 # We could use durations from segments file, but that's not the duration of the recordings
-# but the sum of utterance lenghts (silence in between could be excluded from segments)
-# For sum of utterance lenghts:
+# but the sum of utterance lengths (silence in between could be excluded from segments)
+# For sum of utterance lengths:
 # awk 'FNR==NR{uttdur[$1]=$2;next}
 # { for(i=2;i<=NF;i++){dur+=uttdur[$i];}
 #   print $1 FS dur; dur=0  }'  $data/utt2dur $data/reco2utt

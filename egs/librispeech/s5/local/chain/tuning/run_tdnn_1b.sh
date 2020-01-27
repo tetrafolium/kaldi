@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# run_tdnn_1b.sh's topo is similiar with run_tdnn_1a.sh but we used the xconfigs. Otherwise "frames_per_eg=150,140,100".
+# run_tdnn_1b.sh's topo is similar with run_tdnn_1a.sh but we used the xconfigs. Otherwise "frames_per_eg=150,140,100".
 
 #exp/chain_cleaned/tdnn_1b_sp: num-iters=871 nj=3..16 num-params=17.1M dim=40+100->5151 combine=-0.074->-0.074 xent:train/valid[579,870,final]=(-1.02,-0.986,-0.990/-0.985,-0.953,-0.957) logprob:train/valid[579,870,final]=(-0.066,-0.062,-0.063/-0.070,-0.069,-0.069)
 

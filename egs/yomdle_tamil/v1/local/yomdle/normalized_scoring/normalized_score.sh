@@ -48,7 +48,7 @@ fi
 python3 ${script_dir}/utils/trans_to_tokenized_words.py $OUTDIR/hyp.norm-final.txt $OUTDIR/hyp.norm-final.words.txt
 python3 ${script_dir}/utils/trans_to_tokenized_words.py $OUTDIR/ref.norm-final.txt $OUTDIR/ref.norm-final.words.txt
 
-# Step 3. Also need to turn into space-seperated character stream to get char-based output
+# Step 3. Also need to turn into space-separated character stream to get char-based output
 python3 ${script_dir}/utils/trans_to_chars.py $OUTDIR/hyp.norm-final.txt $OUTDIR/hyp.norm-final.chars.txt
 python3 ${script_dir}/utils/trans_to_chars.py $OUTDIR/ref.norm-final.txt $OUTDIR/ref.norm-final.chars.txt
 

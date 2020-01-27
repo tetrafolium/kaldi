@@ -5,7 +5,7 @@
 #           2019       Fei Wu
 
 # Based on material recipe for low-resource languages
-# Factored TDNN with skip connectiong and splicing (two bottle neck layers)
+# Factored TDNN with skip connecting and splicing (two bottle neck layers)
 
 #   WER results on dev
 #   Model       LM          Corpus      WER(%)

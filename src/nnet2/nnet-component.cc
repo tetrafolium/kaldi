@@ -3033,7 +3033,7 @@ void DctComponent::Reorder(CuMatrixBase<BaseFloat> *mat, bool reverse) const {
       block_size_in = dim_ / dct_dim,
       block_size_out = dct_keep_dim;
 
-  //This does not necesarily needs to be true anymore -- output must be reordered as well, but the dimension differs...
+  //This does not necessarily needs to be true anymore -- output must be reordered as well, but the dimension differs...
   //KALDI_ASSERT(mat->NumCols() == dim_);
   if (reverse) std::swap(block_size_in, block_size_out);
 
@@ -3651,14 +3651,14 @@ Convolutional1dComponent::Convolutional1dComponent(const CuMatrixBase<BaseFloat>
   is_gradient_ = false;
 }
 
-// aquire input dim
+// acquire input dim
 int32 Convolutional1dComponent::InputDim() const {
   int32 filter_dim = filter_params_.NumCols();
   int32 num_splice = filter_dim / patch_dim_;
   return patch_stride_ * num_splice;
 }
 
-// aquire output dim
+// acquire output dim
 int32 Convolutional1dComponent::OutputDim() const {
   int32 num_filters = filter_params_.NumRows();
   int32 num_patches = 1 + (patch_stride_ - patch_dim_) / patch_step_;

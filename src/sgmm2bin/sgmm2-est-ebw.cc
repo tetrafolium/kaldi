@@ -1,6 +1,6 @@
 // sgmm2bin/sgmm2-est-ebw.cc
 
-// Copyright 2012  Johns Hopkins Univerity (Author: Daniel Povey)
+// Copyright 2012  Johns Hopkins University (Author: Daniel Povey)
 
 // See ../../COPYING for clarification regarding multiple authors
 //

@@ -207,7 +207,7 @@ void CombineNnetsA(const NnetCombineAconfig &config,
     if (uc != NULL) {
       BaseFloat step_length = scale_params(i), factor = step_length;
       // Our basic rule is to update the learning rate by multiplying it
-      // by "step_lenght", but this is subject to certain limits.
+      // by "step_length", but this is subject to certain limits.
       if (factor < config.min_learning_rate_factor)
         factor = config.min_learning_rate_factor;
       if (factor > config.max_learning_rate_factor)

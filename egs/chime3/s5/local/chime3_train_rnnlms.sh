@@ -91,7 +91,7 @@ $KALDI_ROOT/tools/extras/check_for_rnnlm.sh "$rnnlm_ver" || exit 1
 # train a RNN language model
 rnnmodel=$dir/rnnlm_5k_h${hidden}_bptt${bptt}
 if [ -f $rnnmodel ]; then
-  echo "A RNN language model aready exists and is not constructed again"
+  echo "A RNN language model already exists and is not constructed again"
   echo "To reconstruct, remove $rnnmodel first"
 else
   echo "Training a RNN language model with $rnnlm_ver"

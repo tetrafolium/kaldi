@@ -77,7 +77,7 @@ parser.add_option(
     '--param-stddev-factor',
     dest='param_stddev_factor',
     help=
-    'Factor to rescale Normal distriburtion for initalizing weight matrices [default: %default]',
+    'Factor to rescale Normal distriburtion for initializing weight matrices [default: %default]',
     default=0.1,
     type='float')
 parser.add_option(
@@ -103,14 +103,14 @@ parser.add_option(
     '--max-norm',
     dest='max_norm',
     help=
-    'Max radius of neuron-weights in L2 space (if longer weights get shrinked, not applied to last layer, 0.0 = disable) [default: %default]',
+    'Max radius of neuron-weights in L2 space (if longer weights get shrunk, not applied to last layer, 0.0 = disable) [default: %default]',
     default=0.0,
     type='float')
 parser.add_option(
     '--affine-opts',
     dest='affine_opts',
     help=
-    'Additional options for protoype of affine tranform [default: %default]',
+    'Additional options for protoype of affine transform [default: %default]',
     default='',
     type='string')
 # Topology related,

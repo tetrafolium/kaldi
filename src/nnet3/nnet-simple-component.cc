@@ -404,11 +404,11 @@ void SigmoidComponent::RepairGradients(
   // for inputs < 0 and negative for inputs > 0.
 
   // We can rearrange the above as: for only the problematic columns,
-  //   input-deriv -= 2 * self-repair-scale / repair-probabilty * output
-  //   input-deriv +=  self-repair-scale / repair-probabilty
+  //   input-deriv -= 2 * self-repair-scale / repair-probability * output
+  //   input-deriv +=  self-repair-scale / repair-probability
   // which we can write as:
-  //   input-deriv -= 2 * self-repair-scale / repair-probabilty * output * thresholds-vec
-  //   input-deriv +=  self-repair-scale / repair-probabilty * thresholds-vec
+  //   input-deriv -= 2 * self-repair-scale / repair-probability * output * thresholds-vec
+  //   input-deriv +=  self-repair-scale / repair-probability * thresholds-vec
 
   in_deriv->AddMatDiagVec(-2.0 * self_repair_scale_ / repair_probability,
                           out_value, kNoTrans, thresholds_vec);
@@ -910,9 +910,9 @@ void TanhComponent::RepairGradients(
   // inputs < 0 and negative for inputs > 0.
 
   // We can rearrange the above as: for only the problematic columns,
-  //   input-deriv -= self-repair-scale / repair-probabilty * output
+  //   input-deriv -= self-repair-scale / repair-probability * output
   // which we can write as:
-  //   input-deriv -=  self-repair-scale / repair-probabilty * output * thresholds-vec
+  //   input-deriv -=  self-repair-scale / repair-probability * output * thresholds-vec
 
   in_deriv->AddMatDiagVec(-self_repair_scale_ / repair_probability,
                           out_value, kNoTrans, thresholds_vec);
@@ -1562,7 +1562,7 @@ void RepeatedAffineComponent::Write(std::ostream &os, bool binary) const {
 
 int32 RepeatedAffineComponent::NumParameters() const {
   // Note: unlike AffineComponent, InputDim() & OutputDim() are not used here and below,
-  // for they are multipled by num_repeats_.
+  // for they are multiplied by num_repeats_.
   return linear_params_.NumCols() * linear_params_.NumRows() + bias_params_.Dim();
 }
 

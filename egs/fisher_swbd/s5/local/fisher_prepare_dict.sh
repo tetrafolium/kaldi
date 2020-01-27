@@ -104,7 +104,7 @@ head -n 20 $dir/oov_counts.txt
 
 
 
-# Preparing SWBD acronymns from its dictionary
+# Preparing SWBD acronyms from its dictionary
 srcdir=data/local/train_swbd # This is where we downloaded some stuff..
 dir=data/local/dict
 mkdir -p $dir
