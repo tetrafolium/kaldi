@@ -1,0 +1,135 @@
+inspecode:
+
+  experimental:
+    ignore:
+    - '**/*-test.cc'
+
+  astyle:       ## for C++
+    auto-fix: true
+    thresholds: { num-issues: 999 }
+    # errno message: No such file or directory
+    # Error getting file status in directory ./src/nnet2bin
+    # Artistic Style has terminated
+
+  autopep8:     ## for Python
+    auto-fix: true
+    thresholds: { num-issues: 999 }
+
+  clang-format: ## for C++
+    options:
+      -style: "{BasedOnStyle: LLVM, DisableFormat: true, SortIncludes: false}"
+    auto-fix: true
+    thresholds: { num-issues: 999 }
+
+  cpd:          ## for C++, Python
+    thresholds: { num-issues: 999 }
+
+  cppcheck:     ## for C++
+    thresholds: { num-issues: 999 }
+
+  cpplint:      ## for C++
+    options:
+      --filter:
+      - -whitespace
+      - -readability
+      - -build/header_guard
+      - -build/include_what_you_use
+      - -build/storage_class
+      - -runtime/int
+      - -runtime/string
+    thresholds: { num-issues: 999 }
+
+  flake8:       ## for Python
+  - input: egs/
+    options:
+      --ignore: [ E1, E2, E3, E5, E7, W19, W29 ]
+    thresholds: { num-issues: 999 }
+  - input: misc/
+    options:
+      --ignore: [ E111 ]
+    thresholds: { num-issues: 999 }
+
+  grep:         ## for any-languages
+    thresholds: { num-issues: 999 }
+
+  infer:        ## for C++
+    thresholds: { num-issues: 999 }
+    # make: wget: Command not found
+
+  jscpd:        ## for C++, Python, Shell
+    thresholds: { num-issues: 999 }
+
+  misspell:     ## for any-languages
+    auto-fix: true
+    thresholds: { num-issues: 999 }
+
+  nose2:        ## for Python
+    thresholds: { num-issues: 999 }
+
+  prospector:   ## for Python
+    thresholds: { num-issues: 999 }
+    # too many issues detected: 8967 > 1000
+
+  pycodestyle:  ## for Python
+  - input: egs/
+    options:
+      --ignore: [ E1, E2, E302, E5, E7, W19, W29, W503, W605 ]
+    thresholds: { num-issues: 999 }
+  - input: misc/
+    options:
+      --ignore: [ E111 ]
+    thresholds: { num-issues: 999 }
+
+  pyflakes:     ## for Python
+    thresholds: { num-issues: 999 }
+
+  pylint:       ## for Python
+    thresholds: { num-issues: 999 }
+    # too many issues detected: 18613 > 1000
+
+  pytest:       ## for Python
+    thresholds: { num-issues: 999 }
+
+  scan-build:   ## for C++
+    thresholds: { num-issues: 999 }
+    # make: wget: Command not found
+
+  shellcheck:   ## for Shell
+  - input:  [ egs/babel/** ]
+    options:
+      -e:   [ SC1091, SC2002, SC2004, SC2006, SC2007, SC2034, SC2046, SC2059, SC2086, SC2119,
+              SC2154, SC2236 ]
+    thresholds: { num-issues: 999 }
+  - input:  [ egs/wsj/** ]
+    options:
+      -e:   [ SC1091, SC2002, SC2006, SC2007, SC2034, SC2046, SC2086, SC2145, SC2236 ]
+    thresholds: { num-issues: 999 }
+  - input:  [ egs/swbd/** ]
+    options:
+      -e:   [ SC1091, SC2046, SC2086, SC2154 ]
+    thresholds: { num-issues: 999 }
+  - input:  [ egs/** ]
+    ignore: [ egs/babel/**, egs/wsj/**, egs/swbd/** ]
+    options:
+      -e:   [ SC1090, SC1091, SC2001, SC2002, SC2006, SC2007, SC2034, SC2043, SC2046, SC2048,
+              SC2068, SC2086, SC2090, SC2145, SC2148, SC2154, SC2155, SC2164, SC2206, SC2236 ]
+    thresholds: { num-issues: 999 }
+  - ignore: [ egs/** ]
+    options:
+      -e:   [ SC2086 ]
+    thresholds: { num-issues: 999 }
+
+  uncrustify:   ## for C++
+    config-file: rocro-uncrustify.cfg
+    auto-fix: true
+    thresholds: { num-issues: 999 }
+
+  unused:       ## for C++, Python, Shell
+    options:
+      --single-occurrence:
+      --all-likelihoods:
+    thresholds: { num-issues: 999 }
+
+  yapf:         ## for Python
+    auto-fix: true
+    thresholds: { num-issues: 999 }
