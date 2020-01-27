@@ -5,6 +5,10 @@
 #           2017    Hossein Hadian
 # Apache 2.0.
 
+import libs.nnet3.report.log_parse as nnet3_log_parse
+import libs.nnet3.train.chain_objf.acoustic_model as chain_lib
+import libs.common as common_lib
+import libs.nnet3.train.common as common_train_lib
 """ This script does flat-start chain training and is based on
     steps/nnet3/chain/train.py.
 """
@@ -18,10 +22,6 @@ import sys
 import traceback
 
 sys.path.insert(0, 'steps')
-import libs.nnet3.train.common as common_train_lib
-import libs.common as common_lib
-import libs.nnet3.train.chain_objf.acoustic_model as chain_lib
-import libs.nnet3.report.log_parse as nnet3_log_parse
 
 
 logger = logging.getLogger('libs')
@@ -97,7 +97,6 @@ def get_args():
                         dest='left_deriv_truncate',
                         default=None,
                         help="Deprecated. Kept for back compatibility")
-
 
     # trainer options
     parser.add_argument("--trainer.num-epochs", type=float, dest='num_epochs',
@@ -182,10 +181,11 @@ def process_args(args):
     """
 
     if not common_train_lib.validate_chunk_width(args.chunk_width):
-        raise Exception("--egs.chunk-width has an invalid value");
+        raise Exception("--egs.chunk-width has an invalid value")
 
     if not common_train_lib.validate_minibatch_size_str(args.num_chunk_per_minibatch):
-        raise Exception("--trainer.num-chunk-per-minibatch has an invalid value");
+        raise Exception(
+            "--trainer.num-chunk-per-minibatch has an invalid value")
 
     if args.chunk_left_context < 0:
         raise Exception("--egs.chunk-left-context should be non-negative")
@@ -272,7 +272,7 @@ def train(args, run_opts):
     # split the training data into parts for individual jobs
     # we will use the same number of jobs as that used for compiling FSTs
     common_lib.execute_command("utils/split_data.sh {0} {1}".format(
-            args.feat_dir, num_jobs))
+        args.feat_dir, num_jobs))
     shutil.copy('{0}/tree'.format(args.tree_dir), args.dir)
     shutil.copy('{0}/phones.txt'.format(args.tree_dir), args.dir)
     shutil.copy('{0}/phone_lm.fst'.format(args.tree_dir), args.dir)
@@ -341,21 +341,21 @@ def train(args, run_opts):
                     --frames-per-iter {frames_per_iter} \
                     --srand {srand} \
                     {data} {dir} {fst_dir} {egs_dir}""".format(
-                        command=run_opts.command,
-                        cmvn_opts=args.cmvn_opts if args.cmvn_opts is not None else '',
-                        ivector_dir=(args.online_ivector_dir
-                                     if args.online_ivector_dir is not None
-                                     else ''),
-                        left_context=egs_left_context,
-                        right_context=egs_right_context,
-                        left_context_initial=egs_left_context_initial,
-                        right_context_final=egs_right_context_final,
-                        frame_subsampling_factor=args.frame_subsampling_factor,
-                        stage=args.egs_stage, frames_per_iter=args.frames_per_iter,
-                        srand=args.srand,
-                        data=args.feat_dir, dir=args.dir, fst_dir=args.tree_dir,
-                        egs_dir=default_egs_dir,
-                        egs_opts=args.egs_opts if args.egs_opts is not None else ''))
+                command=run_opts.command,
+                cmvn_opts=args.cmvn_opts if args.cmvn_opts is not None else '',
+                ivector_dir=(args.online_ivector_dir
+                             if args.online_ivector_dir is not None
+                             else ''),
+                left_context=egs_left_context,
+                right_context=egs_right_context,
+                left_context_initial=egs_left_context_initial,
+                right_context_final=egs_right_context_final,
+                frame_subsampling_factor=args.frame_subsampling_factor,
+                stage=args.egs_stage, frames_per_iter=args.frames_per_iter,
+                srand=args.srand,
+                data=args.feat_dir, dir=args.dir, fst_dir=args.tree_dir,
+                egs_dir=default_egs_dir,
+                egs_opts=args.egs_opts if args.egs_opts is not None else ''))
 
     if args.egs_dir is None:
         egs_dir = default_egs_dir
@@ -378,9 +378,9 @@ def train(args, run_opts):
 
     # copy the properties of the egs to dir for
     # use during decoding
-    logger.info("Copying the properties from {0} to {1}".format(egs_dir, args.dir))
+    logger.info("Copying the properties from {0} to {1}".format(
+        egs_dir, args.dir))
     common_train_lib.copy_egs_properties_to_exp_dir(egs_dir, args.dir)
-
 
     if (args.stage <= -1):
         logger.info("Preparing the initial acoustic model.")
@@ -408,7 +408,7 @@ def train(args, run_opts):
     if args.deriv_truncate_margin is not None:
         min_deriv_time = -args.deriv_truncate_margin - model_left_context
         max_deriv_time_relative = \
-           args.deriv_truncate_margin + model_right_context
+            args.deriv_truncate_margin + model_right_context
 
     logger.info("Training will run for {0} epochs = "
                 "{1} iterations".format(args.num_epochs, num_iters))
@@ -444,8 +444,8 @@ def train(args, run_opts):
             if args.shrink_value < shrinkage_value:
                 shrinkage_value = (args.shrink_value
                                    if common_train_lib.should_do_shrinkage(
-                                        iter, model_file,
-                                        args.shrink_saturation_threshold)
+                                       iter, model_file,
+                                       args.shrink_saturation_threshold)
                                    else shrinkage_value)
 
             shrink_info_str = ''
@@ -486,7 +486,6 @@ def train(args, run_opts):
                 frame_subsampling_factor=args.frame_subsampling_factor,
                 run_opts=run_opts)
 
-
             if args.cleanup:
                 # do a clean up everything but the last 2 models, under certain
                 # conditions
@@ -508,7 +507,6 @@ def train(args, run_opts):
 
         num_archives_processed = num_archives_processed + current_num_jobs
 
-
     if args.stage <= num_iters:
         logger.info("Doing final combination to produce final.mdl")
         chain_lib.combine_models(
@@ -520,7 +518,6 @@ def train(args, run_opts):
             l2_regularize=args.l2_regularize,
             xent_regularize=args.xent_regularize,
             run_opts=run_opts)
-
 
     if args.cleanup:
         logger.info("Cleaning up the experiment directory "
@@ -547,7 +544,7 @@ def train(args, run_opts):
         f.write(report)
 
     common_lib.execute_command("steps/info/chain_dir_info.pl "
-                                 "{0}".format(args.dir))
+                               "{0}".format(args.dir))
 
 
 def main():
@@ -565,6 +562,7 @@ def main():
         if not isinstance(e, KeyboardInterrupt):
             traceback.print_exc()
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

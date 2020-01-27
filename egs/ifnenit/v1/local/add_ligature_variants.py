@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os, sys, io
+import os
+import sys
+import io
 
 # This script is originally from qatip project (http://qatsdemo.cloudapp.net/qatip/demo/)
 # of Qatar Computing Research Institute (http://qcri.qa/)
@@ -9,42 +11,43 @@ import os, sys, io
 # per pronunciation but apply all possible rules
 
 classMap = {
-  'hh': 'x',
-  'am': 'a',
-  'ae': 'a',
-  'ah': 'a',
-  'al': 'a',
-  'aa': 'a',
-  'ba': 'b',
-  'te': 'x',
-  'ta': 'b',
-  'th': 'b',
-  'ja': 'h',
-  'ha': 'h',
-  'kh': 'h',
-  'da': 'd',
-  'dh': 'd',
-  'ra': 'd',
-  'zy': 'd',
-  'se': 's',
-  'sh': 's',
-  'sa': 'o',
-  'de': 'o',
-  'to': 't',
-  'za': 't',
-  'ay': 'i',
-  'gh': 'i',
-  'fa': 'f',
-  'ka': 'f',
-  'ke': 'k',
-  'la': 'l',
-  'ma': 'm',
-  'na': 'n',
-  'he': 'x',
-  'wa': 'x',
-  'ee': 'j',
-  'ya': 'j'
+    'hh': 'x',
+    'am': 'a',
+    'ae': 'a',
+    'ah': 'a',
+    'al': 'a',
+    'aa': 'a',
+    'ba': 'b',
+    'te': 'x',
+    'ta': 'b',
+    'th': 'b',
+    'ja': 'h',
+    'ha': 'h',
+    'kh': 'h',
+    'da': 'd',
+    'dh': 'd',
+    'ra': 'd',
+    'zy': 'd',
+    'se': 's',
+    'sh': 's',
+    'sa': 'o',
+    'de': 'o',
+    'to': 't',
+    'za': 't',
+    'ay': 'i',
+    'gh': 'i',
+    'fa': 'f',
+    'ka': 'f',
+    'ke': 'k',
+    'la': 'l',
+    'ma': 'm',
+    'na': 'n',
+    'he': 'x',
+    'wa': 'x',
+    'ee': 'j',
+    'ya': 'j'
 }
+
 
 def match(phoneme, placeholder):
     if phoneme == placeholder:
@@ -55,6 +58,7 @@ def match(phoneme, placeholder):
     if not p in classMap:
         return False
     return (phoneme[-1:] == placeholder[-1:]) and (classMap[p] == placeholder[:-1])
+
 
 # Load ligature file
 rules = dict()
@@ -86,8 +90,8 @@ for line in in_stream:
                         matched = False
                         break
                 if matched:
-                    out_stream.write(word + " " 
-                            + ((' '.join(phonemes[0:start])) + ' '
-                            + ruleName + ' '
-                            + (' '.join(phonemes[start+2*offset+1:]))).strip() + "\n")
+                    out_stream.write(word + " "
+                                     + ((' '.join(phonemes[0:start])) + ' '
+                                        + ruleName + ' '
+                                        + (' '.join(phonemes[start+2*offset+1:]))).strip() + "\n")
                     break

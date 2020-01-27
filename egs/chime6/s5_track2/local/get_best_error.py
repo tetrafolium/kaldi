@@ -10,6 +10,7 @@ import numpy as np
 import argparse
 from munkres import Munkres
 
+
 def get_args():
     parser = argparse.ArgumentParser(
         description="""This script finds best matching of reference and hypothesis speakers.
@@ -46,18 +47,20 @@ def get_min_wer(recording_id, num_speakers, WER_dir):
         all_errors_mat[i] = [0] * num_speakers
     for i in range(1, num_speakers+1):
         for j in range(1, num_speakers+1):
-            filename = '/wer_' + recording_id + '_' + 'r' + str(i)+ 'h' + str(j)
+            filename = '/wer_' + recording_id + \
+                '_' + 'r' + str(i) + 'h' + str(j)
             filename = WER_dir + filename
             total_words, ins, deletions, sub = get_results(filename)
             ins = int(ins)
             deletions = int(deletions)
             sub = int(sub)
             total_error = ins + deletions + sub
-            total_error_mat[i-1][j-1]=total_error
-            all_errors_mat[i-1][j-1]= (total_words, total_error, ins, deletions, sub)
+            total_error_mat[i-1][j-1] = total_error
+            all_errors_mat[i-1][j-1] = (total_words,
+                                        total_error, ins, deletions, sub)
 
     indexes = m.compute(total_error_mat)
-    total_errors=total_words=total_ins=total_del=total_sub=0
+    total_errors = total_words = total_ins = total_del = total_sub = 0
     spk_order = '('
     for row, column in indexes:
         words, errs, ins, deletions, sub = all_errors_mat[row][column]
@@ -67,11 +70,12 @@ def get_min_wer(recording_id, num_speakers, WER_dir):
         total_del += int(deletions)
         total_sub += int(sub)
         spk_order = spk_order + str(column+1) + ', '
-    spk_order = spk_order + ')' 
-    text = "Best error: (#T #E #I #D #S) " + str(total_words)+ ', '+str(total_errors)+ ', '+str(total_ins)+ ', '+str(total_del)+ ', '+str(total_sub)
-    best_wer_writer.write(" recording_id: "+ recording_id + ' ')
+    spk_order = spk_order + ')'
+    text = "Best error: (#T #E #I #D #S) " + str(total_words) + ', '+str(
+        total_errors) + ', '+str(total_ins) + ', '+str(total_del) + ', '+str(total_sub)
+    best_wer_writer.write(" recording_id: " + recording_id + ' ')
     best_wer_writer.write(' best hypothesis speaker order: ' + spk_order + ' ')
-    best_wer_writer.write(text+ '\n')
+    best_wer_writer.write(text + '\n')
     best_wer_writer.close()
 
 

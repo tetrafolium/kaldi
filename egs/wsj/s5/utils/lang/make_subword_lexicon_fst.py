@@ -9,6 +9,8 @@ import math
 import sys
 
 # see get_args() below for usage mesage
+
+
 def get_args():
     parser = argparse.ArgumentParser(description="""This script creates the
         text form of a subword lexicon FST to be compiled by fstcompile using
@@ -45,6 +47,7 @@ def get_args():
     args = parser.parse_args()
     return args
 
+
 def contain_disambig_symbol(phones):
     """Return true if the phone sequence contains disambiguation symbol.
     Return false otherwise. Disambiguation symbol is at the end of phones 
@@ -52,13 +55,16 @@ def contain_disambig_symbol(phones):
     symbol for each phone sequence"""
     return True if phones[-1].startswith("#") else False
 
+
 def print_arc(src, dest, phone, word, cost):
     print('{}\t{}\t{}\t{}\t{}'.format(src, dest, phone, word, cost))
+
 
 def is_end(word, separator):
     """Return true if the subword can appear at the end of a word (i.e., the subword
     does not end with separator). Return false otherwise."""
     return not word.endswith(separator)
+
 
 def get_suffix(phone):
     """Return the suffix of a phone. The suffix is in the form of '_B', '_I'..."""
@@ -67,6 +73,7 @@ def get_suffix(phone):
               sys.argv[0], phone), file=sys.stderr)
         sys.exit(1)
     return phone[-2:]
+
 
 def write_fst_no_silence(lexicon, position_dependent, separator):
     """Writes the text format of L.fst to the standard output.  This version is for
@@ -120,7 +127,8 @@ def write_fst_no_silence(lexicon, position_dependent, separator):
         # set start and end state for different cases
         if position_dependent:
             first_phone_suffix = get_suffix(phones[0])
-            last_phone = phones[-2] if contain_disambig_symbol(phones) else phones[-1]
+            last_phone = phones[-2] if contain_disambig_symbol(
+                phones) else phones[-1]
             last_phone_suffix = get_suffix(last_phone)
 
             # singleton word
@@ -139,7 +147,8 @@ def write_fst_no_silence(lexicon, position_dependent, separator):
                 end_state = loop_state
         else:
             current_state = word_start_state
-            end_state = loop_state if is_end(word, separator) else word_start_state
+            end_state = loop_state if is_end(
+                word, separator) else word_start_state
 
         # print arcs (except the last one) for the subword
         for i in range(phones_len - 1):
@@ -151,13 +160,14 @@ def write_fst_no_silence(lexicon, position_dependent, separator):
 
         # print the last arc
         i = phones_len - 1
-        phone = phones[i] if i >=0 else "<eps>"
+        phone = phones[i] if i >= 0 else "<eps>"
         word = word if i <= 0 else "<eps>"
         cost = pron_cost if i <= 0 else 0.0
         print_arc(current_state, end_state, phone, word, cost)
 
     # set the final state
     print("{state}\t{final_cost}".format(state=loop_state, final_cost=0.0))
+
 
 def write_fst_with_silence(lexicon, sil_phone, sil_prob, sil_disambig, position_dependent, separator):
     """Writes the text format of L.fst to the standard output.  This version is for
@@ -207,7 +217,7 @@ def write_fst_with_silence(lexicon, sil_phone, sil_prob, sil_disambig, position_
     start_state = 0
     loop_state = 1         # also the final state
     sil_state = 2          # words terminate here when followed by silence; this state
-                           # has a licence transition to loop_state
+    # has a licence transition to loop_state
     word_start_state = 3   # subword leave from here
     next_state = 4         # the next un-allocated state, will be incremented as we go
 
@@ -232,11 +242,12 @@ def write_fst_with_silence(lexicon, sil_phone, sil_prob, sil_disambig, position_
     for (word, pron_prob, phones) in lexicon:
         pron_cost = 0.0           # do not support pron_prob
         phones_len = len(phones)
-        
+
         # set start and end state for different cases
         if position_dependent:
             first_phone_suffix = get_suffix(phones[0])
-            last_phone = phones[-2] if contain_disambig_symbol(phones) else phones[-1]
+            last_phone = phones[-2] if contain_disambig_symbol(
+                phones) else phones[-1]
             last_phone_suffix = get_suffix(last_phone)
 
             # singleton subword
@@ -284,6 +295,7 @@ def write_fst_with_silence(lexicon, sil_phone, sil_prob, sil_disambig, position_
     # set the final state
     print("{state}\t{final_cost}".format(state=loop_state, final_cost=0.0))
 
+
 def main():
     args = get_args()
     if args.sil_prob < 0.0 or args.sil_prob >= 1.0:
@@ -294,8 +306,9 @@ def main():
     if args.sil_prob == 0.0:
         write_fst_no_silence(lexicon, args.position_dependent, args.separator)
     else:
-        write_fst_with_silence(lexicon, args.sil_phone, args.sil_prob, 
-            args.sil_disambig, args.position_dependent, args.separator)
+        write_fst_with_silence(lexicon, args.sil_phone, args.sil_prob,
+                               args.sil_disambig, args.position_dependent, args.separator)
+
 
 if __name__ == "__main__":
     main()

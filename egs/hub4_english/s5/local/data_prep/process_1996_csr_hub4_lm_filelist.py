@@ -3,6 +3,7 @@
 # Copyright 2016    Vimal Manohar
 # Apache 2.0.
 
+import libs.common as common_lib
 """Prepare CSR-IV 1996 Language model text corpus (LDC98T31)."""
 
 from __future__ import print_function
@@ -17,7 +18,6 @@ import sys
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -34,7 +34,7 @@ def get_args():
 
     parser = argparse.ArgumentParser("""Prepare CSR-IV 1996 Language model text
     corpus (LDC98T31).""")
-    parser.add_argument("--verbose", choices=[0,1,2,3], type=int, default=0,
+    parser.add_argument("--verbose", choices=[0, 1, 2, 3], type=int, default=0,
                         help="Set higher for more verbose logging.")
     parser.add_argument("file_list",
                         help="""List of compressed source files""")

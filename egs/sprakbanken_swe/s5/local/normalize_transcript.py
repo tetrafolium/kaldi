@@ -5,7 +5,7 @@ import re
 #import writenumbers
 
 
-## Global vars
+# Global vars
 
 normdict = {".": "",
             ",": "",
@@ -16,19 +16,19 @@ normdict = {".": "",
             "\\": " ",
             "\t": " "
             }
-#removes all the above signs
+# removes all the above signs
 
 from_chars = ''.join(list(normdict.keys()))
 to_chars = ''.join(list(normdict.values()))
 
 t_table = str.maketrans(normdict)
 
-## Main
+# Main
 
 transcript = codecs.open(sys.argv[1], "r", "utf8")
 outtext = codecs.open(sys.argv[2], "w", "utf8")
 
-#TODO: Add number normalisation and remove uppercasing
+# TODO: Add number normalisation and remove uppercasing
 
 for line in transcript:
     line = line.replace(".\Punkt", ".")

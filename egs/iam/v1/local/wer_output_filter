@@ -19,9 +19,9 @@ punctuations = "!(),.?;:'-\""
 escaped_punctuations = re.escape(punctuations)
 
 for line in sys.stdin:
-  words = line.strip().split()
-  uttid = words[0]
-  transcript = ' '.join(words[1:])
-  split_transcript = " ".join(re.split("([{}])".format(escaped_punctuations),
-                                       transcript)).strip()
-  print("{} {}".format(uttid, split_transcript))
+    words = line.strip().split()
+    uttid = words[0]
+    transcript = ' '.join(words[1:])
+    split_transcript = " ".join(re.split("([{}])".format(escaped_punctuations),
+                                         transcript)).strip()
+    print("{} {}".format(uttid, split_transcript))

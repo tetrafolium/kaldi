@@ -5,6 +5,7 @@
 # Apache 2.0
 
 
+import libs.common as common_lib
 """ This script generates a set of allowed lengths of utterances
     spaced by a factor (like 10%). This is useful for generating
     fixed-length chunks for chain training.
@@ -18,7 +19,6 @@ import math
 import logging
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger('libs')
 logger.setLevel(logging.INFO)
@@ -28,6 +28,7 @@ formatter = logging.Formatter("%(asctime)s [%(pathname)s:%(lineno)s - "
                               "%(funcName)s - %(levelname)s ] %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
 
 def get_args():
     parser = argparse.ArgumentParser(description="""
@@ -147,12 +148,12 @@ def get_allowed_durations(start_dur, end_dur, args):
     allowed_durations = []
     d = start_dur
     with open(os.path.join(args.dir, 'allowed_durs.txt'), 'w', encoding='latin-1') as durs_fp, \
-           open(os.path.join(args.dir, 'allowed_lengths.txt'), 'w', encoding='latin-1') as lengths_fp:
+            open(os.path.join(args.dir, 'allowed_lengths.txt'), 'w', encoding='latin-1') as lengths_fp:
         while d < end_dur:
             length = int(d * 1000 - args.frame_length) / args.frame_shift + 1
             if length % args.frame_subsampling_factor != 0:
                 length = (args.frame_subsampling_factor *
-                              (length // args.frame_subsampling_factor))
+                          (length // args.frame_subsampling_factor))
                 d = (args.frame_shift * (length - 1.0)
                      + args.frame_length + args.frame_shift / 2) / 1000.0
             allowed_durations.append(d)
@@ -171,11 +172,11 @@ def get_trivial_allowed_durations(utt2dur, args):
 
     allowed_durations = []
     with open(os.path.join(args.dir, 'allowed_durs.txt'), 'w', encoding='latin-1') as durs_fp, \
-           open(os.path.join(args.dir, 'allowed_lengths.txt'), 'w', encoding='latin-1') as lengths_fp:
+            open(os.path.join(args.dir, 'allowed_lengths.txt'), 'w', encoding='latin-1') as lengths_fp:
         for length in lengths:
             if length % args.frame_subsampling_factor != 0:
                 length = (args.frame_subsampling_factor *
-                              (length // args.frame_subsampling_factor))
+                          (length // args.frame_subsampling_factor))
                 d = (args.frame_shift * (length - 1.0)
                      + args.frame_length + args.frame_shift / 2) / 1000.0
             allowed_durations.append(d)
@@ -207,13 +208,13 @@ def main():
     start_dur, end_dur = find_duration_range(utt2dur, args.coverage_factor)
     logger.info("Durations in the range [{},{}] will be covered. "
                 "Coverage rate: {}%".format(start_dur, end_dur,
-                                      100.0 - args.coverage_factor * 2))
+                                            100.0 - args.coverage_factor * 2))
     logger.info("There will be {} unique allowed lengths "
-                "for the utterances.".format(int(math.log(end_dur / start_dur)/
+                "for the utterances.".format(int(math.log(end_dur / start_dur) /
                                                  math.log(args.factor))))
 
     get_allowed_durations(start_dur, end_dur, args)
 
 
 if __name__ == '__main__':
-      main()
+    main()

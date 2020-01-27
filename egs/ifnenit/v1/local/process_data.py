@@ -18,7 +18,7 @@ parser.add_argument('--train_sets', type=str,
 parser.add_argument('--test_sets', type=str,
                     help='sets for testing')
 parser.add_argument('--dataset', type=str, default='train',
-                    choices=['train','test'],
+                    choices=['train', 'test'],
                     help='choose trainset, testset, validationset1, or validationset2')
 args = parser.parse_args()
 
@@ -39,32 +39,27 @@ imgs_y = []
 imgs_x = []
 sets = {}
 if args.dataset == 'train':
-  sets = args.train_sets.split(" ")
+    sets = args.train_sets.split(" ")
 else:
-  sets = args.test_sets.split(" ")
+    sets = args.test_sets.split(" ")
 for dir_name in sorted(sets):
-    if( dir_name == "set_e" or dir_name == "set_f" or dir_name == "set_s"):
-      png_path = args.database_path + '/' + dir_name + '/png'
-      tru_path = args.database_path + '/' + dir_name + '/tru'
-      for i in range(0,len(os.listdir(png_path))):
-        png_file_name = sorted(os.listdir(png_path))[i][:-4]
-        writer_id = png_file_name[0:5]
-        utt_id = png_file_name
-        image_fh.write(utt_id + ' ' + png_path + '/' + sorted(os.listdir(png_path))[i] + '\n' )
-        utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
-    else: 
-      png_path = args.database_path + '/' + dir_name + '/png'
-      tru_path = args.database_path + '/' + dir_name + '/tru'
-      for i in range(0,len(os.listdir(png_path))):
-        png_file_name = sorted(os.listdir(png_path))[i][:-4]
-        writer_id = png_file_name[0:4]
-        utt_id = png_file_name
-        image_fh.write(utt_id + ' ' + png_path + '/' + sorted(os.listdir(png_path))[i] + '\n' )
-        utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
-
-
-
-
-
-
-
+    if(dir_name == "set_e" or dir_name == "set_f" or dir_name == "set_s"):
+        png_path = args.database_path + '/' + dir_name + '/png'
+        tru_path = args.database_path + '/' + dir_name + '/tru'
+        for i in range(0, len(os.listdir(png_path))):
+            png_file_name = sorted(os.listdir(png_path))[i][:-4]
+            writer_id = png_file_name[0:5]
+            utt_id = png_file_name
+            image_fh.write(utt_id + ' ' + png_path + '/' +
+                           sorted(os.listdir(png_path))[i] + '\n')
+            utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
+    else:
+        png_path = args.database_path + '/' + dir_name + '/png'
+        tru_path = args.database_path + '/' + dir_name + '/tru'
+        for i in range(0, len(os.listdir(png_path))):
+            png_file_name = sorted(os.listdir(png_path))[i][:-4]
+            writer_id = png_file_name[0:4]
+            utt_id = png_file_name
+            image_fh.write(utt_id + ' ' + png_path + '/' +
+                           sorted(os.listdir(png_path))[i] + '\n')
+            utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')

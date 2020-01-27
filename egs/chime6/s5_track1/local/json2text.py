@@ -27,7 +27,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('json', type=str, help='JSON transcription file')
     parser.add_argument('--mictype', type=str,
-                        choices=['ref', 'worn', 'gss', 'u01', 'u02', 'u03', 'u04', 'u05', 'u06'],
+                        choices=['ref', 'worn', 'gss', 'u01',
+                                 'u02', 'u03', 'u04', 'u05', 'u06'],
                         help='Type of microphones')
     args = parser.parse_args()
 
@@ -48,7 +49,7 @@ if __name__ == '__main__':
             elif args.mictype == 'worn' or args.mictype == 'gss':
                 mictype = 'original'
             else:
-                mictype = args.mictype.upper() # convert from u01 to U01
+                mictype = args.mictype.upper()  # convert from u01 to U01
 
             # add location tag for scoring (only for dev and eval sets)
             if 'location' in x.keys():
@@ -89,4 +90,5 @@ if __name__ == '__main__':
             # (the end time is earlier than the start time)
             # We just ignored such utterances.
             if end_time > start_time:
-                sys.stdout.buffer.write((uttid + ' ' + words + '\n').encode("utf-8"))
+                sys.stdout.buffer.write(
+                    (uttid + ' ' + words + '\n').encode("utf-8"))

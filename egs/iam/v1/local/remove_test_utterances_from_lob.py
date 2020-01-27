@@ -16,6 +16,7 @@ parser.add_argument('test_text', type=str,
                     help='test transcription location.')
 args = parser.parse_args()
 
+
 def remove_punctuations(transcript):
     char_list = []
     for char in transcript:

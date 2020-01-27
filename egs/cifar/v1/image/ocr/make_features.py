@@ -48,10 +48,10 @@ parser.add_argument('--num-channels', type=int, default=1,
                     help='Number of color channels')
 parser.add_argument('--vertical-shift', type=int, default=0,
                     help='total number of padding pixel per column')
-parser.add_argument('--fliplr', type=lambda x: (str(x).lower()=='true'), default=False,
-                   help="Flip the image left-right for right to left languages")
+parser.add_argument('--fliplr', type=lambda x: (str(x).lower() == 'true'), default=False,
+                    help="Flip the image left-right for right to left languages")
 parser.add_argument('--augment_type', type=str, default='no_aug',
-                    choices=['no_aug', 'random_scale','random_shift'],
+                    choices=['no_aug', 'random_scale', 'random_shift'],
                     help='Subset of data to process.')
 args = parser.parse_args()
 
@@ -72,11 +72,12 @@ def write_kaldi_matrix(file_handle, matrix, key):
             file_handle.write("\n")
     file_handle.write(" ]\n")
 
-def horizontal_pad(im, allowed_lengths = None):
+
+def horizontal_pad(im, allowed_lengths=None):
     if allowed_lengths is None:
         left_padding = right_padding = args.padding
     else:  # Find an allowed length for the image
-        imlen = im.shape[1] # width
+        imlen = im.shape[1]  # width
         allowed_len = 0
         for l in allowed_lengths:
             if l > imlen:
@@ -88,8 +89,8 @@ def horizontal_pad(im, allowed_lengths = None):
         padding = allowed_len - imlen
         left_padding = int(padding // 2)
         right_padding = padding - left_padding
-    dim_y = im.shape[0] # height
-    if args.num_channels in [1,4]:
+    dim_y = im.shape[0]  # height
+    if args.num_channels in [1, 4]:
         im_pad = np.concatenate((255 * np.ones((dim_y, left_padding),
                                                dtype=int), im), axis=1)
         im_pad1 = np.concatenate((im_pad, 255 * np.ones((dim_y, right_padding),
@@ -101,13 +102,14 @@ def horizontal_pad(im, allowed_lengths = None):
                                                         dtype=int)), axis=1)
     return im_pad1
 
+
 def get_scaled_image_aug(im, mode='normal'):
     scale_size = args.feat_dim
     sx = im.shape[1]
     sy = im.shape[0]
     scale = (1.0 * scale_size) / sy
     nx = int(scale_size)
-    ny = int(scale * sx) 
+    ny = int(scale * sx)
     scale_size = random.randint(10, 30)
     scale = (1.0 * scale_size) / sy
     down_nx = int(scale_size)
@@ -120,6 +122,7 @@ def get_scaled_image_aug(im, mode='normal'):
         im_scaled_up = misc.imresize(im_scaled_down, (nx, ny))
         return im_scaled_up
     return im
+
 
 def vertical_shift(im, mode='normal'):
     if args.vertical_shift == 0:
@@ -149,13 +152,14 @@ def vertical_shift(im, mode='normal'):
          np.random.normal(2, 1, (bottom, width)).astype(int)), axis=0)
     return im_pad
 
+
 ### main ###
 random.seed(1)
 data_list_path = args.images_scp_path
 if args.out_ark == '-':
     out_fh = sys.stdout
 else:
-    out_fh = open(args.out_ark,'w')
+    out_fh = open(args.out_ark, 'w')
 
 allowed_lengths = None
 allowed_len_handle = args.allowed_len_file_path
@@ -194,7 +198,7 @@ with open(data_list_path) as f:
             im = vertical_shift(im, 'normal')
         elif args.augment_type == 'random_shift':
             im = vertical_shift(im, 'notmid')
-        if args.num_channels in [1,4]:
+        if args.num_channels in [1, 4]:
             data = np.transpose(im, (1, 0))
         elif args.num_channels == 3:
             H = im.shape[0]

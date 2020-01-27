@@ -3,11 +3,11 @@
 # Copyright 2017  Vimal Manohar
 # Apache 2.0
 
+import libs.common as common_lib
 import argparse
 import sys
 sys.path.insert(0, 'steps')
 
-import libs.common as common_lib
 
 def get_args():
     parser = argparse.ArgumentParser(

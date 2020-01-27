@@ -36,5 +36,6 @@ def utf8_char_to_uxxxx(char):
     uxxxx_char = "u%s" % raw_hex
     return uxxxx_char
 
+
 if __name__ == "__main__":
     main()

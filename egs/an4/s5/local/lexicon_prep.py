@@ -26,14 +26,13 @@ if len(sys.argv) != 2:
 an4_root = sys.argv[1]
 
 with open(os.path.join(an4_root, 'etc', 'an4.dic')) as dic_f, \
-     open(os.path.join('data', 'local', 'dict', 'lexicon.txt'), 'w') as lexicon_f:
+        open(os.path.join('data', 'local', 'dict', 'lexicon.txt'), 'w') as lexicon_f:
 
     lexicon_f.truncate()
-    
+
     for line in dic_f.readlines():
         line = line.strip()
         if not line:
-            continue        
+            continue
         line = re.sub(r'(\(\d+\))?\s+', ' ', line)
         lexicon_f.write(line + '\n')
-

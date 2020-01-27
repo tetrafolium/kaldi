@@ -9,6 +9,7 @@ phones present in lang/phones.txt."""
 import argparse
 import sys
 
+
 def get_args():
     parser = argparse.ArgumentParser(description="""
     This script verifies the list of phones read from stdin are valid

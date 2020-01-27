@@ -6,6 +6,10 @@
 #           2017 Johns Hopkins University (author: Daniel Povey)
 # Apache 2.0.
 
+import libs.nnet3.report.log_parse as nnet3_log_parse
+import libs.nnet3.train.frame_level_objf as train_lib
+import libs.common as common_lib
+import libs.nnet3.train.common as common_train_lib
 """ This script is similar to steps/nnet3/train_rnn.py but trains a
 raw neural network instead of an acoustic model.
 """
@@ -19,10 +23,6 @@ import sys
 import traceback
 
 sys.path.insert(0, 'steps')
-import libs.nnet3.train.common as common_train_lib
-import libs.common as common_lib
-import libs.nnet3.train.frame_level_objf as train_lib
-import libs.nnet3.report.log_parse as nnet3_log_parse
 
 logger = logging.getLogger('libs')
 logger.setLevel(logging.INFO)
@@ -172,7 +172,8 @@ def process_args(args):
         raise Exception("--egs.chunk-width has an invalid value")
 
     if not common_train_lib.validate_minibatch_size_str(args.num_chunk_per_minibatch):
-        raise Exception("--trainer.rnn.num-chunk-per-minibatch has an invalid value")
+        raise Exception(
+            "--trainer.rnn.num-chunk-per-minibatch has an invalid value")
 
     if args.chunk_left_context < 0:
         raise Exception("--egs.chunk-left-context should be non-negative")
@@ -184,7 +185,7 @@ def process_args(args):
         raise Exception("Directory specified with --dir={0} "
                         "does not exist.".format(args.dir))
     if (not os.path.exists(args.dir + "/configs") and
-        (args.input_model is None or not os.path.exists(args.input_model))):
+            (args.input_model is None or not os.path.exists(args.input_model))):
         raise Exception("Either --trainer.input-model option should be supplied, "
                         "and exist; or the {0}/configs directory should exist."
                         "{0}/configs is the output of make_configs.py"
@@ -362,7 +363,8 @@ def train(args, run_opts):
 
     if args.stage <= -1:
         logger.info("Preparing the initial network.")
-        common_train_lib.prepare_initial_network(args.dir, run_opts, args.srand, args.input_model)
+        common_train_lib.prepare_initial_network(
+            args.dir, run_opts, args.srand, args.input_model)
 
     # set num_iters so that as close as possible, we process the data
     # $num_epochs times, i.e. $num_iters*$avg_num_jobs) ==
@@ -370,7 +372,8 @@ def train(args, run_opts):
     # avg_num_jobs=(num_jobs_initial+num_jobs_final)/2.
     num_archives_to_process = int(args.num_epochs * num_archives)
     num_archives_processed = 0
-    num_iters = int((num_archives_to_process * 2) / (args.num_jobs_initial + args.num_jobs_final))
+    num_iters = int((num_archives_to_process * 2) /
+                    (args.num_jobs_initial + args.num_jobs_final))
 
     # If do_final_combination is True, compute the set of models_to_combine.
     # Otherwise, models_to_combine will be none.
@@ -403,7 +406,7 @@ def train(args, run_opts):
     if args.deriv_truncate_margin is not None:
         min_deriv_time = -args.deriv_truncate_margin - model_left_context
         max_deriv_time_relative = \
-           args.deriv_truncate_margin + model_right_context
+            args.deriv_truncate_margin + model_right_context
 
     logger.info("Training will run for {0} epochs = "
                 "{1} iterations".format(args.num_epochs, num_iters))
@@ -436,9 +439,9 @@ def train(args, run_opts):
             if args.shrink_value < shrinkage_value:
                 shrinkage_value = (args.shrink_value
                                    if common_train_lib.should_do_shrinkage(
-                                           iter, model_file,
-                                           args.shrink_saturation_threshold,
-                                           get_raw_nnet_from_am=False)
+                                       iter, model_file,
+                                       args.shrink_saturation_threshold,
+                                       get_raw_nnet_from_am=False)
                                    else shrinkage_value)
 
             percent = num_archives_processed * 100.0 / num_archives_to_process
@@ -543,7 +546,8 @@ def train(args, run_opts):
             get_raw_nnet_from_am=False)
 
     # do some reporting
-    [report, times, data] = nnet3_log_parse.generate_acc_logprob_report(args.dir)
+    [report, times, data] = nnet3_log_parse.generate_acc_logprob_report(
+        args.dir)
     if args.email is not None:
         common_lib.send_mail(report, "Update : Expt {0} : "
                                      "complete".format(args.dir), args.email)
@@ -570,6 +574,7 @@ def main():
         if not isinstance(e, KeyboardInterrupt):
             traceback.print_exc()
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

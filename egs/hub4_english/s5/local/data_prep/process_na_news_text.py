@@ -3,6 +3,8 @@
 # Copyright 2016    Vimal Manohar
 # Apache 2.0.
 
+import libs.common as common_lib
+import hub4_utils
 """Prepare NA News Text Corpus (LDC95T21)
 or NA New Text Supplement Corpus (LDC98T30)."""
 
@@ -17,10 +19,8 @@ import sys
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, 'local/data_prep')
-import hub4_utils
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

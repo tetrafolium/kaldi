@@ -4,6 +4,7 @@
 #           2018  Capital One (Author: Zhiyuan Guan)
 # Apache 2.0
 
+import libs.common as common_lib
 """
 This script converts frame-level speech activity detection marks (in kaldi
 integer vector text archive format) into kaldi segments and utt2spk.
@@ -17,7 +18,6 @@ import logging
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -126,14 +126,14 @@ class SegmenterStats(object):
                 "filter-short-duration={filter_short_duration}, "
                 "padding-duration={padding_duration}, "
                 "final-duration={final_duration}".format(
-            num_segments_initial=self.num_segments_initial,
-            num_short_segments_filtered=self.num_short_segments_filtered,
-            num_merges=self.num_merges,
-            num_segments_final=self.num_segments_final,
-            initial_duration=self.initial_duration,
-            filter_short_duration=self.filter_short_duration,
-            padding_duration=self.padding_duration,
-            final_duration=self.final_duration))
+                    num_segments_initial=self.num_segments_initial,
+                    num_short_segments_filtered=self.num_short_segments_filtered,
+                    num_merges=self.num_merges,
+                    num_segments_final=self.num_segments_final,
+                    initial_duration=self.initial_duration,
+                    filter_short_duration=self.filter_short_duration,
+                    padding_duration=self.padding_duration,
+                    final_duration=self.final_duration))
 
 
 def process_label(text_label):
@@ -218,7 +218,8 @@ class Segmentation(object):
             max_duration = float("inf")
         for i, segment in enumerate(self.segments):
             assert segment[2] == 2, segment
-            segment[0] -= segment_padding  # try adding padding on the left side
+            # try adding padding on the left side
+            segment[0] -= segment_padding
             self.stats.padding_duration += segment_padding
             if segment[0] < 0.0:
                 # Padding takes the segment start to before the beginning of the utterance.
@@ -229,7 +230,7 @@ class Segmentation(object):
                 # Padding takes the segment start to before the end the previous segment.
                 # Reduce padding.
                 self.stats.padding_duration -= (
-                        self.segments[i - 1][1] - segment[0])
+                    self.segments[i - 1][1] - segment[0])
                 segment[0] = self.segments[i - 1][1]
 
             segment[1] += segment_padding
@@ -244,7 +245,7 @@ class Segmentation(object):
                 # Padding takes the segment end beyond the start of the next segment.
                 # Reduce padding.
                 self.stats.padding_duration -= (
-                        segment[1] - self.segments[i + 1][0])
+                    segment[1] - self.segments[i + 1][0])
                 segment[1] = self.segments[i + 1][0]
         self.stats.final_duration += self.stats.padding_duration
 
@@ -314,7 +315,8 @@ def run(args):
             segmentation.pad_speech_segments(args.segment_padding,
                                              None if args.utt2dur is None
                                              else utt2dur[utt_id])
-            segmentation.merge_consecutive_segments(args.merge_consecutive_max_dur)
+            segmentation.merge_consecutive_segments(
+                args.merge_consecutive_max_dur)
             segmentation.write(utt_id, out_segments_fh)
             global_stats.add(segmentation.stats)
     logger.info(global_stats)

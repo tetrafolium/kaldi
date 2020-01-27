@@ -87,7 +87,8 @@ class LiveDemo(object):
                     print('\nMarked end of dialogue\n')
         finally:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
-        print("""Chunks: %d ; Utterance %d ; end %d : press 'u'\nFor terminating press 'c'\n\n""" % (len(self.frames), self.utt_frames, self.utt_end))
+        print("""Chunks: %d ; Utterance %d ; end %d : press 'u'\nFor terminating press 'c'\n\n""" % (
+            len(self.frames), self.utt_frames, self.utt_end))
 
     def run(self):
         while True:

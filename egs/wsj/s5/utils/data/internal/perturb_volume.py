@@ -15,6 +15,7 @@ import re
 import random
 import sys
 
+
 def get_args():
     parser = argparse.ArgumentParser(description="""
         This script reads a wav.scp file from the input and perturbs the

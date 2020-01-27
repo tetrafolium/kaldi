@@ -4,6 +4,7 @@
 # Apache 2.0
 
 
+import libs.common as common_lib
 """ This script perturbs speeds of utterances to force their lengths to some
     allowed lengths spaced by a factor (like 10%)
 """
@@ -16,7 +17,6 @@ import math
 import logging
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger('libs')
 logger.setLevel(logging.INFO)
@@ -26,6 +26,7 @@ formatter = logging.Formatter("%(asctime)s [%(pathname)s:%(lineno)s - "
                               "%(funcName)s - %(levelname)s ] %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
 
 def get_args():
     parser = argparse.ArgumentParser(description="""This script copies the 'srcdir'
@@ -50,7 +51,7 @@ def get_args():
     parser.add_argument('--frame-subsampling-factor', type=int, default=3,
                         help="""Chain frame subsampling factor.
                              See steps/nnet3/chain/train.py""")
-    parser.add_argument('--speed-perturb', type=str, choices=['true','false'],
+    parser.add_argument('--speed-perturb', type=str, choices=['true', 'false'],
                         default='true',
                         help="""If false, no speed perturbation will occur, i.e.
                              only 1 copy of each utterance will be
@@ -59,6 +60,7 @@ def get_args():
     args = parser.parse_args()
     args.speed_perturb = True if args.speed_perturb == 'true' else False
     return args
+
 
 class Utterance(object):
     """ This class represents a Kaldi utterance
@@ -109,7 +111,7 @@ def read_kaldi_datadir(dir):
     for utt in wav_scp:
         if utt in text and utt in utt2dur and utt in utt2spk:
             utterances.append(Utterance(utt, wav_scp[utt], utt2spk[utt],
-                                  text[utt], utt2dur[utt]))
+                                        text[utt], utt2dur[utt]))
         else:
             num_fail += 1
 
@@ -136,6 +138,7 @@ def read_kaldi_mapfile(path):
             val = line[sp_pos+1:]
             m[key] = val
     return m
+
 
 def generate_kaldi_data_files(utterances, outdir):
     """ Write out a list of utterances as Kaldi data files into an
@@ -174,6 +177,7 @@ def generate_kaldi_data_files(utterances, outdir):
 
     logger.info("Successfully wrote {} utterances to data "
                 "directory '{}'".format(len(utterances), outdir))
+
 
 def find_duration_range(utterances, coverage_factor):
     """Given a list of utterances, find the start and end duration to cover
@@ -223,12 +227,12 @@ def find_allowed_durations(start_dur, end_dur, args):
     allowed_durations = []
     d = start_dur
     with open(os.path.join(args.dir, 'allowed_durs.txt'), 'w', encoding='latin-1') as durs_fp, \
-           open(os.path.join(args.dir, 'allowed_lengths.txt'), 'w', encoding='latin-1') as lengths_fp:
+            open(os.path.join(args.dir, 'allowed_lengths.txt'), 'w', encoding='latin-1') as lengths_fp:
         while d < end_dur:
             length = int(d * 1000 - args.frame_length) / args.frame_shift + 1
             if length % args.frame_subsampling_factor != 0:
                 length = (args.frame_subsampling_factor *
-                              (length // args.frame_subsampling_factor))
+                          (length // args.frame_subsampling_factor))
                 d = (args.frame_shift * (length - 1.0)
                      + args.frame_length + args.frame_shift / 2) / 1000.0
             allowed_durations.append(d)
@@ -236,7 +240,6 @@ def find_allowed_durations(start_dur, end_dur, args):
             lengths_fp.write("{}\n".format(int(length)))
             d *= args.factor
     return allowed_durations
-
 
 
 def perturb_utterances(utterances, allowed_durations, args):
@@ -267,15 +270,16 @@ def perturb_utterances(utterances, allowed_durations, args):
         if i > 0 and args.speed_perturb:  # we have a smaller allowed duration
             allowed_dur = allowed_durations[i - 1]
             speed = u.dur / allowed_dur
-            if max(speed, 1.0/speed) > args.factor:  # this could happen for very short/long utterances
+            # this could happen for very short/long utterances
+            if max(speed, 1.0/speed) > args.factor:
                 continue
             u1 = copy.deepcopy(u)
             u1.id = 'pv1-' + u.id
             u1.speaker = 'pv1-' + u.speaker
-            u1.wavefile = '{} sox -t wav - -t wav - speed {} | '.format(u.wavefile, speed)
+            u1.wavefile = '{} sox -t wav - -t wav - speed {} | '.format(
+                u.wavefile, speed)
             u1.dur = allowed_dur
             perturbed_utterances.append(u1)
-
 
         if i < len(allowed_durations):  # we have a larger allowed duration
             allowed_dur2 = allowed_durations[i]
@@ -283,14 +287,15 @@ def perturb_utterances(utterances, allowed_durations, args):
             if max(speed, 1.0/speed) > args.factor:
                 continue
 
-            ## Add two versions for the second allowed_duration
-            ## one version is by using speed modification using sox
-            ## the other is by extending by silence
+            # Add two versions for the second allowed_duration
+            # one version is by using speed modification using sox
+            # the other is by extending by silence
             if args.speed_perturb:
                 u2 = copy.deepcopy(u)
                 u2.id = 'pv2-' + u.id
                 u2.speaker = 'pv2-' + u.speaker
-                u2.wavefile = '{} sox -t wav - -t wav - speed {} | '.format(u.wavefile, speed)
+                u2.wavefile = '{} sox -t wav - -t wav - speed {} | '.format(
+                    u.wavefile, speed)
                 u2.dur = allowed_dur2
                 perturbed_utterances.append(u2)
 
@@ -300,11 +305,11 @@ def perturb_utterances(utterances, allowed_durations, args):
             u3 = copy.deepcopy(u)
             u3.id = 'pv3-' + u.id
             u3.speaker = 'pv3-' + u.speaker
-            u3.wavefile = '{} extend-wav-with-silence --extra-silence-length={} - - | '.format(u.wavefile, delta)
+            u3.wavefile = '{} extend-wav-with-silence --extra-silence-length={} - - | '.format(
+                u.wavefile, delta)
             u3.dur = allowed_dur2
             perturbed_utterances.append(u3)
     return perturbed_utterances
-
 
 
 def main():
@@ -319,9 +324,9 @@ def main():
     start_dur, end_dur = find_duration_range(utterances, args.coverage_factor)
     logger.info("Durations in the range [{},{}] will be covered. "
                 "Coverage rate: {}%".format(start_dur, end_dur,
-                                      100.0 - args.coverage_factor * 2))
+                                            100.0 - args.coverage_factor * 2))
     logger.info("There will be {} unique allowed lengths "
-                "for the utterances.".format(int(math.log(end_dur / start_dur)/
+                "for the utterances.".format(int(math.log(end_dur / start_dur) /
                                                  math.log(args.factor))))
 
     allowed_durations = find_allowed_durations(start_dur, end_dur, args)
@@ -333,4 +338,4 @@ def main():
 
 
 if __name__ == '__main__':
-      main()
+    main()

@@ -38,11 +38,12 @@ def get_scaled_image_length(im):
     nx = int(scale * sx)
     return nx
 
+
 ### main ###
-data_list_path = os.path.join(args.dir,'images.scp')
+data_list_path = os.path.join(args.dir, 'images.scp')
 
 if not args.out_ark:
-    args.out_ark = os.path.join(args.dir,'image2num_frames')
+    args.out_ark = os.path.join(args.dir, 'image2num_frames')
 if args.out_ark == '-':
     out_fh = sys.stdout
 else:

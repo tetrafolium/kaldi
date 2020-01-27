@@ -107,7 +107,7 @@ def parse_non_calls_transcript_file(transcript_file, segments_fh,
             raise Exception("Transcript file {0} does not start with [0.000"
                             "".format(transcript_file))
         try:
-            start_time  = float(re.sub(r"\[([^\]]+)\]", r"\1", line))
+            start_time = float(re.sub(r"\[([^\]]+)\]", r"\1", line))
         except Exception:
             print("Could not parse line {0}".format(line), file=sys.stderr)
             raise
@@ -120,7 +120,7 @@ def parse_non_calls_transcript_file(transcript_file, segments_fh,
                 raise Exception("Time-stamp in transcript file {0} does not start with [; error parsing line {1} after text {2}"
                                 "".format(transcript_file, line, text))
             try:
-                end_time  = float(re.sub(r"\[([^\]]+)\]", r"\1", line))
+                end_time = float(re.sub(r"\[([^\]]+)\]", r"\1", line))
             except Exception:
                 print("Could not parse line {0}".format(line), file=sys.stderr)
                 raise
@@ -164,7 +164,8 @@ if __name__ == "__main__":
                              channel="A" if channel == 1 else "B"),
                    file=reco2file_and_channel_fh)
             print ("{reco_id} sox {wav_file} -r 8000 -b 16 -c 1 -t wav - remix {channel} |"
-                   "".format(reco_id=reco_id, wav_file=wav_file, channel=channel),
+                   "".format(reco_id=reco_id, wav_file=wav_file,
+                             channel=channel),
                    file=wav_scp_fh)
 
         parse_calls_transcript_file(transcript_file, segments_fh,

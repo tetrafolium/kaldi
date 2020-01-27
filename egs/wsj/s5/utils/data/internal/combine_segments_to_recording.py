@@ -9,6 +9,7 @@ import sys
 import collections
 from collections import defaultdict
 
+
 def get_args():
     parser = argparse.ArgumentParser(description="""
         This script combines segments into utterances at

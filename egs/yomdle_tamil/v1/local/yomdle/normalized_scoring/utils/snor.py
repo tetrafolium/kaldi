@@ -7,6 +7,7 @@
     some other text here (id-of-next-utterance)
 """
 
+
 def SnorIter(fh):
     for line in fh:
         lparen_location = line.rfind("(")
@@ -16,7 +17,7 @@ def SnorIter(fh):
             lparen_location_modifier = -1
         else:
             lparen_location_modifier = 0
-        utt = line[ :lparen_location + lparen_location_modifier ]
-        uttid = line[ lparen_location+1 : rparen_location ]
+        utt = line[:lparen_location + lparen_location_modifier]
+        uttid = line[lparen_location+1: rparen_location]
 
         yield utt, uttid

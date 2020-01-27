@@ -233,7 +233,7 @@ def resolve_overlaps(ctms, segments):
             try:
                 index = next(
                     (i for i, line in enumerate(ctm_for_next_utt)
-                    if line[2] + line[3] / 2.0 > overlap / 2.0))
+                     if line[2] + line[3] / 2.0 > overlap / 2.0))
             except StopIteration:
                 # This can happen if there is no word hypothesized after
                 # half the overlap region.

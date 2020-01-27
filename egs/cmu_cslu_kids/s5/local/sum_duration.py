@@ -1,4 +1,4 @@
-# Sum duration obtained by using 
+# Sum duration obtained by using
 # utils/data/get_utt2dur.sh
 
 import sys
@@ -11,5 +11,5 @@ with open(file, 'r') as fp:
         sum += float(toks[1])
         line = fp.readline()
 fp.close()
-h=sum/3600
-sys.stdout.write("%f hour data.\n"%h)
+h = sum/3600
+sys.stdout.write("%f hour data.\n" % h)

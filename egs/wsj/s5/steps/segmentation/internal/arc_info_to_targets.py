@@ -3,6 +3,7 @@
 # Copyright 2017  Vimal Manohar
 # Apache 2.0
 
+import libs.common as common_lib
 """
 This script converts arc-info into targets for training
 speech activity detection network. The output is a matrix archive
@@ -16,7 +17,6 @@ import logging
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

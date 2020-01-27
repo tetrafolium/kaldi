@@ -36,7 +36,7 @@ def get_prev_names(all_layers, current_layer):
     for name in prev_names:
         if name in prev_names_set:
             raise RuntimeError("{0}: Layer name {1} is used more than once.".format(
-                    sys.argv[0], name))
+                sys.argv[0], name))
         prev_names_set.add(name)
     return prev_names
 
@@ -64,6 +64,8 @@ def split_layer_name(full_layer_name):
 # inheriting from XconfigLayerBase.  'current_layer' is provided so that the
 # function can make sure not to look in layers that appear *after* this layer
 # (because that's not allowed).
+
+
 def get_dim_from_layer_name(all_layers, current_layer, full_layer_name):
     layer_name, auxiliary_output = split_layer_name(full_layer_name)
     for layer in all_layers:
@@ -82,20 +84,20 @@ def get_dim_from_layer_name(all_layers, current_layer, full_layer_name):
         # auxiliary_output, will only be used in the (rare) case when we are
         # using auxiliary outputs, e.g. 'lstm1.c'.
         if layer.get_name() == full_layer_name:
-            return  layer.output_dim()
+            return layer.output_dim()
 
         if layer.get_name() == layer_name:
             if (not auxiliary_output in layer.auxiliary_outputs()
-                and auxiliary_output is not None):
+                    and auxiliary_output is not None):
                 raise RuntimeError("Layer '{0}' has no such auxiliary output:"
                                    "'{1}' ({0}.{1})".format(layer_name,
                                                             auxiliary_output))
             return layer.output_dim(auxiliary_output)
     # No such layer was found.
-    if layer_name in [ layer.get_name() for layer in all_layers ]:
+    if layer_name in [layer.get_name() for layer in all_layers]:
         raise RuntimeError("Layer '{0}' was requested before it appeared in "
-                        "the xconfig file (circular dependencies or out-of-order "
-                        "layers".format(layer_name))
+                           "the xconfig file (circular dependencies or out-of-order "
+                           "layers".format(layer_name))
     else:
         raise RuntimeError("No such layer: '{0}'".format(layer_name))
 
@@ -127,16 +129,16 @@ def get_string_from_layer_name(all_layers, current_layer, full_layer_name):
 
         if layer.get_name() == layer_name:
             if (not auxiliary_output in layer.auxiliary_outputs() and
-                auxiliary_output is not None):
+                    auxiliary_output is not None):
                 raise RuntimeError("Layer '{0}' has no such auxiliary output: "
                                    "'{1}' ({0}.{1})".format(
-                    layer_name, auxiliary_output))
+                                       layer_name, auxiliary_output))
             return layer.output_name(auxiliary_output)
     # No such layer was found.
-    if layer_name in [ layer.get_name() for layer in all_layers ]:
+    if layer_name in [layer.get_name() for layer in all_layers]:
         raise RuntimeError("Layer '{0}' was requested before it appeared in "
-                        "the xconfig file (circular dependencies or out-of-order "
-                        "layers".format(layer_name))
+                           "the xconfig file (circular dependencies or out-of-order "
+                           "layers".format(layer_name))
     else:
         raise RuntimeError("No such layer: '{0}'".format(layer_name))
 
@@ -170,7 +172,6 @@ def convert_value_to_type(key, dest_type, string_value):
         return string_value
 
 
-
 # This class parses and stores a Descriptor-- expression
 # like Append(Offset(input, -3), input) and so on.
 # For the full range of possible expressions, see the comment at the
@@ -186,8 +187,8 @@ def convert_value_to_type(key, dest_type, string_value):
 # last-but-one input/layer/output, and so on.
 class Descriptor(object):
     def __init__(self,
-                 descriptor_string = None,
-                 prev_names = None):
+                 descriptor_string=None,
+                 prev_names=None):
         # self.operator is a string that may be 'Offset', 'Append',
         # 'Sum', 'Failover', 'IfDefined', 'Offset', 'Switch', 'Round',
         # 'ReplaceIndex'; it also may be None, representing the base-case
@@ -215,7 +216,7 @@ class Descriptor(object):
                 # that terminates 'tokens'.
                 if pos != len(tokens) - 1:
                     raise RuntimeError("Parsing Descriptor, saw junk at end: " +
-                                    ' '.join(tokens[pos:-1]))
+                                       ' '.join(tokens[pos:-1]))
                 # copy members from d.
                 self.operator = d.operator
                 self.items = d.items
@@ -237,8 +238,8 @@ class Descriptor(object):
         else:
             assert isinstance(self.operator, str)
             return self.operator + '(' + ', '.join(
-                    [ item.config_string(layer_to_string) if isinstance(item, Descriptor) else str(item)
-                      for item in self.items]) + ')'
+                [item.config_string(layer_to_string) if isinstance(item, Descriptor) else str(item)
+                 for item in self.items]) + ')'
 
     def str(self):
         if self.operator is None:
@@ -263,7 +264,7 @@ class Descriptor(object):
             # base-case: self.items = [ layer_name ] (or sub-layer name, like
             # 'lstm.memory_cell').
             return layer_to_dim(self.items[0])
-        elif self.operator in [ 'Sum', 'Failover', 'IfDefined', 'Switch' ]:
+        elif self.operator in ['Sum', 'Failover', 'IfDefined', 'Switch']:
             # these are all operators for which all args are descriptors
             # and must have the same dim.
             dim = self.items[0].dim(layer_to_dim)
@@ -273,11 +274,11 @@ class Descriptor(object):
                     raise RuntimeError("In descriptor {0}, different fields have different "
                                        "dimensions: {1} != {2}".format(self.str(), dim, next_dim))
             return dim
-        elif self.operator in [  'Offset', 'Round', 'ReplaceIndex' ]:
+        elif self.operator in ['Offset', 'Round', 'ReplaceIndex']:
             # for these operators, only the 1st arg is relevant.
             return self.items[0].dim(layer_to_dim)
         elif self.operator == 'Append':
-            return sum([ x.dim(layer_to_dim) for x in self.items])
+            return sum([x.dim(layer_to_dim) for x in self.items])
         elif self.operator == 'Scale':
             # e.g. Scale(2.0, lstm1).  Return dim of 2nd arg.
             return self.items[1].dim(layer_to_dim)
@@ -286,7 +287,6 @@ class Descriptor(object):
             return self.items[1]
         else:
             raise RuntimeError("Unknown operator {0}".format(self.operator))
-
 
 
 # This just checks that seen_item == expected_item, and raises an
@@ -298,6 +298,8 @@ def expect_token(expected_item, seen_item, what_parsing):
 
 # returns true if 'name' is valid as the name of a line (input, layer or output);
 # this is the same as IsValidname() in the nnet3 code.
+
+
 def is_valid_line_name(name):
     return isinstance(name, str) and re.match(r'^[a-zA-Z_][-a-zA-Z_0-9.]*', name) != None
 
@@ -311,6 +313,8 @@ def is_valid_line_name(name):
 # 'prev_names' is so that we can find the most recent layer name for
 # expressions like Append(-3, 0, 3) which is shorthand for the most recent
 # layer spliced at those time offsets.
+
+
 def parse_new_descriptor(tokens, pos, prev_names):
     size = len(tokens)
     first_token = tokens[pos]
@@ -319,8 +323,8 @@ def parse_new_descriptor(tokens, pos, prev_names):
 
     # when reading this function, be careful to note the indent level,
     # there is an if-statement within an if-statement.
-    if first_token in [ 'Offset', 'Round', 'ReplaceIndex', 'Append', 'Sum',
-                        'Switch', 'Failover', 'IfDefined' ]:
+    if first_token in ['Offset', 'Round', 'ReplaceIndex', 'Append', 'Sum',
+                       'Switch', 'Failover', 'IfDefined']:
         expect_token('(', tokens[pos], first_token + '()')
         pos += 1
         d.operator = first_token
@@ -336,34 +340,40 @@ def parse_new_descriptor(tokens, pos, prev_names):
                 pos += 1
                 d.items.append(t_offset)
             except:
-                raise RuntimeError("Parsing Offset(), expected integer, got " + tokens[pos])
+                raise RuntimeError(
+                    "Parsing Offset(), expected integer, got " + tokens[pos])
             if tokens[pos] == ')':
                 return (d, pos + 1)
             elif tokens[pos] != ',':
-                raise RuntimeError("Parsing Offset(), expected ')' or ',', got " + tokens[pos])
+                raise RuntimeError(
+                    "Parsing Offset(), expected ')' or ',', got " + tokens[pos])
             pos += 1
             try:
                 x_offset = int(tokens[pos])
                 pos += 1
                 d.items.append(x_offset)
             except:
-                raise RuntimeError("Parsing Offset(), expected integer, got " + tokens[pos])
+                raise RuntimeError(
+                    "Parsing Offset(), expected integer, got " + tokens[pos])
             expect_token(')', tokens[pos], 'Offset()')
             pos += 1
-        elif first_token in [ 'Append', 'Sum', 'Switch', 'Failover', 'IfDefined' ]:
+        elif first_token in ['Append', 'Sum', 'Switch', 'Failover', 'IfDefined']:
             while True:
                 if tokens[pos] == ')':
                     # check num-items is correct for some special cases.
                     if first_token == 'Failover' and len(d.items) != 2:
-                        raise RuntimeError("Parsing Failover(), expected 2 items but got {0}".format(len(d.items)))
+                        raise RuntimeError(
+                            "Parsing Failover(), expected 2 items but got {0}".format(len(d.items)))
                     if first_token == 'IfDefined' and len(d.items) != 1:
-                        raise RuntimeError("Parsing IfDefined(), expected 1 item but got {0}".format(len(d.items)))
+                        raise RuntimeError(
+                            "Parsing IfDefined(), expected 1 item but got {0}".format(len(d.items)))
                     pos += 1
                     break
                 elif tokens[pos] == ',':
                     pos += 1  # consume the comma.
                 else:
-                    raise RuntimeError("Parsing Append(), expected ')' or ',', got " + tokens[pos])
+                    raise RuntimeError(
+                        "Parsing Append(), expected ')' or ',', got " + tokens[pos])
 
                 (desc, pos) = parse_new_descriptor(tokens, pos, prev_names)
                 d.items.append(desc)
@@ -376,18 +386,19 @@ def parse_new_descriptor(tokens, pos, prev_names):
                 pos += 1
                 d.items.append(t_modulus)
             except:
-                raise RuntimeError("Parsing Offset(), expected integer, got " + tokens[pos])
+                raise RuntimeError(
+                    "Parsing Offset(), expected integer, got " + tokens[pos])
             expect_token(')', tokens[pos], 'Round()')
             pos += 1
         elif first_token == 'ReplaceIndex':
             expect_token(',', tokens[pos], 'ReplaceIndex()')
             pos += 1
-            if tokens[pos] in [ 'x', 't' ]:
+            if tokens[pos] in ['x', 't']:
                 d.items.append(tokens[pos])
                 pos += 1
             else:
                 raise RuntimeError("Parsing ReplaceIndex(), expected 'x' or 't', got " +
-                                tokens[pos])
+                                   tokens[pos])
             expect_token(',', tokens[pos], 'ReplaceIndex()')
             pos += 1
             try:
@@ -395,12 +406,13 @@ def parse_new_descriptor(tokens, pos, prev_names):
                 pos += 1
                 d.items.append(new_value)
             except:
-                raise RuntimeError("Parsing Offset(), expected integer, got " + tokens[pos])
+                raise RuntimeError(
+                    "Parsing Offset(), expected integer, got " + tokens[pos])
             expect_token(')', tokens[pos], 'ReplaceIndex()')
             pos += 1
         else:
             raise RuntimeError("code error")
-    elif first_token in ['Scale', 'Const' ]:
+    elif first_token in ['Scale', 'Const']:
         # Parsing something like 'Scale(2.0, lstm1)' or 'Const(1.0, 512)'
         expect_token('(', tokens[pos], first_token + '()')
         pos += 1
@@ -432,7 +444,7 @@ def parse_new_descriptor(tokens, pos, prev_names):
                     tokens[pos]))
         expect_token(')', tokens[pos], first_token)
         pos += 1
-    elif first_token in [ 'end of string', '(', ')', ',', '@' ]:
+    elif first_token in ['end of string', '(', ')', ',', '@']:
         raise RuntimeError("Expected descriptor, got " + first_token)
     elif is_valid_line_name(first_token) or first_token == '[':
         # This section parses a raw input/layer/output name, e.g. "affine2"
@@ -458,7 +470,7 @@ def parse_new_descriptor(tokens, pos, prev_names):
                 d = Descriptor()
                 # e.g. foo@3 is equivalent to 'Offset(foo, 3)'.
                 d.operator = 'Offset'
-                d.items = [ inner_d, offset_t ]
+                d.items = [inner_d, offset_t]
     else:
         # the last possible case is that 'first_token' is just an integer i,
         # which can appear in things like Append(-3, 0, 3).
@@ -469,11 +481,11 @@ def parse_new_descriptor(tokens, pos, prev_names):
             offset_t = int(first_token)
         except:
             raise RuntimeError("Parsing descriptor, expected descriptor but got " +
-                            first_token)
+                               first_token)
         assert isinstance(prev_names, list)
         if len(prev_names) < 1:
             raise RuntimeError("Parsing descriptor, could not interpret '{0}' because "
-                            "there is no previous layer".format(first_token))
+                               "there is no previous layer".format(first_token))
         d.operator = None
         # the layer name is the name of the most recent layer.
         d.items = [prev_names[-1]]
@@ -481,7 +493,7 @@ def parse_new_descriptor(tokens, pos, prev_names):
             inner_d = d
             d = Descriptor()
             d.operator = 'Offset'
-            d.items = [ inner_d, offset_t ]
+            d.items = [inner_d, offset_t]
     return (d, pos)
 
 
@@ -495,7 +507,7 @@ def parse_new_descriptor(tokens, pos, prev_names):
 # If there are no such expressions in the string, it's OK if
 # prev_names == None (this is useful for testing).
 def replace_bracket_expressions_in_descriptor(descriptor_string,
-                                              prev_names = None):
+                                              prev_names=None):
     fields = re.split(r'(\[|\])\s*', descriptor_string)
     out_fields = []
     i = 0
@@ -507,7 +519,7 @@ def replace_bracket_expressions_in_descriptor(descriptor_string,
         elif f == '[':
             if i + 2 >= len(fields):
                 raise RuntimeError("Error tokenizing string '{0}': '[' found too close "
-                                "to the end of the descriptor.".format(descriptor_string))
+                                   "to the end of the descriptor.".format(descriptor_string))
             assert isinstance(prev_names, list)
             try:
                 offset = int(fields[i])
@@ -515,7 +527,7 @@ def replace_bracket_expressions_in_descriptor(descriptor_string,
                 i += 2  # consume the int and the ']'.
             except:
                 raise RuntimeError("Error tokenizing string '{0}': expression [{1}] has an "
-                                "invalid or out of range offset.".format(descriptor_string, fields[i]))
+                                   "invalid or out of range offset.".format(descriptor_string, fields[i]))
             this_field = prev_names[offset]
             out_fields.append(this_field)
         else:
@@ -535,8 +547,10 @@ def replace_bracket_expressions_in_descriptor(descriptor_string,
 #   tokenize_descriptor('Append(-1, 0, 1, [-2]@0)', prev_names = ['a', 'b', 'c', 'd'])
 # the [-2] would get replaced with prev_names[-2] = 'c', returning:
 #  [ 'Append', '(', '-1', ',', '0', ',', '1', ',', 'c', '@', '0', ')' ]
+
+
 def tokenize_descriptor(descriptor_string,
-                       prev_names = None):
+                        prev_names=None):
     # split on '(', ')', ',', '@', and space.  Note: the parenthesis () in the
     # regexp causes it to output the stuff inside the () as if it were a field,
     # which is how the call to re.split() keeps characters like '(' and ')' as
@@ -582,13 +596,14 @@ def parse_config_line(orig_config_line):
                                .format(bad_char))
 
     # Now split on space; later we may splice things back together.
-    fields=config_line.split()
+    fields = config_line.split()
     if len(fields) == 0:
         return None   # Line was only whitespace after removing comments.
     first_token = fields[0]
     # if first_token does not look like 'foo-bar' or 'foo-bar2', then die.
     if re.match('^[a-z][-a-z0-9]+$', first_token) is None:
-        raise RuntimeError("Error parsing config line (first field doesn't look right).")
+        raise RuntimeError(
+            "Error parsing config line (first field doesn't look right).")
 
     # get rid of the first field which we put in 'first_token'.
     fields = fields[1:]
@@ -612,11 +627,12 @@ def parse_config_line(orig_config_line):
         end = positions[i * 2 + 1]
 
         line_before_start = rest_of_line[:start]
-        inside_quotes=rest_of_line[start+1:end].replace('=', '?')
+        inside_quotes = rest_of_line[start+1:end].replace('=', '?')
         line_after_end = rest_of_line[end + 1:]
         # the reason why we include the spaces here, is to keep the length of
         # rest_of_line the same, and the positions in 'positions' valid.
-        new_rest_of_line = line_before_start + ' ' + inside_quotes + ' ' + line_after_end
+        new_rest_of_line = line_before_start + ' ' + \
+            inside_quotes + ' ' + line_after_end
         assert len(new_rest_of_line) == len(rest_of_line)
         rest_of_line = new_rest_of_line
 
@@ -625,8 +641,8 @@ def parse_config_line(orig_config_line):
     # fields = ['', 'input', 'Append(foo, bar)', 'foo', 'bar']
     ans_dict = dict()
     other_fields = re.split(r'\s*([-a-zA-Z0-9_]*)=', rest_of_line)
-    if not (other_fields[0] == '' and len(other_fields) % 2 ==  1):
-        raise RuntimeError("Could not parse config line.");
+    if not (other_fields[0] == '' and len(other_fields) % 2 == 1):
+        raise RuntimeError("Could not parse config line.")
     fields += other_fields[1:]
     num_variables = len(fields) // 2
     for i in range(num_variables):
@@ -634,7 +650,7 @@ def parse_config_line(orig_config_line):
         var_value = fields[i * 2 + 1]
         if re.match(r'[a-zA-Z_]', var_name) is None:
             raise RuntimeError("Expected variable name '{0}' to start with alphabetic character or _, "
-                            "in config line {1}".format(var_name, orig_config_line))
+                               "in config line {1}".format(var_name, orig_config_line))
         if var_name in ans_dict:
             raise RuntimeError("Config line has multiply defined variable {0}: {1}".format(
                 var_name, orig_config_line))
@@ -648,45 +664,50 @@ def parse_config_line(orig_config_line):
 
 
 def test_library():
-    tokenize_test = lambda x: tokenize_descriptor(x)[:-1]  # remove 'end of string'
+    def tokenize_test(x): return tokenize_descriptor(x)[
+        :-1]  # remove 'end of string'
     assert tokenize_test("hi") == ['hi']
     assert tokenize_test("hi there") == ['hi', 'there']
     assert tokenize_test("hi,there") == ['hi', ',', 'there']
     assert tokenize_test("hi@-1,there") == ['hi', '@', '-1', ',', 'there']
     assert tokenize_test("hi(there)") == ['hi', '(', 'there', ')']
-    assert tokenize_descriptor("[-1]@2", ['foo', 'bar'])[:-1] == ['bar', '@', '2' ]
-    assert tokenize_descriptor("[-2].special@2", ['foo', 'bar'])[:-1] == ['foo.special', '@', '2' ]
+    assert tokenize_descriptor(
+        "[-1]@2", ['foo', 'bar'])[:-1] == ['bar', '@', '2']
+    assert tokenize_descriptor(
+        "[-2].special@2", ['foo', 'bar'])[:-1] == ['foo.special', '@', '2']
 
     assert Descriptor('foo').str() == 'foo'
     assert Descriptor('Sum(foo,bar)').str() == 'Sum(foo, bar)'
-    assert Descriptor('Sum(Offset(foo,1),Offset(foo,0))').str() == 'Sum(Offset(foo, 1), Offset(foo, 0))'
-    for x in [ 'Append(foo, Sum(bar, Offset(baz, 1)))', 'Failover(foo, Offset(bar, -1))',
-               'IfDefined(Round(baz, 3))', 'Switch(foo1, Offset(foo2, 2), Offset(foo3, 3))',
-               'IfDefined(ReplaceIndex(ivector, t, 0))', 'ReplaceIndex(foo, x, 0)' ]:
+    assert Descriptor('Sum(Offset(foo,1),Offset(foo,0))').str(
+    ) == 'Sum(Offset(foo, 1), Offset(foo, 0))'
+    for x in ['Append(foo, Sum(bar, Offset(baz, 1)))', 'Failover(foo, Offset(bar, -1))',
+              'IfDefined(Round(baz, 3))', 'Switch(foo1, Offset(foo2, 2), Offset(foo3, 3))',
+              'IfDefined(ReplaceIndex(ivector, t, 0))', 'ReplaceIndex(foo, x, 0)']:
         if not Descriptor(x).str() == x:
             print("Error: '{0}' != '{1}'".format(Descriptor(x).str(), x))
 
     prev_names = ['last_but_one_layer', 'prev_layer']
-    for x, y in [ ('Sum(foo,bar)', 'Sum(foo, bar)'),
-                  ('Sum(foo1,bar-3_4)', 'Sum(foo1, bar-3_4)'),
-                  ('Append(input@-3, input@0, input@3)',
-                   'Append(Offset(input, -3), input, Offset(input, 3))'),
-                  ('Append(-3,0,3)',
-                   'Append(Offset(prev_layer, -3), prev_layer, Offset(prev_layer, 3))'),
-                  ('[-1]', 'prev_layer'),
-                  ('Scale(2.0,foo)', 'Scale(2.0, foo)'),
-                  ('Const(0.5,500)', 'Const(0.5, 500)'),
-                  ('[-2]', 'last_but_one_layer'),
-                  ('[-2]@3',
-                   'Offset(last_but_one_layer, 3)') ]:
+    for x, y in [('Sum(foo,bar)', 'Sum(foo, bar)'),
+                 ('Sum(foo1,bar-3_4)', 'Sum(foo1, bar-3_4)'),
+                 ('Append(input@-3, input@0, input@3)',
+                  'Append(Offset(input, -3), input, Offset(input, 3))'),
+                 ('Append(-3,0,3)',
+                  'Append(Offset(prev_layer, -3), prev_layer, Offset(prev_layer, 3))'),
+                 ('[-1]', 'prev_layer'),
+                 ('Scale(2.0,foo)', 'Scale(2.0, foo)'),
+                 ('Const(0.5,500)', 'Const(0.5, 500)'),
+                 ('[-2]', 'last_but_one_layer'),
+                 ('[-2]@3',
+                  'Offset(last_but_one_layer, 3)')]:
         if not Descriptor(x, prev_names).str() == y:
             print("Error: '{0}' != '{1}'".format(Descriptor(x).str(), y))
 
-
     print(parse_config_line('affine-layer input=Append(foo, bar) foo=bar'))
-    print(parse_config_line('affine-layer x="y z" input=Append(foo, bar) foo=bar opt2="a=1 b=2"'))
+    print(parse_config_line(
+        'affine-layer x="y z" input=Append(foo, bar) foo=bar opt2="a=1 b=2"'))
     print(parse_config_line('affine-layer1 input=Append(foo, bar) foo=bar'))
     print(parse_config_line('affine-layer'))
+
 
 if __name__ == "__main__":
     test_library()

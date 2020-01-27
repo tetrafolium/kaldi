@@ -870,7 +870,8 @@ class Segment(object):
         #        a * (length_with_truncation - length_with_relaxed_boundaries)
         # -> a = (length_cutoff - length_with_relaxed_boundaries)
         #        / (length_with_truncation - length_with_relaxed_boundaries)
-        a = (length_cutoff - length_with_relaxed_boundaries) / (length_with_truncation - length_with_relaxed_boundaries)
+        a = (length_cutoff - length_with_relaxed_boundaries) / \
+            (length_with_truncation - length_with_relaxed_boundaries)
         if a < 0.0 or a > 1.0:
             # TODO(vimal): Should this be an error?
             _global_logger.warn("bad 'a' value = %.4f", a)
@@ -1772,8 +1773,8 @@ def write_segments_for_utterance(text_output_handle, segments_output_handle,
     for n, segment in enumerate(segments):
         # split utterances will be named foo-bar-1 foo-bar-2, etc.
         new_utterance_name = "{old}-{index:0{width}}".format(
-                                 old=old_utterance_name, index=n+1,
-                                 width=num_digits)
+            old=old_utterance_name, index=n+1,
+            width=num_digits)
         # print a line to the text output of the form like
         # <new-utterance-id> <text>
         # like:
@@ -1845,6 +1846,7 @@ class WordStats(object):
     with some kind of error (there is a higher probability of having a
     wrong lexicon entry).
     """
+
     def __init__(self):
         self.word_count_pair = defaultdict(lambda: [0, 0])
 

@@ -31,11 +31,13 @@ C = 3  # num_channels
 H = 32  # num_rows
 W = 32  # num_cols
 
+
 def load_svhn_data(matlab_file):
     matlab_data = sio.loadmat(matlab_file)
     data = matlab_data['X'].astype(float) / 255.0  # H*W*C*NUM_IMAGES
     labels = matlab_data['y']  # NUM_IMAGES*1
     return data, labels
+
 
 def write_kaldi_matrix(file_handle, matrix, key):
     # matrix is a list of lists
@@ -54,17 +56,19 @@ def write_kaldi_matrix(file_handle, matrix, key):
             file_handle.write("\n")
     file_handle.write(" ]\n")
 
+
 def zeropad(x, length):
-  s = str(x)
-  while len(s) < length:
-    s = '0' + s
-  return s
+    s = str(x)
+    while len(s) < length:
+        s = '0' + s
+    return s
+
 
 ### main ###
 if args.out_ark == '-':
-  out_fh = sys.stdout  # output file handle to write the feats to
+    out_fh = sys.stdout  # output file handle to write the feats to
 else:
-  out_fh = open(args.out_ark, 'wb')
+    out_fh = open(args.out_ark, 'wb')
 
 labels_file = os.path.join(args.dir, 'labels.txt')
 labels_fh = open(labels_file, 'wb')

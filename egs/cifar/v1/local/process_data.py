@@ -19,9 +19,11 @@ parser.add_argument('database',
                     default='data/dl/cifar-10-batches-bin',
                     help='path to downloaded cifar data (binary version)')
 parser.add_argument('dir', help='output dir')
-parser.add_argument('--cifar-version', default='CIFAR-10', choices=['CIFAR-10', 'CIFAR-100'])
+parser.add_argument('--cifar-version', default='CIFAR-10',
+                    choices=['CIFAR-10', 'CIFAR-100'])
 parser.add_argument('--dataset', default='train', choices=['train', 'test'])
-parser.add_argument('--out-ark', default='-', help='where to write output feature data')
+parser.add_argument('--out-ark', default='-',
+                    help='where to write output feature data')
 
 args = parser.parse_args()
 
@@ -29,6 +31,7 @@ args = parser.parse_args()
 C = 3  # num_channels
 H = 32  # num_rows
 W = 32  # num_cols
+
 
 def load_cifar10_data_batch(datafile):
     num_images_in_batch = 10000
@@ -39,10 +42,11 @@ def load_cifar10_data_batch(datafile):
             label = ord(fh.read(1))
             bin_img = fh.read(C * H * W)
             img = [[[ord(byte)/255.0 for byte in bin_img[channel*H*W+row*W:channel*H*W+(row+1)*W]]
-                  for row in range(H)] for channel in range(C)]
+                    for row in range(H)] for channel in range(C)]
             labels += [label]
             data += [img]
     return data, labels
+
 
 def load_cifar100_data_batch(datafile, num_images_in_batch):
     data = []
@@ -54,23 +58,25 @@ def load_cifar100_data_batch(datafile, num_images_in_batch):
             fine_label = ord(fh.read(1))
             bin_img = fh.read(C * H * W)
             img = [[[ord(byte)/255.0 for byte in bin_img[channel*H*W+row*W:channel*H*W+(row+1)*W]]
-                  for row in range(H)] for channel in range(C)]
+                    for row in range(H)] for channel in range(C)]
             fine_labels += [fine_label]
             coarse_labels += [coarse_label]
             data += [img]
     return data, fine_labels, coarse_labels
 
+
 def image_to_feat_matrix(img):
-  mat = [0]*H  # 32 * 96
-  for i in range(W):
-    mat[i] = [0]*C*H
-    for ch in range(C):
-      for j in range(H):
-        mat[i][j*C+ch] = img[ch][j][i]
-  return mat
+    mat = [0]*H  # 32 * 96
+    for i in range(W):
+        mat[i] = [0]*C*H
+        for ch in range(C):
+            for j in range(H):
+                mat[i][j*C+ch] = img[ch][j][i]
+    return mat
+
 
 def write_kaldi_matrix(file_handle, matrix, key):
-    # matrix is a list of lists
+        # matrix is a list of lists
     file_handle.write(key + "  [ ")
     num_rows = len(matrix)
     if num_rows == 0:
@@ -86,28 +92,30 @@ def write_kaldi_matrix(file_handle, matrix, key):
             file_handle.write("\n")
     file_handle.write(" ]\n")
 
+
 def zeropad(x, length):
-  s = str(x)
-  while len(s) < length:
-    s = '0' + s
-  return s
+    s = str(x)
+    while len(s) < length:
+        s = '0' + s
+    return s
+
 
 ### main ###
 cifar10 = (args.cifar_version.lower() == 'cifar-10')
 if args.out_ark == '-':
-  out_fh = sys.stdout  # output file handle to write the feats to
+    out_fh = sys.stdout  # output file handle to write the feats to
 else:
-  out_fh = open(args.out_ark, 'wb')
+    out_fh = open(args.out_ark, 'wb')
 
 if cifar10:
     img_id = 1  # similar to utt_id
     labels_file = os.path.join(args.dir, 'labels.txt')
     labels_fh = open(labels_file, 'wb')
 
-
     if args.dataset == 'train':
         for i in range(1, 6):
-            fpath = os.path.join(args.database, 'data_batch_' + str(i) + '.bin')
+            fpath = os.path.join(
+                args.database, 'data_batch_' + str(i) + '.bin')
             data, labels = load_cifar10_data_batch(fpath)
             for i in range(len(data)):
                 key = zeropad(img_id, 5)
@@ -135,7 +143,8 @@ else:
 
     if args.dataset == 'train':
         fpath = os.path.join(args.database, 'train.bin')
-        data, fine_labels, coarse_labels = load_cifar100_data_batch(fpath, 50000)
+        data, fine_labels, coarse_labels = load_cifar100_data_batch(
+            fpath, 50000)
         for i in range(len(data)):
             key = zeropad(img_id, 5)
             fine_labels_fh.write(key + ' ' + str(fine_labels[i]) + '\n')
@@ -145,7 +154,8 @@ else:
             img_id += 1
     else:
         fpath = os.path.join(args.database, 'test.bin')
-        data, fine_labels, coarse_labels = load_cifar100_data_batch(fpath, 10000)
+        data, fine_labels, coarse_labels = load_cifar100_data_batch(
+            fpath, 10000)
         for i in range(len(data)):
             key = zeropad(img_id, 5)
             fine_labels_fh.write(key + ' ' + str(fine_labels[i]) + '\n')

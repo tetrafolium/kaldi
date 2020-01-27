@@ -12,7 +12,8 @@ import re
 
 parser = argparse.ArgumentParser(description="Validates data directory containing text "
                                  "files from one or more data sources, including dev.txt.",
-                                 epilog="E.g. " + sys.argv[0] + " data/rnnlm/data",
+                                 epilog="E.g. " +
+                                 sys.argv[0] + " data/rnnlm/data",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument("--spot-check", type=str, default='true',
@@ -30,10 +31,12 @@ EOS_SYMBOL = '</s>'
 SPECIAL_SYMBOLS = ['<s>', '<brk>', '<eps>']
 
 if not os.path.exists(args.text_dir):
-    sys.exit(sys.argv[0] + ": Expected directory {0} to exist".format(args.text_dir))
+    sys.exit(
+        sys.argv[0] + ": Expected directory {0} to exist".format(args.text_dir))
 
 if not os.path.exists("{0}/dev.txt".format(args.text_dir)):
-    sys.exit(sys.argv[0] + ": Expected file {0}/dev.txt to exist".format(args.text_dir))
+    sys.exit(
+        sys.argv[0] + ": Expected file {0}/dev.txt to exist".format(args.text_dir))
 
 
 num_text_files = 0
@@ -68,7 +71,8 @@ def check_text_file(text_file):
                     print(sys.argv[0] + ": Too long line with {0} words in file "
                           "{1} at {2}".format(len(words), text_file, lineno), file=sys.stderr)
     if not found_nonempty_line:
-        sys.exit(sys.argv[0] + ": Input file {0} doesn't look right.".format(text_file))
+        sys.exit(
+            sys.argv[0] + ": Input file {0} doesn't look right.".format(text_file))
 
     # Next we're going to check that it's not the case
     # that the first and second fields have disjoint words on them, and the
@@ -107,7 +111,8 @@ for f in os.listdir(args.text_dir):
         sys.exit(sys.argv[0] + ": Text directory should not contain files with suffixes "
                  "other than .txt and .counts: " + f)
     if not os.path.isfile(full_path):
-        sys.exit(sys.argv[0] + ": Expected {0} to be a file.".format(full_path))
+        sys.exit(sys.argv[0] +
+                 ": Expected {0} to be a file.".format(full_path))
     check_text_file(full_path)
     num_text_files += 1
 

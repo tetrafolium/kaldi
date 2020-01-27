@@ -3,8 +3,10 @@
 # Apache 2.0.
 
 import argparse
-import sys, os
+import sys
+import os
 import string
+
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -17,6 +19,7 @@ def get_args():
     args = parser.parse_args()
     return args
 
+
 def get_results(filename):
     with open(filename) as f:
         first_line = f.readline()
@@ -27,9 +30,10 @@ def get_results(filename):
         sub = parts[3].split()[0]
         return int(total_words), int(ins), int(deletion), int(sub)
 
+
 def main():
     args = get_args()
-    recodingid_error_dict={}
+    recodingid_error_dict = {}
     min_wer_per_recording = os.path.join(args.wer_dir_path, 'all.txt')
     for line in open(min_wer_per_recording, 'r', encoding='utf8'):
         toks = line.strip().split()
@@ -39,18 +43,21 @@ def main():
         total_ins = toks[-3][:-1]
         total_del = toks[-2][:-1]
         total_sub = toks[-1]
-        recodingid_error_dict[recordingid]=(total_words, total_errors, total_ins, total_del, total_sub)
-    
-    recording_spkorder_file = os.path.join(args.output_dir_path, 'recordinid_spkorder')
+        recodingid_error_dict[recordingid] = (
+            total_words, total_errors, total_ins, total_del, total_sub)
+
+    recording_spkorder_file = os.path.join(
+        args.output_dir_path, 'recordinid_spkorder')
     for line in open(recording_spkorder_file, 'r', encoding='utf8'):
         parts = line.strip().split(':')
         recordingid = parts[0]
         spkorder = parts[1]
-        spkorder_list=spkorder.split('_')
-        num_speakers=len(spkorder_list)
-        total_errors=total_words=total_ins=total_del=total_sub=0    
+        spkorder_list = spkorder.split('_')
+        num_speakers = len(spkorder_list)
+        total_errors = total_words = total_ins = total_del = total_sub = 0
         for i in range(1, num_speakers+1):
-            filename = 'wer_' + recordingid + '_' + 'r' + str(i)+ 'h' + str(spkorder_list[i-1])
+            filename = 'wer_' + recordingid + '_' + 'r' + \
+                str(i) + 'h' + str(spkorder_list[i-1])
             wer_filename = os.path.join(args.wer_dir_path, filename)
             words, ins, deletion, sub = get_results(wer_filename)
             total_words += words
@@ -58,11 +65,16 @@ def main():
             total_del += deletion
             total_sub += sub
             total_errors += ins + deletion + sub
-        assert int(total_words) == int(recodingid_error_dict[recordingid][0]), "Total words mismatch"
-        assert int(total_errors) == int(recodingid_error_dict[recordingid][1]), "Total errors mismatch"
-        assert int(total_ins) == int(recodingid_error_dict[recordingid][2]), "Total insertions mismatch"
-        assert int(total_del) == int(recodingid_error_dict[recordingid][3]), "Total deletions mismatch"
-        assert int(total_sub) == int(recodingid_error_dict[recordingid][4]), "Total substitutions mismatch"
+        assert int(total_words) == int(
+            recodingid_error_dict[recordingid][0]), "Total words mismatch"
+        assert int(total_errors) == int(
+            recodingid_error_dict[recordingid][1]), "Total errors mismatch"
+        assert int(total_ins) == int(
+            recodingid_error_dict[recordingid][2]), "Total insertions mismatch"
+        assert int(total_del) == int(
+            recodingid_error_dict[recordingid][3]), "Total deletions mismatch"
+        assert int(total_sub) == int(
+            recodingid_error_dict[recordingid][4]), "Total substitutions mismatch"
 
 
 if __name__ == '__main__':

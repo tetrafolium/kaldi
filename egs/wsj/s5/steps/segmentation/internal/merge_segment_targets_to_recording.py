@@ -3,6 +3,7 @@
 # Copyright 2017  Vimal Manohar
 # Apache 2.0
 
+import libs.common as common_lib
 """
 This script merges targets matrices corresponding to
 segments into targets matrix for whole recording. The frames that are not
@@ -18,7 +19,6 @@ import subprocess
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -235,7 +235,7 @@ def run(args):
                                    "i.e. this segment is completely within "
                                    "another segment. Ignoring this segment."
                                    "".format(utt=utt, end=end_frame))
-                    num_utt_err +=1
+                    num_utt_err += 1
                     continue
 
                 if start_frame < end_frame_accounted:

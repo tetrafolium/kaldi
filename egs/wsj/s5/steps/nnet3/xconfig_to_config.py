@@ -9,6 +9,8 @@
 # to a single named file.
 
 
+import libs.common as common_lib
+import libs.nnet3.xconfig.parser as xparser
 import argparse
 import os
 import sys
@@ -17,9 +19,6 @@ from collections import defaultdict
 sys.path.insert(0, 'steps/')
 # the following is in case we weren't running this from the normal directory.
 sys.path.insert(0, os.path.realpath(os.path.dirname(sys.argv[0])) + '/')
-
-import libs.nnet3.xconfig.parser as xparser
-import libs.common as common_lib
 
 
 def get_args():
@@ -42,7 +41,7 @@ def get_args():
                              'e.g. In Transfer learning: generate new model using '
                              'component nodes in existing model.')
     parser.add_argument('--config-file-out', required=True,
-                        help='Filename to write nnet config file.');
+                        help='Filename to write nnet config file.')
     parser.add_argument('--nnet-edits', type=str, default=None,
                         action=common_lib.NullstrToNoneAction,
                         help="""This option is useful in case the network you
@@ -58,7 +57,6 @@ def get_args():
     args = parser.parse_args()
 
     return args
-
 
 
 def write_config_file(config_file_out, all_layers):

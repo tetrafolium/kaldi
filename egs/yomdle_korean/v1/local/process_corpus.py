@@ -5,7 +5,8 @@
 # which have any other phone.
 
 import os
-import sys, io
+import sys
+import io
 
 phone_file = os.path.join('data/local/text/cleaned/phones.txt')
 infile = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
@@ -26,5 +27,4 @@ for line in infile:
             skip_text = True
             break
     if not skip_text:
-        output.write(text+ '\n')
-
+        output.write(text + '\n')

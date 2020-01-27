@@ -5,14 +5,15 @@
 # This script is evoked by diarization/VB_resegmentation.sh. It prepares the necessary
 # inputs for the VB system and creates the output RTTM file. The inputs include data directory
 # (data_dir), the rttm file to initialize the VB system(init_rttm_filename), the directory to
-# output the rttm prediction(output_dir), path to diagonal UBM model(dubm_model) and path to 
+# output the rttm prediction(output_dir), path to diagonal UBM model(dubm_model) and path to
 # i-vector extractor model(ie_model).
 
 import numpy as np
 import VB_diarization
 import kaldi_io
 import argparse
-from convert_VB_model import load_dubm, load_ivector_extractor 
+from convert_VB_model import load_dubm, load_ivector_extractor
+
 
 def get_utt_list(utt2spk_filename):
     with open(utt2spk_filename, 'r') as fh:
@@ -22,6 +23,8 @@ def get_utt_list(utt2spk_filename):
     return utt_list
 
 # prepare utt2num_frames dictionary
+
+
 def get_utt2num_frames(utt2num_frames_filename):
     utt2num_frames = {}
     with open(utt2num_frames_filename, 'r') as fh:
@@ -33,6 +36,8 @@ def get_utt2num_frames(utt2num_frames_filename):
     return utt2num_frames
 
 # prepare utt2feats dictionary
+
+
 def get_utt2feats(utt2feats_filename):
     utt2feats = {}
     with open(utt2feats_filename, 'r') as fh:
@@ -42,6 +47,7 @@ def get_utt2feats(utt2feats_filename):
         line_split = line.split(None, 1)
         utt2feats[line_split[0]] = line_split[1]
     return utt2feats
+
 
 def create_ref(uttname, utt2num_frames, full_rttm_filename):
     num_frames = utt2num_frames[uttname]
@@ -59,14 +65,15 @@ def create_ref(uttname, utt2num_frames, full_rttm_filename):
         uttname_line = line_split[1]
         if uttname != uttname_line:
             continue
-        start_time, duration = int(float(line_split[3]) * 100), int(float(line_split[4]) * 100)
+        start_time, duration = int(
+            float(line_split[3]) * 100), int(float(line_split[4]) * 100)
         end_time = start_time + duration
         spkname = line_split[7]
         if spkname not in speaker_dict.keys():
             spk_idx = num_spk + 2
             speaker_dict[spkname] = spk_idx
             num_spk += 1
-        
+
         for i in range(start_time, end_time):
             if i < 0:
                 raise ValueError("Time index less than 0")
@@ -75,12 +82,14 @@ def create_ref(uttname, utt2num_frames, full_rttm_filename):
                 break
             else:
                 if ref[i] == 0:
-                    ref[i] = speaker_dict[spkname] 
+                    ref[i] = speaker_dict[spkname]
                 else:
-                    ref[i] = 1 # The overlapping speech is marked as 1.
+                    ref[i] = 1  # The overlapping speech is marked as 1.
     return ref.astype(int)
 
 # create output rttm file
+
+
 def create_rttm_output(uttname, predicted_label, output_dir, channel):
     num_frames = len(predicted_label)
 
@@ -89,10 +98,11 @@ def create_rttm_output(uttname, predicted_label, output_dir, channel):
 
     last_label = predicted_label[0]
     for i in range(num_frames):
-        if predicted_label[i] == last_label: # The speaker label remains the same.
+        # The speaker label remains the same.
+        if predicted_label[i] == last_label:
             continue
-        else: # The speaker label is different.
-            if last_label != 0: # Ignore the silence.
+        else:  # The speaker label is different.
+            if last_label != 0:  # Ignore the silence.
                 seg_list.append([start_idx, i, last_label])
             start_idx = i
             last_label = predicted_label[i]
@@ -105,17 +115,21 @@ def create_rttm_output(uttname, predicted_label, output_dir, channel):
             end_frame = (seg_list[i])[1]
             label = (seg_list[i])[2]
             duration = end_frame - start_frame
-            fh.write("SPEAKER {} {} {:.2f} {:.2f} <NA> <NA> {} <NA> <NA>\n".format(uttname, channel, start_frame / 100.0, duration / 100.0, label))
+            fh.write("SPEAKER {} {} {:.2f} {:.2f} <NA> <NA> {} <NA> <NA>\n".format(
+                uttname, channel, start_frame / 100.0, duration / 100.0, label))
     return 0
+
 
 def main():
     parser = argparse.ArgumentParser(description='VB Resegmentation Wrapper')
     parser.add_argument('data_dir', type=str, help='Subset data directory')
-    parser.add_argument('init_rttm_filename', type=str, 
+    parser.add_argument('init_rttm_filename', type=str,
                         help='The rttm file to initialize the VB system, usually the AHC cluster result')
     parser.add_argument('output_dir', type=str, help='Output directory')
-    parser.add_argument('dubm_model', type=str, help='Path of the diagonal UBM model')
-    parser.add_argument('ie_model', type=str, help='Path of the i-vector extractor model')
+    parser.add_argument('dubm_model', type=str,
+                        help='Path of the diagonal UBM model')
+    parser.add_argument('ie_model', type=str,
+                        help='Path of the i-vector extractor model')
 
     parser.add_argument('--max-speakers', type=int, default=10,
                         help='Maximum number of speakers expected in the utterance (default: 10)')
@@ -150,18 +164,20 @@ def main():
     print(args)
 
     utt_list = get_utt_list("{}/utt2spk".format(args.data_dir))
-    utt2num_frames = get_utt2num_frames("{}/utt2num_frames".format(args.data_dir))
-    
+    utt2num_frames = get_utt2num_frames(
+        "{}/utt2num_frames".format(args.data_dir))
+
     # Load the diagonal UBM and i-vector extractor
     dubm_para = load_dubm(args.dubm_model)
     ie_para = load_ivector_extractor(args.ie_model)
 
     # Check the diagonal UBM and i-vector extractor model
     assert '<WEIGHTS>' in dubm_para and '<MEANS_INVVARS>' in dubm_para and '<INV_VARS>' in dubm_para
-    DUBM_WEIGHTS, DUBM_MEANS_INVVARS, DUBM_INV_VARS = dubm_para['<WEIGHTS>'], dubm_para['<MEANS_INVVARS>'], dubm_para['<INV_VARS>']
+    DUBM_WEIGHTS, DUBM_MEANS_INVVARS, DUBM_INV_VARS = dubm_para[
+        '<WEIGHTS>'], dubm_para['<MEANS_INVVARS>'], dubm_para['<INV_VARS>']
     assert 'M' in ie_para
     IE_M = np.transpose(ie_para['M'], (2, 0, 1))
-    
+
     m = DUBM_MEANS_INVVARS / DUBM_INV_VARS
     iE = DUBM_INV_VARS
     w = DUBM_WEIGHTS
@@ -181,22 +197,24 @@ def main():
         X = kaldi_io.read_mat(feats_dict[utt]).astype(np.float64)
         assert len(init_ref) == len(X)
 
-        # Keep only the voiced frames (0 denotes the silence 
+        # Keep only the voiced frames (0 denotes the silence
         # frames, 1 denotes the overlapping speech frames).
         mask = (init_ref >= 2)
         X_voiced = X[mask]
         init_ref_voiced = init_ref[mask] - 2
 
         if X_voiced.shape[0] == 0:
-            print("Warning: {} has no voiced frames in the initialization file".format(utt))
+            print(
+                "Warning: {} has no voiced frames in the initialization file".format(utt))
             continue
 
         # Initialize the posterior of each speaker based on the clustering result.
         if args.initialize:
-            q = VB_diarization.frame_labels2posterior_mx(init_ref_voiced, args.max_speakers)
+            q = VB_diarization.frame_labels2posterior_mx(
+                init_ref_voiced, args.max_speakers)
         else:
             q = None
-        
+
         # VB resegmentation
 
         # q  - S x T matrix of posteriors attribution each frame to one of S possible
@@ -207,8 +225,8 @@ def main():
         # Li - values of auxiliary function (and DER and frame cross-entropy between q
         #      and reference if 'ref' is provided) over iterations.
         q_out, sp_out, L_out = VB_diarization.VB_diarization(X_voiced, m, iE, w, V, sp=None, q=q, maxSpeakers=args.max_speakers, maxIters=args.max_iters, VtiEV=None,
-                                  downsample=args.downsample, alphaQInit=args.alphaQInit, sparsityThr=args.sparsityThr, epsilon=args.epsilon, minDur=args.minDur,
-                                  loopProb=args.loopProb, statScale=args.statScale, llScale=args.llScale, ref=None, plot=False)
+                                                             downsample=args.downsample, alphaQInit=args.alphaQInit, sparsityThr=args.sparsityThr, epsilon=args.epsilon, minDur=args.minDur,
+                                                             loopProb=args.loopProb, statScale=args.statScale, llScale=args.llScale, ref=None, plot=False)
         predicted_label_voiced = np.argmax(q_out, 1) + 2
         predicted_label = (np.zeros(len(mask))).astype(int)
         predicted_label[mask] = predicted_label_voiced
@@ -216,6 +234,7 @@ def main():
         # Create the output rttm file
         create_rttm_output(utt, predicted_label, args.output_dir, args.channel)
     return 0
+
 
 if __name__ == "__main__":
     main()

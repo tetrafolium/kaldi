@@ -3,6 +3,7 @@
 # Copyright 2016    Vimal Manohar
 # Apache 2.0.
 
+import libs.common as common_lib
 """This module aligns a hypothesis (CTM or text) with a reference to
 find the best matching sub-sequence in the reference for the hypothesis
 using Smith-Waterman like alignment.
@@ -17,7 +18,6 @@ import logging
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -268,7 +268,7 @@ def smith_waterman_alignment(ref, hyp, similarity_score_function,
                     "".format(ref_index, hyp_index-1, ref_index, hyp_index,
                               H[ref_index][hyp_index]))
 
-            #if hyp_index == hyp_len and H[ref_index][hyp_index] >= max_score:
+            # if hyp_index == hyp_len and H[ref_index][hyp_index] >= max_score:
             if ((not align_full_hyp or hyp_index == hyp_len)
                     and H[ref_index][hyp_index] >= max_score):
                 max_score = H[ref_index][hyp_index]
@@ -470,11 +470,11 @@ def get_ctm_edits(alignment_output, ctm_array, eps_symbol="<eps>",
         except Exception:
             logger.error("Could not get ctm edits for "
                          "edits@{edits_pos} = {0}, ctm@{ctm_pos} = {1}".format(
-                            ("NONE" if ali_pos >= ali_len
-                             else alignment_output[ali_pos]),
-                            ("NONE" if ctm_pos >= ctm_len
-                             else ctm_array[ctm_pos]),
-                            edits_pos=ali_pos, ctm_pos=ctm_pos))
+                             ("NONE" if ali_pos >= ali_len
+                              else alignment_output[ali_pos]),
+                             ("NONE" if ctm_pos >= ctm_len
+                                 else ctm_array[ctm_pos]),
+                             edits_pos=ali_pos, ctm_pos=ctm_pos))
             logger.error("alignment = {0}".format(alignment_output))
             raise
     return ctm_edits

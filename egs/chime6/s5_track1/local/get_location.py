@@ -8,10 +8,12 @@
 import json
 from datetime import timedelta
 from glob import glob
-import sys, io
+import sys
+import io
 from decimal import Decimal
 
 SAMPLE_RATE = 16000
+
 
 def to_samples(time: str):
     "mapping time in string to int, as mapped in pb_chime5"
@@ -32,13 +34,13 @@ def to_samples(time: str):
 
 def main():
     output = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-    json_file_location= sys.argv[1] + '/*.json'
+    json_file_location = sys.argv[1] + '/*.json'
     json_files = glob(json_file_location)
 
-    json_file_location= sys.argv[1] + '/*.json'
+    json_file_location = sys.argv[1] + '/*.json'
     json_files = glob(json_file_location)
     location_dict = {}
-    json_file_location= sys.argv[1] + '/*.json'
+    json_file_location = sys.argv[1] + '/*.json'
     json_files = glob(json_file_location)
     location_dict = {}
     for file in json_files:
@@ -47,24 +49,28 @@ def main():
 
         for uttid in session_dict:
             try:
-                ref=uttid['ref']
+                ref = uttid['ref']
                 speaker_id = uttid['speaker']
                 location = uttid['location']
-                location=location.upper()
-                session_id=uttid['session_id']
+                location = location.upper()
+                session_id = uttid['session_id']
                 words = uttid['words']
-                end_sample=to_samples(str(uttid['end_time']))
-                start_sample=to_samples(str(uttid['start_time']))
-                start_sample_str = str(int(start_sample * 100 / SAMPLE_RATE)).zfill(7)
-                end_sample_str = str(int(end_sample * 100 / SAMPLE_RATE)).zfill(7)
-                utt = "{0}_{1}-{2}-{3}".format(speaker_id, session_id, start_sample_str, end_sample_str)
-                location_dict[utt]=(location)
+                end_sample = to_samples(str(uttid['end_time']))
+                start_sample = to_samples(str(uttid['start_time']))
+                start_sample_str = str(
+                    int(start_sample * 100 / SAMPLE_RATE)).zfill(7)
+                end_sample_str = str(
+                    int(end_sample * 100 / SAMPLE_RATE)).zfill(7)
+                utt = "{0}_{1}-{2}-{3}".format(speaker_id,
+                                               session_id, start_sample_str, end_sample_str)
+                location_dict[utt] = (location)
             except:
                 continue
 
     for key in sorted(location_dict.keys()):
-        utt= "{0} {1}".format(key, location_dict[key])
-        output.write(utt+ '\n')
+        utt = "{0} {1}".format(key, location_dict[key])
+        output.write(utt + '\n')
+
 
 if __name__ == '__main__':
     main()

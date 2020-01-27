@@ -4,6 +4,7 @@
 #           2016    Vimal Manohar
 # Apache 2.0
 
+import unittest
 """This module contains classes and methods common to training of
 nnet3 neural networks.
 """
@@ -40,6 +41,7 @@ class RunOpts(object):
         self.prior_gpu_opt = None
         self.prior_queue_opt = None
         self.parallel_train_opts = None
+
 
 def get_outputs_list(model_file, get_raw_nnet_from_am=True):
     """ Generates list of output-node-names used in nnet3 model configuration.
@@ -147,8 +149,8 @@ def get_average_nnet_model(dir, iter, nnets_list, run_opts,
     if get_raw_nnet_from_am:
         out_model = ("""- \| nnet3-am-copy --set-raw-nnet=-  \
                         {dir}/{iter}.mdl {dir}/{next_iter}.mdl""".format(
-                            dir=dir, iter=iter,
-                            next_iter=next_iter))
+            dir=dir, iter=iter,
+            next_iter=next_iter))
     else:
         out_model = "{dir}/{next_iter}.raw".format(
             dir=dir, next_iter=next_iter)
@@ -174,7 +176,7 @@ def get_best_nnet_model(dir, iter, best_model_index, run_opts,
     if get_raw_nnet_from_am:
         out_model = ("""- \| nnet3-am-copy --set-raw-nnet=- \
                         {dir}/{iter}.mdl {dir}/{next_iter}.mdl""".format(
-                            dir=dir, iter=iter, next_iter=iter + 1))
+            dir=dir, iter=iter, next_iter=iter + 1))
     else:
         out_model = "{dir}/{next_iter}.raw".format(dir=dir,
                                                    next_iter=iter + 1)
@@ -303,7 +305,8 @@ def halve_minibatch_size_str(minibatch_size_str):
     sizes (as opposed to chunk-lengths) and that are >1."""
 
     if not validate_minibatch_size_str(minibatch_size_str):
-        raise Exception("Invalid minibatch-size string '{0}'".format(minibatch_size_str))
+        raise Exception(
+            "Invalid minibatch-size string '{0}'".format(minibatch_size_str))
 
     a = minibatch_size_str.split("/")
     ans = []
@@ -381,9 +384,9 @@ def get_input_model_info(input_model):
             parts = line.split(":")
             if len(parts) != 2:
                 continue
-            if parts[0].strip() ==  'left-context':
+            if parts[0].strip() == 'left-context':
                 variables['model_left_context'] = int(parts[1].strip())
-            elif parts[0].strip() ==  'right-context':
+            elif parts[0].strip() == 'right-context':
                 variables['model_right_context'] = int(parts[1].strip())
 
     except ValueError:
@@ -396,14 +399,14 @@ def verify_egs_dir(egs_dir, feat_dim, ivector_dim, ivector_extractor_id,
                    left_context_initial=-1, right_context_final=-1):
     try:
         egs_feat_dim = int(open('{0}/info/feat_dim'.format(
-                                    egs_dir)).readline())
+            egs_dir)).readline())
 
         egs_ivector_id = None
         try:
             egs_ivector_id = open('{0}/info/final.ie.id'.format(
-                                        egs_dir)).readline().strip()
+                egs_dir)).readline().strip()
             if (egs_ivector_id == ""):
-                egs_ivector_id = None;
+                egs_ivector_id = None
         except:
             # it could actually happen that the file is not there
             # for example in cases where the egs were dumped by
@@ -418,16 +421,18 @@ def verify_egs_dir(egs_dir, feat_dim, ivector_dim, ivector_extractor_id,
         egs_left_context = int(open('{0}/info/left_context'.format(
                                     egs_dir)).readline())
         egs_right_context = int(open('{0}/info/right_context'.format(
-                                    egs_dir)).readline())
+            egs_dir)).readline())
         try:
             egs_left_context_initial = int(open('{0}/info/left_context_initial'.format(
-                        egs_dir)).readline())
-        except:  # older scripts didn't write this, treat it as -1 in that case.
+                egs_dir)).readline())
+        # older scripts didn't write this, treat it as -1 in that case.
+        except:
             egs_left_context_initial = -1
         try:
             egs_right_context_final = int(open('{0}/info/right_context_final'.format(
-                        egs_dir)).readline())
-        except:  # older scripts didn't write this, treat it as -1 in that case.
+                egs_dir)).readline())
+        # older scripts didn't write this, treat it as -1 in that case.
+        except:
             egs_right_context_final = -1
 
         # if feat_dim was supplied as 0, it means the --feat-dir option was not
@@ -438,23 +443,25 @@ def verify_egs_dir(egs_dir, feat_dim, ivector_dim, ivector_extractor_id,
                             "egs directory")
 
         if (((egs_ivector_id is None) and (ivector_extractor_id is not None)) or
-            ((egs_ivector_id is not None) and (ivector_extractor_id is None))):
+                ((egs_ivector_id is not None) and (ivector_extractor_id is None))):
             logger.warning("The ivector ids are used inconsistently. It's your "
-                          "responsibility to make sure the ivector extractor "
-                          "has been used consistently")
-            logger.warning("ivector id for egs: {0} in dir {1}".format(egs_ivector_id, egs_dir))
-            logger.warning("ivector id for extractor: {0}".format(ivector_extractor_id))
+                           "responsibility to make sure the ivector extractor "
+                           "has been used consistently")
+            logger.warning("ivector id for egs: {0} in dir {1}".format(
+                egs_ivector_id, egs_dir))
+            logger.warning("ivector id for extractor: {0}".format(
+                ivector_extractor_id))
         elif ((egs_ivector_dim > 0) and (egs_ivector_id is None) and (ivector_extractor_id is None)):
             logger.warning("The ivector ids are not used. It's your "
-                          "responsibility to make sure the ivector extractor "
-                          "has been used consistently")
+                           "responsibility to make sure the ivector extractor "
+                           "has been used consistently")
         elif ivector_extractor_id != egs_ivector_id:
             raise Exception("The egs were generated using a different ivector "
                             "extractor. id1 = {0}, id2={1}".format(
-                                ivector_extractor_id, egs_ivector_id));
+                                ivector_extractor_id, egs_ivector_id))
 
         if (egs_left_context < left_context or
-            egs_right_context < right_context):
+                egs_right_context < right_context):
             raise Exception('The egs have insufficient (l,r) context ({0},{1}) '
                             'versus expected ({2},{3})'.format(
                                 egs_left_context, egs_right_context,
@@ -469,7 +476,7 @@ def verify_egs_dir(egs_dir, feat_dim, ivector_dim, ivector_extractor_id,
         # options to make things matched up.  [note: the model l/r context gets
         # added in, so you have to correct for changes in that.]
         if (egs_left_context_initial != left_context_initial or
-            egs_right_context_final != right_context_final):
+                egs_right_context_final != right_context_final):
             raise Exception('The egs have incorrect initial/final (l,r) context '
                             '({0},{1}) versus expected ({2},{3}).  See code from '
                             'where this exception was raised for more info'.format(
@@ -477,12 +484,12 @@ def verify_egs_dir(egs_dir, feat_dim, ivector_dim, ivector_extractor_id,
                                 left_context_initial, right_context_final))
 
         frames_per_eg_str = open('{0}/info/frames_per_eg'.format(
-                             egs_dir)).readline().rstrip()
+            egs_dir)).readline().rstrip()
         if not validate_chunk_width(frames_per_eg_str):
             raise Exception("Invalid frames_per_eg in directory {0}/info".format(
-                    egs_dir))
+                egs_dir))
         num_archives = int(open('{0}/info/num_archives'.format(
-                                    egs_dir)).readline())
+            egs_dir)).readline())
 
         return [egs_left_context, egs_right_context,
                 frames_per_eg_str, num_archives]
@@ -522,7 +529,7 @@ def compute_presoftmax_prior_scale(dir, alidir, num_jobs, run_opts,
     common_lib.write_kaldi_matrix(output_file, [scaled_counts])
     common_lib.force_symlink("../presoftmax_prior_scale.vec",
                              "{0}/configs/presoftmax_prior_scale.vec".format(
-                                dir))
+                                 dir))
 
 
 def smooth_presoftmax_prior_scale_vector(pdf_counts,
@@ -548,19 +555,19 @@ def prepare_initial_network(dir, run_opts, srand=-3, input_model=None):
             """{command} {dir}/log/add_first_layer.log \
                     nnet3-init --srand={srand} {dir}/init.raw \
                     {dir}/configs/final.config {dir}/0.raw""".format(
-                        command=run_opts.command, srand=srand,
-                        dir=dir))
+                command=run_opts.command, srand=srand,
+                dir=dir))
     else:
         common_lib.execute_command(
             """{command} {dir}/log/init_model.log \
            nnet3-init --srand={srand} {dir}/configs/final.config {dir}/0.raw""".format(
-                        command=run_opts.command, srand=srand,
-                        dir=dir))
+                command=run_opts.command, srand=srand,
+                dir=dir))
 
 
 def get_model_combine_iters(num_iters, num_epochs,
-                      num_archives, max_models_combine,
-                      num_jobs_final):
+                            num_archives, max_models_combine,
+                            num_jobs_final):
     """ Figures out the list of iterations for which we'll use those models
         in the final model-averaging phase.  (note: it's a weighted average
         where the weights are worked out from a subset of training data.)"""
@@ -619,10 +626,10 @@ def get_learning_rate(iter, num_jobs, num_iters, num_archives_processed,
         effective_learning_rate = final_effective_lrate
     else:
         effective_learning_rate = (
-                initial_effective_lrate
-                * math.exp(num_archives_processed
-                           * math.log(float(final_effective_lrate) / initial_effective_lrate)
-                           / num_archives_to_process))
+            initial_effective_lrate
+            * math.exp(num_archives_processed
+                       * math.log(float(final_effective_lrate) / initial_effective_lrate)
+                       / num_archives_to_process))
 
     return num_jobs * effective_learning_rate
 
@@ -656,7 +663,7 @@ def should_do_shrinkage(iter, model_file, shrink_saturation_threshold,
 
 def remove_nnet_egs(egs_dir):
     common_lib.execute_command("steps/nnet2/remove_egs.sh {egs_dir}".format(
-            egs_dir=egs_dir))
+        egs_dir=egs_dir))
 
 
 def clean_nnet_dir(nnet_dir, num_iters, egs_dir,
@@ -693,10 +700,10 @@ def remove_model(nnet_dir, iter, num_iters, models_to_combine=None,
 
 
 def positive_int(arg):
-   val = int(arg)
-   if (val <= 0):
-      raise argparse.ArgumentTypeError("must be positive int: '%s'" % arg)
-   return val
+    val = int(arg)
+    if (val <= 0):
+        raise argparse.ArgumentTypeError("must be positive int: '%s'" % arg)
+    return val
 
 
 class CommonParser(object):
@@ -854,8 +861,8 @@ class CommonParser(object):
                                  help="Number of neural net jobs to run in "
                                  "parallel at the end of training")
         self.parser.add_argument("--trainer.optimization.num-jobs-step",
-            type=positive_int,  metavar='N', dest='num_jobs_step', default=1,
-            help="""Number of jobs increment, when exceeds this number. For
+                                 type=positive_int,  metavar='N', dest='num_jobs_step', default=1,
+                                 help="""Number of jobs increment, when exceeds this number. For
             example, if N=3, the number of jobs may progress as 1, 2, 3, 6, 9...""")
         self.parser.add_argument("--trainer.optimization.max-models-combine",
                                  "--trainer.max-models-combine",
@@ -954,7 +961,8 @@ class CommonParser(object):
                                  action=common_lib.NullstrToNoneAction,
                                  help="Script to launch egs jobs")
         self.parser.add_argument("--use-gpu", type=str,
-                                 choices=["true", "false", "yes", "no", "wait"],
+                                 choices=["true", "false",
+                                          "yes", "no", "wait"],
                                  help="Use GPU for training. "
                                  "Note 'true' and 'false' are deprecated.",
                                  default="yes")
@@ -995,42 +1003,38 @@ class CommonParser(object):
                                  then only failure notifications are sent""")
 
 
-import unittest
-
 class SelfTest(unittest.TestCase):
 
     def test_halve_minibatch_size_str(self):
         self.assertEqual('32', halve_minibatch_size_str('64'))
         self.assertEqual('32,8:16', halve_minibatch_size_str('64,16:32'))
         self.assertEqual('1', halve_minibatch_size_str('1'))
-        self.assertEqual('128=32/256=20,40:50', halve_minibatch_size_str('128=64/256=40,80:100'))
-
+        self.assertEqual('128=32/256=20,40:50',
+                         halve_minibatch_size_str('128=64/256=40,80:100'))
 
     def test_validate_chunk_width(self):
-        for s in [ '64', '64,25,128' ]:
+        for s in ['64', '64,25,128']:
             self.assertTrue(validate_chunk_width(s), s)
-
 
     def test_validate_minibatch_size_str(self):
         # Good descriptors.
-        for s in [ '32', '32,64', '1:32', '1:32,64', '64,1:32', '1:5,10:15',
-                   '128=64:128/256=32,64', '1=2/3=4', '1=1/2=2/3=3/4=4' ]:
+        for s in ['32', '32,64', '1:32', '1:32,64', '64,1:32', '1:5,10:15',
+                  '128=64:128/256=32,64', '1=2/3=4', '1=1/2=2/3=3/4=4']:
             self.assertTrue(validate_minibatch_size_str(s), s)
         # Bad descriptors.
-        for s in [ None, 42, (43,), '', '1:', ':2', '3,', ',4', '5:6,', ',7:8',
-                   '9=', '10=10/', '11=11/11', '12=1:2//13=1:3' '14=/15=15',
-                   '16/17=17', '/18=18', '/18', '//19', '/' ]:
+        for s in [None, 42, (43,), '', '1:', ':2', '3,', ',4', '5:6,', ',7:8',
+                  '9=', '10=10/', '11=11/11', '12=1:2//13=1:3' '14=/15=15',
+                  '16/17=17', '/18=18', '/18', '//19', '/']:
             self.assertFalse(validate_minibatch_size_str(s), s)
-
 
     def test_get_current_num_jobs(self):
         niters = 12
         self.assertEqual([2, 3, 3, 4, 4, 5, 6, 6, 7, 7, 8, 8],
                          [get_current_num_jobs(i, niters, 2, 1, 9)
-                              for i in range(niters)])
+                          for i in range(niters)])
         self.assertEqual([2, 3, 3, 3, 3, 6, 6, 6, 6, 6, 9, 9],
                          [get_current_num_jobs(i, niters, 2, 3, 9)
-                              for i in range(niters)])
+                          for i in range(niters)])
 
 
 if __name__ == '__main__':

@@ -71,10 +71,10 @@ def train_new_models(dir, iter, srand, num_jobs,
     deriv_time_opts = []
     if min_deriv_time is not None:
         deriv_time_opts.append("--optimization.min-deriv-time={0}".format(
-                           min_deriv_time))
+            min_deriv_time))
     if max_deriv_time_relative is not None:
         deriv_time_opts.append("--optimization.max-deriv-time-relative={0}".format(
-                           max_deriv_time_relative))
+            max_deriv_time_relative))
 
     threads = []
 
@@ -96,7 +96,7 @@ def train_new_models(dir, iter, srand, num_jobs,
             frame = (k // num_archives + archive_index) % frames_per_eg
 
         cache_io_opts = (("--read-cache={dir}/cache.{iter}".format(dir=dir,
-                                                                  iter=iter)
+                                                                   iter=iter)
                           if iter > 0 else "") +
                          (" --write-cache={0}/cache.{1}".format(dir, iter + 1)
                           if job == 1 else ""))
@@ -108,7 +108,6 @@ def train_new_models(dir, iter, srand, num_jobs,
                     aug_opts=image_augmentation_opts))
         else:
             image_augmentation_cmd = ''
-
 
         multitask_egs_opts = common_train_lib.get_multitask_egs_opts(
             egs_dir,
@@ -235,7 +234,6 @@ def train_one_iteration(dir, iter, srand, egs_dir,
 
     do_average = (iter > 0)
 
-
     raw_model_string = ("nnet3-copy --learning-rate={lr} --scale={s} "
                         "{dir}/{iter}.{suf} - |".format(
                             lr=learning_rate, s=shrinkage_value,
@@ -253,7 +251,8 @@ def train_one_iteration(dir, iter, srand, egs_dir,
         # always helpful when the model is changing too fast (i.e. it can worsen
         # the objective function), and the smaller minibatch size will help to
         # keep the update stable.
-        cur_minibatch_size_str = common_train_lib.halve_minibatch_size_str(minibatch_size_str)
+        cur_minibatch_size_str = common_train_lib.halve_minibatch_size_str(
+            minibatch_size_str)
         cur_max_param_change = float(max_param_change) / math.sqrt(2)
 
     train_new_models(dir=dir, iter=iter, srand=srand, num_jobs=num_jobs,
@@ -274,7 +273,7 @@ def train_one_iteration(dir, iter, srand, egs_dir,
                      backstitch_training_interval=backstitch_training_interval)
 
     [models_to_average, best_model] = common_train_lib.get_successful_models(
-         num_jobs, '{0}/log/train.{1}.%.log'.format(dir, iter))
+        num_jobs, '{0}/log/train.{1}.%.log'.format(dir, iter))
     nnets_list = []
     for n in models_to_average:
         nnets_list.append("{0}/{1}.{2}.raw".format(dir, iter + 1, n))
@@ -341,20 +340,21 @@ def compute_preconditioning_matrix(dir, egs_dir, num_lda_jobs, run_opts,
                 nnet3-acc-lda-stats --rand-prune={rand_prune} \
                 {dir}/init.raw "{egs_rspecifier}" \
                 {dir}/JOB.lda_stats""".format(
-                    command=run_opts.command,
-                    num_lda_jobs=num_lda_jobs,
-                    dir=dir,
-                    egs_rspecifier=egs_rspecifier,
-                    rand_prune=rand_prune))
+            command=run_opts.command,
+            num_lda_jobs=num_lda_jobs,
+            dir=dir,
+            egs_rspecifier=egs_rspecifier,
+            rand_prune=rand_prune))
 
     # the above command would have generated dir/{1..num_lda_jobs}.lda_stats
-    lda_stat_files = ['{0}/{1}.lda_stats'.format(dir, x) for x in range(1, num_lda_jobs + 1)]
+    lda_stat_files = [
+        '{0}/{1}.lda_stats'.format(dir, x) for x in range(1, num_lda_jobs + 1)]
 
     common_lib.execute_command(
         """{command} {dir}/log/sum_transform_stats.log \
                 sum-lda-accs {dir}/lda_stats {lda_stat_files}""".format(
-                    command=run_opts.command,
-                    dir=dir, lda_stat_files=" ".join(lda_stat_files)))
+            command=run_opts.command,
+            dir=dir, lda_stat_files=" ".join(lda_stat_files)))
 
     for file in lda_stat_files:
         try:
@@ -371,8 +371,8 @@ def compute_preconditioning_matrix(dir, egs_dir, num_lda_jobs, run_opts,
         """{command} {dir}/log/get_transform.log \
                 nnet-get-feature-transform {lda_opts} {dir}/lda.mat \
                 {dir}/lda_stats""".format(
-                    command=run_opts.command, dir=dir,
-                    lda_opts=lda_opts if lda_opts is not None else ""))
+            command=run_opts.command, dir=dir,
+            lda_opts=lda_opts if lda_opts is not None else ""))
 
     common_lib.force_symlink("../lda.mat", "{0}/configs/lda.mat".format(dir))
 
@@ -396,9 +396,9 @@ def compute_train_cv_probabilities(dir, iter, egs_dir, run_opts,
         opts.append("--compute-per-dim-accuracy")
 
     multitask_egs_opts = common_train_lib.get_multitask_egs_opts(
-                             egs_dir,
-                             egs_prefix="valid_diagnostic.",
-                             use_multitask_egs=use_multitask_egs)
+        egs_dir,
+        egs_prefix="valid_diagnostic.",
+        use_multitask_egs=use_multitask_egs)
 
     common_lib.background_command(
         """ {command} {dir}/log/compute_prob_valid.{iter}.log \
@@ -417,9 +417,9 @@ def compute_train_cv_probabilities(dir, iter, egs_dir, run_opts,
         scp_or_ark, egs_dir, egs_suffix))
 
     multitask_egs_opts = common_train_lib.get_multitask_egs_opts(
-                             egs_dir,
-                             egs_prefix="train_diagnostic.",
-                             use_multitask_egs=use_multitask_egs)
+        egs_dir,
+        egs_prefix="train_diagnostic.",
+        use_multitask_egs=use_multitask_egs)
 
     common_lib.background_command(
         """{command} {dir}/log/compute_prob_train.{iter}.log \
@@ -443,7 +443,7 @@ def compute_progress(dir, iter, egs_dir,
     model = '{0}/{1}.{2}'.format(dir, iter, suffix)
 
     common_lib.background_command(
-            """{command} {dir}/log/progress.{iter}.log \
+        """{command} {dir}/log/progress.{iter}.log \
                     nnet3-info {model} '&&' \
                     nnet3-show-progress --use-gpu=no {prev_model} {model} """
         ''.format(command=run_opts.command, dir=dir,
@@ -470,7 +470,6 @@ def compute_progress(dir, iter, egs_dir,
                    dir=dir,
                    iter=iter,
                    model=model))
-
 
 
 def combine_models(dir, num_iters, models_to_combine, egs_dir,
@@ -505,7 +504,6 @@ def combine_models(dir, num_iters, models_to_combine, egs_dir,
     else:
         out_model = '{dir}/final.raw'.format(dir=dir)
 
-
     # We reverse the order of the raw model strings so that the freshest one
     # goes first.  This is important for systems that include batch
     # normalization-- it means that the freshest batch-norm stats are used.
@@ -521,9 +519,9 @@ def combine_models(dir, num_iters, models_to_combine, egs_dir,
                                                  egs_dir, egs_suffix)
 
     multitask_egs_opts = common_train_lib.get_multitask_egs_opts(
-                             egs_dir,
-                             egs_prefix="combine.",
-                             use_multitask_egs=use_multitask_egs)
+        egs_dir,
+        egs_prefix="combine.",
+        use_multitask_egs=use_multitask_egs)
     common_lib.execute_command(
         """{command} {combine_queue_opt} {dir}/log/combine.log \
                 nnet3-combine {combine_gpu_opt} \
@@ -590,8 +588,8 @@ def align(dir, data, lang, run_opts, iter=None,
           online_ivector_dir=None):
 
     alidir = '{dir}/ali{ali_suffix}'.format(
-            dir=dir,
-            ali_suffix="_iter_{0}".format(iter) if iter is not None else "")
+        dir=dir,
+        ali_suffix="_iter_{0}".format(iter) if iter is not None else "")
 
     logger.info("Aligning the data{gpu}with {num_jobs} jobs.".format(
         gpu=" using gpu " if run_opts.realign_use_gpu else " ",
@@ -602,18 +600,18 @@ def align(dir, data, lang, run_opts, iter=None,
                 --use-gpu {align_use_gpu} \
                 --online-ivector-dir "{online_ivector_dir}" \
                 --iter "{iter}" {data} {lang} {dir} {alidir}""".format(
-                    dir=dir, align_use_gpu=("yes"
-                                            if run_opts.realign_use_gpu
-                                            else "no"),
-                    align_cmd=run_opts.realign_command,
-                    align_queue_opt=run_opts.realign_queue_opt,
-                    num_jobs_align=run_opts.realign_num_jobs,
-                    online_ivector_dir=(online_ivector_dir
-                                        if online_ivector_dir is not None
-                                        else ""),
-                    iter=iter if iter is not None else "",
-                    alidir=alidir,
-                    lang=lang, data=data))
+            dir=dir, align_use_gpu=("yes"
+                                    if run_opts.realign_use_gpu
+                                    else "no"),
+            align_cmd=run_opts.realign_command,
+            align_queue_opt=run_opts.realign_queue_opt,
+            num_jobs_align=run_opts.realign_num_jobs,
+            online_ivector_dir=(online_ivector_dir
+                                if online_ivector_dir is not None
+                                else ""),
+            iter=iter if iter is not None else "",
+            alidir=alidir,
+            lang=lang, data=data))
     return alidir
 
 
@@ -628,9 +626,9 @@ def realign(dir, iter, feat_dir, lang, prev_egs_dir, cur_egs_dir,
     # we're using different random subsets of it.
 
     avg_post_vec_file = compute_average_posterior(
-            dir=dir, iter=iter, egs_dir=prev_egs_dir,
-            num_archives=num_archives, prior_subset_size=prior_subset_size,
-            run_opts=run_opts)
+        dir=dir, iter=iter, egs_dir=prev_egs_dir,
+        num_archives=num_archives, prior_subset_size=prior_subset_size,
+        run_opts=run_opts)
 
     avg_post_vec_file = "{dir}/post.{iter}.vec".format(dir=dir, iter=iter)
     logger.info("Re-adjusting priors based on computed posteriors")
@@ -642,12 +640,12 @@ def realign(dir, iter, feat_dir, lang, prev_egs_dir, cur_egs_dir,
     common_lib.execute_command(
         """steps/nnet3/relabel_egs.sh --cmd "{command}" --iter {iter} \
                 {alidir} {prev_egs_dir} {cur_egs_dir}""".format(
-                    command=run_opts.command,
-                    iter=iter,
-                    dir=dir,
-                    alidir=alidir,
-                    prev_egs_dir=prev_egs_dir,
-                    cur_egs_dir=cur_egs_dir))
+            command=run_opts.command,
+            iter=iter,
+            dir=dir,
+            alidir=alidir,
+            prev_egs_dir=prev_egs_dir,
+            cur_egs_dir=cur_egs_dir))
 
 
 def adjust_am_priors(dir, input_model, avg_posterior_vector, output_model,
@@ -656,10 +654,10 @@ def adjust_am_priors(dir, input_model, avg_posterior_vector, output_model,
         """{command} {dir}/log/adjust_priors.final.log \
                 nnet3-am-adjust-priors "{input_model}" {avg_posterior_vector} \
                 "{output_model}" """.format(
-                    command=run_opts.command,
-                    dir=dir, input_model=input_model,
-                    avg_posterior_vector=avg_posterior_vector,
-                    output_model=output_model))
+            command=run_opts.command,
+            dir=dir, input_model=input_model,
+            avg_posterior_vector=avg_posterior_vector,
+            output_model=output_model))
 
 
 def compute_average_posterior(dir, iter, egs_dir, num_archives,
@@ -690,13 +688,13 @@ def compute_average_posterior(dir, iter, egs_dir, num_archives,
                 "{model}" ark:- ark:- \| \
                 matrix-sum-rows ark:- ark:- \| vector-sum ark:- \
                 {dir}/post.{iter}.JOB.vec""".format(
-                    command=run_opts.command,
-                    dir=dir, model=model,
-                    num_jobs_compute_prior=run_opts.num_jobs_compute_prior,
-                    prior_queue_opt=run_opts.prior_queue_opt,
-                    iter=iter, prior_subset_size=prior_subset_size,
-                    egs_dir=egs_dir, egs_part=egs_part,
-                    prior_gpu_opt=run_opts.prior_gpu_opt))
+            command=run_opts.command,
+            dir=dir, model=model,
+            num_jobs_compute_prior=run_opts.num_jobs_compute_prior,
+            prior_queue_opt=run_opts.prior_queue_opt,
+            iter=iter, prior_subset_size=prior_subset_size,
+            egs_dir=egs_dir, egs_part=egs_part,
+            prior_gpu_opt=run_opts.prior_gpu_opt))
 
     # make sure there is time for $dir/post.{iter}.*.vec to appear.
     time.sleep(5)

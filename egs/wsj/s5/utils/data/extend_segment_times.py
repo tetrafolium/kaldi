@@ -12,17 +12,17 @@ parser = argparse.ArgumentParser(description="""
  with specified left and right context (for cases where there was no
  silence padding in the original segments file)""")
 
-parser.add_argument("--start-padding", type = float, default = 0.1,
+parser.add_argument("--start-padding", type=float, default=0.1,
                     help="Amount of padding, in seconds, for the start time of "
                     "each segment (start times <0 will be set to zero).")
-parser.add_argument("--end-padding", type = float, default = 0.1,
+parser.add_argument("--end-padding", type=float, default=0.1,
                     help="Amount of padding, in seconds, for the end time of "
                     "each segment.")
-parser.add_argument("--last-segment-end-padding", type = float, default = 0.1,
+parser.add_argument("--last-segment-end-padding", type=float, default=0.1,
                     help="Amount of padding, in seconds, for the end time of "
                     "the last segment of each file (maximum allowed).")
-parser.add_argument("--fix-overlapping-segments", type = str,
-                    default = 'true', choices=['true', 'false'],
+parser.add_argument("--fix-overlapping-segments", type=str,
+                    default='true', choices=['true', 'false'],
                     help="If true, prevent segments from overlapping as a result "
                     "of the padding (or that were already overlapping)")
 args = parser.parse_args()
@@ -51,14 +51,14 @@ while True:
     if line == '':
         break
     try:
-        [ utt_id, recording_id, start_time, end_time ] = line.split()
+        [utt_id, recording_id, start_time, end_time] = line.split()
         start_time = float(start_time)
         end_time = float(end_time)
     except:
         sys.exit("extend_segment_times.py: could not interpret line: " + line)
     if not end_time > start_time:
         print("extend_segment_times.py: bad segment (ignoring): " + line,
-              file = sys.stderr)
+              file=sys.stderr)
     recording_to_utt_indexes[recording_id].append(len(entries))
     entries.append([utt_id, recording_id, start_time, end_time])
 
@@ -68,10 +68,11 @@ for recording, utt_indexes in recording_to_utt_indexes.items():
     # this_entries is a list of lists, sorted on mid-time.
     # Notice: because lists are objects, when we change 'this_entries'
     # we change the underlying entries.
-    this_entries = sorted([ entries[x] for x in utt_indexes ],
-                          key = lambda x : 0.5 * (x[2] + x[3]))
+    this_entries = sorted([entries[x] for x in utt_indexes],
+                          key=lambda x: 0.5 * (x[2] + x[3]))
     min_time = 0
-    max_time = max([ x[3] for x in this_entries ]) + args.last_segment_end_padding
+    max_time = max([x[3] for x in this_entries]) + \
+        args.last_segment_end_padding
     start_padding = args.start_padding
     end_padding = args.end_padding
     for n in range(len(this_entries)):
@@ -91,7 +92,7 @@ for recording, utt_indexes in recording_to_utt_indexes.items():
 # this prints a number with a certain number of digits after
 # the point, while removing trailing zeros.
 def FloatToString(f):
-    num_digits = 6 # we want to print 6 digits after the zero
+    num_digits = 6  # we want to print 6 digits after the zero
     g = f
     while abs(g) > 1.0:
         g *= 0.1
@@ -99,20 +100,21 @@ def FloatToString(f):
     format_str = '%.{0}g'.format(num_digits)
     return format_str % f
 
+
 for entry in entries:
-    [ utt_id, recording_id, start_time, end_time ] = entry
+    [utt_id, recording_id, start_time, end_time] = entry
     if not start_time < end_time:
         print("extend_segment_times.py: bad segment after processing (ignoring): " +
-              ' '.join(entry), file = sys.stderr)
+              ' '.join(entry), file=sys.stderr)
         continue
-    print(utt_id, recording_id, FloatToString(start_time), FloatToString(end_time))
+    print(utt_id, recording_id, FloatToString(
+        start_time), FloatToString(end_time))
 
 
 print("extend_segment_times.py: extended {0} segments; fixed {1} "
       "overlapping segments".format(len(entries), num_times_fixed),
-      file = sys.stderr)
+      file=sys.stderr)
 
-## test:
+# test:
 #  (echo utt1 reco1 0.2 6.2; echo utt2 reco1 6.3 9.8 )| extend_segment_times.py
 # and also try the above with the options --last-segment-end-padding=0.0 --fix-overlapping-segments=false
-

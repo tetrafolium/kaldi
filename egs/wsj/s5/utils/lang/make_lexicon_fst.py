@@ -18,6 +18,7 @@ import re
 sys.stdout = open(1, 'w', encoding='latin-1', closefd=False)
 sys.stderr = open(2, 'w', encoding='latin-1', closefd=False)
 
+
 def get_args():
     parser = argparse.ArgumentParser(description="""This script creates the
        text form of a lexicon FST, to be compiled by fstcompile using the
@@ -87,7 +88,8 @@ def read_lexiconp(filename):
                 pron_prob = float(a[1])
             except:
                 print("{0}: error: found bad line '{1}' in lexicon file {2}, 2nd field "
-                      "should be pron-prob".format(sys.argv[0], line.strip(" \t\r\n"), filename),
+                      "should be pron-prob".format(
+                          sys.argv[0], line.strip(" \t\r\n"), filename),
                       file=sys.stderr)
                 sys.exit(1)
             prons = a[2:]
@@ -97,7 +99,7 @@ def read_lexiconp(filename):
                 sys.exit(1)
             if len(prons) == 0:
                 found_empty_prons = True
-            ans.append( (word, pron_prob, prons) )
+            ans.append((word, pron_prob, prons))
             if pron_prob > 1.0:
                 found_large_pronprobs = True
     if found_empty_prons:
@@ -107,7 +109,6 @@ def read_lexiconp(filename):
     if found_large_pronprobs:
         print("{0}: warning: found at least one word with pron-prob >1.0 "
               "in {1}".format(sys.argv[0], filename), file=sys.stderr)
-
 
     if len(ans) == 0:
         print("{0}: error: found no pronunciations in lexicon file {1}".format(
@@ -169,7 +170,6 @@ def write_nonterminal_arcs(start_state, loop_state, next_state,
     return next_state
 
 
-
 def write_fst_no_silence(lexicon, nonterminals=None, left_context_phones=None):
     """Writes the text format of L.fst to the standard output.  This version is for
     when --sil-prob=0.0, meaning there is no optional silence allowed.
@@ -185,7 +185,8 @@ def write_fst_no_silence(lexicon, nonterminals=None, left_context_phones=None):
     """
 
     loop_state = 0
-    next_state = 1  # the next un-allocated state, will be incremented as we go.
+    # the next un-allocated state, will be incremented as we go.
+    next_state = 1
     for (word, pronprob, pron) in lexicon:
         cost = -math.log(pronprob)
         cur_state = loop_state
@@ -237,14 +238,14 @@ def write_fst_with_silence(lexicon, sil_prob, sil_phone, sil_disambig,
 
     assert sil_prob > 0.0 and sil_prob < 1.0
     sil_cost = -math.log(sil_prob)
-    no_sil_cost = -math.log(1.0 - sil_prob);
+    no_sil_cost = -math.log(1.0 - sil_prob)
 
     start_state = 0
     loop_state = 1  # words enter and leave from here
     sil_state = 2   # words terminate here when followed by silence; this state
-                    # has a silence transition to loop_state.
-    next_state = 3  # the next un-allocated state, will be incremented as we go.
-
+    # has a silence transition to loop_state.
+    # the next un-allocated state, will be incremented as we go.
+    next_state = 3
 
     print('{src}\t{dest}\t{phone}\t{word}\t{cost}'.format(
         src=start_state, dest=loop_state,
@@ -265,7 +266,6 @@ def write_fst_with_silence(lexicon, sil_prob, sil_phone, sil_disambig,
         print('{src}\t{dest}\t{phone}\t{word}\t{cost}'.format(
             src=sil_disambig_state, dest=loop_state,
             phone=sil_disambig, word='<eps>', cost=0.0))
-
 
     for (word, pronprob, pron) in lexicon:
         pron_cost = -math.log(pronprob)
@@ -303,8 +303,6 @@ def write_fst_with_silence(lexicon, sil_prob, sil_phone, sil_disambig,
         final_cost=0.0))
 
 
-
-
 def write_words_txt(orig_lines, highest_numbered_symbol, nonterminals, filename):
     """Writes updated words.txt to 'filename'.  'orig_lines' is the original lines
        in the words.txt file as a list of strings (without the newlines);
@@ -314,7 +312,7 @@ def write_words_txt(orig_lines, highest_numbered_symbol, nonterminals, filename)
         for l in orig_lines:
             print(l, file=f)
         cur_symbol = highest_numbered_symbol + 1
-        for n in [ '#nonterm_begin', '#nonterm_end' ] + nonterminals:
+        for n in ['#nonterm_begin', '#nonterm_end'] + nonterminals:
             print("{0} {1}".format(n, cur_symbol), file=f)
             cur_symbol = cur_symbol + 1
 
@@ -324,30 +322,38 @@ def read_nonterminals(filename):
        it has the expected format and has no duplicates, and returns the nonterminal
        symbols as a list of strings, e.g.
        ['#nonterm:contact_list', '#nonterm:phone_number', ... ]. """
-    ans = [line.strip(" \t\r\n") for line in open(filename, 'r', encoding='latin-1')]
+    ans = [line.strip(" \t\r\n")
+           for line in open(filename, 'r', encoding='latin-1')]
     if len(ans) == 0:
-        raise RuntimeError("The file {0} contains no nonterminals symbols.".format(filename))
+        raise RuntimeError(
+            "The file {0} contains no nonterminals symbols.".format(filename))
     for nonterm in ans:
         if nonterm[:9] != '#nonterm:':
             raise RuntimeError("In file '{0}', expected nonterminal symbols to start with '#nonterm:', found '{1}'"
                                .format(filename, nonterm))
     if len(set(ans)) != len(ans):
-        raise RuntimeError("Duplicate nonterminal symbols are present in file {0}".format(filename))
+        raise RuntimeError(
+            "Duplicate nonterminal symbols are present in file {0}".format(filename))
     return ans
+
 
 def read_left_context_phones(filename):
     """Reads, checks, and returns a list of left-context phones, in text form, one
        per line.  Returns a list of strings, e.g. ['a', 'ah', ..., '#nonterm_bos' ]"""
-    ans = [line.strip(" \t\r\n") for line in open(filename, 'r', encoding='latin-1')]
+    ans = [line.strip(" \t\r\n")
+           for line in open(filename, 'r', encoding='latin-1')]
     if len(ans) == 0:
-        raise RuntimeError("The file {0} contains no left-context phones.".format(filename))
+        raise RuntimeError(
+            "The file {0} contains no left-context phones.".format(filename))
     whitespace = re.compile("[ \t]+")
     for s in ans:
         if len(whitespace.split(s)) != 1:
-            raise RuntimeError("The file {0} contains an invalid line '{1}'".format(filename, s)   )
+            raise RuntimeError(
+                "The file {0} contains an invalid line '{1}'".format(filename, s))
 
     if len(set(ans)) != len(ans):
-        raise RuntimeError("Duplicate nonterminal symbols are present in file {0}".format(filename))
+        raise RuntimeError(
+            "Duplicate nonterminal symbols are present in file {0}".format(filename))
     return ans
 
 
@@ -356,7 +362,7 @@ def is_token(s):
     if not isinstance(s, str):
         return False
     whitespace = re.compile("[ \t\r\n]+")
-    split_str = whitespace.split(s);
+    split_str = whitespace.split(s)
     return len(split_str) == 1 and s == split_str[0]
 
 
@@ -373,12 +379,13 @@ def main():
                   "be specified".format(sys.argv[0]))
             sys.exit(1)
         nonterminals = read_nonterminals(args.nonterminals)
-        left_context_phones = read_left_context_phones(args.left_context_phones)
+        left_context_phones = read_left_context_phones(
+            args.left_context_phones)
 
     if args.sil_prob == 0.0:
-          write_fst_no_silence(lexicon,
-                               nonterminals=nonterminals,
-                               left_context_phones=left_context_phones)
+        write_fst_no_silence(lexicon,
+                             nonterminals=nonterminals,
+                             left_context_phones=left_context_phones)
     else:
         # Do some checking that the options make sense.
         if args.sil_prob < 0.0 or args.sil_prob >= 1.0:
@@ -388,7 +395,8 @@ def main():
 
         if not is_token(args.sil_phone):
             print("{0}: you specified --sil-prob={1} but --sil-phone is set "
-                  "to '{2}'".format(sys.argv[0], args.sil_prob, args.sil_phone),
+                  "to '{2}'".format(
+                      sys.argv[0], args.sil_prob, args.sil_phone),
                   file=sys.stderr)
             sys.exit(1)
         if args.sil_disambig is not None and not is_token(args.sil_disambig):
@@ -401,11 +409,9 @@ def main():
                                left_context_phones=left_context_phones)
 
 
-
 #    (lines, highest_symbol) = read_words_txt(args.input_words_txt)
 #    nonterminals = read_nonterminals(args.nonterminal_symbols_list)
 #    write_words_txt(lines, highest_symbol, nonterminals, args.output_words_txt)
 
-
 if __name__ == '__main__':
-      main()
+    main()

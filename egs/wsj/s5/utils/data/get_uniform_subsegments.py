@@ -10,6 +10,7 @@ import logging
 import sys
 import textwrap
 
+
 def get_args():
     parser = argparse.ArgumentParser(
         description=textwrap.dedent("""
@@ -92,9 +93,9 @@ def run(args):
 
         if (args.constant_duration):
             if (dur < 0):
-              continue
+                continue
             if (dur < args.max_remaining_duration):
-              start = max(end_time - args.max_segment_duration, start_time)
+                start = max(end_time - args.max_segment_duration, start_time)
             end = min(start + args.max_segment_duration, end_time)
         else:
             end = end_time

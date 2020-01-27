@@ -4,6 +4,10 @@
 #           2016    Vimal Manohar
 # Apache 2.0.
 
+import libs.nnet3.report.log_parse as nnet3_log_parse
+import libs.nnet3.train.frame_level_objf as train_lib
+import libs.common as common_lib
+import libs.nnet3.train.common as common_train_lib
 """ This script is based on steps/nnet3/lstm/train.sh
 """
 
@@ -18,10 +22,6 @@ import sys
 import traceback
 
 sys.path.insert(0, 'steps')
-import libs.nnet3.train.common as common_train_lib
-import libs.common as common_lib
-import libs.nnet3.train.frame_level_objf as train_lib
-import libs.nnet3.report.log_parse as nnet3_log_parse
 
 
 logger = logging.getLogger('libs')
@@ -163,7 +163,8 @@ def process_args(args):
         raise Exception("--egs.chunk-width has an invalid value")
 
     if not common_train_lib.validate_minibatch_size_str(args.num_chunk_per_minibatch):
-        raise Exception("--trainer.rnn.num-chunk-per-minibatch has an invalid value")
+        raise Exception(
+            "--trainer.rnn.num-chunk-per-minibatch has an invalid value")
 
     if args.chunk_left_context < 0:
         raise Exception("--egs.chunk-left-context should be non-negative")
@@ -175,7 +176,7 @@ def process_args(args):
         raise Exception("Directory specified with --dir={0} "
                         "does not exist.".format(args.dir))
     if (not os.path.exists(args.dir + "/configs") and
-        (args.input_model is None or not os.path.exists(args.input_model))):
+            (args.input_model is None or not os.path.exists(args.input_model))):
         raise Exception("Either --trainer.input-model option should be supplied, "
                         "and exist; or the {0}/configs directory should exist. "
                         "{0}/configs is the output of make_configs.py"
@@ -298,7 +299,8 @@ def train(args, run_opts):
         logger.info("Generating egs")
 
         if args.feat_dir is None:
-            raise Exception("--feat-dir option is required if you don't supply --egs-dir")
+            raise Exception(
+                "--feat-dir option is required if you don't supply --egs-dir")
 
         train_lib.acoustic_model.generate_egs(
             data=args.feat_dir, alidir=args.ali_dir,
@@ -370,7 +372,8 @@ def train(args, run_opts):
     # avg_num_jobs=(num_jobs_initial+num_jobs_final)/2.
     num_archives_to_process = int(args.num_epochs * num_archives)
     num_archives_processed = 0
-    num_iters = int((num_archives_to_process * 2) / (args.num_jobs_initial + args.num_jobs_final))
+    num_iters = int((num_archives_to_process * 2) /
+                    (args.num_jobs_initial + args.num_jobs_final))
 
     # If do_final_combination is True, compute the set of models_to_combine.
     # Otherwise, models_to_combine will be none.
@@ -387,7 +390,7 @@ def train(args, run_opts):
     if args.deriv_truncate_margin is not None:
         min_deriv_time = -args.deriv_truncate_margin - model_left_context
         max_deriv_time_relative = \
-           args.deriv_truncate_margin + model_right_context
+            args.deriv_truncate_margin + model_right_context
 
     logger.info("Training will run for {0} epochs = "
                 "{1} iterations".format(args.num_epochs, num_iters))
@@ -404,7 +407,6 @@ def train(args, run_opts):
         if args.stage <= iter:
             model_file = "{dir}/{iter}.mdl".format(dir=args.dir, iter=iter)
 
-
             lrate = common_train_lib.get_learning_rate(iter, current_num_jobs,
                                                        num_iters,
                                                        num_archives_processed,
@@ -420,8 +422,8 @@ def train(args, run_opts):
             if args.shrink_value < shrinkage_value:
                 shrinkage_value = (args.shrink_value
                                    if common_train_lib.should_do_shrinkage(
-                                           iter, model_file,
-                                           args.shrink_saturation_threshold) else 1.0)
+                                       iter, model_file,
+                                       args.shrink_saturation_threshold) else 1.0)
 
             percent = num_archives_processed * 100.0 / num_archives_to_process
             epoch = (num_archives_processed * args.num_epochs
@@ -509,7 +511,7 @@ def train(args, run_opts):
 
         logger.info("Re-adjusting priors based on computed posteriors")
         combined_or_last_numbered_model = "{dir}/{iter}.mdl".format(dir=args.dir,
-                iter=real_iter)
+                                                                    iter=real_iter)
         final_model = "{dir}/final.mdl".format(dir=args.dir)
         train_lib.common.adjust_am_priors(args.dir, combined_or_last_numbered_model,
                                           avg_post_vec_file, final_model,
@@ -530,7 +532,8 @@ def train(args, run_opts):
             remove_egs=remove_egs)
 
     # do some reporting
-    [report, times, data] = nnet3_log_parse.generate_acc_logprob_report(args.dir)
+    [report, times, data] = nnet3_log_parse.generate_acc_logprob_report(
+        args.dir)
     if args.email is not None:
         common_lib.send_mail(report, "Update : Expt {0} : "
                                      "complete".format(args.dir), args.email)

@@ -30,12 +30,12 @@ if __name__ == "__main__":
                         "It specifies the entire log file name, except for the job number, "
                         "which is replaced with '%'. e.g. exp/nneet3/tdnn_sp/log/train.4.%.log")
 
-
     args = parser.parse_args()
 
     assert(args.num_models > 0)
 
-    parse_regex = re.compile("LOG .* Overall average objective function for 'output' is ([0-9e.\-+]+) over ([0-9e.\-+]+) frames")
+    parse_regex = re.compile(
+        "LOG .* Overall average objective function for 'output' is ([0-9e.\-+]+) over ([0-9e.\-+]+) frames")
     loss = []
     for i in range(args.num_models):
         model_num = i + 1
@@ -48,8 +48,8 @@ if __name__ == "__main__":
             mat_obj = parse_regex.search(lines[-1*line_num])
             if mat_obj is not None:
                 this_loss = float(mat_obj.groups()[0])
-                break;
-        loss.append(this_loss);
+                break
+        loss.append(this_loss)
     max_index = loss.index(max(loss))
     accepted_models = []
     for i in range(args.num_models):

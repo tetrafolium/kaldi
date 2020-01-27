@@ -332,7 +332,7 @@ def run(args):
 
         print ("{0} {1}".format(query_id, " ".join(
             ["%s,%.2f,%.2f" % x for x in best_docs])),
-               file=args.relevant_docs)
+            file=args.relevant_docs)
 
     if num_queries == 0:
         raise RuntimeError("Failed to retrieve any document.")

@@ -6,8 +6,8 @@
 # Apache 2.0
 
 # minimum bounding box part in this script is originally from
-#https://github.com/BebeSparkelSparkel/MinimumBoundingBox
-#https://startupnextdoor.com/computing-convex-hull-in-python/
+# https://github.com/BebeSparkelSparkel/MinimumBoundingBox
+# https://startupnextdoor.com/computing-convex-hull-in-python/
 """ This module will be used for extracting line images from page image.
  Given the word segmentation (bounding box around a word) for every word, it will
  extract line segmentation. To extract line segmentation, it will take word bounding
@@ -31,15 +31,19 @@ from PIL import Image
 from scipy.misc import toimage
 from pathlib import Path
 from glob import glob
-parser = argparse.ArgumentParser(description="Creates line images from page image")
+parser = argparse.ArgumentParser(
+    description="Creates line images from page image")
 parser.add_argument('image_dir', type=str, help='Path to full page images')
 parser.add_argument('csv_dir', type=str, help='Path to csv files')
 parser.add_argument('out_dir', type=str, help='Path to output directory')
-parser.add_argument('output_file', type=str, help='file containing all line images id')
-parser.add_argument('--padding', type=int, default=100, help='Padding so BBox does not exceed image area')
-parser.add_argument('--ext', type=str, default='.jpg', help='Extention of the line images')
+parser.add_argument('output_file', type=str,
+                    help='file containing all line images id')
+parser.add_argument('--padding', type=int, default=100,
+                    help='Padding so BBox does not exceed image area')
+parser.add_argument('--ext', type=str, default='.jpg',
+                    help='Extention of the line images')
 parser.add_argument("--filter", action="store_true",
-                   help="If true, filter height/width<10 pixels minimum area rectangles")
+                    help="If true, filter height/width<10 pixels minimum area rectangles")
 args = parser.parse_args()
 
 """
@@ -56,13 +60,13 @@ bounding_box is a named tuple which contains:
 """
 
 bounding_box_tuple = namedtuple('bounding_box_tuple', 'area '
-                                        'length_parallel '
-                                        'length_orthogonal '
-                                        'rectangle_center '
-                                        'unit_vector '
-                                        'unit_vector_angle '
-                                        'corner_points'
-                         )
+                                'length_parallel '
+                                'length_orthogonal '
+                                'rectangle_center '
+                                'unit_vector '
+                                'unit_vector_angle '
+                                'corner_points'
+                                )
 
 
 def unit_vector(pt0, pt1):
@@ -131,7 +135,7 @@ def to_xy_coordinates(unit_vector_angle, point):
     """
     angle_orthogonal = unit_vector_angle + pi / 2
     return point[0] * cos(unit_vector_angle) + point[1] * cos(angle_orthogonal), \
-           point[0] * sin(unit_vector_angle) + point[1] * sin(angle_orthogonal)
+        point[0] * sin(unit_vector_angle) + point[1] * sin(angle_orthogonal)
 
 
 def rotate_points(center_of_rotation, angle, points):
@@ -169,7 +173,7 @@ def rectangle_corners(rectangle):
     for i1 in (.5, -.5):
         for i2 in (i1, -1 * i1):
             corner_points.append((rectangle['rectangle_center'][0] + i1 * rectangle['length_parallel'],
-                            rectangle['rectangle_center'][1] + i2 * rectangle['length_orthogonal']))
+                                  rectangle['rectangle_center'][1] + i2 * rectangle['length_orthogonal']))
 
     return rotate_points(rectangle['rectangle_center'], rectangle['unit_vector_angle'], corner_points)
 
@@ -189,7 +193,8 @@ def minimum_bounding_box(points):
     corner_points: set that contains the corners of the rectangle
     """
 
-    if len(points) <= 2: raise ValueError('More than two points required.')
+    if len(points) <= 2:
+        raise ValueError('More than two points required.')
 
     hull_ordered = [points[index] for index in ConvexHull(points).vertices]
     hull_ordered.append(hull_ordered[0])
@@ -201,17 +206,19 @@ def minimum_bounding_box(points):
         if rectangle['area'] < min_rectangle['area']:
             min_rectangle = rectangle
 
-    min_rectangle['unit_vector_angle'] = atan2(min_rectangle['unit_vector'][1], min_rectangle['unit_vector'][0])
-    min_rectangle['rectangle_center'] = to_xy_coordinates(min_rectangle['unit_vector_angle'], min_rectangle['rectangle_center'])
+    min_rectangle['unit_vector_angle'] = atan2(
+        min_rectangle['unit_vector'][1], min_rectangle['unit_vector'][0])
+    min_rectangle['rectangle_center'] = to_xy_coordinates(
+        min_rectangle['unit_vector_angle'], min_rectangle['rectangle_center'])
 
     return bounding_box_tuple(
-        area = min_rectangle['area'],
-        length_parallel = min_rectangle['length_parallel'],
-        length_orthogonal = min_rectangle['length_orthogonal'],
-        rectangle_center = min_rectangle['rectangle_center'],
-        unit_vector = min_rectangle['unit_vector'],
-        unit_vector_angle = min_rectangle['unit_vector_angle'],
-        corner_points = set(rectangle_corners(min_rectangle))
+        area=min_rectangle['area'],
+        length_parallel=min_rectangle['length_parallel'],
+        length_orthogonal=min_rectangle['length_orthogonal'],
+        rectangle_center=min_rectangle['rectangle_center'],
+        unit_vector=min_rectangle['unit_vector'],
+        unit_vector_angle=min_rectangle['unit_vector_angle'],
+        corner_points=set(rectangle_corners(min_rectangle))
     )
 
 
@@ -276,15 +283,23 @@ def rotated_points(bounding_box, center):
     x4, y4 = p4
     center_x, center_y = center
     rotation_angle_in_rad = -get_smaller_angle(bounding_box)
-    x_dash_1 = (x1 - center_x) * cos(rotation_angle_in_rad) - (y1 - center_y) * sin(rotation_angle_in_rad) + center_x
-    x_dash_2 = (x2 - center_x) * cos(rotation_angle_in_rad) - (y2 - center_y) * sin(rotation_angle_in_rad) + center_x
-    x_dash_3 = (x3 - center_x) * cos(rotation_angle_in_rad) - (y3 - center_y) * sin(rotation_angle_in_rad) + center_x
-    x_dash_4 = (x4 - center_x) * cos(rotation_angle_in_rad) - (y4 - center_y) * sin(rotation_angle_in_rad) + center_x
+    x_dash_1 = (x1 - center_x) * cos(rotation_angle_in_rad) - \
+        (y1 - center_y) * sin(rotation_angle_in_rad) + center_x
+    x_dash_2 = (x2 - center_x) * cos(rotation_angle_in_rad) - \
+        (y2 - center_y) * sin(rotation_angle_in_rad) + center_x
+    x_dash_3 = (x3 - center_x) * cos(rotation_angle_in_rad) - \
+        (y3 - center_y) * sin(rotation_angle_in_rad) + center_x
+    x_dash_4 = (x4 - center_x) * cos(rotation_angle_in_rad) - \
+        (y4 - center_y) * sin(rotation_angle_in_rad) + center_x
 
-    y_dash_1 = (y1 - center_y) * cos(rotation_angle_in_rad) + (x1 - center_x) * sin(rotation_angle_in_rad) + center_y
-    y_dash_2 = (y2 - center_y) * cos(rotation_angle_in_rad) + (x2 - center_x) * sin(rotation_angle_in_rad) + center_y
-    y_dash_3 = (y3 - center_y) * cos(rotation_angle_in_rad) + (x3 - center_x) * sin(rotation_angle_in_rad) + center_y
-    y_dash_4 = (y4 - center_y) * cos(rotation_angle_in_rad) + (x4 - center_x) * sin(rotation_angle_in_rad) + center_y
+    y_dash_1 = (y1 - center_y) * cos(rotation_angle_in_rad) + \
+        (x1 - center_x) * sin(rotation_angle_in_rad) + center_y
+    y_dash_2 = (y2 - center_y) * cos(rotation_angle_in_rad) + \
+        (x2 - center_x) * sin(rotation_angle_in_rad) + center_y
+    y_dash_3 = (y3 - center_y) * cos(rotation_angle_in_rad) + \
+        (x3 - center_x) * sin(rotation_angle_in_rad) + center_y
+    y_dash_4 = (y4 - center_y) * cos(rotation_angle_in_rad) + \
+        (x4 - center_x) * sin(rotation_angle_in_rad) + center_y
     return x_dash_1, y_dash_1, x_dash_2, y_dash_2, x_dash_3, y_dash_3, x_dash_4, y_dash_4
 
 
@@ -297,9 +312,11 @@ def pad_image(image):
     image: page image
     """
     offset = int(args.padding // 2)
-    padded_image = Image.new('L', (image.size[0] + int(args.padding), image.size[1] + int(args.padding)), "white")
-    padded_image.paste(im = image, box = (offset, offset))
+    padded_image = Image.new(
+        'L', (image.size[0] + int(args.padding), image.size[1] + int(args.padding)), "white")
+    padded_image.paste(im=image, box=(offset, offset))
     return padded_image
+
 
 def update_minimum_bounding_box_input(bounding_box_input):
     """ Given list of 2D points, returns list of 2D points shifted by an offset.
@@ -327,7 +344,8 @@ for filename in sorted(file_list):
     filename = str(filename)
     with open(str(filename), 'r', encoding='utf-8') as f:
         base_name = os.path.basename(filename)
-        image_file = os.path.join(args.image_dir, base_name.split('.')[0] + args.ext)
+        image_file = os.path.join(
+            args.image_dir, base_name.split('.')[0] + args.ext)
         try:
             im = Image.open(image_file).convert('L')
         except Exception as e:
@@ -372,14 +390,15 @@ for filename in sorted(file_list):
             rot_points.append(p3_new)
             rot_points.append(p4_new)
             cropped_bounding_box = bounding_box_tuple(bounding_box.area,
-                    bounding_box.length_parallel,
-                    bounding_box.length_orthogonal,
-                    bounding_box.length_orthogonal,
-                    bounding_box.unit_vector,
-                    bounding_box.unit_vector_angle,
-                    set(rot_points))
+                                                      bounding_box.length_parallel,
+                                                      bounding_box.length_orthogonal,
+                                                      bounding_box.length_orthogonal,
+                                                      bounding_box.unit_vector,
+                                                      bounding_box.unit_vector_angle,
+                                                      set(rot_points))
             rotation_angle_in_rad = get_smaller_angle(cropped_bounding_box)
-            img2 = region_initial.rotate(degrees(rotation_angle_in_rad), resample = Image.BICUBIC)
+            img2 = region_initial.rotate(
+                degrees(rotation_angle_in_rad), resample=Image.BICUBIC)
             x_dash_1, y_dash_1, x_dash_2, y_dash_2, x_dash_3, y_dash_3, x_dash_4, y_dash_4 = rotated_points(
                 cropped_bounding_box, get_center(region_initial))
             min_x = int(min(x_dash_1, x_dash_2, x_dash_3, x_dash_4))
@@ -390,15 +409,15 @@ for filename in sorted(file_list):
             region_final = img2.crop(box)
             width, height = region_final.size
             if args.filter:
-              if height > (width * 2):
-                  globvar += 1
-                  continue
-              if height < 10:
-                  globvar += 1
-                  continue
-              if width < 10:
-                  globvar += 1
-                  continue
+                if height > (width * 2):
+                    globvar += 1
+                    continue
+                if height < 10:
+                    globvar += 1
+                    continue
+                if width < 10:
+                    globvar += 1
+                    continue
             fname = row[1].split('.')[0]
             text_fh.write(fname + '\n')
             image_out_file = os.path.join(args.out_dir, row[1])

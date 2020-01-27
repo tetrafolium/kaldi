@@ -17,6 +17,7 @@ input_ids_file = sys.argv[1]
 input_trans = sys.argv[2]
 output_trans = sys.argv[3]
 
+
 def main():
 
     # First load ids to filter out of transcript
@@ -32,7 +33,6 @@ def main():
                 continue
 
             fh_out.write("%s (%s)\n" % (utt, uttid))
-
 
 
 if __name__ == "__main__":

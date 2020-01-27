@@ -3,6 +3,7 @@
 # Copyright 2016  Vimal Manohar
 # Apache 2.0.
 
+import libs.common as common_lib
 """This script converts kaldi-style utt2spk and segments to a NIST RTTM
 file.
 
@@ -27,7 +28,6 @@ import argparse
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 
 def get_args():

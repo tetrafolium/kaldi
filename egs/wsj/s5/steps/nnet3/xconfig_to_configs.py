@@ -6,6 +6,8 @@
 # Apache 2.0.
 
 # we're using python 3.x style print but want it to work in python 2.x,
+import libs.common as common_lib
+import libs.nnet3.xconfig.parser as xparser
 from __future__ import print_function
 import argparse
 import os
@@ -15,9 +17,6 @@ from collections import defaultdict
 sys.path.insert(0, 'steps/')
 # the following is in case we weren't running this from the normal directory.
 sys.path.insert(0, os.path.realpath(os.path.dirname(sys.argv[0])) + '/')
-
-import libs.nnet3.xconfig.parser as xparser
-import libs.common as common_lib
 
 
 def get_args():
@@ -203,15 +202,15 @@ def write_config_files(config_dir, all_layers):
 
     for basename, lines in config_basename_to_lines.items():
         # check the lines num start with 'output-node':
-        num_output_node_lines = sum( [ 1 if line.startswith('output-node' ) else 0
-                                       for line in lines ] )
+        num_output_node_lines = sum([1 if line.startswith('output-node') else 0
+                                     for line in lines])
         if num_output_node_lines == 0:
             if basename == 'init':
-                continue # do not write the init.config
+                continue  # do not write the init.config
             else:
                 print('{0}: error in xconfig file {1}: may be lack of a '
                       'output layer'.format(sys.argv[0], sys.argv[2]),
-                                            file=sys.stderr)
+                      file=sys.stderr)
                 raise
 
         header = config_basename_to_header[basename]
@@ -251,7 +250,7 @@ def add_nnet_context_info(config_dir, nnet_edits=None,
     # modulus: 1
     # ...
     info = {}
-    for line in out.split("\n")[:4]: # take 4 initial lines,
+    for line in out.split("\n")[:4]:  # take 4 initial lines,
         parts = line.split(":")
         if len(parts) != 2:
             continue
@@ -264,6 +263,7 @@ def add_nnet_context_info(config_dir, nnet_edits=None,
     vf.write('model_left_context={0}\n'.format(info['left-context']))
     vf.write('model_right_context={0}\n'.format(info['right-context']))
     vf.close()
+
 
 def check_model_contexts(config_dir, nnet_edits=None, existing_model=None):
     contexts = {}
@@ -280,14 +280,15 @@ def check_model_contexts(config_dir, nnet_edits=None, existing_model=None):
             if nnet_edits is not None and file_name != 'init':
                 model = "nnet3-copy --edits='{0}' {1} - |".format(nnet_edits,
                                                                   model)
-            out = common_lib.get_command_stdout('nnet3-info "{0}"'.format(model))
+            out = common_lib.get_command_stdout(
+                'nnet3-info "{0}"'.format(model))
             # out looks like this
             # left-context: 7
             # right-context: 0
             # num-parameters: 90543902
             # modulus: 1
             # ...
-            for line in out.split("\n")[:4]: # take 4 initial lines,
+            for line in out.split("\n")[:4]:  # take 4 initial lines,
                 parts = line.split(":")
                 if len(parts) != 2:
                     continue
@@ -299,19 +300,18 @@ def check_model_contexts(config_dir, nnet_edits=None, existing_model=None):
     if 'init' in contexts:
         assert('ref' in contexts)
         if ('left-context' in contexts['init'] and
-            'left-context' in contexts['ref']):
+                'left-context' in contexts['ref']):
             if ((contexts['init']['left-context']
                  > contexts['ref']['left-context'])
                 or (contexts['init']['right-context']
                     > contexts['ref']['right-context'])):
-               raise Exception(
+                raise Exception(
                     "Model specified in {0}/init.config requires greater"
                     " context than the model specified in {0}/ref.config."
                     " This might be due to use of label-delay at the output"
                     " in ref.config. Please use delay=$label_delay in the"
                     " initial fixed-affine-layer of the network, to avoid"
                     " this issue.")
-
 
 
 def main():

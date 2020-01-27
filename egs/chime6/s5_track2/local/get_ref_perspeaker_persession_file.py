@@ -6,6 +6,7 @@
 
 import argparse
 
+
 def get_args():
     parser = argparse.ArgumentParser(
         description="""This script splits a kaldi text file
@@ -20,7 +21,7 @@ def get_args():
 
 def main():
     args = get_args()
-    sessionid_speakerid_dict= {}
+    sessionid_speakerid_dict = {}
     spkrid_mapping = {}
     for line in open(args.input_text_path):
         parts = line.strip().split()
@@ -29,7 +30,7 @@ def main():
         sessionid = uttid_id.strip().split('_')[1]
         sessionid_speakerid = sessionid + '_' + speakerid
         if sessionid_speakerid not in sessionid_speakerid_dict:
-            sessionid_speakerid_dict[sessionid_speakerid]=list()
+            sessionid_speakerid_dict[sessionid_speakerid] = list()
         sessionid_speakerid_dict[sessionid_speakerid].append(line)
 
     spkr_num = 1
@@ -74,6 +75,7 @@ def main():
         wc_writer.write('\n')
         wc_writer.close()
         ref_writer.close()
+
 
 if __name__ == '__main__':
     main()

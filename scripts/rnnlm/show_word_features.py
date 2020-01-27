@@ -3,17 +3,18 @@
 # Copyright  2017  Jian Wang
 # License: Apache 2.0.
 
+import re
 import os
 import argparse
 import sys
 
 sys.stdout = open(1, 'w', encoding='utf-8', closefd=False)
 
-import re
-
 
 parser = argparse.ArgumentParser(description="This script turns the word features to a human readable format.",
-                                 epilog="E.g. " + sys.argv[0] + "exp/rnnlm/word_feats.txt exp/rnnlm/features.txt "
+                                 epilog="E.g. " +
+                                 sys.argv[0] +
+                                 "exp/rnnlm/word_feats.txt exp/rnnlm/features.txt "
                                         "> exp/rnnlm/word_feats.str.txt",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -45,6 +46,7 @@ def read_feature_type_and_key(features_file):
 
     return feat_types
 
+
 feat_type_and_key = read_feature_type_and_key(args.features_file)
 
 num_word_feats = 0
@@ -55,17 +57,17 @@ with open(args.word_features_file, 'r', encoding="utf-8") as f:
 
         print(int(fields[0]), end='\t')
         for idx in range(1, len(fields), 2):
-          feat_id = int(fields[idx])
-          feat_value = fields[idx + 1]
-          feat_type, feat_key = feat_type_and_key[feat_id]
-          if feat_type == 'constant':
-              print(' "constant"={0}'.format(feat_value), end='')
-          elif feat_type == 'unigram':
-              print(' "unigram"={0}'.format(feat_value), end='')
-          elif feat_type == 'length':
-              print(' "length"={0}'.format(feat_value), end='')
-          else: # other types are the same
-              print(' "{0} {1}"={2}'.format(feat_type, feat_key, feat_value), end='')
+            feat_id = int(fields[idx])
+            feat_value = fields[idx + 1]
+            feat_type, feat_key = feat_type_and_key[feat_id]
+            if feat_type == 'constant':
+                print(' "constant"={0}'.format(feat_value), end='')
+            elif feat_type == 'unigram':
+                print(' "unigram"={0}'.format(feat_value), end='')
+            elif feat_type == 'length':
+                print(' "length"={0}'.format(feat_value), end='')
+            else:  # other types are the same
+                print(' "{0} {1}"={2}'.format(feat_type, feat_key, feat_value), end='')
         print('')
         num_word_feats += 1
 

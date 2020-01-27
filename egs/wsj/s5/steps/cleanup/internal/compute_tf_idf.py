@@ -111,8 +111,8 @@ def _run(args):
 
     if args.accumulate_over_docs:
         tf_stats.compute_term_stats(idf_stats=idf_stats
-                                              if args.input_idf_stats is None
-                                              else None)
+                                    if args.input_idf_stats is None
+                                    else None)
 
         if args.output_idf_stats is not None:
             idf_stats.write(args.output_idf_stats)
@@ -126,6 +126,7 @@ def _run(args):
 
     if num_done == 0:
         raise RuntimeError("Could not compute TF-IDF for any query documents")
+
 
 def main():
     args = _get_args()

@@ -13,7 +13,8 @@ import os
 import sys
 
 parser = argparse.ArgumentParser(description="Creates text, utt2spk and images.scp files",
-                                 epilog="E.g.  " + sys.argv[0] + " data/train data/local/lines ",
+                                 epilog="E.g.  " +
+                                 sys.argv[0] + " data/train data/local/lines ",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('image_transcription_file', type=str,
                     help='Path to the file containing line image path and transcription information')
@@ -56,12 +57,11 @@ image_fh = open(image_file, 'w', encoding='utf-8')
 
 image_transcription_dict = read_image_text(args.image_transcription_file)
 for line_id in sorted(image_transcription_dict.keys()):
-        writer_id = line_id.strip().split('_')[-3]
-        updated_line_id = line_id + '.png'
-        image_file_path = os.path.join('lines', updated_line_id)
-        text = image_transcription_dict[line_id]
-        utt_id = line_id
-        text_fh.write(utt_id + ' ' + text + '\n')
-        utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
-        image_fh.write(utt_id + ' ' + image_file_path + '\n')
-
+    writer_id = line_id.strip().split('_')[-3]
+    updated_line_id = line_id + '.png'
+    image_file_path = os.path.join('lines', updated_line_id)
+    text = image_transcription_dict[line_id]
+    utt_id = line_id
+    text_fh.write(utt_id + ' ' + text + '\n')
+    utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
+    image_fh.write(utt_id + ' ' + image_file_path + '\n')

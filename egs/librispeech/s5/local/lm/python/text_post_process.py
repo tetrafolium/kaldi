@@ -10,8 +10,10 @@
 # - corrects likely wrong normalizations (e.g. Sun -> Sunday)
 # - splits the sentences into separate lines
 
-import sys, argparse
+import sys
+import argparse
 import re
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -19,7 +21,7 @@ def parse_args():
     parser.add_argument('--max-sent-len', type=int, default=600,
                         help="The maximum allowed # of words per sentence")
     parser.add_argument('--abort-long-sent', type=bool, default=False,
-                        help='If True and a sentence longer than "max-sent-len" detected' +\
+                        help='If True and a sentence longer than "max-sent-len" detected' +
                              'exit with error code 1. If False, just split the long sentences.')
     parser.add_argument('--sent-end-marker', default="DOTDOTDOT")
     parser.add_argument("in_text", help="Input text")
@@ -33,8 +35,8 @@ def parse_args():
 if __name__ == '__main__':
     opts = parse_args()
     with open(opts.in_text) as src, \
-         open(opts.out_text, 'w') as dst, \
-         open(opts.sent_bounds, 'w') as bounds:
+            open(opts.out_text, 'w') as dst, \
+            open(opts.sent_bounds, 'w') as bounds:
         corrections = 0
         lines = list()
         current_line = list()
@@ -48,14 +50,16 @@ if __name__ == '__main__':
                 sent_bounds.append(n_tokens - 1)
                 if len(current_line) > opts.max_sent_len:
                     if opts.abort_long_sent:
-                        sys.stderr.write('ERROR: Too long sentence - aborting!\n')
+                        sys.stderr.write(
+                            'ERROR: Too long sentence - aborting!\n')
                         sys.exit(1)
                     else:
-                        sys.stderr.write('WARNING: Too long sentence - splitting ...\n')
+                        sys.stderr.write(
+                            'WARNING: Too long sentence - splitting ...\n')
                         sent_start = 0
                         while sent_start < len(current_line):
-                            lines.append(' '.join(current_line[sent_start:\
-                                                  sent_start + opts.max_sent_len]))
+                            lines.append(' '.join(current_line[sent_start:
+                                                               sent_start + opts.max_sent_len]))
                             sent_start += opts.max_sent_len
                 else:
                     lines.append(' '.join(current_line))
@@ -71,7 +75,7 @@ if __name__ == '__main__':
                 if m is not None:
                     n_tokens += 1
                     current_line.append(opl_tokens[i])
-                #else:
+                # else:
                 #    sys.stderr.write('rejected: %s\n' % opl_tokens[i])
         sys.stderr.write('Corrected tokens: %d\n' % corrections)
         dst.write('\n'.join(lines) + '\n')

@@ -9,6 +9,7 @@ mt_dir = sys.argv[2]
 file = sys.argv[3]
 output_dir = sys.argv[4]
 
+
 def get_asr_dict(file):
     asr_dict = dict()
     with open(file, 'r') as f:
@@ -20,6 +21,7 @@ def get_asr_dict(file):
             asr_dict[utt_id] = sentence
 
     return asr_dict
+
 
 def get_utt_id(line_list):
     start_time = "".join(line_list[2].split('.'))
@@ -39,6 +41,7 @@ def get_utt_id(line_list):
     utt_id = line_list[0] + "_" + start_time + "_" + end_time
     return utt_id
 
+
 def write_result(asr_dict, file, mt_dir, output_dir):
     # create output directory
     output_path = Path(output_dir)
@@ -57,11 +60,14 @@ def write_result(asr_dict, file, mt_dir, output_dir):
                         if utt_id not in asr_dict:
                             print(utt_id)
                         else:
-                            output_file.write(utt_id + " " + asr_dict[utt_id] + "\n")
+                            output_file.write(
+                                utt_id + " " + asr_dict[utt_id] + "\n")
+
 
 def main():
     asr_dict = get_asr_dict(asr_result)
     write_result(asr_dict, file, mt_dir, output_dir)
+
 
 if __name__ == "__main__":
     main()
