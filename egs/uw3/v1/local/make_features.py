@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 # Copyright      2017  Chun Chieh Chang
-
 """ This script converts images to Kaldi-format feature matrices. The input to
     this script is the path to a data directory, e.g. "data/train". This script
     reads the images listed in images.scp and writes them to standard output
@@ -22,15 +21,25 @@ from scipy import ndimage
 from signal import signal, SIGPIPE, SIG_DFL
 signal(SIGPIPE, SIG_DFL)
 
-parser = argparse.ArgumentParser(description="""Converts images (in 'dir'/images.scp) to features and
-                                                writes them to standard output in text format.""")
+parser = argparse.ArgumentParser(
+    description="""Converts images (in 'dir'/images.scp) to features and
+                                                writes them to standard output in text format."""
+)
 parser.add_argument('dir', help='data directory (should contain images.scp)')
-parser.add_argument('--out-ark', default='-',
-                    help='where to write the output feature file.')
-parser.add_argument('--feat-dim', type=int, default=40,
-                    help='size to scale the height of all images (i.e. the dimension of the resulting features)')
-parser.add_argument('--pad', type=bool, default=False,
-                    help='pad the left and right of the images with 10 white pixels.')
+parser.add_argument(
+    '--out-ark', default='-', help='where to write the output feature file.')
+parser.add_argument(
+    '--feat-dim',
+    type=int,
+    default=40,
+    help=
+    'size to scale the height of all images (i.e. the dimension of the resulting features)'
+)
+parser.add_argument(
+    '--pad',
+    type=bool,
+    default=False,
+    help='pad the left and right of the images with 10 white pixels.')
 
 args = parser.parse_args()
 

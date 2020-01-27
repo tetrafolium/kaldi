@@ -10,36 +10,51 @@ import sys
 
 import re
 
+parser = argparse.ArgumentParser(
+    description="This script prepares files containing integerized text, "
+    "for consumption by nnet3-get-egs.",
+    epilog="E.g. " + sys.argv[0] + " --vocab-file=data/rnnlm/vocab/words.txt "
+    "--num-splits=5 "
+    "--data-weights-file=exp/rnnlm/data_weights.txt data/rnnlm/data "
+    "exp/rnnlm1/split_text",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-parser = argparse.ArgumentParser(description="This script prepares files containing integerized text, "
-                                 "for consumption by nnet3-get-egs.",
-                                 epilog="E.g. " +
-                                 sys.argv[0] +
-                                 " --vocab-file=data/rnnlm/vocab/words.txt "
-                                        "--num-splits=5 "
-                                        "--data-weights-file=exp/rnnlm/data_weights.txt data/rnnlm/data "
-                                        "exp/rnnlm1/split_text",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-parser.add_argument("--vocab-file", type=str, default='', required=True,
-                    help="The vocabulary file (used to convert symbols to integers)")
-parser.add_argument("--unk-word", type=str,
-                    help="The unknown word; if supplied, words out of this vocabulary "
-                    "will be mapped to this word while dumping the data (if not, it is "
-                    "an error).  If you supply the empty string, it is as if you did "
-                    "not supply this option.")
-parser.add_argument("--data-weights-file", type=str, default='', required=True,
-                    help="File that specifies multiplicities and weights for each data source: "
-                    "e.g. if <data_dir> contains foo.txt and bar.txt, then should have lines "
-                    "like 'foo 1 0.5' and 'bar 2 1.5'.  These don't have to sum to one.")
-parser.add_argument("--num-splits", type=int, required=True,
-                    help="The number of pieces to split up the data into.")
-parser.add_argument("text_dir",
-                    help="Directory in which to look for source data, as validated by validate_text_dir.py")
-parser.add_argument("split_dir",
-                    help="Directory in which the split-up data will be written.  Will be created "
-                    "if it does not exist.")
-
+parser.add_argument(
+    "--vocab-file",
+    type=str,
+    default='',
+    required=True,
+    help="The vocabulary file (used to convert symbols to integers)")
+parser.add_argument(
+    "--unk-word",
+    type=str,
+    help="The unknown word; if supplied, words out of this vocabulary "
+    "will be mapped to this word while dumping the data (if not, it is "
+    "an error).  If you supply the empty string, it is as if you did "
+    "not supply this option.")
+parser.add_argument(
+    "--data-weights-file",
+    type=str,
+    default='',
+    required=True,
+    help="File that specifies multiplicities and weights for each data source: "
+    "e.g. if <data_dir> contains foo.txt and bar.txt, then should have lines "
+    "like 'foo 1 0.5' and 'bar 2 1.5'.  These don't have to sum to one.")
+parser.add_argument(
+    "--num-splits",
+    type=int,
+    required=True,
+    help="The number of pieces to split up the data into.")
+parser.add_argument(
+    "text_dir",
+    help=
+    "Directory in which to look for source data, as validated by validate_text_dir.py"
+)
+parser.add_argument(
+    "split_dir",
+    help=
+    "Directory in which the split-up data will be written.  Will be created "
+    "if it does not exist.")
 
 args = parser.parse_args()
 
@@ -74,7 +89,8 @@ def read_data_weights(weights_file, data_sources):
                 assert len(fields) == 3
                 if fields[0] in data_weights:
                     raise Exception("duplicated data source({0}) specified in "
-                                    "data-weights: {1}".format(fields[0], weights_file))
+                                    "data-weights: {1}".format(
+                                        fields[0], weights_file))
                 data_weights[fields[0]] = (int(fields[1]), float(fields[2]))
             except Exception as e:
                 sys.exit(sys.argv[0] + ": bad data-weights line: '" +
@@ -82,8 +98,8 @@ def read_data_weights(weights_file, data_sources):
 
     for name in data_sources.keys():
         if name not in data_weights:
-            sys.exit(
-                sys.argv[0] + ": Weight for data source '{0}' not set".format(name))
+            sys.exit(sys.argv[0] +
+                     ": Weight for data source '{0}' not set".format(name))
 
     return data_weights
 
@@ -99,8 +115,8 @@ def distribute_to_outputs(source_filename, weight, output_filehandles):
     try:
         f = open(source_filename, 'r', encoding="utf-8")
     except Exception as e:
-        sys.exit(sys.argv[0] + ": failed to open file {0} for reading: {1} ".format(
-            source_filename, str(e)))
+        sys.exit(sys.argv[0] + ": failed to open file {0} for reading: {1} ".
+                 format(source_filename, str(e)))
     for line in f:
         output_filehandle = output_filehandles[n % num_outputs]
         # the line 'line' will already have a terminating newline, so we
@@ -108,8 +124,8 @@ def distribute_to_outputs(source_filename, weight, output_filehandles):
         try:
             print(weight_str + line, end='', file=output_filehandle)
         except:
-            sys.exit(
-                sys.argv[0] + ": failed to write to temporary file (disk full?)")
+            sys.exit(sys.argv[0] +
+                     ": failed to write to temporary file (disk full?)")
         n += 1
         print
     f.close()
@@ -122,14 +138,18 @@ if not os.path.exists(args.split_dir + "/info"):
     os.makedirs(args.split_dir + "/info")
 
 # set up the 'num_splits' file, which contains an integer.
-with open("{0}/info/num_splits".format(args.split_dir), 'w', encoding="utf-8") as f:
+with open(
+        "{0}/info/num_splits".format(args.split_dir), 'w',
+        encoding="utf-8") as f:
     print(args.num_splits, file=f)
 
 # e.g. set temp_files = [ 'foo/1.tmp', 'foo/2.tmp', ..., 'foo/5.tmp' ]
 # we write the text data to here, later we convert to integer
 # while writing to the *.txt files.
-temp_files = ["{0}/{1}.tmp".format(args.split_dir, n)
-              for n in range(1, args.num_splits + 1)]
+temp_files = [
+    "{0}/{1}.tmp".format(args.split_dir, n)
+    for n in range(1, args.num_splits + 1)
+]
 
 # create filehandles for writing to each of these '.tmp' output files.
 temp_filehandles = []
@@ -142,7 +162,6 @@ for fname in temp_files:
                  "need to rewrite parts of this script, but a workaround "
                  "is to use fewer splits of the data (or change your OS "
                  "ulimits)")
-
 
 print(sys.argv[0] + ": distributing data to temporary files")
 
@@ -170,13 +189,11 @@ for name in data_sources.keys():
         # documentation for this function for more details.
         distribute_to_outputs(source_file, weight, rotated_filehandles)
 
-
 for f in temp_filehandles:
     try:
         f.close()
     except:
         sys.exit(sys.argv[0] + ": error closing temporary file (disk full?)")
-
 
 print(sys.argv[0] + ": converting from text to integer form.")
 
@@ -195,26 +212,23 @@ for n in range(1, args.num_splits + 1):
         output_file="{0}/{1}.txt".format(args.split_dir, n))
     ret = os.system(command)
     if ret != 0:
-        sys.exit(sys.argv[0] + ": command '{0}' returned with status {1}".format(
-            command, ret))
+        sys.exit(sys.argv[0] + ": command '{0}' returned with status {1}".
+                 format(command, ret))
     os.remove("{0}/{1}.tmp".format(args.split_dir, n))
 
-
 print(sys.argv[0] + ": converting dev data from text to integer form.")
-
 
 command = "utils/sym2int.pl {unk_opt} {vocab_file} <{input_file} | {awk_command} >{output_file}".format(
     vocab_file=args.vocab_file,
     unk_opt=unk_opt,
     awk_command="awk '{print 1.0, $0;}'",  # this is passed as a variable
-                                           # because it has {}'s awhich would
-                                           # otherwise be interpreted.
+    # because it has {}'s awhich would
+    # otherwise be interpreted.
     input_file="{0}/dev.txt".format(args.text_dir),
     output_file="{0}/dev.txt".format(args.split_dir))
 ret = os.system(command)
 if ret != 0:
-    sys.exit(sys.argv[0] + ": command '{0}' returned with status {1}".format(
-        command, ret))
-
+    sys.exit(sys.argv[0] +
+             ": command '{0}' returned with status {1}".format(command, ret))
 
 print(sys.argv[0] + ": created split data in {0}".format(args.split_dir))

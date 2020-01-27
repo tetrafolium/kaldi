@@ -22,6 +22,7 @@ def get_utt_list(utt2spk_filename):
     print("{} utterances in total".format(len(utt_list)))
     return utt_list
 
+
 # prepare utt2num_frames dictionary
 
 
@@ -34,6 +35,7 @@ def get_utt2num_frames(utt2num_frames_filename):
         line_split = line.split()
         utt2num_frames[line_split[0]] = int(line_split[1])
     return utt2num_frames
+
 
 # prepare utt2feats dictionary
 
@@ -65,8 +67,8 @@ def create_ref(uttname, utt2num_frames, full_rttm_filename):
         uttname_line = line_split[1]
         if uttname != uttname_line:
             continue
-        start_time, duration = int(
-            float(line_split[3]) * 100), int(float(line_split[4]) * 100)
+        start_time, duration = int(float(line_split[3]) * 100), int(
+            float(line_split[4]) * 100)
         end_time = start_time + duration
         spkname = line_split[7]
         if spkname not in speaker_dict.keys():
@@ -86,6 +88,7 @@ def create_ref(uttname, utt2num_frames, full_rttm_filename):
                 else:
                     ref[i] = 1  # The overlapping speech is marked as 1.
     return ref.astype(int)
+
 
 # create output rttm file
 
@@ -115,57 +118,103 @@ def create_rttm_output(uttname, predicted_label, output_dir, channel):
             end_frame = (seg_list[i])[1]
             label = (seg_list[i])[2]
             duration = end_frame - start_frame
-            fh.write("SPEAKER {} {} {:.2f} {:.2f} <NA> <NA> {} <NA> <NA>\n".format(
-                uttname, channel, start_frame / 100.0, duration / 100.0, label))
+            fh.write(
+                "SPEAKER {} {} {:.2f} {:.2f} <NA> <NA> {} <NA> <NA>\n".format(
+                    uttname, channel, start_frame / 100.0, duration / 100.0,
+                    label))
     return 0
 
 
 def main():
     parser = argparse.ArgumentParser(description='VB Resegmentation Wrapper')
     parser.add_argument('data_dir', type=str, help='Subset data directory')
-    parser.add_argument('init_rttm_filename', type=str,
-                        help='The rttm file to initialize the VB system, usually the AHC cluster result')
+    parser.add_argument(
+        'init_rttm_filename',
+        type=str,
+        help=
+        'The rttm file to initialize the VB system, usually the AHC cluster result'
+    )
     parser.add_argument('output_dir', type=str, help='Output directory')
-    parser.add_argument('dubm_model', type=str,
-                        help='Path of the diagonal UBM model')
-    parser.add_argument('ie_model', type=str,
-                        help='Path of the i-vector extractor model')
+    parser.add_argument(
+        'dubm_model', type=str, help='Path of the diagonal UBM model')
+    parser.add_argument(
+        'ie_model', type=str, help='Path of the i-vector extractor model')
 
-    parser.add_argument('--max-speakers', type=int, default=10,
-                        help='Maximum number of speakers expected in the utterance (default: 10)')
-    parser.add_argument('--max-iters', type=int, default=10,
-                        help='Maximum number of algorithm iterations (default: 10)')
-    parser.add_argument('--downsample', type=int, default=25,
-                        help='Perform diarization on input downsampled by this factor (default: 25)')
-    parser.add_argument('--alphaQInit', type=float, default=100.0,
-                        help='Dirichlet concentraion parameter for initializing q')
-    parser.add_argument('--sparsityThr', type=float, default=0.001,
-                        help='Set occupations smaller that this threshold to 0.0 (saves memory as \
+    parser.add_argument(
+        '--max-speakers',
+        type=int,
+        default=10,
+        help=
+        'Maximum number of speakers expected in the utterance (default: 10)')
+    parser.add_argument(
+        '--max-iters',
+        type=int,
+        default=10,
+        help='Maximum number of algorithm iterations (default: 10)')
+    parser.add_argument(
+        '--downsample',
+        type=int,
+        default=25,
+        help=
+        'Perform diarization on input downsampled by this factor (default: 25)'
+    )
+    parser.add_argument(
+        '--alphaQInit',
+        type=float,
+        default=100.0,
+        help='Dirichlet concentraion parameter for initializing q')
+    parser.add_argument(
+        '--sparsityThr',
+        type=float,
+        default=0.001,
+        help=
+        'Set occupations smaller that this threshold to 0.0 (saves memory as \
                         the posteriors are represented by sparse matrix)')
-    parser.add_argument('--epsilon', type=float, default=1e-6,
-                        help='Stop iterating, if obj. fun. improvement is less than epsilon')
-    parser.add_argument('--minDur', type=int, default=1,
-                        help='Minimum number of frames between speaker turns imposed by linear \
+    parser.add_argument(
+        '--epsilon',
+        type=float,
+        default=1e-6,
+        help='Stop iterating, if obj. fun. improvement is less than epsilon')
+    parser.add_argument(
+        '--minDur',
+        type=int,
+        default=1,
+        help='Minimum number of frames between speaker turns imposed by linear \
                         chains of HMM states corresponding to each speaker. All the states \
                         in a chain share the same output distribution')
-    parser.add_argument('--loopProb', type=float, default=0.9,
-                        help='Probability of not switching speakers between frames')
-    parser.add_argument('--statScale', type=float, default=0.2,
-                        help='Scale sufficient statiscits collected using UBM')
-    parser.add_argument('--llScale', type=float, default=1.0,
-                        help='Scale UBM likelihood (i.e. llScale < 1.0 make atribution of \
+    parser.add_argument(
+        '--loopProb',
+        type=float,
+        default=0.9,
+        help='Probability of not switching speakers between frames')
+    parser.add_argument(
+        '--statScale',
+        type=float,
+        default=0.2,
+        help='Scale sufficient statiscits collected using UBM')
+    parser.add_argument(
+        '--llScale',
+        type=float,
+        default=1.0,
+        help='Scale UBM likelihood (i.e. llScale < 1.0 make atribution of \
                         frames to UBM componets more uncertain)')
-    parser.add_argument('--channel', type=int, default=0,
-                        help='Channel information in the rttm file')
-    parser.add_argument('--initialize', type=int, default=1,
-                        help='Whether to initalize the speaker posterior')
+    parser.add_argument(
+        '--channel',
+        type=int,
+        default=0,
+        help='Channel information in the rttm file')
+    parser.add_argument(
+        '--initialize',
+        type=int,
+        default=1,
+        help='Whether to initalize the speaker posterior')
 
     args = parser.parse_args()
     print(args)
 
     utt_list = get_utt_list("{}/utt2spk".format(args.data_dir))
-    utt2num_frames = get_utt2num_frames(
-        "{}/utt2num_frames".format(args.data_dir))
+    utt2num_frames = get_utt2num_frames("{}/utt2num_frames".format(
+        args.data_dir))
 
     # Load the diagonal UBM and i-vector extractor
     dubm_para = load_dubm(args.dubm_model)
@@ -205,7 +254,8 @@ def main():
 
         if X_voiced.shape[0] == 0:
             print(
-                "Warning: {} has no voiced frames in the initialization file".format(utt))
+                "Warning: {} has no voiced frames in the initialization file".
+                format(utt))
             continue
 
         # Initialize the posterior of each speaker based on the clustering result.
@@ -224,9 +274,27 @@ def main():
         #      probabilities of the redundant speaker should converge to zero.
         # Li - values of auxiliary function (and DER and frame cross-entropy between q
         #      and reference if 'ref' is provided) over iterations.
-        q_out, sp_out, L_out = VB_diarization.VB_diarization(X_voiced, m, iE, w, V, sp=None, q=q, maxSpeakers=args.max_speakers, maxIters=args.max_iters, VtiEV=None,
-                                                             downsample=args.downsample, alphaQInit=args.alphaQInit, sparsityThr=args.sparsityThr, epsilon=args.epsilon, minDur=args.minDur,
-                                                             loopProb=args.loopProb, statScale=args.statScale, llScale=args.llScale, ref=None, plot=False)
+        q_out, sp_out, L_out = VB_diarization.VB_diarization(
+            X_voiced,
+            m,
+            iE,
+            w,
+            V,
+            sp=None,
+            q=q,
+            maxSpeakers=args.max_speakers,
+            maxIters=args.max_iters,
+            VtiEV=None,
+            downsample=args.downsample,
+            alphaQInit=args.alphaQInit,
+            sparsityThr=args.sparsityThr,
+            epsilon=args.epsilon,
+            minDur=args.minDur,
+            loopProb=args.loopProb,
+            statScale=args.statScale,
+            llScale=args.llScale,
+            ref=None,
+            plot=False)
         predicted_label_voiced = np.argmax(q_out, 1) + 2
         predicted_label = (np.zeros(len(mask))).astype(int)
         predicted_label[mask] = predicted_label_voiced

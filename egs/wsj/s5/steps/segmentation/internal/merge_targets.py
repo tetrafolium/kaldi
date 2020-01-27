@@ -44,32 +44,42 @@ def get_args():
     """,
         formatter_class=argparse.RawTextHelpFormatter)
 
-    parser.add_argument("--weights", type=str, default="",
-                        help="A comma-separated list of weights corresponding "
-                        "to each targets source being combined. "
-                        "Weights will be normalized internally to sum-to-one.")
-    parser.add_argument("--dim", type=int, default=3,
-                        help="Number of columns corresponding to each "
-                        "target matrix")
-    parser.add_argument("--remove-mismatch-frames", type=str, default=False,
-                        choices=["true", "false"],
-                        action=common_lib.StrToBoolAction,
-                        help="If true, the mismatch frames are removed by "
-                        "setting targets to 0 in the following cases:\n"
-                        "a) If none of the sources have a column with value "
-                        "> 0.5\n"
-                        "b) If two sources have columns with value > 0.5, but "
-                        "they occur at different indexes e.g. silence prob is "
-                        "> 0.5 for the targets from alignment, and speech prob "
-                        "> 0.5 for the targets from decoding.")
+    parser.add_argument(
+        "--weights",
+        type=str,
+        default="",
+        help="A comma-separated list of weights corresponding "
+        "to each targets source being combined. "
+        "Weights will be normalized internally to sum-to-one.")
+    parser.add_argument(
+        "--dim",
+        type=int,
+        default=3,
+        help="Number of columns corresponding to each "
+        "target matrix")
+    parser.add_argument(
+        "--remove-mismatch-frames",
+        type=str,
+        default=False,
+        choices=["true", "false"],
+        action=common_lib.StrToBoolAction,
+        help="If true, the mismatch frames are removed by "
+        "setting targets to 0 in the following cases:\n"
+        "a) If none of the sources have a column with value "
+        "> 0.5\n"
+        "b) If two sources have columns with value > 0.5, but "
+        "they occur at different indexes e.g. silence prob is "
+        "> 0.5 for the targets from alignment, and speech prob "
+        "> 0.5 for the targets from decoding.")
 
-    parser.add_argument("pasted_targets", type=str,
-                        help="Input target matrices with columns appended "
-                        "together using paste-feats. Its column dimension is "
-                        "num-sources * dim, which dim is specified by --dim "
-                        "option.")
-    parser.add_argument("out_targets", type=str,
-                        help="Output target matrices")
+    parser.add_argument(
+        "pasted_targets",
+        type=str,
+        help="Input target matrices with columns appended "
+        "together using paste-feats. Its column dimension is "
+        "num-sources * dim, which dim is specified by --dim "
+        "option.")
+    parser.add_argument("out_targets", type=str, help="Output target matrices")
 
     args = parser.parse_args()
 
@@ -130,8 +140,7 @@ def should_remove_frame(row, dim):
     # corresponding to the source 'i' and
     # 'value' is the corresponding score.
     for source_idx in range(num_sources):
-        idx = np.argmax(row[(source_idx * dim):
-                            ((source_idx+1) * dim)])
+        idx = np.argmax(row[(source_idx * dim):((source_idx + 1) * dim)])
         val = row[source_idx * dim + idx]
         confident_in_source.append(bool(val > 0.5))
         best_values_for_source.append((val, idx))
@@ -168,8 +177,11 @@ def run(args):
                 raise RuntimeError(
                     "For utterance {utt} in {f}, num-columns {nc} "
                     "is not a multiple of dim {dim}"
-                    "".format(utt=key, f=args.pasted_targets.name,
-                              nc=mat.shape[1], dim=args.dim))
+                    "".format(
+                        utt=key,
+                        f=args.pasted_targets.name,
+                        nc=mat.shape[1],
+                        dim=args.dim))
             num_sources = mat.shape[1] // args.dim
 
             out_mat = np.matrix(np.zeros([mat.shape[0], args.dim]))
@@ -181,18 +193,17 @@ def run(args):
                     else:
                         for i in range(num_sources):
                             out_mat[n, :] += (
-                                mat[n, (i * args.dim): ((i+1) * args.dim)]
-                                * (1.0 if args.weights is None
-                                   else args.weights[i]))
+                                mat[n, (i * args.dim):((i + 1) * args.dim)] *
+                                (1.0
+                                 if args.weights is None else args.weights[i]))
             else:
                 # Just interpolate the targets
                 for i in range(num_sources):
-                    out_mat += (
-                        mat[:, (i * args.dim): ((i+1) * args.dim)]
-                        * (1.0 if args.weights is None else args.weights[i]))
+                    out_mat += (mat[:, (i * args.dim):((i + 1) * args.dim)] * (
+                        1.0 if args.weights is None else args.weights[i]))
 
-            common_lib.write_matrix_ascii(targets_writer, out_mat.tolist(),
-                                          key=key)
+            common_lib.write_matrix_ascii(
+                targets_writer, out_mat.tolist(), key=key)
             num_done += 1
 
     logger.info("Merged {num_done} target matrices"

@@ -2,7 +2,6 @@
 
 # Copyright      2017  Chun Chieh Chang
 #                2017  Ashish Arora
-
 """ This script reads the extracted IAM database files and creates
     the following files (for the data subset selected via --dataset):
     text, utt2spk, images.scp.
@@ -20,13 +19,17 @@ import xml.dom.minidom as minidom
 
 parser = argparse.ArgumentParser(description="""Creates text, utt2spk
                                                 and images.scp files.""")
-parser.add_argument('database_path', type=str,
-                    help='Path to the downloaded (and extracted) IAM data')
-parser.add_argument('out_dir', type=str,
-                    help='Where to write output files.')
-parser.add_argument('--dataset', type=str, default='train',
-                    choices=['train', 'test', 'validation'],
-                    help='Subset of data to process.')
+parser.add_argument(
+    'database_path',
+    type=str,
+    help='Path to the downloaded (and extracted) IAM data')
+parser.add_argument('out_dir', type=str, help='Where to write output files.')
+parser.add_argument(
+    '--dataset',
+    type=str,
+    default='train',
+    choices=['train', 'test', 'validation'],
+    help='Subset of data to process.')
 args = parser.parse_args()
 
 text_file = os.path.join(args.out_dir + '/', 'text')
@@ -38,11 +41,9 @@ utt2spk_fh = open(utt2spk_file, 'w')
 image_file = os.path.join(args.out_dir + '/', 'images.scp')
 image_fh = open(image_file, 'w')
 
-dataset_path = os.path.join(args.database_path,
-                            args.dataset + '.uttlist')
+dataset_path = os.path.join(args.database_path, args.dataset + '.uttlist')
 
-text_file_path = os.path.join(args.database_path,
-                              'ascii', 'lines.txt')
+text_file_path = os.path.join(args.database_path, 'ascii', 'lines.txt')
 text_dict = {}
 
 
@@ -75,8 +76,8 @@ with open(dataset_path) as f:
         writer_id = form_elements.getAttribute('writer-id')
         outerfolder = form_elements.getAttribute('id')[0:3]
         innerfolder = form_elements.getAttribute('id')
-        lines_path = os.path.join(args.database_path, 'lines',
-                                  outerfolder, innerfolder, innerfolder)
+        lines_path = os.path.join(args.database_path, 'lines', outerfolder,
+                                  innerfolder, innerfolder)
         image_file_path = lines_path + img_num + '.png'
         text = text_dict[line]
         utt_id = writer_id + '_' + line

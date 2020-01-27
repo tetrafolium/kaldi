@@ -16,7 +16,8 @@ if len(sys.argv) < 3:
 # Note that the ECA lexicon's default encoding is ISO-8859-6, not UTF8
 symtable = codecs.open(sys.argv[1], encoding="utf8")
 lexicon = codecs.open(
-    sys.argv[2] + "/callhome_arabic_lexicon_991012/ar_lex.v07", encoding="iso-8859-6")
+    sys.argv[2] + "/callhome_arabic_lexicon_991012/ar_lex.v07",
+    encoding="iso-8859-6")
 
 dict_cache = {}
 # First read off the dictionary and store stuff in a cache

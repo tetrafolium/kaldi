@@ -17,7 +17,7 @@ def get_asr_dict(file):
             line_split = line.split()
             utt_id = line_split[0]
             sentence = " ".join(line_split[1:])
-            assert(utt_id not in asr_dict)
+            assert (utt_id not in asr_dict)
             asr_dict[utt_id] = sentence
 
     return asr_dict
@@ -52,16 +52,17 @@ def write_result(asr_dict, file, mt_dir, output_dir):
         for line in f.readlines():
             file_name = line.split()[0]
             output_file_name = file_name.split('.')[0]
-            with open(mt_dir+"/"+file_name, 'r') as input_file:
-                with open(output_dir+"/"+output_file_name+".txt", 'w') as output_file:
+            with open(mt_dir + "/" + file_name, 'r') as input_file:
+                with open(output_dir + "/" + output_file_name + ".txt",
+                          'w') as output_file:
                     for line in input_file.readlines():
                         line_split = line.split()
                         utt_id = get_utt_id(line_split)
                         if utt_id not in asr_dict:
                             print(utt_id)
                         else:
-                            output_file.write(
-                                utt_id + " " + asr_dict[utt_id] + "\n")
+                            output_file.write(utt_id + " " + asr_dict[utt_id] +
+                                              "\n")
 
 
 def main():

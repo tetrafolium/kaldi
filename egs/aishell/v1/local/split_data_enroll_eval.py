@@ -29,7 +29,7 @@ for key in dictutt:
     random.shuffle(utts)
     for i in range(0, len(utts)):
         line = utts[i] + ' ' + key
-        if(i < 3):
+        if (i < 3):
             fenroll.write(line + '\n')
         else:
             feval.write(line + '\n')

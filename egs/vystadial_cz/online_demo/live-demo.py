@@ -31,7 +31,6 @@ CHANNELS, RATE, FORMAT = 1, 16000, pyaudio.paInt16
 
 
 class LiveDemo(object):
-
     def __init__(self, audio_batch_size, wst, dec_args):
         self.batch_size = audio_batch_size
         self.wst = wst
@@ -46,9 +45,13 @@ class LiveDemo(object):
         self.d.reset()
         self.d.setup(argv)
         self.pin = pyaudio.PyAudio()
-        self.stream = self.pin.open(format=FORMAT, channels=CHANNELS,
-                                    rate=RATE, input=True, frames_per_buffer=self.batch_size,
-                                    stream_callback=self.get_audio_callback())
+        self.stream = self.pin.open(
+            format=FORMAT,
+            channels=CHANNELS,
+            rate=RATE,
+            input=True,
+            frames_per_buffer=self.batch_size,
+            stream_callback=self.get_audio_callback())
         self.utt_frames, self.new_frames = 0, 0
         self.utt_end, self.dialog_end = False, False
         self.frames = []
@@ -67,6 +70,7 @@ class LiveDemo(object):
             self.d.frame_in(in_data)
             self.frames.append(in_data)
             return in_data, pyaudio.paContinue
+
         return frame_in
 
     def _user_control(self):
@@ -77,7 +81,8 @@ class LiveDemo(object):
         try:
             tty.setcbreak(sys.stdin.fileno())
             # if is data on input
-            while (select.select([sys.stdin], [], [], 1) == ([sys.stdin], [], [])):
+            while (select.select([sys.stdin], [], [], 1) == ([sys.stdin], [],
+                                                             [])):
                 c = sys.stdin.read(1)
                 if c == 'u':
                     print('\nMarked end of utterance\n')
@@ -87,8 +92,9 @@ class LiveDemo(object):
                     print('\nMarked end of dialogue\n')
         finally:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
-        print("""Chunks: %d ; Utterance %d ; end %d : press 'u'\nFor terminating press 'c'\n\n""" % (
-            len(self.frames), self.utt_frames, self.utt_end))
+        print(
+            """Chunks: %d ; Utterance %d ; end %d : press 'u'\nFor terminating press 'c'\n\n"""
+            % (len(self.frames), self.utt_frames, self.utt_end))
 
     def run(self):
         while True:
@@ -109,8 +115,9 @@ class LiveDemo(object):
                     decoded = ' '.join([wst[w] for w in best_path])
                 else:
                     decoded = 'Empty hypothesis'
-                print("%s secs, frames: %d, prob: %f, %s " % (
-                    str(time.time() - start), self.utt_frames, prob, decoded))
+                print(
+                    "%s secs, frames: %d, prob: %f, %s " %
+                    (str(time.time() - start), self.utt_frames, prob, decoded))
                 self.utt_frames = 0
                 self.d.reset(keep_buffer_data=False)
             if self.dialog_end:

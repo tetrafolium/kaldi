@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script normalizes a text file. It performs following normalizations:
     remove tatweel, vowels and hamza, RTL and LTR marks,
     convert arabic keheh to arabic kaf, Farsi Yeh to Arabic Yeh,
@@ -21,7 +20,9 @@ output_file = sys.argv[2]
 
 def main():
 
-    with open(input_file, 'r', encoding='utf-8') as fh, open(output_file, 'w', encoding='utf-8') as fh_out:
+    with open(
+            input_file, 'r', encoding='utf-8') as fh, open(
+                output_file, 'w', encoding='utf-8') as fh_out:
         for utt, uttid in SnorIter(fh):
             for char in utt:
                 # First, convert from presentation form to base form
@@ -249,7 +250,6 @@ for base in BASE_TO_PRESENTATION:
         if presentation == '':
             continue
         PRESENTATION_TO_BASE[presentation.lower()] = base.lower()
-
 
 if __name__ == "__main__":
     main()

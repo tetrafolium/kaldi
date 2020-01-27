@@ -11,10 +11,12 @@ def get_args():
     parser = argparse.ArgumentParser(
         description="""This script splits a kaldi text file
         into per_array per_session per_speaker  text files""")
-    parser.add_argument("input_text_path", type=str,
-                        help="path of text files")
-    parser.add_argument("output_dir_path", type=str,
-                        help="Output path for per_array per_session per_speaker reference files")
+    parser.add_argument("input_text_path", type=str, help="path of text files")
+    parser.add_argument(
+        "output_dir_path",
+        type=str,
+        help="Output path for per_array per_session per_speaker reference files"
+    )
     args = parser.parse_args()
     return args
 

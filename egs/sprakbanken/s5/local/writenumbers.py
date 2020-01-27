@@ -187,10 +187,7 @@ def splitNumeric(s, splitchar="([-,/])"):
 
 def writeOutSplits(s):
     '''Writes common separators to their spoken form. Context-sensitive '''
-    d = {"-": 'TIL',
-         "/": 'SKRÅSTREG',
-         "-": 'STREG'
-         }
+    d = {"-": 'TIL', "/": 'SKRÅSTREG', "-": 'STREG'}
     splitchar = d.keys()
 
     if len(s) == 3:
@@ -223,8 +220,9 @@ def normNumber(line, table):
         newtoks = splitNumeric(tok)
         if newtoks != False:
             newtoks = writeOutSplits(newtoks)
-            written = [writeNumber(x, table, keys)
-                       for x in newtoks if x.isnumeric()]
+            written = [
+                writeNumber(x, table, keys) for x in newtoks if x.isnumeric()
+            ]
             newstring = list2string(written)
         else:
             newstring = writeNumber(tok, table, keys)
@@ -237,7 +235,7 @@ def writeOutNumbers(infile, outfile, tablefile="numbers.tbl"):
     text = codecs.open(infile, "r", "utf8")
     fout = codecs.open(outfile, "w", "utf8")
     table = loadNumTable(tablefile)
-#    keys = table.keys()
+    #    keys = table.keys()
     for line in text:
         cleanline = normNumber(line, table)
         # print(cleanline)

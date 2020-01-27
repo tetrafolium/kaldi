@@ -15,16 +15,15 @@ __author__ = 'Minhua Wu'
 
 parser = argparse.ArgumentParser(description='format acronyms to a._b._c.')
 parser.add_argument('-i', '--input', help='Input lexicon', required=True)
-parser.add_argument('-o1', '--output1',
-                    help='Output acronym lexicon(mapped)', required=True)
-parser.add_argument('-o2', '--output2',
-                    help='Output acronym lexicon(original)', required=True)
+parser.add_argument(
+    '-o1', '--output1', help='Output acronym lexicon(mapped)', required=True)
+parser.add_argument(
+    '-o2', '--output2', help='Output acronym lexicon(original)', required=True)
 parser.add_argument(
     '-L', '--Letter', help='Input single letter pronunciation', required=True)
 parser.add_argument(
     '-M', '--Map', help='Output acronyms mapping', required=True)
 args = parser.parse_args()
-
 
 fin_lex = open(args.input, "r")
 fin_Letter = open(args.Letter, "r")
@@ -36,14 +35,14 @@ fout_map = open(args.Map, "w")
 dict_letter = {}
 for single_letter_lex in fin_Letter:
     items = single_letter_lex.split()
-    dict_letter[items[0]] = single_letter_lex[len(items[0])+1:].strip()
+    dict_letter[items[0]] = single_letter_lex[len(items[0]) + 1:].strip()
 fin_Letter.close()
 #print dict_letter
 
 for lex in fin_lex:
     items = lex.split()
     word = items[0]
-    lexicon = lex[len(items[0])+1:].strip()
+    lexicon = lex[len(items[0]) + 1:].strip()
     # find acronyms from words with only letters and '
     pre_match = re.match(r'^[A-Za-z]+$|^[A-Za-z]+\'s$|^[A-Za-z]+s$', word)
     if pre_match:

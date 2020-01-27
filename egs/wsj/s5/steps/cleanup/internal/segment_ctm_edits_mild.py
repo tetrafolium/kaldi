@@ -12,7 +12,6 @@ import logging
 import heapq
 import sys
 from collections import defaultdict
-
 """
 This script reads 'ctm-edits' file format that is produced by align_ctm_ref.py
 and modified by modify_ctm_edits.py and taint_ctm_edits.py. Its function is to
@@ -54,66 +53,99 @@ def get_args():
         steps/cleanup/internal/taint_ctm_edits.py.""",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("--min-segment-length", type=float, default=0.5,
-                        help="""Minimum allowed segment length (in seconds) for
+    parser.add_argument(
+        "--min-segment-length",
+        type=float,
+        default=0.5,
+        help="""Minimum allowed segment length (in seconds) for
                         any segment; shorter segments than this will be
                         discarded.""")
-    parser.add_argument("--min-new-segment-length", type=float, default=1.0,
-                        help="""Minimum allowed segment length (in seconds) for
+    parser.add_argument(
+        "--min-new-segment-length",
+        type=float,
+        default=1.0,
+        help="""Minimum allowed segment length (in seconds) for
                         newly created segments (i.e. not identical to the input
                         utterances).
                         Expected to be >= --min-segment-length.""")
-    parser.add_argument("--frame-length", type=float, default=0.01,
-                        help="""This only affects rounding of the output times;
+    parser.add_argument(
+        "--frame-length",
+        type=float,
+        default=0.01,
+        help="""This only affects rounding of the output times;
                         they will be constrained to multiples of this
                         value.""")
-    parser.add_argument("--max-tainted-length", type=float, default=0.05,
-                        help="""Maximum allowed length of any 'tainted' line.
+    parser.add_argument(
+        "--max-tainted-length",
+        type=float,
+        default=0.05,
+        help="""Maximum allowed length of any 'tainted' line.
                         Note: 'tainted' lines may only appear at the boundary
                         of a segment""")
-    parser.add_argument("--max-edge-silence-length", type=float, default=0.5,
-                        help="""Maximum allowed length of silence if it appears
+    parser.add_argument(
+        "--max-edge-silence-length",
+        type=float,
+        default=0.5,
+        help="""Maximum allowed length of silence if it appears
                         at the edge of a segment (will be truncated).  This
                         rule is relaxed if such truncation would take a segment
                         below the --min-segment-length or
                         --min-new-segment-length.""")
-    parser.add_argument("--max-edge-non-scored-length", type=float,
-                        default=0.5,
-                        help="""Maximum allowed length of a non-scored word
+    parser.add_argument(
+        "--max-edge-non-scored-length",
+        type=float,
+        default=0.5,
+        help="""Maximum allowed length of a non-scored word
                         (noise, cough, etc.) if it appears at the edge of a
                         segment (will be truncated).  This rule is relaxed if
                         such truncation would take a segment below the
                         --min-segment-length.""")
-    parser.add_argument("--max-internal-silence-length", type=float,
-                        default=2.0,
-                        help="""Maximum allowed length of silence if it appears
+    parser.add_argument(
+        "--max-internal-silence-length",
+        type=float,
+        default=2.0,
+        help="""Maximum allowed length of silence if it appears
                         inside a segment (will cause the segment to be
                         split).""")
-    parser.add_argument("--max-internal-non-scored-length", type=float,
-                        default=2.0,
-                        help="""Maximum allowed length of a non-scored word
+    parser.add_argument(
+        "--max-internal-non-scored-length",
+        type=float,
+        default=2.0,
+        help="""Maximum allowed length of a non-scored word
                         (noise, etc.) if it appears inside a segment (will
                         cause the segment to be split).
                         Note: reference words which are real words but OOV are
                         not included in this category.""")
-    parser.add_argument("--unk-padding", type=float, default=0.05,
-                        help="""Amount of padding with <unk> that we do if a
+    parser.add_argument(
+        "--unk-padding",
+        type=float,
+        default=0.05,
+        help="""Amount of padding with <unk> that we do if a
                         segment boundary is next to errors (ins, del, sub).
                         That is, we add this amount of time to the segment and
                         add the <unk> word to cover the acoustics.  If nonzero,
                         the --oov-symbol-file option must be supplied.""")
-    parser.add_argument("--max-junk-proportion", type=float, default=0.1,
-                        help="""Maximum proportion of the time of the segment
+    parser.add_argument(
+        "--max-junk-proportion",
+        type=float,
+        default=0.1,
+        help="""Maximum proportion of the time of the segment
                         that may consist of potentially bad data, in which we
                         include 'tainted' lines of the ctm-edits input and
                         unk-padding.""")
-    parser.add_argument("--min-split-point-duration", type=float, default=0.0,
-                        help="""Minimum duration of silence or non-scored word
+    parser.add_argument(
+        "--min-split-point-duration",
+        type=float,
+        default=0.0,
+        help="""Minimum duration of silence or non-scored word
                         to be considered a viable split point when
                         truncating based on junk proportion.""")
-    parser.add_argument("--max-deleted-words-kept-when-merging",
-                        dest='max_deleted_words', type=int, default=1,
-                        help="""When merging segments that are found to be
+    parser.add_argument(
+        "--max-deleted-words-kept-when-merging",
+        dest='max_deleted_words',
+        type=int,
+        default=1,
+        help="""When merging segments that are found to be
                         overlapping or adjacent after all other processing,
                         keep in the transcript the reference words that were
                         deleted between the segments [if any] as long as there
@@ -123,83 +155,111 @@ def get_args():
                         reattach will not appear in the generated transcript
                         (so we'll match the hyp).""")
 
-    parser.add_argument("--splitting.min-silence-length",
-                        dest="min_silence_length_to_split",
-                        type=float, default=0.3,
-                        help="""Only considers silences that are at least this
+    parser.add_argument(
+        "--splitting.min-silence-length",
+        dest="min_silence_length_to_split",
+        type=float,
+        default=0.3,
+        help="""Only considers silences that are at least this
                         long as potential split points""")
-    parser.add_argument("--splitting.min-non-scored-length",
-                        dest="min_non_scored_length_to_split",
-                        type=float, default=0.1,
-                        help="""Only considers non-scored words that are at
+    parser.add_argument(
+        "--splitting.min-non-scored-length",
+        dest="min_non_scored_length_to_split",
+        type=float,
+        default=0.1,
+        help="""Only considers non-scored words that are at
                         least this long as potential split points""")
-    parser.add_argument("--splitting.max-segment-length",
-                        dest="max_segment_length_for_splitting",
-                        type=float, default=10,
-                        help="""Try to split long segments into segments that
+    parser.add_argument(
+        "--splitting.max-segment-length",
+        dest="max_segment_length_for_splitting",
+        type=float,
+        default=10,
+        help="""Try to split long segments into segments that
                         are smaller that this size. See
                         possibly_split_long_segments() in Segment class.""")
-    parser.add_argument("--splitting.hard-max-segment-length",
-                        dest="hard_max_segment_length",
-                        type=float, default=15,
-                        help="""Split all segments that are longer than this
+    parser.add_argument(
+        "--splitting.hard-max-segment-length",
+        dest="hard_max_segment_length",
+        type=float,
+        default=15,
+        help="""Split all segments that are longer than this
                         uniformly into segments of size
                         --splitting.max-segment-length""")
 
-    parser.add_argument("--merging-score.silence-factor",
-                        dest="silence_factor",
-                        type=float, default=1,
-                        help="""Weightage on the silence length when merging
+    parser.add_argument(
+        "--merging-score.silence-factor",
+        dest="silence_factor",
+        type=float,
+        default=1,
+        help="""Weightage on the silence length when merging
                         segments""")
-    parser.add_argument("--merging-score.incorrect-words-factor",
-                        dest="incorrect_words_factor",
-                        type=float, default=1,
-                        help="""Weightage on the incorrect_words_length when
+    parser.add_argument(
+        "--merging-score.incorrect-words-factor",
+        dest="incorrect_words_factor",
+        type=float,
+        default=1,
+        help="""Weightage on the incorrect_words_length when
                         merging segments""")
-    parser.add_argument("--merging-score.tainted-words-factor",
-                        dest="tainted_words_factor",
-                        type=float, default=1,
-                        help="""Weightage on the WER including the
+    parser.add_argument(
+        "--merging-score.tainted-words-factor",
+        dest="tainted_words_factor",
+        type=float,
+        default=1,
+        help="""Weightage on the WER including the
                         tainted words as incorrect words.""")
 
-    parser.add_argument("--merging.max-wer",
-                        dest="max_wer",
-                        type=float, default=10.0,
-                        help="Max WER%% of merged segments when merging")
-    parser.add_argument("--merging.max-bad-proportion",
-                        dest="max_bad_proportion",
-                        type=float, default=0.2,
-                        help="""Maximum length of silence, junk and incorrect
+    parser.add_argument(
+        "--merging.max-wer",
+        dest="max_wer",
+        type=float,
+        default=10.0,
+        help="Max WER%% of merged segments when merging")
+    parser.add_argument(
+        "--merging.max-bad-proportion",
+        dest="max_bad_proportion",
+        type=float,
+        default=0.2,
+        help="""Maximum length of silence, junk and incorrect
                         words in a merged segment allowed as a fraction of the
                         total length of merged segment.""")
-    parser.add_argument("--merging.max-segment-length",
-                        dest='max_segment_length_for_merging',
-                        type=float, default=10,
-                        help="""Maximum segment length allowed for merged
+    parser.add_argument(
+        "--merging.max-segment-length",
+        dest='max_segment_length_for_merging',
+        type=float,
+        default=10,
+        help="""Maximum segment length allowed for merged
                         segment""")
-    parser.add_argument("--merging.max-intersegment-incorrect-words-length",
-                        dest='max_intersegment_incorrect_words_length',
-                        type=float, default=0.2,
-                        help="""Maximum length of intersegment region that
+    parser.add_argument(
+        "--merging.max-intersegment-incorrect-words-length",
+        dest='max_intersegment_incorrect_words_length',
+        type=float,
+        default=0.2,
+        help="""Maximum length of intersegment region that
                         can be of incorrect word. This is to
                         allow cases where there may be a lot of silence in the
                         segment but the incorrect words are few, while
                         preventing regions that have a lot of incorrect
                         words.""")
 
-    parser.add_argument("--oov-symbol-file", type=argparse.FileType('r'),
-                        help="""Filename of file such as data/lang/oov.txt
+    parser.add_argument(
+        "--oov-symbol-file",
+        type=argparse.FileType('r'),
+        help="""Filename of file such as data/lang/oov.txt
                         which contains the text form of the OOV word, normally
                         '<unk>'.  Supplied as a file to avoid complications
                         with escaping.  Necessary if the --unk-padding option
                         has a nonzero value (which it does by default.""")
-    parser.add_argument("--ctm-edits-out", type=argparse.FileType('w'),
-                        help="""Filename to output an extended version of the
+    parser.add_argument(
+        "--ctm-edits-out",
+        type=argparse.FileType('w'),
+        help="""Filename to output an extended version of the
                         ctm-edits format with segment start and end points
                         noted.  This file is intended to be read by humans;
                         there are currently no scripts that will read it.""")
-    parser.add_argument("--word-stats-out", type=argparse.FileType('w'),
-                        help="""Filename for output of word-level stats, of the
+    parser.add_argument(
+        "--word-stats-out",
+        type=argparse.FileType('w'),
+        help="""Filename for output of word-level stats, of the
                         form '<word> <bad-proportion> <total-count-in-ref>',
                         e.g. 'hello 0.12 12408', where the <bad-proportion> is
                         the proportion of the time that this reference word
@@ -207,31 +267,41 @@ def get_args():
                         words that have problematic pronunciations or are
                         associated with transcription errors.""")
 
-    parser.add_argument("non_scored_words_in",
-                        metavar="<non-scored-words-file>",
-                        type=argparse.FileType('r'),
-                        help="""Filename of file containing a list of
+    parser.add_argument(
+        "non_scored_words_in",
+        metavar="<non-scored-words-file>",
+        type=argparse.FileType('r'),
+        help="""Filename of file containing a list of
                         non-scored words, one per line. See
                         steps/cleanup/internal/get_nonscored_words.py.""")
-    parser.add_argument("ctm_edits_in", metavar="<ctm-edits-in>",
-                        type=argparse.FileType('r'),
-                        help="""Filename of input ctm-edits file.  Use
+    parser.add_argument(
+        "ctm_edits_in",
+        metavar="<ctm-edits-in>",
+        type=argparse.FileType('r'),
+        help="""Filename of input ctm-edits file.  Use
                         /dev/stdin for standard input.""")
-    parser.add_argument("text_out", metavar="<text-out>",
-                        type=argparse.FileType('w'),
-                        help="""Filename of output text file (same format as
+    parser.add_argument(
+        "text_out",
+        metavar="<text-out>",
+        type=argparse.FileType('w'),
+        help="""Filename of output text file (same format as
                         data/train/text, i.e.  <new-utterance-id> <word1>
                         <word2> ... <wordN>""")
-    parser.add_argument("segments_out", metavar="<segments-out>",
-                        type=argparse.FileType('w'),
-                        help="""Filename of output segments.  This has the same
+    parser.add_argument(
+        "segments_out",
+        metavar="<segments-out>",
+        type=argparse.FileType('w'),
+        help="""Filename of output segments.  This has the same
                         format as data/train/segments, but instead of
                         <recording-id>, the second field is the old
                         utterance-id, i.e <new-utterance-id> <old-utterance-id>
                         <start-time> <end-time>""")
 
-    parser.add_argument("--verbose", type=int, default=0,
-                        help="Use higher verbosity for more debugging output")
+    parser.add_argument(
+        "--verbose",
+        type=int,
+        default=0,
+        help="Use higher verbosity for more debugging output")
 
     args = parser.parse_args()
 
@@ -352,8 +422,8 @@ class SegmentStats(object):
         self.num_tainted_words += scale * other.num_tainted_words
         self.num_words += scale * other.num_words
         self.incorrect_words_length += scale * other.incorrect_words_length
-        self.tainted_nonsilence_length += (scale
-                                           * other.tainted_nonsilence_length)
+        self.tainted_nonsilence_length += (
+            scale * other.tainted_nonsilence_length)
         self.silence_length += scale * other.silence_length
         self.total_length += scale * other.total_length
 
@@ -361,10 +431,11 @@ class SegmentStats(object):
         try:
             assert self.num_incorrect_words == other.num_incorrect_words
             assert self.num_tainted_words == other.num_tainted_words
-            assert (abs(self.incorrect_words_length
-                        - other.incorrect_words_length) < 0.01)
-            assert (abs(self.tainted_nonsilence_length
-                        - other.tainted_nonsilence_length) < 0.01)
+            assert (
+                abs(self.incorrect_words_length - other.incorrect_words_length)
+                < 0.01)
+            assert (abs(self.tainted_nonsilence_length -
+                        other.tainted_nonsilence_length) < 0.01)
             assert abs(self.silence_length - other.silence_length) < 0.01
             assert self.num_words == other.num_words
             assert abs(self.total_length - other.total_length) < 0.01
@@ -410,8 +481,12 @@ class SegmentStats(object):
 class Segment(object):
     """Class to store segments."""
 
-    def __init__(self, split_lines_of_utt, start_index, end_index,
-                 debug_str=None, compute_segment_stats=False,
+    def __init__(self,
+                 split_lines_of_utt,
+                 start_index,
+                 end_index,
+                 debug_str=None,
+                 compute_segment_stats=False,
                  segment_stats=None):
         self.split_lines_of_utt = split_lines_of_utt
 
@@ -430,8 +505,8 @@ class Segment(object):
 
         # debug_str keeps track of the 'core' of the segment.
         if debug_str is None:
-            debug_str = 'core-start={0},core-end={1}'.format(start_index,
-                                                             end_index)
+            debug_str = 'core-start={0},core-end={1}'.format(
+                start_index, end_index)
         else:
             assert type(debug_str) == str
         self.debug_str = debug_str
@@ -456,10 +531,13 @@ class Segment(object):
             self.stats = segment_stats
 
     def copy(self, copy_stats=True):
-        segment = Segment(self.split_lines_of_utt, self.start_index,
-                          self.end_index, debug_str=self.debug_str,
-                          segment_stats=(None if not copy_stats
-                                         else copy.deepcopy(self.stats)))
+        segment = Segment(
+            self.split_lines_of_utt,
+            self.start_index,
+            self.end_index,
+            debug_str=self.debug_str,
+            segment_stats=(None
+                           if not copy_stats else copy.deepcopy(self.stats)))
         segment.start_keep_proportion = self.start_keep_proportion
         segment.end_keep_proportion = self.end_keep_proportion
         segment.start_unk_padding = self.start_unk_padding
@@ -501,13 +579,12 @@ class Segment(object):
                 if self.split_lines_of_utt[i][7] == 'sil':
                     self.stats.silence_length += this_duration
                 else:
-                    if (self.split_lines_of_utt[i][6]
-                            not in non_scored_words()):
+                    if (self.split_lines_of_utt[i][6] not in
+                            non_scored_words()):
                         self.stats.num_words += 1
                 if (is_tainted(self.split_lines_of_utt[i])
-                        and self.split_lines_of_utt[i][7] not in 'sil'
-                        and (self.split_lines_of_utt[i][6]
-                             not in non_scored_words())):
+                        and self.split_lines_of_utt[i][7] not in 'sil' and
+                    (self.split_lines_of_utt[i][6] not in non_scored_words())):
                     # If ref_word is not a non-scored word, this would be
                     # counted as an incorrect word.
                     self.stats.num_tainted_words += 1
@@ -520,9 +597,8 @@ class Segment(object):
         self.stats.total_length = self.length()
 
         try:
-            assert (self.stats.tainted_nonsilence_length
-                    + self.stats.silence_length
-                    + self.stats.incorrect_words_length - 0.001
+            assert (self.stats.tainted_nonsilence_length + self.stats.
+                    silence_length + self.stats.incorrect_words_length - 0.001
                     <= self.stats.total_length)
         except AssertionError:
             _global_logger.error(
@@ -572,8 +648,7 @@ class Segment(object):
                     # at the boundary was a non-silence word that was correctly
                     # decoded and not fixed [see modify_ctm_edits.py.]
                     if (boundary_edit_type == 'cor'
-                            and (boundary_ref_word
-                                 not in non_scored_words())):
+                            and (boundary_ref_word not in non_scored_words())):
                         # Add the adjacent tainted line to the segment.
                         if b:
                             self.end_index += 1
@@ -611,20 +686,21 @@ class Segment(object):
             this_duration = float(this_split_line[3])
             this_edit_type = this_split_line[7]
             this_ref_word = this_split_line[6]
-            if ((this_edit_type == 'sil' and
-                 this_duration > max_internal_silence_length)
-                    or (this_ref_word in non_scored_words()
-                        and (this_duration
-                             > max_internal_non_scored_length))):
+            if ((this_edit_type == 'sil'
+                 and this_duration > max_internal_silence_length)
+                    or (this_ref_word in non_scored_words() and
+                        (this_duration > max_internal_non_scored_length))):
                 # We split this segment at this index, dividing the word in two
                 # [later on, in possibly_truncate_boundaries, it may be further
                 # truncated.]
                 # Note: we use 'index_to_split_at + 1' because the Segment
                 # constructor takes an 'end-index' which is interpreted as one
                 # past the end.
-                new_segment = Segment(self.split_lines_of_utt, cur_start_index,
-                                      index_to_split_at + 1,
-                                      debug_str=self.debug_str)
+                new_segment = Segment(
+                    self.split_lines_of_utt,
+                    cur_start_index,
+                    index_to_split_at + 1,
+                    debug_str=self.debug_str)
                 if cur_start_is_split:
                     new_segment.start_keep_proportion = 0.5
                 new_segment.end_keep_proportion = 0.5
@@ -635,18 +711,19 @@ class Segment(object):
             segments.append(self)
         else:
             # We did split.  Add the very last segment.
-            new_segment = Segment(self.split_lines_of_utt, cur_start_index,
-                                  self.end_index,
-                                  debug_str=self.debug_str)
+            new_segment = Segment(
+                self.split_lines_of_utt,
+                cur_start_index,
+                self.end_index,
+                debug_str=self.debug_str)
             assert cur_start_is_split
             new_segment.start_keep_proportion = 0.5
             segments.append(new_segment)
         return segments
 
-    def possibly_split_long_segment(self, max_segment_length,
-                                    hard_max_segment_length,
-                                    min_silence_length_to_split,
-                                    min_non_scored_length_to_split):
+    def possibly_split_long_segment(
+            self, max_segment_length, hard_max_segment_length,
+            min_silence_length_to_split, min_non_scored_length_to_split):
         """
         This is stage 4 of segment processing.
         This function will split a segment into multiple pieces if it is
@@ -722,14 +799,18 @@ class Segment(object):
                 # constructor takes an 'end-index' which is interpreted as one
                 # past the end.
                 new_segment = Segment(
-                    self.split_lines_of_utt, segment.start_index,
-                    index_to_split_at + 1, debug_str=self.debug_str)
+                    self.split_lines_of_utt,
+                    segment.start_index,
+                    index_to_split_at + 1,
+                    debug_str=self.debug_str)
                 new_segment.end_keep_proportion = 0.5
                 new_segments.append(new_segment)
 
                 new_segment = Segment(
-                    self.split_lines_of_utt, index_to_split_at,
-                    segment.end_index, debug_str=self.debug_str)
+                    self.split_lines_of_utt,
+                    index_to_split_at,
+                    segment.end_index,
+                    debug_str=self.debug_str)
                 new_segment.start_keep_proportion = 0.5
                 new_segments.append(new_segment)
 
@@ -756,12 +837,11 @@ class Segment(object):
                 while True:
                     index_to_split_at = next(
                         (i for i in range(cur_start_index, segment.end_index)
-                         if (float(self.split_lines_of_utt[i][2])
-                             >= cur_start + max_segment_length)))
+                         if (float(self.split_lines_of_utt[i][2]) >=
+                             cur_start + max_segment_length)))
 
-                    new_segment = Segment(
-                        self.split_lines_of_utt, cur_start_index,
-                        index_to_split_at)
+                    new_segment = Segment(self.split_lines_of_utt,
+                                          cur_start_index, index_to_split_at)
                     new_segments.append(new_segment)
 
                     cur_start_index = index_to_split_at
@@ -769,8 +849,8 @@ class Segment(object):
                         self.split_lines_of_utt[cur_start_index][2])
                     index_to_split_at = None
 
-                    if (segment.end_time() - cur_start
-                            < hard_max_segment_length):
+                    if (segment.end_time() - cur_start <
+                            hard_max_segment_length):
                         raise StopIteration
             except StopIteration:
                 if index_to_split_at is None:
@@ -778,9 +858,8 @@ class Segment(object):
                         "Could not find an index in the range (%d, %d) with "
                         "start time > %.2f", cur_start_index,
                         segment.end_index, cur_start + max_segment_length)
-                new_segment = Segment(
-                    self.split_lines_of_utt, cur_start_index,
-                    segment.end_index)
+                new_segment = Segment(self.split_lines_of_utt, cur_start_index,
+                                      segment.end_index)
                 new_segments.append(new_segment)
                 break
         segments = new_segments
@@ -876,9 +955,8 @@ class Segment(object):
             # TODO(vimal): Should this be an error?
             _global_logger.warn("bad 'a' value = %.4f", a)
             return
-        self.start_keep_proportion = (
-            a * orig_start_keep_proportion
-            + (1 - a) * self.start_keep_proportion)
+        self.start_keep_proportion = (a * orig_start_keep_proportion +
+                                      (1 - a) * self.start_keep_proportion)
         self.end_keep_proportion = (
             a * orig_end_keep_proportion + (1 - a) * self.end_keep_proportion)
         if abs(self.length() - length_cutoff) >= 0.01:
@@ -906,7 +984,7 @@ class Segment(object):
             this_edit = this_split_line[7]
             if this_edit == 'cor' and this_ref_word not in non_scored_words():
                 # we can consider adding unk-padding.
-                if b:   # start of utterance.
+                if b:  # start of utterance.
                     unk_padding = max_unk_padding
                     # close to beginning of file
                     if unk_padding > this_start_time:
@@ -919,11 +997,11 @@ class Segment(object):
                     if unk_padding < 0.5 * max_unk_padding:
                         unk_padding = 0.0
                     self.start_unk_padding = unk_padding
-                else:   # end of utterance.
+                else:  # end of utterance.
                     this_end_time = this_start_time + float(this_split_line[3])
                     last_line = self.split_lines_of_utt[-1]
-                    utterance_end_time = (float(last_line[2])
-                                          + float(last_line[3]))
+                    utterance_end_time = (
+                        float(last_line[2]) + float(last_line[3]))
                     max_allowable_padding = utterance_end_time - this_end_time
                     assert max_allowable_padding > -0.01
                     unk_padding = max_unk_padding
@@ -950,8 +1028,8 @@ class Segment(object):
         first_line_start = float(first_line[2])
         first_line_duration = float(first_line[3])
         first_line_end = first_line_start + first_line_duration
-        return (first_line_end - self.start_unk_padding
-                - (first_line_duration * self.start_keep_proportion))
+        return (first_line_end - self.start_unk_padding -
+                (first_line_duration * self.start_keep_proportion))
 
     def debug_info(self, include_stats=True):
         """Returns some string-valued information about 'this' that is useful
@@ -968,13 +1046,16 @@ class Segment(object):
                 'start-time={start_time:.2f},end-time={end_time:.2f},'
                 '{stats}'
                 'debug-str={debug_str}'.format(
-                    start=self.start_index, end=self.end_index,
+                    start=self.start_index,
+                    end=self.end_index,
                     start_unk_padding=self.start_unk_padding,
                     end_unk_padding=self.end_unk_padding,
                     start_prop=self.start_keep_proportion,
                     end_prop=self.end_keep_proportion,
-                    start_time=self.start_time(), end_time=self.end_time(),
-                    stats=stats, debug_str=self.debug_str))
+                    start_time=self.start_time(),
+                    end_time=self.end_time(),
+                    stats=stats,
+                    debug_str=self.debug_str))
 
     def end_time(self):
         """Returns the start time of the utterance (within the enclosing
@@ -985,9 +1066,9 @@ class Segment(object):
         last_line = self.split_lines_of_utt[self.end_index - 1]
         last_line_start = float(last_line[2])
         last_line_duration = float(last_line[3])
-        return (last_line_start
-                + (last_line_duration * self.end_keep_proportion)
-                + self.end_unk_padding)
+        return (
+            last_line_start + (last_line_duration * self.end_keep_proportion) +
+            self.end_unk_padding)
 
     def length(self):
         """Returns the segment length in seconds."""
@@ -998,8 +1079,8 @@ class Segment(object):
         it's a part of (i.e. its start/end time are zero and the end-time of
         the last segment."""
         last_line_of_utt = self.split_lines_of_utt[-1]
-        last_line_end_time = (float(last_line_of_utt[2])
-                              + float(last_line_of_utt[3]))
+        last_line_end_time = (
+            float(last_line_of_utt[2]) + float(last_line_of_utt[3]))
         return (abs(self.start_time() - 0.0) < 0.001
                 and abs(self.end_time() - last_line_end_time) < 0.001)
 
@@ -1053,8 +1134,10 @@ class Segment(object):
 
         if self.end_index == other.start_index + 1:
             overlapping_segment = Segment(
-                self.split_lines_of_utt, other.start_index,
-                self.end_index, compute_segment_stats=True)
+                self.split_lines_of_utt,
+                other.start_index,
+                self.end_index,
+                compute_segment_stats=True)
             self.stats.combine(overlapping_segment.stats, scale=-1)
 
         _global_logger.debug("Other segment: %s", other)
@@ -1100,9 +1183,8 @@ class Segment(object):
         _global_logger.debug("Before merging: %s", self)
 
         assert (not self.stats.compare(other.stats)
-                or self.start_time() != other.start_time()
-                or self.end_time() != other.end_time()
-                ), "%s %s" % (self, other)
+                or self.start_time() != other.start_time() or
+                self.end_time() != other.end_time()), "%s %s" % (self, other)
         self.stats.combine(other.stats)
 
         _global_logger.debug("Other segment: %s", other)
@@ -1133,8 +1215,10 @@ class Segment(object):
                 first_index_of_overlap = orig_self_end_index
                 last_index_of_overlap = other.start_index - 1
                 segment = Segment(
-                    self.split_lines_of_utt, orig_self_end_index,
-                    other.start_index, compute_segment_stats=True)
+                    self.split_lines_of_utt,
+                    orig_self_end_index,
+                    other.start_index,
+                    compute_segment_stats=True)
                 self.stats.combine(segment.stats)
             else:
                 first_index_of_overlap = other.start_index
@@ -1152,10 +1236,10 @@ class Segment(object):
                         self.split_lines_of_utt[i].append(
                             'do-not-include-in-text')
         except:
-            _global_logger.error(
-                "first-index-of-overlap = %d", first_index_of_overlap)
-            _global_logger.error(
-                "last-index-of-overlap = %d", last_index_of_overlap)
+            _global_logger.error("first-index-of-overlap = %d",
+                                 first_index_of_overlap)
+            _global_logger.error("last-index-of-overlap = %d",
+                                 last_index_of_overlap)
             _global_logger.error("line = %d = %s", i,
                                  self.split_lines_of_utt[i])
             raise
@@ -1221,7 +1305,9 @@ class SegmentsMerger(object):
 
         if segments[0].start_index > 0:
             self.between_segments[0] = Segment(
-                self.split_lines_of_utt, 0, segments[0].start_index,
+                self.split_lines_of_utt,
+                0,
+                segments[0].start_index,
                 compute_segment_stats=True)
 
         for i, x in enumerate(segments):
@@ -1230,15 +1316,22 @@ class SegmentsMerger(object):
 
             if i > 0 and segments[i].start_index > segments[i - 1].end_index:
                 self.between_segments[i] = Segment(
-                    self.split_lines_of_utt, segments[i - 1].end_index,
-                    segments[i].start_index, compute_segment_stats=True)
+                    self.split_lines_of_utt,
+                    segments[i - 1].end_index,
+                    segments[i].start_index,
+                    compute_segment_stats=True)
 
         if segments[-1].end_index < len(self.split_lines_of_utt):
             self.between_segments[-1] = Segment(
-                self.split_lines_of_utt, segments[-1].end_index,
-                len(self.split_lines_of_utt), compute_segment_stats=True)
+                self.split_lines_of_utt,
+                segments[-1].end_index,
+                len(self.split_lines_of_utt),
+                compute_segment_stats=True)
 
-    def _get_merged_cluster(self, cluster1, cluster2, rejected_clusters=None,
+    def _get_merged_cluster(self,
+                            cluster1,
+                            cluster2,
+                            rejected_clusters=None,
                             max_intersegment_incorrect_words_length=1):
         try:
             assert cluster2[0] > cluster1[-1]
@@ -1250,18 +1343,17 @@ class SegmentsMerger(object):
                 return (None, new_cluster, True)
 
             if new_cluster_tup in self.merged_segments:
-                return (self.merged_segments[new_cluster_tup],
-                        new_cluster, False)
+                return (self.merged_segments[new_cluster_tup], new_cluster,
+                        False)
 
             if cluster1[-1] == -1:
                 assert len(cluster1) == 1
                 # Consider merging cluster2 with the region before the 0^th
                 # segment
                 if (self.between_segments[0] is None
-                        or self.between_segments[0].stats.total_length == 0
-                        or (self.between_segments[0]
-                            .stats.incorrect_words_length
-                            > max_intersegment_incorrect_words_length)):
+                        or self.between_segments[0].stats.total_length == 0 or
+                    (self.between_segments[0].stats.incorrect_words_length >
+                     max_intersegment_incorrect_words_length)):
                     # Reject zero length or bad start region
                     return (None, new_cluster, True)
                 merged_segment = self.between_segments[0].copy()
@@ -1270,18 +1362,16 @@ class SegmentsMerger(object):
 
                 if cluster2[0] == len(self.segments):
                     assert len(cluster2) == 1
-                    if (self.between_segments[-1] is None
-                            or (self.between_segments[-1]
-                                .stats.total_length == 0)
-                            or (self.between_segments[-1]
-                                .stats.incorrect_words_length
-                                > max_intersegment_incorrect_words_length)):
+                    if (self.between_segments[-1] is None or
+                        (self.between_segments[-1].stats.total_length == 0) or
+                        (self.between_segments[-1].stats.incorrect_words_length
+                         > max_intersegment_incorrect_words_length)):
                         # Reject zero length or bad end region
                         return (None, new_cluster, True)
                 if self.between_segments[cluster2[0]] is not None:
-                    if (self.between_segments[cluster2[0]]
-                            .stats.incorrect_words_length
-                            > max_intersegment_incorrect_words_length):
+                    if (self.between_segments[
+                            cluster2[0]].stats.incorrect_words_length >
+                            max_intersegment_incorrect_words_length):
                         return (None, new_cluster, True)
                     merged_segment.merge_adjacent_segment(
                         self.between_segments[cluster2[0]])
@@ -1304,13 +1394,16 @@ class SegmentsMerger(object):
                                          self.segments[i])
             raise
 
-    def merge_clusters(self, scoring_function,
-                       max_wer=10, max_bad_proportion=0.3,
+    def merge_clusters(self,
+                       scoring_function,
+                       max_wer=10,
+                       max_bad_proportion=0.3,
                        max_segment_length=10,
                        max_intersegment_incorrect_words_length=1):
         for i, x in enumerate(self.segments):
-            _global_logger.debug("before agglomerative clustering, segment %d"
-                                 " = %s", i, x)
+            _global_logger.debug(
+                "before agglomerative clustering, segment %d"
+                " = %s", i, x)
 
         # Initial clusters are the individual segments themselves.
         clusters = [[x] for x in range(-1, len(self.segments) + 1)]
@@ -1326,14 +1419,17 @@ class SegmentsMerger(object):
                 for i in range(len(clusters) - 1):
                     merged_segment, new_cluster, reject = (
                         self._get_merged_cluster(
-                            clusters[i], clusters[i + 1], rejected_clusters,
+                            clusters[i],
+                            clusters[i + 1],
+                            rejected_clusters,
                             max_intersegment_incorrect_words_length=(
                                 max_intersegment_incorrect_words_length)))
                     if reject:
                         rejected_clusters.add(tuple(new_cluster))
                         continue
-                    heapq.heappush(heap, ((-scoring_function(merged_segment), i),
-                                          (merged_segment, i, new_cluster)))
+                    heapq.heappush(heap,
+                                   ((-scoring_function(merged_segment), i),
+                                    (merged_segment, i, new_cluster)))
 
                 candidate_index = -1
                 candidate_cluster = None
@@ -1346,8 +1442,8 @@ class SegmentsMerger(object):
 
                     segment, index, cluster = tup
 
-                    _global_logger.debug(
-                        "Considering new cluster: (%d, %s)", index, cluster)
+                    _global_logger.debug("Considering new cluster: (%d, %s)",
+                                         index, cluster)
 
                     if segment.stats.wer() > max_wer:
                         _global_logger.debug(
@@ -1393,8 +1489,7 @@ class SegmentsMerger(object):
                         clusters, new_clusters))
                 clusters = new_clusters
             except Exception:
-                _global_logger.error(
-                    "Failed merging clusters %s", clusters)
+                _global_logger.error("Failed merging clusters %s", clusters)
                 raise
 
         return clusters
@@ -1408,11 +1503,10 @@ def merge_segments(segments, args):
     def scoring_function(segment):
         stats = segment.stats
         try:
-            return (-stats.wer() - args.silence_factor * stats.silence_length
-                    - args.incorrect_words_factor
-                    * stats.incorrect_words_length
-                    - args.tainted_words_factor
-                    * stats.num_tainted_words * 100.0 / stats.num_words)
+            return (-stats.wer() - args.silence_factor * stats.silence_length -
+                    args.incorrect_words_factor * stats.incorrect_words_length
+                    - args.tainted_words_factor * stats.num_tainted_words *
+                    100.0 / stats.num_words)
         except ZeroDivisionError:
             return float("-inf")
 
@@ -1421,7 +1515,8 @@ def merge_segments(segments, args):
     # stats of the combined segment.
     merger = SegmentsMerger(segments)
     clusters = merger.merge_clusters(
-        scoring_function, max_wer=args.max_wer,
+        scoring_function,
+        max_wer=args.max_wer,
         max_bad_proportion=args.max_bad_proportion,
         max_segment_length=args.max_segment_length_for_merging,
         max_intersegment_incorrect_words_length=(
@@ -1432,8 +1527,8 @@ def merge_segments(segments, args):
     # Do the actual merging based on the clusters.
     new_segments = []
     for cluster_index, cluster in enumerate(clusters):
-        _global_logger.debug(
-            "Merging cluster (%d, %s)", cluster_index, cluster)
+        _global_logger.debug("Merging cluster (%d, %s)", cluster_index,
+                             cluster)
 
         try:
             if cluster_index == 0 and len(cluster) == 1:
@@ -1444,9 +1539,8 @@ def merge_segments(segments, args):
                 # not merged with the initial segment
                 continue
             elif cluster_index == len(clusters) - 1 and len(cluster) == 1:
-                _global_logger.debug(
-                    "Not adding remaining end region %s",
-                    cluster[0])
+                _global_logger.debug("Not adding remaining end region %s",
+                                     cluster[0])
                 assert cluster[0] == len(segments)
                 # skip adding the lines after the last segment if its
                 # not merged with the last segment
@@ -1454,15 +1548,15 @@ def merge_segments(segments, args):
 
             new_segments.append(merger.merged_segments[tuple(cluster)])
         except Exception:
-            _global_logger.error("Error with cluster (%d, %s)",
-                                 cluster_index, cluster)
+            _global_logger.error("Error with cluster (%d, %s)", cluster_index,
+                                 cluster)
             raise
 
     segments = new_segments
 
     for i, x in enumerate(segments):
-        _global_logger.debug(
-            "after agglomerative clustering: segment %d = %s", i, x)
+        _global_logger.debug("after agglomerative clustering: segment %d = %s",
+                             i, x)
 
     assert len(segments) > 0
     segment_index = 0
@@ -1478,9 +1572,10 @@ def merge_segments(segments, args):
                              "WER%% %.2f", args.max_wer)
         return []
 
-    _global_logger.debug("Merging overlapping segments starting from the "
-                         "first segment with WER%% < max_wer i.e. %d = %s",
-                         segment_index, segments[segment_index])
+    _global_logger.debug(
+        "Merging overlapping segments starting from the "
+        "first segment with WER%% < max_wer i.e. %d = %s", segment_index,
+        segments[segment_index])
 
     new_segments = [segments[segment_index]]
     segment_index += 1
@@ -1490,8 +1585,8 @@ def merge_segments(segments, args):
             segment_index += 1
             continue
         if new_segments[-1].end_time() >= segments[segment_index].start_time():
-            new_segments[-1].merge_with_segment(
-                segments[segment_index], args.max_deleted_words)
+            new_segments[-1].merge_with_segment(segments[segment_index],
+                                                args.max_deleted_words)
         else:
             new_segments.append(segments[segment_index])
         segment_index += 1
@@ -1513,15 +1608,16 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
 
     segment_ranges = compute_segment_cores(split_lines_of_utt)
 
-    utterance_end_time = (float(split_lines_of_utt[-1][2])
-                          + float(split_lines_of_utt[-1][3]))
+    utterance_end_time = (
+        float(split_lines_of_utt[-1][2]) + float(split_lines_of_utt[-1][3]))
     utterance_stats.total_length_of_utterances += utterance_end_time
 
-    segments = [Segment(split_lines_of_utt, x[0], x[1])
-                for x in segment_ranges]
+    segments = [
+        Segment(split_lines_of_utt, x[0], x[1]) for x in segment_ranges
+    ]
 
-    utterance_stats.accumulate_segment_stats(
-        segments, 'stage  0 [segment cores]')
+    utterance_stats.accumulate_segment_stats(segments,
+                                             'stage  0 [segment cores]')
 
     for i, x in enumerate(segments):
         _global_logger.debug("stage 0: segment %d = %s", i, x)
@@ -1535,8 +1631,8 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
 
     for segment in segments:
         segment.possibly_add_tainted_lines()
-    utterance_stats.accumulate_segment_stats(
-        segments, 'stage  1 [add tainted lines]')
+    utterance_stats.accumulate_segment_stats(segments,
+                                             'stage  1 [add tainted lines]')
 
     for i, x in enumerate(segments):
         _global_logger.debug("stage 1: segment %d = %s", i, x)
@@ -1549,8 +1645,8 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
                                        segments_copy, [])
 
     segments = merge_segments(segments, args)
-    utterance_stats.accumulate_segment_stats(
-        segments, 'stage  2 [merge segments]')
+    utterance_stats.accumulate_segment_stats(segments,
+                                             'stage  2 [merge segments]')
 
     for i, x in enumerate(segments):
         _global_logger.debug("stage 2: segment %d = %s", i, x)
@@ -1568,12 +1664,11 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
             args.max_internal_silence_length,
             args.max_internal_non_scored_length)
     segments = new_segments
-    utterance_stats.accumulate_segment_stats(
-        segments, 'stage  3 [split segments]')
+    utterance_stats.accumulate_segment_stats(segments,
+                                             'stage  3 [split segments]')
 
     for i, x in enumerate(segments):
-        _global_logger.debug(
-            "stage 3: segment %d, %s", i, x.debug_info(False))
+        _global_logger.debug("stage 3: segment %d, %s", i, x.debug_info(False))
 
     if args.verbose > 4:
         print("Stage 3 [split segments]:", file=sys.stderr)
@@ -1586,16 +1681,14 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
     for s in segments:
         new_segments += s.possibly_split_long_segment(
             args.max_segment_length_for_splitting,
-            args.hard_max_segment_length,
-            args.min_silence_length_to_split,
+            args.hard_max_segment_length, args.min_silence_length_to_split,
             args.min_non_scored_length_to_split)
     segments = new_segments
-    utterance_stats.accumulate_segment_stats(
-        segments, 'stage  4 [split long segments]')
+    utterance_stats.accumulate_segment_stats(segments,
+                                             'stage  4 [split long segments]')
 
     for i, x in enumerate(segments):
-        _global_logger.debug(
-            "stage 4: segment %d, %s", i, x.debug_info(False))
+        _global_logger.debug("stage 4: segment %d, %s", i, x.debug_info(False))
 
     if args.verbose > 4:
         print("Stage 4 [split long segments]:", file=sys.stderr)
@@ -1607,12 +1700,12 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
     for s in segments:
         s.possibly_truncate_boundaries(args.max_edge_silence_length,
                                        args.max_edge_non_scored_length)
-    utterance_stats.accumulate_segment_stats(
-        segments, 'stage  5 [truncate boundaries]')
+    utterance_stats.accumulate_segment_stats(segments,
+                                             'stage  5 [truncate boundaries]')
 
     for i, x in enumerate(segments):
-        _global_logger.debug(
-            "stage 5: segment %d = %s", i, x.debug_info(False))
+        _global_logger.debug("stage 5: segment %d = %s", i,
+                             x.debug_info(False))
 
     if args.verbose > 4:
         print("Stage 5 [truncate boundaries]:", file=sys.stderr)
@@ -1628,8 +1721,8 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
         segments, 'stage  6 [relax boundary truncation]')
 
     for i, x in enumerate(segments):
-        _global_logger.debug(
-            "stage 6: segment %d = %s", i, x.debug_info(False))
+        _global_logger.debug("stage 6: segment %d = %s", i,
+                             x.debug_info(False))
 
     if args.verbose > 4:
         print("Stage 6 [relax boundary truncation]:", file=sys.stderr)
@@ -1640,12 +1733,12 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
 
     for s in segments:
         s.possibly_add_unk_padding(args.unk_padding)
-    utterance_stats.accumulate_segment_stats(
-        segments, 'stage  7 [unk-padding]')
+    utterance_stats.accumulate_segment_stats(segments,
+                                             'stage  7 [unk-padding]')
 
     for i, x in enumerate(segments):
-        _global_logger.debug(
-            "stage 7: segment %d = %s", i, x.debug_info(False))
+        _global_logger.debug("stage 7: segment %d = %s", i,
+                             x.debug_info(False))
 
     if args.verbose > 4:
         print("Stage 7 [unk-padding]:", file=sys.stderr)
@@ -1670,12 +1763,13 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
         'stage  8 [remove new segments under --min-new-segment-length')
 
     for i, x in enumerate(segments):
-        _global_logger.debug(
-            "stage 8: segment %d = %s", i, x.debug_info(False))
+        _global_logger.debug("stage 8: segment %d = %s", i,
+                             x.debug_info(False))
 
     if args.verbose > 4:
         print("Stage 8 [remove new segments under "
-              "--min-new-segment-length]:", file=sys.stderr)
+              "--min-new-segment-length]:",
+              file=sys.stderr)
         segments_copy = [x.copy() for x in segments]
         print_debug_info_for_utterance(sys.stderr,
                                        copy.deepcopy(split_lines_of_utt),
@@ -1694,12 +1788,13 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
         segments, 'stage  9 [remove segments under --min-segment-length]')
 
     for i, x in enumerate(segments):
-        _global_logger.debug(
-            "stage 9: segment %d = %s", i, x.debug_info(False))
+        _global_logger.debug("stage 9: segment %d = %s", i,
+                             x.debug_info(False))
 
     if args.verbose > 4:
         print("Stage 9 [remove segments under "
-              "--min-segment-length]:", file=sys.stderr)
+              "--min-segment-length]:",
+              file=sys.stderr)
         segments_copy = [x.copy() for x in segments]
         print_debug_info_for_utterance(sys.stderr,
                                        copy.deepcopy(split_lines_of_utt),
@@ -1717,12 +1812,13 @@ def get_segments_for_utterance(split_lines_of_utt, args, utterance_stats):
         segments, 'stage 10 [remove segments without scored,non-OOV words]')
 
     for i, x in enumerate(segments):
-        _global_logger.debug(
-            "stage 10: segment %d = %s", i, x.debug_info(False))
+        _global_logger.debug("stage 10: segment %d = %s", i,
+                             x.debug_info(False))
 
     if args.verbose > 4:
         print("Stage 10 [remove segments without scored, non-OOV words "
-              "", file=sys.stderr)
+              "",
+              file=sys.stderr)
         segments_copy = [x.copy() for x in segments]
         print_debug_info_for_utterance(sys.stderr,
                                        copy.deepcopy(split_lines_of_utt),
@@ -1766,29 +1862,36 @@ def time_to_string(time, frame_length):
     return float_to_string(n * frame_length)
 
 
-def write_segments_for_utterance(text_output_handle, segments_output_handle,
-                                 old_utterance_name, segments, oov_symbol,
-                                 eps_symbol="<eps>", frame_length=0.01):
+def write_segments_for_utterance(text_output_handle,
+                                 segments_output_handle,
+                                 old_utterance_name,
+                                 segments,
+                                 oov_symbol,
+                                 eps_symbol="<eps>",
+                                 frame_length=0.01):
     num_digits = len(str(len(segments)))
     for n, segment in enumerate(segments):
         # split utterances will be named foo-bar-1 foo-bar-2, etc.
         new_utterance_name = "{old}-{index:0{width}}".format(
-            old=old_utterance_name, index=n+1,
-            width=num_digits)
+            old=old_utterance_name, index=n + 1, width=num_digits)
         # print a line to the text output of the form like
         # <new-utterance-id> <text>
         # like:
         # foo-bar-1 hello this is dan
-        print(new_utterance_name, segment.text(oov_symbol, eps_symbol),
-              file=text_output_handle)
+        print(
+            new_utterance_name,
+            segment.text(oov_symbol, eps_symbol),
+            file=text_output_handle)
         # print a line to the segments output of the form
         # <new-utterance-id> <old-utterance-id> <start-time> <end-time>
         # like:
         # foo-bar-1 foo-bar 5.1 7.2
-        print(new_utterance_name, old_utterance_name,
-              time_to_string(segment.start_time(), frame_length),
-              time_to_string(segment.end_time(), frame_length),
-              file=segments_output_handle)
+        print(
+            new_utterance_name,
+            old_utterance_name,
+            time_to_string(segment.start_time(), frame_length),
+            time_to_string(segment.end_time(), frame_length),
+            file=segments_output_handle)
 
 
 # Note, this is destrutive of 'segments_for_utterance', but it won't matter.
@@ -1832,9 +1935,8 @@ def print_debug_info_for_utterance(ctm_edits_out_handle,
             info_to_print = info_to_print[1:]
             # add a field like 'start-segment1[...]=3.21' to what we're about
             # to print.
-            split_line_copy.append(
-                '{0}={1}'.format(string,
-                                 time_to_string(segment_start, frame_length)))
+            split_line_copy.append('{0}={1}'.format(
+                string, time_to_string(segment_start, frame_length)))
         print(' '.join(split_line_copy), file=ctm_edits_out_handle)
 
 
@@ -1850,7 +1952,8 @@ class WordStats(object):
     def __init__(self):
         self.word_count_pair = defaultdict(lambda: [0, 0])
 
-    def accumulate_for_utterance(self, split_lines_of_utt,
+    def accumulate_for_utterance(self,
+                                 split_lines_of_utt,
                                  segments_for_utterance,
                                  eps_symbol="<eps>"):
         # word_count_pair is a map from a string (the word) to
@@ -1875,7 +1978,7 @@ class WordStats(object):
         # pair[0]^2.
         for key, pair in sorted(
                 self.word_count_pair.items(),
-                key=lambda item: (item[1][1] ** 3) * 1.0 / (item[1][0] ** 2),
+                key=lambda item: (item[1][1]**3) * 1.0 / (item[1][0]**2),
                 reverse=True):
             badness = pair[1] * 1.0 / pair[0]
             total_count = pair[0]
@@ -1883,8 +1986,9 @@ class WordStats(object):
         try:
             word_stats_out.close()
         except:
-            _global_logger.error("error closing file --word-stats-out=%s "
-                                 "(full disk?)", word_stats_out.name)
+            _global_logger.error(
+                "error closing file --word-stats-out=%s "
+                "(full disk?)", word_stats_out.name)
             raise
 
         _global_logger.info(
@@ -1917,18 +2021,24 @@ def process_data(args, oov_symbol, utterance_stats, word_stats):
                 # Read one whole utterance. Now process it.
                 (segments_for_utterance,
                  deleted_segments_for_utterance) = get_segments_for_utterance(
-                     split_lines_of_cur_utterance, args=args,
+                     split_lines_of_cur_utterance,
+                     args=args,
                      utterance_stats=utterance_stats)
                 word_stats.accumulate_for_utterance(
                     split_lines_of_cur_utterance, segments_for_utterance)
                 write_segments_for_utterance(
-                    args.text_out, args.segments_out, cur_utterance,
-                    segments_for_utterance, oov_symbol=oov_symbol,
+                    args.text_out,
+                    args.segments_out,
+                    cur_utterance,
+                    segments_for_utterance,
+                    oov_symbol=oov_symbol,
                     frame_length=args.frame_length)
                 if args.ctm_edits_out is not None:
                     print_debug_info_for_utterance(
-                        args.ctm_edits_out, split_lines_of_cur_utterance,
-                        segments_for_utterance, deleted_segments_for_utterance,
+                        args.ctm_edits_out,
+                        split_lines_of_cur_utterance,
+                        segments_for_utterance,
+                        deleted_segments_for_utterance,
                         frame_length=args.frame_length)
 
                 split_lines_of_cur_utterance = []
@@ -1945,8 +2055,7 @@ def process_data(args, oov_symbol, utterance_stats, word_stats):
                     sys.exit("segment_ctm_edits.py: got an "
                              "empty or whitespace input line")
         except Exception:
-            _global_logger.error(
-                "Error with utterance %s", cur_utterance)
+            _global_logger.error("Error with utterance %s", cur_utterance)
             raise
 
 
@@ -1962,7 +2071,6 @@ def read_non_scored_words(non_scored_words_file):
 
 
 class UtteranceStats(object):
-
     def __init__(self):
         # segment_total_length and num_segments are maps from
         # 'stage' strings; see accumulate_segment_stats for details.
@@ -1987,25 +2095,22 @@ class UtteranceStats(object):
         _global_logger.info(
             """Number of utterances is %d, of which %.2f%% had no segments
             after all processing; total length of data in original utterances
-            (in seconds) was %d""",
-            self.num_utterances,
-            (self.num_utterances_without_segments * 100.0
-             / self.num_utterances),
-            self.total_length_of_utterances)
+            (in seconds) was %d""", self.num_utterances,
+            (self.num_utterances_without_segments * 100.0 /
+             self.num_utterances), self.total_length_of_utterances)
 
         keys = sorted(self.segment_total_length.keys())
         for i, key in enumerate(keys):
             if i > 0:
                 delta_percentage = '[%+.2f%%]' % (
-                    (self.segment_total_length[key]
-                     - self.segment_total_length[keys[i - 1]])
-                    * 100.0 / self.total_length_of_utterances)
+                    (self.segment_total_length[key] -
+                     self.segment_total_length[keys[i - 1]]) * 100.0 /
+                    self.total_length_of_utterances)
             _global_logger.info(
                 'At %s, num-segments is %d, total length %.2f%% of '
-                'original total %s',
-                key, self.num_segments[key],
-                (self.segment_total_length[key]
-                 * 100.0 / self.total_length_of_utterances),
+                'original total %s', key, self.num_segments[key],
+                (self.segment_total_length[key] * 100.0 /
+                 self.total_length_of_utterances),
                 delta_percentage if i > 0 else '')
 
 
@@ -2026,21 +2131,22 @@ def main():
                 assert args.oov_symbol_file.readline() == ''
                 args.oov_symbol_file.close()
             except Exception:
-                _global_logger.error("error reading file "
-                                     "--oov-symbol-file=%s",
-                                     args.oov_symbol_file.name)
+                _global_logger.error(
+                    "error reading file "
+                    "--oov-symbol-file=%s", args.oov_symbol_file.name)
                 raise
         elif args.unk_padding != 0.0:
-            raise ValueError(
-                "if the --unk-padding option is nonzero (which "
-                "it is by default, "
-                "the --oov-symbol-file option must be supplied.")
+            raise ValueError("if the --unk-padding option is nonzero (which "
+                             "it is by default, "
+                             "the --oov-symbol-file option must be supplied.")
 
         utterance_stats = UtteranceStats()
         word_stats = WordStats()
-        process_data(args,
-                     oov_symbol=oov_symbol, utterance_stats=utterance_stats,
-                     word_stats=word_stats)
+        process_data(
+            args,
+            oov_symbol=oov_symbol,
+            utterance_stats=utterance_stats,
+            word_stats=word_stats)
 
         try:
             args.text_out.close()
@@ -2056,8 +2162,9 @@ def main():
         if args.word_stats_out is not None:
             word_stats.print(args.word_stats_out)
         if args.ctm_edits_out is not None:
-            _global_logger.info("detailed utterance-level debug information "
-                                "is in %s", args.ctm_edits_out.name)
+            _global_logger.info(
+                "detailed utterance-level debug information "
+                "is in %s", args.ctm_edits_out.name)
     except:
         _global_logger.error("Failed segmenting CTM edits")
         raise

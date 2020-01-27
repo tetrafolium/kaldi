@@ -19,13 +19,25 @@ def get_args():
 
     parser.add_argument("--segment-length", default=20)
     parser.add_argument(
-        "audio_dir", help="""Location of the CHiME5 Audio files. e.g. /export/corpora4/CHiME5/audio/train/""")
+        "audio_dir",
+        help=
+        """Location of the CHiME5 Audio files. e.g. /export/corpora4/CHiME5/audio/train/"""
+    )
     parser.add_argument(
-        "trans_dir", help="""Location of the CHiME5 Transcriptions. e.g. /export/corpora4/CHiME5/transcriptions/train/""")
+        "trans_dir",
+        help=
+        """Location of the CHiME5 Transcriptions. e.g. /export/corpora4/CHiME5/transcriptions/train/"""
+    )
     parser.add_argument(
-        "audio_list", help="""List of ids of the CHiME5 recordings from which noise is extracted. e.g. local/distant_audio_list""")
+        "audio_list",
+        help=
+        """List of ids of the CHiME5 recordings from which noise is extracted. e.g. local/distant_audio_list"""
+    )
     parser.add_argument(
-        "out_dir", help="Output directory to write noise files. e.g. /export/b05/zhiqiw/noise/")
+        "out_dir",
+        help=
+        "Output directory to write noise files. e.g. /export/b05/zhiqiw/noise/"
+    )
 
     args = parser.parse_args()
     return args
@@ -35,7 +47,7 @@ def Trans_time(time, fs):
     units = time.split(':')
     time_second = float(units[0]) * 3600 + \
         float(units[1]) * 60 + float(units[2])
-    return int(time_second*fs)
+    return int(time_second * fs)
 
 
 def Get_time(conf, tag, mic, fs):
@@ -48,9 +60,9 @@ def Get_time(conf, tag, mic, fs):
 
 def write_noise(out_dir, seg, audio, sig, tag, fs, cnt):
     sig_noise = sig[np.nonzero(tag)]
-    for i in range(math.floor(len(sig_noise)/(seg*fs))):
-        siw.write(out_dir + '/noise'+str(cnt)+'.wav',
-                  fs, sig_noise[i*seg*fs:(i+1)*seg*fs])
+    for i in range(math.floor(len(sig_noise) / (seg * fs))):
+        siw.write(out_dir + '/noise' + str(cnt) + '.wav', fs,
+                  sig_noise[i * seg * fs:(i + 1) * seg * fs])
         cnt += 1
     return cnt
 
@@ -81,8 +93,8 @@ def main():
             with open(args.trans_dir + "/" + session + '.json') as f:
                 conf = json.load(f)
         tag = Get_time(conf, tag, mic, fs)
-        cnt = write_noise(args.out_dir, args.segment_length,
-                          audio, sig, tag, fs, cnt)
+        cnt = write_noise(args.out_dir, args.segment_length, audio, sig, tag,
+                          fs, cnt)
         session_p = session
 
 

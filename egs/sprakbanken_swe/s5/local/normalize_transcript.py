@@ -4,18 +4,18 @@ import sys
 import re
 #import writenumbers
 
-
 # Global vars
 
-normdict = {".": "",
-            ",": "",
-            ":": "",
-            ";": "",
-            "?": "",
-            "!": "",
-            "\\": " ",
-            "\t": " "
-            }
+normdict = {
+    ".": "",
+    ",": "",
+    ":": "",
+    ";": "",
+    "?": "",
+    "!": "",
+    "\\": " ",
+    "\t": " "
+}
 # removes all the above signs
 
 from_chars = ''.join(list(normdict.keys()))

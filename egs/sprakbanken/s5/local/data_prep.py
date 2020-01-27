@@ -20,7 +20,6 @@ This script outputs text1, wav.scp and utt2spk in the directory specified
 
 '''
 
-
 import sys
 import os
 import codecs
@@ -116,10 +115,8 @@ def create_parallel_kaldi(filelist, sphpipe, snd=False):
         waves.append(scpline)
         utt2spkline = make_utt2spk(line)
         utt2spk.append(utt2spkline)
-    return (sorted(unique(transcripts)),
-            sorted(unique(waves)),
-            sorted(unique(utt2spk))
-            )
+    return (sorted(unique(transcripts)), sorted(unique(waves)),
+            sorted(unique(utt2spk)))
 
 
 if __name__ == '__main__':
@@ -132,8 +129,8 @@ if __name__ == '__main__':
     else:
         traindata = create_parallel_kaldi(flist, "")
 
-    textout = codecs.open(os.path.join(
-        outpath, "text.unnormalised"), "w", "utf8")
+    textout = codecs.open(
+        os.path.join(outpath, "text.unnormalised"), "w", "utf8")
     wavout = codecs.open(os.path.join(outpath, "wav.scp"), "w")
     utt2spkout = codecs.open(os.path.join(outpath, "utt2spk"), "w")
     textout.writelines(traindata[0])

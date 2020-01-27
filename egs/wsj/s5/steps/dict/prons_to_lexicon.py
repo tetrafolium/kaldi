@@ -21,44 +21,73 @@ class StrToBoolAction(argparse.Action):
         elif values == "false":
             setattr(namespace, self.dest, False)
         else:
-            raise Exception(
-                "Unknown value {0} for --{1}".format(values, self.dest))
+            raise Exception("Unknown value {0} for --{1}".format(
+                values, self.dest))
 
 
 def GetArgs():
-    parser = argparse.ArgumentParser(description="Converts pronunciation statistics (from phonetic decoding or g2p) "
-                                     "into a lexicon for. We prune the pronunciations "
-                                     "based on a provided stats file, and optionally filter out entries which are present "
-                                     "in a filter lexicon.",
-                                     epilog="e.g. steps/dict/prons_to_lexicon.py --min-prob=0.4 \\"
-                                     "--filter-lexicon=exp/tri3_lex_0.4_work/phone_decode/filter_lexicon.txt \\"
-                                     "exp/tri3_lex_0.4_work/phone_decode/prons.txt \\"
-                                     "exp/tri3_lex_0.4_work/lexicon_phone_decoding.txt"
-                                     "See steps/dict/learn_lexicon_greedy.sh for examples in detail.")
+    parser = argparse.ArgumentParser(
+        description=
+        "Converts pronunciation statistics (from phonetic decoding or g2p) "
+        "into a lexicon for. We prune the pronunciations "
+        "based on a provided stats file, and optionally filter out entries which are present "
+        "in a filter lexicon.",
+        epilog="e.g. steps/dict/prons_to_lexicon.py --min-prob=0.4 \\"
+        "--filter-lexicon=exp/tri3_lex_0.4_work/phone_decode/filter_lexicon.txt \\"
+        "exp/tri3_lex_0.4_work/phone_decode/prons.txt \\"
+        "exp/tri3_lex_0.4_work/lexicon_phone_decoding.txt"
+        "See steps/dict/learn_lexicon_greedy.sh for examples in detail.")
 
-    parser.add_argument("--set-sum-to-one", type=str, default=False,
-                        action=StrToBoolAction, choices=["true", "false"],
-                        help="If normalize lexicon such that the sum of "
-                        "probabilities is 1.")
-    parser.add_argument("--set-max-to-one", type=str, default=True,
-                        action=StrToBoolAction, choices=["true", "false"],
-                        help="If normalize lexicon such that the max "
-                        "probability is 1.")
-    parser.add_argument("--top-N", type=int, default=0,
-                        help="If non-zero, we just take the top N pronunciations (according to stats/pron-probs) for each word.")
-    parser.add_argument("--min-prob", type=float, default=0.1,
-                        help="Remove pronunciation with probabilities less "
-                        "than this value after normalization.")
-    parser.add_argument("--filter-lexicon", metavar='<filter-lexicon>', type=str, default='',
-                        help="Exclude entries in this filter lexicon from the output lexicon."
-                        "each line must be <word> <phones>")
-    parser.add_argument("stats_file", metavar='<stats-file>', type=str,
-                        help="Input lexicon file containing pronunciation statistics/probs in the first column."
-                        "each line must be <counts> <word> <phones>")
-    parser.add_argument("out_lexicon", metavar='<out-lexicon>', type=str,
-                        help="Output lexicon.")
+    parser.add_argument(
+        "--set-sum-to-one",
+        type=str,
+        default=False,
+        action=StrToBoolAction,
+        choices=["true", "false"],
+        help="If normalize lexicon such that the sum of "
+        "probabilities is 1.")
+    parser.add_argument(
+        "--set-max-to-one",
+        type=str,
+        default=True,
+        action=StrToBoolAction,
+        choices=["true", "false"],
+        help="If normalize lexicon such that the max "
+        "probability is 1.")
+    parser.add_argument(
+        "--top-N",
+        type=int,
+        default=0,
+        help=
+        "If non-zero, we just take the top N pronunciations (according to stats/pron-probs) for each word."
+    )
+    parser.add_argument(
+        "--min-prob",
+        type=float,
+        default=0.1,
+        help="Remove pronunciation with probabilities less "
+        "than this value after normalization.")
+    parser.add_argument(
+        "--filter-lexicon",
+        metavar='<filter-lexicon>',
+        type=str,
+        default='',
+        help="Exclude entries in this filter lexicon from the output lexicon."
+        "each line must be <word> <phones>")
+    parser.add_argument(
+        "stats_file",
+        metavar='<stats-file>',
+        type=str,
+        help=
+        "Input lexicon file containing pronunciation statistics/probs in the first column."
+        "each line must be <counts> <word> <phones>")
+    parser.add_argument(
+        "out_lexicon",
+        metavar='<out-lexicon>',
+        type=str,
+        help="Output lexicon.")
 
-    print (' '.join(sys.argv), file=sys.stderr)
+    print(' '.join(sys.argv), file=sys.stderr)
 
     args = parser.parse_args()
     args = CheckArgs(args)
@@ -116,8 +145,8 @@ def ReadLexicon(lexicon_file_handle):
             if len(splits) == 0:
                 continue
             if len(splits) < 2:
-                raise Exception('Invalid format of line ' + line
-                                + ' in lexicon file.')
+                raise Exception('Invalid format of line ' + line +
+                                ' in lexicon file.')
             word = splits[0]
             phones = ' '.join(splits[1:])
             lexicon.add((word, phones))
@@ -146,8 +175,10 @@ def ConvertWordProbsToLexicon(word_probs):
     return lexicon
 
 
-def NormalizeLexicon(lexicon, set_max_to_one=True,
-                     set_sum_to_one=False, min_prob=0):
+def NormalizeLexicon(lexicon,
+                     set_max_to_one=True,
+                     set_sum_to_one=False,
+                     min_prob=0):
     word_probs = {}
     for entry, prob in lexicon.iteritems():
         t = word_probs.get(entry[0], (0, 0))
@@ -188,14 +219,26 @@ def WriteLexicon(args, lexicon, filter_lexicon):
             num_filtered += 1
             continue
         words.add(entry[0])
-        print("{0} {1}".format(entry[0], entry[1]),
-              file=args.out_lexicon_handle)
-    print ("Before pruning, the total num. pronunciations is: {}".format(len(lexicon)), file=sys.stderr)
-    print ("Removed {0} pronunciations by setting min_prob {1}".format(num_removed, args.min_prob), file=sys.stderr)
-    print ("Filtered out {} pronunciations in the filter lexicon.".format(num_filtered), file=sys.stderr)
+        print(
+            "{0} {1}".format(entry[0], entry[1]), file=args.out_lexicon_handle)
+    print(
+        "Before pruning, the total num. pronunciations is: {}".format(
+            len(lexicon)),
+        file=sys.stderr)
+    print(
+        "Removed {0} pronunciations by setting min_prob {1}".format(
+            num_removed, args.min_prob),
+        file=sys.stderr)
+    print(
+        "Filtered out {} pronunciations in the filter lexicon.".format(
+            num_filtered),
+        file=sys.stderr)
     num_prons_from_phone_decoding = len(lexicon) - num_removed - num_filtered
-    print ("Num. pronunciations in the output lexicon, which solely come from phone decoding"
-           "is {0}. num. words is {1}".format(num_prons_from_phone_decoding, len(words)), file=sys.stderr)
+    print(
+        "Num. pronunciations in the output lexicon, which solely come from phone decoding"
+        "is {0}. num. words is {1}".format(num_prons_from_phone_decoding,
+                                           len(words)),
+        file=sys.stderr)
 
 
 def Main():
@@ -212,9 +255,11 @@ def Main():
     if args.top_N > 0:
         TakeTopN(lexicon, args.top_N)
     else:
-        NormalizeLexicon(lexicon, set_max_to_one=args.set_max_to_one,
-                         set_sum_to_one=args.set_sum_to_one,
-                         min_prob=args.min_prob)
+        NormalizeLexicon(
+            lexicon,
+            set_max_to_one=args.set_max_to_one,
+            set_sum_to_one=args.set_sum_to_one,
+            min_prob=args.min_prob)
     WriteLexicon(args, lexicon, filter_lexicon)
     args.out_lexicon_handle.close()
 

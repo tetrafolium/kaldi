@@ -26,8 +26,9 @@ global_analysis_final = None
 
 def mean(l):
     if len(l) > 0:
-        return (float(sum(l))/len(l))
+        return (float(sum(l)) / len(l))
     return 0
+
 
 # Analysis class
 # Stores statistics like the confusion matrix, length of the segments etc.
@@ -62,18 +63,15 @@ class Analysis(object):
     # The interpretation of 'speech', 'noise' and 'silence' are bound to change
     # through the different post-processing stages. e.g at the end, speech and silence
     # correspond respectively to 'in segment' and 'out of segment'
-    def write_confusion_matrix(self, write_hours=False, file_handle=sys.stderr):
+    def write_confusion_matrix(self, write_hours=False,
+                               file_handle=sys.stderr):
         sys.stderr.write("Total counts: \n")
 
-        name = ['Silence as silence',
-                'Silence as noise',
-                'Silence as speech',
-                'Noise as silence',
-                'Noise as noise',
-                'Noise as speech',
-                'Speech as silence',
-                'Speech as noise',
-                'Speech as speech']
+        name = [
+            'Silence as silence', 'Silence as noise', 'Silence as speech',
+            'Noise as silence', 'Noise as noise', 'Noise as speech',
+            'Speech as silence', 'Speech as noise', 'Speech as speech'
+        ]
 
         for j in range(0, 9):
             if self.frame_shift != None:
@@ -83,17 +81,20 @@ class Analysis(object):
                 # functions like merge_segments
                 if write_hours:
                     # Write stats in hours instead of seconds
-                    sys.stderr.write("File %s: %s : %s : %8.3f hrs\n" %
-                                     (self.file_id, self.prefix, name[j],
-                                      self.confusion_matrix[j] * self.frame_shift / 3600.0))
+                    sys.stderr.write(
+                        "File %s: %s : %s : %8.3f hrs\n" %
+                        (self.file_id, self.prefix, name[j],
+                         self.confusion_matrix[j] * self.frame_shift / 3600.0))
                 else:
-                    sys.stderr.write("File %s: %s : %s : %8.3f seconds\n" %
-                                     (self.file_id, self.prefix, name[j],
-                                      self.confusion_matrix[j] * self.frame_shift))
+                    sys.stderr.write(
+                        "File %s: %s : %s : %8.3f seconds\n" %
+                        (self.file_id, self.prefix, name[j],
+                         self.confusion_matrix[j] * self.frame_shift))
                 # End if write_hours
             else:
-                sys.stderr.write("File %s: %s : Confusion: Type %d : %8.3f counts\n" %
-                                 (self.file_id, self.prefix, j, self.confusion_matrix[j]))
+                sys.stderr.write(
+                    "File %s: %s : Confusion: Type %d : %8.3f counts\n" %
+                    (self.file_id, self.prefix, j, self.confusion_matrix[j]))
             # End if
         # End for loop over 9 cells of confusion matrix
 
@@ -102,9 +103,7 @@ class Analysis(object):
     def write_total_stats(self, write_hours=True, file_handle=sys.stderr):
         sys.stderr.write("Total Stats: \n")
 
-        name = ['Actual Silence',
-                'Actual Noise',
-                'Actual Speech']
+        name = ['Actual Silence', 'Actual Noise', 'Actual Speech']
 
         for j in [0, 1, 2]:
             if self.frame_shift != None:
@@ -114,24 +113,26 @@ class Analysis(object):
                 # functions like merge_segments
                 if write_hours:
                     # Write stats in hours instead of seconds
-                    sys.stderr.write("File %s: %s : %s : %8.3f hrs\n" %
-                                     (self.file_id, self.prefix, name[j],
-                                      sum(self.confusion_matrix[3*j:3*j+3]) * self.frame_shift / 3600.0))
+                    sys.stderr.write(
+                        "File %s: %s : %s : %8.3f hrs\n" %
+                        (self.file_id, self.prefix, name[j],
+                         sum(self.confusion_matrix[3 * j:3 * j + 3]) *
+                         self.frame_shift / 3600.0))
                 else:
-                    sys.stderr.write("File %s: %s : %s : %8.3f seconds\n" %
-                                     (self.file_id, self.prefix, name[j],
-                                      sum(self.confusion_matrix[3*j:3*j+3]) * self.frame_shift))
+                    sys.stderr.write(
+                        "File %s: %s : %s : %8.3f seconds\n" %
+                        (self.file_id, self.prefix, name[j],
+                         sum(self.confusion_matrix[3 * j:3 * j + 3]) *
+                         self.frame_shift))
                 # End if write_hours
             else:
                 sys.stderr.write("File %s: %s : %s : %8.3f counts\n" %
                                  (self.file_id, self.prefix, name[j],
-                                  sum(self.confusion_matrix[3*j:3*j+3])))
+                                  sum(self.confusion_matrix[3 * j:3 * j + 3])))
             # End if
         # End for loop over 3 rows of confusion matrix
 
-        name = ['Predicted Silence',
-                'Predicted Noise',
-                'Predicted Speech']
+        name = ['Predicted Silence', 'Predicted Noise', 'Predicted Speech']
 
         for j in [0, 1, 2]:
             if self.frame_shift != None:
@@ -143,16 +144,18 @@ class Analysis(object):
                     # Write stats in hours instead of seconds
                     sys.stderr.write("File %s: %s : %s : %8.3f hrs\n" %
                                      (self.file_id, self.prefix, name[j],
-                                      sum(self.confusion_matrix[j:7+j:3]) * self.frame_shift / 3600.0))
+                                      sum(self.confusion_matrix[j:7 + j:3]) *
+                                      self.frame_shift / 3600.0))
                 else:
                     sys.stderr.write("File %s: %s : %s : %8.3f seconds\n" %
                                      (self.file_id, self.prefix, name[j],
-                                      sum(self.confusion_matrix[j:7+j:3]) * self.frame_shift))
+                                      sum(self.confusion_matrix[j:7 + j:3]) *
+                                      self.frame_shift))
                 # End if write_hours
             else:
                 sys.stderr.write("File %s: %s : %s : %8.3f counts\n" %
                                  (self.file_id, self.prefix, name[j],
-                                  sum(self.confusion_matrix[j:7+j:3])))
+                                  sum(self.confusion_matrix[j:7 + j:3])))
             # End if
         # End for loop over 3 columns of confusion matrix
 
@@ -167,28 +170,30 @@ class Analysis(object):
                 # 'segment contains only noise', 'segment contains noise and speech'.
                 # For compatibility with the rest of the analysis code,
                 # the for loop is over 9 kinds.
-                max_length = max([0]+self.type_counts[j][i])
-                min_length = min([10000]+self.type_counts[j][i])
+                max_length = max([0] + self.type_counts[j][i])
+                min_length = min([10000] + self.type_counts[j][i])
                 mean_length = mean(self.type_counts[j][i])
                 if use_numpy:
                     try:
-                        percentile25 = np.percentile(
-                            self.type_counts[j][i], 25)
+                        percentile25 = np.percentile(self.type_counts[j][i],
+                                                     25)
                     except ValueError:
                         percentile25 = 0
                     try:
-                        percentile50 = np.percentile(
-                            self.type_counts[j][i], 50)
+                        percentile50 = np.percentile(self.type_counts[j][i],
+                                                     50)
                     except ValueError:
                         percentile50 = 0
                     try:
-                        percentile75 = np.percentile(
-                            self.type_counts[j][i], 75)
+                        percentile75 = np.percentile(self.type_counts[j][i],
+                                                     75)
                     except ValueError:
                         percentile75 = 0
 
-                file_handle.write("File %s: %s : TypeStats: Type %d %d: Min: %4d Max: %4d Mean: %4d percentile25: %4d percentile50: %4d percentile75: %4d\n" % (
-                    self.file_id, self.prefix, j, i,  min_length, max_length, mean_length, percentile25, percentile50, percentile75))
+                file_handle.write(
+                    "File %s: %s : TypeStats: Type %d %d: Min: %4d Max: %4d Mean: %4d percentile25: %4d percentile50: %4d percentile75: %4d\n"
+                    % (self.file_id, self.prefix, j, i, min_length, max_length,
+                       mean_length, percentile25, percentile50, percentile75))
             # End for loop over 9 different kinds of segments
         # End for loop over 3 types of frames
 
@@ -198,8 +203,8 @@ class Analysis(object):
     # each of the 9 cells of the confusion matrix
     def write_length_stats(self, file_handle=sys.stderr):
         for i in range(0, 9):
-            self.max_length[i] = max([0]+self.state_count[i])
-            self.min_length[i] = min([10000]+self.state_count[i])
+            self.max_length[i] = max([0] + self.state_count[i])
+            self.min_length[i] = min([10000] + self.state_count[i])
             self.mean_length[i] = mean(self.state_count[i])
             if use_numpy:
                 try:
@@ -218,8 +223,12 @@ class Analysis(object):
                 except ValueError:
                     self.percentile75[i] = 0
 
-            file_handle.write("File %s: %s : Length: Type %d: Min: %4d Max: %4d Mean: %4d percentile25: %4d percentile50: %4d percentile75: %4d\n" % (
-                self.file_id, self.prefix, i,  self.min_length[i], self.max_length[i], self.mean_length[i], self.percentile25[i], self.percentile50[i], self.percentile75[i]))
+            file_handle.write(
+                "File %s: %s : Length: Type %d: Min: %4d Max: %4d Mean: %4d percentile25: %4d percentile50: %4d percentile75: %4d\n"
+                % (self.file_id, self.prefix, i, self.min_length[i],
+                   self.max_length[i], self.mean_length[i],
+                   self.percentile25[i], self.percentile50[i],
+                   self.percentile75[i]))
         # End for loop over 9 cells
 
     # Print detailed stats of each cell of the confusion matrix.
@@ -232,12 +241,30 @@ class Analysis(object):
         file_handle.write("Start frames of different segments:\n")
         for j in range(0, 9):
             if self.phones[j] == []:
-                file_handle.write("File %s: %s : Markers: Type %d: %s\n" % (self.file_id, self.prefix, j,  str(sorted(
-                    [str(self.markers[j][i])+' (' + str(self.state_count[j][i]) + ')' for i in range(0, len(self.state_count[j]))], key=lambda x: int(x.split()[0])))))
+                file_handle.write(
+                    "File %s: %s : Markers: Type %d: %s\n" %
+                    (self.file_id, self.prefix, j,
+                     str(
+                         sorted([
+                             str(self.markers[j][i]) + ' (' + str(
+                                 self.state_count[j][i]) + ')'
+                             for i in range(0, len(self.state_count[j]))
+                         ],
+                                key=lambda x: int(x.split()[0])))))
             else:
-                file_handle.write("File %s: %s : Markers: Type %d: %s\n" % (self.file_id, self.prefix, j,  str(sorted([str(self.markers[j][i])+' (' + str(
-                    self.state_count[j][i])+') ( ' + str(self.phones[j][i]) + ')' for i in range(0, len(self.state_count[j]))], key=lambda x: int(x.split()[0])))))
+                file_handle.write(
+                    "File %s: %s : Markers: Type %d: %s\n" %
+                    (self.file_id, self.prefix, j,
+                     str(
+                         sorted([
+                             str(self.markers[j][i]) + ' (' + str(
+                                 self.state_count[j][i]) + ') ( ' + str(
+                                     self.phones[j][i]) + ')'
+                             for i in range(0, len(self.state_count[j]))
+                         ],
+                                key=lambda x: int(x.split()[0])))))
         # End for loop over 9 cells
+
 
 # Function to read a standard IARPA Babel RTTM file
 # as structure in Jan 16, 2014
@@ -275,22 +302,24 @@ def read_rttm_file(rttm_file, temp_dir, frame_shift):
                 # First time seeing this file_id. Open a new file for writing.
                 reference[file_id] = 1
                 try:
-                    ref_file_handle = open(temp_dir+"/"+file_id+".ref", 'w')
+                    ref_file_handle = open(temp_dir + "/" + file_id + ".ref",
+                                           'w')
                 except IOError:
-                    sys.stderr.write("Unable to open " +
-                                     temp_dir+"/"+file_id+".ref for writing\n")
+                    sys.stderr.write("Unable to open " + temp_dir + "/" +
+                                     file_id + ".ref for writing\n")
                     sys.exit(1)
                 ref_file_handle.write(file_id + "\t")
             else:
                 # This file has been seen before but not in the previous iteration.
                 # The file has already been closed. So open it for append.
                 try:
-                    this_file = open(temp_dir+"/"+file_id +
+                    this_file = open(temp_dir + "/" + file_id +
                                      ".ref").readline().strip().split()[1:]
-                    ref_file_handle = open(temp_dir+"/"+file_id+".ref", 'a')
+                    ref_file_handle = open(temp_dir + "/" + file_id + ".ref",
+                                           'a')
                 except IOError:
-                    sys.stderr.write("Unable to open " + temp_dir +
-                                     "/"+file_id+".ref for appending\n")
+                    sys.stderr.write("Unable to open " + temp_dir + "/" +
+                                     file_id + ".ref for appending\n")
                     sys.exit(1)
             # End if
         # End if
@@ -298,23 +327,24 @@ def read_rttm_file(rttm_file, temp_dir, frame_shift):
         i = len(this_file)
         category = splits[6]
         word = splits[5]
-        start_time = int((float(splits[3])/frame_shift) + 0.5)
-        duration = int((float(splits[4])/frame_shift) + 0.5)
+        start_time = int((float(splits[3]) / frame_shift) + 0.5)
+        duration = int((float(splits[4]) / frame_shift) + 0.5)
         if i < start_time:
-            this_file.extend(["0"]*(start_time - i))
+            this_file.extend(["0"] * (start_time - i))
         if type1 == "NON-LEX":
             if category == "other":
                 # <no-speech> is taken as Silence
-                this_file.extend(["0"]*duration)
+                this_file.extend(["0"] * duration)
             else:
-                this_file.extend(["1"]*duration)
+                this_file.extend(["1"] * duration)
         if type1 == "LEXEME":
-            this_file.extend(["2"]*duration)
+            this_file.extend(["2"] * duration)
         if type1 == "NON-SPEECH":
-            this_file.extend(["1"]*duration)
+            this_file.extend(["1"] * duration)
 
     ref_file_handle.write(' '.join(this_file))
     ref_file_handle.close()
+
 
 # Stats class to store some basic stats about the number of
 # times the post-processor goes through particular loops or blocks
@@ -331,10 +361,10 @@ class Stats(object):
         self.noise_only = 0
 
     def print_stats(self):
-        sys.stderr.write("Inter-utt nonspeech: %d\n" %
-                         self.inter_utt_nonspeech)
-        sys.stderr.write("Merge nonspeech segment: %d\n" %
-                         self.merge_nonspeech_segment)
+        sys.stderr.write(
+            "Inter-utt nonspeech: %d\n" % self.inter_utt_nonspeech)
+        sys.stderr.write(
+            "Merge nonspeech segment: %d\n" % self.merge_nonspeech_segment)
         sys.stderr.write("Merge segment: %d\n" % self.merge_segments)
         sys.stderr.write("Split segments: %d\n" % self.split_segments)
         sys.stderr.write("Noise only: %d\n" % self.noise_only)
@@ -348,6 +378,7 @@ class Stats(object):
         self.silence_only = 0
         self.noise_only = 0
 
+
 # Timer class to time functions
 
 
@@ -360,23 +391,25 @@ class Timer(object):
         self.end = time.clock()
         self.interval = self.end - self.start
 
+
 # The main class for post-processing a file.
 # This does the segmentation either looking at the file isolated
 # or by looking at both classes simultaneously
 
 
 class JointResegmenter(object):
-    def __init__(self, P, A, f, options, phone_map, stats=None, reference=None):
+    def __init__(self, P, A, f, options, phone_map, stats=None,
+                 reference=None):
 
         # Pointers to prediction arrays and Initialization
-        self.P = P                    # Predicted phones
-        self.B = [i for i in A]     # Original predicted classes
-        self.A = A                    # Predicted classes
-        self.file_id = f              # File name
+        self.P = P  # Predicted phones
+        self.B = [i for i in A]  # Original predicted classes
+        self.A = A  # Predicted classes
+        self.file_id = f  # File name
         # Length of the prediction (= Num of frames in the audio file)
         self.N = len(A)
-        self.S = [False] * self.N     # Array of Start boundary markers
-        self.E = [False] * (self.N+1)  # Array of End boundary markers
+        self.S = [False] * self.N  # Array of Start boundary markers
+        self.E = [False] * (self.N + 1)  # Array of End boundary markers
 
         self.phone_map = phone_map
         self.options = options
@@ -401,14 +434,14 @@ class JointResegmenter(object):
         self.THIS_SILENCE = ("0", "1", "2")
         self.THIS_NOISE = ("3", "4", "5")
         self.THIS_SPEECH = ("6", "7", "8")
-        self.THIS_SPEECH_THAT_SIL = ("6",)
-        self.THIS_SPEECH_THAT_NOISE = ("7",)
-        self.THIS_SIL_CONVERT_THAT_SIL = ("9",)
-        self.THIS_SIL_CONVERT_THAT_NOISE = ("10",)
+        self.THIS_SPEECH_THAT_SIL = ("6", )
+        self.THIS_SPEECH_THAT_NOISE = ("7", )
+        self.THIS_SIL_CONVERT_THAT_SIL = ("9", )
+        self.THIS_SIL_CONVERT_THAT_NOISE = ("10", )
         self.THIS_SIL_CONVERT = ("9", "10", "11")
         self.THIS_SILENCE_CONVERT = ("9", "10", "11")
-        self.THIS_NOISE_CONVERT_THAT_SIL = ("12",)
-        self.THIS_NOISE_CONVERT_THAT_NOISE = ("13",)
+        self.THIS_NOISE_CONVERT_THAT_SIL = ("12", )
+        self.THIS_NOISE_CONVERT_THAT_NOISE = ("13", )
         self.THIS_NOISE_CONVERT = ("12", "13", "14")
         self.THIS_NOISE_OR_SILENCE = self.THIS_NOISE + self.THIS_SILENCE
         self.THIS_SILENCE_OR_NOISE = self.THIS_NOISE + self.THIS_SILENCE
@@ -433,7 +466,7 @@ class JointResegmenter(object):
         self.B = self.B[0:N]
         self.A = self.A[0:N]
         self.S = self.S[0:N]
-        self.E = self.E[0:N+1]
+        self.E = self.E[0:N + 1]
         if sum(self.S) == sum(self.E) + 1:
             self.E[N] = True
         self.N = N
@@ -443,23 +476,23 @@ class JointResegmenter(object):
         with Timer() as t:
             self.get_initial_segments()
         if self.options.verbose > 1:
-            sys.stderr.write("For %s: get_initial_segments took %f sec\n" % (
-                self.file_id, t.interval))
+            sys.stderr.write("For %s: get_initial_segments took %f sec\n" %
+                             (self.file_id, t.interval))
         with Timer() as t:
             self.set_nonspeech_proportion()
         if self.options.verbose > 1:
-            sys.stderr.write("For %s: set_nonspeech_proportion took %f sec\n" % (
-                self.file_id, t.interval))
+            sys.stderr.write("For %s: set_nonspeech_proportion took %f sec\n" %
+                             (self.file_id, t.interval))
         with Timer() as t:
             self.merge_segments()
         if self.options.verbose > 1:
-            sys.stderr.write("For %s: merge took %f sec\n" %
-                             (self.file_id, t.interval))
+            sys.stderr.write(
+                "For %s: merge took %f sec\n" % (self.file_id, t.interval))
         with Timer() as t:
             self.split_long_segments()
         if self.options.verbose > 1:
-            sys.stderr.write("For %s: split took %f sec\n" %
-                             (self.file_id, t.interval))
+            sys.stderr.write(
+                "For %s: split took %f sec\n" % (self.file_id, t.interval))
         if self.remove_noise_segments:
             with Timer() as t:
                 self.remove_noise_only_segments()
@@ -478,11 +511,11 @@ class JointResegmenter(object):
 
     def get_initial_segments(self):
         for i in range(0, self.N):
-            if (i > 0) and self.A[i-1] != self.A[i]:
+            if (i > 0) and self.A[i - 1] != self.A[i]:
                 # This frame is different from the previous frame.
                 if self.A[i] in self.THIS_SPEECH:
                     # This frame is speech.
-                    if self.A[i-1] in self.THIS_SPEECH:
+                    if self.A[i - 1] in self.THIS_SPEECH:
                         # Both this and the previous frames are speech
                         # But they are different. e.g. "8 7"
                         # So this is the end of the previous region and
@@ -495,17 +528,17 @@ class JointResegmenter(object):
                         self.S[i] = True
                 else:
                     # This frame is non-speech
-                    if self.A[i-1] in self.THIS_SPEECH:
+                    if self.A[i - 1] in self.THIS_SPEECH:
                         # Previous frame is speech, but this one is not.
                         # So this frame is the end of the previous segment
                         self.E[i] = True
             elif i == 0 and self.A[i] in self.THIS_SPEECH:
                 # The frame is speech. So this is the start of a new segment.
                 self.S[i] = True
-        if self.A[self.N-1] in self.THIS_SPEECH:
+        if self.A[self.N - 1] in self.THIS_SPEECH:
             # Handle the special case where the last frame of file is not nonspeech
             self.E[self.N] = True
-        assert(sum(self.S) == sum(self.E))
+        assert (sum(self.S) == sum(self.E))
 
         ###########################################################################
         # Analysis section
@@ -523,23 +556,25 @@ class JointResegmenter(object):
                     C[i] = "1"
                 elif self.reference[i] == "0" and self.A[i] in self.THIS_SPEECH:
                     C[i] = "2"
-                elif self.reference[i] == "1" and self.A[i] in self.THIS_SILENCE:
+                elif self.reference[i] == "1" and self.A[
+                        i] in self.THIS_SILENCE:
                     C[i] = "3"
                 elif self.reference[i] == "1" and self.A[i] in self.THIS_NOISE:
                     C[i] = "4"
                 elif self.reference[i] == "1" and self.A[i] in self.THIS_SPEECH:
                     C[i] = "5"
-                elif self.reference[i] == "2" and self.A[i] in self.THIS_SILENCE:
+                elif self.reference[i] == "2" and self.A[
+                        i] in self.THIS_SILENCE:
                     C[i] = "6"
                 elif self.reference[i] == "2" and self.A[i] in self.THIS_NOISE:
                     C[i] = "7"
                 elif self.reference[i] == "2" and self.A[i] in self.THIS_SPEECH:
                     C[i] = "8"
-                if i > 0 and C[i-1] != C[i]:
-                    a.state_count[int(C[i-1])].append(count)
-                    a.markers[int(C[i-1])].append(i - count)
-                    a.phones[int(C[i-1])
-                             ].append(' '.join(set(self.P[i-count:i])))
+                if i > 0 and C[i - 1] != C[i]:
+                    a.state_count[int(C[i - 1])].append(count)
+                    a.markers[int(C[i - 1])].append(i - count)
+                    a.phones[int(C[i - 1])].append(' '.join(
+                        set(self.P[i - count:i])))
                     count = 1
                 else:
                     count += 1
@@ -566,11 +601,11 @@ class JointResegmenter(object):
         active_frames = []
         for n in range(0, self.N + 1):
             if self.E[n]:
-                assert(in_segment)
+                assert (in_segment)
                 in_segment = False
                 active_frames.append(n)
             if n < self.N and self.S[n]:
-                assert(not in_segment)
+                assert (not in_segment)
                 in_segment = True
                 active_frames.append(n)
             if n < self.N:
@@ -579,8 +614,8 @@ class JointResegmenter(object):
                     num_speech_frames += 1
         assert (not in_segment)
         if num_speech_frames == 0:
-            sys.stderr.write("%s: Warning: no speech found for recording %s\n" % (
-                sys.argv[0], self.file_id))
+            sys.stderr.write("%s: Warning: no speech found for recording %s\n"
+                             % (sys.argv[0], self.file_id))
 
         # Set the number of non-speech frames to be added depending on the
         # silence proportion. The target number of frames in the segments
@@ -609,46 +644,48 @@ class JointResegmenter(object):
 
                     # Convert the non-speech frame to be included in segment
                     self.A[n] = str(int(self.B[n]) + 9)
-                    if self.B[n-1] != self.B[n]:
+                    if self.B[n - 1] != self.B[n]:
                         # In this frame there is a transition from
                         # one type of non-speech (0, 1 ... 5) to another
                         # So its the start of a segment. Also add it to the
                         # end of the active frames list
                         self.S[n] = True
-                        active_frames.append(n+1)
+                        active_frames.append(n + 1)
                     else:
                         # We need to extend the segment end since we have
                         # included a non-speeech frame. Remove the current segment end mark
                         # and one to the next frame
                         self.E[n] = False
                         active_frames[i] = n + 1
-                    self.E[n+1] = True
+                    self.E[n + 1] = True
                     # Increment the number of frames in the segments
                     num_segment_frames += 1
                     changed = True
                 if n < self.N and self.S[n] and n > 0 and not self.E[n]:
                     # This must be the beginning of a speech region.
                     # Include some non-speech before it into the segments
-                    assert (self.A[n-1] not in self.THIS_SPEECH)
-                    self.A[n-1] = str(int(self.B[n-1]) + 9)
-                    if self.B[n-1] != self.B[n]:
+                    assert (self.A[n - 1] not in self.THIS_SPEECH)
+                    self.A[n - 1] = str(int(self.B[n - 1]) + 9)
+                    if self.B[n - 1] != self.B[n]:
                         self.E[n] = True
-                        active_frames.append(n-1)
+                        active_frames.append(n - 1)
                     else:
                         self.S[n] = False
                         active_frames[i] = n - 1
-                    self.S[n-1] = True
+                    self.S[n - 1] = True
                     num_segment_frames += 1
                     changed = True
                 if num_segment_frames >= target_segment_frames:
                     break
-            if not changed:   # avoid an infinite loop. if no changes, then break.
+            if not changed:  # avoid an infinite loop. if no changes, then break.
                 break
         if num_segment_frames < target_segment_frames:
             proportion = float(num_segment_frames -
                                num_speech_frames) / num_segment_frames
-            sys.stderr.write("%s: Warning: for recording %s, only got a proportion %f of non-speech frames, versus target %f\n" %
-                             (sys.argv[0], self.file_id, proportion, self.options.silence_proportion))
+            sys.stderr.write(
+                "%s: Warning: for recording %s, only got a proportion %f of non-speech frames, versus target %f\n"
+                % (sys.argv[0], self.file_id, proportion,
+                   self.options.silence_proportion))
 
         ###########################################################################
         # Analysis section
@@ -660,29 +697,35 @@ class JointResegmenter(object):
         if self.reference != None:
             count = 0
             for i in range(0, self.N):
-                if self.reference[i] == "0" and self.A[i] in (self.THIS_SILENCE + self.THIS_NOISE):
+                if self.reference[i] == "0" and self.A[i] in (
+                        self.THIS_SILENCE + self.THIS_NOISE):
                     C[i] = "0"
-                elif self.reference[i] == "0" and self.A[i] in self.THIS_CONVERT:
+                elif self.reference[i] == "0" and self.A[
+                        i] in self.THIS_CONVERT:
                     C[i] = "1"
                 elif self.reference[i] == "0" and self.A[i] in self.THIS_SPEECH:
                     C[i] = "2"
-                elif self.reference[i] == "1" and self.A[i] in (self.THIS_SILENCE + self.THIS_NOISE):
+                elif self.reference[i] == "1" and self.A[i] in (
+                        self.THIS_SILENCE + self.THIS_NOISE):
                     C[i] = "3"
-                elif self.reference[i] == "1" and self.A[i] in self.THIS_CONVERT:
+                elif self.reference[i] == "1" and self.A[
+                        i] in self.THIS_CONVERT:
                     C[i] = "4"
                 elif self.reference[i] == "1" and self.A[i] in self.THIS_SPEECH:
                     C[i] = "5"
-                elif self.reference[i] == "2" and self.A[i] in (self.THIS_SILENCE + self.THIS_NOISE):
+                elif self.reference[i] == "2" and self.A[i] in (
+                        self.THIS_SILENCE + self.THIS_NOISE):
                     C[i] = "6"
-                elif self.reference[i] == "2" and self.A[i] in self.THIS_CONVERT:
+                elif self.reference[i] == "2" and self.A[
+                        i] in self.THIS_CONVERT:
                     C[i] = "7"
                 elif self.reference[i] == "2" and self.A[i] in self.THIS_SPEECH:
                     C[i] = "8"
-                if i > 0 and C[i-1] != C[i]:
-                    a.state_count[int(C[i-1])].append(count)
-                    a.markers[int(C[i-1])].append(i - count)
-                    a.phones[int(C[i-1])
-                             ].append(' '.join(set(self.P[i-count:i])))
+                if i > 0 and C[i - 1] != C[i]:
+                    a.state_count[int(C[i - 1])].append(count)
+                    a.markers[int(C[i - 1])].append(i - count)
+                    a.phones[int(C[i - 1])].append(' '.join(
+                        set(self.P[i - count:i])))
                     count = 1
                 else:
                     count += 1
@@ -709,7 +752,8 @@ class JointResegmenter(object):
 
         if self.options.verbose > 3:
             sys.stderr.write(
-                "Length of segment starts before non-speech adding: %d\n" % len(segment_starts))
+                "Length of segment starts before non-speech adding: %d\n" %
+                len(segment_starts))
 
         if self.min_inter_utt_nonspeech_length > 0.0:
             segment_starts = list(
@@ -722,7 +766,8 @@ class JointResegmenter(object):
             segment_ends.pop(0)
             if self.options.verbose > 3:
                 sys.stderr.write(
-                    "Length of segment starts after non-speech adding: %d\n" % len(segment_starts))
+                    "Length of segment starts after non-speech adding: %d\n" %
+                    len(segment_starts))
             for i in segment_starts:
                 self.S[i] = True
             for i in segment_ends:
@@ -755,15 +800,15 @@ class JointResegmenter(object):
                 # check if that is a 'boundary'
                 i += 1
             else:
-                assert(i < len(segment_starts) and j < len(segment_ends))
+                assert (i < len(segment_starts) and j < len(segment_ends))
                 # A boundary:
                 # Find the segment score as the min of lengths of the segments
                 # to the left and to the right.
                 # This segment score will be used to prioritize merging of
                 # the segment with its neighbor
                 assert ((j + 1) < len(segment_ends))
-                segment_score = min(segment_starts[i] - segment_starts[i-1],
-                                    segment_ends[j+1] - segment_ends[j])
+                segment_score = min(segment_starts[i] - segment_starts[i - 1],
+                                    segment_ends[j + 1] - segment_ends[j])
                 # Also find the type of tranisition of the segments at the boundary.
                 # This is also used to prioritize the merging of the segment
                 boundaries.append((segment_ends[j], segment_score,
@@ -811,11 +856,12 @@ class JointResegmenter(object):
                 if self.E[p]:
                     break
                 p += 1
-            assert (self.min_inter_utt_nonspeech_length == 0 or p ==
-                    self.N or self.S[p] or self.A[p] in self.THIS_SILENCE_OR_NOISE)
+            assert (self.min_inter_utt_nonspeech_length == 0 or p == self.N
+                    or self.S[p] or self.A[p] in self.THIS_SILENCE_OR_NOISE)
 
-            if self.min_inter_utt_nonspeech_length > 0 and self.A[b[0]] in self.THIS_SILENCE_OR_NOISE:
-                assert(b[2] == 6 or b[2] == 7)
+            if self.min_inter_utt_nonspeech_length > 0 and self.A[
+                    b[0]] in self.THIS_SILENCE_OR_NOISE:
+                assert (b[2] == 6 or b[2] == 7)
                 if (p - b[0]) > self.min_inter_utt_nonspeech_length:
                     # This is a non-speech segment that is longer than the minimum
                     # inter-utterance non-speech length.
@@ -868,8 +914,9 @@ class JointResegmenter(object):
                     self.E[p_temp] = False
                     continue
                 # End if
-            elif self.min_inter_utt_nonspeech_length > 0 and (b[2] == 8 or b[2] == 9):
-                assert(p_left == 0)
+            elif self.min_inter_utt_nonspeech_length > 0 and (b[2] == 8
+                                                              or b[2] == 9):
+                assert (p_left == 0)
                 if b[0] - p_left > self.min_inter_utt_nonspeech_length:
                     self.S[p_left] = False
                     self.E[b[0]] = False
@@ -903,6 +950,7 @@ class JointResegmenter(object):
             # End if
         # End if
         ###########################################################################
+
     # End function merge_segments
 
     def split_long_segments(self):
@@ -919,14 +967,15 @@ class JointResegmenter(object):
                     # Count the number of times long segments are split
                     self.stats.split_segments += 1
 
-                    num_pieces = int(
-                        (float(segment_length) / self.hard_max_frames) + 0.99999)
-                    sys.stderr.write("%s: Warning: for recording %s, "
-                                     % (sys.argv[0], self.file_id)
-                                     + "splitting segment of length %f seconds into %d pieces "
-                                     % (segment_length * self.frame_shift, num_pieces)
-                                     + "(--hard-max-segment-length %f)\n"
-                                     % self.options.hard_max_segment_length)
+                    num_pieces = int((float(segment_length) /
+                                      self.hard_max_frames) + 0.99999)
+                    sys.stderr.write(
+                        "%s: Warning: for recording %s, " %
+                        (sys.argv[0], self.file_id) +
+                        "splitting segment of length %f seconds into %d pieces "
+                        % (segment_length * self.frame_shift, num_pieces) +
+                        "(--hard-max-segment-length %f)\n" %
+                        self.options.hard_max_segment_length)
                     frames_per_piece = int(segment_length / num_pieces)
                     for i in range(1, num_pieces):
                         q = n + i * frames_per_piece
@@ -935,6 +984,7 @@ class JointResegmenter(object):
                 if p - 1 > n:
                     n = p - 1
         assert (sum(self.S) == sum(self.E))
+
     # End function split_long_segments
 
     def remove_silence_only_segments(self):
@@ -978,6 +1028,7 @@ class JointResegmenter(object):
                 a.write_markers()
             # End if
         # End if
+
     # End function remove_silence_only_segments
 
     def remove_noise_only_segments(self):
@@ -1021,31 +1072,53 @@ class JointResegmenter(object):
             # End if
         # End if
         ###########################################################################
+
     # End function remove_noise_only_segments
 
     # Return the transition type from frame j-1 to frame j
     def transition_type(self, j):
         assert (j > 0)
-        assert (self.A[j-1] != self.A[j] or self.A[j] in self.THIS_CONVERT)
-        if self.A[j-1] in (self.THIS_SPEECH_THAT_NOISE + self.THIS_SPEECH_THAT_SIL) and self.A[j] in (self.THIS_SPEECH_THAT_NOISE + self.THIS_SPEECH_THAT_SIL):
+        assert (self.A[j - 1] != self.A[j] or self.A[j] in self.THIS_CONVERT)
+        if self.A[j - 1] in (
+                self.THIS_SPEECH_THAT_NOISE +
+                self.THIS_SPEECH_THAT_SIL) and self.A[j] in (
+                    self.THIS_SPEECH_THAT_NOISE + self.THIS_SPEECH_THAT_SIL):
             return 0
-        if self.A[j-1] in self.THIS_SPEECH and self.A[j] in self.THIS_SPEECH:
+        if self.A[j - 1] in self.THIS_SPEECH and self.A[j] in self.THIS_SPEECH:
             return 1
-        if self.A[j-1] in (self.THIS_SPEECH + self.THIS_NOISE_CONVERT_THAT_SIL + self.THIS_NOISE_CONVERT_THAT_NOISE) and self.A[j] in (self.THIS_SPEECH + self.THIS_NOISE_CONVERT_THAT_SIL + self.THIS_NOISE_CONVERT_THAT_NOISE):
+        if self.A[j - 1] in (
+                self.THIS_SPEECH + self.THIS_NOISE_CONVERT_THAT_SIL +
+                self.THIS_NOISE_CONVERT_THAT_NOISE) and self.A[j] in (
+                    self.THIS_SPEECH + self.THIS_NOISE_CONVERT_THAT_SIL +
+                    self.THIS_NOISE_CONVERT_THAT_NOISE):
             return 2
-        if self.A[j-1] in (self.THIS_SPEECH + self.THIS_NOISE_CONVERT) and self.A[j] in (self.THIS_SPEECH + self.THIS_NOISE_CONVERT):
+        if self.A[j - 1] in (
+                self.THIS_SPEECH + self.THIS_NOISE_CONVERT) and self.A[j] in (
+                    self.THIS_SPEECH + self.THIS_NOISE_CONVERT):
             return 3
-        if self.A[j-1] in (self.THIS_SPEECH + self.THIS_NOISE_CONVERT + self.THIS_SIL_CONVERT_THAT_SIL + self.THIS_SIL_CONVERT_THAT_NOISE) and self.A[j] in (self.THIS_SPEECH + self.THIS_NOISE_CONVERT + self.THIS_SIL_CONVERT_THAT_SIL + self.THIS_SIL_CONVERT_THAT_NOISE):
+        if self.A[j - 1] in (
+                self.THIS_SPEECH + self.THIS_NOISE_CONVERT +
+                self.THIS_SIL_CONVERT_THAT_SIL +
+                self.THIS_SIL_CONVERT_THAT_NOISE) and self.A[j] in (
+                    self.THIS_SPEECH + self.THIS_NOISE_CONVERT +
+                    self.THIS_SIL_CONVERT_THAT_SIL +
+                    self.THIS_SIL_CONVERT_THAT_NOISE):
             return 4
-        if self.A[j-1] in (self.THIS_SPEECH + self.THIS_CONVERT) and self.A[j] in (self.THIS_SPEECH + self.THIS_CONVERT):
+        if self.A[j - 1] in (
+                self.THIS_SPEECH + self.THIS_CONVERT) and self.A[j] in (
+                    self.THIS_SPEECH + self.THIS_CONVERT):
             return 5
-        if self.A[j-1] in self.THIS_SPEECH_PLUS and self.A[j] in (self.THIS_SPEECH_PLUS + self.THIS_NOISE):
+        if self.A[j - 1] in self.THIS_SPEECH_PLUS and self.A[j] in (
+                self.THIS_SPEECH_PLUS + self.THIS_NOISE):
             return 6
-        if self.A[j-1] in self.THIS_SPEECH_PLUS and self.A[j] in (self.THIS_SPEECH_PLUS + self.THIS_SILENCE):
+        if self.A[j - 1] in self.THIS_SPEECH_PLUS and self.A[j] in (
+                self.THIS_SPEECH_PLUS + self.THIS_SILENCE):
             return 7
-        if self.A[j-1] in (self.THIS_SPEECH_PLUS + self.THIS_NOISE) and self.A[j] in self.THIS_SPEECH_PLUS:
+        if self.A[j - 1] in (self.THIS_SPEECH_PLUS + self.THIS_NOISE
+                             ) and self.A[j] in self.THIS_SPEECH_PLUS:
             return 8
-        if self.A[j-1] in (self.THIS_SPEECH_PLUS + self.THIS_SILENCE) and self.A[j] in self.THIS_SPEECH_PLUS:
+        if self.A[j - 1] in (self.THIS_SPEECH_PLUS + self.THIS_SILENCE
+                             ) and self.A[j] in self.THIS_SPEECH_PLUS:
             return 9
         assert (False)
 
@@ -1062,7 +1135,8 @@ class JointResegmenter(object):
         while n < self.N:
             if self.E[n] and not self.S[n]:
                 sys.stderr.write(
-                    "%s: Error: Ending segment before starting it: n=%d\n" % (sys.argv[0], n))
+                    "%s: Error: Ending segment before starting it: n=%d\n" %
+                    (sys.argv[0], n))
             if self.S[n]:
                 p = n + 1
                 while p < self.N and not self.E[p]:
@@ -1078,8 +1152,8 @@ class JointResegmenter(object):
             n += 1
 
         if len(segments) == 0:
-            sys.stderr.write("%s: Warning: no segments for recording %s\n" % (
-                sys.argv[0], self.file_id))
+            sys.stderr.write("%s: Warning: no segments for recording %s\n" %
+                             (sys.argv[0], self.file_id))
             sys.exit(1)
 
         ############################################################################
@@ -1111,11 +1185,11 @@ class JointResegmenter(object):
                     C[i] = "6"
                 elif self.reference[i] == "2" and in_seg:
                     C[i] = "8"
-                if i > 0 and C[i-1] != C[i]:
-                    a.state_count[int(C[i-1])].append(count)
-                    a.markers[int(C[i-1])].append(i - count)
-                    a.phones[int(C[i-1])
-                             ].append(' '.join(set(self.P[i-count:i])))
+                if i > 0 and C[i - 1] != C[i]:
+                    a.state_count[int(C[i - 1])].append(count)
+                    a.markers[int(C[i - 1])].append(i - count)
+                    a.phones[int(C[i - 1])].append(' '.join(
+                        set(self.P[i - count:i])))
                     count = 1
                 else:
                     count += 1
@@ -1152,10 +1226,12 @@ class JointResegmenter(object):
             start_str = format_str % (start * self.frame_shift * 100.0)
             end_str = format_str % (end * self.frame_shift * 100.0)
             utterance_id = "%s%s%s%s%s" % (
-                self.file_id, self.options.first_separator, start_str, self.options.second_separator, end_str)
+                self.file_id, self.options.first_separator, start_str,
+                self.options.second_separator, end_str)
             # Output:
-            out_file_handle.write("%s %s %s %s\n" % (
-                utterance_id, self.file_id, start_seconds, end_seconds))
+            out_file_handle.write(
+                "%s %s %s %s\n" % (utterance_id, self.file_id, start_seconds,
+                                   end_seconds))
 
     # Some intermediate stage analysis of the segmentation
     def segmentation_analysis(self, title="Analysis"):
@@ -1166,7 +1242,7 @@ class JointResegmenter(object):
         # First get the segment start and segment ends
         # Note that they are in sync by construction
         segment_starts = [i for i in range(0, self.N) if self.S[i]]
-        segment_ends = [i for i in range(0, self.N+1) if self.E[i]]
+        segment_ends = [i for i in range(0, self.N + 1) if self.E[i]]
 
         D = {}
         for i, st in enumerate(segment_starts):
@@ -1179,8 +1255,8 @@ class JointResegmenter(object):
                 types[val] = types.get(val, 0) + 1
             # End for loop over a particular segment
             # Make a tuple out of the counts of the types of frames
-            D[st] = (en, types.get("0", 0), types.get(
-                "1", 0), types.get("2", 0))
+            D[st] = (en, types.get("0", 0), types.get("1", 0), types.get(
+                "2", 0))
         # End for loop over all segments
 
         a = Analysis(self.file_id, None, title)
@@ -1190,7 +1266,7 @@ class JointResegmenter(object):
             if info[1] > 0 and info[2] == 0 and info[3] == 0:
                 # All frames silence
                 a.confusion_matrix[0] += 1
-                a.state_count[0].append((en-st,)+info[1:])
+                a.state_count[0].append((en - st, ) + info[1:])
                 a.type_counts[0][0].append(info[1])
                 a.type_counts[1][0].append(info[2])
                 a.type_counts[2][0].append(info[3])
@@ -1198,7 +1274,7 @@ class JointResegmenter(object):
             elif info[1] == 0 and info[2] > 0 and info[3] == 0:
                 # All frames noise
                 a.confusion_matrix[1] += 1
-                a.state_count[1].append((en-st,)+info[1:])
+                a.state_count[1].append((en - st, ) + info[1:])
                 a.type_counts[0][1].append(info[1])
                 a.type_counts[1][1].append(info[2])
                 a.type_counts[2][1].append(info[3])
@@ -1206,7 +1282,7 @@ class JointResegmenter(object):
             elif info[1] == 0 and info[2] == 0 and info[3] > 0:
                 # All frames speech
                 a.confusion_matrix[2] += 1
-                a.state_count[2].append((en-st,)+info[1:])
+                a.state_count[2].append((en - st, ) + info[1:])
                 a.type_counts[0][2].append(info[1])
                 a.type_counts[1][2].append(info[2])
                 a.type_counts[2][2].append(info[3])
@@ -1214,7 +1290,7 @@ class JointResegmenter(object):
             elif info[1] > 0 and info[2] > 0 and info[3] == 0:
                 # Segment contains both silence and noise
                 a.confusion_matrix[3] += 1
-                a.state_count[3].append((en-st,)+info[1:])
+                a.state_count[3].append((en - st, ) + info[1:])
                 a.type_counts[0][3].append(info[1])
                 a.type_counts[1][3].append(info[2])
                 a.type_counts[2][3].append(info[3])
@@ -1225,12 +1301,12 @@ class JointResegmenter(object):
                 a.type_counts[0][4].append(info[1])
                 a.type_counts[1][4].append(info[2])
                 a.type_counts[2][4].append(info[3])
-                a.state_count[4].append((en-st,)+info[1:])
+                a.state_count[4].append((en - st, ) + info[1:])
                 a.markers[4].append(st)
             elif info[1] == 0 and info[2] > 0 and info[3] > 0:
                 # Segment contains both noise and speech
                 a.confusion_matrix[5] += 1
-                a.state_count[5].append((en-st,)+info[1:])
+                a.state_count[5].append((en - st, ) + info[1:])
                 a.type_counts[0][5].append(info[1])
                 a.type_counts[1][5].append(info[2])
                 a.type_counts[2][5].append(info[3])
@@ -1238,7 +1314,7 @@ class JointResegmenter(object):
             elif info[1] > 0 and info[2] > 0 and info[3] > 0:
                 # Segment contains silence, noise and speech
                 a.confusion_matrix[6] += 1
-                a.state_count[6].append((en-st,)+info[1:])
+                a.state_count[6].append((en - st, ) + info[1:])
                 a.type_counts[0][6].append(info[1])
                 a.type_counts[1][6].append(info[2])
                 a.type_counts[2][6].append(info[3])
@@ -1249,6 +1325,7 @@ class JointResegmenter(object):
             # End if
         # End for loop over all stats
         return a
+
     # End function segmentation_analysis
 
 
@@ -1267,7 +1344,8 @@ def map_prediction(A1, A2, phone_map, speech_cap=None, f=None):
                 #sys.stderr.write("PHONE_LENGTH %s %d %s %d\n" % (prev_x, len_x, f, i - len_x))
                 if phone_map[prev_x] == "0":
                     B.extend(["0"] * len_x)
-                elif (speech_cap != None and len_x > speech_cap) or phone_map[prev_x] == "1":
+                elif (speech_cap != None
+                      and len_x > speech_cap) or phone_map[prev_x] == "1":
                     B.extend(["4"] * len_x)
                 elif phone_map[prev_x] == "2":
                     B.extend(["8"] * len_x)
@@ -1286,7 +1364,8 @@ def map_prediction(A1, A2, phone_map, speech_cap=None, f=None):
 
         if phone_map[prev_x] == "0":
             B.extend(["0"] * len_x)
-        elif (speech_cap != None and len_x > speech_cap) or phone_map[prev_x] == "1":
+        elif (speech_cap != None
+              and len_x > speech_cap) or phone_map[prev_x] == "1":
             B.extend(["4"] * len_x)
         elif phone_map[prev_x] == "2":
             B.extend(["8"] * len_x)
@@ -1342,73 +1421,124 @@ def map_prediction(A1, A2, phone_map, speech_cap=None, f=None):
 
 def main():
     parser = ArgumentParser(description='Get segmentation arguments')
-    parser.add_argument('--verbose', type=int,
-                        dest='verbose', default=0,
-                        help='Give higher verbose for more logging (default: %(default)s)')
-    parser.add_argument('--silence-proportion', type=float,
-                        dest='silence_proportion', default=0.05,
-                        help="The amount of silence at the sides of segments is "
-                        + "tuned to give this proportion of silence. (default: %(default)s)")
-    parser.add_argument('--frame-shift', type=float,
-                        dest='frame_shift', default=0.01,
-                        help="Time difference between adjacent frame (default: %(default)s)s")
-    parser.add_argument('--max-segment-length', type=float,
-                        dest='max_segment_length', default=10.0,
-                        help="Maximum segment length while we are marging segments (default: %(default)s)")
-    parser.add_argument('--hard-max-segment-length', type=float,
-                        dest='hard_max_segment_length', default=15.0,
-                        help="Hard maximum on the segment length above which the segment "
-                        + "will be broken even if in the middle of speech (default: %(default)s)")
-    parser.add_argument('--first-separator',
-                        dest='first_separator', default="-",
-                        help="Separator between recording-id and start-time (default: %(default)s)")
-    parser.add_argument('--second-separator',
-                        dest='second_separator', default="-",
-                        help="Separator between start-time and end-time (default: %(default)s)")
-    parser.add_argument('--remove-noise-only-segments',
-                        dest='remove_noise_only_segments', default="true", choices=("true", "false"),
-                        help="Remove segments that have only noise. (default: %(default)s)")
-    parser.add_argument('--min-inter-utt-silence-length', type=float,
-                        dest='min_inter_utt_silence_length', default=1.0,
-                        help="Minimum silence that must exist between two separate utterances (default: %(default)s)")
-    parser.add_argument('--channel1-file',
-                        dest='channel1_file', default="inLine",
-                        help="String that matches with the channel 1 file (default: %(default)s)")
-    parser.add_argument('--channel2-file',
-                        dest='channel2_file', default="outLine",
-                        help="String that matches with the channel 2 file (default: %(default)s)")
-    parser.add_argument('--isolated-resegmentation',
-                        dest='isolated_resegmentation',
-                        action='store_true', help="Do not do joint segmentation (default: %(default)s)")
-    parser.add_argument('--max-length-diff', type=float,
-                        dest='max_length_diff', default=1.0,
-                        help="Maximum difference in the lengths of the two channels for joint "
-                        + "segmentation to be done (default: %(default)s)")
-    parser.add_argument('--reference-rttm', dest='reference_rttm',
-                        help="RTTM file to compare and get statistics (default: %(default)s)")
-    parser.add_argument('--speech-cap-length', type=float, default=None,
-                        help="Maximum length in seconds of a particular speech phone prediction."
-                        + "\nAny length above this will be considered as noise")
-    parser.add_argument('prediction_dir',
-                        help='Directory where the predicted phones (.pred files) are found')
-    parser.add_argument('phone_map',
-                        help='Phone Map file that maps from phones to classes')
-    parser.add_argument('output_segments', nargs='?', default="-",
-                        help='Output segments file')
+    parser.add_argument(
+        '--verbose',
+        type=int,
+        dest='verbose',
+        default=0,
+        help='Give higher verbose for more logging (default: %(default)s)')
+    parser.add_argument(
+        '--silence-proportion',
+        type=float,
+        dest='silence_proportion',
+        default=0.05,
+        help="The amount of silence at the sides of segments is " +
+        "tuned to give this proportion of silence. (default: %(default)s)")
+    parser.add_argument(
+        '--frame-shift',
+        type=float,
+        dest='frame_shift',
+        default=0.01,
+        help="Time difference between adjacent frame (default: %(default)s)s")
+    parser.add_argument(
+        '--max-segment-length',
+        type=float,
+        dest='max_segment_length',
+        default=10.0,
+        help=
+        "Maximum segment length while we are marging segments (default: %(default)s)"
+    )
+    parser.add_argument(
+        '--hard-max-segment-length',
+        type=float,
+        dest='hard_max_segment_length',
+        default=15.0,
+        help="Hard maximum on the segment length above which the segment " +
+        "will be broken even if in the middle of speech (default: %(default)s)"
+    )
+    parser.add_argument(
+        '--first-separator',
+        dest='first_separator',
+        default="-",
+        help=
+        "Separator between recording-id and start-time (default: %(default)s)")
+    parser.add_argument(
+        '--second-separator',
+        dest='second_separator',
+        default="-",
+        help="Separator between start-time and end-time (default: %(default)s)"
+    )
+    parser.add_argument(
+        '--remove-noise-only-segments',
+        dest='remove_noise_only_segments',
+        default="true",
+        choices=("true", "false"),
+        help="Remove segments that have only noise. (default: %(default)s)")
+    parser.add_argument(
+        '--min-inter-utt-silence-length',
+        type=float,
+        dest='min_inter_utt_silence_length',
+        default=1.0,
+        help=
+        "Minimum silence that must exist between two separate utterances (default: %(default)s)"
+    )
+    parser.add_argument(
+        '--channel1-file',
+        dest='channel1_file',
+        default="inLine",
+        help=
+        "String that matches with the channel 1 file (default: %(default)s)")
+    parser.add_argument(
+        '--channel2-file',
+        dest='channel2_file',
+        default="outLine",
+        help=
+        "String that matches with the channel 2 file (default: %(default)s)")
+    parser.add_argument(
+        '--isolated-resegmentation',
+        dest='isolated_resegmentation',
+        action='store_true',
+        help="Do not do joint segmentation (default: %(default)s)")
+    parser.add_argument(
+        '--max-length-diff',
+        type=float,
+        dest='max_length_diff',
+        default=1.0,
+        help="Maximum difference in the lengths of the two channels for joint "
+        + "segmentation to be done (default: %(default)s)")
+    parser.add_argument(
+        '--reference-rttm',
+        dest='reference_rttm',
+        help="RTTM file to compare and get statistics (default: %(default)s)")
+    parser.add_argument(
+        '--speech-cap-length',
+        type=float,
+        default=None,
+        help="Maximum length in seconds of a particular speech phone prediction."
+        + "\nAny length above this will be considered as noise")
+    parser.add_argument(
+        'prediction_dir',
+        help='Directory where the predicted phones (.pred files) are found')
+    parser.add_argument(
+        'phone_map', help='Phone Map file that maps from phones to classes')
+    parser.add_argument(
+        'output_segments', nargs='?', default="-", help='Output segments file')
     parser.usage = ':'.join(parser.format_usage().split(':')[1:]) \
         + 'e.g. :  %(prog)s exp/tri4b_whole_resegment_dev10h/pred exp/tri4b_whole_resegment_dev10h/phone_map.txt data/dev10h.seg/segments'
     options = parser.parse_args()
 
     sys.stderr.write(' '.join(sys.argv) + "\n")
-    if not (options.silence_proportion
-            > 0.01 and options.silence_proportion < 0.99):
-        sys.stderr.write("%s: Error: Invalid silence-proportion value %f\n"
-                         % options.silence_proportion)
+    if not (options.silence_proportion > 0.01
+            and options.silence_proportion < 0.99):
+        sys.stderr.write("%s: Error: Invalid silence-proportion value %f\n" %
+                         options.silence_proportion)
         sys.exit(1)
 
-    if not (options.remove_noise_only_segments == "false" or options.remove_noise_only_segments == "true"):
-        sys.stderr.write("%s: Error: Invalid value for remove-noise-only segments %s. Must be true or false.\n"
-                         % options.remove_noise_only_segments)
+    if not (options.remove_noise_only_segments == "false"
+            or options.remove_noise_only_segments == "true"):
+        sys.stderr.write(
+            "%s: Error: Invalid value for remove-noise-only segments %s. Must be true or false.\n"
+            % options.remove_noise_only_segments)
         sys.exit(1)
 
     if options.output_segments == '-':
@@ -1444,51 +1574,55 @@ def main():
 
     stats = Stats()
 
-    pred_files = dict([(f.split('/')[-1][0:-5], False)
-                       for f in glob.glob(os.path.join(prediction_dir, "*.pred"))])
+    pred_files = dict(
+        [(f.split('/')[-1][0:-5], False)
+         for f in glob.glob(os.path.join(prediction_dir, "*.pred"))])
 
     global global_analysis_get_initial_segments
     global_analysis_get_initial_segments = Analysis(
-        "TOTAL_Get_Initial_Segments", options.frame_shift, "Global Analysis after get_initial_segments")
+        "TOTAL_Get_Initial_Segments", options.frame_shift,
+        "Global Analysis after get_initial_segments")
 
     global global_analysis_set_nonspeech_proportion
     global_analysis_set_nonspeech_proportion = Analysis(
-        "TOTAL_set_nonspeech_proportion", options.frame_shift, "Global Analysis after set_nonspeech_proportion")
+        "TOTAL_set_nonspeech_proportion", options.frame_shift,
+        "Global Analysis after set_nonspeech_proportion")
 
     global global_analysis_final
-    global_analysis_final = Analysis(
-        "TOTAL_Final", options.frame_shift, "Global Analysis Final")
+    global_analysis_final = Analysis("TOTAL_Final", options.frame_shift,
+                                     "Global Analysis Final")
 
     speech_cap = None
     if options.speech_cap_length != None:
-        speech_cap = int(options.speech_cap_length/options.frame_shift)
+        speech_cap = int(options.speech_cap_length / options.frame_shift)
     # End if
 
     for f in pred_files:
         if pred_files[f]:
             continue
-        if re.match(".*_"+channel1_file, f) is None:
-            if re.match(".*_"+channel2_file, f) is None:
-                sys.stderr.write("%s does not match pattern .*_%s or .*_%s\n"
-                                 % (f, channel1_file, channel2_file))
+        if re.match(".*_" + channel1_file, f) is None:
+            if re.match(".*_" + channel2_file, f) is None:
+                sys.stderr.write("%s does not match pattern .*_%s or .*_%s\n" %
+                                 (f, channel1_file, channel2_file))
                 sys.exit(1)
             else:
                 f1 = f
                 f2 = f
-                f1 = re.sub("(.*_)"+channel2_file, r"\1"+channel1_file, f1)
+                f1 = re.sub("(.*_)" + channel2_file, r"\1" + channel1_file, f1)
         else:
             f1 = f
             f2 = f
-            f2 = re.sub("(.*_)"+channel1_file, r"\1"+channel2_file, f2)
+            f2 = re.sub("(.*_)" + channel1_file, r"\1" + channel2_file, f2)
 
         if options.isolated_resegmentation or f2 not in pred_files or f1 not in pred_files:
             pred_files[f] = True
             try:
-                A = open(os.path.join(prediction_dir, f+".pred")
-                         ).readline().strip().split()[1:]
+                A = open(
+                    os.path.join(prediction_dir,
+                                 f + ".pred")).readline().strip().split()[1:]
             except IndexError:
-                sys.stderr.write(
-                    "Incorrect format of file %s/%s.pred\n" % (prediction_dir, f))
+                sys.stderr.write("Incorrect format of file %s/%s.pred\n" %
+                                 (prediction_dir, f))
                 sys.exit(1)
 
             B = map_prediction(A, None, phone_map, speech_cap, f)
@@ -1496,7 +1630,7 @@ def main():
             if temp_dir != None:
                 try:
                     reference = open(os.path.join(
-                        temp_dir, f+".ref")).readline().strip().split()[1:]
+                        temp_dir, f + ".ref")).readline().strip().split()[1:]
                 except IOError:
                     reference = None
             else:
@@ -1510,18 +1644,20 @@ def main():
             pred_files[f1] = True
             pred_files[f2] = True
             try:
-                A1 = open(os.path.join(prediction_dir, f1+".pred")
-                          ).readline().strip().split()[1:]
+                A1 = open(
+                    os.path.join(prediction_dir,
+                                 f1 + ".pred")).readline().strip().split()[1:]
             except IndexError:
-                sys.stderr.write(
-                    "Incorrect format of file %s/%s.pred\n" % (prediction_dir, f1))
+                sys.stderr.write("Incorrect format of file %s/%s.pred\n" %
+                                 (prediction_dir, f1))
                 sys.exit(1)
             try:
-                A2 = open(os.path.join(prediction_dir, f2+".pred")
-                          ).readline().strip().split()[1:]
+                A2 = open(
+                    os.path.join(prediction_dir,
+                                 f2 + ".pred")).readline().strip().split()[1:]
             except IndexError:
-                sys.stderr.write(
-                    "Incorrect format of file %s/%s.pred\n" % (prediction_dir, f2))
+                sys.stderr.write("Incorrect format of file %s/%s.pred\n" %
+                                 (prediction_dir, f2))
                 sys.exit(1)
 
             if len(A1) < len(A2):
@@ -1534,11 +1670,12 @@ def main():
                 f2 = f3
             # End if
 
-            if (len(A1) - len(A2)) > int(options.max_length_diff/options.frame_shift):
+            if (len(A1) - len(A2)) > int(
+                    options.max_length_diff / options.frame_shift):
                 sys.stderr.write(
                     "%s: Warning: Lengths of %s and %s differ by more than %f. "
-                    % (sys.argv[0], f1, f2, options.max_length_diff)
-                    + "So using isolated resegmentation\n")
+                    % (sys.argv[0], f1, f2, options.max_length_diff) +
+                    "So using isolated resegmentation\n")
                 B1 = map_prediction(A1, None, phone_map, speech_cap)
                 B2 = map_prediction(A2, None, phone_map, speech_cap)
             else:
@@ -1548,26 +1685,26 @@ def main():
             if temp_dir != None:
                 try:
                     reference1 = open(os.path.join(
-                        temp_dir, f1+".ref")).readline().strip().split()[1:]
+                        temp_dir, f1 + ".ref")).readline().strip().split()[1:]
                 except IOError:
                     reference1 = None
             else:
                 reference1 = None
-            r1 = JointResegmenter(A1, B1, f1, options,
-                                  phone_map, stats, reference1)
+            r1 = JointResegmenter(A1, B1, f1, options, phone_map, stats,
+                                  reference1)
             r1.resegment()
             r1.print_segments(out_file)
 
             if temp_dir != None:
                 try:
                     reference2 = open(os.path.join(
-                        temp_dir, f2+".ref")).readline().strip().split()[1:]
+                        temp_dir, f2 + ".ref")).readline().strip().split()[1:]
                 except IOError:
                     reference2 = None
             else:
                 reference2 = None
-            r2 = JointResegmenter(A1, B2, f2, options,
-                                  phone_map, stats, reference2)
+            r2 = JointResegmenter(A1, B2, f2, options, phone_map, stats,
+                                  reference2)
             r2.resegment()
             r2.restrict(len(A2))
             r2.print_segments(out_file)

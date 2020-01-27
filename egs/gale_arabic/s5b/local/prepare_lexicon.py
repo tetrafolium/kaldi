@@ -23,6 +23,9 @@ with open(text_path, 'r', encoding='utf-8') as f:
             ['V' if char == '*' else char for char in characters])
         lex[line] = characters
 
-with open(os.path.join('data', 'local', 'dict', 'lexicon.txt'), 'w', encoding='utf-8') as fp:
+with open(
+        os.path.join('data', 'local', 'dict', 'lexicon.txt'),
+        'w',
+        encoding='utf-8') as fp:
     for key in sorted(lex):
         fp.write(key + "  " + lex[key] + "\n")

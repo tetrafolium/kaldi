@@ -18,17 +18,25 @@ import re
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Post-process an .opl file into plain text")
-    parser.add_argument('--max-sent-len', type=int, default=600,
-                        help="The maximum allowed # of words per sentence")
-    parser.add_argument('--abort-long-sent', type=bool, default=False,
-                        help='If True and a sentence longer than "max-sent-len" detected' +
-                             'exit with error code 1. If False, just split the long sentences.')
+    parser.add_argument(
+        '--max-sent-len',
+        type=int,
+        default=600,
+        help="The maximum allowed # of words per sentence")
+    parser.add_argument(
+        '--abort-long-sent',
+        type=bool,
+        default=False,
+        help='If True and a sentence longer than "max-sent-len" detected' +
+        'exit with error code 1. If False, just split the long sentences.')
     parser.add_argument('--sent-end-marker', default="DOTDOTDOT")
     parser.add_argument("in_text", help="Input text")
     parser.add_argument("out_text", help="Output text")
-    parser.add_argument("sent_bounds",
-                        help="A file that will contain a comma separated list of numbers, s.t. if" +
-                             "i is in this list, then there is a sententence break after token i")
+    parser.add_argument(
+        "sent_bounds",
+        help=
+        "A file that will contain a comma separated list of numbers, s.t. if" +
+        "i is in this list, then there is a sententence break after token i")
     return parser.parse_args()
 
 
@@ -58,14 +66,16 @@ if __name__ == '__main__':
                             'WARNING: Too long sentence - splitting ...\n')
                         sent_start = 0
                         while sent_start < len(current_line):
-                            lines.append(' '.join(current_line[sent_start:
-                                                               sent_start + opts.max_sent_len]))
+                            lines.append(' '.join(
+                                current_line[sent_start:sent_start +
+                                             opts.max_sent_len]))
                             sent_start += opts.max_sent_len
                 else:
                     lines.append(' '.join(current_line))
                 current_line = list()
                 continue
-            if len(opl_tokens) >= 4 and opl_tokens[3] == 'SUNDAY' and opl_tokens[1] == 'EXPN':
+            if len(opl_tokens) >= 4 and opl_tokens[
+                    3] == 'SUNDAY' and opl_tokens[1] == 'EXPN':
                 corrections += 1
                 n_tokens += 1
                 start_scan = 4

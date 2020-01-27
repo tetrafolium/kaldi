@@ -22,7 +22,6 @@ parser.add_argument(
     '-M', '--Map', help='Output acronyms mapping', required=True)
 args = parser.parse_args()
 
-
 fin_lex = open(args.input, "r")
 fin_Letter = open(args.Letter, "r")
 fout_lex = open(args.output, "w")
@@ -32,14 +31,14 @@ fout_map = open(args.Map, "w")
 dict_letter = {}
 for single_letter_lex in fin_Letter:
     items = single_letter_lex.split()
-    dict_letter[items[0]] = single_letter_lex[len(items[0])+1:].strip()
+    dict_letter[items[0]] = single_letter_lex[len(items[0]) + 1:].strip()
 fin_Letter.close()
 #print dict_letter
 
 for lex in fin_lex:
     items = lex.split()
     word = items[0]
-    lexicon = lex[len(items[0])+1:].strip()
+    lexicon = lex[len(items[0]) + 1:].strip()
     # find acronyms from words with only letters and '
     pre_match = re.match(r'^[A-Za-z]+$|^[A-Za-z]+\'s$|^[A-Za-z]+s$', word)
     if pre_match:
@@ -61,8 +60,8 @@ for lex in fin_lex:
                     actual_word[-1].lower() + '.\'s'
                 acronym_mapped_back = acronym_mapped_back + \
                     actual_word[-1].lower() + '\'s'
-                fout_map.write(word + '\t' + acronym_mapped +
-                               '\t' + acronym_mapped_back + '\n')
+                fout_map.write(word + '\t' + acronym_mapped + '\t' +
+                               acronym_mapped_back + '\n')
                 fout_lex.write(acronym_mapped + ' ' + lexicon + '\n')
             else:
                 fout_lex.write(lex)
@@ -85,8 +84,8 @@ for lex in fin_lex:
                     actual_word[-1].lower() + '.s'
                 acronym_mapped_back = acronym_mapped_back + \
                     actual_word[-1].lower() + '\'s'
-                fout_map.write(word + '\t' + acronym_mapped +
-                               '\t' + acronym_mapped_back + '\n')
+                fout_map.write(word + '\t' + acronym_mapped + '\t' +
+                               acronym_mapped_back + '\n')
                 fout_lex.write(acronym_mapped + ' ' + lexicon + '\n')
             else:
                 fout_lex.write(lex)
@@ -105,8 +104,8 @@ for lex in fin_lex:
                     acronym_mapped_back = acronym_mapped_back + l.lower() + ' '
                 acronym_mapped = acronym_mapped + word[-1].lower() + '.'
                 acronym_mapped_back = acronym_mapped_back + word[-1].lower()
-                fout_map.write(word + '\t' + acronym_mapped +
-                               '\t' + acronym_mapped_back + '\n')
+                fout_map.write(word + '\t' + acronym_mapped + '\t' +
+                               acronym_mapped_back + '\n')
                 fout_lex.write(acronym_mapped + ' ' + lexicon + '\n')
             else:
                 fout_lex.write(lex)

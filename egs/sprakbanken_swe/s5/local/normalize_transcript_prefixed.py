@@ -17,27 +17,27 @@
 # limitations under the License.
 '''
 
-
 import codecs
 import sys
 import re
 
 # Global vars
 
-normdict = {",": " ",
-            ":": " ",
-            ";": " ",
-            "?": " ",
-            "!": " ",
-            "\\": " ",
-            "\t": " ",
-            ".": ""
-            }
+normdict = {
+    ",": " ",
+    ":": " ",
+    ";": " ",
+    "?": " ",
+    "!": " ",
+    "\\": " ",
+    "\t": " ",
+    ".": ""
+}
 
 t_table = str.maketrans(normdict)
 
-
 # Utility function
+
 
 def getuttid_text(line):
     return line.split(" ", 1)

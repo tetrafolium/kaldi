@@ -48,5 +48,5 @@ print("==============Test===============")
 print(evaltest)
 print("Total Conversations in test = {}".format(testConv))
 print("=================================")
-print("Total Conversations in Corpus = {}".format(
-    trainConv + devConv + testConv))
+print("Total Conversations in Corpus = {}".format(trainConv + devConv +
+                                                  testConv))

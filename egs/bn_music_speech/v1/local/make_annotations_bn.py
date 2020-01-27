@@ -45,7 +45,8 @@ def extract_speech(line):
     m = re.search('(?<=E_time=)\d+.\d+', line)
     end = float(m.group(0))
     if start > end:
-        print("Skipping annotation where end time is before start time: {}".format(line))
+        print("Skipping annotation where end time is before start time: {}".
+              format(line))
     return start, end
 
 
@@ -55,7 +56,8 @@ def extract_other_type2(line):
     m = re.search('(?<=E_time=)\d+.\d+', line)
     end = float(m.group(0))
     if start > end:
-        print("Skipping annotation where end time is before start time: {}".format(line))
+        print("Skipping annotation where end time is before start time: {}".
+              format(line))
     return start, end
 
 
@@ -108,8 +110,8 @@ def process_file(annos):
             max_time = max(speech_end, max_time)
         elif is_other_type2(line):
             other_type2_start, other_type2_end = extract_other_type2(line)
-            other_type2 = "{}{} {}\n".format(
-                other_type2, other_type2_start, other_type2_end)
+            other_type2 = "{}{} {}\n".format(other_type2, other_type2_start,
+                                             other_type2_end)
             max_time = max(other_type2_end, max_time)
         elif is_music(line):
             time, is_on = extract_music(line)
@@ -127,15 +129,15 @@ def process_file(annos):
                 prev_other_time = time
                 start_new_other_segment = False
             elif not is_on and not start_new_other_segment:
-                other_type1 = "{}{} {}\n".format(
-                    other_type1, prev_other_time, time)
+                other_type1 = "{}{} {}\n".format(other_type1, prev_other_time,
+                                                 time)
                 start_new_other_segment = True
 
     if not start_new_music_segment:
         music = "{}{} {}\n".format(music, prev_music_time, max_time)
     if not start_new_other_segment:
-        other_type1 = "{}{} {}\n".format(
-            other_type1, prev_other_time, max_time)
+        other_type1 = "{}{} {}\n".format(other_type1, prev_other_time,
+                                         max_time)
 
     other = other_type1 + other_type2
     return speech, music, other

@@ -16,7 +16,9 @@ def print_wrapper(*args_, **kwargs):
 
 
 def get_subdirectories(d):
-    return [name for name in os.listdir(d) if os.path.isdir(os.path.join(d, name))]
+    return [
+        name for name in os.listdir(d) if os.path.isdir(os.path.join(d, name))
+    ]
 
 
 def is_bin_dir(d):
@@ -24,7 +26,10 @@ def is_bin_dir(d):
 
 
 def get_files(d):
-    return [name for name in os.listdir(d) if os.path.isfile(os.path.join(d, name))]
+    return [
+        name for name in os.listdir(d)
+        if os.path.isfile(os.path.join(d, name))
+    ]
 
 
 def is_header(f):
@@ -51,7 +56,8 @@ def wrap_notwin32_condition(should_wrap, lines):
     if isinstance(lines, str):
         lines = [lines]
     if should_wrap:
-        return ["if(NOT WIN32)"] + list(map(lambda l: "    " + l, lines)) + ["endif()"]
+        return ["if(NOT WIN32)"] + list(map(lambda l: "    " + l,
+                                            lines)) + ["endif()"]
     else:
         return lines
 
@@ -88,20 +94,21 @@ def get_exe_additional_depends(t):
         "gmm-*": ["hmm", "transform", "lat", "decoder"],
     }
     if t in additional:
-        return list(map(lambda name: dir_name_to_lib_target(name), additional[t]))
+        return list(
+            map(lambda name: dir_name_to_lib_target(name), additional[t]))
     elif (t.split("-", 1)[0] + "-*") in additional:
         wildcard = (t.split("-", 1)[0] + "-*")
-        return list(map(lambda name: dir_name_to_lib_target(name), additional[wildcard]))
+        return list(
+            map(lambda name: dir_name_to_lib_target(name),
+                additional[wildcard]))
     else:
         return []
 
 
 def disable_for_win32(t):
     disabled = [
-        "online-audio-client",
-        "online-net-client",
-        "online2-tcp-nnet3-decode-faster",
-        "online-server-gmm-decode-faster",
+        "online-audio-client", "online-net-client",
+        "online2-tcp-nnet3-decode-faster", "online-server-gmm-decode-faster",
         "online-audio-server-decode-faster"
     ]
     return t in disabled
@@ -134,8 +141,8 @@ class CMakeListsHeaderLibrary(object):
             ret.append(")\n")
 
         ret.append("add_library(" + self.target_name + " INTERFACE)")
-        ret.append("target_include_directories(" +
-                   self.target_name + " INTERFACE ")
+        ret.append("target_include_directories(" + self.target_name +
+                   " INTERFACE ")
         ret.append("     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>")
         ret.append("     $<INSTALL_INTERFACE:include/kaldi>")
         ret.append(")\n")
@@ -150,7 +157,6 @@ install(FILES ${{PUBLIC_HEADERS}} DESTINATION include/kaldi/{dir})
 
 
 class CMakeListsLibrary(object):
-
     def __init__(self, dir_name):
         self.dir_name = dir_name
         self.target_name = dir_name_to_lib_target(self.dir_name)
@@ -207,8 +213,8 @@ class CMakeListsLibrary(object):
         for f in self.source_list:
             ret.append("    " + f)
         ret.append(")\n")
-        ret.append("target_include_directories(" +
-                   self.target_name + " PUBLIC ")
+        ret.append("target_include_directories(" + self.target_name +
+                   " PUBLIC ")
         ret.append("     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>")
         ret.append("     $<INSTALL_INTERFACE:include/kaldi>")
         ret.append(")\n")
@@ -221,7 +227,8 @@ class CMakeListsLibrary(object):
 
         def get_test_exe_name(filename):
             exe_name = os.path.splitext(f)[0]
-            if self.dir_name.startswith("nnet") and exe_name.startswith("nnet"):
+            if self.dir_name.startswith("nnet") and exe_name.startswith(
+                    "nnet"):
                 return self.dir_name + "-" + exe_name.split("-", 1)[1]
             else:
                 return exe_name
@@ -230,10 +237,13 @@ class CMakeListsLibrary(object):
             ret.append("if(KALDI_BUILD_TEST)")
             for f in self.test_source_list:
                 exe_target = get_test_exe_name(f)
-                depends = (self.target_name + " " +
-                           " ".join(get_exe_additional_depends(exe_target))).strip()
-                ret.extend(wrap_notwin32_condition(disable_for_win32(self.target_name),
-                                                   "    add_kaldi_test_executable(NAME " + exe_target + " SOURCES " + f + " DEPENDS " + depends + ")"))
+                depends = (self.target_name + " " + " ".join(
+                    get_exe_additional_depends(exe_target))).strip()
+                ret.extend(
+                    wrap_notwin32_condition(
+                        disable_for_win32(self.target_name),
+                        "    add_kaldi_test_executable(NAME " + exe_target +
+                        " SOURCES " + f + " DEPENDS " + depends + ")"))
             ret.append("endif()")
 
         ret.append("""
@@ -251,9 +261,8 @@ install(FILES ${{PUBLIC_HEADERS}} DESTINATION include/kaldi/{dir})
 
 
 class CMakeListsExecutable(object):
-
     def __init__(self, dir_name, filename):
-        assert(dir_name.endswith("bin"))
+        assert (dir_name.endswith("bin"))
         self.list = []
         exe_name = os.path.splitext(os.path.basename(filename))[0]
         file_name = filename
@@ -263,10 +272,13 @@ class CMakeListsExecutable(object):
     def gen_code(self):
         ret = []
         for exe_name, file_name, depend in self.list:
-            depends = (depend + " " +
-                       " ".join(get_exe_additional_depends(exe_name))).strip()
-            ret.extend(wrap_notwin32_condition(disable_for_win32(exe_name),
-                                               "add_kaldi_executable(NAME " + exe_name + " SOURCES " + file_name + " DEPENDS " + depends + ")"))
+            depends = (depend + " " + " ".join(
+                get_exe_additional_depends(exe_name))).strip()
+            ret.extend(
+                wrap_notwin32_condition(
+                    disable_for_win32(exe_name),
+                    "add_kaldi_executable(NAME " + exe_name + " SOURCES " +
+                    file_name + " DEPENDS " + depends + ")"))
 
         return "\n".join(ret)
 

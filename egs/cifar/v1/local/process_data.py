@@ -2,8 +2,6 @@
 
 # Copyright 2017 Johns Hopkins University (author: Hossein Hadian)
 # Apache 2.0
-
-
 """ This script prepares the training and test data for CIFAR-10 or CIFAR-100.
 """
 from __future__ import division
@@ -15,15 +13,16 @@ import sys
 parser = argparse.ArgumentParser(description="""Converts train/test data of
                                                 CIFAR-10 or CIFAR-100 to
                                                 Kaldi feature format""")
-parser.add_argument('database',
-                    default='data/dl/cifar-10-batches-bin',
-                    help='path to downloaded cifar data (binary version)')
+parser.add_argument(
+    'database',
+    default='data/dl/cifar-10-batches-bin',
+    help='path to downloaded cifar data (binary version)')
 parser.add_argument('dir', help='output dir')
-parser.add_argument('--cifar-version', default='CIFAR-10',
-                    choices=['CIFAR-10', 'CIFAR-100'])
+parser.add_argument(
+    '--cifar-version', default='CIFAR-10', choices=['CIFAR-10', 'CIFAR-100'])
 parser.add_argument('--dataset', default='train', choices=['train', 'test'])
-parser.add_argument('--out-ark', default='-',
-                    help='where to write output feature data')
+parser.add_argument(
+    '--out-ark', default='-', help='where to write output feature data')
 
 args = parser.parse_args()
 
@@ -41,8 +40,11 @@ def load_cifar10_data_batch(datafile):
         for i in range(num_images_in_batch):
             label = ord(fh.read(1))
             bin_img = fh.read(C * H * W)
-            img = [[[ord(byte)/255.0 for byte in bin_img[channel*H*W+row*W:channel*H*W+(row+1)*W]]
-                    for row in range(H)] for channel in range(C)]
+            img = [[[
+                ord(byte) / 255.0
+                for byte in bin_img[channel * H * W + row * W:channel * H * W +
+                                    (row + 1) * W]
+            ] for row in range(H)] for channel in range(C)]
             labels += [label]
             data += [img]
     return data, labels
@@ -57,8 +59,11 @@ def load_cifar100_data_batch(datafile, num_images_in_batch):
             coarse_label = ord(fh.read(1))
             fine_label = ord(fh.read(1))
             bin_img = fh.read(C * H * W)
-            img = [[[ord(byte)/255.0 for byte in bin_img[channel*H*W+row*W:channel*H*W+(row+1)*W]]
-                    for row in range(H)] for channel in range(C)]
+            img = [[[
+                ord(byte) / 255.0
+                for byte in bin_img[channel * H * W + row * W:channel * H * W +
+                                    (row + 1) * W]
+            ] for row in range(H)] for channel in range(C)]
             fine_labels += [fine_label]
             coarse_labels += [coarse_label]
             data += [img]
@@ -66,17 +71,17 @@ def load_cifar100_data_batch(datafile, num_images_in_batch):
 
 
 def image_to_feat_matrix(img):
-    mat = [0]*H  # 32 * 96
+    mat = [0] * H  # 32 * 96
     for i in range(W):
-        mat[i] = [0]*C*H
+        mat[i] = [0] * C * H
         for ch in range(C):
             for j in range(H):
-                mat[i][j*C+ch] = img[ch][j][i]
+                mat[i][j * C + ch] = img[ch][j][i]
     return mat
 
 
 def write_kaldi_matrix(file_handle, matrix, key):
-        # matrix is a list of lists
+    # matrix is a list of lists
     file_handle.write(key + "  [ ")
     num_rows = len(matrix)
     if num_rows == 0:
@@ -114,8 +119,8 @@ if cifar10:
 
     if args.dataset == 'train':
         for i in range(1, 6):
-            fpath = os.path.join(
-                args.database, 'data_batch_' + str(i) + '.bin')
+            fpath = os.path.join(args.database,
+                                 'data_batch_' + str(i) + '.bin')
             data, labels = load_cifar10_data_batch(fpath)
             for i in range(len(data)):
                 key = zeropad(img_id, 5)

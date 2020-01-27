@@ -14,17 +14,25 @@ sys.path.insert(0, 'steps/')
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="Create MUSAN corpus",
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--use-vocals", type=str,
-                        dest='use_vocals', default=True,
-                        action=common_lib.StrToBoolAction,
-                        choices=["true", "false"],
-                        help='use vocals from the music corpus')
-    parser.add_argument('--sampling-rate', type=int, default=16000,
-                        help="Sampling rate of the source data. If a positive integer is specified with this option, "
-                        "the MUSAN corpus will be resampled to the rate of the source data."
-                        "Original MUSAN corpus is sampled at 16KHz. Defaults to 16000 Hz")
+    parser = argparse.ArgumentParser(
+        description="Create MUSAN corpus",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        "--use-vocals",
+        type=str,
+        dest='use_vocals',
+        default=True,
+        action=common_lib.StrToBoolAction,
+        choices=["true", "false"],
+        help='use vocals from the music corpus')
+    parser.add_argument(
+        '--sampling-rate',
+        type=int,
+        default=16000,
+        help=
+        "Sampling rate of the source data. If a positive integer is specified with this option, "
+        "the MUSAN corpus will be resampled to the rate of the source data."
+        "Original MUSAN corpus is sampled at 16KHz. Defaults to 16000 Hz")
     parser.add_argument("in_dir", help="Input data directory")
     parser.add_argument("out_dir", help="Output data directory")
 
@@ -91,8 +99,8 @@ def prepare_music(root_dir, use_vocals, sampling_rate):
         else:
             print("Missing file {}".format(utt))
             num_bad_files += 1
-    print("In music directory, processed {} files; {} had missing wav data".format(
-        num_good_files, num_bad_files))
+    print("In music directory, processed {} files; {} had missing wav data".
+          format(num_good_files, num_bad_files))
     return utt2spk_str, utt2wav_str
 
 
@@ -124,8 +132,8 @@ def prepare_speech(root_dir, sampling_rate):
         else:
             print("Missing file {}".format(utt))
             num_bad_files += 1
-    print("In speech directory, processed {} files; {} had missing wav data".format(
-        num_good_files, num_bad_files))
+    print("In speech directory, processed {} files; {} had missing wav data".
+          format(num_good_files, num_bad_files))
     return utt2spk_str, utt2wav_str
 
 
@@ -157,8 +165,8 @@ def prepare_noise(root_dir, sampling_rate):
         else:
             print("Missing file {}".format(utt))
             num_bad_files += 1
-    print("In noise directory, processed {} files; {} had missing wav data".format(
-        num_good_files, num_bad_files))
+    print("In noise directory, processed {} files; {} had missing wav data".
+          format(num_good_files, num_bad_files))
     return utt2spk_str, utt2wav_str
 
 
@@ -169,8 +177,8 @@ def main():
     use_vocals = args.use_vocals
     sampling_rate = args.sampling_rate
 
-    utt2spk_music, utt2wav_music = prepare_music(
-        in_dir, use_vocals, sampling_rate)
+    utt2spk_music, utt2wav_music = prepare_music(in_dir, use_vocals,
+                                                 sampling_rate)
     utt2spk_speech, utt2wav_speech = prepare_speech(in_dir, sampling_rate)
     utt2spk_noise, utt2wav_noise = prepare_noise(in_dir, sampling_rate)
 

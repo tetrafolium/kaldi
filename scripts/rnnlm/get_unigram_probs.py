@@ -9,36 +9,46 @@ import sys
 
 import re
 
+parser = argparse.ArgumentParser(
+    description="This script gets the unigram probabilities of words.",
+    epilog="E.g. " + sys.argv[0] + " --vocab-file=data/rnnlm/vocab/words.txt "
+    "--data-weights-file=exp/rnnlm/data_weights.txt data/rnnlm/data "
+    "> exp/rnnlm/unigram_probs.txt",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-parser = argparse.ArgumentParser(description="This script gets the unigram probabilities of words.",
-                                 epilog="E.g. " +
-                                 sys.argv[0] +
-                                 " --vocab-file=data/rnnlm/vocab/words.txt "
-                                        "--data-weights-file=exp/rnnlm/data_weights.txt data/rnnlm/data "
-                                        "> exp/rnnlm/unigram_probs.txt",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-parser.add_argument("--vocab-file", type=str, default='', required=True,
-                    help="Specify the vocab file.")
-parser.add_argument("--unk-word", type=str, default='',
-                    help="String form of unknown word, e.g. <unk>.  Words in the counts "
-                    "but not present in the vocabulary will be mapped to this word. "
-                    "If the empty string, we act as if there is no unknown-word, and "
-                    "OOV words are treated as an error.")
-parser.add_argument("--data-weights-file", type=str, default='', required=True,
-                    help="File that specifies multiplicities and weights for each data source: "
-                    "e.g. if <text_dir> contains foo.txt and bar.txt, then should have lines "
-                    "like 'foo 1 0.5' and 'bar 5 1.5'.  These "
-                    "don't have to sum to one.")
-parser.add_argument("--smooth-unigram-counts", type=float, default=1.0,
-                    help="Specify the constant for smoothing. We will add "
-                         "(smooth_unigram_counts * num_words_with_non_zero_counts / vocab_size) "
-                         "to every unigram counts.")
-parser.add_argument("text_dir",
-                    help="Directory in which to look for data")
+parser.add_argument(
+    "--vocab-file",
+    type=str,
+    default='',
+    required=True,
+    help="Specify the vocab file.")
+parser.add_argument(
+    "--unk-word",
+    type=str,
+    default='',
+    help="String form of unknown word, e.g. <unk>.  Words in the counts "
+    "but not present in the vocabulary will be mapped to this word. "
+    "If the empty string, we act as if there is no unknown-word, and "
+    "OOV words are treated as an error.")
+parser.add_argument(
+    "--data-weights-file",
+    type=str,
+    default='',
+    required=True,
+    help="File that specifies multiplicities and weights for each data source: "
+    "e.g. if <text_dir> contains foo.txt and bar.txt, then should have lines "
+    "like 'foo 1 0.5' and 'bar 5 1.5'.  These "
+    "don't have to sum to one.")
+parser.add_argument(
+    "--smooth-unigram-counts",
+    type=float,
+    default=1.0,
+    help="Specify the constant for smoothing. We will add "
+    "(smooth_unigram_counts * num_words_with_non_zero_counts / vocab_size) "
+    "to every unigram counts.")
+parser.add_argument("text_dir", help="Directory in which to look for data")
 
 args = parser.parse_args()
-
 
 SPECIAL_SYMBOLS = ["<eps>", "<s>", "<brk>"]
 
@@ -66,13 +76,14 @@ def get_all_data_sources_except_dev(text_dir):
             else:
                 data_sources[name] = (None, full_path)
         else:
-            sys.exit(sys.argv[0] + ": Text directory should not contain files with suffixes "
+            sys.exit(sys.argv[0] +
+                     ": Text directory should not contain files with suffixes "
                      "other than .txt or .counts: " + f)
 
     for name, (txt_file, counts_file) in data_sources.items():
         if txt_file is None or counts_file is None:
-            sys.exit(
-                sys.argv[0] + ": Missing .txt or .counts file for data source: " + name)
+            sys.exit(sys.argv[0] +
+                     ": Missing .txt or .counts file for data source: " + name)
 
     return data_sources
 
@@ -89,7 +100,8 @@ def read_data_weights(weights_file, data_sources):
                 assert len(fields) == 3
                 if fields[0] in data_weights:
                     raise Exception("duplicated data source({0}) specified in "
-                                    "data-weights: {1}".format(fields[0], weights_file))
+                                    "data-weights: {1}".format(
+                                        fields[0], weights_file))
                 data_weights[fields[0]] = (int(fields[1]), float(fields[2]))
             except Exception as e:
                 sys.exit(sys.argv[0] + ": bad data-weights line: '" +
@@ -97,8 +109,8 @@ def read_data_weights(weights_file, data_sources):
 
     for name in data_sources.keys():
         if name not in data_weights:
-            sys.exit(
-                sys.argv[0] + ": Weight for data source '{0}' not set".format(name))
+            sys.exit(sys.argv[0] +
+                     ": Weight for data source '{0}' not set".format(name))
 
     return data_weights
 
@@ -112,8 +124,8 @@ def read_vocab(vocab_file):
             fields = line.split()
             assert len(fields) == 2
             if fields[0] in vocab:
-                sys.exit(sys.argv[0] + ": duplicated word({0}) in vocab: {1}"
-                                       .format(fields[0], vocab_file))
+                sys.exit(sys.argv[0] + ": duplicated word({0}) in vocab: {1}".
+                         format(fields[0], vocab_file))
             vocab[fields[0]] = int(fields[1])
 
     # check there is no duplication and no gap among word ids
@@ -121,8 +133,9 @@ def read_vocab(vocab_file):
     for idx, id in enumerate(sorted_ids):
         assert idx == id
     if args.unk_word != '' and args.unk_word not in vocab:
-        sys.exit(sys.argv[0] + "--unk-word={0} does not appear in vocab file {1}".format(
-            args.unk_word, vocab_file))
+        sys.exit(sys.argv[0] +
+                 "--unk-word={0} does not appear in vocab file {1}".format(
+                     args.unk_word, vocab_file))
     return vocab
 
 
@@ -140,15 +153,22 @@ def get_counts(data_sources, data_weights, vocab):
             for line in f:
                 fields = line.split()
                 if len(fields) != 2:
-                    print("Warning, should be 2 cols:", fields, line, file=sys.stderr)
-                assert(len(fields) == 2)
+                    print(
+                        "Warning, should be 2 cols:",
+                        fields,
+                        line,
+                        file=sys.stderr)
+                assert (len(fields) == 2)
                 word = fields[0]
                 count = fields[1]
                 if word not in vocab:
                     if args.unk_word == '':
-                        sys.exit(sys.argv[0] + ": error: an OOV word {0} is present in the "
-                                 "counts file {1} but you have not specified an unknown word to "
-                                 "map it to (--unk-word option).".format(word, counts_file))
+                        sys.exit(
+                            sys.argv[0] +
+                            ": error: an OOV word {0} is present in the "
+                            "counts file {1} but you have not specified an unknown word to "
+                            "map it to (--unk-word option).".format(
+                                word, counts_file))
                     else:
                         word = args.unk_word
                 counts[vocab[word]] += weight * int(fields[1])
@@ -170,7 +190,7 @@ def get_unigram_probs(vocab, counts, smooth_constant):
 
     if num_words_with_non_zero_counts < vocab_size and smooth_constant == 0.0:
         sys.exit(sys.argv[0] + ": --smooth-unigram-counts should not be zero, "
-                               "since there are words with zero-counts")
+                 "since there are words with zero-counts")
 
     smooth_count = smooth_constant * num_words_with_non_zero_counts / vocab_size
 
@@ -189,8 +209,9 @@ def get_unigram_probs(vocab, counts, smooth_constant):
 
 
 if os.system("rnnlm/ensure_counts_present.sh {0}".format(args.text_dir)) != 0:
-    print(sys.argv[0] + ": command 'rnnlm/ensure_counts_present.sh {0}' failed.".format(
-        args.text_dir))
+    print(sys.argv[0] +
+          ": command 'rnnlm/ensure_counts_present.sh {0}' failed.".format(
+              args.text_dir))
 
 data_sources = get_all_data_sources_except_dev(args.text_dir)
 data_weights = read_data_weights(args.data_weights_file, data_sources)

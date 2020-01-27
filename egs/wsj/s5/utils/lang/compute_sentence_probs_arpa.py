@@ -9,21 +9,30 @@ import argparse
 import sys
 import math
 
-parser = argparse.ArgumentParser(description="This script evaluates the log probabilty (default log base is e) of each sentence "
-                                             "from data (in text form), given a language model in arpa form "
-                                             "and a specific ngram order.",
-                                 epilog="e.g. ./compute_sentence_probs_arpa.py ARPA_LM NGRAM_ORDER TEXT_IN PROB_FILE --log-base=LOG_BASE",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("arpa_lm", type=str,
-                    help="Input language model in arpa form.")
-parser.add_argument("ngram_order", type=int,
-                    help="Order of ngram")
-parser.add_argument("text_in", type=str,
-                    help="Filename of input text file (each line will be interpreted as a sentence).")
-parser.add_argument("prob_file", type=str,
-                    help="Filename of output probability file.")
-parser.add_argument("--log-base", type=float, default=math.exp(1),
-                    help="Log base for log porbability")
+parser = argparse.ArgumentParser(
+    description=
+    "This script evaluates the log probabilty (default log base is e) of each sentence "
+    "from data (in text form), given a language model in arpa form "
+    "and a specific ngram order.",
+    epilog=
+    "e.g. ./compute_sentence_probs_arpa.py ARPA_LM NGRAM_ORDER TEXT_IN PROB_FILE --log-base=LOG_BASE",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument(
+    "arpa_lm", type=str, help="Input language model in arpa form.")
+parser.add_argument("ngram_order", type=int, help="Order of ngram")
+parser.add_argument(
+    "text_in",
+    type=str,
+    help=
+    "Filename of input text file (each line will be interpreted as a sentence)."
+)
+parser.add_argument(
+    "prob_file", type=str, help="Filename of output probability file.")
+parser.add_argument(
+    "--log-base",
+    type=float,
+    default=math.exp(1),
+    help="Log base for log porbability")
 args = parser.parse_args()
 
 
@@ -34,7 +43,8 @@ def check_args(args):
         args.prob_file, "w")
     if args.log_base <= 0:
         sys.exit(
-            "compute_sentence_probs_arpa.py: Invalid log base (must be greater than 0)")
+            "compute_sentence_probs_arpa.py: Invalid log base (must be greater than 0)"
+        )
 
 
 def is_logprob(input):
@@ -59,6 +69,7 @@ def check_number(model_file, tot_num):
             cur_num += int(line.split("=")[-1])
             max_ngram_order = int(line.split("=")[0].split()[-1])
 
+
 # This function load language model in arpa form and save in a dictionary for
 # computing sentence probabilty of input text file.
 
@@ -71,7 +82,8 @@ def load_model(model_file):
         # check arpa form
         if lines[0][:-1] != "\\data\\":
             sys.exit(
-                "compute_sentence_probs_arpa.py: Please make sure that language model is in arpa form.")
+                "compute_sentence_probs_arpa.py: Please make sure that language model is in arpa form."
+            )
 
         # read line
         for line in lines:
@@ -81,14 +93,16 @@ def load_model(model_file):
                     ngram_key = " ".join(line_split[1:-1])
                     if ngram_key in ngram_dict:
                         sys.exit(
-                            "compute_sentence_probs_arpa.py: Duplicated ngram in arpa language model: {}.".format(ngram_key))
+                            "compute_sentence_probs_arpa.py: Duplicated ngram in arpa language model: {}."
+                            .format(ngram_key))
                     ngram_dict[ngram_key] = (line_split[0], line_split[-1])
                 else:
                     ngram_key = " ".join(line_split[1:])
                     if ngram_key in ngram_dict:
                         sys.exit(
-                            "compute_sentence_probs_arpa.py: Duplicated ngram in arpa language model: {}.".format(ngram_key))
-                    ngram_dict[ngram_key] = (line_split[0],)
+                            "compute_sentence_probs_arpa.py: Duplicated ngram in arpa language model: {}."
+                            .format(ngram_key))
+                    ngram_dict[ngram_key] = (line_split[0], )
 
     return ngram_dict, len(ngram_dict)
 
@@ -96,7 +110,8 @@ def load_model(model_file):
 def compute_sublist_prob(sub_list):
     if len(sub_list) == 0:
         sys.exit(
-            "compute_sentence_probs_arpa.py: Ngram substring not found in arpa language model, please check.")
+            "compute_sentence_probs_arpa.py: Ngram substring not found in arpa language model, please check."
+        )
 
     sub_string = " ".join(sub_list)
     if sub_string in ngram_dict:
@@ -113,6 +128,7 @@ def compute_begin_prob(sub_list):
     for i in range(1, len(sub_list) - 1):
         logprob += compute_sublist_prob(sub_list[:i + 1])
     return logprob
+
 
 # The probability is computed in this way:
 # p(word_N | word_N-1 ... word_1) = ngram_dict[word_1 ... word_N][0].
@@ -139,7 +155,7 @@ def compute_sentence_prob(sentence, ngram_order):
         logprob += compute_begin_prob(begin_sublist)
 
         for i in range(sen_length - ngram_order + 1):
-            cur_sublist = sentence_split[i: i + ngram_order]
+            cur_sublist = sentence_split[i:i + ngram_order]
             logprob += compute_sublist_prob(cur_sublist)
 
     return logprob
@@ -165,7 +181,9 @@ if __name__ == "__main__":
     if not num_valid:
         sys.exit("compute_sentence_probs_arpa.py: Wrong loading model.")
     if args.ngram_order <= 0 or args.ngram_order > max_ngram_order:
-        sys.exit("compute_sentence_probs_arpa.py: " +
-                 "Invalid ngram_order (either negative or greater than maximum ngram number ({}) allowed)".format(max_ngram_order))
+        sys.exit(
+            "compute_sentence_probs_arpa.py: " +
+            "Invalid ngram_order (either negative or greater than maximum ngram number ({}) allowed)"
+            .format(max_ngram_order))
 
     output_result(args.text_in_handle, args.prob_file_handle, args.ngram_order)

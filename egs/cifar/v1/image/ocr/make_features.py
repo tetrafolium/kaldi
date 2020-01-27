@@ -5,7 +5,6 @@
 #                2017  Yiwen Shao
 #                2018  Hossein Hadian
 #                2018  Desh Raj
-
 """ This script converts images to Kaldi-format feature matrices. The input to
     this script is the path to a data directory, e.g. "data/train". This script
     reads the images listed in images.scp and writes them to standard output
@@ -30,29 +29,52 @@ import math
 from signal import signal, SIGPIPE, SIG_DFL
 signal(SIGPIPE, SIG_DFL)
 
-parser = argparse.ArgumentParser(description="""Converts images (in 'dir'/images.scp) to features and
-                                                writes them to standard output in text format.""")
-parser.add_argument('images_scp_path', type=str,
-                    help='Path of images.scp file')
-parser.add_argument('--allowed_len_file_path', type=str, default=None,
-                    help='If supplied, each images will be padded to reach the '
-                    'target length (this overrides --padding).')
-parser.add_argument('--out-ark', type=str, default='-',
-                    help='Where to write the output feature file')
-parser.add_argument('--feat-dim', type=int, default=40,
-                    help='Size to scale the height of all images')
-parser.add_argument('--padding', type=int, default=5,
-                    help='Number of white pixels to pad on the left'
-                    'and right side of the image.')
-parser.add_argument('--num-channels', type=int, default=1,
-                    help='Number of color channels')
-parser.add_argument('--vertical-shift', type=int, default=0,
-                    help='total number of padding pixel per column')
-parser.add_argument('--fliplr', type=lambda x: (str(x).lower() == 'true'), default=False,
-                    help="Flip the image left-right for right to left languages")
-parser.add_argument('--augment_type', type=str, default='no_aug',
-                    choices=['no_aug', 'random_scale', 'random_shift'],
-                    help='Subset of data to process.')
+parser = argparse.ArgumentParser(
+    description="""Converts images (in 'dir'/images.scp) to features and
+                                                writes them to standard output in text format."""
+)
+parser.add_argument(
+    'images_scp_path', type=str, help='Path of images.scp file')
+parser.add_argument(
+    '--allowed_len_file_path',
+    type=str,
+    default=None,
+    help='If supplied, each images will be padded to reach the '
+    'target length (this overrides --padding).')
+parser.add_argument(
+    '--out-ark',
+    type=str,
+    default='-',
+    help='Where to write the output feature file')
+parser.add_argument(
+    '--feat-dim',
+    type=int,
+    default=40,
+    help='Size to scale the height of all images')
+parser.add_argument(
+    '--padding',
+    type=int,
+    default=5,
+    help='Number of white pixels to pad on the left'
+    'and right side of the image.')
+parser.add_argument(
+    '--num-channels', type=int, default=1, help='Number of color channels')
+parser.add_argument(
+    '--vertical-shift',
+    type=int,
+    default=0,
+    help='total number of padding pixel per column')
+parser.add_argument(
+    '--fliplr',
+    type=lambda x: (str(x).lower() == 'true'),
+    default=False,
+    help="Flip the image left-right for right to left languages")
+parser.add_argument(
+    '--augment_type',
+    type=str,
+    default='no_aug',
+    choices=['no_aug', 'random_scale', 'random_shift'],
+    help='Subset of data to process.')
 args = parser.parse_args()
 
 
@@ -91,15 +113,19 @@ def horizontal_pad(im, allowed_lengths=None):
         right_padding = padding - left_padding
     dim_y = im.shape[0]  # height
     if args.num_channels in [1, 4]:
-        im_pad = np.concatenate((255 * np.ones((dim_y, left_padding),
-                                               dtype=int), im), axis=1)
-        im_pad1 = np.concatenate((im_pad, 255 * np.ones((dim_y, right_padding),
-                                                        dtype=int)), axis=1)
+        im_pad = np.concatenate((255 * np.ones(
+            (dim_y, left_padding), dtype=int), im),
+                                axis=1)
+        im_pad1 = np.concatenate((im_pad, 255 * np.ones(
+            (dim_y, right_padding), dtype=int)),
+                                 axis=1)
     else:
-        im_pad = np.concatenate((255 * np.ones((dim_y, left_padding, args.num_channels),
-                                               dtype=int), im), axis=1)
-        im_pad1 = np.concatenate((im_pad, 255 * np.ones((dim_y, right_padding, args.num_channels),
-                                                        dtype=int)), axis=1)
+        im_pad = np.concatenate((255 * np.ones(
+            (dim_y, left_padding, args.num_channels), dtype=int), im),
+                                axis=1)
+        im_pad1 = np.concatenate((im_pad, 255 * np.ones(
+            (dim_y, right_padding, args.num_channels), dtype=int)),
+                                 axis=1)
     return im_pad1
 
 
@@ -144,12 +170,15 @@ def vertical_shift(im, mode='normal'):
         top = random.randint(0, total / 2)
         bottom = total - top
     width = im.shape[1]
+    im_pad = np.concatenate((255 * np.ones(
+        (top, width), dtype=int) - np.random.normal(2, 1,
+                                                    (top, width)).astype(int),
+                             im),
+                            axis=0)
     im_pad = np.concatenate(
-        (255 * np.ones((top, width), dtype=int) -
-         np.random.normal(2, 1, (top, width)).astype(int), im), axis=0)
-    im_pad = np.concatenate(
-        (im_pad, 255 * np.ones((bottom, width), dtype=int) -
-         np.random.normal(2, 1, (bottom, width)).astype(int)), axis=0)
+        (im_pad, 255 * np.ones((bottom, width), dtype=int) - np.random.normal(
+            2, 1, (bottom, width)).astype(int)),
+        axis=0)
     return im_pad
 
 
@@ -169,8 +198,10 @@ if os.path.isfile(allowed_len_handle):
     with open(allowed_len_handle) as f:
         for line in f:
             allowed_lengths.append(int(line.strip()))
-    print("Read {} allowed lengths and will apply them to the "
-          "features.".format(len(allowed_lengths)), file=sys.stderr)
+    print(
+        "Read {} allowed lengths and will apply them to the "
+        "features.".format(len(allowed_lengths)),
+        file=sys.stderr)
 
 num_fail = 0
 num_ok = 0
@@ -209,5 +240,7 @@ with open(data_list_path) as f:
         num_ok += 1
         write_kaldi_matrix(out_fh, data, image_id)
 
-print('Generated features for {} images. Failed for {} (image too '
-      'long).'.format(num_ok, num_fail), file=sys.stderr)
+print(
+    'Generated features for {} images. Failed for {} (image too '
+    'long).'.format(num_ok, num_fail),
+    file=sys.stderr)

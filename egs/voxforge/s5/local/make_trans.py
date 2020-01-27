@@ -2,7 +2,6 @@
 
 # Copyright 2012 Vassil Panayotov
 # Apache 2.0
-
 """
 Takes a "PROMPTS" file with lines like:
 1snoke-20120412-hge/mfc/a0405 IT SEEMED THE ORDAINED ORDER OF THINGS THAT DOGS SHOULD WORK

@@ -21,7 +21,7 @@ import re
 import sys
 
 if len(sys.argv) != 2:
-    print ('Usage: python lang_prep.py [an4_root]')
+    print('Usage: python lang_prep.py [an4_root]')
     sys.exit(1)
 an4_root = sys.argv[1]
 

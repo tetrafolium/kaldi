@@ -9,34 +9,31 @@ import subprocess
 import sys
 import re
 
+parser = argparse.ArgumentParser(
+    description="This script works out the embedding dimension from a "
+    "nnet3 neural network (e.g. 0.raw).  It does this by invoking "
+    "nnet3-info to print information about the neural network, and "
+    "parsing it.  You should make sure nnet3-info is on your path "
+    "before you call this script.  It is an error if the input and "
+    "output dimensions of the neural network are not the same.  This "
+    "script prints the embedding dimension to the standard output.",
+    epilog="E.g. " + sys.argv[0] + " 0.raw",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-parser = argparse.ArgumentParser(description="This script works out the embedding dimension from a "
-                                 "nnet3 neural network (e.g. 0.raw).  It does this by invoking "
-                                 "nnet3-info to print information about the neural network, and "
-                                 "parsing it.  You should make sure nnet3-info is on your path "
-                                 "before you call this script.  It is an error if the input and "
-                                 "output dimensions of the neural network are not the same.  This "
-                                 "script prints the embedding dimension to the standard output.",
-                                 epilog="E.g. " + sys.argv[0] + " 0.raw",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-
-parser.add_argument("nnet",
-                    help="Path for raw neural net (e.g. 0.raw)")
+parser.add_argument("nnet", help="Path for raw neural net (e.g. 0.raw)")
 
 args = parser.parse_args()
 
 if not os.path.exists(args.nnet):
-    sys.exit(
-        sys.argv[0] + ": input neural net '{0}' does not exist.".format(args.nnet))
+    sys.exit(sys.argv[0] +
+             ": input neural net '{0}' does not exist.".format(args.nnet))
 
 proc = subprocess.Popen(["nnet3-info", args.nnet], stdout=subprocess.PIPE)
 out_lines = proc.stdout.readlines()
 proc.communicate()
 if proc.returncode != 0:
-    sys.exit(
-        sys.argv[0] + ": error running command 'nnet3-info {0}'".format(args.nnet))
-
+    sys.exit(sys.argv[0] +
+             ": error running command 'nnet3-info {0}'".format(args.nnet))
 
 # we're looking for lines like:
 # input-node name=input dim=600
@@ -91,16 +88,16 @@ if right_context > 0:
              "future.".format(args.nnet, left_context))
 
 if left_context > 0:
-    sys.exit(sys.argv[0] + ": left-context of model {0} is >0: (it's {1}). "
-             "This model cannot be used as an RNNLM because it requires left "
-             "context and the code does not support this.  You can generally use "
-             "IfDefined() in descriptors, and set configs of layers, in such "
-             "a way that left-context is not required"
-             "".format(args.nnet, left_context))
+    sys.exit(
+        sys.argv[0] + ": left-context of model {0} is >0: (it's {1}). "
+        "This model cannot be used as an RNNLM because it requires left "
+        "context and the code does not support this.  You can generally use "
+        "IfDefined() in descriptors, and set configs of layers, in such "
+        "a way that left-context is not required"
+        "".format(args.nnet, left_context))
 
 if input_dim != output_dim:
     sys.exit(sys.argv[0] + ": input and output dims differ for "
-             "nnet '{0}': {1} != {2}".format(
-        args.nnet, input_dim, output_dim))
+             "nnet '{0}': {1} != {2}".format(args.nnet, input_dim, output_dim))
 
 print('{}'.format(input_dim))

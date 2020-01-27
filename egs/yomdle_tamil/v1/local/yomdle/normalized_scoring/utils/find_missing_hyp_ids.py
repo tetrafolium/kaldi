@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script finds and prints the hypothesis utterance ids which
     are not present in the reference utterance ids.
     Eg. find_missing_hyp_ids.py <ref-file> <hyp-file>
@@ -18,7 +17,9 @@ ref_file = sys.argv[2]
 
 def main():
 
-    with open(hyp_file, 'r', encoding='utf-8') as hyp_fh, open(ref_file, 'r', encoding='utf-8') as ref_fh:
+    with open(
+            hyp_file, 'r', encoding='utf-8') as hyp_fh, open(
+                ref_file, 'r', encoding='utf-8') as ref_fh:
         ref_ids = set()
         for utt, uttid in SnorIter(ref_fh):
             ref_ids.add(uttid)

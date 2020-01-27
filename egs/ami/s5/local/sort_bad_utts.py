@@ -10,15 +10,17 @@ logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
 handler.setLevel(logging.INFO)
 formatter = logging.Formatter(
-    '%(asctime)s [%(filename)s:%(lineno)s - %(funcName)s - %(levelname)s ] %(message)s')
+    '%(asctime)s [%(filename)s:%(lineno)s - %(funcName)s - %(levelname)s ] %(message)s'
+)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
 def GetArgs():
     # we add compulsary arguments as named arguments for readability
-    parser = argparse.ArgumentParser(description=""" """,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=""" """,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     # feat options
     parser.add_argument("--bad-utt-info-file", type=str, required=True)
@@ -36,7 +38,7 @@ def GetSortedWers(utt_info_file):
     for line in open(utt_info_file, 'r'):
         parts = line.split()
         utt = parts[0]
-        wer = float(parts[1])/float(parts[2])*100
+        wer = float(parts[1]) / float(parts[2]) * 100
         utt_wer.append([utt, wer])
 
     utt_wer_sorted = sorted(utt_wer, key=lambda k: k[1])
@@ -50,8 +52,9 @@ def GetSortedWers(utt_info_file):
         num_utts = len(utt_wer)
         string = ''
         for i in range(len(hist)):
-            string += '[{0}, {1}] {2}\n'.format(bin_edges[i],
-                                                bin_edges[i+1], float(hist[i])/num_utts * 100)
+            string += '[{0}, {1}] {2}\n'.format(
+                bin_edges[i], bin_edges[i + 1],
+                float(hist[i]) / num_utts * 100)
         logger.info("The histogram is \n {0}".format(string))
     except ImportError:
         pass

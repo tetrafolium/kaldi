@@ -24,7 +24,6 @@ import traceback
 
 sys.path.insert(0, 'steps')
 
-
 logger = logging.getLogger('libs')
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
@@ -50,51 +49,77 @@ def get_args():
         cross-entropy objective.  DNNs include simple DNNs, TDNNs and CNNs.""",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         conflict_handler='resolve',
-        parents=[common_train_lib.CommonParser(include_chunk_context=False).parser])
+        parents=[
+            common_train_lib.CommonParser(include_chunk_context=False).parser
+        ])
 
     # egs extraction options
-    parser.add_argument("--egs.frames-per-eg", type=int, dest='frames_per_eg',
-                        default=8,
-                        help="Number of output labels per example")
+    parser.add_argument(
+        "--egs.frames-per-eg",
+        type=int,
+        dest='frames_per_eg',
+        default=8,
+        help="Number of output labels per example")
 
     # trainer options
-    parser.add_argument("--trainer.input-model", type=str,
-                        dest='input_model', default=None,
-                        action=common_lib.NullstrToNoneAction,
-                        help="""If specified, this model is used as initial
+    parser.add_argument(
+        "--trainer.input-model",
+        type=str,
+        dest='input_model',
+        default=None,
+        action=common_lib.NullstrToNoneAction,
+        help="""If specified, this model is used as initial
                         raw model (0.raw in the script) instead of initializing
                         the model from xconfig. Configs dir is not expected to
                         exist and left/right context is computed from this
                         model.""")
-    parser.add_argument("--trainer.prior-subset-size", type=int,
-                        dest='prior_subset_size', default=20000,
-                        help="Number of samples for computing priors")
-    parser.add_argument("--trainer.num-jobs-compute-prior", type=int,
-                        dest='num_jobs_compute_prior', default=10,
-                        help="The prior computation jobs are single "
-                        "threaded and run on the CPU")
+    parser.add_argument(
+        "--trainer.prior-subset-size",
+        type=int,
+        dest='prior_subset_size',
+        default=20000,
+        help="Number of samples for computing priors")
+    parser.add_argument(
+        "--trainer.num-jobs-compute-prior",
+        type=int,
+        dest='num_jobs_compute_prior',
+        default=10,
+        help="The prior computation jobs are single "
+        "threaded and run on the CPU")
 
     # Parameters for the optimization
-    parser.add_argument("--trainer.optimization.minibatch-size",
-                        type=str, dest='minibatch_size', default='512',
-                        help="""Size of the minibatch used in SGD training
+    parser.add_argument(
+        "--trainer.optimization.minibatch-size",
+        type=str,
+        dest='minibatch_size',
+        default='512',
+        help="""Size of the minibatch used in SGD training
                         (argument to nnet3-merge-egs); may be a more general
                         rule as accepted by the --minibatch-size option of
                         nnet3-merge-egs; run that program without args to see
                         the format.""")
 
     # General options
-    parser.add_argument("--feat-dir", type=str, required=False,
-                        help="Directory with features used for training "
-                        "the neural network.")
-    parser.add_argument("--lang", type=str, required=False,
-                        help="Language directory")
-    parser.add_argument("--ali-dir", type=str, required=True,
-                        help="Directory with alignments used for training "
-                        "the neural network.")
-    parser.add_argument("--dir", type=str, required=True,
-                        help="Directory to store the models and "
-                        "all other files.")
+    parser.add_argument(
+        "--feat-dir",
+        type=str,
+        required=False,
+        help="Directory with features used for training "
+        "the neural network.")
+    parser.add_argument(
+        "--lang", type=str, required=False, help="Language directory")
+    parser.add_argument(
+        "--ali-dir",
+        type=str,
+        required=True,
+        help="Directory with alignments used for training "
+        "the neural network.")
+    parser.add_argument(
+        "--dir",
+        type=str,
+        required=True,
+        help="Directory to store the models and "
+        "all other files.")
 
     print(' '.join(sys.argv), file=sys.stderr)
     print(sys.argv, file=sys.stderr)
@@ -121,11 +146,12 @@ def process_args(args):
         raise Exception("Directory specified with --dir={0} "
                         "does not exist.".format(args.dir))
     if (not os.path.exists(args.dir + "/configs") and
-            (args.input_model is None or not os.path.exists(args.input_model))):
-        raise Exception("Either --trainer.input-model option should be supplied, "
-                        "and exist; or the {0}/configs directory should exist."
-                        "{0}/configs is the output of make_configs.py"
-                        "".format(args.dir))
+        (args.input_model is None or not os.path.exists(args.input_model))):
+        raise Exception(
+            "Either --trainer.input-model option should be supplied, "
+            "and exist; or the {0}/configs directory should exist."
+            "{0}/configs is the output of make_configs.py"
+            "".format(args.dir))
 
     # set the options corresponding to args.use_gpu
     run_opts = common_train_lib.RunOpts()
@@ -159,8 +185,7 @@ def process_args(args):
 
     run_opts.command = args.command
     run_opts.egs_command = (args.egs_command
-                            if args.egs_command is not None else
-                            args.command)
+                            if args.egs_command is not None else args.command)
     run_opts.num_jobs_compute_prior = args.num_jobs_compute_prior
 
     return [args, run_opts]
@@ -228,11 +253,10 @@ def train(args, run_opts):
        (args.input_model is None):
         logger.info("Initializing a basic network for estimating "
                     "preconditioning matrix")
-        common_lib.execute_command(
-            """{command} {dir}/log/nnet_init.log \
+        common_lib.execute_command("""{command} {dir}/log/nnet_init.log \
                     nnet3-init --srand=-2 {dir}/configs/init.config \
-                    {dir}/init.raw""".format(command=run_opts.command,
-                                             dir=args.dir))
+                    {dir}/init.raw""".format(
+            command=run_opts.command, dir=args.dir))
 
     default_egs_dir = '{0}/egs'.format(args.dir)
     if (args.stage <= -4) and args.egs_dir is None:
@@ -243,8 +267,11 @@ def train(args, run_opts):
                 "--feat-dir option is required if you don't supply --egs-dir")
 
         train_lib.acoustic_model.generate_egs(
-            data=args.feat_dir, alidir=args.ali_dir, egs_dir=default_egs_dir,
-            left_context=left_context, right_context=right_context,
+            data=args.feat_dir,
+            alidir=args.ali_dir,
+            egs_dir=default_egs_dir,
+            left_context=left_context,
+            right_context=right_context,
             run_opts=run_opts,
             frames_per_eg_str=str(args.frames_per_eg),
             srand=args.srand,
@@ -260,10 +287,9 @@ def train(args, run_opts):
         egs_dir = args.egs_dir
 
     [egs_left_context, egs_right_context,
-     frames_per_eg_str, num_archives] = (
-         common_train_lib.verify_egs_dir(egs_dir, feat_dim,
-                                         ivector_dim, ivector_id,
-                                         left_context, right_context))
+     frames_per_eg_str, num_archives] = (common_train_lib.verify_egs_dir(
+         egs_dir, feat_dim, ivector_dim, ivector_id, left_context,
+         right_context))
     assert str(args.frames_per_eg) == frames_per_eg_str
 
     if args.num_jobs_final > num_archives:
@@ -274,29 +300,35 @@ def train(args, run_opts):
     # use during decoding
     common_train_lib.copy_egs_properties_to_exp_dir(egs_dir, args.dir)
 
-    if args.stage <= -3 and os.path.exists(args.dir+"/configs/init.config") and (args.input_model is None):
+    if args.stage <= -3 and os.path.exists(
+            args.dir + "/configs/init.config") and (args.input_model is None):
         logger.info('Computing the preconditioning matrix for input features')
 
         train_lib.common.compute_preconditioning_matrix(
-            args.dir, egs_dir, num_archives, run_opts,
+            args.dir,
+            egs_dir,
+            num_archives,
+            run_opts,
             max_lda_jobs=args.max_lda_jobs,
             rand_prune=args.rand_prune)
 
     if args.stage <= -2 and (args.input_model is None):
-        logger.info("Computing initial vector for FixedScaleComponent before"
-                    " softmax, using priors^{prior_scale} and rescaling to"
-                    " average 1".format(
-                        prior_scale=args.presoftmax_prior_scale_power))
+        logger.info(
+            "Computing initial vector for FixedScaleComponent before"
+            " softmax, using priors^{prior_scale} and rescaling to"
+            " average 1".format(prior_scale=args.presoftmax_prior_scale_power))
 
         common_train_lib.compute_presoftmax_prior_scale(
-            args.dir, args.ali_dir, num_jobs, run_opts,
+            args.dir,
+            args.ali_dir,
+            num_jobs,
+            run_opts,
             presoftmax_prior_scale_power=args.presoftmax_prior_scale_power)
 
     if args.stage <= -1:
         logger.info("Preparing the initial acoustic model.")
         train_lib.acoustic_model.prepare_initial_acoustic_model(
-            args.dir, args.ali_dir, run_opts,
-            input_model=args.input_model)
+            args.dir, args.ali_dir, run_opts, input_model=args.input_model)
 
     # set num_iters so that as close as possible, we process the data
     # $num_epochs times, i.e. $num_iters*$avg_num_jobs) ==
@@ -312,9 +344,8 @@ def train(args, run_opts):
     # Otherwise, models_to_combine will be none.
     if args.do_final_combination:
         models_to_combine = common_train_lib.get_model_combine_iters(
-            num_iters, args.num_epochs,
-            num_archives_expanded, args.max_models_combine,
-            args.num_jobs_final)
+            num_iters, args.num_epochs, num_archives_expanded,
+            args.max_models_combine, args.num_jobs_final)
     else:
         models_to_combine = None
 
@@ -327,35 +358,32 @@ def train(args, run_opts):
             return
 
         current_num_jobs = common_train_lib.get_current_num_jobs(
-            iter, num_iters,
-            args.num_jobs_initial, args.num_jobs_step, args.num_jobs_final)
+            iter, num_iters, args.num_jobs_initial, args.num_jobs_step,
+            args.num_jobs_final)
 
         if args.stage <= iter:
-            lrate = common_train_lib.get_learning_rate(iter, current_num_jobs,
-                                                       num_iters,
-                                                       num_archives_processed,
-                                                       num_archives_to_process,
-                                                       args.initial_effective_lrate,
-                                                       args.final_effective_lrate)
+            lrate = common_train_lib.get_learning_rate(
+                iter, current_num_jobs, num_iters, num_archives_processed,
+                num_archives_to_process, args.initial_effective_lrate,
+                args.final_effective_lrate)
             shrinkage_value = 1.0 - (args.proportional_shrink * lrate)
             if shrinkage_value <= 0.5:
-                raise Exception("proportional-shrink={0} is too large, it gives "
-                                "shrink-value={1}".format(args.proportional_shrink,
-                                                          shrinkage_value))
+                raise Exception(
+                    "proportional-shrink={0} is too large, it gives "
+                    "shrink-value={1}".format(args.proportional_shrink,
+                                              shrinkage_value))
 
             percent = num_archives_processed * 100.0 / num_archives_to_process
-            epoch = (num_archives_processed * args.num_epochs
-                     / num_archives_to_process)
+            epoch = (num_archives_processed * args.num_epochs /
+                     num_archives_to_process)
             shrink_info_str = ''
             if shrinkage_value != 1.0:
                 shrink_info_str = 'shrink: {0:0.5f}'.format(shrinkage_value)
             logger.info("Iter: {0}/{1}   Jobs: {2}   "
                         "Epoch: {3:0.2f}/{4:0.1f} ({5:0.1f}% complete)   "
-                        "lr: {6:0.6f}   {7}".format(iter, num_iters - 1,
-                                                    current_num_jobs,
-                                                    epoch, args.num_epochs,
-                                                    percent,
-                                                    lrate, shrink_info_str))
+                        "lr: {6:0.6f}   {7}".format(
+                            iter, num_iters - 1, current_num_jobs, epoch,
+                            args.num_epochs, percent, lrate, shrink_info_str))
 
             train_lib.common.train_one_iteration(
                 dir=args.dir,
@@ -382,16 +410,17 @@ def train(args, run_opts):
             if args.cleanup:
                 # do a clean up everythin but the last 2 models, under certain
                 # conditions
-                common_train_lib.remove_model(
-                    args.dir, iter-2, num_iters, models_to_combine,
-                    args.preserve_model_interval)
+                common_train_lib.remove_model(args.dir, iter - 2, num_iters,
+                                              models_to_combine,
+                                              args.preserve_model_interval)
 
             if args.email is not None:
                 reporting_iter_interval = num_iters * args.reporting_interval
                 if iter % reporting_iter_interval == 0:
                     # lets do some reporting
-                    [report, times, data] = (
-                        nnet3_log_parse.generate_acc_logprob_report(args.dir))
+                    [report, times,
+                     data] = (nnet3_log_parse.generate_acc_logprob_report(
+                         args.dir))
                     message = report
                     subject = ("Update : Expt {dir} : "
                                "Iter {iter}".format(dir=args.dir, iter=iter))
@@ -403,10 +432,12 @@ def train(args, run_opts):
         if args.do_final_combination:
             logger.info("Doing final combination to produce final.mdl")
             train_lib.common.combine_models(
-                dir=args.dir, num_iters=num_iters,
+                dir=args.dir,
+                num_iters=num_iters,
                 models_to_combine=models_to_combine,
                 egs_dir=egs_dir,
-                minibatch_size_str=args.minibatch_size, run_opts=run_opts,
+                minibatch_size_str=args.minibatch_size,
+                run_opts=run_opts,
                 max_objective_evaluations=args.max_objective_evaluations)
 
     if args.stage <= num_iters + 1:
@@ -417,16 +448,20 @@ def train(args, run_opts):
         # Otherwise, we will use the last_numbered model.
         real_iter = 'combined' if args.do_final_combination else num_iters
         avg_post_vec_file = train_lib.common.compute_average_posterior(
-            dir=args.dir, iter=real_iter,
-            egs_dir=egs_dir, num_archives=num_archives,
-            prior_subset_size=args.prior_subset_size, run_opts=run_opts)
+            dir=args.dir,
+            iter=real_iter,
+            egs_dir=egs_dir,
+            num_archives=num_archives,
+            prior_subset_size=args.prior_subset_size,
+            run_opts=run_opts)
 
         logger.info("Re-adjusting priors based on computed posteriors")
-        combined_or_last_numbered_model = "{dir}/{iter}.mdl".format(dir=args.dir,
-                                                                    iter=real_iter)
+        combined_or_last_numbered_model = "{dir}/{iter}.mdl".format(
+            dir=args.dir, iter=real_iter)
         final_model = "{dir}/final.mdl".format(dir=args.dir)
-        train_lib.common.adjust_am_priors(args.dir, combined_or_last_numbered_model,
-                                          avg_post_vec_file, final_model, run_opts)
+        train_lib.common.adjust_am_priors(
+            args.dir, combined_or_last_numbered_model, avg_post_vec_file,
+            final_model, run_opts)
 
     if args.cleanup:
         logger.info("Cleaning up the experiment directory "
@@ -438,16 +473,19 @@ def train(args, run_opts):
             remove_egs = False
 
         common_train_lib.clean_nnet_dir(
-            nnet_dir=args.dir, num_iters=num_iters, egs_dir=egs_dir,
+            nnet_dir=args.dir,
+            num_iters=num_iters,
+            egs_dir=egs_dir,
             preserve_model_interval=args.preserve_model_interval,
             remove_egs=remove_egs)
 
     # do some reporting
-    [report, times, data] = nnet3_log_parse.generate_acc_logprob_report(
-        args.dir)
+    [report, times,
+     data] = nnet3_log_parse.generate_acc_logprob_report(args.dir)
     if args.email is not None:
-        common_lib.send_mail(report, "Update : Expt {0} : "
-                                     "complete".format(args.dir), args.email)
+        common_lib.send_mail(
+            report, "Update : Expt {0} : "
+            "complete".format(args.dir), args.email)
 
     with open("{dir}/accuracy.report".format(dir=args.dir), "w") as f:
         f.write(report)

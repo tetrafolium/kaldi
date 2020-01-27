@@ -35,10 +35,8 @@ flags.DEFINE_integer("hidden_size", 200, "hidden dim of RNN")
 
 flags.DEFINE_string("data_path", None,
                     "Where the training/test data is stored.")
-flags.DEFINE_string("vocab_path", None,
-                    "Where the wordlist file is stored.")
-flags.DEFINE_string("save_path", "export",
-                    "Model output directory.")
+flags.DEFINE_string("vocab_path", None, "Where the wordlist file is stored.")
+flags.DEFINE_string("save_path", "export", "Model output directory.")
 flags.DEFINE_bool("use_fp16", False,
                   "Train using 16-bit floats instead of 32bit floats")
 
@@ -75,7 +73,8 @@ class RNNLMModel(tf.Module):
         dt = data_type()
 
         def lstm_cell():
-            return tf.keras.layers.LSTMCell(size, dtype=dt, unit_forget_bias=False)
+            return tf.keras.layers.LSTMCell(
+                size, dtype=dt, unit_forget_bias=False)
 
         def add_dropout(cell):
             if config.keep_prob < 1:
@@ -139,7 +138,11 @@ class RNNLMModel(tf.Module):
         logits = self.fc(rnn_out)
         output = self.get_score(logits)
         log_prob = output[0, word_id[0, 0]]
-        return {"log_prob": log_prob, "rnn_states": rnn_states, "rnn_out": rnn_out}
+        return {
+            "log_prob": log_prob,
+            "rnn_states": rnn_states,
+            "rnn_out": rnn_out
+        }
 
 
 class RNNLMModelTrainer(tf.Module):
@@ -162,7 +165,8 @@ class RNNLMModelTrainer(tf.Module):
         for i, (inputs, labels) in enumerate(data_producer.iterate()):
             loss = self._train_step(inputs, labels)
             if verbose and i % (data_producer.epoch_size // 10) == 1:
-                print("{}/{}: loss={}".format(i, data_producer.epoch_size, loss))
+                print("{}/{}: loss={}".format(i, data_producer.epoch_size,
+                                              loss))
 
     @tf.function
     def evaluate(self, data_producer):
@@ -213,12 +217,12 @@ def main(_):
         config.batch_size = 4
 
     model = RNNLMModel(config)
-    train_producer = reader.RNNLMProducer(
-        train_data, config.batch_size, config.num_steps)
+    train_producer = reader.RNNLMProducer(train_data, config.batch_size,
+                                          config.num_steps)
     trainer = RNNLMModelTrainer(model, config)
 
-    valid_producer = reader.RNNLMProducer(
-        valid_data, config.batch_size, config.num_steps)
+    valid_producer = reader.RNNLMProducer(valid_data, config.batch_size,
+                                          config.num_steps)
 
     # Save variables to disk if you want to prevent crash...
     # Data producer can also be saved to preverse feeding progress.
@@ -227,7 +231,7 @@ def main(_):
     manager = tf.train.CheckpointManager(checkpoint, "checkpoints/", 5)
 
     for i in range(config.max_max_epoch):
-        lr_decay = config.lr_decay ** max(i + 1 - config.max_epoch, 0.0)
+        lr_decay = config.lr_decay**max(i + 1 - config.max_epoch, 0.0)
         lr = config.learning_rate * lr_decay
         trainer.train_one_epoch(train_producer, lr)
         manager.save()
@@ -237,12 +241,22 @@ def main(_):
 
     # Export
     print("Saving model to %s." % FLAGS.save_path)
-    spec = [tf.TensorSpec(shape=[config.num_layers, 2, 1, config.hidden_size], dtype=data_type(), name="context"),
-            tf.TensorSpec(shape=[1, 1], dtype=tf.int32, name="word_id")]
+    spec = [
+        tf.TensorSpec(
+            shape=[config.num_layers, 2, 1, config.hidden_size],
+            dtype=data_type(),
+            name="context"),
+        tf.TensorSpec(shape=[1, 1], dtype=tf.int32, name="word_id")
+    ]
     cfunc = model.single_step.get_concrete_function(*spec)
     cfunc2 = model.get_initial_state.get_concrete_function()
-    tf.saved_model.save(model, FLAGS.save_path, signatures={
-                        "single_step": cfunc, "get_initial_state": cfunc2})
+    tf.saved_model.save(
+        model,
+        FLAGS.save_path,
+        signatures={
+            "single_step": cfunc,
+            "get_initial_state": cfunc2
+        })
 
 
 if __name__ == "__main__":

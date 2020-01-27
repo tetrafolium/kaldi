@@ -1,7 +1,6 @@
 # Copyright 2017    Johns Hopkins University (Dan Povey)
 #           2017    Hossein Hadian
 # Apache 2.0.
-
 """ This module has the implementation of attention layers.
 """
 
@@ -28,52 +27,58 @@ class XconfigAttentionLayer(XconfigLayerBase):
     def __init__(self, first_token, key_to_value, prev_names=None):
         # Here we just list some likely combinations.. you can just add any
         # combinations you want to use, to this list.
-        assert first_token in ['attention-renorm-layer',
-                               'attention-relu-renorm-layer',
-                               'attention-relu-batchnorm-layer',
-                               'relu-renorm-attention-layer']
+        assert first_token in [
+            'attention-renorm-layer', 'attention-relu-renorm-layer',
+            'attention-relu-batchnorm-layer', 'relu-renorm-attention-layer'
+        ]
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
         # note: self.config['input'] is a descriptor, '[-1]' means output
         # the most recent layer.
-        self.config = {'input': '[-1]',
-                       'dim': -1,
-                       'max-change': 0.75,
-                       'self-repair-scale': 1.0e-05,
-                       'target-rms': 1.0,
-                       'learning-rate-factor': 1.0,
-                       'ng-affine-options': '',
-                       'l2-regularize': 0.0,
-                       'num-left-inputs-required': -1,
-                       'num-right-inputs-required': -1,
-                       'output-context': True,
-                       'time-stride': 1,
-                       'num-heads': 1,
-                       'key-dim': -1,
-                       'key-scale': 0.0,
-                       'value-dim': -1,
-                       'num-left-inputs': -1,
-                       'num-right-inputs': -1,
-                       'dropout-proportion': 0.5}  # dropout-proportion only
+        self.config = {
+            'input': '[-1]',
+            'dim': -1,
+            'max-change': 0.75,
+            'self-repair-scale': 1.0e-05,
+            'target-rms': 1.0,
+            'learning-rate-factor': 1.0,
+            'ng-affine-options': '',
+            'l2-regularize': 0.0,
+            'num-left-inputs-required': -1,
+            'num-right-inputs-required': -1,
+            'output-context': True,
+            'time-stride': 1,
+            'num-heads': 1,
+            'key-dim': -1,
+            'key-scale': 0.0,
+            'value-dim': -1,
+            'num-left-inputs': -1,
+            'num-right-inputs': -1,
+            'dropout-proportion': 0.5
+        }  # dropout-proportion only
         # affects layers with
         # 'dropout' in the name.
 
     def check_configs(self):
-        if self.config['self-repair-scale'] < 0.0 or self.config['self-repair-scale'] > 1.0:
-            raise RuntimeError("self-repair-scale has invalid value {0}"
-                               .format(self.config['self-repair-scale']))
+        if self.config['self-repair-scale'] < 0.0 or self.config[
+                'self-repair-scale'] > 1.0:
+            raise RuntimeError(
+                "self-repair-scale has invalid value {0}".format(
+                    self.config['self-repair-scale']))
         if self.config['target-rms'] < 0.0:
-            raise RuntimeError("target-rms has invalid value {0}"
-                               .format(self.config['target-rms']))
+            raise RuntimeError("target-rms has invalid value {0}".format(
+                self.config['target-rms']))
         if self.config['learning-rate-factor'] <= 0.0:
-            raise RuntimeError("learning-rate-factor has invalid value {0}"
-                               .format(self.config['learning-rate-factor']))
-        for conf in ['value-dim', 'key-dim',
-                     'num-left-inputs', 'num-right-inputs']:
+            raise RuntimeError(
+                "learning-rate-factor has invalid value {0}".format(
+                    self.config['learning-rate-factor']))
+        for conf in [
+                'value-dim', 'key-dim', 'num-left-inputs', 'num-right-inputs'
+        ]:
             if self.config[conf] < 0:
-                raise RuntimeError("{0} has invalid value {1}"
-                                   .format(conf, self.config[conf]))
+                raise RuntimeError("{0} has invalid value {1}".format(
+                    conf, self.config[conf]))
         if self.config['key-scale'] == 0.0:
             self.config['key-scale'] = 1.0 / math.sqrt(self.config['key-dim'])
 
@@ -102,9 +107,8 @@ class XconfigAttentionLayer(XconfigLayerBase):
                        self.config['num-right-inputs'] + 1)
         num_heads = self.config['num-heads']
         value_dim = self.config['value-dim']
-        return (num_heads *
-                (value_dim +
-                 (context_dim if self.config['output-context'] else 0)))
+        return (num_heads * (
+            value_dim + (context_dim if self.config['output-context'] else 0)))
 
     def output_dim(self, auxiliary_output=None):
         return self.attention_output_dim()
@@ -143,8 +147,9 @@ class XconfigAttentionLayer(XconfigLayerBase):
         ng_affine_options = self.config['ng-affine-options']
         l2_regularize = self.config['l2-regularize']
         learning_rate_factor = self.config['learning-rate-factor']
-        learning_rate_option = ('learning-rate-factor={0}'.format(learning_rate_factor)
-                                if learning_rate_factor != 1.0 else '')
+        learning_rate_option = (
+            'learning-rate-factor={0}'.format(learning_rate_factor)
+            if learning_rate_factor != 1.0 else '')
         l2_regularize_option = ('l2-regularize={0} '.format(l2_regularize)
                                 if l2_regularize != 0.0 else '')
         configs = []
@@ -155,9 +160,9 @@ class XconfigAttentionLayer(XconfigLayerBase):
                 ' output-dim={2}'
                 ' max-change={3}'
                 ' {4} {5} {6}'
-                ''.format(self.name, input_dim, dim,
-                          max_change, ng_affine_options,
-                          learning_rate_option, l2_regularize_option))
+                ''.format(self.name, input_dim, dim, max_change,
+                          ng_affine_options, learning_rate_option,
+                          l2_regularize_option))
         configs.append(line)
 
         line = ('component-node name={0}.affine'
@@ -218,15 +223,13 @@ class XconfigAttentionLayer(XconfigLayerBase):
                 line = ('component name={0}.{1}'
                         ' type=NormalizeComponent dim={2}'
                         ' target-rms={3}'
-                        ''.format(self.name, nonlinearity, dim,
-                                  target_rms))
+                        ''.format(self.name, nonlinearity, dim, target_rms))
 
             elif nonlinearity == 'batchnorm':
                 line = ('component name={0}.{1}'
                         ' type=BatchNormComponent dim={2}'
                         ' target-rms={3}'
-                        ''.format(self.name, nonlinearity, dim,
-                                  target_rms))
+                        ''.format(self.name, nonlinearity, dim, target_rms))
 
             elif nonlinearity == 'dropout':
                 line = ('component name={0}.{1} type=DropoutComponent '
@@ -235,8 +238,8 @@ class XconfigAttentionLayer(XconfigLayerBase):
                             self.config['dropout-proportion']))
 
             else:
-                raise RuntimeError("Unknown nonlinearity type: {0}"
-                                   .format(nonlinearity))
+                raise RuntimeError(
+                    "Unknown nonlinearity type: {0}".format(nonlinearity))
 
             configs.append(line)
             line = ('component-node name={0}.{1}'

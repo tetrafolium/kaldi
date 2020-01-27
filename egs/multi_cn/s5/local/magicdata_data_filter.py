@@ -20,8 +20,8 @@ def main(argv):
             bad.append(line.strip('\r\n'))
 
     fWavScp = open(os.path.join(argv[2], 'wav.scp'), 'w')
-    fText = open(os.path.join(
-        argv[2], 'transcripts.txt'), 'w', encoding="utf-8")
+    fText = open(
+        os.path.join(argv[2], 'transcripts.txt'), 'w', encoding="utf-8")
     fUtt2Spk = open(os.path.join(argv[2], 'utt2spk'), 'w')
     for line in open(argv[1], encoding="utf-8"):
         if '.wav' not in line:

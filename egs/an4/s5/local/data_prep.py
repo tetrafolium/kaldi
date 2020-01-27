@@ -21,15 +21,12 @@ import re
 import sys
 
 if len(sys.argv) != 3:
-    print ('Usage: python data_prep.py [an4_root] [sph2pipe]')
+    print('Usage: python data_prep.py [an4_root] [sph2pipe]')
     sys.exit(1)
 an4_root = sys.argv[1]
 sph2pipe = sys.argv[2]
 
-sph_dir = {
-    'train': 'an4_clstk',
-    'test': 'an4test_clstk'
-}
+sph_dir = {'train': 'an4_clstk', 'test': 'an4test_clstk'}
 
 for x in ['train', 'test']:
     with open(os.path.join(an4_root, 'etc', 'an4_' + x + '.transcription')) as transcript_f, \
@@ -57,5 +54,6 @@ for x in ['train', 'test']:
 
             text_f.write(utt_id + ' ' + words + '\n')
             wav_scp_f.write(utt_id + ' ' + sph2pipe + ' -f wav -p -c 1 ' +
-                            os.path.join(an4_root, 'wav', sph_dir[x], mid, source + '.sph') + ' |\n')
+                            os.path.join(an4_root, 'wav', sph_dir[x], mid,
+                                         source + '.sph') + ' |\n')
             utt2spk_f.write(utt_id + ' ' + mid + '\n')

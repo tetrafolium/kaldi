@@ -77,19 +77,30 @@ def GetArgs():
         description="Converts nnet2 into nnet3 models.",
         epilog="""e.g. steps/nnet3/convert_nnet2_to_nnet3.py 
                   exp/tri4_nnet2 exp/tri4_nnet3""")
-    parser.add_argument("--tmpdir", type=str, default="./",
-                        help="Custom location for the temporary directory.")
-    parser.add_argument("--skip-cleanup", action='store_true',
-                        help="Will not remove the temporary directory.")
-    parser.add_argument("--model", type=str, default='final.mdl',
-                        help="Choose a specific model to convert.")
-    parser.add_argument("--binary", type=str, default="true",
-                        choices=["true", "false"],
-                        help="Whether to write the model in binary or not.")
-    parser.add_argument("nnet2_dir", metavar="src-nnet2-dir", type=str,
-                        help="")
-    parser.add_argument("nnet3_dir", metavar="src-nnet3-dir", type=str,
-                        help="")
+    parser.add_argument(
+        "--tmpdir",
+        type=str,
+        default="./",
+        help="Custom location for the temporary directory.")
+    parser.add_argument(
+        "--skip-cleanup",
+        action='store_true',
+        help="Will not remove the temporary directory.")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default='final.mdl',
+        help="Choose a specific model to convert.")
+    parser.add_argument(
+        "--binary",
+        type=str,
+        default="true",
+        choices=["true", "false"],
+        help="Whether to write the model in binary or not.")
+    parser.add_argument(
+        "nnet2_dir", metavar="src-nnet2-dir", type=str, help="")
+    parser.add_argument(
+        "nnet3_dir", metavar="src-nnet3-dir", type=str, help="")
 
     print(' '.join(sys.argv))
 
@@ -141,8 +152,9 @@ class Nnet3Model(object):
             return
 
         # format pairs: {'<InputDim>':43} -> {'input-dim':43}
-        pairs = ["{0}={1}".format(token_to_string(key), pairs[key])
-                 for key in pairs]
+        pairs = [
+            "{0}={1}".format(token_to_string(key), pairs[key]) for key in pairs
+        ]
 
         # keep track of layer type number (e.g. affine3)
         node_name = NODE_NAMES[component]
@@ -167,31 +179,34 @@ class Nnet3Model(object):
                     continue
                 config_string = ' '.join(component.pairs)
 
-                f.write("component name={name} type={comp_type} {config_string}"
-                        "\n".format(name=component.ident,
-                                    comp_type=component.component,
-                                    config_string=config_string))
+                f.write(
+                    "component name={name} type={comp_type} {config_string}"
+                    "\n".format(
+                        name=component.ident,
+                        comp_type=component.component,
+                        config_string=config_string))
 
             f.write("\n# Component nodes\n")
             if self.ivector_dim != 0:
                 f.write(
-                    "input-node name=input dim={0}\n".format(self.input_dim-self.ivector_dim))
-                f.write(
-                    "input-node name=ivector dim={0}\n".format(self.ivector_dim))
+                    "input-node name=input dim={0}\n".format(self.input_dim -
+                                                             self.ivector_dim))
+                f.write("input-node name=ivector dim={0}\n".format(
+                    self.ivector_dim))
             else:
-                f.write(
-                    "input-node name=input dim={0}\n".format(self.input_dim))
+                f.write("input-node name=input dim={0}\n".format(
+                    self.input_dim))
             previous_component = "input"
             for component in self.components:
                 if component.ident == "splice":
                     # Create splice string for the next node
-                    previous_component = make_splice_string(previous_component,
-                                                            component.pairs["<Context>"],
-                                                            component.pairs["<ConstComponentDim>"])
+                    previous_component = make_splice_string(
+                        previous_component, component.pairs["<Context>"],
+                        component.pairs["<ConstComponentDim>"])
                     continue
                 f.write("component-node name={name} component={name} "
-                        "input={inp}\n".format(name=component.ident,
-                                               inp=previous_component))
+                        "input={inp}\n".format(
+                            name=component.ident, inp=previous_component))
                 previous_component = component.ident
             logger.warning("Assuming linear objective.")
             f.write("output-node name=output input={inp} objective={obj}"
@@ -199,23 +214,26 @@ class Nnet3Model(object):
 
     def write_model(self, model, binary="true"):
         if not os.path.exists(self.config):
-            raise IOError(
-                "Config file {0} does not exist.".format(self.config))
+            raise IOError("Config file {0} does not exist.".format(
+                self.config))
 
         # write raw model
-        common_lib.execute_command("nnet3-init --binary=true {0} {1}"
-                                   .format(self.config, os.path.join(tmpdir, "nnet3.raw")))
+        common_lib.execute_command("nnet3-init --binary=true {0} {1}".format(
+            self.config, os.path.join(tmpdir, "nnet3.raw")))
 
         # add transition model
-        common_lib.execute_command("nnet3-am-init --binary=true {0} {1} {2}"
-                                   .format(self.transition_model, os.path.join(tmpdir, "nnet3.raw"),
-                                           os.path.join(tmpdir, "nnet3_no_prior.mdl")))
+        common_lib.execute_command(
+            "nnet3-am-init --binary=true {0} {1} {2}".format(
+                self.transition_model, os.path.join(tmpdir, "nnet3.raw"),
+                os.path.join(tmpdir, "nnet3_no_prior.mdl")))
 
         # add priors
         common_lib.execute_command("nnet3-am-adjust-priors "
-                                   "--binary={0} {1} {2} {3}"
-                                   .format(binary, os.path.join(tmpdir, "nnet3_no_prior.mdl"),
-                                           self.priors, model))
+                                   "--binary={0} {1} {2} {3}".format(
+                                       binary,
+                                       os.path.join(tmpdir,
+                                                    "nnet3_no_prior.mdl"),
+                                       self.priors, model))
 
 
 def parse_nnet2_to_nnet3(line_buffer):
@@ -245,8 +263,8 @@ def parse_nnet2_to_nnet3(line_buffer):
     model.priors = parse_priors(line, line_buffer)
 
     if model.components_read != model.num_components:
-        logger.error("Did not read all components succesfully: {0}/{1}"
-                     .format(model.components_read, model.num_components))
+        logger.error("Did not read all components succesfully: {0}/{1}".format(
+            model.components_read, model.num_components))
 
     return model
 
@@ -372,8 +390,11 @@ def parse_splice_component(component, line, line_buffer):
     line = consume_token("<ConstComponentDim>", line)
     const_component_dim = int(line.strip().split()[0])
 
-    return line, {"<InputDim>": input_dim, "<Context>": context,
-                  "<ConstComponentDim>": const_component_dim}
+    return line, {
+        "<InputDim>": input_dim,
+        "<Context>": context,
+        "<ConstComponentDim>": const_component_dim
+    }
 
 
 def parse_end_of_component(component, line, line_buffer):
@@ -456,16 +477,17 @@ def token_to_string(token):
     E.g. <InputDim> -> input-dim
     """
     string = token[1:-1]
-    string = re.sub(
-        r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))", r'-\1', string).lower()
+    string = re.sub(r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))", r'-\1',
+                    string).lower()
     return string
 
 
 def consume_token(token, line):
     """Returns line without token"""
     if token != line.split(None, 1)[0]:
-        logger.error("Unexpected token, expected '{0}', got '{1}'."
-                     .format(token, line.split(None, 1)[0]))
+        logger.error("Unexpected token, expected '{0}', got '{1}'.".format(
+            token,
+            line.split(None, 1)[0]))
 
     return line.partition(token)[2]
 
@@ -489,16 +511,17 @@ tmpdir = ""
 
 def Main():
     args = GetArgs()
-    logger.info("Converting nnet2 model {0} to nnet3 model {1}"
-                .format(os.path.join(args.nnet2_dir, args.model),
-                        os.path.join(args.nnet3_dir, args.model)))
+    logger.info("Converting nnet2 model {0} to nnet3 model {1}".format(
+        os.path.join(args.nnet2_dir, args.model),
+        os.path.join(args.nnet3_dir, args.model)))
     global tmpdir
     tmpdir = tempfile.mkdtemp(dir=args.tmpdir)
 
     # Convert nnet2 model to text and remove preconditioning
-    common_lib.execute_command("nnet-am-copy "
-                               "--remove-preconditioning=true --binary=false {0}/{1} {2}/{1}"
-                               .format(args.nnet2_dir, args.model, tmpdir))
+    common_lib.execute_command(
+        "nnet-am-copy "
+        "--remove-preconditioning=true --binary=false {0}/{1} {2}/{1}".format(
+            args.nnet2_dir, args.model, tmpdir))
 
     # Parse nnet2 and return nnet3 object
     with open(os.path.join(tmpdir, args.model)) as f:
@@ -506,16 +529,16 @@ def Main():
 
     # Write model
     nnet3.write_config(os.path.join(tmpdir, "config"))
-    nnet3.write_model(os.path.join(args.nnet3_dir, args.model),
-                      binary=args.binary)
+    nnet3.write_model(
+        os.path.join(args.nnet3_dir, args.model), binary=args.binary)
 
     if not args.skip_cleanup:
         shutil.rmtree(tmpdir)
     else:
         logger.info("Not removing temporary directory {0}".format(tmpdir))
 
-    logger.info("Wrote nnet3 model to {0}".format(os.path.join(args.nnet3_dir,
-                                                               args.model)))
+    logger.info("Wrote nnet3 model to {0}".format(
+        os.path.join(args.nnet3_dir, args.model)))
 
 
 if __name__ == "__main__":

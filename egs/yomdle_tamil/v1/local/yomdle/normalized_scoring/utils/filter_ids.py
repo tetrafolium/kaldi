@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script is used for partial scoring, it will remove the given
     utterance ids and will score with the remailing utterance ids.
     Eg. filter_ids.py <ids-to-filter> <input-trans> <output-trans>
@@ -27,7 +26,9 @@ def main():
             ids_to_filter.add(line.strip())
 
     # Now load input transcript and filter out the ids
-    with open(input_trans, 'r', encoding='utf-8') as fh, open(output_trans, 'w', encoding='utf-8') as fh_out:
+    with open(
+            input_trans, 'r', encoding='utf-8') as fh, open(
+                output_trans, 'w', encoding='utf-8') as fh_out:
         for utt, uttid in SnorIter(fh):
             if uttid in ids_to_filter:
                 continue

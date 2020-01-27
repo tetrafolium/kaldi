@@ -28,7 +28,7 @@ DEBUG = False
 
 
 def write_decoded(f, wav_name, word_ids, wst):
-    assert(len(word_ids) > 0)
+    assert (len(word_ids) > 0)
     best_weight, best_path = word_ids[0]
     if wst is not None:
         decoded = [wst[w] for w in best_path]
@@ -66,8 +66,7 @@ def decode(d, pcm):
     return (lat, lik, decoded_frames)
 
 
-def decode_wrap(argv, audio_batch_size, wav_paths,
-                file_output, wst_path=None):
+def decode_wrap(argv, audio_batch_size, wav_paths, file_output, wst_path=None):
     wst = wst2dict(wst_path)
     d = PyOnlineLatgenRecogniser()
     d.setup(argv)
@@ -82,8 +81,8 @@ def decode_wrap(argv, audio_batch_size, wav_paths,
                 f.write(lat._repr_svg_())
             lat.write('%s_pykaldi.fst' % wav_name)
 
-        print("Log-likelihood per frame for utterance %s is %f over %d frames" % (
-            wav_name, int(lik / decoded_frames), decoded_frames))
+        print("Log-likelihood per frame for utterance %s is %f over %d frames"
+              % (wav_name, int(lik / decoded_frames), decoded_frames))
         word_ids = lattice_to_nbest(lat, n=10)
         write_decoded(file_output, wav_name, word_ids, wst)
 

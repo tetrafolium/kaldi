@@ -132,12 +132,12 @@ def main(_):
         config.batch_size = 4
 
     model = FastRNNLMModel(config)
-    train_producer = reader.RNNLMProducer(
-        train_data, config.batch_size, config.num_steps)
+    train_producer = reader.RNNLMProducer(train_data, config.batch_size,
+                                          config.num_steps)
     trainer = RNNLMModelTrainer(model, config)
 
-    valid_producer = reader.RNNLMProducer(
-        valid_data, config.batch_size, config.num_steps)
+    valid_producer = reader.RNNLMProducer(valid_data, config.batch_size,
+                                          config.num_steps)
 
     # Save variables to disk if you want to prevent crash...
     # Data producer can also be saved to preverse feeding progress.
@@ -146,7 +146,7 @@ def main(_):
     manager = tf.train.CheckpointManager(checkpoint, "checkpoints/", 5)
 
     for i in range(config.max_max_epoch):
-        lr_decay = config.lr_decay ** max(i + 1 - config.max_epoch, 0.0)
+        lr_decay = config.lr_decay**max(i + 1 - config.max_epoch, 0.0)
         lr = config.learning_rate * lr_decay
         trainer.train_one_epoch(train_producer, lr)
         manager.save()
@@ -156,12 +156,22 @@ def main(_):
 
     # Export
     print("Saving model to %s." % FLAGS.save_path)
-    spec = [tf.TensorSpec(shape=[config.num_layers, 2, 1, config.hidden_size], dtype=data_type(), name="context"),
-            tf.TensorSpec(shape=[1, 1], dtype=tf.int32, name="word_id")]
+    spec = [
+        tf.TensorSpec(
+            shape=[config.num_layers, 2, 1, config.hidden_size],
+            dtype=data_type(),
+            name="context"),
+        tf.TensorSpec(shape=[1, 1], dtype=tf.int32, name="word_id")
+    ]
     cfunc = model.single_step.get_concrete_function(*spec)
     cfunc2 = model.get_initial_state.get_concrete_function()
-    tf.saved_model.save(model, FLAGS.save_path, signatures={
-                        "single_step": cfunc, "get_initial_state": cfunc2})
+    tf.saved_model.save(
+        model,
+        FLAGS.save_path,
+        signatures={
+            "single_step": cfunc,
+            "get_initial_state": cfunc2
+        })
 
 
 if __name__ == "__main__":

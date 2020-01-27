@@ -2,7 +2,6 @@
 
 # Copyright      2018  Ashish Arora
 #                2018  Chun Chieh Chang
-
 """ This script reads the extracted Farsi OCR (yomdle and slam) database files 
     and creates the following files (for the data subset selected via --dataset):
     text, utt2spk, images.scp.
@@ -30,10 +29,12 @@ parser = argparse.ArgumentParser(
     description="Creates text, utt2spk, and images.scp files")
 parser.add_argument('database_path', type=str, help='Path to data')
 parser.add_argument('out_dir', type=str, help='directory to output files')
-parser.add_argument('--padding', type=int, default=100,
-                    help='Padding so BBox does not exceed image area')
+parser.add_argument(
+    '--padding',
+    type=int,
+    default=100,
+    help='Padding so BBox does not exceed image area')
 args = parser.parse_args()
-
 """
 bounding_box is a named tuple which contains:
              area (float): area of the rectangle
@@ -47,13 +48,14 @@ bounding_box is a named tuple which contains:
              corner_points [(float, float)]: set that contains the corners of the rectangle
 """
 
-bounding_box_tuple = namedtuple('bounding_box_tuple', 'area '
-                                'length_parallel '
-                                'length_orthogonal '
-                                'rectangle_center '
-                                'unit_vector '
-                                'unit_vector_angle '
-                                'corner_points')
+bounding_box_tuple = namedtuple(
+    'bounding_box_tuple', 'area '
+    'length_parallel '
+    'length_orthogonal '
+    'rectangle_center '
+    'unit_vector '
+    'unit_vector_angle '
+    'corner_points')
 
 
 def unit_vector(pt0, pt1):
@@ -93,7 +95,7 @@ def bounding_area(index, hull):
     unit_vector: direction of the length_parallel side.
     (it's orthogonal vector can be found with the orthogonal_vector function)
     """
-    unit_vector_p = unit_vector(hull[index], hull[index+1])
+    unit_vector_p = unit_vector(hull[index], hull[index + 1])
     unit_vector_o = orthogonal_vector(unit_vector_p)
 
     dis_p = tuple(np.dot(unit_vector_p, pt) for pt in hull)
@@ -104,11 +106,14 @@ def bounding_area(index, hull):
     len_p = max(dis_p) - min_p
     len_o = max(dis_o) - min_o
 
-    return {'area': len_p * len_o,
-            'length_parallel': len_p,
-            'length_orthogonal': len_o,
-            'rectangle_center': (min_p + float(len_p) / 2, min_o + float(len_o) / 2),
-            'unit_vector': unit_vector_p}
+    return {
+        'area': len_p * len_o,
+        'length_parallel': len_p,
+        'length_orthogonal': len_o,
+        'rectangle_center': (min_p + float(len_p) / 2,
+                             min_o + float(len_o) / 2),
+        'unit_vector': unit_vector_p
+    }
 
 
 def to_xy_coordinates(unit_vector_angle, point):
@@ -142,8 +147,9 @@ def rotate_points(center_of_rotation, angle, points):
         diff_angle = atan2(diff[1], diff[0]) + angle
         ang.append(diff_angle)
         diff_length = sqrt(sum([d**2 for d in diff]))
-        rot_points.append((center_of_rotation[0] + diff_length * cos(diff_angle),
-                           center_of_rotation[1] + diff_length * sin(diff_angle)))
+        rot_points.append(
+            (center_of_rotation[0] + diff_length * cos(diff_angle),
+             center_of_rotation[1] + diff_length * sin(diff_angle)))
 
     return rot_points
 
@@ -158,10 +164,13 @@ def rectangle_corners(rectangle):
     corner_points = []
     for i1 in (.5, -.5):
         for i2 in (i1, -1 * i1):
-            corner_points.append((rectangle['rectangle_center'][0] + i1 * rectangle['length_parallel'],
-                                  rectangle['rectangle_center'][1] + i2 * rectangle['length_orthogonal']))
+            corner_points.append((rectangle['rectangle_center'][0] +
+                                  i1 * rectangle['length_parallel'],
+                                  rectangle['rectangle_center'][1] +
+                                  i2 * rectangle['length_orthogonal']))
 
-    return rotate_points(rectangle['rectangle_center'], rectangle['unit_vector_angle'], corner_points)
+    return rotate_points(rectangle['rectangle_center'],
+                         rectangle['unit_vector_angle'], corner_points)
 
 
 def get_orientation(origin, p1, p2):
@@ -172,10 +181,8 @@ def get_orientation(origin, p1, p2):
     -------
     integer: Negative if p1 is clockwise of p2.
     """
-    difference = (
-        ((p2[0] - origin[0]) * (p1[1] - origin[1]))
-        - ((p1[0] - origin[0]) * (p2[1] - origin[1]))
-    )
+    difference = (((p2[0] - origin[0]) * (p1[1] - origin[1])) - (
+        (p1[0] - origin[0]) * (p2[1] - origin[1])))
     return difference
 
 
@@ -245,13 +252,13 @@ def minimum_bounding_box(points):
     hull_ordered = tuple(hull_ordered)
 
     min_rectangle = bounding_area(0, hull_ordered)
-    for i in range(1, len(hull_ordered)-1):
+    for i in range(1, len(hull_ordered) - 1):
         rectangle = bounding_area(i, hull_ordered)
         if rectangle['area'] < min_rectangle['area']:
             min_rectangle = rectangle
 
-    min_rectangle['unit_vector_angle'] = atan2(
-        min_rectangle['unit_vector'][1], min_rectangle['unit_vector'][0])
+    min_rectangle['unit_vector_angle'] = atan2(min_rectangle['unit_vector'][1],
+                                               min_rectangle['unit_vector'][0])
     min_rectangle['rectangle_center'] = to_xy_coordinates(
         min_rectangle['unit_vector_angle'], min_rectangle['rectangle_center'])
 
@@ -356,7 +363,9 @@ def pad_image(image):
     """
     offset = int(args.padding // 2)
     padded_image = Image.new(
-        'RGB', (image.size[0] + int(args.padding), image.size[1] + int(args.padding)), "white")
+        'RGB',
+        (image.size[0] + int(args.padding), image.size[1] + int(args.padding)),
+        "white")
     padded_image.paste(im=image, box=(offset, offset))
     return padded_image
 
@@ -393,12 +402,12 @@ for filename in sorted(os.listdir(args.database_path)):
     if filename.endswith('.dgr'):
         with open(os.path.join(args.database_path, filename), 'rb') as f:
             iHdSize = struct.unpack('i', f.read(4))[0]
-            szFormatCode = struct.unpack(
-                ''.join('c' for x in range(0, 8)), f.read(8))
+            szFormatCode = struct.unpack(''.join('c' for x in range(0, 8)),
+                                         f.read(8))
             szFormatCode = "".join([x.decode('utf8') for x in szFormatCode])
             szIllustr = f.read(iHdSize - 36)
-            szCodeType = struct.unpack(
-                ''.join(['c' for x in range(0, 20)]), f.read(20))
+            szCodeType = struct.unpack(''.join(['c' for x in range(0, 20)]),
+                                       f.read(20))
             szCodeType = "".join([x.decode('utf8') for x in szCodeType])
             sCodeLen = struct.unpack('h', f.read(2))[0]
             sBitApp = struct.unpack('h', f.read(2))[0]
@@ -425,13 +434,14 @@ for filename in sorted(os.listdir(args.database_path)):
                         image_dict[i] += [[sTop, sLeft, sHei, sWid]]
                     else:
                         image_dict[i] = [[sTop, sLeft, sHei, sWid]]
-                    pTmpData = struct.unpack("{}B".format(
-                        sHei * sWid), f.read(sHei * sWid))
+                    pTmpData = struct.unpack("{}B".format(sHei * sWid),
+                                             f.read(sHei * sWid))
                     character = misc.toimage(
                         np.array(pTmpData).reshape(sHei, sWid))
                     pDocImg.paste(character, (sLeft, sTop))
-            pDocImg.save(os.path.join(args.out_dir, 'data', 'images',
-                                      os.path.splitext(filename)[0] + '.png'), 'png')
+            pDocImg.save(
+                os.path.join(args.out_dir, 'data', 'images',
+                             os.path.splitext(filename)[0] + '.png'), 'png')
 
             im_page = pad_image(pDocImg)
             for i in range(0, iLineNum):
@@ -440,12 +450,18 @@ for filename in sorted(os.listdir(args.database_path)):
                 for j, char in enumerate(text_dict[i]):
                     text += char
                     points.append([image_dict[i][j][1], image_dict[i][j][0]])
-                    points.append(
-                        [image_dict[i][j][1] + image_dict[i][j][3], image_dict[i][j][0]])
-                    points.append(
-                        [image_dict[i][j][1], image_dict[i][j][0] + image_dict[i][j][2]])
-                    points.append([image_dict[i][j][1] + image_dict[i]
-                                   [j][3], image_dict[i][j][0] + image_dict[i][j][2]])
+                    points.append([
+                        image_dict[i][j][1] + image_dict[i][j][3],
+                        image_dict[i][j][0]
+                    ])
+                    points.append([
+                        image_dict[i][j][1],
+                        image_dict[i][j][0] + image_dict[i][j][2]
+                    ])
+                    points.append([
+                        image_dict[i][j][1] + image_dict[i][j][3],
+                        image_dict[i][j][0] + image_dict[i][j][2]
+                    ])
                 updated_mbb_input = update_minimum_bounding_box_input(points)
                 bounding_box = minimum_bounding_box(updated_mbb_input)
                 p1, p2, p3, p4 = bounding_box.corner_points
@@ -468,13 +484,11 @@ for filename in sorted(os.listdir(args.database_path)):
                 rot_points.append(p2_new)
                 rot_points.append(p3_new)
                 rot_points.append(p4_new)
-                cropped_bounding_box = bounding_box_tuple(bounding_box.area,
-                                                          bounding_box.length_parallel,
-                                                          bounding_box.length_orthogonal,
-                                                          bounding_box.length_orthogonal,
-                                                          bounding_box.unit_vector,
-                                                          bounding_box.unit_vector_angle,
-                                                          set(rot_points))
+                cropped_bounding_box = bounding_box_tuple(
+                    bounding_box.area, bounding_box.length_parallel,
+                    bounding_box.length_orthogonal,
+                    bounding_box.length_orthogonal, bounding_box.unit_vector,
+                    bounding_box.unit_vector_angle, set(rot_points))
 
                 rotation_angle_in_rad = get_smaller_angle(cropped_bounding_box)
                 img2 = region_initial.rotate(
@@ -490,10 +504,12 @@ for filename in sorted(os.listdir(args.database_path)):
                 region_final = img2.crop(box)
                 text = text.replace('\x00', '')
                 text = unicodedata.normalize('NFC', text)
-                image_id = os.path.splitext(
-                    filename)[0] + '_' + str(i).zfill(3)
-                image_filepath = os.path.join(args.out_dir, 'data', 'images', os.path.splitext(
-                    filename)[0] + '_' + str(i).zfill(3) + '.png')
+                image_id = os.path.splitext(filename)[0] + '_' + str(i).zfill(
+                    3)
+                image_filepath = os.path.join(
+                    args.out_dir, 'data', 'images',
+                    os.path.splitext(filename)[0] + '_' + str(i).zfill(3) +
+                    '.png')
                 writer_id = os.path.splitext(filename)[0].split('-')[0]
                 region_final.save(image_filepath, 'png')
 

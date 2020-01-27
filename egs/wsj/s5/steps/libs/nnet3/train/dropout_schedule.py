@@ -2,7 +2,6 @@
 
 # Copyright 2016    Vimal Manohar
 # Apache 2.0
-
 """This module contains methods related to scheduling dropout.
 See _self_test() for examples of how the functions work.
 """
@@ -11,7 +10,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
-
 
 _debug_dropout = False
 
@@ -102,8 +100,7 @@ def _parse_dropout_string(dropout_str):
                 dropout_proportion = float(value_x_pair[0])
                 data_fraction = float(value_x_pair[1])
 
-            if (data_fraction < dropout_values[-1][0]
-                    or data_fraction > 1.0):
+            if (data_fraction < dropout_values[-1][0] or data_fraction > 1.0):
                 logger.error(
                     "Failed while parsing value %s in dropout-schedule. "
                     "dropout-schedule must be in incresing "
@@ -114,9 +111,10 @@ def _parse_dropout_string(dropout_str):
 
         dropout_values.append((1.0, float(parts[-1])))
     except Exception:
-        logger.error("Unable to parse dropout proportion string %s. "
-                     "See help for option "
-                     "--trainer.dropout-schedule.", dropout_str)
+        logger.error(
+            "Unable to parse dropout proportion string %s. "
+            "See help for option "
+            "--trainer.dropout-schedule.", dropout_str)
         raise
 
     # reverse sort so that its easy to retrieve the dropout proportion
@@ -157,11 +155,11 @@ def _get_component_dropout(dropout_schedule, data_fraction):
                                  for i, tup in enumerate(dropout_schedule)
                                  if tup[0] <= data_fraction)
     except StopIteration:
-        raise RuntimeError(
-            "Could not find data_fraction in dropout schedule "
-            "corresponding to data_fraction {0}.\n"
-            "Maybe something wrong with the parsed "
-            "dropout schedule {1}.".format(data_fraction, dropout_schedule))
+        raise RuntimeError("Could not find data_fraction in dropout schedule "
+                           "corresponding to data_fraction {0}.\n"
+                           "Maybe something wrong with the parsed "
+                           "dropout schedule {1}.".format(
+                               data_fraction, dropout_schedule))
 
     if dropout_schedule_index == 0:
         assert dropout_schedule[0][0] == 1 and data_fraction == 1
@@ -179,10 +177,9 @@ def _get_component_dropout(dropout_schedule, data_fraction):
     assert (data_fraction >= initial_data_fraction
             and data_fraction < final_data_fraction)
 
-    return ((data_fraction - initial_data_fraction)
-            * (final_dropout - initial_dropout)
-            / (final_data_fraction - initial_data_fraction)
-            + initial_dropout)
+    return ((data_fraction - initial_data_fraction) *
+            (final_dropout - initial_dropout) /
+            (final_data_fraction - initial_data_fraction) + initial_dropout)
 
 
 def _get_dropout_proportions(dropout_schedule, data_fraction):
@@ -219,9 +216,10 @@ def _get_dropout_proportions(dropout_schedule, data_fraction):
     dropout_schedule = _parse_dropout_option(dropout_schedule)
     dropout_proportions = []
     for component_name, component_dropout_schedule in dropout_schedule:
-        dropout_proportions.append(
-            (component_name, _get_component_dropout(
-                component_dropout_schedule, data_fraction)))
+        dropout_proportions.append((component_name,
+                                    _get_component_dropout(
+                                        component_dropout_schedule,
+                                        data_fraction)))
     return dropout_proportions
 
 
@@ -245,8 +243,8 @@ def get_dropout_edit_string(dropout_schedule, data_fraction, iter_):
     if dropout_schedule is None:
         return ""
 
-    dropout_proportions = _get_dropout_proportions(
-        dropout_schedule, data_fraction)
+    dropout_proportions = _get_dropout_proportions(dropout_schedule,
+                                                   data_fraction)
 
     edit_config_lines = []
     dropout_info = []
@@ -278,49 +276,53 @@ def _self_test():
             assert list1[i][0] == list2[i][0]
             assert abs(list1[i][1] - list2[i][1]) < 1e-8
 
-    assert (_parse_dropout_option('*=0.0,0.5,0.0 lstm.*=0.0,0.3@0.75,0.0')
-            == [('*', [(1.0, 0.0), (0.5, 0.5), (0.0, 0.0)]),
-                ('lstm.*', [(1.0, 0.0), (0.75, 0.3), (0.0, 0.0)])])
-    assert_approx_equal(_get_dropout_proportions(
-        '*=0.0,0.5,0.0 lstm.*=0.0,0.3@0.75,0.0', 0.75),
-        [('*', 0.25), ('lstm.*', 0.3)])
-    assert_approx_equal(_get_dropout_proportions(
-        '*=0.0,0.5,0.0 lstm.*=0.0,0.3@0.75,0.0', 0.5),
+    assert (_parse_dropout_option('*=0.0,0.5,0.0 lstm.*=0.0,0.3@0.75,0.0') == [
+        ('*', [(1.0, 0.0), (0.5, 0.5), (0.0, 0.0)]),
+        ('lstm.*', [(1.0, 0.0), (0.75, 0.3), (0.0, 0.0)])
+    ])
+    assert_approx_equal(
+        _get_dropout_proportions('*=0.0,0.5,0.0 lstm.*=0.0,0.3@0.75,0.0',
+                                 0.75), [('*', 0.25), ('lstm.*', 0.3)])
+    assert_approx_equal(
+        _get_dropout_proportions('*=0.0,0.5,0.0 lstm.*=0.0,0.3@0.75,0.0', 0.5),
         [('*', 0.5), ('lstm.*', 0.2)])
-    assert_approx_equal(_get_dropout_proportions(
-        '*=0.0,0.5,0.0 lstm.*=0.0,0.3@0.75,0.0', 0.25),
-        [('*', 0.25), ('lstm.*', 0.1)])
+    assert_approx_equal(
+        _get_dropout_proportions('*=0.0,0.5,0.0 lstm.*=0.0,0.3@0.75,0.0',
+                                 0.25), [('*', 0.25), ('lstm.*', 0.1)])
 
-    assert (_parse_dropout_option('0.0,0.3,0.0')
-            == [('*', [(1.0, 0.0), (0.5, 0.3), (0.0, 0.0)])])
-    assert_approx_equal(_get_dropout_proportions('0.0,0.3,0.0', 0.5),
-                        [('*', 0.3)])
-    assert_approx_equal(_get_dropout_proportions('0.0,0.3,0.0', 0.0),
-                        [('*', 0.0)])
-    assert_approx_equal(_get_dropout_proportions('0.0,0.3,0.0', 1.0),
-                        [('*', 0.0)])
-    assert_approx_equal(_get_dropout_proportions('0.0,0.3,0.0', 0.25),
-                        [('*', 0.15)])
+    assert (_parse_dropout_option('0.0,0.3,0.0') == [('*', [(1.0, 0.0),
+                                                            (0.5, 0.3),
+                                                            (0.0, 0.0)])])
+    assert_approx_equal(
+        _get_dropout_proportions('0.0,0.3,0.0', 0.5), [('*', 0.3)])
+    assert_approx_equal(
+        _get_dropout_proportions('0.0,0.3,0.0', 0.0), [('*', 0.0)])
+    assert_approx_equal(
+        _get_dropout_proportions('0.0,0.3,0.0', 1.0), [('*', 0.0)])
+    assert_approx_equal(
+        _get_dropout_proportions('0.0,0.3,0.0', 0.25), [('*', 0.15)])
 
-    assert (_parse_dropout_option('0.0,0.5@0.25,0.0,0.6@0.75,0.0')
-            == [('*', [(1.0, 0.0), (0.75, 0.6), (0.5, 0.0), (0.25, 0.5), (0.0, 0.0)])])
-    assert_approx_equal(_get_dropout_proportions(
-        '0.0,0.5@0.25,0.0,0.6@0.75,0.0', 0.25),
+    assert (_parse_dropout_option('0.0,0.5@0.25,0.0,0.6@0.75,0.0') == [
+        ('*', [(1.0, 0.0), (0.75, 0.6), (0.5, 0.0), (0.25, 0.5), (0.0, 0.0)])
+    ])
+    assert_approx_equal(
+        _get_dropout_proportions('0.0,0.5@0.25,0.0,0.6@0.75,0.0', 0.25),
         [('*', 0.5)])
-    assert_approx_equal(_get_dropout_proportions(
-        '0.0,0.5@0.25,0.0,0.6@0.75,0.0', 0.1),
+    assert_approx_equal(
+        _get_dropout_proportions('0.0,0.5@0.25,0.0,0.6@0.75,0.0', 0.1),
         [('*', 0.2)])
 
-    assert (_parse_dropout_option('lstm.*=0.0,0.3,0.0@0.75,1.0')
-            == [('lstm.*', [(1.0, 1.0), (0.75, 0.0), (0.5, 0.3), (0.0, 0.0)])])
-    assert_approx_equal(_get_dropout_proportions(
-        'lstm.*=0.0,0.3,0.0@0.75,1.0', 0.25),
+    assert (_parse_dropout_option('lstm.*=0.0,0.3,0.0@0.75,1.0') == [
+        ('lstm.*', [(1.0, 1.0), (0.75, 0.0), (0.5, 0.3), (0.0, 0.0)])
+    ])
+    assert_approx_equal(
+        _get_dropout_proportions('lstm.*=0.0,0.3,0.0@0.75,1.0', 0.25),
         [('lstm.*', 0.15)])
-    assert_approx_equal(_get_dropout_proportions(
-        'lstm.*=0.0,0.3,0.0@0.75,1.0', 0.5),
+    assert_approx_equal(
+        _get_dropout_proportions('lstm.*=0.0,0.3,0.0@0.75,1.0', 0.5),
         [('lstm.*', 0.3)])
-    assert_approx_equal(_get_dropout_proportions(
-        'lstm.*=0.0,0.3,0.0@0.75,1.0', 0.9),
+    assert_approx_equal(
+        _get_dropout_proportions('lstm.*=0.0,0.3,0.0@0.75,1.0', 0.9),
         [('lstm.*', 0.6)])
 
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script reads xml file and creates the following files :text, utt2spk, images.scp.
     It also creates line images from page image and stores it into
     data/local/rimes_data/train/lines.
@@ -17,14 +16,21 @@ import os
 import random
 parser = argparse.ArgumentParser(
     description="""Creates line images from page image.""")
-parser.add_argument('database_path', type=str,
-                    help='Path to the downloaded (and extracted) mdacat data')
-parser.add_argument('dataset', type=str,
-                    help='Subset of data to process.')
-parser.add_argument("--augment", type=lambda x: (str(x).lower() == 'true'), default=False,
-                    help="performs image augmentation")
-parser.add_argument('--pixel-scaling', type=int, default=20,
-                    help='padding across horizontal/verticle direction')
+parser.add_argument(
+    'database_path',
+    type=str,
+    help='Path to the downloaded (and extracted) mdacat data')
+parser.add_argument('dataset', type=str, help='Subset of data to process.')
+parser.add_argument(
+    "--augment",
+    type=lambda x: (str(x).lower() == 'true'),
+    default=False,
+    help="performs image augmentation")
+parser.add_argument(
+    '--pixel-scaling',
+    type=int,
+    default=20,
+    help='padding across horizontal/verticle direction')
 args = parser.parse_args()
 
 
@@ -38,7 +44,8 @@ def expand_aabb(left, right, top, bottom, delta_pixel):
     return left, right, top, bottom
 
 
-def get_line_images_from_page_image(file_name, left, right, top, bottom, line_id):
+def get_line_images_from_page_image(file_name, left, right, top, bottom,
+                                    line_id):
     """ Given a page image, extracts the line images from it.
     Input
     -----
@@ -53,8 +60,8 @@ def get_line_images_from_page_image(file_name, left, right, top, bottom, line_id
     base_name = os.path.splitext(os.path.basename(file_name))[0]
     line_image_file_name = base_name + '_' + str(line_id).zfill(6) + '.png'
     imgray = region.convert('L')
-    line_image_path = os.path.join(
-        args.database_path, 'line_image', args.dataset, line_image_file_name)
+    line_image_path = os.path.join(args.database_path, 'line_image',
+                                   args.dataset, line_image_file_name)
     imgray.save(line_image_path)
     return base_name, line_image_path
 
@@ -73,8 +80,8 @@ def write_kaldi_process_data_files(base_name, line_id, text):
     writer_id = 'writer' + writer_id
     utt_id = writer_id + '_' + base_name + '_' + str(line_id).zfill(6)
     line_image_file_name = base_name + '_' + str(line_id).zfill(6) + '.png'
-    image_path = os.path.join(
-        args.database_path, 'line_image', args.dataset, line_image_file_name)
+    image_path = os.path.join(args.database_path, 'line_image', args.dataset,
+                              line_image_file_name)
     text_fh.write(utt_id + ' ' + text + '\n')
     utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
     image_fh.write(utt_id + ' ' + image_path + '\n')
@@ -90,8 +97,8 @@ image_fh = open(image_file, 'w', encoding='utf-8')
 
 xml_path = os.path.join(args.database_path, 'xml',
                         args.dataset) + '/rimes_2011.xml'
-page_image_folder = os.path.join(
-    args.database_path, 'page_image', args.dataset)
+page_image_folder = os.path.join(args.database_path, 'page_image',
+                                 args.dataset)
 doc = minidom.parse(xml_path)
 single_page = doc.getElementsByTagName('SinglePage')
 for page in single_page:
@@ -113,7 +120,8 @@ for page in single_page:
             write_kaldi_process_data_files(base_name, str(id), text)
             additional_pixel = random.randint(1, args.pixel_scaling)
             left, right, top, bottom = expand_aabb(
-                left, right, top, bottom, args.pixel_scaling + additional_pixel + 1)
+                left, right, top, bottom,
+                args.pixel_scaling + additional_pixel + 1)
             line_id = str(id) + '_scale' + str(2)
             base_name, image_path = get_line_images_from_page_image(
                 file_name, left, right, top, bottom, line_id)

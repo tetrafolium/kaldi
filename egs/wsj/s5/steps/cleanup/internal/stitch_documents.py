@@ -2,7 +2,6 @@
 
 # Copyright 2016    Vimal Manohar
 # Apache 2.0.
-
 """This script reads an archive of mapping from query to
 documents and stitches the documents for each query into a
 new document.
@@ -51,25 +50,34 @@ def get_args():
         documents and stitches the documents for each query into a new
         document.""")
 
-    parser.add_argument("--query2docs", type=argparse.FileType('r'),
-                        required=True,
-                        help="""Input file containing an archive
+    parser.add_argument(
+        "--query2docs",
+        type=argparse.FileType('r'),
+        required=True,
+        help="""Input file containing an archive
                         of list of documents indexed by a query document
                         id.""")
-    parser.add_argument("--input-documents", type=argparse.FileType('r'),
-                        required=True,
-                        help="""Input file containing the documents
+    parser.add_argument(
+        "--input-documents",
+        type=argparse.FileType('r'),
+        required=True,
+        help="""Input file containing the documents
                         indexed by the document id.""")
-    parser.add_argument("--output-documents", type=argparse.FileType('w'),
-                        required=True,
-                        help="""Output documents indexed by the query
+    parser.add_argument(
+        "--output-documents",
+        type=argparse.FileType('w'),
+        required=True,
+        help="""Output documents indexed by the query
                         document-id, obtained by stitching input documents
                         corresponding to the query.""")
-    parser.add_argument("--check-sorted-docs-per-query", type=str,
-                        choices=["true", "false"], default="false",
-                        help="If specified, the script will expect "
-                        "the document ids in --query2docs to be "
-                        "sorted.")
+    parser.add_argument(
+        "--check-sorted-docs-per-query",
+        type=str,
+        choices=["true", "false"],
+        default="false",
+        help="If specified, the script will expect "
+        "the document ids in --query2docs to be "
+        "sorted.")
 
     args = parser.parse_args()
 
@@ -129,8 +137,9 @@ def run(args):
                         output_document.extend(
                             doc[int(end_fraction * num_words):])
 
-            print ("{0} {1}".format(query, " ".join(output_document)),
-                   file=args.output_documents)
+            print(
+                "{0} {1}".format(query, " ".join(output_document)),
+                file=args.output_documents)
         except Exception:
             logger.error("Error processing line %s in file %s", line,
                          args.query2docs.name)
@@ -143,12 +152,12 @@ def main():
     try:
         run(args)
     except:
-        logger.error("Failed to stictch document; got error ",
-                     exc_info=True)
+        logger.error("Failed to stictch document; got error ", exc_info=True)
         raise SystemExit(1)
     finally:
-        for f in [args.query2docs, args.input_documents,
-                  args.output_documents]:
+        for f in [
+                args.query2docs, args.input_documents, args.output_documents
+        ]:
             if f is not None:
                 f.close()
 

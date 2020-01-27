@@ -30,20 +30,19 @@ def process_transcripts(transcripts_dir, transcripts_list):
                 if not line.startswith("["):
                     words = line.strip().split(" ")
                     for w in words:
-                        if (not w.startswith("<") and not
-                                w.startswith("(") and not
-                                w.endswith("-") and not w.startswith("-")):
+                        if (not w.startswith("<") and not w.startswith("(")
+                                and not w.endswith("-")
+                                and not w.startswith("-")):
                             # Get rid of mispronunciation markings
-                            if (not w.startswith("*") and not
-                                    w.endswith("*") and
-                                    w != "~"):
+                            if (not w.startswith("*") and not w.endswith("*")
+                                    and w != "~"):
                                 try:
                                     word_list[w] += 1
                                 except KeyError:
                                     word_list[w] = 1
                             else:
                                 w = w.replace("*", "")
-                                if(w != "~"):
+                                if (w != "~"):
                                     try:
                                         misprons[w] += 1
                                     except KeyError:
@@ -59,19 +58,28 @@ def process_transcripts(transcripts_dir, transcripts_list):
 def main():
     if len(sys.argv[1:]) == 0:
         print("Usage: ./make_word_list.py "
-              "<transcripts_list> <transcripts_dir> <word_list>", file=sys.stderr)
+              "<transcripts_list> <transcripts_dir> <word_list>",
+              file=sys.stderr)
         sys.exit(1)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("transcripts_list", help="Path to list of training "
-                        "transcripts")
-    parser.add_argument("transcripts_dir", help="Path to the training "
-                        "transcripts directory")
-    parser.add_argument("word_list", help="Path to the generated word list"
-                        " of training words")
-    parser.add_argument("--misprons", help="Path to the generated word list"
-                        " of mispronounced words",
-                        action="store", default=None)
+    parser.add_argument(
+        "transcripts_list", help="Path to list of training "
+        "transcripts")
+    parser.add_argument(
+        "transcripts_dir",
+        help="Path to the training "
+        "transcripts directory")
+    parser.add_argument(
+        "word_list",
+        help="Path to the generated word list"
+        " of training words")
+    parser.add_argument(
+        "--misprons",
+        help="Path to the generated word list"
+        " of mispronounced words",
+        action="store",
+        default=None)
     args = parser.parse_args()
 
     # Collect words

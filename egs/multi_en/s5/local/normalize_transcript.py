@@ -35,8 +35,8 @@ def main():
         for line in f.readlines():
             chunks = line.split(' ')
             if len(chunks) > 1:
-                sys.stdout.write(chunks[0].strip() +
-                                 ' ' + normalize(' '.join(chunks[1:])))
+                sys.stdout.write(chunks[0].strip() + ' ' +
+                                 normalize(' '.join(chunks[1:])))
             else:
                 sys.stdout.write(chunks[0].strip() + '\n')
 

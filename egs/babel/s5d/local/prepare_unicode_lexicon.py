@@ -121,9 +121,8 @@ def write_phonemes(phonemes_dict, phonesfile):
             fp.write("%s\n" % line.strip())
 
 
-def write_extra_questions(nonsil_phonemes, nonsil_phonemes_dict,
-                          sil_phonemes, sil_phonemes_dict,
-                          tags, extra_questions):
+def write_extra_questions(nonsil_phonemes, nonsil_phonemes_dict, sil_phonemes,
+                          sil_phonemes_dict, tags, extra_questions):
     with codecs.open(extra_questions, "w", "utf-8") as fp:
         # Write all unique "nonsilence_phones" to a single line.
         for p in nonsil_phonemes:
@@ -139,29 +138,35 @@ def write_extra_questions(nonsil_phonemes, nonsil_phonemes_dict,
         for tag in tags:
             for p in nonsil_phonemes_dict.keys():
                 tagged_phoneme = "_".join([p, tag])
-                if(tagged_phoneme in nonsil_phonemes_dict[p]):
+                if (tagged_phoneme in nonsil_phonemes_dict[p]):
                     fp.write("%s " % tagged_phoneme)
             for p in sil_phonemes_dict.keys():
                 tagged_phoneme = "_".join([p, tag])
-                if(tagged_phoneme in sil_phonemes_dict[p]):
+                if (tagged_phoneme in sil_phonemes_dict[p]):
                     fp.write("%s " % tagged_phoneme)
             fp.write("\n")
 
 
 def main():
     # ----------------- Parse input arguments ---------------------------
-    if(len(sys.argv[1:]) == 0):
+    if (len(sys.argv[1:]) == 0):
         print("Usage: local/prepare_unicode_lexicon.txt <lexicon>"
-              " <lexicon_dir>", file=sys.sterr)
+              " <lexicon_dir>",
+              file=sys.sterr)
         sys.exit(1)
 
     parser = argparse.ArgumentParser()
     parser.add_argument("lexicon", help="A kaldi format lexicon.")
-    parser.add_argument("lexicon_dir", help="Directory to which all files"
-                        " should be written")
-    parser.add_argument("--silence-lexicon", help="File with silence words "
-                        "and tab-separated pronunciations", action="store",
-                        default=None)
+    parser.add_argument(
+        "lexicon_dir",
+        help="Directory to which all files"
+        " should be written")
+    parser.add_argument(
+        "--silence-lexicon",
+        help="File with silence words "
+        "and tab-separated pronunciations",
+        action="store",
+        default=None)
     args = parser.parse_args()
 
     # ---------------- Prepare the dictionary directory -----------------
@@ -216,7 +221,8 @@ def main():
                    os.path.join(args.lexicon_dir, "nonsilence_phones.txt"))
 
     # Write the optional_silence.txt file
-    with open(os.path.join(args.lexicon_dir, "optional_silence.txt"), "w") as fp:
+    with open(os.path.join(args.lexicon_dir, "optional_silence.txt"),
+              "w") as fp:
         fp.write("SIL\n")
 
     # ------------------------- Extract tags ---------------------------------
@@ -224,15 +230,15 @@ def main():
     for p in set(nonsil_phonemes).union(set(sil_phonemes)):
         # Only consider phonemes with tags
         p_tags = p.split("_")
-        if(len(p_tags) > 1):
+        if (len(p_tags) > 1):
             tag = "_".join(p_tags[1:])
-            if(tag not in tags):
+            if (tag not in tags):
                 tags.append(tag)
 
     # --------------- Write the extra questions file -------------------------
-    write_extra_questions(nonsil_phonemes, nonsil_phonemes_dict,
-                          sil_phonemes, sil_phonemes_dict, tags,
-                          os.path.join(args.lexicon_dir, "extra_questions.txt"))
+    write_extra_questions(
+        nonsil_phonemes, nonsil_phonemes_dict, sil_phonemes, sil_phonemes_dict,
+        tags, os.path.join(args.lexicon_dir, "extra_questions.txt"))
 
 
 if __name__ == "__main__":

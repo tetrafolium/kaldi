@@ -11,22 +11,28 @@ from collections import defaultdict
 
 import re
 
+parser = argparse.ArgumentParser(
+    description=
+    "This script turns the words into the sparse feature representation, "
+    "using features from rnnlm/choose_features.py.",
+    epilog="E.g. " + sys.argv[0] +
+    " --unigram-probs=exp/rnnlm/unigram_probs.txt "
+    "data/rnnlm/vocab/words.txt exp/rnnlm/features.txt "
+    "> exp/rnnlm/word_feats.txt",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-parser = argparse.ArgumentParser(description="This script turns the words into the sparse feature representation, "
-                                             "using features from rnnlm/choose_features.py.",
-                                 epilog="E.g. " +
-                                 sys.argv[0] +
-                                 " --unigram-probs=exp/rnnlm/unigram_probs.txt "
-                                        "data/rnnlm/vocab/words.txt exp/rnnlm/features.txt "
-                                        "> exp/rnnlm/word_feats.txt",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-parser.add_argument("--unigram-probs", type=str, default='',
-                    help="Specify the file containing unigram probs.")
+parser.add_argument(
+    "--unigram-probs",
+    type=str,
+    default='',
+    help="Specify the file containing unigram probs.")
 parser.add_argument("vocab_file", help="Path for vocab file")
 parser.add_argument("features_file", help="Path for features file")
-parser.add_argument("--treat-as-bos", type=str, default='',
-                    help="""Comma-separated list of written representations of
+parser.add_argument(
+    "--treat-as-bos",
+    type=str,
+    default='',
+    help="""Comma-separated list of written representations of
                     words that are to be treated the same as the BOS symbol
                     <s> for purposes of getting the word features (i.e. they will
                     have the same features as <s>.  Because <s> will always
@@ -48,8 +54,8 @@ def read_vocab(vocab_file):
             fields = line.split()
             assert len(fields) == 2
             if fields[0] in vocab:
-                sys.exit(sys.argv[0] + ": duplicated word({0}) in vocab: {1}"
-                                       .format(fields[0], vocab_file))
+                sys.exit(sys.argv[0] + ": duplicated word({0}) in vocab: {1}".
+                         format(fields[0], vocab_file))
             vocab[fields[0]] = int(fields[1])
 
     # check there is no duplication and no gap among word ids
@@ -82,6 +88,7 @@ def read_unigram_probs(unigram_probs_file):
 # read the features
 # return a dict with following items:
 
+
 #   feats['constant'] is None if there is no constant feature used, else
 #                     a 2-tuple (feat_id, value), e.g. (1, 0.01)
 #   feats['special'] is a dict whose key is special words and value is a tuple (feat_id, scale)
@@ -108,7 +115,7 @@ def read_features(features_file):
     with open(features_file, 'r', encoding="utf-8") as f:
         for line in f:
             fields = line.split()
-            assert(len(fields) in [3, 4, 5])
+            assert (len(fields) in [3, 4, 5])
 
             feat_id = int(fields[0])
             feat_type = fields[1]
@@ -136,8 +143,8 @@ def read_features(features_file):
                 if order < feats['min_ngram_order']:
                     feats['min_ngram_order'] = order
             else:
-                sys.exit(
-                    sys.argv[0] + ": error feature type: {0}".format(feat_type))
+                sys.exit(sys.argv[0] +
+                         ": error feature type: {0}".format(feat_type))
 
     return feats
 
@@ -172,13 +179,14 @@ def get_feature_list(word, idx):
     if word in feats['special']:
         (feat_id, scale) = feats['special'][word]
         ans[feat_id] = 1 * scale
-        return ans   # return because words with the 'special' feature do
+        return ans  # return because words with the 'special' feature do
         # not get any other features (except the constant
         # feature).
 
     if 'unigram' in feats:
         if unigram_probs is None:
-            sys.exit(sys.argv[0] + ": if unigram feature is present, you must specify the "
+            sys.exit(sys.argv[0] +
+                     ": if unigram feature is present, you must specify the "
                      "--unigram-probs option.")
         (feat_id, offset, scale) = feats['unigram']
         logp = math.log(unigram_probs[idx])
@@ -193,7 +201,8 @@ def get_feature_list(word, idx):
         ans[feat_id] = 1 * scale
 
     for pos in range(len(word) + 1):  # +1 for EOW
-        for order in range(feats['min_ngram_order'], feats['max_ngram_order'] + 1):
+        for order in range(feats['min_ngram_order'],
+                           feats['max_ngram_order'] + 1):
             start = pos - order + 1
             end = pos + 1
 
@@ -226,7 +235,10 @@ for word, idx in sorted(vocab.items(), key=lambda x: x[1]):
         feature_list = get_feature_list("<s>", idx)
     else:
         feature_list = get_feature_list(word, idx)
-    print("{0}\t{1}".format(idx,
-                            " ".join(["%s %.3g" % (f, v) for f, v in sorted(feature_list.items())])))
+    print("{0}\t{1}".format(
+        idx, " ".join(
+            ["%s %.3g" % (f, v) for f, v in sorted(feature_list.items())])))
 
-print(sys.argv[0] + ": made features for {0} words.".format(len(vocab)), file=sys.stderr)
+print(
+    sys.argv[0] + ": made features for {0} words.".format(len(vocab)),
+    file=sys.stderr)

@@ -37,8 +37,8 @@ for line in sys.stdin:
         s = [unescape(w) for w in t[3:]]
         words = ' '.join(s)
 
-        segId = '%s_spk-%04d_seg-%07d:%07d' % (basename,
-                                               spk, start*100, end*100)
+        segId = '%s_spk-%04d_seg-%07d:%07d' % (basename, spk, start * 100,
+                                               end * 100)
         spkId = '%s_spk-%04d' % (basename, spk)
 
         # only add segments where the Matching Error Rate is below the prescribed threshhold
@@ -46,8 +46,8 @@ for line in sys.stdin:
             #print >> segments_file, '%s %s %.2f %.2f' % (segId, basename, start, end )
             #print >> text_file, '%s %s' % (segId, words)
             #print >> utt2spk_file, '%s %s' % (segId, spkId)
-            print >> mgb2_file, '%s %s %.3f %.3f %s' % (
-                basename, segId, start, end, words)
+            print >> mgb2_file, '%s %s %.3f %.3f %s' % (basename, segId, start,
+                                                        end, words)
 
 # segments_file.close()
 # utt2spk_file.close()

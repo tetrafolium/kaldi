@@ -3,7 +3,6 @@
 # Copyright     2017  Hossein Hadian
 # Apache 2.0
 
-
 import libs.common as common_lib
 """ This script perturbs speeds of utterances to force their lengths to some
     allowed lengths spaced by a factor (like 10%)
@@ -29,31 +28,49 @@ logger.addHandler(handler)
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="""This script copies the 'srcdir'
+    parser = argparse.ArgumentParser(
+        description="""This script copies the 'srcdir'
                                    data directory to output data directory 'dir'
                                    while modifying the utterances so that there are
                                    3 copies of each utterance: one with the same
                                    speed, one with a higher speed (not more than
                                    factor% faster) and one with a lower speed
                                    (not more than factor% slower)""")
-    parser.add_argument('factor', type=float, default=12,
-                        help='Spacing (in percentage) between allowed lengths.')
-    parser.add_argument('srcdir', type=str,
-                        help='path to source data dir')
+    parser.add_argument(
+        'factor',
+        type=float,
+        default=12,
+        help='Spacing (in percentage) between allowed lengths.')
+    parser.add_argument('srcdir', type=str, help='path to source data dir')
     parser.add_argument('dir', type=str, help='output dir')
-    parser.add_argument('--coverage-factor', type=float, default=0.05,
-                        help="""Percentage of durations not covered from each
+    parser.add_argument(
+        '--coverage-factor',
+        type=float,
+        default=0.05,
+        help="""Percentage of durations not covered from each
                              side of duration histogram.""")
-    parser.add_argument('--frame-shift', type=int, default=10,
-                        help="""Frame shift in milliseconds.""")
-    parser.add_argument('--frame-length', type=int, default=25,
-                        help="""Frame length in milliseconds.""")
-    parser.add_argument('--frame-subsampling-factor', type=int, default=3,
-                        help="""Chain frame subsampling factor.
+    parser.add_argument(
+        '--frame-shift',
+        type=int,
+        default=10,
+        help="""Frame shift in milliseconds.""")
+    parser.add_argument(
+        '--frame-length',
+        type=int,
+        default=25,
+        help="""Frame length in milliseconds.""")
+    parser.add_argument(
+        '--frame-subsampling-factor',
+        type=int,
+        default=3,
+        help="""Chain frame subsampling factor.
                              See steps/nnet3/chain/train.py""")
-    parser.add_argument('--speed-perturb', type=str, choices=['true', 'false'],
-                        default='true',
-                        help="""If false, no speed perturbation will occur, i.e.
+    parser.add_argument(
+        '--speed-perturb',
+        type=str,
+        choices=['true', 'false'],
+        default='true',
+        help="""If false, no speed perturbation will occur, i.e.
                              only 1 copy of each utterance will be
                              saved, which is modified to have an allowed length
                              by using extend-wav-with-silence.""")
@@ -68,8 +85,8 @@ class Utterance(object):
     """
 
     def __init__(self, uid, wavefile, speaker, transcription, dur):
-        self.wavefile = (wavefile if wavefile.rstrip(" \t\r\n").endswith('|') else
-                         'cat {} |'.format(wavefile))
+        self.wavefile = (wavefile if wavefile.rstrip(" \t\r\n").endswith('|')
+                         else 'cat {} |'.format(wavefile))
         self.speaker = speaker
         self.transcription = transcription
         self.id = uid
@@ -93,11 +110,12 @@ def read_kaldi_datadir(dir):
     # check to make sure that no segments file exists as this script won't work
     # with data directories which use a segments file.
     if os.path.isfile(os.path.join(dir, 'segments')):
-        logger.info("The data directory '{}' seems to use a 'segments' file. "
-                    "This script does not yet support a 'segments' file. You'll need "
-                    "to use utils/data/extract_wav_segments_data_dir.sh "
-                    "to convert the data dir so it does not use a 'segments' file. "
-                    "Exiting...".format(dir))
+        logger.info(
+            "The data directory '{}' seems to use a 'segments' file. "
+            "This script does not yet support a 'segments' file. You'll need "
+            "to use utils/data/extract_wav_segments_data_dir.sh "
+            "to convert the data dir so it does not use a 'segments' file. "
+            "Exiting...".format(dir))
         sys.exit(1)
 
     logger.info("Loading the data from {}...".format(dir))
@@ -110,8 +128,9 @@ def read_kaldi_datadir(dir):
     num_fail = 0
     for utt in wav_scp:
         if utt in text and utt in utt2dur and utt in utt2spk:
-            utterances.append(Utterance(utt, wav_scp[utt], utt2spk[utt],
-                                        text[utt], utt2dur[utt]))
+            utterances.append(
+                Utterance(utt, wav_scp[utt], utt2spk[utt], text[utt],
+                          utt2dur[utt]))
         else:
             num_fail += 1
 
@@ -135,7 +154,7 @@ def read_kaldi_mapfile(path):
             line = line.strip(" \t\r\n")
             sp_pos = line.find(' ')
             key = line[:sp_pos]
-            val = line[sp_pos+1:]
+            val = line[sp_pos + 1:]
             m[key] = val
     return m
 
@@ -233,8 +252,8 @@ def find_allowed_durations(start_dur, end_dur, args):
             if length % args.frame_subsampling_factor != 0:
                 length = (args.frame_subsampling_factor *
                           (length // args.frame_subsampling_factor))
-                d = (args.frame_shift * (length - 1.0)
-                     + args.frame_length + args.frame_shift / 2) / 1000.0
+                d = (args.frame_shift * (length - 1.0) + args.frame_length +
+                     args.frame_shift / 2) / 1000.0
             allowed_durations.append(d)
             durs_fp.write("{}\n".format(d))
             lengths_fp.write("{}\n".format(int(length)))
@@ -263,7 +282,8 @@ def perturb_utterances(utterances, allowed_durations, args):
         else:
             i = 1
             while i < len(allowed_durations):
-                if u.dur <= allowed_durations[i] and u.dur >= allowed_durations[i - 1]:
+                if u.dur <= allowed_durations[
+                        i] and u.dur >= allowed_durations[i - 1]:
                     break
                 i += 1
 
@@ -271,7 +291,7 @@ def perturb_utterances(utterances, allowed_durations, args):
             allowed_dur = allowed_durations[i - 1]
             speed = u.dur / allowed_dur
             # this could happen for very short/long utterances
-            if max(speed, 1.0/speed) > args.factor:
+            if max(speed, 1.0 / speed) > args.factor:
                 continue
             u1 = copy.deepcopy(u)
             u1.id = 'pv1-' + u.id
@@ -284,7 +304,7 @@ def perturb_utterances(utterances, allowed_durations, args):
         if i < len(allowed_durations):  # we have a larger allowed duration
             allowed_dur2 = allowed_durations[i]
             speed = u.dur / allowed_dur2
-            if max(speed, 1.0/speed) > args.factor:
+            if max(speed, 1.0 / speed) > args.factor:
                 continue
 
             # Add two versions for the second allowed_duration
@@ -325,9 +345,10 @@ def main():
     logger.info("Durations in the range [{},{}] will be covered. "
                 "Coverage rate: {}%".format(start_dur, end_dur,
                                             100.0 - args.coverage_factor * 2))
-    logger.info("There will be {} unique allowed lengths "
-                "for the utterances.".format(int(math.log(end_dur / start_dur) /
-                                                 math.log(args.factor))))
+    logger.info(
+        "There will be {} unique allowed lengths "
+        "for the utterances.".format(
+            int(math.log(end_dur / start_dur) / math.log(args.factor))))
 
     allowed_durations = find_allowed_durations(start_dur, end_dur, args)
 

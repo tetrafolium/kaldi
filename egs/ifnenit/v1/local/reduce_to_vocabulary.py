@@ -20,5 +20,5 @@ for line in in_stream:
     str = ""
     for word in line.strip().split():
         if word in d:
-            str = str+" "+word
+            str = str + " " + word
     out_stream.write(str.strip() + "\n")

@@ -16,14 +16,18 @@ import warnings
 
 def GetArgs():
     # we add compulsary arguments as named arguments for readability
-    parser = argparse.ArgumentParser(description="""
+    parser = argparse.ArgumentParser(
+        description="""
     **Warning, this script is deprecated.  Please use utils/data/combine_short_segments.sh**
     This script concatenates segments in the input_data_dir to ensure that"""
-                                     " the segments in the output_data_dir have a specified minimum length.",
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        " the segments in the output_data_dir have a specified minimum length.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("--minimum-duration", type=float, required=True,
-                        help="Minimum duration of the segments in the output directory")
+    parser.add_argument(
+        "--minimum-duration",
+        type=float,
+        required=True,
+        help="Minimum duration of the segments in the output directory")
     parser.add_argument("--input-data-dir", type=str, required=True)
     parser.add_argument("--output-data-dir", type=str, required=True)
 
@@ -35,15 +39,15 @@ def GetArgs():
 def RunKaldiCommand(command, wait=True):
     """ Runs commands frequently seen in Kaldi scripts. These are usually a
         sequence of commands connected by pipes, so we use shell=True """
-    p = subprocess.Popen(command, shell=True,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
+    p = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if wait:
         [stdout, stderr] = p.communicate()
         if p.returncode is not 0:
-            raise Exception("There was an error while running the command {0}\n".format(
-                command)+"-"*10+"\n"+stderr)
+            raise Exception(
+                "There was an error while running the command {0}\n".format(
+                    command) + "-" * 10 + "\n" + stderr)
         return stdout, stderr
     else:
         return p
@@ -68,13 +72,15 @@ def CheckFiles(input_data_dir):
 
 def ParseFileToDict(file, assert2fields=False, value_processor=None):
     if value_processor is None:
-        def value_processor(x): return x[0]
+
+        def value_processor(x):
+            return x[0]
 
     dict = {}
     for line in open(file, 'r'):
         parts = line.split()
         if assert2fields:
-            assert(len(parts) == 2)
+            assert (len(parts) == 2)
 
         dict[parts[0]] = value_processor(parts[1:])
     return dict
@@ -96,18 +102,19 @@ def WriteDictToFile(dict, file_name):
 
 
 def ParseDataDirInfo(data_dir):
-    def data_dir_file(file_name): return '{0}/{1}'.format(data_dir, file_name)
+    def data_dir_file(file_name):
+        return '{0}/{1}'.format(data_dir, file_name)
 
     utt2spk = ParseFileToDict(data_dir_file('utt2spk'))
-    spk2utt = ParseFileToDict(data_dir_file(
-        'spk2utt'), value_processor=lambda x: x)
-    text = ParseFileToDict(data_dir_file(
-        'text'), value_processor=lambda x: " ".join(x))
+    spk2utt = ParseFileToDict(
+        data_dir_file('spk2utt'), value_processor=lambda x: x)
+    text = ParseFileToDict(
+        data_dir_file('text'), value_processor=lambda x: " ".join(x))
     # we want to assert feats.scp has just 2 fields, as we don't know how
     # to process it otherwise
     feat = ParseFileToDict(data_dir_file('feats.scp'), assert2fields=True)
-    utt2dur = ParseFileToDict(data_dir_file(
-        'utt2dur'), value_processor=lambda x: float(x[0]))
+    utt2dur = ParseFileToDict(
+        data_dir_file('utt2dur'), value_processor=lambda x: float(x[0]))
     utt2uniq = None
     if os.path.exists(data_dir_file('utt2uniq')):
         utt2uniq = ParseFileToDict(data_dir_file('utt2uniq'))
@@ -177,12 +184,15 @@ def GetCombinedUttIndexRange(utt_index, utts, utt_durs, minimum_duration):
 
         cur_utt_dur = left_right_combined_utt_dur
     left_index = max(0, left_index)
-    right_index = min(len(utts)-1, right_index)
+    right_index = min(len(utts) - 1, right_index)
     return left_index, right_index, cur_utt_dur
 
 
-def WriteCombinedDirFiles(output_dir, utt2spk, spk2utt, text, feat, utt2dur, utt2uniq):
-    def out_dir_file(file_name): return '{0}/{1}'.format(output_dir, file_name)
+def WriteCombinedDirFiles(output_dir, utt2spk, spk2utt, text, feat, utt2dur,
+                          utt2uniq):
+    def out_dir_file(file_name):
+        return '{0}/{1}'.format(output_dir, file_name)
+
     total_combined_utt_list = []
     for speaker in spk2utt.keys():
         utts = spk2utt[speaker]
@@ -194,7 +204,7 @@ def WriteCombinedDirFiles(output_dir, utt2spk, spk2utt, text, feat, utt2dur, utt
     for speaker, combined_utt_tuple in total_combined_utt_list:
         combined_utt_list = list(combined_utt_tuple)
         combined_utt_list.sort()
-        new_utt_name = "-".join(combined_utt_list)+'-appended'
+        new_utt_name = "-".join(combined_utt_list) + '-appended'
 
         # updating the utt2spk dict
         for utt in combined_utt_list:
@@ -277,8 +287,10 @@ def CombineSegments(input_dir, output_dir, minimum_duration):
                 if not cur_utt_dur >= minimum_duration:
                     # this is a rare occurrence, better make the user aware of this
                     # situation and let them deal with it
-                    warnings.warn('Speaker {0} does not have enough utterances to satisfy the minimum duration '
-                                  'constraint. Not modifying these utterances'.format(speaker))
+                    warnings.warn(
+                        'Speaker {0} does not have enough utterances to satisfy the minimum duration '
+                        'constraint. Not modifying these utterances'.format(
+                            speaker))
                     utt_index = utt_index + 1
                     continue
                 combined_duration = 0
@@ -293,7 +305,7 @@ def CombineSegments(input_dir, output_dir, minimum_duration):
                         combined_utts.append(utt)
                 # converting to immutable type to use as dictionary key
                 combined_utts = tuple(combined_utts)
-                assert(cur_utt_dur == combined_duration)
+                assert (cur_utt_dur == combined_duration)
 
                 # now modify the utts list
                 combined_indices = list(range(left_index, right_index + 1))
@@ -305,13 +317,15 @@ def CombineSegments(input_dir, output_dir, minimum_duration):
                 utt_durs[combined_utts] = combined_duration
                 utt_index = left_index
             utt_index = utt_index + 1
-    WriteCombinedDirFiles(output_dir, utt2spk, spk2utt,
-                          text, feat, utt2dur, utt2uniq)
+    WriteCombinedDirFiles(output_dir, utt2spk, spk2utt, text, feat, utt2dur,
+                          utt2uniq)
 
 
 def Main():
-    print("""steps/cleanup/combine_short_segments.py: warning: this script is deprecated and will be removed.
-          Please use utils/data/combine_short_segments.sh""", file=sys.stderr)
+    print(
+        """steps/cleanup/combine_short_segments.py: warning: this script is deprecated and will be removed.
+          Please use utils/data/combine_short_segments.sh""",
+        file=sys.stderr)
     args = GetArgs()
 
     CheckFiles(args.input_data_dir)
@@ -319,14 +333,15 @@ def Main():
     feat_lengths = {}
     segments_file = '{0}/segments'.format(args.input_data_dir)
 
-    RunKaldiCommand(
-        "utils/data/get_utt2dur.sh {0}".format(args.input_data_dir))
+    RunKaldiCommand("utils/data/get_utt2dur.sh {0}".format(
+        args.input_data_dir))
 
     CombineSegments(args.input_data_dir, args.output_data_dir,
                     args.minimum_duration)
 
     RunKaldiCommand(
-        "utils/utt2spk_to_spk2utt.pl {od}/utt2spk > {od}/spk2utt".format(od=args.output_data_dir))
+        "utils/utt2spk_to_spk2utt.pl {od}/utt2spk > {od}/spk2utt".format(
+            od=args.output_data_dir))
     if os.path.exists('{0}/cmvn.scp'.format(args.input_data_dir)):
         shutil.copy('{0}/cmvn.scp'.format(args.input_data_dir),
                     args.output_data_dir)

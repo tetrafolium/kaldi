@@ -10,8 +10,9 @@ import io
 import sys
 import unicodedata
 # R=strong right-to-left;  AL=strong arabic right-to-left
-rtl_set = set(chr(i) for i in range(sys.maxunicode)
-              if unicodedata.bidirectional(chr(i)) in ['R', 'AL'])
+rtl_set = set(
+    chr(i) for i in range(sys.maxunicode)
+    if unicodedata.bidirectional(chr(i)) in ['R', 'AL'])
 
 
 def determine_text_direction(text):
@@ -34,8 +35,9 @@ def utf8_visual_to_logical(text):
 
     bidi.set_para(text, text_dir, None)
 
-    res = bidi.get_reordered(0 | icu_bidi.UBidiWriteReorderedOpt.UBIDI_DO_MIRRORING |
-                             icu_bidi.UBidiWriteReorderedOpt.UBIDI_KEEP_BASE_COMBINING)
+    res = bidi.get_reordered(
+        0 | icu_bidi.UBidiWriteReorderedOpt.UBIDI_DO_MIRRORING
+        | icu_bidi.UBidiWriteReorderedOpt.UBIDI_KEEP_BASE_COMBINING)
 
     return res
 
@@ -51,8 +53,9 @@ def utf8_logical_to_visual(text):
 
     bidi.set_para(text, text_dir, None)
 
-    res = bidi.get_reordered(0 | icu_bidi.UBidiWriteReorderedOpt.UBIDI_DO_MIRRORING |
-                             icu_bidi.UBidiWriteReorderedOpt.UBIDI_KEEP_BASE_COMBINING)
+    res = bidi.get_reordered(
+        0 | icu_bidi.UBidiWriteReorderedOpt.UBIDI_DO_MIRRORING
+        | icu_bidi.UBidiWriteReorderedOpt.UBIDI_KEEP_BASE_COMBINING)
 
     return res
 

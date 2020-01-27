@@ -14,8 +14,10 @@ rir_string = ['binaural', 'phone']
 phone_pos = ['hhp', 'hfrp']
 head_pos = [0, 1]
 mockup_types = [1, 2]
-room_string = ['booth',  'office',  'meeting',  'lecture',  'stairway',  'stairway1',
-               'stairway2',  'corridor',  'bathroom',  'lecture1',  'aula_carolina', 'kitchen']
+room_string = [
+    'booth', 'office', 'meeting', 'lecture', 'stairway', 'stairway1',
+    'stairway2', 'corridor', 'bathroom', 'lecture1', 'aula_carolina', 'kitchen'
+]
 azimuths = set(range(0, 181, 15))
 azimuths.union(range(0, 181, 45))
 azimuths = list(azimuths)
@@ -29,13 +31,15 @@ for rir_type in rir_string:
                     for mockup_type in mockup_types:
                         for position in phone_pos:
                             if rir_type == 'binaural':
-                                if room in set(['stairway', 'stairway1', 'stairway2']):
+                                if room in set(
+                                    ['stairway', 'stairway1', 'stairway2']):
                                     file_pattern = '{0}/air_binaural_{1}_*_{2}_{3}_{4}.mat'.format(
                                         air_dir, room, head, rir_no, azimuth)
                                 elif room == 'aula_carolina':
                                     mic_type = 3
                                     file_pattern = '{0}/air_binaural_{1}_*_{2}_{3}_{4}_{5}.mat'.format(
-                                        air_dir, room, head, rir_no, azimuth, mic_type)
+                                        air_dir, room, head, rir_no, azimuth,
+                                        mic_type)
                                 else:
                                     file_pattern = '{0}/air_binaural_{1}_*_{2}_{3}.mat'.format(
                                         air_dir, room, head, rir_no)
@@ -51,11 +55,12 @@ for rir_type in rir_string:
                             files = glob.glob(file_pattern)
                             if len(files) > 0:
                                 output_file_name = re.sub(
-                                    'mat$', 'wav', re.sub('\_\*', '', file_pattern))
+                                    'mat$', 'wav',
+                                    re.sub('\_\*', '', file_pattern))
                                 output_file_name = os.path.split(
                                     output_file_name)[1]
-                                file_patterns.append(
-                                    file_pattern+" "+output_file_name)
+                                file_patterns.append(file_pattern + " " +
+                                                     output_file_name)
 file_patterns = list(set(file_patterns))
 file_patterns.sort()
 print("\n".join(file_patterns))

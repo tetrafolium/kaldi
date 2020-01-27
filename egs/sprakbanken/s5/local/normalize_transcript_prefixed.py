@@ -17,7 +17,6 @@
 # limitations under the License.
 '''
 
-
 import codecs
 import sys
 import re
@@ -36,8 +35,8 @@ import writenumbers
 
 # t_table = str.maketrans(normdict)
 
-
 # Utility function
+
 
 def getuttid_text(line):
     return line.split(" ", 1)
@@ -58,7 +57,6 @@ for line in textin:
     normtext4 = writenumbers.normNumber(normtext3, numtable)
     outtext.write(normtext4)
     fid.write(utt_id + "\n")
-
 
 textin.close()
 outtext.close()

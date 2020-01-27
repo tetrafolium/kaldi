@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 # Copyright 2016 Johns Hopkins University (author: Daniel Povey)
 # Apache 2.0.
 
@@ -20,19 +19,21 @@ else:
     assert sys.version_info.major == 3
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
 
+parser = argparse.ArgumentParser(
+    description="This script reads stats created in analyze_lats.sh "
+    "to print information about lattice depths broken down per phone. "
+    "The normal output of this script is written to the standard output "
+    "and is human readable (on crashes, we'll print an error to stderr.")
 
-parser = argparse.ArgumentParser(description="This script reads stats created in analyze_lats.sh "
-                                 "to print information about lattice depths broken down per phone. "
-                                 "The normal output of this script is written to the standard output "
-                                 "and is human readable (on crashes, we'll print an error to stderr.")
+parser.add_argument(
+    "--frequency-cutoff-percentage",
+    type=float,
+    default=0.5,
+    help="Cutoff, expressed as a percentage "
+    "(between 0 and 100), of frequency at which we print stats "
+    "for a phone.")
 
-parser.add_argument("--frequency-cutoff-percentage", type=float,
-                    default=0.5, help="Cutoff, expressed as a percentage "
-                    "(between 0 and 100), of frequency at which we print stats "
-                    "for a phone.")
-
-parser.add_argument("lang",
-                    help="Language directory, e.g. data/lang.")
+parser.add_argument("lang", help="Language directory, e.g. data/lang.")
 
 args = parser.parse_args()
 
@@ -45,8 +46,9 @@ try:
         phone_int2text[int(number)] = word
     f.close()
 except:
-    sys.exit(u"analyze_lattice_depth_stats.py: error opening or reading {0}/phones.txt".format(
-        args.lang))
+    sys.exit(
+        u"analyze_lattice_depth_stats.py: error opening or reading {0}/phones.txt"
+        .format(args.lang))
 # this is a special case... for begin- and end-of-sentence stats,
 # we group all nonsilence phones together.
 phone_int2text[0] = 'nonsilence'
@@ -66,8 +68,9 @@ try:
         nonsilence.remove(int(silence_phone))
     f.close()
 except Exception as e:
-    sys.exit(u"analyze_lattice_depth_stats.py: error processing {0}/phones/silence.csl: {1}".format(
-        args.lang, str(e)))
+    sys.exit(
+        u"analyze_lattice_depth_stats.py: error processing {0}/phones/silence.csl: {1}"
+        .format(args.lang, str(e)))
 
 # phone_depth_counts is a dict of dicts.
 # for each integer phone-id 'phone',
@@ -91,7 +94,8 @@ while True:
     a = line.split()
     if len(a) != 3:
         sys.exit(
-            u"analyze_lattice_depth_stats.py: reading stdin, could not interpret line: " + line)
+            u"analyze_lattice_depth_stats.py: reading stdin, could not interpret line: "
+            + line)
     try:
         phone, depth, count = [int(x) for x in a]
 
@@ -104,7 +108,8 @@ while True:
         phone_depth_counts[universal_phone][depth] += count
     except Exception as e:
         sys.exit(u"analyze_lattice_depth_stats.py: unexpected phone {0} "
-                 u"seen (lang directory mismatch?): line is {1}, error is {2}".format(phone, line, str(e)))
+                 u"seen (lang directory mismatch?): line is {1}, error is {2}".
+                 format(phone, line, str(e)))
 
 if total_frames == 0:
     sys.exit(u"analyze_lattice_depth_stats.py: read no input")
@@ -146,9 +151,9 @@ print(u"The total amount of data analyzed assuming 100 frames per second "
 # Phone Z_E accounts for 2.5% of phone occurrences, with lattice depth (10,50,90-percentile)=(1,2,6) and mean=2.9
 # ...
 
-
 # sort the phones in decreasing order of count.
-for phone, depths in sorted(phone_depth_counts.items(), key=lambda x: -sum(x[1].values())):
+for phone, depths in sorted(
+        phone_depth_counts.items(), key=lambda x: -sum(x[1].values())):
 
     frequency_percentage = sum(depths.values()) * 100.0 / total_frames
     if frequency_percentage < args.frequency_cutoff_percentage:
@@ -163,8 +168,9 @@ for phone, depths in sorted(phone_depth_counts.items(), key=lambda x: -sum(x[1].
         try:
             phone_text = phone_int2text[phone]
         except:
-            sys.exit(u"analyze_lattice_depth_stats.py: phone {0} is not covered on phones.txt "
-                     u"(lang/alignment mismatch?)".format(phone))
+            sys.exit(
+                u"analyze_lattice_depth_stats.py: phone {0} is not covered on phones.txt "
+                u"(lang/alignment mismatch?)".format(phone))
         preamble = u"Phone {phone_text} accounts for {percent}% of frames, with".format(
             phone_text=phone_text, percent="%.1f" % frequency_percentage)
     elif phone == 0:
@@ -174,9 +180,11 @@ for phone, depths in sorted(phone_depth_counts.items(), key=lambda x: -sum(x[1].
         assert phone == -1
         preamble = "Overall,"
 
-    print(u"{preamble} lattice depth (10,50,90-percentile)=({p10},{p50},{p90}) and mean={mean}".format(
-        preamble=preamble,
-        p10=depth_percentile_10,
-        p50=depth_percentile_50,
-        p90=depth_percentile_90,
-        mean="%.1f" % depth_mean))
+    print(
+        u"{preamble} lattice depth (10,50,90-percentile)=({p10},{p50},{p90}) and mean={mean}"
+        .format(
+            preamble=preamble,
+            p10=depth_percentile_10,
+            p50=depth_percentile_50,
+            p90=depth_percentile_90,
+            mean="%.1f" % depth_mean))

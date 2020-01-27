@@ -24,11 +24,8 @@ def to_samples(time: str):
     seconds = Decimal(seconds)
 
     seconds_samples = seconds * SAMPLE_RATE
-    samples = (
-        hours * 3600 * SAMPLE_RATE
-        + minutes * 60 * SAMPLE_RATE
-        + seconds_samples
-    )
+    samples = (hours * 3600 * SAMPLE_RATE + minutes * 60 * SAMPLE_RATE +
+               seconds_samples)
     return int(samples)
 
 
@@ -57,12 +54,12 @@ def main():
                 words = uttid['words']
                 end_sample = to_samples(str(uttid['end_time']))
                 start_sample = to_samples(str(uttid['start_time']))
-                start_sample_str = str(
-                    int(start_sample * 100 / SAMPLE_RATE)).zfill(7)
-                end_sample_str = str(
-                    int(end_sample * 100 / SAMPLE_RATE)).zfill(7)
-                utt = "{0}_{1}-{2}-{3}".format(speaker_id,
-                                               session_id, start_sample_str, end_sample_str)
+                start_sample_str = str(int(
+                    start_sample * 100 / SAMPLE_RATE)).zfill(7)
+                end_sample_str = str(int(
+                    end_sample * 100 / SAMPLE_RATE)).zfill(7)
+                utt = "{0}_{1}-{2}-{3}".format(
+                    speaker_id, session_id, start_sample_str, end_sample_str)
                 location_dict[utt] = (location)
             except:
                 continue

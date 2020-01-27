@@ -3,8 +3,6 @@
 #           2017    Lu Huang (THU)
 #           2018    Hang Lyu
 # Apache 2.0.
-
-
 """ This module has the implementations of different GRU layers.
 """
 from __future__ import print_function
@@ -41,16 +39,17 @@ class XconfigGruLayer(XconfigLayerBase):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0
+        }
 
     def set_derived_configs(self):
         if self.config['cell-dim'] <= 0:
@@ -59,16 +58,16 @@ class XconfigGruLayer(XconfigLayerBase):
     def check_configs(self):
         key = 'cell-dim'
         if self.config['cell-dim'] <= 0:
-            raise RuntimeError(
-                "cell-dim has invalid value {0}.".format(self.config[key]))
+            raise RuntimeError("cell-dim has invalid value {0}.".format(
+                self.config[key]))
 
         if self.config['delay'] == 0:
             raise RuntimeError("delay cannot be zero")
 
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError(
-                    "{0} has invalid value {1}.".format(key, self.config[key]))
+                raise RuntimeError("{0} has invalid value {1}.".format(
+                    key, self.config[key]))
 
     def output_name(self, auxiliary_output=None):
         node_name = 's_t'
@@ -111,7 +110,8 @@ class XconfigGruLayer(XconfigLayerBase):
         affine_str = self.config['ng-affine-options']
         # Natural gradient per element scale parameters
         # TODO: decide if we want to keep exposing these options
-        ng_per_element_scale_options = self.config['ng-per-element-scale-options']
+        ng_per_element_scale_options = self.config[
+            'ng-per-element-scale-options']
         if re.search('param-mean', ng_per_element_scale_options) is None and \
            re.search('param-stddev', ng_per_element_scale_options) is None:
             ng_per_element_scale_options += " param-mean=0.0 param-stddev=1.0 "
@@ -126,73 +126,95 @@ class XconfigGruLayer(XconfigLayerBase):
 
         configs = []
         configs.append("# Update gate control : W_z* matrics")
-        configs.append("component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + cell_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + cell_dim, cell_dim, affine_str))
 
         configs.append("# Reset gate control : W_r* matrics")
-        configs.append("component name={0}.W_z.xs_r type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + cell_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs_r type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + cell_dim, cell_dim, affine_str))
 
         configs.append("# h related matrix : W_h* matrics")
-        configs.append("component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + cell_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + cell_dim, cell_dim, affine_str))
 
         configs.append("# Defining the non-linearities")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.r type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.h type=TanhComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.r type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.h type=TanhComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
 
         configs.append("# Defining the components for other cell computations")
         configs.append(
-            "component name={0}.h1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.h1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y type=NoOpComponent dim={1}".format(name, cell_dim))
+            "component name={0}.y type=NoOpComponent dim={1}".format(
+                name, cell_dim))
 
         recurrent_connection = '{0}.s_t'.format(name)
 
         configs.append("# z_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(name))
+            "component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".
+            format(name))
 
         configs.append("# r_t")
-        configs.append("component-node name={0}.r_t_pre component={0}.W_z.xs_r input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".format(name))
+            "component-node name={0}.r_t_pre component={0}.W_z.xs_r input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".
+            format(name))
 
         configs.append("# h_t")
-        configs.append("component-node name={0}.h1_t component={0}.h1 input=Append({0}.r_t, IfDefined(Offset({1}, {2})))".format(
-            name, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.h_t_pre component={0}.W_h.UW input=Append({1}, {0}.h1_t)".format(name, input_descriptor))
+            "component-node name={0}.h1_t component={0}.h1 input=Append({0}.r_t, IfDefined(Offset({1}, {2})))"
+            .format(name, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.h_t component={0}.h input={0}.h_t_pre".format(name))
+            "component-node name={0}.h_t_pre component={0}.W_h.UW input=Append({1}, {0}.h1_t)"
+            .format(name, input_descriptor))
+        configs.append(
+            "component-node name={0}.h_t component={0}.h input={0}.h_t_pre".
+            format(name))
 
         configs.append("# y_t")
         configs.append("# The following two lines are to implement (1 - z_t)")
         configs.append(
-            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))".format(name, cell_dim))
-        configs.append("component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)".format(
-            name, recurrent_connection, delay))
+            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))"
+            .format(name, cell_dim))
         configs.append(
-            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)".format(name))
+            "component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)"
+            .format(name, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)"
+            .format(name))
 
         configs.append("# s_t : recurrence")
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, cell_dim, bptrunc_str))
+        configs.append(
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, cell_dim, bptrunc_str))
 
         configs.append("# s_t will be output and recurrence")
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.y_t".format(name))
+            "component-node name={0}.s_t component={0}.s_r input={0}.y_t".
+            format(name))
         return configs
 
 
@@ -221,37 +243,42 @@ class XconfigGruLayer(XconfigLayerBase):
 #   ng-per-element-scale-options=''   [Additional options used for the diagonal matrices in the GRU ]
 #   ng-affine-options=''              [Additional options used for the full matrices in the GRU, can be used to do things like set biases to initialize to 1]
 
+
 class XconfigPgruLayer(XconfigLayerBase):
     def __init__(self, first_token, key_to_value, prev_names=None):
         assert first_token == "pgru-layer"
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
-                       'non-recurrent-projection-dim': -1,  # defaults to
-                       # recurrent-projection-dim
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75 ',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
+            'non-recurrent-projection-dim': -1,  # defaults to
+            # recurrent-projection-dim
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75 ',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0
+        }
 
     def set_derived_configs(self):
         if self.config['recurrent-projection-dim'] <= 0:
-            self.config['recurrent-projection-dim'] = self.config['cell-dim'] / 4
+            self.config[
+                'recurrent-projection-dim'] = self.config['cell-dim'] / 4
 
         if self.config['non-recurrent-projection-dim'] <= 0:
             self.config['non-recurrent-projection-dim'] = \
                 self.config['recurrent-projection-dim']
 
     def check_configs(self):
-        for key in ['cell-dim', 'recurrent-projection-dim',
-                    'non-recurrent-projection-dim']:
+        for key in [
+                'cell-dim', 'recurrent-projection-dim',
+                'non-recurrent-projection-dim'
+        ]:
             if self.config[key] <= 0:
                 raise RuntimeError("{0} has invalid value {1}.".format(
                     key, self.config[key]))
@@ -260,15 +287,15 @@ class XconfigPgruLayer(XconfigLayerBase):
             raise RuntimeError("delay cannot be zero")
 
         if (self.config['recurrent-projection-dim'] +
-            self.config['non-recurrent-projection-dim'] >
+                self.config['non-recurrent-projection-dim'] >
                 self.config['cell-dim']):
-            raise RuntimeError("recurrent+non-recurrent projection dim exceeds "
-                               "cell dim.")
+            raise RuntimeError(
+                "recurrent+non-recurrent projection dim exceeds "
+                "cell dim.")
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError("{0} has invalid value {2}."
-                                   .format(self.layer_type, key,
-                                           self.config[key]))
+                raise RuntimeError("{0} has invalid value {2}.".format(
+                    self.layer_type, key, self.config[key]))
 
     def auxiliary_outputs(self):
         return ['h_t']
@@ -279,8 +306,9 @@ class XconfigPgruLayer(XconfigLayerBase):
             if auxiliary_output in self.auxiliary_outputs():
                 node_name = auxiliary_output
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
         return '{0}.{1}'.format(self.name, node_name)
 
@@ -291,10 +319,12 @@ class XconfigPgruLayer(XconfigLayerBase):
                     return self.config['cell-dim']
                 # add code for other auxiliary_outputs here when we decide to expose them
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
-        return self.config['recurrent-projection-dim'] + self.config['non-recurrent-projection-dim']
+        return self.config['recurrent-projection-dim'] + self.config[
+            'non-recurrent-projection-dim']
 
     def get_full_config(self):
         ans = []
@@ -328,8 +358,7 @@ class XconfigPgruLayer(XconfigLayerBase):
                        " recurrence-interval={3}"
                        "".format(self.config['clipping-threshold'],
                                  self.config['zeroing-threshold'],
-                                 self.config['zeroing-interval'],
-                                 abs(delay)))
+                                 self.config['zeroing-interval'], abs(delay)))
         affine_str = self.config['ng-affine-options']
         pes_str = self.config['ng-per-element-scale-options']
 
@@ -349,79 +378,105 @@ class XconfigPgruLayer(XconfigLayerBase):
 
         configs = []
         configs.append("# Update gate control : W_z* matrics")
-        configs.append("component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
 
         configs.append("# Reset gate control : W_r* matrics")
-        configs.append("component name={0}.W_z.xs_r type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, rec_proj_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs_r type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, rec_proj_dim, affine_str))
 
         configs.append("# h related matrix : W_h* matrics")
-        configs.append("component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
 
         configs.append("# Defining the non-linearities")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.r type=SigmoidComponent dim={1} {2}".format(
-            name, rec_proj_dim, repair_nonlin_str))
-        configs.append("component name={0}.h type=TanhComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.r type=SigmoidComponent dim={1} {2}".format(
+                name, rec_proj_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.h type=TanhComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
 
         configs.append("# Defining the components for other cell computations")
-        configs.append("component name={0}.h1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(
-            name, 2 * rec_proj_dim, rec_proj_dim))
         configs.append(
-            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.h1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * rec_proj_dim, rec_proj_dim))
         configs.append(
-            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y type=NoOpComponent dim={1}".format(name, cell_dim))
+            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
+        configs.append(
+            "component name={0}.y type=NoOpComponent dim={1}".format(
+                name, cell_dim))
 
         recurrent_connection = '{0}.s_t'.format(name)
         recurrent_connection_y = '{0}.y_t'.format(name)
 
         configs.append("# z_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(name))
+            "component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".
+            format(name))
 
         configs.append("# r_t")
-        configs.append("component-node name={0}.r_t_pre component={0}.W_z.xs_r input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".format(name))
+            "component-node name={0}.r_t_pre component={0}.W_z.xs_r input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".
+            format(name))
 
         configs.append("# h_t")
-        configs.append("component-node name={0}.h1_t component={0}.h1 input=Append({0}.r_t, IfDefined(Offset({1}, {2})))".format(
-            name, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.h_t_pre component={0}.W_h.UW input=Append({1}, {0}.h1_t)".format(name, input_descriptor))
+            "component-node name={0}.h1_t component={0}.h1 input=Append({0}.r_t, IfDefined(Offset({1}, {2})))"
+            .format(name, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.h_t component={0}.h input={0}.h_t_pre".format(name))
+            "component-node name={0}.h_t_pre component={0}.W_h.UW input=Append({1}, {0}.h1_t)"
+            .format(name, input_descriptor))
+        configs.append(
+            "component-node name={0}.h_t component={0}.h input={0}.h_t_pre".
+            format(name))
 
         configs.append(
-            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))".format(name, cell_dim))
-        configs.append("component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)".format(
-            name, recurrent_connection_y, delay))
+            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))"
+            .format(name, cell_dim))
+        configs.append(
+            "component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)"
+            .format(name, recurrent_connection_y, delay))
 
         configs.append(
-            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)".format(name))
+            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)"
+            .format(name))
 
         configs.append("# s_t recurrent")
-        configs.append("component name={0}.W_s.ys type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, cell_dim, rec_proj_dim + nonrec_proj_dim, affine_str))
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, rec_proj_dim, bptrunc_str))
+        configs.append(
+            "component name={0}.W_s.ys type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, cell_dim, rec_proj_dim + nonrec_proj_dim,
+                    affine_str))
+        configs.append(
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, rec_proj_dim, bptrunc_str))
 
         configs.append("# s_t and n_t : sn_t will be the output")
         configs.append(
-            "component-node name={0}.sn_t component={0}.W_s.ys input={0}.y_t".format(name))
+            "component-node name={0}.sn_t component={0}.W_s.ys input={0}.y_t".
+            format(name))
         configs.append(
-            "dim-range-node name={0}.s_t_preclip input-node={0}.sn_t dim-offset=0 dim={1}".format(name, rec_proj_dim))
+            "dim-range-node name={0}.s_t_preclip input-node={0}.sn_t dim-offset=0 dim={1}"
+            .format(name, rec_proj_dim))
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_preclip".format(name))
+            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_preclip"
+            .format(name))
 
         return configs
 
@@ -452,40 +507,46 @@ class XconfigPgruLayer(XconfigLayerBase):
 #   ng-per-element-scale-options=''   [Additional options used for the diagonal matrices in the GRU ]
 #   ng-affine-options=''              [Additional options used for the full matrices in the GRU, can be used to do things like set biases to initialize to 1]
 
+
 class XconfigNormPgruLayer(XconfigLayerBase):
     def __init__(self, first_token, key_to_value, prev_names=None):
         assert first_token == "norm-pgru-layer"
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
-                       'non-recurrent-projection-dim': -1,  # defaults to
-                       # recurrent-projection-dim
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75 ',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0,
-                       'dropout-proportion': -1.0,  # If -1.0, no dropout components will be added
-                       # If False, regular dropout, not per frame.
-                       'dropout-per-frame': True
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
+            'non-recurrent-projection-dim': -1,  # defaults to
+            # recurrent-projection-dim
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75 ',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0,
+            'dropout-proportion':
+            -1.0,  # If -1.0, no dropout components will be added
+            # If False, regular dropout, not per frame.
+            'dropout-per-frame': True
+        }
 
     def set_derived_configs(self):
         if self.config['recurrent-projection-dim'] <= 0:
-            self.config['recurrent-projection-dim'] = self.config['cell-dim'] / 4
+            self.config[
+                'recurrent-projection-dim'] = self.config['cell-dim'] / 4
 
         if self.config['non-recurrent-projection-dim'] <= 0:
             self.config['non-recurrent-projection-dim'] = \
                 self.config['recurrent-projection-dim']
 
     def check_configs(self):
-        for key in ['cell-dim', 'recurrent-projection-dim',
-                    'non-recurrent-projection-dim']:
+        for key in [
+                'cell-dim', 'recurrent-projection-dim',
+                'non-recurrent-projection-dim'
+        ]:
             if self.config[key] <= 0:
                 raise RuntimeError("{0} has invalid value {1}.".format(
                     key, self.config[key]))
@@ -494,20 +555,21 @@ class XconfigNormPgruLayer(XconfigLayerBase):
             raise RuntimeError("delay cannot be zero")
 
         if (self.config['recurrent-projection-dim'] +
-            self.config['non-recurrent-projection-dim'] >
+                self.config['non-recurrent-projection-dim'] >
                 self.config['cell-dim']):
-            raise RuntimeError("recurrent+non-recurrent projection dim exceeds "
-                               "cell dim.")
+            raise RuntimeError(
+                "recurrent+non-recurrent projection dim exceeds "
+                "cell dim.")
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError("{0} has invalid value {2}."
-                                   .format(self.layer_type, key,
-                                           self.config[key]))
-        if ((self.config['dropout-proportion'] > 1.0 or
-             self.config['dropout-proportion'] < 0.0) and
-                self.config['dropout-proportion'] != -1.0):
-            raise RuntimeError("dropout-proportion has invalid value {0}."
-                               .format(self.config['dropout-proportion']))
+                raise RuntimeError("{0} has invalid value {2}.".format(
+                    self.layer_type, key, self.config[key]))
+        if ((self.config['dropout-proportion'] > 1.0
+             or self.config['dropout-proportion'] < 0.0)
+                and self.config['dropout-proportion'] != -1.0):
+            raise RuntimeError(
+                "dropout-proportion has invalid value {0}.".format(
+                    self.config['dropout-proportion']))
 
     def auxiliary_outputs(self):
         return ['h_t']
@@ -518,8 +580,9 @@ class XconfigNormPgruLayer(XconfigLayerBase):
             if auxiliary_output in self.auxiliary_outputs():
                 node_name = auxiliary_output
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
         return '{0}.{1}'.format(self.name, node_name)
 
@@ -530,10 +593,12 @@ class XconfigNormPgruLayer(XconfigLayerBase):
                     return self.config['cell-dim']
                 # add code for other auxiliary_outputs here when we decide to expose them
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
-        return self.config['recurrent-projection-dim'] + self.config['non-recurrent-projection-dim']
+        return self.config['recurrent-projection-dim'] + self.config[
+            'non-recurrent-projection-dim']
 
     def get_full_config(self):
         ans = []
@@ -567,12 +632,12 @@ class XconfigNormPgruLayer(XconfigLayerBase):
                        " recurrence-interval={3}"
                        "".format(self.config['clipping-threshold'],
                                  self.config['zeroing-threshold'],
-                                 self.config['zeroing-interval'],
-                                 abs(delay)))
+                                 self.config['zeroing-interval'], abs(delay)))
         affine_str = self.config['ng-affine-options']
         pes_str = self.config['ng-per-element-scale-options']
         dropout_proportion = self.config['dropout-proportion']
-        dropout_per_frame = 'true' if self.config['dropout-per-frame'] else 'false'
+        dropout_per_frame = 'true' if self.config[
+            'dropout-per-frame'] else 'false'
 
         # Natural gradient per element scale parameters
         # TODO: decide if we want to keep exposing these options
@@ -591,108 +656,144 @@ class XconfigNormPgruLayer(XconfigLayerBase):
 
         configs = []
         configs.append("# Update gate control : W_z* matrics")
-        configs.append("component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
 
         configs.append("# Reset gate control : W_r* matrics")
-        configs.append("component name={0}.W_z.xs_r type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, rec_proj_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs_r type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, rec_proj_dim, affine_str))
 
         configs.append("# h related matrix : W_h* matrics")
-        configs.append("component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
 
         if dropout_proportion != -1.0:
-            configs.append("component name={0}.dropout_z type=DropoutComponent dim={1} "
-                           "dropout-proportion={2} dropout-per-frame={3}"
-                           .format(name, cell_dim, dropout_proportion, dropout_per_frame))
-            configs.append("component name={0}.dropout_r type=DropoutComponent dim={1} "
-                           "dropout-proportion={2} dropout-per-frame={3}"
-                           .format(name, rec_proj_dim, dropout_proportion, dropout_per_frame))
+            configs.append(
+                "component name={0}.dropout_z type=DropoutComponent dim={1} "
+                "dropout-proportion={2} dropout-per-frame={3}".format(
+                    name, cell_dim, dropout_proportion, dropout_per_frame))
+            configs.append(
+                "component name={0}.dropout_r type=DropoutComponent dim={1} "
+                "dropout-proportion={2} dropout-per-frame={3}".format(
+                    name, rec_proj_dim, dropout_proportion, dropout_per_frame))
 
         configs.append("# Defining the non-linearities")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.r type=SigmoidComponent dim={1} {2}".format(
-            name, rec_proj_dim, repair_nonlin_str))
-        configs.append("component name={0}.h type=TanhComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.r type=SigmoidComponent dim={1} {2}".format(
+                name, rec_proj_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.h type=TanhComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
 
         configs.append("# Defining the components for other cell computations")
-        configs.append("component name={0}.h1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(
-            name, 2 * rec_proj_dim, rec_proj_dim))
         configs.append(
-            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.h1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * rec_proj_dim, rec_proj_dim))
         configs.append(
-            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y type=NoOpComponent dim={1}".format(name, cell_dim))
+            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
+        configs.append(
+            "component name={0}.y type=NoOpComponent dim={1}".format(
+                name, cell_dim))
 
         recurrent_connection = '{0}.s_t'.format(name)
         recurrent_connection_y = '{0}.y_t'.format(name)
 
         configs.append("# z_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         if dropout_proportion != -1.0:
             configs.append(
-                "component-node name={0}.z_predrop_t component={0}.z input={0}.z_t_pre".format(name))
+                "component-node name={0}.z_predrop_t component={0}.z input={0}.z_t_pre"
+                .format(name))
             configs.append(
-                "component-node name={0}.z_t component={0}.dropout_z input={0}.z_predrop_t".format(name))
+                "component-node name={0}.z_t component={0}.dropout_z input={0}.z_predrop_t"
+                .format(name))
         else:
-            configs.append("component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(
-                name, input_descriptor, recurrent_connection, delay))
+            configs.append(
+                "component-node name={0}.z_t component={0}.z input={0}.z_t_pre"
+                .format(name, input_descriptor, recurrent_connection, delay))
 
         configs.append("# r_t")
-        configs.append("component-node name={0}.r_t_pre component={0}.W_z.xs_r input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.r_t_pre component={0}.W_z.xs_r input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         if dropout_proportion != -1.0:
             configs.append(
-                "component-node name={0}.r_predrop_t component={0}.r input={0}.r_t_pre".format(name))
+                "component-node name={0}.r_predrop_t component={0}.r input={0}.r_t_pre"
+                .format(name))
             configs.append(
-                "component-node name={0}.r_t component={0}.dropout_r input={0}.r_predrop_t".format(name))
+                "component-node name={0}.r_t component={0}.dropout_r input={0}.r_predrop_t"
+                .format(name))
         else:
             configs.append(
-                "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".format(name))
+                "component-node name={0}.r_t component={0}.r input={0}.r_t_pre"
+                .format(name))
 
         configs.append("# h_t")
-        configs.append("component-node name={0}.h1_t component={0}.h1 input=Append({0}.r_t, IfDefined(Offset({1}, {2})))".format(
-            name, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.h_t_pre component={0}.W_h.UW input=Append({1}, {0}.h1_t)".format(name, input_descriptor))
+            "component-node name={0}.h1_t component={0}.h1 input=Append({0}.r_t, IfDefined(Offset({1}, {2})))"
+            .format(name, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.h_t component={0}.h input={0}.h_t_pre".format(name))
+            "component-node name={0}.h_t_pre component={0}.W_h.UW input=Append({1}, {0}.h1_t)"
+            .format(name, input_descriptor))
+        configs.append(
+            "component-node name={0}.h_t component={0}.h input={0}.h_t_pre".
+            format(name))
 
         configs.append(
-            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))".format(name, cell_dim))
-        configs.append("component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)".format(
-            name, recurrent_connection_y, delay))
+            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))"
+            .format(name, cell_dim))
         configs.append(
-            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)".format(name))
+            "component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)"
+            .format(name, recurrent_connection_y, delay))
+        configs.append(
+            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)"
+            .format(name))
 
         configs.append("# s_t recurrent")
-        configs.append("component name={0}.W_s.ys type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, cell_dim, rec_proj_dim + nonrec_proj_dim, affine_str))
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, rec_proj_dim, bptrunc_str))
-
-        configs.append("component name={0}.batchnorm type=BatchNormComponent dim={1} target-rms=1.0".format(
-            name, rec_proj_dim + nonrec_proj_dim))
         configs.append(
-            "component name={0}.renorm type=NormalizeComponent dim={1} target-rms=1.0".format(name, rec_proj_dim))
+            "component name={0}.W_s.ys type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, cell_dim, rec_proj_dim + nonrec_proj_dim,
+                    affine_str))
+        configs.append(
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, rec_proj_dim, bptrunc_str))
+
+        configs.append(
+            "component name={0}.batchnorm type=BatchNormComponent dim={1} target-rms=1.0"
+            .format(name, rec_proj_dim + nonrec_proj_dim))
+        configs.append(
+            "component name={0}.renorm type=NormalizeComponent dim={1} target-rms=1.0"
+            .format(name, rec_proj_dim))
 
         configs.append("# s_t and n_t : sn_t will be the output")
         configs.append(
-            "component-node name={0}.sn_nobatchnorm_t component={0}.W_s.ys input={0}.y_t".format(name))
+            "component-node name={0}.sn_nobatchnorm_t component={0}.W_s.ys input={0}.y_t"
+            .format(name))
         configs.append(
-            "dim-range-node name={0}.s_t_preclip input-node={0}.sn_nobatchnorm_t dim-offset=0 dim={1}".format(name, rec_proj_dim))
+            "dim-range-node name={0}.s_t_preclip input-node={0}.sn_nobatchnorm_t dim-offset=0 dim={1}"
+            .format(name, rec_proj_dim))
         configs.append(
-            "component-node name={0}.sn_t component={0}.batchnorm input={0}.sn_nobatchnorm_t".format(name))
+            "component-node name={0}.sn_t component={0}.batchnorm input={0}.sn_nobatchnorm_t"
+            .format(name))
 
         configs.append(
-            "component-node name={0}.s_renorm_t component={0}.renorm input={0}.s_t_preclip".format(name))
+            "component-node name={0}.s_renorm_t component={0}.renorm input={0}.s_t_preclip"
+            .format(name))
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.s_renorm_t".format(name))
+            "component-node name={0}.s_t component={0}.s_r input={0}.s_renorm_t"
+            .format(name))
 
         return configs
 
@@ -725,31 +826,35 @@ class XconfigOpgruLayer(XconfigLayerBase):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
-                       'non-recurrent-projection-dim': -1,  # defaults to
-                       # recurrent-projection-dim
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75 ',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
+            'non-recurrent-projection-dim': -1,  # defaults to
+            # recurrent-projection-dim
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75 ',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0
+        }
 
     def set_derived_configs(self):
         if self.config['recurrent-projection-dim'] <= 0:
-            self.config['recurrent-projection-dim'] = self.config['cell-dim'] / 4
+            self.config[
+                'recurrent-projection-dim'] = self.config['cell-dim'] / 4
 
         if self.config['non-recurrent-projection-dim'] <= 0:
             self.config['non-recurrent-projection-dim'] = \
                 self.config['recurrent-projection-dim']
 
     def check_configs(self):
-        for key in ['cell-dim', 'recurrent-projection-dim',
-                    'non-recurrent-projection-dim']:
+        for key in [
+                'cell-dim', 'recurrent-projection-dim',
+                'non-recurrent-projection-dim'
+        ]:
             if self.config[key] <= 0:
                 raise RuntimeError("{0} has invalid value {1}.".format(
                     key, self.config[key]))
@@ -758,15 +863,15 @@ class XconfigOpgruLayer(XconfigLayerBase):
             raise RuntimeError("delay cannot be zero")
 
         if (self.config['recurrent-projection-dim'] +
-            self.config['non-recurrent-projection-dim'] >
+                self.config['non-recurrent-projection-dim'] >
                 self.config['cell-dim']):
-            raise RuntimeError("recurrent+non-recurrent projection dim exceeds "
-                               "cell dim.")
+            raise RuntimeError(
+                "recurrent+non-recurrent projection dim exceeds "
+                "cell dim.")
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError("{0} has invalid value {2}."
-                                   .format(self.layer_type, key,
-                                           self.config[key]))
+                raise RuntimeError("{0} has invalid value {2}.".format(
+                    self.layer_type, key, self.config[key]))
 
     def auxiliary_outputs(self):
         return ['h_t']
@@ -777,8 +882,9 @@ class XconfigOpgruLayer(XconfigLayerBase):
             if auxiliary_output in self.auxiliary_outputs():
                 node_name = auxiliary_output
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
         return '{0}.{1}'.format(self.name, node_name)
 
@@ -789,10 +895,12 @@ class XconfigOpgruLayer(XconfigLayerBase):
                     return self.config['cell-dim']
                 # add code for other auxiliary_outputs here when we decide to expose them
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
-        return self.config['recurrent-projection-dim'] + self.config['non-recurrent-projection-dim']
+        return self.config['recurrent-projection-dim'] + self.config[
+            'non-recurrent-projection-dim']
 
     def get_full_config(self):
         ans = []
@@ -826,8 +934,7 @@ class XconfigOpgruLayer(XconfigLayerBase):
                        " recurrence-interval={3}"
                        "".format(self.config['clipping-threshold'],
                                  self.config['zeroing-threshold'],
-                                 self.config['zeroing-interval'],
-                                 abs(delay)))
+                                 self.config['zeroing-interval'], abs(delay)))
         affine_str = self.config['ng-affine-options']
         pes_str = self.config['ng-per-element-scale-options']
 
@@ -847,84 +954,113 @@ class XconfigOpgruLayer(XconfigLayerBase):
 
         configs = []
         configs.append("# Update gate control : W_z* matrics")
-        configs.append("component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
 
         configs.append("# Output gate control : W_r* matrics")
-        configs.append("component name={0}.W_z.xs_o type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs_o type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
 
         configs.append("# h related matrix : W_h* matrics")
-        configs.append("component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim, cell_dim, affine_str))
-        configs.append("component name={0}.W_h.UW_elementwise type=NaturalGradientPerElementScaleComponent dim={1} {2}".format(
-            name, cell_dim, pes_str))
+        configs.append(
+            "component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_h.UW_elementwise type=NaturalGradientPerElementScaleComponent dim={1} {2}"
+            .format(name, cell_dim, pes_str))
 
         configs.append("# Defining the non-linearities")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.o type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.h type=TanhComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.o type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.h type=TanhComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
 
         configs.append("# Defining the components for other cell computations")
         configs.append(
-            "component name={0}.o1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.o1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y type=NoOpComponent dim={1}".format(name, cell_dim))
+            "component name={0}.y type=NoOpComponent dim={1}".format(
+                name, cell_dim))
 
         recurrent_connection = '{0}.s_t'.format(name)
         recurrent_connection_y = '{0}.y_t'.format(name)
 
         configs.append("# z_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(name))
+            "component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".
+            format(name))
 
         configs.append("# o_t")
-        configs.append("component-node name={0}.o_t_pre component={0}.W_z.xs_o input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.o_t component={0}.o input={0}.o_t_pre".format(name))
+            "component-node name={0}.o_t_pre component={0}.W_z.xs_o input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.o_t component={0}.o input={0}.o_t_pre".
+            format(name))
 
         configs.append("# h_t")
         configs.append(
-            "component-node name={0}.h_t_pre component={0}.W_h.UW input={1}".format(name, input_descriptor))
-        configs.append("component-node name={0}.h_t_pre2 component={0}.W_h.UW_elementwise input=IfDefined(Offset({1}, {2}))".format(
-            name, recurrent_connection_y, delay))
+            "component-node name={0}.h_t_pre component={0}.W_h.UW input={1}".
+            format(name, input_descriptor))
         configs.append(
-            "component-node name={0}.h_t component={0}.h input=Sum({0}.h_t_pre, {0}.h_t_pre2)".format(name))
+            "component-node name={0}.h_t_pre2 component={0}.W_h.UW_elementwise input=IfDefined(Offset({1}, {2}))"
+            .format(name, recurrent_connection_y, delay))
+        configs.append(
+            "component-node name={0}.h_t component={0}.h input=Sum({0}.h_t_pre, {0}.h_t_pre2)"
+            .format(name))
 
         configs.append(
-            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))".format(name, cell_dim))
-        configs.append("component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)".format(
-            name, recurrent_connection_y, delay))
+            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))"
+            .format(name, cell_dim))
         configs.append(
-            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)".format(name))
+            "component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)"
+            .format(name, recurrent_connection_y, delay))
         configs.append(
-            "component-node name={0}.y_o_t component={0}.o1 input=Append({0}.o_t, {0}.y_t)".format(name))
+            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)"
+            .format(name))
+        configs.append(
+            "component-node name={0}.y_o_t component={0}.o1 input=Append({0}.o_t, {0}.y_t)"
+            .format(name))
 
         configs.append("# s_t recurrent")
-        configs.append("component name={0}.W_s.ys type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, cell_dim, rec_proj_dim + nonrec_proj_dim, affine_str))
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, rec_proj_dim, bptrunc_str))
+        configs.append(
+            "component name={0}.W_s.ys type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, cell_dim, rec_proj_dim + nonrec_proj_dim,
+                    affine_str))
+        configs.append(
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, rec_proj_dim, bptrunc_str))
 
         configs.append("# s_t and n_t : sn_t will be the output")
         configs.append(
-            "component-node name={0}.sn_t component={0}.W_s.ys input={0}.y_o_t".format(name))
+            "component-node name={0}.sn_t component={0}.W_s.ys input={0}.y_o_t"
+            .format(name))
         configs.append(
-            "dim-range-node name={0}.s_t_preclip input-node={0}.sn_t dim-offset=0 dim={1}".format(name, rec_proj_dim))
+            "dim-range-node name={0}.s_t_preclip input-node={0}.sn_t dim-offset=0 dim={1}"
+            .format(name, rec_proj_dim))
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_preclip".format(name))
+            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_preclip"
+            .format(name))
 
         return configs
+
 
 # This class is for lines like
 #   'norm-opgru-layer name=norm-opgru1 input=[-1] delay=-3'
@@ -960,35 +1096,40 @@ class XconfigNormOpgruLayer(XconfigLayerBase):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
-                       'non-recurrent-projection-dim': -1,  # defaults to
-                       # recurrent-projection-dim
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75 ',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0,
-                       'dropout-proportion': -1.0,  # If -1.0, no dropout components will be added
-                       'l2-regularize': 0.0,
-                       # If false, regular dropout, not per frame.
-                       'dropout-per-frame': True
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
+            'non-recurrent-projection-dim': -1,  # defaults to
+            # recurrent-projection-dim
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75 ',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0,
+            'dropout-proportion':
+            -1.0,  # If -1.0, no dropout components will be added
+            'l2-regularize': 0.0,
+            # If false, regular dropout, not per frame.
+            'dropout-per-frame': True
+        }
 
     def set_derived_configs(self):
         if self.config['recurrent-projection-dim'] <= 0:
-            self.config['recurrent-projection-dim'] = self.config['cell-dim'] / 4
+            self.config[
+                'recurrent-projection-dim'] = self.config['cell-dim'] / 4
 
         if self.config['non-recurrent-projection-dim'] <= 0:
             self.config['non-recurrent-projection-dim'] = \
                 self.config['recurrent-projection-dim']
 
     def check_configs(self):
-        for key in ['cell-dim', 'recurrent-projection-dim',
-                    'non-recurrent-projection-dim']:
+        for key in [
+                'cell-dim', 'recurrent-projection-dim',
+                'non-recurrent-projection-dim'
+        ]:
             if self.config[key] <= 0:
                 raise RuntimeError("{0} has invalid value {1}.".format(
                     key, self.config[key]))
@@ -997,20 +1138,21 @@ class XconfigNormOpgruLayer(XconfigLayerBase):
             raise RuntimeError("delay cannot be zero")
 
         if (self.config['recurrent-projection-dim'] +
-            self.config['non-recurrent-projection-dim'] >
+                self.config['non-recurrent-projection-dim'] >
                 self.config['cell-dim']):
-            raise RuntimeError("recurrent+non-recurrent projection dim exceeds "
-                               "cell dim.")
+            raise RuntimeError(
+                "recurrent+non-recurrent projection dim exceeds "
+                "cell dim.")
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError("{0} has invalid value {2}."
-                                   .format(self.layer_type, key,
-                                           self.config[key]))
-        if ((self.config['dropout-proportion'] > 1.0 or
-             self.config['dropout-proportion'] < 0.0) and
-                self.config['dropout-proportion'] != -1.0):
-            raise RuntimeError("dropout-proportion has invalid value {0}."
-                               .format(self.config['dropout-proportion']))
+                raise RuntimeError("{0} has invalid value {2}.".format(
+                    self.layer_type, key, self.config[key]))
+        if ((self.config['dropout-proportion'] > 1.0
+             or self.config['dropout-proportion'] < 0.0)
+                and self.config['dropout-proportion'] != -1.0):
+            raise RuntimeError(
+                "dropout-proportion has invalid value {0}.".format(
+                    self.config['dropout-proportion']))
 
     def auxiliary_outputs(self):
         return ['h_t']
@@ -1021,8 +1163,9 @@ class XconfigNormOpgruLayer(XconfigLayerBase):
             if auxiliary_output in self.auxiliary_outputs():
                 node_name = auxiliary_output
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
         return '{0}.{1}'.format(self.name, node_name)
 
@@ -1033,10 +1176,12 @@ class XconfigNormOpgruLayer(XconfigLayerBase):
                     return self.config['cell-dim']
                 # add code for other auxiliary_outputs here when we decide to expose them
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
-        return self.config['recurrent-projection-dim'] + self.config['non-recurrent-projection-dim']
+        return self.config['recurrent-projection-dim'] + self.config[
+            'non-recurrent-projection-dim']
 
     def get_full_config(self):
         ans = []
@@ -1070,12 +1215,12 @@ class XconfigNormOpgruLayer(XconfigLayerBase):
                        " recurrence-interval={3}"
                        "".format(self.config['clipping-threshold'],
                                  self.config['zeroing-threshold'],
-                                 self.config['zeroing-interval'],
-                                 abs(delay)))
+                                 self.config['zeroing-interval'], abs(delay)))
         affine_str = self.config['ng-affine-options']
         pes_str = self.config['ng-per-element-scale-options']
         dropout_proportion = self.config['dropout-proportion']
-        dropout_per_frame = 'true' if self.config['dropout-per-frame'] else 'false'
+        dropout_per_frame = 'true' if self.config[
+            'dropout-per-frame'] else 'false'
 
         l2_regularize = self.config['l2-regularize']
         l2_regularize_option = ('l2-regularize={0} '.format(l2_regularize)
@@ -1098,110 +1243,151 @@ class XconfigNormOpgruLayer(XconfigLayerBase):
 
         configs = []
         configs.append("# Update gate control : W_z* matrics")
-        configs.append("component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3} {4}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str, l2_regularize_option))
+        configs.append(
+            "component name={0}.W_z.xs_z type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3} {4}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str,
+                    l2_regularize_option))
 
         configs.append("# Output gate control : W_r* matrics")
-        configs.append("component name={0}.W_z.xs_o type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3} {4}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str, l2_regularize_option))
+        configs.append(
+            "component name={0}.W_z.xs_o type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3} {4}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str,
+                    l2_regularize_option))
 
         configs.append("# h related matrix : W_h* matrics")
-        configs.append("component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3} {4}".format(
-            name, input_dim, cell_dim, affine_str, l2_regularize_option))
-        configs.append("component name={0}.W_h.UW_elementwise type=NaturalGradientPerElementScaleComponent dim={1} {2}".format(
-            name, cell_dim, pes_str))
+        configs.append(
+            "component name={0}.W_h.UW type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3} {4}"
+            .format(name, input_dim, cell_dim, affine_str,
+                    l2_regularize_option))
+        configs.append(
+            "component name={0}.W_h.UW_elementwise type=NaturalGradientPerElementScaleComponent dim={1} {2}"
+            .format(name, cell_dim, pes_str))
 
         configs.append("# Defining the non-linearities")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.o type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.h type=TanhComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.o type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.h type=TanhComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
 
         configs.append("# Defining the components for other cell computations")
         configs.append(
-            "component name={0}.o1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.o1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.y1 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.y2 type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component name={0}.y type=NoOpComponent dim={1}".format(name, cell_dim))
+            "component name={0}.y type=NoOpComponent dim={1}".format(
+                name, cell_dim))
 
         if dropout_proportion != -1.0:
-            configs.append("component name={0}.dropout type=DropoutComponent dim={1} "
-                           "dropout-proportion={2} dropout-per-frame={3}"
-                           .format(name, cell_dim, dropout_proportion, dropout_per_frame))
+            configs.append(
+                "component name={0}.dropout type=DropoutComponent dim={1} "
+                "dropout-proportion={2} dropout-per-frame={3}".format(
+                    name, cell_dim, dropout_proportion, dropout_per_frame))
 
         recurrent_connection = '{0}.s_t'.format(name)
         recurrent_connection_y = '{0}.y_t'.format(name)
 
         configs.append("# z_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.z_t_pre component={0}.W_z.xs_z input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         if dropout_proportion != -1.0:
             configs.append(
-                "component-node name={0}.z_predrop_t component={0}.z input={0}.z_t_pre".format(name))
+                "component-node name={0}.z_predrop_t component={0}.z input={0}.z_t_pre"
+                .format(name))
             configs.append(
-                "component-node name={0}.z_t component={0}.dropout input={0}.z_predrop_t".format(name))
+                "component-node name={0}.z_t component={0}.dropout input={0}.z_predrop_t"
+                .format(name))
         else:
             configs.append(
-                "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(name))
+                "component-node name={0}.z_t component={0}.z input={0}.z_t_pre"
+                .format(name))
 
         configs.append("# o_t")
-        configs.append("component-node name={0}.o_t_pre component={0}.W_z.xs_o input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.o_t_pre component={0}.W_z.xs_o input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         if dropout_proportion != -1.0:
             configs.append(
-                "component-node name={0}.o_predrop_t component={0}.o input={0}.o_t_pre".format(name))
+                "component-node name={0}.o_predrop_t component={0}.o input={0}.o_t_pre"
+                .format(name))
             configs.append(
-                "component-node name={0}.o_t component={0}.dropout input={0}.o_predrop_t".format(name))
+                "component-node name={0}.o_t component={0}.dropout input={0}.o_predrop_t"
+                .format(name))
         else:
             configs.append(
-                "component-node name={0}.o_t component={0}.o input={0}.o_t_pre".format(name))
+                "component-node name={0}.o_t component={0}.o input={0}.o_t_pre"
+                .format(name))
 
         configs.append("# h_t")
         configs.append(
-            "component-node name={0}.h_t_pre component={0}.W_h.UW input={1}".format(name, input_descriptor))
-        configs.append("component-node name={0}.h_t_pre2 component={0}.W_h.UW_elementwise input=IfDefined(Offset({1}, {2}))".format(
-            name, recurrent_connection_y, delay))
+            "component-node name={0}.h_t_pre component={0}.W_h.UW input={1}".
+            format(name, input_descriptor))
         configs.append(
-            "component-node name={0}.h_t component={0}.h input=Sum({0}.h_t_pre, {0}.h_t_pre2)".format(name))
+            "component-node name={0}.h_t_pre2 component={0}.W_h.UW_elementwise input=IfDefined(Offset({1}, {2}))"
+            .format(name, recurrent_connection_y, delay))
+        configs.append(
+            "component-node name={0}.h_t component={0}.h input=Sum({0}.h_t_pre, {0}.h_t_pre2)"
+            .format(name))
 
         configs.append("# The following two lines are to implement (1 - z_t)")
         configs.append(
-            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))".format(name, cell_dim))
-        configs.append("component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)".format(
-            name, recurrent_connection_y, delay))
+            "component-node name={0}.y1_t component={0}.y1 input=Append({0}.h_t, Sum(Scale(-1.0,{0}.z_t), Const(1.0, {1})))"
+            .format(name, cell_dim))
         configs.append(
-            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)".format(name))
+            "component-node name={0}.y2_t component={0}.y2 input=Append(IfDefined(Offset({1}, {2})), {0}.z_t)"
+            .format(name, recurrent_connection_y, delay))
         configs.append(
-            "component-node name={0}.y_o_t component={0}.o1 input=Append({0}.o_t, {0}.y_t)".format(name))
+            "component-node name={0}.y_t component={0}.y input=Sum({0}.y1_t, {0}.y2_t)"
+            .format(name))
+        configs.append(
+            "component-node name={0}.y_o_t component={0}.o1 input=Append({0}.o_t, {0}.y_t)"
+            .format(name))
 
         configs.append("# s_t recurrent")
-        configs.append("component name={0}.W_s.ys type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3} {4}".format(
-            name, cell_dim, rec_proj_dim + nonrec_proj_dim, affine_str, l2_regularize_option))
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, rec_proj_dim, bptrunc_str))
-        configs.append("component name={0}.batchnorm type=BatchNormComponent dim={1} target-rms=1.0".format(
-            name, rec_proj_dim + nonrec_proj_dim))
         configs.append(
-            "component name={0}.renorm type=NormalizeComponent dim={1} target-rms=1.0".format(name, rec_proj_dim))
+            "component name={0}.W_s.ys type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3} {4}"
+            .format(name, cell_dim, rec_proj_dim + nonrec_proj_dim, affine_str,
+                    l2_regularize_option))
+        configs.append(
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, rec_proj_dim, bptrunc_str))
+        configs.append(
+            "component name={0}.batchnorm type=BatchNormComponent dim={1} target-rms=1.0"
+            .format(name, rec_proj_dim + nonrec_proj_dim))
+        configs.append(
+            "component name={0}.renorm type=NormalizeComponent dim={1} target-rms=1.0"
+            .format(name, rec_proj_dim))
 
         configs.append("# s_t and n_t : sn_t will be the output")
         configs.append(
-            "component-node name={0}.sn_nobatchnorm_t component={0}.W_s.ys input={0}.y_o_t".format(name))
+            "component-node name={0}.sn_nobatchnorm_t component={0}.W_s.ys input={0}.y_o_t"
+            .format(name))
         configs.append(
-            "component-node name={0}.sn_t component={0}.batchnorm input={0}.sn_nobatchnorm_t".format(name))
+            "component-node name={0}.sn_t component={0}.batchnorm input={0}.sn_nobatchnorm_t"
+            .format(name))
         configs.append(
-            "dim-range-node name={0}.s_t_preclip input-node={0}.sn_nobatchnorm_t dim-offset=0 dim={1}".format(name, rec_proj_dim))
+            "dim-range-node name={0}.s_t_preclip input-node={0}.sn_nobatchnorm_t dim-offset=0 dim={1}"
+            .format(name, rec_proj_dim))
         configs.append(
-            "component-node name={0}.s_t_preclip_renorm component={0}.renorm input={0}.s_t_preclip".format(name))
+            "component-node name={0}.s_t_preclip_renorm component={0}.renorm input={0}.s_t_preclip"
+            .format(name))
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_preclip_renorm".format(name))
+            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_preclip_renorm"
+            .format(name))
 
         return configs
+
 
 # This class is for lines like
 #   'fast-gru-layer name=gru1 input=[-1] delay=-3'
@@ -1232,22 +1418,23 @@ class XconfigFastGruLayer(XconfigLayerBase):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0,
-                       # if you want to set 'self-repair-scale', ' self-repair-threshold'
-                       # or 'param-stddev' for GruNonlinearityComponent
-                       # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
-                       # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
-                       # you can also see src/nnet3/nnet-combined-component.h for detail
-                       'gru-nonlinearity-options': ' max-change=0.75'
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0,
+            # if you want to set 'self-repair-scale', ' self-repair-threshold'
+            # or 'param-stddev' for GruNonlinearityComponent
+            # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
+            # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
+            # you can also see src/nnet3/nnet-combined-component.h for detail
+            'gru-nonlinearity-options': ' max-change=0.75'
+        }
 
     def set_derived_configs(self):
         if self.config['cell-dim'] <= 0:
@@ -1256,16 +1443,16 @@ class XconfigFastGruLayer(XconfigLayerBase):
     def check_configs(self):
         key = 'cell-dim'
         if self.config['cell-dim'] <= 0:
-            raise RuntimeError(
-                "cell-dim has invalid value {0}.".format(self.config[key]))
+            raise RuntimeError("cell-dim has invalid value {0}.".format(
+                self.config[key]))
 
         if self.config['delay'] == 0:
             raise RuntimeError("delay cannot be zero")
 
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError(
-                    "{0} has invalid value {1}.".format(key, self.config[key]))
+                raise RuntimeError("{0} has invalid value {1}.".format(
+                    key, self.config[key]))
 
     def output_name(self, auxiliary_output=None):
         node_name = 'y_t'
@@ -1328,56 +1515,73 @@ class XconfigFastGruLayer(XconfigLayerBase):
 
         configs.append("### Begin Gru layer '{0}'".format(name))
         configs.append("# Update gate control : W_z* matrices")
-        configs.append("component name={0}.W_z.xh type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + cell_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xh type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + cell_dim, cell_dim, affine_str))
         configs.append("# Reset gate control : W_r* matrices")
-        configs.append("component name={0}.W_r.xh type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + cell_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_r.xh type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + cell_dim, cell_dim, affine_str))
 
         configs.append("# hpart_t related matrix : W_hpart matrice")
-        configs.append("component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim, cell_dim, affine_str))
 
         configs.append("# Defining the non-linearities for z_t and r_t")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.r type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.r type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
 
         recurrent_connection = '{0}.s_t'.format(name)
 
         configs.append("# z_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xh input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(name))
+            "component-node name={0}.z_t_pre component={0}.W_z.xh input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".
+            format(name))
         configs.append("# r_t")
-        configs.append("component-node name={0}.r_t_pre component={0}.W_r.xh input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".format(name))
+            "component-node name={0}.r_t_pre component={0}.W_r.xh input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".
+            format(name))
 
         configs.append("# hpart_t")
         configs.append(
-            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}".format(name, input_descriptor))
+            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}"
+            .format(name, input_descriptor))
 
         configs.append("# y_t")
         configs.append(
-            "# Note: the output of GruNonlinearityComponent is (h_t, c_t), we just get the second half. Otherwise, in non-projection gru layer, y_t = c_t")
+            "# Note: the output of GruNonlinearityComponent is (h_t, c_t), we just get the second half. Otherwise, in non-projection gru layer, y_t = c_t"
+        )
         configs.append(
-            "component name={0}.gru_nonlin type=GruNonlinearityComponent cell-dim={1} {2}".format(name, cell_dim, gru_nonlin_str))
-        configs.append("component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.r_t, {0}.hpart_t, IfDefined(Offset({1}, {2})))".format(
-            name, recurrent_connection, delay))
+            "component name={0}.gru_nonlin type=GruNonlinearityComponent cell-dim={1} {2}"
+            .format(name, cell_dim, gru_nonlin_str))
         configs.append(
-            "dim-range-node name={0}.y_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}".format(name, cell_dim))
+            "component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.r_t, {0}.hpart_t, IfDefined(Offset({1}, {2})))"
+            .format(name, recurrent_connection, delay))
+        configs.append(
+            "dim-range-node name={0}.y_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}"
+            .format(name, cell_dim))
 
         configs.append("# s_t : recurrence")
         configs.append(
-            "# Note: in non-projection gru layer, the recurrent part equals the output, namely y_t.")
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, cell_dim, bptrunc_str))
+            "# Note: in non-projection gru layer, the recurrent part equals the output, namely y_t."
+        )
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.y_t".format(name))
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, cell_dim, bptrunc_str))
+        configs.append(
+            "component-node name={0}.s_t component={0}.s_r input={0}.y_t".
+            format(name))
         return configs
 
 
@@ -1412,37 +1616,41 @@ class XconfigFastPgruLayer(XconfigLayerBase):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
-                       'non-recurrent-projection-dim': -1,  # defaults to
-                       # recurrent-projection-dim
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75 ',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0,
-                       # if you want to set 'self-repair-scale', ' self-repair-threshold'
-                       # or 'param-stddev' for GruNonlinearityComponent
-                       # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
-                       # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
-                       # you can also see src/nnet3/nnet-combined-component.h for detail
-                       'gru-nonlinearity-options': ' max-change=0.75'
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
+            'non-recurrent-projection-dim': -1,  # defaults to
+            # recurrent-projection-dim
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75 ',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0,
+            # if you want to set 'self-repair-scale', ' self-repair-threshold'
+            # or 'param-stddev' for GruNonlinearityComponent
+            # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
+            # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
+            # you can also see src/nnet3/nnet-combined-component.h for detail
+            'gru-nonlinearity-options': ' max-change=0.75'
+        }
 
     def set_derived_configs(self):
         if self.config['recurrent-projection-dim'] <= 0:
-            self.config['recurrent-projection-dim'] = self.config['cell-dim'] / 4
+            self.config[
+                'recurrent-projection-dim'] = self.config['cell-dim'] / 4
 
         if self.config['non-recurrent-projection-dim'] <= 0:
             self.config['non-recurrent-projection-dim'] = \
                 self.config['recurrent-projection-dim']
 
     def check_configs(self):
-        for key in ['cell-dim', 'recurrent-projection-dim',
-                    'non-recurrent-projection-dim']:
+        for key in [
+                'cell-dim', 'recurrent-projection-dim',
+                'non-recurrent-projection-dim'
+        ]:
             if self.config[key] <= 0:
                 raise RuntimeError("{0} has invalid value {1}.".format(
                     key, self.config[key]))
@@ -1451,15 +1659,15 @@ class XconfigFastPgruLayer(XconfigLayerBase):
             raise RuntimeError("delay cannot be zero")
 
         if (self.config['recurrent-projection-dim'] +
-            self.config['non-recurrent-projection-dim'] >
+                self.config['non-recurrent-projection-dim'] >
                 self.config['cell-dim']):
-            raise RuntimeError("recurrent+non-recurrent projection dim exceeds "
-                               "cell dim.")
+            raise RuntimeError(
+                "recurrent+non-recurrent projection dim exceeds "
+                "cell dim.")
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError("{0} has invalid value {2}."
-                                   .format(self.layer_type, key,
-                                           self.config[key]))
+                raise RuntimeError("{0} has invalid value {2}.".format(
+                    self.layer_type, key, self.config[key]))
 
     def auxiliary_outputs(self):
         return ['c_t']
@@ -1470,8 +1678,9 @@ class XconfigFastPgruLayer(XconfigLayerBase):
             if auxiliary_output in self.auxiliary_outputs():
                 node_name = auxiliary_output
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
         return '{0}.{1}'.format(self.name, node_name)
 
@@ -1482,10 +1691,12 @@ class XconfigFastPgruLayer(XconfigLayerBase):
                     return self.config['cell-dim']
                 # add code for other auxiliary_outputs here when we decide to expose them
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
-        return self.config['recurrent-projection-dim'] + self.config['non-recurrent-projection-dim']
+        return self.config['recurrent-projection-dim'] + self.config[
+            'non-recurrent-projection-dim']
 
     def get_full_config(self):
         ans = []
@@ -1519,8 +1730,7 @@ class XconfigFastPgruLayer(XconfigLayerBase):
                        " recurrence-interval={3}"
                        "".format(self.config['clipping-threshold'],
                                  self.config['zeroing-threshold'],
-                                 self.config['zeroing-interval'],
-                                 abs(delay)))
+                                 self.config['zeroing-interval'], abs(delay)))
         affine_str = self.config['ng-affine-options']
         pes_str = self.config['ng-per-element-scale-options']
 
@@ -1554,61 +1764,81 @@ class XconfigFastPgruLayer(XconfigLayerBase):
         configs = []
         configs.append("### Begin Gru layer '{0}'".format(name))
         configs.append("# Update gate control : W_z* matrices")
-        configs.append("component name={0}.W_z.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
         configs.append("# Reset gate control : W_r* matrices")
-        configs.append("component name={0}.W_r.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, rec_proj_dim, affine_str))
+        configs.append(
+            "component name={0}.W_r.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, rec_proj_dim, affine_str))
 
         configs.append("# hpart_t related matrix : W_hpart matric")
-        configs.append("component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim, cell_dim, affine_str))
 
         configs.append("# Defining the non-linearities")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.r type=SigmoidComponent dim={1} {2}".format(
-            name, rec_proj_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.r type=SigmoidComponent dim={1} {2}".format(
+                name, rec_proj_dim, repair_nonlin_str))
 
         recurrent_connection = '{0}.s_t'.format(name)
 
         configs.append("# z_t and r_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xs input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(name))
-        configs.append("component-node name={0}.r_t_pre component={0}.W_r.xs input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+            "component-node name={0}.z_t_pre component={0}.W_z.xs input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".format(name))
+            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".
+            format(name))
+        configs.append(
+            "component-node name={0}.r_t_pre component={0}.W_r.xs input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".
+            format(name))
 
         configs.append("# hpart_t")
         configs.append(
-            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}".format(name, input_descriptor))
+            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}"
+            .format(name, input_descriptor))
 
         configs.append("# c_t")
         configs.append(
-            "# Note: the output of GruNonlinearityComponent is (h_t, c_t), we use the second half.")
-        configs.append("component name={0}.gru_nonlin type=GruNonlinearityComponent cell-dim={1} recurrent-dim={2} {3}".format(
-            name, cell_dim, rec_proj_dim, gru_nonlin_str))
-        configs.append("component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.r_t, {0}.hpart_t, IfDefined(Offset({0}.c_t, {2})), IfDefined(Offset({1}, {2})))".format(
-            name, recurrent_connection, delay))
+            "# Note: the output of GruNonlinearityComponent is (h_t, c_t), we use the second half."
+        )
         configs.append(
-            "dim-range-node name={0}.c_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}".format(name, cell_dim))
+            "component name={0}.gru_nonlin type=GruNonlinearityComponent cell-dim={1} recurrent-dim={2} {3}"
+            .format(name, cell_dim, rec_proj_dim, gru_nonlin_str))
+        configs.append(
+            "component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.r_t, {0}.hpart_t, IfDefined(Offset({0}.c_t, {2})), IfDefined(Offset({1}, {2})))"
+            .format(name, recurrent_connection, delay))
+        configs.append(
+            "dim-range-node name={0}.c_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}"
+            .format(name, cell_dim))
 
         configs.append("# the projected matrix W_y.c and y_t")
-        configs.append("component name={0}.W_y.c type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, cell_dim, rec_proj_dim + nonrec_proj_dim, affine_str))
         configs.append(
-            "component-node name={0}.y_t component={0}.W_y.c input={0}.c_t".format(name))
+            "component name={0}.W_y.c type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, cell_dim, rec_proj_dim + nonrec_proj_dim,
+                    affine_str))
+        configs.append(
+            "component-node name={0}.y_t component={0}.W_y.c input={0}.c_t".
+            format(name))
 
         configs.append("# s_t : recurrence")
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, rec_proj_dim, bptrunc_str))
         configs.append(
-            "dim-range-node name={0}.s_t_pre input-node={0}.y_t dim-offset=0 dim={1}".format(name, rec_proj_dim))
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, rec_proj_dim, bptrunc_str))
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_pre".format(name))
+            "dim-range-node name={0}.s_t_pre input-node={0}.y_t dim-offset=0 dim={1}"
+            .format(name, rec_proj_dim))
+        configs.append(
+            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_pre".
+            format(name))
         return configs
 
 
@@ -1617,6 +1847,7 @@ class XconfigFastPgruLayer(XconfigLayerBase):
 
 # Different from the vanilla PGRU, the NormPGRU uses batchnorm in the forward direction
 # and renorm in the recurrence.
+
 
 # The output dimension of the layer may be specified via 'cell-dim=xxx', but if not specified,
 # the dimension defaults to the same as the input.
@@ -1644,39 +1875,45 @@ class XconfigFastNormPgruLayer(XconfigLayerBase):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
-                       'non-recurrent-projection-dim': -1,  # defaults to
-                       # recurrent-projection-dim
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75 ',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0,
-                       # if you want to set 'self-repair-scale', ' self-repair-threshold'
-                       # or 'param-stddev' for GruNonlinearityComponent
-                       # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
-                       # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
-                       # you can also see src/nnet3/nnet-combined-component.h for detail
-                       'gru-nonlinearity-options': ' max-change=0.75',
-                       'dropout-proportion': -1.0,  # If -1.0, no dropout components will be added
-                       'dropout-per-frame': True  # If False, regular dropout, not per frame
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
+            'non-recurrent-projection-dim': -1,  # defaults to
+            # recurrent-projection-dim
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75 ',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0,
+            # if you want to set 'self-repair-scale', ' self-repair-threshold'
+            # or 'param-stddev' for GruNonlinearityComponent
+            # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
+            # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
+            # you can also see src/nnet3/nnet-combined-component.h for detail
+            'gru-nonlinearity-options': ' max-change=0.75',
+            'dropout-proportion':
+            -1.0,  # If -1.0, no dropout components will be added
+            'dropout-per-frame':
+            True  # If False, regular dropout, not per frame
+        }
 
     def set_derived_configs(self):
         if self.config['recurrent-projection-dim'] <= 0:
-            self.config['recurrent-projection-dim'] = self.config['cell-dim'] / 4
+            self.config[
+                'recurrent-projection-dim'] = self.config['cell-dim'] / 4
 
         if self.config['non-recurrent-projection-dim'] <= 0:
             self.config['non-recurrent-projection-dim'] = \
                 self.config['recurrent-projection-dim']
 
     def check_configs(self):
-        for key in ['cell-dim', 'recurrent-projection-dim',
-                    'non-recurrent-projection-dim']:
+        for key in [
+                'cell-dim', 'recurrent-projection-dim',
+                'non-recurrent-projection-dim'
+        ]:
             if self.config[key] <= 0:
                 raise RuntimeError("{0} has invalid value {1}.".format(
                     key, self.config[key]))
@@ -1685,20 +1922,21 @@ class XconfigFastNormPgruLayer(XconfigLayerBase):
             raise RuntimeError("delay cannot be zero")
 
         if (self.config['recurrent-projection-dim'] +
-            self.config['non-recurrent-projection-dim'] >
+                self.config['non-recurrent-projection-dim'] >
                 self.config['cell-dim']):
-            raise RuntimeError("recurrent+non-recurrent projection dim exceeds "
-                               "cell dim.")
+            raise RuntimeError(
+                "recurrent+non-recurrent projection dim exceeds "
+                "cell dim.")
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError("{0} has invalid value {2}."
-                                   .format(self.layer_type, key,
-                                           self.config[key]))
-        if ((self.config['dropout-proportion'] > 1.0 or
-             self.config['dropout-proportion'] < 0.0) and
-                self.config['dropout-proportion'] != -1.0):
-            raise RuntimeError("dropout-proportion has invalid value {0}."
-                               .format(self.config['dropout-proportion']))
+                raise RuntimeError("{0} has invalid value {2}.".format(
+                    self.layer_type, key, self.config[key]))
+        if ((self.config['dropout-proportion'] > 1.0
+             or self.config['dropout-proportion'] < 0.0)
+                and self.config['dropout-proportion'] != -1.0):
+            raise RuntimeError(
+                "dropout-proportion has invalid value {0}.".format(
+                    self.config['dropout-proportion']))
 
     def auxiliary_outputs(self):
         return ['c_t']
@@ -1709,8 +1947,9 @@ class XconfigFastNormPgruLayer(XconfigLayerBase):
             if auxiliary_output in self.auxiliary_outputs():
                 node_name = auxiliary_output
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
         return '{0}.{1}'.format(self.name, node_name)
 
@@ -1721,10 +1960,12 @@ class XconfigFastNormPgruLayer(XconfigLayerBase):
                     return self.config['cell-dim']
                 # add code for other auxiliary_outputs here when we decide to expose them
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
-        return self.config['recurrent-projection-dim'] + self.config['non-recurrent-projection-dim']
+        return self.config['recurrent-projection-dim'] + self.config[
+            'non-recurrent-projection-dim']
 
     def get_full_config(self):
         ans = []
@@ -1758,12 +1999,12 @@ class XconfigFastNormPgruLayer(XconfigLayerBase):
                        " recurrence-interval={3}"
                        "".format(self.config['clipping-threshold'],
                                  self.config['zeroing-threshold'],
-                                 self.config['zeroing-interval'],
-                                 abs(delay)))
+                                 self.config['zeroing-interval'], abs(delay)))
         affine_str = self.config['ng-affine-options']
         pes_str = self.config['ng-per-element-scale-options']
         dropout_proportion = self.config['dropout-proportion']
-        dropout_per_frame = 'true' if self.config['dropout-per-frame'] else 'false'
+        dropout_per_frame = 'true' if self.config[
+            'dropout-per-frame'] else 'false'
 
         # Natural gradient per element scale parameters
         # TODO: decide if we want to keep exposing these options
@@ -1795,94 +2036,124 @@ class XconfigFastNormPgruLayer(XconfigLayerBase):
         configs = []
         configs.append("### Begin Gru layer '{0}'".format(name))
         configs.append("# Update gate control : W_z* matrices")
-        configs.append("component name={0}.W_z.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
         configs.append("# Reset gate control : W_r* matrices")
-        configs.append("component name={0}.W_r.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, rec_proj_dim, affine_str))
+        configs.append(
+            "component name={0}.W_r.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, rec_proj_dim, affine_str))
 
         configs.append("# hpart_t related matrix : W_hpart matric")
-        configs.append("component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim, cell_dim, affine_str))
 
         configs.append("# Defining the non-linearities")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.r type=SigmoidComponent dim={1} {2}".format(
-            name, rec_proj_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.r type=SigmoidComponent dim={1} {2}".format(
+                name, rec_proj_dim, repair_nonlin_str))
 
         if dropout_proportion != -1.0:
             configs.append("# Defining the dropout component")
-            configs.append("component name={0}.dropout_z type=DropoutComponent dim={1} "
-                           "dropout-proportion={2} dropout-per-frame={3}"
-                           .format(name, cell_dim, dropout_proportion, dropout_per_frame))
-            configs.append("component name={0}.dropout_r type=DropoutComponent dim={1} "
-                           "dropout-proportion={2} dropout-per-frame={3}"
-                           .format(name, rec_proj_dim, dropout_proportion, dropout_per_frame))
+            configs.append(
+                "component name={0}.dropout_z type=DropoutComponent dim={1} "
+                "dropout-proportion={2} dropout-per-frame={3}".format(
+                    name, cell_dim, dropout_proportion, dropout_per_frame))
+            configs.append(
+                "component name={0}.dropout_r type=DropoutComponent dim={1} "
+                "dropout-proportion={2} dropout-per-frame={3}".format(
+                    name, rec_proj_dim, dropout_proportion, dropout_per_frame))
 
         recurrent_connection = '{0}.s_t'.format(name)
 
         configs.append("# z_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xs input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.z_t_pre component={0}.W_z.xs input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         if dropout_proportion != -1.0:
             configs.append(
-                "component-node name={0}.z_t_predrop component={0}.z input={0}.z_t_pre".format(name))
+                "component-node name={0}.z_t_predrop component={0}.z input={0}.z_t_pre"
+                .format(name))
             configs.append(
-                "component-node name={0}.z_t component={0}.dropout_z input={0}.z_t_predrop".format(name))
+                "component-node name={0}.z_t component={0}.dropout_z input={0}.z_t_predrop"
+                .format(name))
         else:
             configs.append(
-                "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(name))
+                "component-node name={0}.z_t component={0}.z input={0}.z_t_pre"
+                .format(name))
 
         configs.append("# r_t")
-        configs.append("component-node name={0}.r_t_pre component={0}.W_r.xs input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.r_t_pre component={0}.W_r.xs input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         if dropout_proportion != -1.0:
             configs.append(
-                "component-node name={0}.r_t_predrop component={0}.r input={0}.r_t_pre".format(name))
+                "component-node name={0}.r_t_predrop component={0}.r input={0}.r_t_pre"
+                .format(name))
             configs.append(
-                "component-node name={0}.r_t component={0}.dropout_r input={0}.r_t_predrop".format(name))
+                "component-node name={0}.r_t component={0}.dropout_r input={0}.r_t_predrop"
+                .format(name))
         else:
             configs.append(
-                "component-node name={0}.r_t component={0}.r input={0}.r_t_pre".format(name))
+                "component-node name={0}.r_t component={0}.r input={0}.r_t_pre"
+                .format(name))
 
         configs.append("# hpart_t")
         configs.append(
-            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}".format(name, input_descriptor))
+            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}"
+            .format(name, input_descriptor))
 
         configs.append("# c_t")
         configs.append(
-            "# Note: the output of GruNonlinearityComponent is (h_t, c_t), we use the second half.")
-        configs.append("component name={0}.gru_nonlin type=GruNonlinearityComponent cell-dim={1} recurrent-dim={2} {3}".format(
-            name, cell_dim, rec_proj_dim, gru_nonlin_str))
-        configs.append("component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.r_t, {0}.hpart_t, IfDefined(Offset({0}.c_t, {2})), IfDefined(Offset({1}, {2})))".format(
-            name, recurrent_connection, delay))
+            "# Note: the output of GruNonlinearityComponent is (h_t, c_t), we use the second half."
+        )
         configs.append(
-            "dim-range-node name={0}.c_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}".format(name, cell_dim))
+            "component name={0}.gru_nonlin type=GruNonlinearityComponent cell-dim={1} recurrent-dim={2} {3}"
+            .format(name, cell_dim, rec_proj_dim, gru_nonlin_str))
+        configs.append(
+            "component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.r_t, {0}.hpart_t, IfDefined(Offset({0}.c_t, {2})), IfDefined(Offset({1}, {2})))"
+            .format(name, recurrent_connection, delay))
+        configs.append(
+            "dim-range-node name={0}.c_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}"
+            .format(name, cell_dim))
 
         configs.append("# the projected matrix W_y.c and y_t_tmp")
-        configs.append("component name={0}.W_y.c type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, cell_dim, rec_proj_dim + nonrec_proj_dim, affine_str))
         configs.append(
-            "component-node name={0}.y_t_tmp component={0}.W_y.c input={0}.c_t".format(name))
+            "component name={0}.W_y.c type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, cell_dim, rec_proj_dim + nonrec_proj_dim,
+                    affine_str))
+        configs.append(
+            "component-node name={0}.y_t_tmp component={0}.W_y.c input={0}.c_t"
+            .format(name))
 
         configs.append("# s_t : recurrence")
         configs.append(
-            "component name={0}.renorm type=NormalizeComponent dim={1} target-rms=1.0".format(name, rec_proj_dim))
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, rec_proj_dim, bptrunc_str))
+            "component name={0}.renorm type=NormalizeComponent dim={1} target-rms=1.0"
+            .format(name, rec_proj_dim))
         configs.append(
-            "dim-range-node name={0}.s_t_pre input-node={0}.y_t_tmp dim-offset=0 dim={1}".format(name, rec_proj_dim))
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, rec_proj_dim, bptrunc_str))
         configs.append(
-            "component-node name={0}.s_t_renorm component={0}.renorm input={0}.s_t_pre".format(name))
+            "dim-range-node name={0}.s_t_pre input-node={0}.y_t_tmp dim-offset=0 dim={1}"
+            .format(name, rec_proj_dim))
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_renorm".format(name))
+            "component-node name={0}.s_t_renorm component={0}.renorm input={0}.s_t_pre"
+            .format(name))
+        configs.append(
+            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_renorm"
+            .format(name))
 
         configs.append("# y_t : output")
-        configs.append("component name={0}.batchnorm type=BatchNormComponent dim={1} target-rms=1.0".format(
-            name, rec_proj_dim + nonrec_proj_dim))
         configs.append(
-            "component-node name={0}.y_t component={0}.batchnorm input={0}.y_t_tmp".format(name))
+            "component name={0}.batchnorm type=BatchNormComponent dim={1} target-rms=1.0"
+            .format(name, rec_proj_dim + nonrec_proj_dim))
+        configs.append(
+            "component-node name={0}.y_t component={0}.batchnorm input={0}.y_t_tmp"
+            .format(name))
         return configs
 
 
@@ -1917,37 +2188,41 @@ class XconfigFastOpgruLayer(XconfigLayerBase):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
-                       'non-recurrent-projection-dim': -1,  # defaults to
-                       # recurrent-projection-dim
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75 ',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0,
-                       # if you want to set 'self-repair-scale', ' self-repair-threshold'
-                       # or 'param-stddev' for GruNonlinearityComponent
-                       # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
-                       # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
-                       # you can also see src/nnet3/nnet-combined-component.h for detail
-                       'gru-nonlinearity-options': ' max-change=0.75'
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
+            'non-recurrent-projection-dim': -1,  # defaults to
+            # recurrent-projection-dim
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75 ',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0,
+            # if you want to set 'self-repair-scale', ' self-repair-threshold'
+            # or 'param-stddev' for GruNonlinearityComponent
+            # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
+            # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
+            # you can also see src/nnet3/nnet-combined-component.h for detail
+            'gru-nonlinearity-options': ' max-change=0.75'
+        }
 
     def set_derived_configs(self):
         if self.config['recurrent-projection-dim'] <= 0:
-            self.config['recurrent-projection-dim'] = self.config['cell-dim'] / 4
+            self.config[
+                'recurrent-projection-dim'] = self.config['cell-dim'] / 4
 
         if self.config['non-recurrent-projection-dim'] <= 0:
             self.config['non-recurrent-projection-dim'] = \
                 self.config['recurrent-projection-dim']
 
     def check_configs(self):
-        for key in ['cell-dim', 'recurrent-projection-dim',
-                    'non-recurrent-projection-dim']:
+        for key in [
+                'cell-dim', 'recurrent-projection-dim',
+                'non-recurrent-projection-dim'
+        ]:
             if self.config[key] <= 0:
                 raise RuntimeError("{0} has invalid value {1}.".format(
                     key, self.config[key]))
@@ -1956,15 +2231,15 @@ class XconfigFastOpgruLayer(XconfigLayerBase):
             raise RuntimeError("delay cannot be zero")
 
         if (self.config['recurrent-projection-dim'] +
-            self.config['non-recurrent-projection-dim'] >
+                self.config['non-recurrent-projection-dim'] >
                 self.config['cell-dim']):
-            raise RuntimeError("recurrent+non-recurrent projection dim exceeds "
-                               "cell dim.")
+            raise RuntimeError(
+                "recurrent+non-recurrent projection dim exceeds "
+                "cell dim.")
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError("{0} has invalid value {2}."
-                                   .format(self.layer_type, key,
-                                           self.config[key]))
+                raise RuntimeError("{0} has invalid value {2}.".format(
+                    self.layer_type, key, self.config[key]))
 
     def auxiliary_outputs(self):
         return ['c_t']
@@ -1975,8 +2250,9 @@ class XconfigFastOpgruLayer(XconfigLayerBase):
             if auxiliary_output in self.auxiliary_outputs():
                 node_name = auxiliary_output
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
         return '{0}.{1}'.format(self.name, node_name)
 
@@ -1987,10 +2263,12 @@ class XconfigFastOpgruLayer(XconfigLayerBase):
                     return self.config['cell-dim']
                 # add code for other auxiliary_outputs here when we decide to expose them
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
-        return self.config['recurrent-projection-dim'] + self.config['non-recurrent-projection-dim']
+        return self.config['recurrent-projection-dim'] + self.config[
+            'non-recurrent-projection-dim']
 
     def get_full_config(self):
         ans = []
@@ -2024,8 +2302,7 @@ class XconfigFastOpgruLayer(XconfigLayerBase):
                        " recurrence-interval={3}"
                        "".format(self.config['clipping-threshold'],
                                  self.config['zeroing-threshold'],
-                                 self.config['zeroing-interval'],
-                                 abs(delay)))
+                                 self.config['zeroing-interval'], abs(delay)))
         affine_str = self.config['ng-affine-options']
         pes_str = self.config['ng-per-element-scale-options']
 
@@ -2059,65 +2336,87 @@ class XconfigFastOpgruLayer(XconfigLayerBase):
         configs = []
         configs.append("### Begin Gru layer '{0}'".format(name))
         configs.append("# Update gate control : W_z* matrices")
-        configs.append("component name={0}.W_z.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
         configs.append("# Reset gate control : W_o* matrices")
-        configs.append("component name={0}.W_o.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_o.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
 
         configs.append("# hpart_t related matrix : W_hpart matric")
-        configs.append("component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim, cell_dim, affine_str))
 
         configs.append("# Defining the non-linearities")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.o type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.o type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
 
         recurrent_connection = '{0}.s_t'.format(name)
 
         configs.append("# z_t and o_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xs input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(name))
-        configs.append("component-node name={0}.o_t_pre component={0}.W_o.xs input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+            "component-node name={0}.z_t_pre component={0}.W_z.xs input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         configs.append(
-            "component-node name={0}.o_t component={0}.o input={0}.o_t_pre".format(name))
+            "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".
+            format(name))
+        configs.append(
+            "component-node name={0}.o_t_pre component={0}.W_o.xs input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.o_t component={0}.o input={0}.o_t_pre".
+            format(name))
 
         configs.append("# hpart_t")
         configs.append(
-            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}".format(name, input_descriptor))
+            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}"
+            .format(name, input_descriptor))
 
         configs.append("# c_t")
         configs.append(
-            "# Note: the output of OutputGruNonlinearityComponent is (h_t, c_t), we use the second half.")
+            "# Note: the output of OutputGruNonlinearityComponent is (h_t, c_t), we use the second half."
+        )
         configs.append(
-            "component name={0}.gru_nonlin type=OutputGruNonlinearityComponent cell-dim={1} {2}".format(name, cell_dim, gru_nonlin_str))
+            "component name={0}.gru_nonlin type=OutputGruNonlinearityComponent cell-dim={1} {2}"
+            .format(name, cell_dim, gru_nonlin_str))
         configs.append(
-            "component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.hpart_t, IfDefined(Offset({0}.c_t, {1})))".format(name, delay))
+            "component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.hpart_t, IfDefined(Offset({0}.c_t, {1})))"
+            .format(name, delay))
         configs.append(
-            "dim-range-node name={0}.c_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}".format(name, cell_dim))
+            "dim-range-node name={0}.c_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}"
+            .format(name, cell_dim))
 
         configs.append("# the projected matrix W_y.cdoto and y_t")
         configs.append(
-            "component name={0}.cdoto type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.cdoto type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component-node name={0}.cdoto component={0}.cdoto input=Append({0}.c_t, {0}.o_t)".format(name))
-        configs.append("component name={0}.W_y.cdoto type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, cell_dim, rec_proj_dim + nonrec_proj_dim, affine_str))
+            "component-node name={0}.cdoto component={0}.cdoto input=Append({0}.c_t, {0}.o_t)"
+            .format(name))
         configs.append(
-            "component-node name={0}.y_t component={0}.W_y.cdoto input={0}.cdoto".format(name))
+            "component name={0}.W_y.cdoto type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, cell_dim, rec_proj_dim + nonrec_proj_dim,
+                    affine_str))
+        configs.append(
+            "component-node name={0}.y_t component={0}.W_y.cdoto input={0}.cdoto"
+            .format(name))
 
         configs.append("# s_t recurrence")
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, rec_proj_dim, bptrunc_str))
         configs.append(
-            "dim-range-node name={0}.s_t_preclip input-node={0}.y_t dim-offset=0 dim={1}".format(name, rec_proj_dim))
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, rec_proj_dim, bptrunc_str))
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_preclip".format(name))
+            "dim-range-node name={0}.s_t_preclip input-node={0}.y_t dim-offset=0 dim={1}"
+            .format(name, rec_proj_dim))
+        configs.append(
+            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_preclip"
+            .format(name))
 
         return configs
 
@@ -2127,6 +2426,7 @@ class XconfigFastOpgruLayer(XconfigLayerBase):
 
 # Different from the vanilla OPGRU, the NormOPGRU uses batchnorm in the forward direction
 # and renorm in the recurrence.
+
 
 # The output dimension of the layer may be specified via 'cell-dim=xxx', but if not specified,
 # the dimension defaults to the same as the input.
@@ -2154,39 +2454,45 @@ class XconfigFastNormOpgruLayer(XconfigLayerBase):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'cell-dim': -1,  # this is a compulsory argument
-                       'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
-                       'non-recurrent-projection-dim': -1,  # defaults to
-                       # recurrent-projection-dim
-                       'clipping-threshold': 30.0,
-                       'delay': -1,
-                       'ng-per-element-scale-options': ' max-change=0.75 ',
-                       'ng-affine-options': ' max-change=0.75 ',
-                       'self-repair-scale-nonlinearity': 0.00001,
-                       'zeroing-interval': 20,
-                       'zeroing-threshold': 15.0,
-                       # if you want to set 'self-repair-scale', ' self-repair-threshold'
-                       # or 'param-stddev' for GruNonlinearityComponent
-                       # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
-                       # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
-                       # you can also see src/nnet3/nnet-combined-component.h for detail
-                       'gru-nonlinearity-options': ' max-change=0.75',
-                       'dropout-proportion': -1.0,  # If -1.0, no dropout components will be added
-                       'dropout-per-frame': True  # If False, regular dropout, not per frame
-                       }
+        self.config = {
+            'input': '[-1]',
+            'cell-dim': -1,  # this is a compulsory argument
+            'recurrent-projection-dim': -1,  # defaults to cell-dim / 4
+            'non-recurrent-projection-dim': -1,  # defaults to
+            # recurrent-projection-dim
+            'clipping-threshold': 30.0,
+            'delay': -1,
+            'ng-per-element-scale-options': ' max-change=0.75 ',
+            'ng-affine-options': ' max-change=0.75 ',
+            'self-repair-scale-nonlinearity': 0.00001,
+            'zeroing-interval': 20,
+            'zeroing-threshold': 15.0,
+            # if you want to set 'self-repair-scale', ' self-repair-threshold'
+            # or 'param-stddev' for GruNonlinearityComponent
+            # For default, they are 1.0e-05, 0.2 and  1.0 / sqrt(d) where d is cell-dim.
+            # you can add somethig like 'self-repair-scale=xxx' to gru-nonlinearity-options.
+            # you can also see src/nnet3/nnet-combined-component.h for detail
+            'gru-nonlinearity-options': ' max-change=0.75',
+            'dropout-proportion':
+            -1.0,  # If -1.0, no dropout components will be added
+            'dropout-per-frame':
+            True  # If False, regular dropout, not per frame
+        }
 
     def set_derived_configs(self):
         if self.config['recurrent-projection-dim'] <= 0:
-            self.config['recurrent-projection-dim'] = self.config['cell-dim'] / 4
+            self.config[
+                'recurrent-projection-dim'] = self.config['cell-dim'] / 4
 
         if self.config['non-recurrent-projection-dim'] <= 0:
             self.config['non-recurrent-projection-dim'] = \
                 self.config['recurrent-projection-dim']
 
     def check_configs(self):
-        for key in ['cell-dim', 'recurrent-projection-dim',
-                    'non-recurrent-projection-dim']:
+        for key in [
+                'cell-dim', 'recurrent-projection-dim',
+                'non-recurrent-projection-dim'
+        ]:
             if self.config[key] <= 0:
                 raise RuntimeError("{0} has invalid value {1}.".format(
                     key, self.config[key]))
@@ -2195,20 +2501,21 @@ class XconfigFastNormOpgruLayer(XconfigLayerBase):
             raise RuntimeError("delay cannot be zero")
 
         if (self.config['recurrent-projection-dim'] +
-            self.config['non-recurrent-projection-dim'] >
+                self.config['non-recurrent-projection-dim'] >
                 self.config['cell-dim']):
-            raise RuntimeError("recurrent+non-recurrent projection dim exceeds "
-                               "cell dim.")
+            raise RuntimeError(
+                "recurrent+non-recurrent projection dim exceeds "
+                "cell dim.")
         for key in ['self-repair-scale-nonlinearity']:
             if self.config[key] < 0.0 or self.config[key] > 1.0:
-                raise RuntimeError("{0} has invalid value {2}."
-                                   .format(self.layer_type, key,
-                                           self.config[key]))
-        if ((self.config['dropout-proportion'] > 1.0 or
-             self.config['dropout-proportion'] < 0.0) and
-                self.config['dropout-proportion'] != -1.0):
-            raise RuntimeError("dropout-proportion has invalid value {0}."
-                               .format(self.config['dropout-proportion']))
+                raise RuntimeError("{0} has invalid value {2}.".format(
+                    self.layer_type, key, self.config[key]))
+        if ((self.config['dropout-proportion'] > 1.0
+             or self.config['dropout-proportion'] < 0.0)
+                and self.config['dropout-proportion'] != -1.0):
+            raise RuntimeError(
+                "dropout-proportion has invalid value {0}.".format(
+                    self.config['dropout-proportion']))
 
     def auxiliary_outputs(self):
         return ['c_t']
@@ -2219,8 +2526,9 @@ class XconfigFastNormOpgruLayer(XconfigLayerBase):
             if auxiliary_output in self.auxiliary_outputs():
                 node_name = auxiliary_output
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
         return '{0}.{1}'.format(self.name, node_name)
 
@@ -2231,10 +2539,12 @@ class XconfigFastNormOpgruLayer(XconfigLayerBase):
                     return self.config['cell-dim']
                 # add code for other auxiliary_outputs here when we decide to expose them
             else:
-                raise Exception("In {0} of type {1}, unknown auxiliary output name {1}".format(
-                    self.layer_type, auxiliary_output))
+                raise Exception(
+                    "In {0} of type {1}, unknown auxiliary output name {1}".
+                    format(self.layer_type, auxiliary_output))
 
-        return self.config['recurrent-projection-dim'] + self.config['non-recurrent-projection-dim']
+        return self.config['recurrent-projection-dim'] + self.config[
+            'non-recurrent-projection-dim']
 
     def get_full_config(self):
         ans = []
@@ -2268,12 +2578,12 @@ class XconfigFastNormOpgruLayer(XconfigLayerBase):
                        " recurrence-interval={3}"
                        "".format(self.config['clipping-threshold'],
                                  self.config['zeroing-threshold'],
-                                 self.config['zeroing-interval'],
-                                 abs(delay)))
+                                 self.config['zeroing-interval'], abs(delay)))
         affine_str = self.config['ng-affine-options']
         pes_str = self.config['ng-per-element-scale-options']
         dropout_proportion = self.config['dropout-proportion']
-        dropout_per_frame = 'true' if self.config['dropout-per-frame'] else 'false'
+        dropout_per_frame = 'true' if self.config[
+            'dropout-per-frame'] else 'false'
 
         # Natural gradient per element scale parameters
         # TODO: decide if we want to keep exposing these options
@@ -2305,94 +2615,125 @@ class XconfigFastNormOpgruLayer(XconfigLayerBase):
         configs = []
         configs.append("### Begin Gru layer '{0}'".format(name))
         configs.append("# Update gate control : W_z* matrices")
-        configs.append("component name={0}.W_z.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_z.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
         configs.append("# Reset gate control : W_o* matrices")
-        configs.append("component name={0}.W_o.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim + rec_proj_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_o.xs type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim + rec_proj_dim, cell_dim, affine_str))
 
         configs.append("# hpart_t related matrix : W_hpart matric")
-        configs.append("component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, input_dim, cell_dim, affine_str))
+        configs.append(
+            "component name={0}.W_hpart.x type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, input_dim, cell_dim, affine_str))
 
         configs.append("# Defining the non-linearities")
-        configs.append("component name={0}.z type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
-        configs.append("component name={0}.o type=SigmoidComponent dim={1} {2}".format(
-            name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.z type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
+        configs.append(
+            "component name={0}.o type=SigmoidComponent dim={1} {2}".format(
+                name, cell_dim, repair_nonlin_str))
 
         if dropout_proportion != -1.0:
             configs.append("# Defining the dropout component")
-            configs.append("component name={0}.dropout type=DropoutComponent dim={1} "
-                           "dropout-proportion={2} dropout-per-frame={3}"
-                           .format(name, cell_dim, dropout_proportion, dropout_per_frame))
+            configs.append(
+                "component name={0}.dropout type=DropoutComponent dim={1} "
+                "dropout-proportion={2} dropout-per-frame={3}".format(
+                    name, cell_dim, dropout_proportion, dropout_per_frame))
 
         recurrent_connection = '{0}.s_t'.format(name)
 
         configs.append("# z_t")
-        configs.append("component-node name={0}.z_t_pre component={0}.W_z.xs input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.z_t_pre component={0}.W_z.xs input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         if dropout_proportion != -1.0:
             configs.append(
-                "component-node name={0}.z_t_predrop component={0}.z input={0}.z_t_pre".format(name))
+                "component-node name={0}.z_t_predrop component={0}.z input={0}.z_t_pre"
+                .format(name))
             configs.append(
-                "component-node name={0}.z_t component={0}.dropout input={0}.z_t_predrop".format(name))
+                "component-node name={0}.z_t component={0}.dropout input={0}.z_t_predrop"
+                .format(name))
         else:
             configs.append(
-                "component-node name={0}.z_t component={0}.z input={0}.z_t_pre".format(name))
+                "component-node name={0}.z_t component={0}.z input={0}.z_t_pre"
+                .format(name))
 
         configs.append("# o_t")
-        configs.append("component-node name={0}.o_t_pre component={0}.W_o.xs input=Append({1}, IfDefined(Offset({2}, {3})))".format(
-            name, input_descriptor, recurrent_connection, delay))
+        configs.append(
+            "component-node name={0}.o_t_pre component={0}.W_o.xs input=Append({1}, IfDefined(Offset({2}, {3})))"
+            .format(name, input_descriptor, recurrent_connection, delay))
         if dropout_proportion != -1.0:
             configs.append(
-                "component-node name={0}.o_t_predrop component={0}.o input={0}.o_t_pre".format(name))
+                "component-node name={0}.o_t_predrop component={0}.o input={0}.o_t_pre"
+                .format(name))
             configs.append(
-                "component-node name={0}.o_t component={0}.dropout input={0}.o_t_predrop".format(name))
+                "component-node name={0}.o_t component={0}.dropout input={0}.o_t_predrop"
+                .format(name))
         else:
             configs.append(
-                "component-node name={0}.o_t component={0}.o input={0}.o_t_pre".format(name))
+                "component-node name={0}.o_t component={0}.o input={0}.o_t_pre"
+                .format(name))
 
         configs.append("# hpart_t")
         configs.append(
-            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}".format(name, input_descriptor))
+            "component-node name={0}.hpart_t component={0}.W_hpart.x input={1}"
+            .format(name, input_descriptor))
 
         configs.append("# c_t")
         configs.append(
-            "# Note: the output of OutputGruNonlinearityComponent is (h_t, c_t), we use the second half.")
+            "# Note: the output of OutputGruNonlinearityComponent is (h_t, c_t), we use the second half."
+        )
         configs.append(
-            "component name={0}.gru_nonlin type=OutputGruNonlinearityComponent cell-dim={1} {2}".format(name, cell_dim, gru_nonlin_str))
+            "component name={0}.gru_nonlin type=OutputGruNonlinearityComponent cell-dim={1} {2}"
+            .format(name, cell_dim, gru_nonlin_str))
         configs.append(
-            "component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.hpart_t, IfDefined(Offset({0}.c_t, {1})))".format(name, delay))
+            "component-node name={0}.gru_nonlin_t component={0}.gru_nonlin input=Append({0}.z_t, {0}.hpart_t, IfDefined(Offset({0}.c_t, {1})))"
+            .format(name, delay))
         configs.append(
-            "dim-range-node name={0}.c_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}".format(name, cell_dim))
+            "dim-range-node name={0}.c_t input-node={0}.gru_nonlin_t dim-offset={1} dim={1}"
+            .format(name, cell_dim))
 
         configs.append("# the projected matrix W_y.cdoto and y_t_tmp")
         configs.append(
-            "component name={0}.cdoto type=ElementwiseProductComponent input-dim={1} output-dim={2}".format(name, 2 * cell_dim, cell_dim))
+            "component name={0}.cdoto type=ElementwiseProductComponent input-dim={1} output-dim={2}"
+            .format(name, 2 * cell_dim, cell_dim))
         configs.append(
-            "component-node name={0}.cdoto component={0}.cdoto input=Append({0}.c_t, {0}.o_t)".format(name))
-        configs.append("component name={0}.W_y.cdoto type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}".format(
-            name, cell_dim, rec_proj_dim + nonrec_proj_dim, affine_str))
+            "component-node name={0}.cdoto component={0}.cdoto input=Append({0}.c_t, {0}.o_t)"
+            .format(name))
         configs.append(
-            "component-node name={0}.y_t_tmp component={0}.W_y.cdoto input={0}.cdoto".format(name))
+            "component name={0}.W_y.cdoto type=NaturalGradientAffineComponent input-dim={1} output-dim={2} {3}"
+            .format(name, cell_dim, rec_proj_dim + nonrec_proj_dim,
+                    affine_str))
+        configs.append(
+            "component-node name={0}.y_t_tmp component={0}.W_y.cdoto input={0}.cdoto"
+            .format(name))
 
         configs.append("# s_t : recurrence")
         configs.append(
-            "component name={0}.renorm type=NormalizeComponent dim={1} target-rms=1.0".format(name, rec_proj_dim))
-        configs.append("component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}".format(
-            name, rec_proj_dim, bptrunc_str))
+            "component name={0}.renorm type=NormalizeComponent dim={1} target-rms=1.0"
+            .format(name, rec_proj_dim))
         configs.append(
-            "dim-range-node name={0}.s_t_pre input-node={0}.y_t_tmp dim-offset=0 dim={1}".format(name, rec_proj_dim))
+            "component name={0}.s_r type=BackpropTruncationComponent dim={1} {2}"
+            .format(name, rec_proj_dim, bptrunc_str))
         configs.append(
-            "component-node name={0}.s_t_renorm component={0}.renorm input={0}.s_t_pre".format(name))
+            "dim-range-node name={0}.s_t_pre input-node={0}.y_t_tmp dim-offset=0 dim={1}"
+            .format(name, rec_proj_dim))
         configs.append(
-            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_renorm".format(name))
+            "component-node name={0}.s_t_renorm component={0}.renorm input={0}.s_t_pre"
+            .format(name))
+        configs.append(
+            "component-node name={0}.s_t component={0}.s_r input={0}.s_t_renorm"
+            .format(name))
 
         configs.append("# y_t : output")
-        configs.append("component name={0}.batchnorm type=BatchNormComponent dim={1} target-rms=1.0".format(
-            name, rec_proj_dim + nonrec_proj_dim))
         configs.append(
-            "component-node name={0}.y_t component={0}.batchnorm input={0}.y_t_tmp".format(name))
+            "component name={0}.batchnorm type=BatchNormComponent dim={1} target-rms=1.0"
+            .format(name, rec_proj_dim + nonrec_proj_dim))
+        configs.append(
+            "component-node name={0}.y_t component={0}.batchnorm input={0}.y_t_tmp"
+            .format(name))
 
         return configs

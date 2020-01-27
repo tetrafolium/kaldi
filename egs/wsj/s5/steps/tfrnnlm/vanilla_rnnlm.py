@@ -42,10 +42,8 @@ flags.DEFINE_integer("hidden_size", 200, "hidden dim of RNN")
 
 flags.DEFINE_string("data_path", None,
                     "Where the training/test data is stored.")
-flags.DEFINE_string("vocab_path", None,
-                    "Where the wordlist file is stored.")
-flags.DEFINE_string("save_path", None,
-                    "Model output directory.")
+flags.DEFINE_string("vocab_path", None, "Where the wordlist file is stored.")
+flags.DEFINE_string("save_path", None, "Model output directory.")
 flags.DEFINE_bool("use_fp16", False,
                   "Train using 16-bit floats instead of 32bit floats")
 
@@ -100,25 +98,30 @@ class RnnlmModel(object):
             # an argument check here:
             if 'reuse' in inspect.getargspec(
                     tf.contrib.rnn.BasicRNNCell.__init__).args:
-                return tf.contrib.rnn.BasicRNNCell(size,
-                                                   reuse=tf.get_variable_scope().reuse)
+                return tf.contrib.rnn.BasicRNNCell(
+                    size, reuse=tf.get_variable_scope().reuse)
             else:
                 return tf.contrib.rnn.BasicRNNCell(size)
+
         attn_cell = rnn_cell
 
         if is_training and config.keep_prob < 1:
+
             def attn_cell():
                 return tf.contrib.rnn.DropoutWrapper(
                     rnn_cell(), output_keep_prob=config.keep_prob)
 
         self.cell = tf.contrib.rnn.MultiRNNCell(
-            [attn_cell() for _ in range(config.num_layers)], state_is_tuple=True)
+            [attn_cell() for _ in range(config.num_layers)],
+            state_is_tuple=True)
 
         self._initial_state = self.cell.zero_state(batch_size, data_type())
         self._initial_state_single = self.cell.zero_state(1, data_type())
 
-        self.initial = tf.reshape(tf.stack(axis=0, values=self._initial_state_single), [
-                                  config.num_layers, 1, size], name="test_initial_state")
+        self.initial = tf.reshape(
+            tf.stack(axis=0, values=self._initial_state_single),
+            [config.num_layers, 1, size],
+            name="test_initial_state")
 
         # first implement the less efficient version
         test_word_in = tf.placeholder(tf.int32, [1, 1], name="test_word_in")
@@ -127,9 +130,7 @@ class RnnlmModel(object):
             tf.float32, [config.num_layers, 1, size], name="test_state_in")
         # unpacking the input state context
         l = tf.unstack(state_placeholder, axis=0)
-        test_input_state = tuple(
-            [l[idx] for idx in range(config.num_layers)]
-        )
+        test_input_state = tuple([l[idx] for idx in range(config.num_layers)])
 
         with tf.device("/cpu:0"):
             self.embedding = tf.get_variable(
@@ -143,8 +144,10 @@ class RnnlmModel(object):
             (test_cell_output, test_output_state) = self.cell(
                 test_inputs[:, 0, :], test_input_state)
 
-        test_state_out = tf.reshape(tf.stack(axis=0, values=test_output_state), [
-                                    config.num_layers, 1, size], name="test_state_out")
+        test_state_out = tf.reshape(
+            tf.stack(axis=0, values=test_output_state),
+            [config.num_layers, 1, size],
+            name="test_state_out")
         test_cell_out = tf.reshape(
             test_cell_output, [1, size], name="test_cell_out")
         # above is the first part of the graph for test
@@ -190,15 +193,14 @@ class RnnlmModel(object):
             for time_step in range(num_steps):
                 if time_step > -1:
                     tf.get_variable_scope().reuse_variables()
-                (cell_output, state) = self.cell(
-                    inputs[:, time_step, :], state)
+                (cell_output, state) = self.cell(inputs[:, time_step, :],
+                                                 state)
                 outputs.append(cell_output)
 
         output = tf.reshape(tf.stack(axis=1, values=outputs), [-1, size])
         logits = tf.matmul(output, softmax_w) + softmax_b
         loss = tf.contrib.legacy_seq2seq.sequence_loss_by_example(
-            [logits],
-            [tf.reshape(input_.targets, [-1])],
+            [logits], [tf.reshape(input_.targets, [-1])],
             [tf.ones([batch_size * num_steps], dtype=data_type())])
         self._cost = cost = tf.reduce_sum(loss) / batch_size
         self._final_state = state
@@ -208,8 +210,8 @@ class RnnlmModel(object):
 
         self._lr = tf.Variable(0.0, trainable=False)
         tvars = tf.trainable_variables()
-        grads, _ = tf.clip_by_global_norm(tf.gradients(cost, tvars),
-                                          config.max_grad_norm)
+        grads, _ = tf.clip_by_global_norm(
+            tf.gradients(cost, tvars), config.max_grad_norm)
         optimizer = tf.train.MomentumOptimizer(self._lr, 0.9)
         self._train_op = optimizer.apply_gradients(
             list(zip(grads, tvars)),
@@ -274,9 +276,10 @@ def run_epoch(session, model, eval_op=None, verbose=False):
         iters += model.input.num_steps
 
         if verbose and step % (model.input.epoch_size // 10) == 10:
-            print("%.3f perplexity: %.3f speed: %.0f wps" %
-                  (step * 1.0 / model.input.epoch_size, np.exp(costs / iters),
-                   iters * model.input.batch_size / (time.time() - start_time)))
+            print(
+                "%.3f perplexity: %.3f speed: %.0f wps" %
+                (step * 1.0 / model.input.epoch_size, np.exp(costs / iters),
+                 iters * model.input.batch_size / (time.time() - start_time)))
 
     return np.exp(costs / iters)
 
@@ -306,38 +309,39 @@ def main(_):
         with tf.name_scope("Train"):
             train_input = RnnlmInput(
                 config=config, data=train_data, name="TrainInput")
-            with tf.variable_scope("Model", reuse=None, initializer=initializer):
-                m = RnnlmModel(is_training=True, config=config,
-                               input_=train_input)
+            with tf.variable_scope(
+                    "Model", reuse=None, initializer=initializer):
+                m = RnnlmModel(
+                    is_training=True, config=config, input_=train_input)
             tf.summary.scalar("Training Loss", m.cost)
             tf.summary.scalar("Learning Rate", m.lr)
 
         with tf.name_scope("Valid"):
             valid_input = RnnlmInput(
                 config=config, data=valid_data, name="ValidInput")
-            with tf.variable_scope("Model", reuse=True, initializer=initializer):
-                mvalid = RnnlmModel(is_training=False,
-                                    config=config, input_=valid_input)
+            with tf.variable_scope(
+                    "Model", reuse=True, initializer=initializer):
+                mvalid = RnnlmModel(
+                    is_training=False, config=config, input_=valid_input)
             tf.summary.scalar("Validation Loss", mvalid.cost)
 
         sv = tf.train.Supervisor(logdir=FLAGS.save_path)
         with sv.managed_session() as session:
             for i in range(config.max_max_epoch):
-                lr_decay = config.lr_decay ** max(i +
-                                                  1 - config.max_epoch, 0.0)
+                lr_decay = config.lr_decay**max(i + 1 - config.max_epoch, 0.0)
 
                 m.assign_lr(session, config.learning_rate * lr_decay)
 
-                print("Epoch: %d Learning rate: %.3f" %
-                      (i + 1, session.run(m.lr)))
-                train_perplexity = run_epoch(session, m, eval_op=m.train_op,
-                                             verbose=True)
+                print("Epoch: %d Learning rate: %.3f" % (i + 1,
+                                                         session.run(m.lr)))
+                train_perplexity = run_epoch(
+                    session, m, eval_op=m.train_op, verbose=True)
 
-                print("Epoch: %d Train Perplexity: %.3f" %
-                      (i + 1, train_perplexity))
+                print("Epoch: %d Train Perplexity: %.3f" % (i + 1,
+                                                            train_perplexity))
                 valid_perplexity = run_epoch(session, mvalid)
-                print("Epoch: %d Valid Perplexity: %.3f" %
-                      (i + 1, valid_perplexity))
+                print("Epoch: %d Valid Perplexity: %.3f" % (i + 1,
+                                                            valid_perplexity))
 
             if FLAGS.save_path:
                 print("Saving model to %s." % FLAGS.save_path)

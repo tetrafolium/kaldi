@@ -41,8 +41,8 @@ for uttid in stems:
     utt = codecs.open(os.path.join(srcdir, fin), "r", "utf8").read()
     text.write(uttid + " " + utt)
     spkid = uttid.rsplit("_")[0]
-    wavscp.write(uttid + " " + os.path.join(srcdir,
-                                            uttid + "." + snd_ext) + "\n")
+    wavscp.write(uttid + " " + os.path.join(srcdir, uttid + "." + snd_ext) +
+                 "\n")
     utt2spk.write(uttid + " " + spkid + "\n")
 
 utt2spk.close()

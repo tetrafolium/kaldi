@@ -20,25 +20,33 @@ grouping utterances to respect the --min-words-per-graph option.  It writes
 the graphs to the standard output and also outputs a map from input utterance-ids
 to the per-group utterance-ids that index the output graphs.""")
 
-parser.add_argument("--lm-opts", type=str, default="",
-                    help="Options to pass in to make_one_biased_lm.py (which "
-                    "creates the individual LM graphs), e.g. '--word-disambig-symbol=8721'.")
-parser.add_argument("--min-words-per-graph", type=int, default=100,
-                    help="Minimum number of words per utterance group; this program "
-                    "will try to arrange the input utterances into groups such that each "
-                    "one has at least this many words in total.")
-parser.add_argument("utterance_map", type=str,
-                    help="Filename to which a map from input utterances to grouped "
-                    "utterances, is written")
+parser.add_argument(
+    "--lm-opts",
+    type=str,
+    default="",
+    help="Options to pass in to make_one_biased_lm.py (which "
+    "creates the individual LM graphs), e.g. '--word-disambig-symbol=8721'.")
+parser.add_argument(
+    "--min-words-per-graph",
+    type=int,
+    default=100,
+    help="Minimum number of words per utterance group; this program "
+    "will try to arrange the input utterances into groups such that each "
+    "one has at least this many words in total.")
+parser.add_argument(
+    "utterance_map",
+    type=str,
+    help="Filename to which a map from input utterances to grouped "
+    "utterances, is written")
 
 args = parser.parse_args()
-
 
 try:
     utterance_map_file = open(args.utterance_map, "w", encoding="utf-8")
 except:
-    sys.exit("make_biased_lms.py: error opening {0} to write utterance map".format(
-        args.utterance_map))
+    sys.exit(
+        "make_biased_lms.py: error opening {0} to write utterance map".format(
+            args.utterance_map))
 
 # This processes one group of input lines; 'group_of_lines' is
 # an array of lines of input integerized text, e.g.
@@ -52,8 +60,8 @@ def ProcessGroupOfLines(group_of_lines):
     except:
         sys.exit("make_biased_lms.py: empty input line")
 
-    group_utterance_id = '{0}-group-of-{1}'.format(
-        first_utterance_id, num_lines)
+    group_utterance_id = '{0}-group-of-{1}'.format(first_utterance_id,
+                                                   num_lines)
     # print the group utterance-id to the stdout; it forms the name in
     # the text-form archive.
     print(group_utterance_id)
@@ -61,8 +69,12 @@ def ProcessGroupOfLines(group_of_lines):
 
     try:
         command = "steps/cleanup/internal/make_one_biased_lm.py " + args.lm_opts
-        p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
-                             stdout=sys.stdout, stderr=sys.stderr)
+        p = subprocess.Popen(
+            command,
+            shell=True,
+            stdin=subprocess.PIPE,
+            stdout=sys.stdout,
+            stderr=sys.stderr)
         for line in group_of_lines:
             a = line.split()
             if len(a) == 0:
@@ -100,7 +112,6 @@ while True:
         this_group_of_lines = []
     if line == '':
         break
-
 
 # test comand [to be run from ../..]
 #

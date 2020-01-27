@@ -22,17 +22,18 @@ for line in infile:
     spkorder_writer.write(recordingid + ':' + spk_order + '\n')
     arrayid = recordingid.strip().split('_')[1]
     if arrayid not in array_id_error_dict:
-        array_id_error_dict[arrayid] = [0]*5
+        array_id_error_dict[arrayid] = [0] * 5
     array_id_error_dict[arrayid][0] += int(total_words)
     array_id_error_dict[arrayid][1] += int(total_errors)
     array_id_error_dict[arrayid][2] += int(total_ins)
     array_id_error_dict[arrayid][3] += int(total_del)
     array_id_error_dict[arrayid][4] += int(total_sub)
 
-
 for arrayid in sorted(array_id_error_dict):
     wer = float(array_id_error_dict[arrayid][1]) / \
         float(array_id_error_dict[arrayid][0])*100
     wer_detail = "%WER {0:5.2f} [ {1} / {2}, {3} ins, {4} del, {5} sub ]".format(
-        wer, array_id_error_dict[arrayid][1], array_id_error_dict[arrayid][0], array_id_error_dict[arrayid][2], array_id_error_dict[arrayid][3], array_id_error_dict[arrayid][4])
+        wer, array_id_error_dict[arrayid][1], array_id_error_dict[arrayid][0],
+        array_id_error_dict[arrayid][2], array_id_error_dict[arrayid][3],
+        array_id_error_dict[arrayid][4])
     output.write(arrayid + ' ' + wer_detail + '\n')

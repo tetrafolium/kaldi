@@ -14,7 +14,11 @@ has its own category, the rest is merged into single class.
 usage = "%prog [opts] words.txt ctm category_mapping"
 parser = OptionParser(usage=usage, description=desc)
 parser.add_option(
-    "--min-count", help="Minimum word-count to have a single word category. [default %default]", type='int', default=20)
+    "--min-count",
+    help=
+    "Minimum word-count to have a single word category. [default %default]",
+    type='int',
+    default=20)
 (o, args) = parser.parse_args()
 
 if len(args) != 3:
@@ -58,4 +62,4 @@ for word, idx in word_id:
 
 # Store the mapping,
 with open(category_mapping_file, 'w') as f:
-    f.writelines([' '.join(record)+'\n' for record in word_id_cat])
+    f.writelines([' '.join(record) + '\n' for record in word_id_cat])

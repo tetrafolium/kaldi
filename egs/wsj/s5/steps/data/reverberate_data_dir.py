@@ -22,74 +22,145 @@ data_lib = imp.load_source('dml', 'steps/data/data_dir_manipulation_lib.py')
 
 def get_args():
     # we add required arguments as named arguments for readability
-    parser = argparse.ArgumentParser(description="Reverberate the data directory with an option "
-                                                 "to add isotropic and point source noises. "
-                                                 "Usage: reverberate_data_dir.py [options...] <in-data-dir> <out-data-dir> "
-                                                 "E.g. reverberate_data_dir.py --rir-set-parameters rir_list "
-                                                 "--foreground-snrs 20:10:15:5:0 --background-snrs 20:10:15:5:0 "
-                                                 "--noise-list-file noise_list --speech-rvb-probability 1 --num-replications 2 "
-                                                 "--random-seed 1 data/train data/train_rvb",
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description="Reverberate the data directory with an option "
+        "to add isotropic and point source noises. "
+        "Usage: reverberate_data_dir.py [options...] <in-data-dir> <out-data-dir> "
+        "E.g. reverberate_data_dir.py --rir-set-parameters rir_list "
+        "--foreground-snrs 20:10:15:5:0 --background-snrs 20:10:15:5:0 "
+        "--noise-list-file noise_list --speech-rvb-probability 1 --num-replications 2 "
+        "--random-seed 1 data/train data/train_rvb",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("--rir-set-parameters", type=str, action='append', required=True, dest="rir_set_para_array",
-                        help="Specifies the parameters of an RIR set. "
-                        "Supports the specification of  mixture_weight and rir_list_file_name. The mixture weight is optional. "
-                        "The default mixture weight is the probability mass remaining after adding the mixture weights "
-                        "of all the RIR lists, uniformly divided among the RIR lists without mixture weights. "
-                        "E.g. --rir-set-parameters '0.3, rir_list' or 'rir_list' "
-                        "the format of the RIR list file is "
-                        "--rir-id <string,required> --room-id <string,required> "
-                        "--receiver-position-id <string,optional> --source-position-id <string,optional> "
-                        "--rt-60 <float,optional> --drr <float, optional> location <rspecifier> "
-                        "E.g. --rir-id 00001 --room-id 001 --receiver-position-id 001 --source-position-id 00001 "
-                        "--rt60 0.58 --drr -4.885 data/impulses/Room001-00001.wav")
-    parser.add_argument("--noise-set-parameters", type=str, action='append', default=None, dest="noise_set_para_array",
-                        help="Specifies the parameters of an noise set. "
-                        "Supports the specification of mixture_weight and noise_list_file_name. The mixture weight is optional. "
-                        "The default mixture weight is the probability mass remaining after adding the mixture weights "
-                        "of all the noise lists, uniformly divided among the noise lists without mixture weights. "
-                        "E.g. --noise-set-parameters '0.3, noise_list' or 'noise_list' "
-                        "the format of the noise list file is "
-                        "--noise-id <string,required> --noise-type <choices = {isotropic, point source},required> "
-                        "--bg-fg-type <choices = {background, foreground}, default=background> "
-                        "--room-linkage <str, specifies the room associated with the noise file. Required if isotropic> "
-                        "location <rspecifier> "
-                        "E.g. --noise-id 001 --noise-type isotropic --rir-id 00019 iso_noise.wav")
-    parser.add_argument("--num-replications", type=int, dest="num_replicas", default=1,
-                        help="Number of replicate to generated for the data")
-    parser.add_argument('--foreground-snrs', type=str, dest="foreground_snr_string", default='20:10:0',
-                        help='When foreground noises are being added the script will iterate through these SNRs.')
-    parser.add_argument('--background-snrs', type=str, dest="background_snr_string", default='20:10:0',
-                        help='When background noises are being added the script will iterate through these SNRs.')
-    parser.add_argument('--prefix', type=str, default=None,
-                        help='This prefix will modified for each reverberated copy, by adding additional affixes.')
-    parser.add_argument("--speech-rvb-probability", type=float, default=1.0,
-                        help="Probability of reverberating a speech signal, e.g. 0 <= p <= 1")
-    parser.add_argument("--pointsource-noise-addition-probability", type=float, default=1.0,
-                        help="Probability of adding point-source noises, e.g. 0 <= p <= 1")
-    parser.add_argument("--isotropic-noise-addition-probability", type=float, default=1.0,
-                        help="Probability of adding isotropic noises, e.g. 0 <= p <= 1")
-    parser.add_argument("--rir-smoothing-weight", type=float, default=0.3,
-                        help="Smoothing weight for the RIR probabilties, e.g. 0 <= p <= 1. If p = 0, no smoothing will be done. "
-                        "The RIR distribution will be mixed with a uniform distribution according to the smoothing weight")
-    parser.add_argument("--noise-smoothing-weight", type=float, default=0.3,
-                        help="Smoothing weight for the noise probabilties, e.g. 0 <= p <= 1. If p = 0, no smoothing will be done. "
-                        "The noise distribution will be mixed with a uniform distribution according to the smoothing weight")
-    parser.add_argument("--max-noises-per-minute", type=int, default=2,
-                        help="This controls the maximum number of point-source noises that could be added to a recording according to its duration")
-    parser.add_argument('--random-seed', type=int, default=0,
-                        help='seed to be used in the randomization of impulses and noises')
-    parser.add_argument("--shift-output", type=str, help="If true, the reverberated waveform will be shifted by the amount of the peak position of the RIR",
-                        choices=['true', 'false'], default="true")
-    parser.add_argument('--source-sampling-rate', type=int, default=None,
-                        help="Sampling rate of the source data. If a positive integer is specified with this option, "
-                        "the RIRs/noises will be resampled to the rate of the source data.")
-    parser.add_argument("--include-original-data", type=str, help="If true, the output data includes one copy of the original data",
-                        choices=['true', 'false'], default="false")
-    parser.add_argument("input_dir",
-                        help="Input data directory")
-    parser.add_argument("output_dir",
-                        help="Output data directory")
+    parser.add_argument(
+        "--rir-set-parameters",
+        type=str,
+        action='append',
+        required=True,
+        dest="rir_set_para_array",
+        help="Specifies the parameters of an RIR set. "
+        "Supports the specification of  mixture_weight and rir_list_file_name. The mixture weight is optional. "
+        "The default mixture weight is the probability mass remaining after adding the mixture weights "
+        "of all the RIR lists, uniformly divided among the RIR lists without mixture weights. "
+        "E.g. --rir-set-parameters '0.3, rir_list' or 'rir_list' "
+        "the format of the RIR list file is "
+        "--rir-id <string,required> --room-id <string,required> "
+        "--receiver-position-id <string,optional> --source-position-id <string,optional> "
+        "--rt-60 <float,optional> --drr <float, optional> location <rspecifier> "
+        "E.g. --rir-id 00001 --room-id 001 --receiver-position-id 001 --source-position-id 00001 "
+        "--rt60 0.58 --drr -4.885 data/impulses/Room001-00001.wav")
+    parser.add_argument(
+        "--noise-set-parameters",
+        type=str,
+        action='append',
+        default=None,
+        dest="noise_set_para_array",
+        help="Specifies the parameters of an noise set. "
+        "Supports the specification of mixture_weight and noise_list_file_name. The mixture weight is optional. "
+        "The default mixture weight is the probability mass remaining after adding the mixture weights "
+        "of all the noise lists, uniformly divided among the noise lists without mixture weights. "
+        "E.g. --noise-set-parameters '0.3, noise_list' or 'noise_list' "
+        "the format of the noise list file is "
+        "--noise-id <string,required> --noise-type <choices = {isotropic, point source},required> "
+        "--bg-fg-type <choices = {background, foreground}, default=background> "
+        "--room-linkage <str, specifies the room associated with the noise file. Required if isotropic> "
+        "location <rspecifier> "
+        "E.g. --noise-id 001 --noise-type isotropic --rir-id 00019 iso_noise.wav"
+    )
+    parser.add_argument(
+        "--num-replications",
+        type=int,
+        dest="num_replicas",
+        default=1,
+        help="Number of replicate to generated for the data")
+    parser.add_argument(
+        '--foreground-snrs',
+        type=str,
+        dest="foreground_snr_string",
+        default='20:10:0',
+        help=
+        'When foreground noises are being added the script will iterate through these SNRs.'
+    )
+    parser.add_argument(
+        '--background-snrs',
+        type=str,
+        dest="background_snr_string",
+        default='20:10:0',
+        help=
+        'When background noises are being added the script will iterate through these SNRs.'
+    )
+    parser.add_argument(
+        '--prefix',
+        type=str,
+        default=None,
+        help=
+        'This prefix will modified for each reverberated copy, by adding additional affixes.'
+    )
+    parser.add_argument(
+        "--speech-rvb-probability",
+        type=float,
+        default=1.0,
+        help="Probability of reverberating a speech signal, e.g. 0 <= p <= 1")
+    parser.add_argument(
+        "--pointsource-noise-addition-probability",
+        type=float,
+        default=1.0,
+        help="Probability of adding point-source noises, e.g. 0 <= p <= 1")
+    parser.add_argument(
+        "--isotropic-noise-addition-probability",
+        type=float,
+        default=1.0,
+        help="Probability of adding isotropic noises, e.g. 0 <= p <= 1")
+    parser.add_argument(
+        "--rir-smoothing-weight",
+        type=float,
+        default=0.3,
+        help=
+        "Smoothing weight for the RIR probabilties, e.g. 0 <= p <= 1. If p = 0, no smoothing will be done. "
+        "The RIR distribution will be mixed with a uniform distribution according to the smoothing weight"
+    )
+    parser.add_argument(
+        "--noise-smoothing-weight",
+        type=float,
+        default=0.3,
+        help=
+        "Smoothing weight for the noise probabilties, e.g. 0 <= p <= 1. If p = 0, no smoothing will be done. "
+        "The noise distribution will be mixed with a uniform distribution according to the smoothing weight"
+    )
+    parser.add_argument(
+        "--max-noises-per-minute",
+        type=int,
+        default=2,
+        help=
+        "This controls the maximum number of point-source noises that could be added to a recording according to its duration"
+    )
+    parser.add_argument(
+        '--random-seed',
+        type=int,
+        default=0,
+        help='seed to be used in the randomization of impulses and noises')
+    parser.add_argument(
+        "--shift-output",
+        type=str,
+        help=
+        "If true, the reverberated waveform will be shifted by the amount of the peak position of the RIR",
+        choices=['true', 'false'],
+        default="true")
+    parser.add_argument(
+        '--source-sampling-rate',
+        type=int,
+        default=None,
+        help=
+        "Sampling rate of the source data. If a positive integer is specified with this option, "
+        "the RIRs/noises will be resampled to the rate of the source data.")
+    parser.add_argument(
+        "--include-original-data",
+        type=str,
+        help="If true, the output data includes one copy of the original data",
+        choices=['true', 'false'],
+        default="false")
+    parser.add_argument("input_dir", help="Input data directory")
+    parser.add_argument("output_dir", help="Output data directory")
 
     print(' '.join(sys.argv))
 
@@ -104,7 +175,8 @@ def check_args(args):
         if args.num_replicas > 1 or args.include_original_data == "true":
             args.prefix = "rvb"
             warnings.warn(
-                "--prefix is set to 'rvb' as more than one copy of data is generated")
+                "--prefix is set to 'rvb' as more than one copy of data is generated"
+            )
 
     if not args.num_replicas > 0:
         raise Exception("--num-replications cannot be non-positive")
@@ -177,12 +249,15 @@ def parse_file_to_dict(file, assert2fields=False, value_processor=None):
         It is useful for parsing file like wav.scp, utt2spk, text...etc
     """
     if value_processor is None:
-        def value_processor(x): return x[0]
+
+        def value_processor(x):
+            return x[0]
+
     dict = {}
     for line in open(file, 'r', encoding='utf-8'):
         parts = line.split()
         if assert2fields:
-            assert(len(parts) == 2)
+            assert (len(parts) == 2)
 
         dict[parts[0]] = value_processor(parts[1:])
     return dict
@@ -204,7 +279,8 @@ def write_dict_to_file(dict, file_name):
     file.close()
 
 
-def create_corrupted_utt2uniq(input_dir, output_dir, num_replicas, include_original, prefix):
+def create_corrupted_utt2uniq(input_dir, output_dir, num_replicas,
+                              include_original, prefix):
     """This function creates the utt2uniq file from the utterance id in utt2spk file
     """
     corrupted_utt2uniq = {}
@@ -217,7 +293,7 @@ def create_corrupted_utt2uniq(input_dir, output_dir, num_replicas, include_origi
     else:
         start_index = 1
 
-    for i in range(start_index, num_replicas+1):
+    for i in range(start_index, num_replicas + 1):
         for utt_id in keys:
             new_utt_id = get_new_id(utt_id, prefix, i)
             corrupted_utt2uniq[new_utt_id] = utt_id
@@ -225,17 +301,19 @@ def create_corrupted_utt2uniq(input_dir, output_dir, num_replicas, include_origi
     write_dict_to_file(corrupted_utt2uniq, output_dir + "/utt2uniq")
 
 
-def add_point_source_noise(noise_addition_descriptor,  # descriptor to store the information of the noise added
-                           room,  # the room selected
-                           pointsource_noise_list,  # the point source noise list
-                           # Probability of adding point-source noises
-                           pointsource_noise_addition_probability,
-                           foreground_snrs,  # the SNR for adding the foreground noises
-                           background_snrs,  # the SNR for adding the background noises
-                           speech_dur,  # duration of the recording
-                           max_noises_recording  # Maximum number of point-source noises that can be added
-                           ):
-    if len(pointsource_noise_list) > 0 and random.random() < pointsource_noise_addition_probability and max_noises_recording >= 1:
+def add_point_source_noise(
+        noise_addition_descriptor,  # descriptor to store the information of the noise added
+        room,  # the room selected
+        pointsource_noise_list,  # the point source noise list
+        # Probability of adding point-source noises
+        pointsource_noise_addition_probability,
+        foreground_snrs,  # the SNR for adding the foreground noises
+        background_snrs,  # the SNR for adding the background noises
+        speech_dur,  # duration of the recording
+        max_noises_recording  # Maximum number of point-source noises that can be added
+):
+    if len(pointsource_noise_list) > 0 and random.random(
+    ) < pointsource_noise_addition_probability and max_noises_recording >= 1:
         for k in range(random.randint(1, max_noises_recording)):
             # pick the RIR to reverberate the point-source noise
             noise = pick_item_with_probability(pointsource_noise_list)
@@ -257,34 +335,35 @@ def add_point_source_noise(noise_addition_descriptor,  # descriptor to store the
             # check if the rspecifier is a pipe or not
             if len(noise.noise_rspecifier.split()) == 1:
                 noise_addition_descriptor['noise_io'].append(
-                    "{1} {0} - |".format(noise.noise_rspecifier, noise_rvb_command))
+                    "{1} {0} - |".format(noise.noise_rspecifier,
+                                         noise_rvb_command))
             else:
                 noise_addition_descriptor['noise_io'].append(
-                    "{0} {1} - - |".format(noise.noise_rspecifier, noise_rvb_command))
+                    "{0} {1} - - |".format(noise.noise_rspecifier,
+                                           noise_rvb_command))
 
     return noise_addition_descriptor
 
 
-def generate_reverberation_opts(room_dict,  # the room dictionary, please refer to make_room_dict() for the format
-                                pointsource_noise_list,  # the point source noise list
-                                iso_noise_dict,  # the isotropic noise dictionary
-                                foreground_snrs,  # the SNR for adding the foreground noises
-                                background_snrs,  # the SNR for adding the background noises
-                                speech_rvb_probability,  # Probability of reverberating a speech signal
-                                isotropic_noise_addition_probability,  # Probability of adding isotropic noises
-                                # Probability of adding point-source noises
-                                pointsource_noise_addition_probability,
-                                speech_dur,  # duration of the recording
-                                max_noises_recording  # Maximum number of point-source noises that can be added
-                                ):
+def generate_reverberation_opts(
+        room_dict,  # the room dictionary, please refer to make_room_dict() for the format
+        pointsource_noise_list,  # the point source noise list
+        iso_noise_dict,  # the isotropic noise dictionary
+        foreground_snrs,  # the SNR for adding the foreground noises
+        background_snrs,  # the SNR for adding the background noises
+        speech_rvb_probability,  # Probability of reverberating a speech signal
+        isotropic_noise_addition_probability,  # Probability of adding isotropic noises
+        # Probability of adding point-source noises
+        pointsource_noise_addition_probability,
+        speech_dur,  # duration of the recording
+        max_noises_recording  # Maximum number of point-source noises that can be added
+):
     """ This function randomly decides whether to reverberate, and sample a RIR if it does
         It also decides whether to add the appropriate noises
         This function return the string of options to the binary wav-reverberate
     """
     reverberate_opts = ""
-    noise_addition_descriptor = {'noise_io': [],
-                                 'start_times': [],
-                                 'snrs': []}
+    noise_addition_descriptor = {'noise_io': [], 'start_times': [], 'snrs': []}
     # Randomly select the room
     # Here the room probability is a sum of the probabilities of the RIRs recorded in the room.
     room = pick_item_with_probability(room_dict)
@@ -299,41 +378,45 @@ def generate_reverberation_opts(room_dict,  # the room dictionary, please refer 
     if speech_rir.room_id in iso_noise_dict:
         rir_iso_noise_list = iso_noise_dict[speech_rir.room_id]
     # Add the corresponding isotropic noise associated with the selected RIR
-    if len(rir_iso_noise_list) > 0 and random.random() < isotropic_noise_addition_probability:
+    if len(rir_iso_noise_list) > 0 and random.random(
+    ) < isotropic_noise_addition_probability:
         isotropic_noise = pick_item_with_probability(rir_iso_noise_list)
         # extend the isotropic noise to the length of the speech waveform
         # check if the rspecifier is a pipe or not
         if len(isotropic_noise.noise_rspecifier.split()) == 1:
             noise_addition_descriptor['noise_io'].append(
-                "wav-reverberate --duration={1} {0} - |".format(isotropic_noise.noise_rspecifier, speech_dur))
+                "wav-reverberate --duration={1} {0} - |".format(
+                    isotropic_noise.noise_rspecifier, speech_dur))
         else:
             noise_addition_descriptor['noise_io'].append(
-                "{0} wav-reverberate --duration={1} - - |".format(isotropic_noise.noise_rspecifier, speech_dur))
+                "{0} wav-reverberate --duration={1} - - |".format(
+                    isotropic_noise.noise_rspecifier, speech_dur))
         noise_addition_descriptor['start_times'].append(0)
         noise_addition_descriptor['snrs'].append(next(background_snrs))
 
-    noise_addition_descriptor = add_point_source_noise(noise_addition_descriptor,  # descriptor to store the information of the noise added
-                                                       room,  # the room selected
-                                                       pointsource_noise_list,  # the point source noise list
-                                                       # Probability of adding point-source noises
-                                                       pointsource_noise_addition_probability,
-                                                       foreground_snrs,  # the SNR for adding the foreground noises
-                                                       background_snrs,  # the SNR for adding the background noises
-                                                       speech_dur,  # duration of the recording
-                                                       max_noises_recording  # Maximum number of point-source noises that can be added
-                                                       )
+    noise_addition_descriptor = add_point_source_noise(
+        noise_addition_descriptor,  # descriptor to store the information of the noise added
+        room,  # the room selected
+        pointsource_noise_list,  # the point source noise list
+        # Probability of adding point-source noises
+        pointsource_noise_addition_probability,
+        foreground_snrs,  # the SNR for adding the foreground noises
+        background_snrs,  # the SNR for adding the background noises
+        speech_dur,  # duration of the recording
+        max_noises_recording  # Maximum number of point-source noises that can be added
+    )
 
     assert len(noise_addition_descriptor['noise_io']) == len(
         noise_addition_descriptor['start_times'])
     assert len(noise_addition_descriptor['noise_io']) == len(
         noise_addition_descriptor['snrs'])
     if len(noise_addition_descriptor['noise_io']) > 0:
-        reverberate_opts += "--additive-signals='{0}' ".format(
-            ','.join(noise_addition_descriptor['noise_io']))
-        reverberate_opts += "--start-times='{0}' ".format(
-            ','.join([str(x) for x in noise_addition_descriptor['start_times']]))
-        reverberate_opts += "--snrs='{0}' ".format(
-            ','.join([str(x) for x in noise_addition_descriptor['snrs']]))
+        reverberate_opts += "--additive-signals='{0}' ".format(','.join(
+            noise_addition_descriptor['noise_io']))
+        reverberate_opts += "--start-times='{0}' ".format(','.join(
+            [str(x) for x in noise_addition_descriptor['start_times']]))
+        reverberate_opts += "--snrs='{0}' ".format(','.join(
+            [str(x) for x in noise_addition_descriptor['snrs']]))
 
     return reverberate_opts
 
@@ -351,26 +434,26 @@ def get_new_id(id, prefix=None, copy=0):
     return new_id
 
 
-def generate_reverberated_wav_scp(wav_scp,  # a dictionary whose values are the Kaldi-IO strings of the speech recordings
-                                  # a dictionary whose values are the duration (in sec) of the speech recordings
-                                  durations,
-                                  output_dir,  # output directory to write the corrupted wav.scp
-                                  room_dict,  # the room dictionary, please refer to make_room_dict() for the format
-                                  pointsource_noise_list,  # the point source noise list
-                                  iso_noise_dict,  # the isotropic noise dictionary
-                                  foreground_snr_array,  # the SNR for adding the foreground noises
-                                  background_snr_array,  # the SNR for adding the background noises
-                                  num_replicas,  # Number of replicate to generated for the data
-                                  include_original,  # include a copy of the original data
-                                  prefix,  # prefix for the id of the corrupted utterances
-                                  speech_rvb_probability,  # Probability of reverberating a speech signal
-                                  shift_output,  # option whether to shift the output waveform
-                                  isotropic_noise_addition_probability,  # Probability of adding isotropic noises
-                                  # Probability of adding point-source noises
-                                  pointsource_noise_addition_probability,
-                                  # maximum number of point-source noises that can be added to a recording according to its duration
-                                  max_noises_per_minute
-                                  ):
+def generate_reverberated_wav_scp(
+        wav_scp,  # a dictionary whose values are the Kaldi-IO strings of the speech recordings
+        # a dictionary whose values are the duration (in sec) of the speech recordings
+        durations,
+        output_dir,  # output directory to write the corrupted wav.scp
+        room_dict,  # the room dictionary, please refer to make_room_dict() for the format
+        pointsource_noise_list,  # the point source noise list
+        iso_noise_dict,  # the isotropic noise dictionary
+        foreground_snr_array,  # the SNR for adding the foreground noises
+        background_snr_array,  # the SNR for adding the background noises
+        num_replicas,  # Number of replicate to generated for the data
+        include_original,  # include a copy of the original data
+        prefix,  # prefix for the id of the corrupted utterances
+        speech_rvb_probability,  # Probability of reverberating a speech signal
+        shift_output,  # option whether to shift the output waveform
+        isotropic_noise_addition_probability,  # Probability of adding isotropic noises
+        # Probability of adding point-source noises
+        pointsource_noise_addition_probability,
+        # maximum number of point-source noises that can be added to a recording according to its duration
+        max_noises_per_minute):
     """ This is the main function to generate pipeline command for the corruption
         The generic command of wav-reverberate will be like:
         wav-reverberate --duration=t --impulse-response=rir.wav
@@ -385,7 +468,7 @@ def generate_reverberated_wav_scp(wav_scp,  # a dictionary whose values are the 
     else:
         start_index = 1
 
-    for i in range(start_index, num_replicas+1):
+    for i in range(start_index, num_replicas + 1):
         for recording_id in keys:
             wav_original_pipe = wav_scp[recording_id]
             # check if it is really a pipe
@@ -395,18 +478,19 @@ def generate_reverberated_wav_scp(wav_scp,  # a dictionary whose values are the 
             max_noises_recording = math.floor(
                 max_noises_per_minute * speech_dur / 60)
 
-            reverberate_opts = generate_reverberation_opts(room_dict,  # the room dictionary, please refer to make_room_dict() for the format
-                                                           pointsource_noise_list,  # the point source noise list
-                                                           iso_noise_dict,  # the isotropic noise dictionary
-                                                           foreground_snrs,  # the SNR for adding the foreground noises
-                                                           background_snrs,  # the SNR for adding the background noises
-                                                           speech_rvb_probability,  # Probability of reverberating a speech signal
-                                                           isotropic_noise_addition_probability,  # Probability of adding isotropic noises
-                                                           # Probability of adding point-source noises
-                                                           pointsource_noise_addition_probability,
-                                                           speech_dur,  # duration of the recording
-                                                           max_noises_recording  # Maximum number of point-source noises that can be added
-                                                           )
+            reverberate_opts = generate_reverberation_opts(
+                room_dict,  # the room dictionary, please refer to make_room_dict() for the format
+                pointsource_noise_list,  # the point source noise list
+                iso_noise_dict,  # the isotropic noise dictionary
+                foreground_snrs,  # the SNR for adding the foreground noises
+                background_snrs,  # the SNR for adding the background noises
+                speech_rvb_probability,  # Probability of reverberating a speech signal
+                isotropic_noise_addition_probability,  # Probability of adding isotropic noises
+                # Probability of adding point-source noises
+                pointsource_noise_addition_probability,
+                speech_dur,  # duration of the recording
+                max_noises_recording  # Maximum number of point-source noises that can be added
+            )
 
             # prefix using index 0 is reserved for original data e.g. rvb0_swb0035 corresponds to the swb0035 recording in original data
             if reverberate_opts == "" or i == 0:
@@ -421,7 +505,12 @@ def generate_reverberated_wav_scp(wav_scp,  # a dictionary whose values are the 
     write_dict_to_file(corrupted_wav_scp, output_dir + "/wav.scp")
 
 
-def add_prefix_to_fields(input_file, output_file, num_replicas, include_original, prefix, field=[0]):
+def add_prefix_to_fields(input_file,
+                         output_file,
+                         num_replicas,
+                         include_original,
+                         prefix,
+                         field=[0]):
     """ This function replicate the entries in files like segments, utt2spk, text
     """
     list = [x.strip() for x in open(input_file, encoding='utf-8')]
@@ -431,7 +520,7 @@ def add_prefix_to_fields(input_file, output_file, num_replicas, include_original
     else:
         start_index = 1
 
-    for i in range(start_index, num_replicas+1):
+    for i in range(start_index, num_replicas + 1):
         for line in list:
             if len(line) > 0 and line[0] != ';':
                 split1 = line.split()
@@ -443,24 +532,24 @@ def add_prefix_to_fields(input_file, output_file, num_replicas, include_original
     f.close()
 
 
-def create_reverberated_copy(input_dir,
-                             output_dir,
-                             room_dict,  # the room dictionary, please refer to make_room_dict() for the format
-                             pointsource_noise_list,  # the point source noise list
-                             iso_noise_dict,  # the isotropic noise dictionary
-                             foreground_snr_string,  # the SNR for adding the foreground noises
-                             background_snr_string,  # the SNR for adding the background noises
-                             num_replicas,  # Number of replicate to generated for the data
-                             include_original,  # include a copy of the original data
-                             prefix,  # prefix for the id of the corrupted utterances
-                             speech_rvb_probability,  # Probability of reverberating a speech signal
-                             shift_output,  # option whether to shift the output waveform
-                             isotropic_noise_addition_probability,  # Probability of adding isotropic noises
-                             # Probability of adding point-source noises
-                             pointsource_noise_addition_probability,
-                             # maximum number of point-source noises that can be added to a recording according to its duration
-                             max_noises_per_minute
-                             ):
+def create_reverberated_copy(
+        input_dir,
+        output_dir,
+        room_dict,  # the room dictionary, please refer to make_room_dict() for the format
+        pointsource_noise_list,  # the point source noise list
+        iso_noise_dict,  # the isotropic noise dictionary
+        foreground_snr_string,  # the SNR for adding the foreground noises
+        background_snr_string,  # the SNR for adding the background noises
+        num_replicas,  # Number of replicate to generated for the data
+        include_original,  # include a copy of the original data
+        prefix,  # prefix for the id of the corrupted utterances
+        speech_rvb_probability,  # Probability of reverberating a speech signal
+        shift_output,  # option whether to shift the output waveform
+        isotropic_noise_addition_probability,  # Probability of adding isotropic noises
+        # Probability of adding point-source noises
+        pointsource_noise_addition_probability,
+        # maximum number of point-source noises that can be added to a recording according to its duration
+        max_noises_per_minute):
     """ This function creates multiple copies of the necessary files,
         e.g. utt2spk, wav.scp ...
     """
@@ -477,42 +566,78 @@ def create_reverberated_copy(input_dir,
     foreground_snr_array = [float(x) for x in foreground_snr_string.split(':')]
     background_snr_array = [float(x) for x in background_snr_string.split(':')]
 
-    generate_reverberated_wav_scp(wav_scp, durations, output_dir, room_dict, pointsource_noise_list, iso_noise_dict,
-                                  foreground_snr_array, background_snr_array, num_replicas, include_original, prefix,
-                                  speech_rvb_probability, shift_output, isotropic_noise_addition_probability,
-                                  pointsource_noise_addition_probability, max_noises_per_minute)
+    generate_reverberated_wav_scp(
+        wav_scp, durations, output_dir, room_dict, pointsource_noise_list,
+        iso_noise_dict, foreground_snr_array, background_snr_array,
+        num_replicas, include_original, prefix, speech_rvb_probability,
+        shift_output, isotropic_noise_addition_probability,
+        pointsource_noise_addition_probability, max_noises_per_minute)
 
-    add_prefix_to_fields(input_dir + "/utt2spk", output_dir + "/utt2spk",
-                         num_replicas, include_original, prefix, field=[0, 1])
-    data_lib.RunKaldiCommand("utils/utt2spk_to_spk2utt.pl <{output_dir}/utt2spk >{output_dir}/spk2utt"
-                             .format(output_dir=output_dir))
+    add_prefix_to_fields(
+        input_dir + "/utt2spk",
+        output_dir + "/utt2spk",
+        num_replicas,
+        include_original,
+        prefix,
+        field=[0, 1])
+    data_lib.RunKaldiCommand(
+        "utils/utt2spk_to_spk2utt.pl <{output_dir}/utt2spk >{output_dir}/spk2utt"
+        .format(output_dir=output_dir))
 
     if os.path.isfile(input_dir + "/utt2uniq"):
-        add_prefix_to_fields(input_dir + "/utt2uniq", output_dir +
-                             "/utt2uniq", num_replicas, include_original, prefix, field=[0])
+        add_prefix_to_fields(
+            input_dir + "/utt2uniq",
+            output_dir + "/utt2uniq",
+            num_replicas,
+            include_original,
+            prefix,
+            field=[0])
     else:
         # Create the utt2uniq file
-        create_corrupted_utt2uniq(
-            input_dir, output_dir, num_replicas, include_original, prefix)
+        create_corrupted_utt2uniq(input_dir, output_dir, num_replicas,
+                                  include_original, prefix)
 
     if os.path.isfile(input_dir + "/text"):
-        add_prefix_to_fields(input_dir + "/text", output_dir + "/text",
-                             num_replicas, include_original, prefix, field=[0])
+        add_prefix_to_fields(
+            input_dir + "/text",
+            output_dir + "/text",
+            num_replicas,
+            include_original,
+            prefix,
+            field=[0])
     if os.path.isfile(input_dir + "/segments"):
-        add_prefix_to_fields(input_dir + "/segments", output_dir + "/segments",
-                             num_replicas, include_original, prefix, field=[0, 1])
+        add_prefix_to_fields(
+            input_dir + "/segments",
+            output_dir + "/segments",
+            num_replicas,
+            include_original,
+            prefix,
+            field=[0, 1])
     if os.path.isfile(input_dir + "/reco2file_and_channel"):
-        add_prefix_to_fields(input_dir + "/reco2file_and_channel", output_dir +
-                             "/reco2file_and_channel", num_replicas, include_original, prefix, field=[0, 1])
+        add_prefix_to_fields(
+            input_dir + "/reco2file_and_channel",
+            output_dir + "/reco2file_and_channel",
+            num_replicas,
+            include_original,
+            prefix,
+            field=[0, 1])
     if os.path.isfile(input_dir + "/vad.scp"):
-        add_prefix_to_fields(input_dir + "/vad.scp", output_dir +
-                             "/vad.scp", num_replicas, include_original, prefix, field=[0])
+        add_prefix_to_fields(
+            input_dir + "/vad.scp",
+            output_dir + "/vad.scp",
+            num_replicas,
+            include_original,
+            prefix,
+            field=[0])
 
-    data_lib.RunKaldiCommand("utils/validate_data_dir.sh --no-feats --no-text {output_dir}"
-                             .format(output_dir=output_dir))
+    data_lib.RunKaldiCommand(
+        "utils/validate_data_dir.sh --no-feats --no-text {output_dir}".format(
+            output_dir=output_dir))
 
 
-def smooth_probability_distribution(set_list, smoothing_weight=0.0, target_sum=1.0):
+def smooth_probability_distribution(set_list,
+                                    smoothing_weight=0.0,
+                                    target_sum=1.0):
     """ This function smooths the probability distribution in the list
     """
     if len(list(set_list)) > 0:
@@ -530,8 +655,10 @@ def smooth_probability_distribution(set_list, smoothing_weight=0.0, target_sum=1
             uniform_probability = (1 - accumulated_prob) / \
                 float(num_unspecified)
         elif num_unspecified > 0 and accumulated_prob >= 1:
-            warnings.warn("The sum of probabilities specified by user is larger than or equal to 1. "
-                          "The items without probabilities specified will be given zero to their probabilities.")
+            warnings.warn(
+                "The sum of probabilities specified by user is larger than or equal to 1. "
+                "The items without probabilities specified will be given zero to their probabilities."
+            )
 
         for item in set_list:
             if item.probability is None:
@@ -539,7 +666,8 @@ def smooth_probability_distribution(set_list, smoothing_weight=0.0, target_sum=1
             else:
                 # smooth the probability
                 item.probability = (
-                    1 - smoothing_weight) * item.probability + smoothing_weight * uniform_probability
+                    1 - smoothing_weight
+                ) * item.probability + smoothing_weight * uniform_probability
 
         # Normalize the probability
         sum_p = sum(item.probability for item in set_list)
@@ -556,7 +684,10 @@ def parse_set_parameter_strings(set_para_array):
     """
     set_list = []
     for set_para in set_para_array:
-        def set(): return None
+
+        def set():
+            return None
+
         setattr(set, "filename", None)
         setattr(set, "probability", None)
         parts = set_para.split(',')
@@ -579,31 +710,65 @@ def parse_rir_list(rir_set_para_array, smoothing_weight, sampling_rate=None):
         Please refer to the help messages in the parser for the meaning of these attributes
     """
     rir_parser = argparse.ArgumentParser()
-    rir_parser.add_argument('--rir-id', type=str, required=True,
-                            help='This id is unique for each RIR and the noise may associate with a particular RIR by refering to this id')
-    rir_parser.add_argument('--room-id', type=str, required=True,
-                            help='This is the room that where the RIR is generated')
-    rir_parser.add_argument('--receiver-position-id',
-                            type=str, default=None, help='receiver position id')
-    rir_parser.add_argument('--source-position-id',
-                            type=str, default=None, help='source position id')
-    rir_parser.add_argument('--rt60', type=float, default=None,
-                            help='RT60 is the time required for reflections of a direct sound to decay 60 dB.')
-    rir_parser.add_argument('--drr', type=float, default=None,
-                            help='Direct-to-reverberant-ratio of the impulse response.')
-    rir_parser.add_argument('--cte', type=float, default=None,
-                            help='Early-to-late index of the impulse response.')
-    rir_parser.add_argument('--probability', type=float,
-                            default=None, help='probability of the impulse response.')
-    rir_parser.add_argument('rir_rspecifier', type=str, help="""rir rspecifier, it can be either a filename or a piped command.
-                            E.g. data/impulses/Room001-00001.wav or "sox data/impulses/Room001-00001.wav -t wav - |" """)
+    rir_parser.add_argument(
+        '--rir-id',
+        type=str,
+        required=True,
+        help=
+        'This id is unique for each RIR and the noise may associate with a particular RIR by refering to this id'
+    )
+    rir_parser.add_argument(
+        '--room-id',
+        type=str,
+        required=True,
+        help='This is the room that where the RIR is generated')
+    rir_parser.add_argument(
+        '--receiver-position-id',
+        type=str,
+        default=None,
+        help='receiver position id')
+    rir_parser.add_argument(
+        '--source-position-id',
+        type=str,
+        default=None,
+        help='source position id')
+    rir_parser.add_argument(
+        '--rt60',
+        type=float,
+        default=None,
+        help=
+        'RT60 is the time required for reflections of a direct sound to decay 60 dB.'
+    )
+    rir_parser.add_argument(
+        '--drr',
+        type=float,
+        default=None,
+        help='Direct-to-reverberant-ratio of the impulse response.')
+    rir_parser.add_argument(
+        '--cte',
+        type=float,
+        default=None,
+        help='Early-to-late index of the impulse response.')
+    rir_parser.add_argument(
+        '--probability',
+        type=float,
+        default=None,
+        help='probability of the impulse response.')
+    rir_parser.add_argument(
+        'rir_rspecifier',
+        type=str,
+        help="""rir rspecifier, it can be either a filename or a piped command.
+                            E.g. data/impulses/Room001-00001.wav or "sox data/impulses/Room001-00001.wav -t wav - |" """
+    )
 
     set_list = parse_set_parameter_strings(rir_set_para_array)
 
     rir_list = []
     for rir_set in set_list:
-        current_rir_list = [rir_parser.parse_args(
-            shlex.split(x.strip())) for x in open(rir_set.filename)]
+        current_rir_list = [
+            rir_parser.parse_args(shlex.split(x.strip()))
+            for x in open(rir_set.filename)
+        ]
         for rir in current_rir_list:
             if sampling_rate is not None:
                 # check if the rspecifier is a pipe or not
@@ -652,7 +817,9 @@ def make_room_dict(rir_list):
     return room_dict
 
 
-def parse_noise_list(noise_set_para_array, smoothing_weight, sampling_rate=None):
+def parse_noise_list(noise_set_para_array,
+                     smoothing_weight,
+                     sampling_rate=None):
     """ This function creates the point-source noise list
          and the isotropic noise dictionary from the noise information file
          The isotropic noise dictionary is indexed by the room
@@ -662,27 +829,48 @@ def parse_noise_list(noise_set_para_array, smoothing_weight, sampling_rate=None)
          Please refer to the help messages in the parser for the meaning of these attributes
     """
     noise_parser = argparse.ArgumentParser()
-    noise_parser.add_argument('--noise-id', type=str,
-                              required=True, help='noise id')
-    noise_parser.add_argument('--noise-type', type=str, required=True,
-                              help='the type of noise; i.e. isotropic or point-source', choices=["isotropic", "point-source"])
-    noise_parser.add_argument('--bg-fg-type', type=str, default="background", help='background or foreground noise, for background noises, '
-                              'they will be extended before addition to cover the whole speech; for foreground noise, they will be kept '
-                              'to their original duration and added at a random point of the speech.', choices=["background", "foreground"])
-    noise_parser.add_argument('--room-linkage', type=str, default=None,
-                              help='required if isotropic, should not be specified if point-source.')
     noise_parser.add_argument(
-        '--probability', type=float, default=None, help='probability of the noise.')
-    noise_parser.add_argument('noise_rspecifier', type=str, help="""noise rspecifier, it can be either a filename or a piped command.
-                              E.g. type5_noise_cirline_ofc_ambient1.wav or "sox type5_noise_cirline_ofc_ambient1.wav -t wav - |" """)
+        '--noise-id', type=str, required=True, help='noise id')
+    noise_parser.add_argument(
+        '--noise-type',
+        type=str,
+        required=True,
+        help='the type of noise; i.e. isotropic or point-source',
+        choices=["isotropic", "point-source"])
+    noise_parser.add_argument(
+        '--bg-fg-type',
+        type=str,
+        default="background",
+        help='background or foreground noise, for background noises, '
+        'they will be extended before addition to cover the whole speech; for foreground noise, they will be kept '
+        'to their original duration and added at a random point of the speech.',
+        choices=["background", "foreground"])
+    noise_parser.add_argument(
+        '--room-linkage',
+        type=str,
+        default=None,
+        help='required if isotropic, should not be specified if point-source.')
+    noise_parser.add_argument(
+        '--probability',
+        type=float,
+        default=None,
+        help='probability of the noise.')
+    noise_parser.add_argument(
+        'noise_rspecifier',
+        type=str,
+        help="""noise rspecifier, it can be either a filename or a piped command.
+                              E.g. type5_noise_cirline_ofc_ambient1.wav or "sox type5_noise_cirline_ofc_ambient1.wav -t wav - |" """
+    )
 
     set_list = parse_set_parameter_strings(noise_set_para_array)
 
     pointsource_noise_list = []
     iso_noise_dict = {}
     for noise_set in set_list:
-        current_noise_list = [noise_parser.parse_args(
-            shlex.split(x.strip())) for x in open(noise_set.filename)]
+        current_noise_list = [
+            noise_parser.parse_args(shlex.split(x.strip()))
+            for x in open(noise_set.filename)
+        ]
         current_pointsource_noise_list = []
         for noise in current_noise_list:
             if sampling_rate is not None:
@@ -697,7 +885,8 @@ def parse_noise_list(noise_set_para_array, smoothing_weight, sampling_rate=None)
             if noise.noise_type == "isotropic":
                 if noise.room_linkage is None:
                     raise Exception(
-                        "--room-linkage must be specified if --noise-type is isotropic")
+                        "--room-linkage must be specified if --noise-type is isotropic"
+                    )
                 else:
                     if noise.room_linkage not in iso_noise_dict:
                         iso_noise_dict[noise.room_linkage] = []
@@ -706,7 +895,8 @@ def parse_noise_list(noise_set_para_array, smoothing_weight, sampling_rate=None)
                 current_pointsource_noise_list.append(noise)
 
         pointsource_noise_list += smooth_probability_distribution(
-            current_pointsource_noise_list, smoothing_weight, noise_set.probability)
+            current_pointsource_noise_list, smoothing_weight,
+            noise_set.probability)
 
     # ensure the point-source noise probabilities sum to 1
     pointsource_noise_list = smooth_probability_distribution(
@@ -729,17 +919,18 @@ def main():
     args = get_args()
 
     random.seed(args.random_seed)
-    rir_list = parse_rir_list(
-        args.rir_set_para_array, args.rir_smoothing_weight, args.source_sampling_rate)
+    rir_list = parse_rir_list(args.rir_set_para_array,
+                              args.rir_smoothing_weight,
+                              args.source_sampling_rate)
     print("Number of RIRs is {0}".format(len(rir_list)))
     pointsource_noise_list = []
     iso_noise_dict = {}
     if args.noise_set_para_array is not None:
-        pointsource_noise_list, iso_noise_dict = parse_noise_list(args.noise_set_para_array,
-                                                                  args.noise_smoothing_weight,
-                                                                  args.source_sampling_rate)
-        print(
-            "Number of point-source noises is {0}".format(len(pointsource_noise_list)))
+        pointsource_noise_list, iso_noise_dict = parse_noise_list(
+            args.noise_set_para_array, args.noise_smoothing_weight,
+            args.source_sampling_rate)
+        print("Number of point-source noises is {0}".format(
+            len(pointsource_noise_list)))
         print("Number of isotropic noises is {0}".format(
             sum(len(iso_noise_dict[key]) for key in iso_noise_dict.keys())))
     room_dict = make_room_dict(rir_list)
@@ -748,24 +939,28 @@ def main():
         include_original = True
     else:
         include_original = False
-    create_reverberated_copy(input_dir=args.input_dir,
-                             output_dir=args.output_dir,
-                             room_dict=room_dict,
-                             pointsource_noise_list=pointsource_noise_list,
-                             iso_noise_dict=iso_noise_dict,
-                             foreground_snr_string=args.foreground_snr_string,
-                             background_snr_string=args.background_snr_string,
-                             num_replicas=args.num_replicas,
-                             include_original=include_original,
-                             prefix=args.prefix,
-                             speech_rvb_probability=args.speech_rvb_probability,
-                             shift_output=args.shift_output,
-                             isotropic_noise_addition_probability=args.isotropic_noise_addition_probability,
-                             pointsource_noise_addition_probability=args.pointsource_noise_addition_probability,
-                             max_noises_per_minute=args.max_noises_per_minute)
+    create_reverberated_copy(
+        input_dir=args.input_dir,
+        output_dir=args.output_dir,
+        room_dict=room_dict,
+        pointsource_noise_list=pointsource_noise_list,
+        iso_noise_dict=iso_noise_dict,
+        foreground_snr_string=args.foreground_snr_string,
+        background_snr_string=args.background_snr_string,
+        num_replicas=args.num_replicas,
+        include_original=include_original,
+        prefix=args.prefix,
+        speech_rvb_probability=args.speech_rvb_probability,
+        shift_output=args.shift_output,
+        isotropic_noise_addition_probability=args.
+        isotropic_noise_addition_probability,
+        pointsource_noise_addition_probability=args.
+        pointsource_noise_addition_probability,
+        max_noises_per_minute=args.max_noises_per_minute)
 
-    data_lib.RunKaldiCommand("utils/validate_data_dir.sh --no-feats --no-text {output_dir}"
-                             .format(output_dir=args.output_dir))
+    data_lib.RunKaldiCommand(
+        "utils/validate_data_dir.sh --no-feats --no-text {output_dir}".format(
+            output_dir=args.output_dir))
 
 
 if __name__ == "__main__":

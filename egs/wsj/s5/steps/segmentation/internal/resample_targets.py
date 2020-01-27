@@ -33,8 +33,7 @@ logger.addHandler(handler)
 
 
 def get_args():
-    parser = argparse.ArgumentParser(
-        description="""
+    parser = argparse.ArgumentParser(description="""
 This script reads a Kaldi text archive of matrices from 'targets_in_ark' (e.g.
 '-' for standard input), modifies them by subsampling them, and writes the
 modified archive to 'targets_out_ark'.
@@ -44,15 +43,26 @@ taking every n'th element.
 Thus, this script is similar to the binary 'subsample-feats' except that
 it subsamples by averaging.""")
 
-    parser.add_argument("--subsampling-factor", type=int, default=1,
-                        help="The sampling rate is scaled by this factor")
-    parser.add_argument("--verbose", type=int, default=0, choices=[0, 1, 2],
-                        help="Verbose level")
+    parser.add_argument(
+        "--subsampling-factor",
+        type=int,
+        default=1,
+        help="The sampling rate is scaled by this factor")
+    parser.add_argument(
+        "--verbose",
+        type=int,
+        default=0,
+        choices=[0, 1, 2],
+        help="Verbose level")
 
-    parser.add_argument("targets_in_ark", type=argparse.FileType('r'),
-                        help="Input targets archive")
-    parser.add_argument("targets_out_ark", type=argparse.FileType('w'),
-                        help="Output targets archive")
+    parser.add_argument(
+        "targets_in_ark",
+        type=argparse.FileType('r'),
+        help="Input targets archive")
+    parser.add_argument(
+        "targets_out_ark",
+        type=argparse.FileType('w'),
+        help="Output targets archive")
 
     args = parser.parse_args()
 
@@ -72,13 +82,14 @@ def run(args):
     for key, mat in common_lib.read_mat_ark(args.targets_in_ark):
         mat = np.matrix(mat)
         if args.subsampling_factor > 0:
-            num_indexes = ((mat.shape[0] + args.subsampling_factor - 1)
-                           / args.subsampling_factor)
+            num_indexes = ((mat.shape[0] + args.subsampling_factor - 1) /
+                           args.subsampling_factor)
 
         out_mat = np.zeros([num_indexes, mat.shape[1]])
         i = 0
-        for k in range(int(args.subsampling_factor / 2.0),
-                       mat.shape[0], args.subsampling_factor):
+        for k in range(
+                int(args.subsampling_factor / 2.0), mat.shape[0],
+                args.subsampling_factor):
             st = int(k - float(args.subsampling_factor) / 2.0)
             end = int(k + float(args.subsampling_factor) / 2.0)
 

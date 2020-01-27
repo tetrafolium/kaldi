@@ -23,8 +23,8 @@ def prepare_dihard_2018_eval(src_dir, data_dir):
                 segment_id = 0
                 for line in lines:
                     start, end, speech = line.split()
-                    segment_id_str = "{}_{}".format(
-                        utt, str(segment_id).zfill(4))
+                    segment_id_str = "{}_{}".format(utt,
+                                                    str(segment_id).zfill(4))
                     segments_str = "{} {} {} {}\n".format(
                         segment_id_str, utt, start, end)
                     utt2spk_str = "{} {}\n".format(segment_id_str, utt)
@@ -34,10 +34,12 @@ def prepare_dihard_2018_eval(src_dir, data_dir):
                 wav_str = "{} sox -t flac {}/data/flac/{}.flac -t wav -r 16k "\
                     "-b 16 - channels 1 |\n".format(utt, src_dir, utt)
                 wavscp_fi.write(wav_str)
-                with open("{}/data/rttm/{}.rttm".format(src_dir, utt), 'r') as fh:
+                with open("{}/data/rttm/{}.rttm".format(src_dir, utt),
+                          'r') as fh:
                     rttm_str = fh.read()
                 rttm_fi.write(rttm_str)
-                with open("{}/data/rttm/{}.rttm".format(src_dir, utt), 'r') as fh:
+                with open("{}/data/rttm/{}.rttm".format(src_dir, utt),
+                          'r') as fh:
                     rttm_list = fh.readlines()
                 spk_list = [(x.split())[7] for x in rttm_list]
                 num_spk = len(set(spk_list))

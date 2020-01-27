@@ -2,8 +2,6 @@
 
 # Copyright    2017 Hossein Hadian
 # Apache 2.0
-
-
 """ This reads data/train/text from standard input, converts the word transcriptions
     to phone transcriptions using the provided lexicon,
     and writes them to standard output.
@@ -20,12 +18,17 @@ parser = argparse.ArgumentParser(description="""This script reads
     data/train/text from std input and converts the word transcriptions
     to phone transcriptions using the provided lexicon""")
 parser.add_argument('langdir', type=str)
-parser.add_argument('--edge-silprob', type=float, default=0.8,
-                    help="""Probability of optional silence at the beginning
+parser.add_argument(
+    '--edge-silprob',
+    type=float,
+    default=0.8,
+    help="""Probability of optional silence at the beginning
                     and end.""")
-parser.add_argument('--between-silprob', type=float, default=0.2,
-                    help="Probability of optional silence between the words.")
-
+parser.add_argument(
+    '--between-silprob',
+    type=float,
+    default=0.2,
+    help="Probability of optional silence between the words.")
 
 args = parser.parse_args()
 
@@ -34,7 +37,6 @@ sil = open(join(args.langdir,
                 "phones/optional_silence.txt")).readline().strip()
 
 oov_word = open(join(args.langdir, "oov.txt")).readline().strip()
-
 
 # load the lexicon
 lexicon = {}
@@ -49,8 +51,8 @@ n_fail = 0
 for line in sys.stdin:
     line = line.strip().split()
     key = line[0]
-    word_trans = line[1:]   # word-level transcription
-    phone_trans = []        # phone-level transcription
+    word_trans = line[1:]  # word-level transcription
+    phone_trans = []  # phone-level transcription
     if random.random() < args.edge_silprob:
         phone_trans += [sil]
     for i in range(len(word_trans)):
@@ -60,7 +62,8 @@ for line in sys.stdin:
             n_fail += 1
             if n_fail < 20:
                 sys.stderr.write(
-                    "{} not found in lexicon, replacing with {}\n".format(word, oov_word))
+                    "{} not found in lexicon, replacing with {}\n".format(
+                        word, oov_word))
             elif n_fail == 20:
                 sys.stderr.write("Not warning about OOVs any more.\n")
             pronunciation = lexicon[oov_word]

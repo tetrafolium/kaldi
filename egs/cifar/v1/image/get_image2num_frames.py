@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 # Copyright      2018  Hossein Hadian
-
-
 """ This script computes the image lengths (with padding) in an image data dir.
     The output is written to 'image2num_frames' in the given data dir. This
     file is later used by image/get_allowed_lengths.py to find a set of allowed lengths
@@ -16,18 +14,29 @@ import sys
 import numpy as np
 from PIL import Image
 
-parser = argparse.ArgumentParser(description="""Computes the image lengths (i.e. width) in an image data dir
-                                                and writes them (by default) to image2num_frames.""")
-parser.add_argument('dir', type=str,
-                    help='Source data directory (containing images.scp)')
-parser.add_argument('--out-ark', type=str, default=None,
-                    help='Where to write the output image-to-num_frames info. '
-                    'Default: "dir"/image2num_frames')
-parser.add_argument('--feat-dim', type=int, default=40,
-                    help='Size to scale the height of all images')
-parser.add_argument('--padding', type=int, default=5,
-                    help='Number of white pixels to pad on the left'
-                    'and right side of the image.')
+parser = argparse.ArgumentParser(
+    description="""Computes the image lengths (i.e. width) in an image data dir
+                                                and writes them (by default) to image2num_frames."""
+)
+parser.add_argument(
+    'dir', type=str, help='Source data directory (containing images.scp)')
+parser.add_argument(
+    '--out-ark',
+    type=str,
+    default=None,
+    help='Where to write the output image-to-num_frames info. '
+    'Default: "dir"/image2num_frames')
+parser.add_argument(
+    '--feat-dim',
+    type=int,
+    default=40,
+    help='Size to scale the height of all images')
+parser.add_argument(
+    '--padding',
+    type=int,
+    default=5,
+    help='Number of white pixels to pad on the left'
+    'and right side of the image.')
 args = parser.parse_args()
 
 

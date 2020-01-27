@@ -37,20 +37,38 @@ def return_nonempty_lines(lines):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--snrs', type=str, default='20:10:0',
-                        help='snrs to be used for corruption')
-    parser.add_argument('--check-output-exists', type=str, default='True',
-                        help='process file only if output file does not exist', choices=['True', 'true', 'False', 'false'])
-    parser.add_argument('--random-seed', type=int, default=0,
-                        help='seed to be used in the randomization of impulses')
-    parser.add_argument('wav_file_list', type=str,
-                        help='wav.scp file to corrupt')
-    parser.add_argument('output_wav_file_list', type=str,
-                        help='wav.scp file to write corrupted output')
-    parser.add_argument('impulses_noises_dir', type=str,
-                        help='directory with impulses and noises and info directory (created by local/prep_rirs.sh)')
-    parser.add_argument('output_command_file', type=str,
-                        help='file to output the corruption commands')
+    parser.add_argument(
+        '--snrs',
+        type=str,
+        default='20:10:0',
+        help='snrs to be used for corruption')
+    parser.add_argument(
+        '--check-output-exists',
+        type=str,
+        default='True',
+        help='process file only if output file does not exist',
+        choices=['True', 'true', 'False', 'false'])
+    parser.add_argument(
+        '--random-seed',
+        type=int,
+        default=0,
+        help='seed to be used in the randomization of impulses')
+    parser.add_argument(
+        'wav_file_list', type=str, help='wav.scp file to corrupt')
+    parser.add_argument(
+        'output_wav_file_list',
+        type=str,
+        help='wav.scp file to write corrupted output')
+    parser.add_argument(
+        'impulses_noises_dir',
+        type=str,
+        help=
+        'directory with impulses and noises and info directory (created by local/prep_rirs.sh)'
+    )
+    parser.add_argument(
+        'output_command_file',
+        type=str,
+        help='file to output the corruption commands')
     params = parser.parse_args()
 
     add_noise = True
@@ -67,11 +85,14 @@ if __name__ == "__main__":
         open(params.wav_file_list, 'r').readlines())
     wav_out_files = return_nonempty_lines(
         open(params.output_wav_file_list, 'r').readlines())
-    assert(len(wav_files) == len(wav_out_files))
-    impulses = list_cyclic_iterator(return_nonempty_lines(open(
-        params.impulses_noises_dir+'/info/impulse_files').readlines()), random_seed=params.random_seed)
-    noises_impulses_files = glob.glob(
-        params.impulses_noises_dir+'/info/noise_impulse_*')
+    assert (len(wav_files) == len(wav_out_files))
+    impulses = list_cyclic_iterator(
+        return_nonempty_lines(
+            open(params.impulses_noises_dir +
+                 '/info/impulse_files').readlines()),
+        random_seed=params.random_seed)
+    noises_impulses_files = glob.glob(params.impulses_noises_dir +
+                                      '/info/noise_impulse_*')
     impulse_noise_index = []
     for file in noises_impulses_files:
         noises_list = []
@@ -102,21 +123,23 @@ if __name__ == "__main__":
                 if impulse_file in impulse_noise_index[i][0]:
                     noise_file = next(impulse_noise_index[i][1])
                     snr = next(snrs)
-                    assert(len(wav_file.strip()) > 0)
-                    assert(len(impulse_file.strip()) > 0)
-                    assert(len(noise_file.strip()) > 0)
-                    assert(len(snr.strip()) > 0)
-                    assert(len(output_wav_file.strip()) > 0)
-                    command_list.append("{4} {0} wav-reverberate --noise-file={2} --snr-db={3} - {1} - |\n".format(
-                        wav_file, impulse_file, noise_file, snr, output_wav_file))
+                    assert (len(wav_file.strip()) > 0)
+                    assert (len(impulse_file.strip()) > 0)
+                    assert (len(noise_file.strip()) > 0)
+                    assert (len(snr.strip()) > 0)
+                    assert (len(output_wav_file.strip()) > 0)
+                    command_list.append(
+                        "{4} {0} wav-reverberate --noise-file={2} --snr-db={3} - {1} - |\n"
+                        .format(wav_file, impulse_file, noise_file, snr,
+                                output_wav_file))
                     found_impulse = True
                     break
         if not found_impulse:
-            assert(len(wav_file.strip()) > 0)
-            assert(len(impulse_file.strip()) > 0)
-            assert(len(output_wav_file.strip()) > 0)
-            command_list.append(
-                "{2} {0} wav-reverberate - {1} - |\n".format(wav_file, impulse_file, output_wav_file))
+            assert (len(wav_file.strip()) > 0)
+            assert (len(impulse_file.strip()) > 0)
+            assert (len(output_wav_file.strip()) > 0)
+            command_list.append("{2} {0} wav-reverberate - {1} - |\n".format(
+                wav_file, impulse_file, output_wav_file))
     file_handle = open(params.output_command_file, 'w')
     file_handle.write("".join(command_list))
     file_handle.close()

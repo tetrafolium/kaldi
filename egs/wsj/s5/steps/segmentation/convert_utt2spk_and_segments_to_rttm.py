@@ -35,18 +35,17 @@ def get_args():
         description="""This script converts kaldi-style utt2spk and
         segments to a NIST RTTM file""")
 
-    parser.add_argument("--reco2file-and-channel", type=str,
-                        action=common_lib.NullstrToNoneAction,
-                        help="""Input reco2file_and_channel.
+    parser.add_argument(
+        "--reco2file-and-channel",
+        type=str,
+        action=common_lib.NullstrToNoneAction,
+        help="""Input reco2file_and_channel.
                         The format is <recording-id> <file-id> <channel-id>.
                         If not provided, then <recording-id> is taken as the
                         <file-id> with <channel-id> = 1.""")
-    parser.add_argument("utt2spk", type=str,
-                        help="Input utt2spk file")
-    parser.add_argument("segments", type=str,
-                        help="Input segments file")
-    parser.add_argument("rttm_file", type=str,
-                        help="Output RTTM file")
+    parser.add_argument("utt2spk", type=str, help="Input utt2spk file")
+    parser.add_argument("segments", type=str, help="Input segments file")
+    parser.add_argument("rttm_file", type=str, help="Output RTTM file")
 
     args = parser.parse_args()
     return args
@@ -91,10 +90,11 @@ def main():
             start_time = float(parts[2])
             duration = float(parts[3]) - start_time
 
-            print("SPEAKER {0} {1} {2:7.2f} {3:7.2f} "
-                  "<NA> <NA> {4} <NA>".format(
-                      file_id, channel, start_time,
-                      duration, spkr), file=rttm_writer)
+            print(
+                "SPEAKER {0} {1} {2:7.2f} {3:7.2f} "
+                "<NA> <NA> {4} <NA>".format(file_id, channel, start_time,
+                                            duration, spkr),
+                file=rttm_writer)
 
 
 if __name__ == '__main__':

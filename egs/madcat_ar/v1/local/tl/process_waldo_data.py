@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script reads image and transcription mapping and creates the following files :text, utt2spk, images.scp.
   Eg. local/process_waldo_data.py lines/hyp_line_image_transcription_mapping_kaldi.txt data/test
   Eg. text file: LDC0001_000404_NHR_ARB_20070113.0052_11_LDC0001_00z2 ﻮﺠﻫ ﻮﻌﻘﻟ ﻍﺍﺮﻗ ﺢﺗّﻯ ﺎﻠﻨﺧﺎﻋ
@@ -12,14 +11,18 @@ import argparse
 import os
 import sys
 
-parser = argparse.ArgumentParser(description="Creates text, utt2spk and images.scp files",
-                                 epilog="E.g.  " +
-                                 sys.argv[0] + " data/train data/local/lines ",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('image_transcription_file', type=str,
-                    help='Path to the file containing line image path and transcription information')
-parser.add_argument('out_dir', type=str,
-                    help='directory location to write output files.')
+parser = argparse.ArgumentParser(
+    description="Creates text, utt2spk and images.scp files",
+    epilog="E.g.  " + sys.argv[0] + " data/train data/local/lines ",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument(
+    'image_transcription_file',
+    type=str,
+    help=
+    'Path to the file containing line image path and transcription information'
+)
+parser.add_argument(
+    'out_dir', type=str, help='directory location to write output files.')
 args = parser.parse_args()
 
 

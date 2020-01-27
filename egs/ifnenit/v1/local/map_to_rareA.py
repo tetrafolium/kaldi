@@ -22,7 +22,7 @@ for line in in_stream:
         if not str:  # leave first word untouched
             str = word
         elif not word in d:
-            str = str+" rareA"
+            str = str + " rareA"
         else:
-            str = str+" "+word
+            str = str + " " + word
     out_stream.write(str.strip() + "\n")

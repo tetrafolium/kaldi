@@ -19,13 +19,17 @@ symtable = '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-matt/data/lang/word
 conversationList = open(
     '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/dev')
 provFile = open(
-    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/ch-d/asr.test.plf', 'w+')
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/ch-d/asr.test.plf',
+    'w+')
 invalidPLF = open(
-    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/ch-d/invalidPLF', 'w+')
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/ch-d/invalidPLF',
+    'w+')
 blankPLF = open(
-    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/ch-d/blankPLF', 'w+')
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/ch-d/blankPLF',
+    'w+')
 rmLines = open(
-    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/ch-d/removeLines', 'w+')
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/ch-d/removeLines',
+    'w+')
 
 if not os.path.exists(tmpdir):
     os.makedirs(tmpdir)
@@ -71,8 +75,8 @@ for line in conversationList:
 
 lineNo = 1
 for item in fileList:
-    timingFile = open(
-        '/export/a04/gkumar/corpora/fishcall/callhome/tim/' + item + '.es')
+    timingFile = open('/export/a04/gkumar/corpora/fishcall/callhome/tim/' +
+                      item + '.es')
     for line in timingFile:
         timeInfo = line.split()
 
@@ -94,8 +98,11 @@ for item in fileList:
                       " | fsttopsort - " + finalFST)
 
             # Now convert to PLF
-            proc = subprocess.Popen('/export/a04/gkumar/corpora/fishcall/bin/fsm2plf.sh ' +
-                                    symtable + ' ' + finalFST, stdout=subprocess.PIPE, shell=True)
+            proc = subprocess.Popen(
+                '/export/a04/gkumar/corpora/fishcall/bin/fsm2plf.sh ' +
+                symtable + ' ' + finalFST,
+                stdout=subprocess.PIPE,
+                shell=True)
             PLFline = proc.stdout.readline()
             finalPLFFile = tmpdir + "/final.plf"
             finalPLF = open(finalPLFFile, "w+")
@@ -104,13 +111,16 @@ for item in fileList:
 
             # now check if this is a valid PLF, if not write it's ID in a
             # file so it can be checked later
-            proc = subprocess.Popen("/export/a04/gkumar/moses/mosesdecoder/checkplf < " +
-                                    finalPLFFile + " 2>&1 | awk 'FNR == 2 {print}'", stdout=subprocess.PIPE, shell=True)
+            proc = subprocess.Popen(
+                "/export/a04/gkumar/moses/mosesdecoder/checkplf < " +
+                finalPLFFile + " 2>&1 | awk 'FNR == 2 {print}'",
+                stdout=subprocess.PIPE,
+                shell=True)
             line = proc.stdout.readline()
             print("{} {}".format(line, lineNo))
             if line.strip() != "PLF format appears to be correct.":
-                os.system("cp " + finalFST + " " +
-                          invalidplfdir + "/" + timeInfo[0])
+                os.system("cp " + finalFST + " " + invalidplfdir + "/" +
+                          timeInfo[0])
                 invalidPLF.write(invalidplfdir + "/" + timeInfo[0] + "\n")
                 rmLines.write("{}\n".format(lineNo))
             else:

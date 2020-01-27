@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script converts kaldi format into snor format..
 """
 import sys

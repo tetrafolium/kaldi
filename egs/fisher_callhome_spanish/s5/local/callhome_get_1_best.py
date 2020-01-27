@@ -51,10 +51,11 @@ if not os.path.exists('exp/tri5a/one-best/ch_train'):
 
 #provFile = open('/export/a04/gkumar/corpora/fishcall/fisher_provisional_dev.es', 'w+')
 provFile = open(
-    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/asr.train', 'w+')
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/asr.train',
+    'w+')
 for item in fileList:
-    timingFile = open(
-        '/export/a04/gkumar/corpora/fishcall/callhome/tim/' + item + '.es')
+    timingFile = open('/export/a04/gkumar/corpora/fishcall/callhome/tim/' +
+                      item + '.es')
     newFile = open('exp/tri5a/one-best/ch_train/' + item + '.es', 'w+')
     for line in timingFile:
         timeInfo = line.split()

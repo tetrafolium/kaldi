@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
-
 """Utilities for parsing RNNLM text files."""
 from __future__ import absolute_import
 from __future__ import division
@@ -82,8 +80,10 @@ def rnnlm_gen_data(*files):
         all_words.update(word_list)
         all_word_lists.append(word_list)
 
-    word_to_id = {word: i for i, (word, _) in enumerate(
-        all_words.most_common())}
+    word_to_id = {
+        word: i
+        for i, (word, _) in enumerate(all_words.most_common())
+    }
 
     def convert(word_list):
         return [word_to_id[word] for word in word_list]

@@ -15,30 +15,44 @@ def get_args():
     to convert a 3x1 probability vector to a
     2x1 pseudo-likelihood vector by first dividing by 3x1 priors vector.""")
 
-    parser.add_argument("--priors", type=str, default=None,
-                        action=common_lib.NullstrToNoneAction,
-                        help="Priors vector used to remove the priors from "
-                        "the neural network output posteriors to "
-                        "convert them to likelihoods")
+    parser.add_argument(
+        "--priors",
+        type=str,
+        default=None,
+        action=common_lib.NullstrToNoneAction,
+        help="Priors vector used to remove the priors from "
+        "the neural network output posteriors to "
+        "convert them to likelihoods")
 
-    parser.add_argument("--sil-in-speech-weight", type=float,
-                        default=0.0,
-                        help="The fraction of silence probability "
-                        "to add to speech")
-    parser.add_argument("--speech-in-sil-weight", type=float,
-                        default=0.0,
-                        help="The fraction of speech probability "
-                        "to add to silence")
-    parser.add_argument("--garbage-in-speech-weight", type=float,
-                        default=0.0,
-                        help="The fraction of garbage probability "
-                        "to add to speech")
-    parser.add_argument("--garbage-in-sil-weight", type=float,
-                        default=0.0,
-                        help="The fraction of garbage probability "
-                        "to add to silence")
-    parser.add_argument("--sil-scale", type=float,
-                        default=1.0, help="""Scale on the silence probability
+    parser.add_argument(
+        "--sil-in-speech-weight",
+        type=float,
+        default=0.0,
+        help="The fraction of silence probability "
+        "to add to speech")
+    parser.add_argument(
+        "--speech-in-sil-weight",
+        type=float,
+        default=0.0,
+        help="The fraction of speech probability "
+        "to add to silence")
+    parser.add_argument(
+        "--garbage-in-speech-weight",
+        type=float,
+        default=0.0,
+        help="The fraction of garbage probability "
+        "to add to speech")
+    parser.add_argument(
+        "--garbage-in-sil-weight",
+        type=float,
+        default=0.0,
+        help="The fraction of garbage probability "
+        "to add to silence")
+    parser.add_argument(
+        "--sil-scale",
+        type=float,
+        default=1.0,
+        help="""Scale on the silence probability
                         (make this more than one to encourage
                         decoding silence).""")
 
@@ -60,12 +74,15 @@ def run(args):
     speech_prior = priors[0][1] / priors_sum
     garbage_prior = priors[0][2] / priors_sum
 
-    transform_mat = [[args.sil_scale / sil_prior,
-                      args.speech_in_sil_weight / speech_prior,
-                      args.garbage_in_sil_weight / garbage_prior],
-                     [args.sil_in_speech_weight / sil_prior,
-                      1.0 / speech_prior,
-                      args.garbage_in_speech_weight / garbage_prior]]
+    transform_mat = [[
+        args.sil_scale / sil_prior, args.speech_in_sil_weight / speech_prior,
+        args.garbage_in_sil_weight / garbage_prior
+    ],
+                     [
+                         args.sil_in_speech_weight / sil_prior,
+                         1.0 / speech_prior,
+                         args.garbage_in_speech_weight / garbage_prior
+                     ]]
 
     common_lib.write_matrix_ascii(sys.stdout, transform_mat)
 

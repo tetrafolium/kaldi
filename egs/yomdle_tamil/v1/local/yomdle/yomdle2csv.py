@@ -28,7 +28,7 @@ pi = np.pi
 
 def Rotate2D(pts, cnt, ang=90):
     M = np.array([[cos(ang), -sin(ang)], [sin(ang), cos(ang)]])
-    res = np.dot(pts-cnt, M)+cnt
+    res = np.dot(pts - cnt, M) + cnt
     return M, res
 
 
@@ -42,12 +42,12 @@ def npbox2string(npar):
 
     return c1, r1, c2, r2, c3, r3, c4, r4
 
+
 # cv2.minAreaRect() returns a Box2D structure which contains following detals - ( center (x,y), (width, height), angle of rotation )
 # Get 4 corners of the rectangle using cv2.boxPoints()
 
 
 class GEDI2CSV(object):
-
     ''' Initialize the extractor'''
 
     def __init__(self, logger, args):
@@ -66,8 +66,11 @@ class GEDI2CSV(object):
 
         rotlist = []
 
-        header = ['ID', 'name', 'col1', 'row1', 'col2', 'row2', 'col3', 'row3', 'col4',
-                  'row4', 'confidence', 'truth', 'pgrot', 'bbrot', 'qual', 'script', 'lang']
+        header = [
+            'ID', 'name', 'col1', 'row1', 'col2', 'row2', 'col3', 'row3',
+            'col4', 'row4', 'confidence', 'truth', 'pgrot', 'bbrot', 'qual',
+            'script', 'lang'
+        ]
         conf = 100
         pgrot = 0
         bbrot = 0
@@ -104,8 +107,10 @@ class GEDI2CSV(object):
 
                 bbrot = 0.0
 
-                rotlist.append([id, baseName + '_' + id + '.png', c1, r1, c2, r2,
-                                c3, r3, c4, r4, conf, text, pgrot, bbrot, qual, script, lang])
+                rotlist.append([
+                    id, baseName + '_' + id + '.png', c1, r1, c2, r2, c3, r3,
+                    c4, r4, conf, text, pgrot, bbrot, qual, script, lang
+                ])
 
             except:
                 print('...polygon error %s, %s' % (j, baseName))
@@ -130,7 +135,6 @@ def main(args):
     print('write to %s' % (writePath))
     if os.path.isdir(writePath) != True:
         os.makedirs(writePath)
-
     ''' Setup logging '''
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
@@ -175,36 +179,42 @@ def main(args):
                 totalpages = int(child.attrib['NrOfPages'])
                 coordinates = []
                 polygons = []
-
                 ''' and for each page '''
-                for i, pgs in enumerate(child.iterfind('gedi:DL_PAGE', namespaces)):
+                for i, pgs in enumerate(
+                        child.iterfind('gedi:DL_PAGE', namespaces)):
 
                     if 'GEDI_orientation' not in pgs.attrib:
                         pageRot = 0
                     else:
                         pageRot = int(pgs.attrib['GEDI_orientation'])
-                        logger.info(' PAGE ROTATION %s, %s' %
-                                    (fullName, str(pageRot)))
-
+                        logger.info(
+                            ' PAGE ROTATION %s, %s' % (fullName, str(pageRot)))
                     ''' find children for each page '''
                     for zone in pgs.findall('gedi:DL_ZONE', namespaces):
 
                         if zone.attrib['gedi_type'] == 'Text':
                             if zone.get('polygon'):
                                 keyCnt += 1
-                                polygons.append([zone.attrib['id'], zone.get('polygon').split(';'),
-                                                 zone.get('Text_Content'), zone.get('Illegible'), zone.get('Language')])
+                                polygons.append([
+                                    zone.attrib['id'],
+                                    zone.get('polygon').split(';'),
+                                    zone.get('Text_Content'),
+                                    zone.get('Illegible'),
+                                    zone.get('Language')
+                                ])
                             else:
                                 print('...Not polygon')
 
                 if len(coordinates) > 0 or len(polygons) > 0:
                     line_write_ctr += gtconverter.csvfile(
-                        coordinates, polygons, os.path.splitext(file)[0], pageRot)
+                        coordinates, polygons,
+                        os.path.splitext(file)[0], pageRot)
                 else:
                     print('...%s has no text content' % (baseName[0]))
 
-    print('complete...total files %d, lines written %d, img errors %d, line error %d' % (
-        fileCnt, line_write_ctr, file_error_ctr, line_error_ctr))
+    print(
+        'complete...total files %d, lines written %d, img errors %d, line error %d'
+        % (fileCnt, line_write_ctr, file_error_ctr, line_error_ctr))
 
 
 ''' Args and defaults '''
@@ -213,12 +223,18 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--inputDir', type=str, help='Input directory',
-                        default='/data/YOMDLE/final_arabic/xml')
-    parser.add_argument('--outputDir', type=str, help='Output directory',
-                        default='/exp/YOMDL/final_arabic/csv_truth/')
-    parser.add_argument('--log', type=str,
-                        help='Log directory', default='/exp/logs.txt')
+    parser.add_argument(
+        '--inputDir',
+        type=str,
+        help='Input directory',
+        default='/data/YOMDLE/final_arabic/xml')
+    parser.add_argument(
+        '--outputDir',
+        type=str,
+        help='Output directory',
+        default='/exp/YOMDL/final_arabic/csv_truth/')
+    parser.add_argument(
+        '--log', type=str, help='Log directory', default='/exp/logs.txt')
 
     return parser.parse_args(argv)
 

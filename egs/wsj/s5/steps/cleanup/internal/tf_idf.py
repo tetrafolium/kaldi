@@ -1,6 +1,5 @@
 # Copyright 2016    Vimal Manohar
 # Apache 2.0.
-
 """This module contains structures to accumulate, store and use stats
 for Term-frequency and Inverse-document-frequency values.
 """
@@ -71,8 +70,9 @@ class IDFStats(object):
             if num == 0:
                 continue
             assert isinstance(term, tuple)
-            print ("{term} {n}".format(term=" ".join(term), n=num),
-                   file=file_handle)
+            print(
+                "{term} {n}".format(term=" ".join(term), n=num),
+                file=file_handle)
 
     def read(self, file_handle):
         """Loads IDF stats from file. """
@@ -96,7 +96,10 @@ class TFStats(object):
         self.raw_counts = {}
         self.max_counts_for_term = {}
 
-    def get_term_frequency(self, term, doc, weighting_scheme="raw",
+    def get_term_frequency(self,
+                           term,
+                           doc,
+                           weighting_scheme="raw",
                            normalization_factor=0.5):
         """Returns the term-frequency for (term, document) pair.
 
@@ -116,19 +119,19 @@ class TFStats(object):
                 return 1 + math.log(self.raw_counts[(term, doc)])
             return 0
         if weighting_scheme == "normalized":
-            return (normalization_factor
-                    + (1 - normalization_factor)
-                    * self.raw_counts.get((term, doc), 0)
-                    / (1.0 + self.max_counts_for_term.get(term, 0)))
-        raise KeyError("Unknown tf-weighting-scheme {0}".format(
-            weighting_scheme))
+            return (normalization_factor +
+                    (1 - normalization_factor) * self.raw_counts.get(
+                        (term, doc), 0) /
+                    (1.0 + self.max_counts_for_term.get(term, 0)))
+        raise KeyError(
+            "Unknown tf-weighting-scheme {0}".format(weighting_scheme))
 
     def accumulate(self, doc, text, ngram_order):
         """Accumulate raw stats from a document for upto the specified
         ngram-order."""
         for n in range(1, ngram_order + 1):
             for i in range(len(text)):
-                term = tuple(text[i:(i+n)])
+                term = tuple(text[i:(i + n)])
                 self.raw_counts.setdefault((term, doc), 0)
                 self.raw_counts[(term, doc)] += 1
 
@@ -154,8 +157,7 @@ class TFStats(object):
         for tup, counts in self.raw_counts.items():
             term, doc = tup
             lines.append("{order} {term} {doc} {counts}".format(
-                order=len(term), term=" ".join(term),
-                doc=doc, counts=counts))
+                order=len(term), term=" ".join(term), doc=doc, counts=counts))
         return "\n".join(lines)
 
     def read(self, file_handle, ngram_order=None, idf_stats=None):
@@ -170,7 +172,7 @@ class TFStats(object):
             assert len(parts) - 3 == order
             if ngram_order is not None and order > ngram_order:
                 continue
-            term = tuple(parts[1:(order+1)])
+            term = tuple(parts[1:(order + 1)])
             doc = parts[-2]
             counts = float(parts[-1])
 
@@ -203,7 +205,9 @@ class TFIDF(object):
         """
         return self.tf_idf[(term, doc)]
 
-    def compute_similarity_scores(self, source_tfidf, source_docs=None,
+    def compute_similarity_scores(self,
+                                  source_tfidf,
+                                  source_docs=None,
                                   do_length_normalization=False,
                                   query_id=None):
         """Computes TF-IDF similarity score between each pair of query
@@ -236,29 +240,25 @@ class TFIDF(object):
                                    "not the required query {1}. \n"
                                    "Something wrong in how this TF-IDF object "
                                    "was created or a bug in the "
-                                   "calling script.".format(
-                                       doc, query_id))
+                                   "calling script.".format(doc, query_id))
 
             if source_docs is not None:
                 for src_doc in source_docs:
                     try:
                         src_value = source_tfidf.get_value(term, src_doc)
                     except KeyError:
-                        logger.debug(
-                            "Could not find ({term}, {src}) in "
-                            "source_tfidf. "
-                            "Choosing a tf-idf value of 0.".format(
-                                term=term, src=src_doc))
+                        logger.debug("Could not find ({term}, {src}) in "
+                                     "source_tfidf. "
+                                     "Choosing a tf-idf value of 0.".format(
+                                         term=term, src=src_doc))
                         src_value = 0
 
-                    similarity_scores[(doc, src_doc)] = (
-                        similarity_scores.get((doc, src_doc), 0)
-                        + src_value * value)
+                    similarity_scores[(doc, src_doc)] = (similarity_scores.get(
+                        (doc, src_doc), 0) + src_value * value)
             else:
                 for src_tup, src_value in source_tfidf.tf_idf.items():
-                    similarity_scores[(doc, src_doc)] = (
-                        similarity_scores.get((doc, src_doc), 0)
-                        + src_value * value)
+                    similarity_scores[(doc, src_doc)] = (similarity_scores.get(
+                        (doc, src_doc), 0) + src_value * value)
 
         if do_length_normalization:
             for doc_pair, value in similarity_scores.items():
@@ -268,8 +268,8 @@ class TFIDF(object):
 
         if logger.isEnabledFor(logging.DEBUG):
             for doc, count in num_terms_per_doc.items():
-                logger.debug(
-                    'Seen {0} terms in query document {1}'.format(count, doc))
+                logger.debug('Seen {0} terms in query document {1}'.format(
+                    count, doc))
 
         return similarity_scores
 
@@ -282,9 +282,8 @@ class TFIDF(object):
         line = tf_idf_file.readline()
         parts = line.strip().split()
         if re.search('^<TFIDF>', line) is None:
-            raise TypeError(
-                "Invalid format of TD-IDF object. "
-                "Missing header <TFIDF>; got {0}".format(line))
+            raise TypeError("Invalid format of TD-IDF object. "
+                            "Missing header <TFIDF>; got {0}".format(line))
         assert parts[0] == "<TFIDF>"
         if len(parts) > 1:
             # Read header; go to the rest of line
@@ -319,31 +318,34 @@ class TFIDF(object):
 
             line = tf_idf_file.readline()
         if not seen_footer:
-            raise TypeError(
-                "Did not see footer </TFIDF> "
-                "in TFIDF object; got {0}".format(line))
+            raise TypeError("Did not see footer </TFIDF> "
+                            "in TFIDF object; got {0}".format(line))
 
         if len(self.tf_idf) == 0:
-            raise RuntimeError(
-                "Read no TF-IDF values from file {0}".format(tf_idf_file.name))
+            raise RuntimeError("Read no TF-IDF values from file {0}".format(
+                tf_idf_file.name))
 
     def write(self, tf_idf_file):
         """Writes TFIDF object to file."""
 
-        print ("<TFIDF>", file=tf_idf_file)
+        print("<TFIDF>", file=tf_idf_file)
         for tup, value in self.tf_idf.items():
             term, doc = tup
-            print("{order} {term} {doc} {tfidf}".format(
-                order=len(term), term=" ".join(term),
-                doc=doc, tfidf=value),
+            print(
+                "{order} {term} {doc} {tfidf}".format(
+                    order=len(term), term=" ".join(term), doc=doc,
+                    tfidf=value),
                 file=tf_idf_file)
-        print ("</TFIDF>", file=tf_idf_file)
+        print("</TFIDF>", file=tf_idf_file)
 
 
-def write_tfidf_from_stats(
-        tf_stats, idf_stats, tf_idf_file, tf_weighting_scheme="raw",
-        idf_weighting_scheme="log", tf_normalization_factor=0.5,
-        expected_document_id=None):
+def write_tfidf_from_stats(tf_stats,
+                           idf_stats,
+                           tf_idf_file,
+                           tf_weighting_scheme="raw",
+                           idf_weighting_scheme="log",
+                           tf_normalization_factor=0.5,
+                           expected_document_id=None):
     """Writes TF-IDF values to file args.tf_idf_file.
     The format used is
     <ngram-order> <term> <document> <tfidf>.
@@ -366,7 +368,7 @@ def write_tfidf_from_stats(
     if idf_stats.num_docs == 0:
         raise RuntimeError("Supplied idf-stats object is empty.")
 
-    print ("<TFIDF>", file=tf_idf_file)
+    print("<TFIDF>", file=tf_idf_file)
     for tup in tf_stats.raw_counts:
         term, doc = tup
 
@@ -378,18 +380,22 @@ def write_tfidf_from_stats(
                                                       expected_document_id))
 
         tf_value = tf_stats.get_term_frequency(
-            term, doc,
+            term,
+            doc,
             weighting_scheme=tf_weighting_scheme,
             normalization_factor=tf_normalization_factor)
 
         idf_value = idf_stats.get_inverse_document_frequency(
             term, weighting_scheme=idf_weighting_scheme)
 
-        print("{order} {term} {doc} {tfidf}".format(
-            order=len(term), term=" ".join(term),
-            doc=doc, tfidf=tf_value * idf_value),
+        print(
+            "{order} {term} {doc} {tfidf}".format(
+                order=len(term),
+                term=" ".join(term),
+                doc=doc,
+                tfidf=tf_value * idf_value),
             file=tf_idf_file)
-    print ("</TFIDF>", file=tf_idf_file)
+    print("</TFIDF>", file=tf_idf_file)
 
 
 def read_key(fd):

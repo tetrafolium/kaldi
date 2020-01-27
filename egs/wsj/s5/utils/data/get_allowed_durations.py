@@ -4,7 +4,6 @@
 #               2019  Facebook Inc. (Author: Vimal Manohar)
 # Apache 2.0
 
-
 import libs.common as common_lib
 """ This script generates a set of allowed lengths of utterances
     spaced by a factor (like 10%). This is useful for generating
@@ -65,23 +64,44 @@ def get_args():
     * utils/data/perturb_speed_to_allowed_lengths.py --
         creates the allowed_lengths.txt AND perturbs the data directory
     """)
-    parser.add_argument('factor', type=float, default=12,
-                        help='Spacing (in percentage) between allowed lengths. '
-                        'Can be 0, which means all seen lengths that are a multiple of '
-                        'frame_subsampling_factor will be allowed.')
-    parser.add_argument('data_dir', type=str, help='path to data dir. Assumes that '
-                        'it contains the utt2dur file.')
-    parser.add_argument('dir', type=str, help='We write the output files '
-                        'allowed_lengths.txt and allowed_durs.txt to this directory.')
-    parser.add_argument('--coverage-factor', type=float, default=0.05,
-                        help="""Percentage of durations not covered from each
+    parser.add_argument(
+        'factor',
+        type=float,
+        default=12,
+        help='Spacing (in percentage) between allowed lengths. '
+        'Can be 0, which means all seen lengths that are a multiple of '
+        'frame_subsampling_factor will be allowed.')
+    parser.add_argument(
+        'data_dir',
+        type=str,
+        help='path to data dir. Assumes that '
+        'it contains the utt2dur file.')
+    parser.add_argument(
+        'dir',
+        type=str,
+        help='We write the output files '
+        'allowed_lengths.txt and allowed_durs.txt to this directory.')
+    parser.add_argument(
+        '--coverage-factor',
+        type=float,
+        default=0.05,
+        help="""Percentage of durations not covered from each
                              side of duration histogram.""")
-    parser.add_argument('--frame-shift', type=int, default=10,
-                        help="""Frame shift in milliseconds.""")
-    parser.add_argument('--frame-length', type=int, default=25,
-                        help="""Frame length in milliseconds.""")
-    parser.add_argument('--frame-subsampling-factor', type=int, default=3,
-                        help="""Chain frame subsampling factor.
+    parser.add_argument(
+        '--frame-shift',
+        type=int,
+        default=10,
+        help="""Frame shift in milliseconds.""")
+    parser.add_argument(
+        '--frame-length',
+        type=int,
+        default=25,
+        help="""Frame length in milliseconds.""")
+    parser.add_argument(
+        '--frame-subsampling-factor',
+        type=int,
+        default=3,
+        help="""Chain frame subsampling factor.
                              See steps/nnet3/chain/train.py""")
     args = parser.parse_args()
     return args
@@ -97,7 +117,7 @@ def read_kaldi_mapfile(path):
             line = line.strip(" \t\r\n")
             sp_pos = line.find(' ')
             key = line[:sp_pos]
-            val = line[sp_pos+1:]
+            val = line[sp_pos + 1:]
             m[key] = val
     return m
 
@@ -154,8 +174,8 @@ def get_allowed_durations(start_dur, end_dur, args):
             if length % args.frame_subsampling_factor != 0:
                 length = (args.frame_subsampling_factor *
                           (length // args.frame_subsampling_factor))
-                d = (args.frame_shift * (length - 1.0)
-                     + args.frame_length + args.frame_shift / 2) / 1000.0
+                d = (args.frame_shift * (length - 1.0) + args.frame_length +
+                     args.frame_shift / 2) / 1000.0
             allowed_durations.append(d)
             durs_fp.write("{}\n".format(d))
             lengths_fp.write("{}\n".format(int(length)))
@@ -164,10 +184,11 @@ def get_allowed_durations(start_dur, end_dur, args):
 
 
 def get_trivial_allowed_durations(utt2dur, args):
-    lengths = list(set(
-        [int(float(d) * 1000 - args.frame_length) / args.frame_shift + 1
-         for key, d in utt2dur.items()]
-    ))
+    lengths = list(
+        set([
+            int(float(d) * 1000 - args.frame_length) / args.frame_shift + 1
+            for key, d in utt2dur.items()
+        ]))
     lengths.sort()
 
     allowed_durations = []
@@ -177,8 +198,8 @@ def get_trivial_allowed_durations(utt2dur, args):
             if length % args.frame_subsampling_factor != 0:
                 length = (args.frame_subsampling_factor *
                           (length // args.frame_subsampling_factor))
-                d = (args.frame_shift * (length - 1.0)
-                     + args.frame_length + args.frame_shift / 2) / 1000.0
+                d = (args.frame_shift * (length - 1.0) + args.frame_length +
+                     args.frame_shift / 2) / 1000.0
             allowed_durations.append(d)
             durs_fp.write("{}\n".format(d))
             lengths_fp.write("{}\n".format(length))
@@ -209,9 +230,10 @@ def main():
     logger.info("Durations in the range [{},{}] will be covered. "
                 "Coverage rate: {}%".format(start_dur, end_dur,
                                             100.0 - args.coverage_factor * 2))
-    logger.info("There will be {} unique allowed lengths "
-                "for the utterances.".format(int(math.log(end_dur / start_dur) /
-                                                 math.log(args.factor))))
+    logger.info(
+        "There will be {} unique allowed lengths "
+        "for the utterances.".format(
+            int(math.log(end_dur / start_dur) / math.log(args.factor))))
 
     get_allowed_durations(start_dur, end_dur, args)
 

@@ -38,16 +38,16 @@ for line in fin_trans:
     for i in range(L):
         if items[i] == 'i':
             x = 0
-            while(i-1-x >= 0 and re.match(r'^[A-Z]$', items[i-1-x])):
+            while (i - 1 - x >= 0 and re.match(r'^[A-Z]$', items[i - 1 - x])):
                 x += 1
 
             y = 0
-            while(i+1+y < L and re.match(r'^[A-Z]$', items[i+1+y])):
+            while (i + 1 + y < L and re.match(r'^[A-Z]$', items[i + 1 + y])):
                 y += 1
 
-            if x+y > 0:
-                for bias in range(-x, y+1):
-                    items[i+bias] = dict_acronym[items[i+bias]]
+            if x + y > 0:
+                for bias in range(-x, y + 1):
+                    items[i + bias] = dict_acronym[items[i + bias]]
 
     # Second pass mapping (not mapping 'i' and 'I')
     for i in range(len(items)):

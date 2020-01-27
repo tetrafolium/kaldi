@@ -55,7 +55,7 @@ for (f, c, t, e) in prf:
             prf_dict[key][float(t1)] = evl
         except ValueError:
             pass
-        t_pos += len(t1)+1  # advance position for parsing,
+        t_pos += len(t1) + 1  # advance position for parsing,
 
 # Load the ctm file (with confidences),
 with open(ctm_file) as f:
@@ -74,4 +74,4 @@ for f, chan, beg, dur, wrd, conf in ctm:
 
 # Save the augmented ctm file,
 with open(ctm_out_file, 'w') as f:
-    f.writelines([' '.join(ctm_record)+'\n' for ctm_record in ctm_out])
+    f.writelines([' '.join(ctm_record) + '\n' for ctm_record in ctm_out])

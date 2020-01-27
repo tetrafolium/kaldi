@@ -10,13 +10,13 @@ import sys
 
 sys.stdout = open(1, 'w', encoding='utf-8', closefd=False)
 
-
-parser = argparse.ArgumentParser(description="This script turns the word features to a human readable format.",
-                                 epilog="E.g. " +
-                                 sys.argv[0] +
-                                 "exp/rnnlm/word_feats.txt exp/rnnlm/features.txt "
-                                        "> exp/rnnlm/word_feats.str.txt",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser = argparse.ArgumentParser(
+    description=
+    "This script turns the word features to a human readable format.",
+    epilog="E.g. " + sys.argv[0] +
+    "exp/rnnlm/word_feats.txt exp/rnnlm/features.txt "
+    "> exp/rnnlm/word_feats.str.txt",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument("word_features_file", help="Path for word_feats file")
 parser.add_argument("features_file", help="Path for features file")
@@ -35,7 +35,7 @@ def read_feature_type_and_key(features_file):
     with open(features_file, 'r', encoding="utf-8") as f:
         for line in f:
             fields = line.split()
-            assert(len(fields) in [2, 3, 4])
+            assert (len(fields) in [2, 3, 4])
 
             feat_id = int(fields[0])
             feat_type = fields[1]
@@ -67,9 +67,12 @@ with open(args.word_features_file, 'r', encoding="utf-8") as f:
             elif feat_type == 'length':
                 print(' "length"={0}'.format(feat_value), end='')
             else:  # other types are the same
-                print(' "{0} {1}"={2}'.format(feat_type, feat_key, feat_value), end='')
+                print(
+                    ' "{0} {1}"={2}'.format(feat_type, feat_key, feat_value),
+                    end='')
         print('')
         num_word_feats += 1
 
-
-print(sys.argv[0] + ": show features for {0} words.".format(num_word_feats), file=sys.stderr)
+print(
+    sys.argv[0] + ": show features for {0} words.".format(num_word_feats),
+    file=sys.stderr)
