@@ -37,26 +37,26 @@ int main(int argc, char *argv[]) {
         "\n"
         "Usage:  gmm-boost-silence [options] <silence-phones-list> <model-in> <model-out>\n"
         "e.g.: gmm-boost-silence --boost=1.5 1:2:3 1.mdl 1_boostsil.mdl\n";
-    
+
     bool binary_write = true;
     BaseFloat boost = 1.5;
-        
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("boost", &boost, "Factor by which to boost silence probs");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     std::string
         silence_phones_string = po.GetArg(1),
         model_rxfilename = po.GetArg(2),
         model_wxfilename = po.GetArg(3);
-    
+
     std::vector<int32> silence_phones;
     if (silence_phones_string != "") {
       SplitStringToIntegers(silence_phones_string, ":", false, &silence_phones);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     } else {
       KALDI_WARN << "gmm-boost-silence: no silence phones specified, doing nothing.";
     }
-    
+
     AmDiagGmm am_gmm;
     TransitionModel trans_model;
     {
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
       KALDI_LOG << "Boosted weights for " << pdfs.size()
                 << " pdfs, by factor of " << boost;
     }
-    
+
     {
       Output ko(model_wxfilename, binary_write);
       trans_model.Write(ko.Stream(), binary_write);

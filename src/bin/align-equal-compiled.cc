@@ -27,7 +27,7 @@
 
 
 /** @brief Write an equally spaced alignment (for getting training started).
-*/
+ */
 int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;

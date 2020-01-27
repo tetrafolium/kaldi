@@ -71,29 +71,29 @@ namespace nnet3 {
                            factor.
  */
 class NormalizeComponent: public Component {
- public:
+public:
   explicit NormalizeComponent(const NormalizeComponent &other);
 
   virtual int32 Properties() const {
     return kSimpleComponent|kBackpropNeedsInput|kBackpropAdds|
-        (add_log_stddev_ ? 0 : kPropagateInPlace|kBackpropInPlace) |
-        (block_dim_ != input_dim_ ? kInputContiguous|kOutputContiguous : 0);
+           (add_log_stddev_ ? 0 : kPropagateInPlace|kBackpropInPlace) |
+           (block_dim_ != input_dim_ ? kInputContiguous|kOutputContiguous : 0);
   }
   NormalizeComponent() { }
   virtual std::string Type() const { return "NormalizeComponent"; }
   virtual void InitFromConfig(ConfigLine *cfl);
   virtual Component* Copy() const { return new NormalizeComponent(*this); }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                          const CuMatrixBase<BaseFloat> &in,
-                          CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &, // out_value
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &,                   // out_value
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -102,7 +102,7 @@ class NormalizeComponent: public Component {
     return (input_dim_ + (add_log_stddev_ ? (input_dim_ / block_dim_) : 0));
   }
   virtual std::string Info() const;
- private:
+private:
   NormalizeComponent &operator = (const NormalizeComponent &other); // Disallow.
   enum { kExpSquaredNormFloor = -66 };
   // kSquaredNormFloor is about 0.7e-20.  We need a value that's exactly representable in
@@ -119,28 +119,28 @@ class NormalizeComponent: public Component {
 
 
 /*
-  BatchNormComponent
+   BatchNormComponent
 
-  This implements batch normalization; for each dimension of the
-  input it normalizes the data to be zero-mean, unit-variance.  You
-  can set the block-dim configuration value to implement spatial
-  batch normalization, see the comment for the variable.
+   This implements batch normalization; for each dimension of the
+   input it normalizes the data to be zero-mean, unit-variance.  You
+   can set the block-dim configuration value to implement spatial
+   batch normalization, see the comment for the variable.
 
-  If you want to combine this with the trainable offset and scale that the
-  original BatchNorm paper used, then follow this by the
-  ScaleAndOffsetComponent.
+   If you want to combine this with the trainable offset and scale that the
+   original BatchNorm paper used, then follow this by the
+   ScaleAndOffsetComponent.
 
-  It's a simple component (uses the kSimpleComponent flag), but it is unusual in
-  that it will give different results if you call it on half the matrix at a
-  time.  Most of the time this would be pretty harmless, so we still return the
-  kSimpleComponent flag.  We may have to modify the test code a little to
-  account for this, or possibly remove the kSimpleComponent flag.  In some sense
-  each output Index depends on every input Index, but putting those dependencies
-  explicitly into the dependency-tracking framework as a GeneralComponent
-  would be very impractical and might lead to a lot of unnecessary things being
-  computed.  You have to be a bit careful where you put this component, and understand
-  what you're doing e.g. putting it in the path of a recurrence is a bit problematic
-  if the minibatch size is small.
+   It's a simple component (uses the kSimpleComponent flag), but it is unusual in
+   that it will give different results if you call it on half the matrix at a
+   time.  Most of the time this would be pretty harmless, so we still return the
+   kSimpleComponent flag.  We may have to modify the test code a little to
+   account for this, or possibly remove the kSimpleComponent flag.  In some sense
+   each output Index depends on every input Index, but putting those dependencies
+   explicitly into the dependency-tracking framework as a GeneralComponent
+   would be very impractical and might lead to a lot of unnecessary things being
+   computed.  You have to be a bit careful where you put this component, and understand
+   what you're doing e.g. putting it in the path of a recurrence is a bit problematic
+   if the minibatch size is small.
 
     Accepted configuration values:
            dim          Dimension of the input and output
@@ -157,7 +157,7 @@ class NormalizeComponent: public Component {
                         was chosen for consistency with NormalizeComponent.
  */
 class BatchNormComponent: public Component {
- public:
+public:
 
   BatchNormComponent() { }
 
@@ -185,21 +185,21 @@ class BatchNormComponent: public Component {
     // internally.  This is not much of a cost, because this will be used
     // in convnets where we have to do this anyway.
     return kSimpleComponent|kBackpropNeedsOutput|kPropagateInPlace|
-        kBackpropInPlace|
-        (block_dim_ < dim_ ? kInputContiguous|kOutputContiguous : 0)|
-        (test_mode_ ? 0 : kUsesMemo|kStoresStats);
+           kBackpropInPlace|
+           (block_dim_ < dim_ ? kInputContiguous|kOutputContiguous : 0)|
+           (test_mode_ ? 0 : kUsesMemo|kStoresStats);
   }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *, // to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *,                   // to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary); // This Read function
   // requires that the Component has the correct type.
@@ -216,15 +216,15 @@ class BatchNormComponent: public Component {
   virtual void DeleteMemo(void *memo) const { delete static_cast<Memo*>(memo); }
 
   virtual void StoreStats(const CuMatrixBase<BaseFloat> &in_value,
-                          const CuMatrixBase<BaseFloat> &out_value,
-                          void *memo);
+      const CuMatrixBase<BaseFloat> &out_value,
+      void *memo);
 
   // Members specific to this component type.
   // Note: the offset and scale will only be nonempty in 'test mode'.
   const CuVector<BaseFloat> &Offset() const { return offset_; }
   const CuVector<BaseFloat> &Scale() const { return scale_; }
 
- private:
+private:
 
   struct Memo {
     // number of frames (after any reshaping).
@@ -242,11 +242,11 @@ class BatchNormComponent: public Component {
   // this function is used in a couple of places; it turns the raw stats into
   // the offset/scale term of a normalizing transform.
   static void ComputeOffsetAndScale(double count,
-                                    BaseFloat epsilon,
-                                    const Vector<double> &stats_sum,
-                                    const Vector<double> &stats_sumsq,
-                                    Vector<BaseFloat> *offset,
-                                    Vector<BaseFloat> *scale);
+      BaseFloat epsilon,
+      const Vector<double> &stats_sum,
+      const Vector<double> &stats_sumsq,
+      Vector<BaseFloat> *offset,
+      Vector<BaseFloat> *scale);
   // computes derived parameters offset_ and scale_.
   void ComputeDerived();
 

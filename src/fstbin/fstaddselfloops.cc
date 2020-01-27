@@ -26,12 +26,12 @@
 #include "fstext/kaldi-fst-io.h"
 
 /* some test examples:
-  pushd ~/tmpdir
- ( echo 3; echo  4) > in.list
- ( echo 5; echo  6) > out.list
- ( echo "0 0 0 0"; echo "0 0" ) | fstcompile | fstaddselfloops in.list out.list | fstprint
- ( echo "0 1 0 1"; echo " 0 2 1 0"; echo "1 0"; echo "2 0"; ) | fstcompile | fstaddselfloops in.list out.list | fstprint
-*/
+   pushd ~/tmpdir
+   ( echo 3; echo  4) > in.list
+   ( echo 5; echo  6) > out.list
+   ( echo "0 0 0 0"; echo "0 0" ) | fstcompile | fstaddselfloops in.list out.list | fstprint
+   ( echo "0 1 0 1"; echo " 0 2 1 0"; echo "1 0"; echo "2 0"; ) | fstcompile | fstaddselfloops in.list out.list | fstprint
+ */
 
 int main(int argc, char *argv[]) {
   try {
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     std::vector<int32> disambig_in;
     if (!ReadIntegerVectorSimple(disambig_in_rxfilename, &disambig_in))
       KALDI_ERR << "fstaddselfloops: Could not read disambiguation symbols from "
-                 << kaldi::PrintableRxfilename(disambig_in_rxfilename);
+                << kaldi::PrintableRxfilename(disambig_in_rxfilename);
 
     std::vector<int32> disambig_out;
     if (!ReadIntegerVectorSimple(disambig_out_rxfilename, &disambig_out))

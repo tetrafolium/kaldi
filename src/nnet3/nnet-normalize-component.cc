@@ -33,10 +33,10 @@ namespace nnet3 {
 const BaseFloat NormalizeComponent::kSquaredNormFloor =
     pow(2.0, NormalizeComponent::kExpSquaredNormFloor);
 
-NormalizeComponent::NormalizeComponent(const NormalizeComponent &other):
-    input_dim_(other.input_dim_), block_dim_(other.block_dim_),
-    target_rms_(other.target_rms_),
-    add_log_stddev_(other.add_log_stddev_) { }
+NormalizeComponent::NormalizeComponent(const NormalizeComponent &other) :
+  input_dim_(other.input_dim_), block_dim_(other.block_dim_),
+  target_rms_(other.target_rms_),
+  add_log_stddev_(other.add_log_stddev_) { }
 
 void NormalizeComponent::InitFromConfig(ConfigLine *cfl) {
   input_dim_ = 0;
@@ -130,8 +130,8 @@ std::string NormalizeComponent::Info() const {
 // If add_log_stddev_ is true, log(max(epsi, sqrt(x^t x / D)))
 // is an extra dimension of the output.
 void* NormalizeComponent::Propagate(const ComponentPrecomputedIndexes *indexes,
-                                   const CuMatrixBase<BaseFloat> &in,
-                                   CuMatrixBase<BaseFloat> *out) const {
+    const CuMatrixBase<BaseFloat> &in,
+    CuMatrixBase<BaseFloat> *out) const {
   KALDI_ASSERT(in.NumCols() == InputDim() && out->NumCols() == OutputDim() &&
                in.NumRows() == out->NumRows());
   if (block_dim_ != input_dim_) {
@@ -140,8 +140,8 @@ void* NormalizeComponent::Propagate(const ComponentPrecomputedIndexes *indexes,
         output_block_dim = block_dim_ + (add_log_stddev_ ? 1 : 0);
     KALDI_ASSERT(in.Stride() == in.NumCols() && out->Stride() == out->NumCols());
     CuSubMatrix<BaseFloat> in_reshaped(in.Data(), new_num_rows,
-                                       block_dim_, block_dim_),
-        out_reshaped(out->Data(), new_num_rows,
+        block_dim_, block_dim_),
+    out_reshaped(out->Data(), new_num_rows,
                      output_block_dim, output_block_dim);
     cu::NormalizePerRow(in_reshaped, target_rms_, add_log_stddev_,
                         &out_reshaped);
@@ -152,36 +152,36 @@ void* NormalizeComponent::Propagate(const ComponentPrecomputedIndexes *indexes,
 }
 
 /*
-  A note on the derivative of NormalizeComponent...
-  let both row_in and row_out be vectors of dimension D.
-  Let p = row_in^T row_in / (D * target_rms^2), and let
-  f = 1.0 / sqrt(max(kSquaredNormFloor, p)), and we compute row_out as:
-  row_out = f row_in.
-  Suppose we have a quantity deriv_out which is the derivative
-  of the objective function w.r.t. row_out.  We want to compute
-  deriv_in which is the derivative of the objective function w.r.t.
-  row_in.  Let the objective function be F.  One term is obvious: we have
-  deriv_in = f deriv_out + ....
-  next we have to take into account the derivative that gets back-propagated
-  through f.  Obviously, dF/df = deriv_out^T row_in.
-  And df/dp = (p <= kSquaredNormFloor ? 0.0 : -0.5 p^{-1.5}) = (f == 1.0 / sqrt(kSquaredNormFloor) ? 0.0 : -0.5 f^3),
-  and dp/d(row_in) = 2/(D * target_rms^2) row_in. [it's vector_valued].
-  So this term in dF/d(row_in) equals:
-  dF/df df/dp dp/d(row_in)   =    2/(D * target_rms^2) (f == 1.0 / sqrt(kSquaredNormFloor)  ? 0.0 : -0.5 f^3) (deriv_out^T row_in) row_in
-  So
-  deriv_in = f deriv_out + (f == 1.0 ? 0.0 : -f^3  / (D * target_rms^2) ) (deriv_out^T row_in) row_in
+   A note on the derivative of NormalizeComponent...
+   let both row_in and row_out be vectors of dimension D.
+   Let p = row_in^T row_in / (D * target_rms^2), and let
+   f = 1.0 / sqrt(max(kSquaredNormFloor, p)), and we compute row_out as:
+   row_out = f row_in.
+   Suppose we have a quantity deriv_out which is the derivative
+   of the objective function w.r.t. row_out.  We want to compute
+   deriv_in which is the derivative of the objective function w.r.t.
+   row_in.  Let the objective function be F.  One term is obvious: we have
+   deriv_in = f deriv_out + ....
+   next we have to take into account the derivative that gets back-propagated
+   through f.  Obviously, dF/df = deriv_out^T row_in.
+   And df/dp = (p <= kSquaredNormFloor ? 0.0 : -0.5 p^{-1.5}) = (f == 1.0 / sqrt(kSquaredNormFloor) ? 0.0 : -0.5 f^3),
+   and dp/d(row_in) = 2/(D * target_rms^2) row_in. [it's vector_valued].
+   So this term in dF/d(row_in) equals:
+   dF/df df/dp dp/d(row_in)   =    2/(D * target_rms^2) (f == 1.0 / sqrt(kSquaredNormFloor)  ? 0.0 : -0.5 f^3) (deriv_out^T row_in) row_in
+   So
+   deriv_in = f deriv_out + (f == 1.0 ? 0.0 : -f^3  / (D * target_rms^2) ) (deriv_out^T row_in) row_in
 
-  if add_log_stddev_ true, the deriv_in has another term as
-  dF/dx_i = dF/df . df/dx_i => df/dx_i = x_i/(x^T x)
-*/
+   if add_log_stddev_ true, the deriv_in has another term as
+   dF/dx_i = dF/df . df/dx_i => df/dx_i = x_i/(x^T x)
+ */
 void NormalizeComponent::Backprop(const std::string &debug_info,
-                                  const ComponentPrecomputedIndexes *indexes,
-                                  const CuMatrixBase<BaseFloat> &in_value,
-                                  const CuMatrixBase<BaseFloat> &, // out_value
-                                  const CuMatrixBase<BaseFloat> &out_deriv,
-                                  void *memo,
-                                  Component *to_update,
-                                  CuMatrixBase<BaseFloat> *in_deriv) const {
+    const ComponentPrecomputedIndexes *indexes,
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &,                               // out_value
+    const CuMatrixBase<BaseFloat> &out_deriv,
+    void *memo,
+    Component *to_update,
+    CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("NormalizeComponent::Backprop");
   if (!in_deriv)
     return;
@@ -193,10 +193,10 @@ void NormalizeComponent::Backprop(const std::string &debug_info,
                  out_deriv.Stride() == out_deriv.NumCols() &&
                  in_deriv->Stride() == in_deriv->NumCols());
     CuSubMatrix<BaseFloat> in_value_reshaped(in_value.Data(), new_num_rows,
-                                             block_dim_, block_dim_),
-        out_deriv_reshaped(out_deriv.Data(), new_num_rows,
+        block_dim_, block_dim_),
+    out_deriv_reshaped(out_deriv.Data(), new_num_rows,
                            output_block_dim, output_block_dim),
-        in_deriv_reshaped(in_deriv->Data(), new_num_rows,
+    in_deriv_reshaped(in_deriv->Data(), new_num_rows,
                           block_dim_, block_dim_);
     cu::DiffNormalizePerRow(in_value_reshaped, out_deriv_reshaped, target_rms_,
                             add_log_stddev_, &in_deriv_reshaped);
@@ -215,9 +215,9 @@ void BatchNormComponent::ComputeDerived() {
 
   if (count_ == 0.0) {
     KALDI_WARN << "Test-mode is set but there is no data count.  "
-        "Creating random counts.  This is NOT A PROBLEM if the message "
-        "appears in unit-tests or in compute_prob_*.0.log.  If you see this "
-        "elsewhere, something is very wrong.";
+      "Creating random counts.  This is NOT A PROBLEM if the message "
+      "appears in unit-tests or in compute_prob_*.0.log.  If you see this "
+      "elsewhere, something is very wrong.";
     count_ = 1.0;
     stats_sum_.SetRandn();
     stats_sumsq_.SetRandn();
@@ -256,11 +256,11 @@ void BatchNormComponent::Check() const {
                epsilon_ > 0.0 && target_rms_ > 0.0);
 }
 
-BatchNormComponent::BatchNormComponent(const BatchNormComponent &other):
-    dim_(other.dim_), block_dim_(other.block_dim_),
-    epsilon_(other.epsilon_), target_rms_(other.target_rms_),
-    test_mode_(other.test_mode_), count_(other.count_),
-    stats_sum_(other.stats_sum_), stats_sumsq_(other.stats_sumsq_) {
+BatchNormComponent::BatchNormComponent(const BatchNormComponent &other) :
+  dim_(other.dim_), block_dim_(other.block_dim_),
+  epsilon_(other.epsilon_), target_rms_(other.target_rms_),
+  test_mode_(other.test_mode_), count_(other.count_),
+  stats_sum_(other.stats_sum_), stats_sumsq_(other.stats_sumsq_) {
   ComputeDerived();
   Check();
 }
@@ -303,7 +303,7 @@ void BatchNormComponent::InitFromConfig(ConfigLine *cfl) {
   if (block_dim_ == -1)
     block_dim_ = dim_;
   if (!(block_dim_ > 0 && dim_ % block_dim_ == 0 &&
-        epsilon_ > 0 && target_rms_ > 0))
+      epsilon_ > 0 && target_rms_ > 0))
     KALDI_ERR << "Invalid configuration in BatchNormComponent.";
   if (cfl->HasUnusedValues())
     KALDI_ERR << "Could not process these elements in initializer: "
@@ -319,26 +319,26 @@ void BatchNormComponent::InitFromConfig(ConfigLine *cfl) {
 
 
 /*
-  BATCHNORM_MATH
+   BATCHNORM_MATH
 
-  This comment describes the equations involved in batch normalization, and
-  derives the forward and back-propagation.
+   This comment describes the equations involved in batch normalization, and
+   derives the forward and back-propagation.
 
-  This is all dimension-by-dimension, so we just imagine the inputs
-  are scalars x(i), for i=0 .. n-1.
+   This is all dimension-by-dimension, so we just imagine the inputs
+   are scalars x(i), for i=0 .. n-1.
 
-  FORWARD PASS:
+   FORWARD PASS:
 
-  Let 'power' be a constant, equal to -0.5 for regular batch-norm.
+   Let 'power' be a constant, equal to -0.5 for regular batch-norm.
 
-  To simplify the math we (conceptually, not physically) do the normalization in
-  two stages: first mean, then variance, so we have x(i) -> y(i) -> z(i).
+   To simplify the math we (conceptually, not physically) do the normalization in
+   two stages: first mean, then variance, so we have x(i) -> y(i) -> z(i).
 
-  The name 'rscale' means 'raw scale', meaning the scale before including
-  target-rms.  Later we'll define 'scale = target-rms * rscale', to make some
-  of the actual computations slightly more efficient.
+   The name 'rscale' means 'raw scale', meaning the scale before including
+   target-rms.  Later we'll define 'scale = target-rms * rscale', to make some
+   of the actual computations slightly more efficient.
 
-  Define:   mean = 1/I * sum_i x(i)
+   Define:   mean = 1/I * sum_i x(i)
             y(i) = x(i) - mean
 
             var = 1/I \sum_i y(i)^2
@@ -346,41 +346,41 @@ void BatchNormComponent::InitFromConfig(ConfigLine *cfl) {
            z(i) = target-rms * rscale * y(i)
 
 
-  Most of the rest of this comment derives how to compute the derivatives.  If
-  you just want the formulas, please skip to the string 'BACKWARD PASS' below.
+   Most of the rest of this comment derives how to compute the derivatives.  If
+   you just want the formulas, please skip to the string 'BACKWARD PASS' below.
 
-  We'll use a notation where an apostrophe on something means (the derivative of
-  the objective function w.r.t. that thing), so y'(i) is df/dy(i), and so on.
-  We are given y'(i).  Propagating the derivatives backward:
+   We'll use a notation where an apostrophe on something means (the derivative of
+   the objective function w.r.t. that thing), so y'(i) is df/dy(i), and so on.
+   We are given y'(i).  Propagating the derivatives backward:
 
     rscale' = (sum_i y(i) z'(i)) * target-rms
             = (sum_i z(i) z'(i)) / rscale
 
-  [ note: d(rscale)/d(var) = power * (var + epsilon)^{power - 1}
+   [ note: d(rscale)/d(var) = power * (var + epsilon)^{power - 1}
                            = power * rscale^{(power-1)/power}  ]
 
     var' = rscale' * power * rscale^{(power-1)/power}
          = power * (\sum_i z'(i) z(i)) * rscale^{(power-1)/power - 1}
          = power * (\sum_i z'(i) z(i)) * rscale^{-1/power}
 
-  [note: the following formula is of the form "direct term" + "indirect term"]
+   [note: the following formula is of the form "direct term" + "indirect term"]
     y'(i) =  z'(i) * target-rms * rscale   +    2/I y(i) var'
 
-  Now, the above is inconvenient because it contains y(i) which is an intermediate
-  quantity.  We reformulate in terms of z(i), using y(i) = z(i) / (target-rms * rscale), so:
+   Now, the above is inconvenient because it contains y(i) which is an intermediate
+   quantity.  We reformulate in terms of z(i), using y(i) = z(i) / (target-rms * rscale), so:
 
-  defining
+   defining
    var_deriv_mod = 2/I * var' / (target-rms * rscale)
                  = 2/I * power/target-rms * (\sum_i z'(i) z(i)) * rscale^{-(1+power)/power}
- we have:
+   we have:
     y'(i) =  z'(i) * target-rms * rscale   +    z(i) var_deriv_mod
 
- Now,
+   Now,
     mean' = \sum_i y'(i)
           = (target-rms * rscale * \sum_i z'(i))  +  (var_deriv_mod \sum_i z(i))
      [... and the 2nd term above is zero when summed over i, because \sum_i z(i) is zero, ...]
           = target-rms * rscale * \sum_i z(i)
- and:
+   and:
     x'(i) =  z'(i) * target-rms * rscale   +    z(i) var_deriv_mod   -  1/I mean'
           =  z'(i) * target-rms * rscale   +    z(i) var_deriv_mod   -  1/I * target-rms * rscale * \sum_i z'(i)
           =  target-rms * rscale * (z'(i) - 1/I * \sum_i z'(i))  +  z(i) var_deriv_mod
@@ -389,7 +389,7 @@ void BatchNormComponent::InitFromConfig(ConfigLine *cfl) {
 
       scale = target-rms * rscale.  This way, we can write as follows:
 
-  BACKWARD PASS (recap):
+   BACKWARD PASS (recap):
 
    var_deriv_mod = 2 * power * target-rms^{1/power} * (1/I \sum_i z'(i) z(i)) * scale^{-(1+power)/power}
                 .. which for power = -0.5, simplifies to:
@@ -397,12 +397,12 @@ void BatchNormComponent::InitFromConfig(ConfigLine *cfl) {
 
            x'(i) = scale * (z'(i) - 1/I * \sum_i z'(i))  + z(i) var_deriv_mod
 
-  */
+ */
 void* BatchNormComponent::Propagate(const ComponentPrecomputedIndexes *indexes,
-                                    const CuMatrixBase<BaseFloat> &in,
-                                    CuMatrixBase<BaseFloat> *out) const {
+    const CuMatrixBase<BaseFloat> &in,
+    CuMatrixBase<BaseFloat> *out) const {
   KALDI_ASSERT(SameDim(in, *out) &&
-               (in.NumCols() == dim_ || in.NumCols() == block_dim_));
+      (in.NumCols() == dim_ || in.NumCols() == block_dim_));
   if (in.NumCols() != block_dim_) {
     // if block_dim_ != dim_, we recurse; this helps keep the main code
     // simple.
@@ -411,7 +411,7 @@ void* BatchNormComponent::Propagate(const ComponentPrecomputedIndexes *indexes,
         orig_cols = in.NumCols(), new_rows = orig_rows * ratio,
         new_cols = orig_cols / ratio;
     CuSubMatrix<BaseFloat> in_reshaped(in.Data(), new_rows, new_cols, new_cols),
-        out_reshaped(out->Data(), new_rows, new_cols, new_cols);
+    out_reshaped(out->Data(), new_rows, new_cols, new_cols);
     return Propagate(indexes, in_reshaped, &out_reshaped);
   }
 
@@ -428,8 +428,8 @@ void* BatchNormComponent::Propagate(const ComponentPrecomputedIndexes *indexes,
     memo->num_frames = num_frames;
     memo->mean_uvar_scale.Resize(5, dim);
     CuSubVector<BaseFloat> mean(memo->mean_uvar_scale, 0),
-        uvar(memo->mean_uvar_scale, 1),
-        scale(memo->mean_uvar_scale, 2);
+    uvar(memo->mean_uvar_scale, 1),
+    scale(memo->mean_uvar_scale, 2);
     mean.AddRowSumMat(1.0 / num_frames, in, 0.0);
     uvar.AddDiagMat2(1.0 / num_frames, in, kTrans, 0.0);
     scale.CopyFromVec(uvar);
@@ -465,20 +465,20 @@ void* BatchNormComponent::Propagate(const ComponentPrecomputedIndexes *indexes,
 }
 
 void BatchNormComponent::Backprop(
-    const std::string &debug_info,
-    const ComponentPrecomputedIndexes *indexes,
-    const CuMatrixBase<BaseFloat> &in_value,  // unused
-    const CuMatrixBase<BaseFloat> &out_value,
-    const CuMatrixBase<BaseFloat> &out_deriv,
-    void *memo_in,
-    Component *to_update,  // unused
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const std::string &debug_info,
+  const ComponentPrecomputedIndexes *indexes,
+  const CuMatrixBase<BaseFloat> &in_value,    // unused
+  const CuMatrixBase<BaseFloat> &out_value,
+  const CuMatrixBase<BaseFloat> &out_deriv,
+  void *memo_in,
+  Component *to_update,    // unused
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("BatchNormComponent::Backprop");
 
   KALDI_ASSERT(SameDim(out_value, out_deriv) &&
                SameDim(out_value, *in_deriv) &&
-               (out_value.NumCols() == dim_ ||
-                out_value.NumCols() == block_dim_));
+      (out_value.NumCols() == dim_ ||
+      out_value.NumCols() == block_dim_));
   if (out_value.NumCols() != block_dim_) {
     // if block_dim_ != dim_, we recurse; this helps keep the main code
     // simple.
@@ -490,9 +490,9 @@ void BatchNormComponent::Backprop(
         orig_cols = out_value.NumCols(),
         new_rows = orig_rows * ratio, new_cols = orig_cols / ratio;
     CuSubMatrix<BaseFloat> out_value_reshaped(out_value.Data(), new_rows,
-                                              new_cols, new_cols),
-        out_deriv_reshaped(out_deriv.Data(), new_rows, new_cols, new_cols),
-        in_deriv_reshaped(in_deriv->Data(), new_rows, new_cols, new_cols);
+        new_cols, new_cols),
+    out_deriv_reshaped(out_deriv.Data(), new_rows, new_cols, new_cols),
+    in_deriv_reshaped(in_deriv->Data(), new_rows, new_cols, new_cols);
     // we'll never use in_value, so pass it in unchanged.
     Backprop(debug_info, indexes, in_value,
              out_value_reshaped, out_deriv_reshaped,
@@ -508,9 +508,9 @@ void BatchNormComponent::Backprop(
     int32 num_frames = memo->num_frames;
     KALDI_ASSERT(out_value.NumRows() == num_frames);
     CuSubVector<BaseFloat>
-        scale(memo->mean_uvar_scale, 2),
-        var_deriv_mod(memo->mean_uvar_scale, 3),
-        temp(memo->mean_uvar_scale, 4);
+    scale(memo->mean_uvar_scale, 2),
+    var_deriv_mod(memo->mean_uvar_scale, 3),
+    temp(memo->mean_uvar_scale, 4);
 
     // var_deriv_mod is going to contain:
     //  2 * power * target-rms^{1/power} * (1/I \sum_i z'(i) z(i)) * scale^{-(1+power)/power}
@@ -549,9 +549,9 @@ void BatchNormComponent::Backprop(
 }
 
 void BatchNormComponent::StoreStats(
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &out_value,
-    void *memo_in) {
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &out_value,
+  void *memo_in) {
   // in test mode this component does not store stats, it doesn't provide the
   // kStoresStats flag.
   KALDI_ASSERT(!test_mode_);
@@ -565,7 +565,7 @@ void BatchNormComponent::StoreStats(
         orig_cols = out_value.NumCols(),
         new_rows = orig_rows * ratio, new_cols = orig_cols / ratio;
     CuSubMatrix<BaseFloat> out_value_reshaped(out_value.Data(), new_rows,
-                                              new_cols, new_cols);
+        new_cols, new_cols);
     // we'll never use in_value, so just pass it in unchanged.
     StoreStats(in_value, out_value_reshaped, memo_in);
     return;
@@ -575,7 +575,7 @@ void BatchNormComponent::StoreStats(
   KALDI_ASSERT(out_value.NumRows() == memo->num_frames);
 
   CuSubVector<BaseFloat> mean(memo->mean_uvar_scale, 0),
-      uvar(memo->mean_uvar_scale, 1);
+  uvar(memo->mean_uvar_scale, 1);
   KALDI_ASSERT(mean.Dim() == block_dim_ && memo->num_frames > 0);
   BaseFloat num_frames = memo->num_frames;
   if (stats_sum_.Dim() != block_dim_) {

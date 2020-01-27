@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string rnnlm_rxfilename = po.GetArg(1),
-                word_embedding_rxfilename = po.GetArg(2),
-                text_filename = po.GetArg(3);
+        word_embedding_rxfilename = po.GetArg(2),
+        text_filename = po.GetArg(3);
 
 #if HAVE_CUDA==1
     CuDevice::Instantiate().SelectGpuId(use_gpu);

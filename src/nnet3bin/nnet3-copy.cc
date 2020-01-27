@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string raw_nnet_rxfilename = po.GetArg(1),
-                raw_nnet_wxfilename = po.GetArg(2);
+        raw_nnet_wxfilename = po.GetArg(2);
 
     Nnet nnet;
     ReadKaldiObject(raw_nnet_rxfilename, &nnet);

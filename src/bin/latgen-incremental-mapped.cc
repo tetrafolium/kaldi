@@ -66,9 +66,9 @@ int main(int argc, char *argv[]) {
     }
 
     std::string model_in_filename = po.GetArg(1), fst_in_str = po.GetArg(2),
-                feature_rspecifier = po.GetArg(3), lattice_wspecifier = po.GetArg(4),
-                words_wspecifier = po.GetOptArg(5),
-                alignment_wspecifier = po.GetOptArg(6);
+        feature_rspecifier = po.GetArg(3), lattice_wspecifier = po.GetArg(4),
+        words_wspecifier = po.GetOptArg(5),
+        alignment_wspecifier = po.GetOptArg(6);
 
     TransitionModel trans_model;
     ReadKaldiObject(model_in_filename, &trans_model);
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     CompactLatticeWriter compact_lattice_writer;
     LatticeWriter lattice_writer;
     if (!(determinize ? compact_lattice_writer.Open(lattice_wspecifier)
-                      : lattice_writer.Open(lattice_wspecifier)))
+        : lattice_writer.Open(lattice_wspecifier)))
       KALDI_ERR << "Could not open table for writing lattices: "
                 << lattice_wspecifier;
 
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
           }
 
           DecodableMatrixScaledMapped decodable(trans_model, loglikes,
-                                                acoustic_scale);
+              acoustic_scale);
 
           double like;
           if (DecodeUtteranceLatticeIncremental(

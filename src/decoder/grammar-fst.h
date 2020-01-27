@@ -58,10 +58,10 @@ struct GrammarFstArc {
   GrammarFstArc() {}
 
   GrammarFstArc(Label ilabel, Label olabel, Weight weight, StateId nextstate)
-      : ilabel(ilabel),
-        olabel(olabel),
-        weight(std::move(weight)),
-        nextstate(nextstate) {}
+    : ilabel(ilabel),
+    olabel(olabel),
+    weight(std::move(weight)),
+    nextstate(nextstate) {}
 };
 
 #define KALDI_GRAMMAR_FST_SPECIAL_WEIGHT 4096.0
@@ -92,9 +92,9 @@ template<> class ArcIterator<GrammarFst>;
    create lightweight copies of this object using the copy constructor,
    e.g. `new GrammarFst(this_grammar_fst)`, if you want to decode from multiple
    threads using the same GrammarFst.
-*/
+ */
 class GrammarFst {
- public:
+public:
   typedef GrammarFstArc Arc;
   typedef TropicalWeight Weight;
 
@@ -139,11 +139,11 @@ class GrammarFst {
               "#nonterm:bar" in phones.txt.  Also no nonterminal may appear more
               than once in 'fsts'.  ifsts may be empty, even though that doesn't
               make much sense.
-    */
+   */
   GrammarFst(
-      int32 nonterm_phones_offset,
-      std::shared_ptr<const ConstFst<StdArc> > top_fst,
-      const std::vector<std::pair<int32, std::shared_ptr<const ConstFst<StdArc> > > > &ifsts);
+    int32 nonterm_phones_offset,
+    std::shared_ptr<const ConstFst<StdArc> > top_fst,
+    const std::vector<std::pair<int32, std::shared_ptr<const ConstFst<StdArc> > > > &ifsts);
 
   /// Copy constructor.  Useful because this object is not thread safe so cannot
   /// be used by multiple parallel decoder threads, but it is lightweight and
@@ -203,7 +203,7 @@ class GrammarFst {
   inline std::string Type() const { return "grammar"; }
 
   ~GrammarFst();
- private:
+private:
 
   struct ExpandedState;
 
@@ -233,10 +233,10 @@ class GrammarFst {
   void Destroy();
 
   /*
-    This utility function sets up a map from "left-context phone", meaning
-    either a phone index or the index of the symbol #nonterm_bos, to
-    an arc-index leaving a particular state in an FST (i.e. an index
-    that we could use to Seek() to the matching arc).
+     This utility function sets up a map from "left-context phone", meaning
+     either a phone index or the index of the symbol #nonterm_bos, to
+     an arc-index leaving a particular state in an FST (i.e. an index
+     that we could use to Seek() to the matching arc).
 
       @param [in]  fst  The FST that is being entered (or reentered)
       @param [in]  entry_state  The state in 'fst' which is being entered
@@ -244,7 +244,7 @@ class GrammarFst {
                  entered.  It must have arcs with ilabels decodable as
                  (nonterminal_symbol, left_context_phone).  Will either be the
                  start state (if 'nonterminal_symbol' corresponds to
-                 #nonterm_begin), or an internal state (if 'nonterminal_symbol'
+   #nonterm_begin), or an internal state (if 'nonterminal_symbol'
                  corresponds to #nonterm_reenter).  The arc-indexes of those
                  arcs will be the values we set in 'phone_to_arc'
       @param [in]  nonterminal_symbol  The index in phones.txt of the
@@ -256,10 +256,10 @@ class GrammarFst {
                  in an arc-iterator set up for the state 'entry_state).
    */
   void InitEntryOrReentryArcs(
-      const ConstFst<StdArc> &fst,
-      int32 entry_state,
-      int32 nonterminal_symbol,
-      std::unordered_map<int32, int32> *phone_to_arc);
+    const ConstFst<StdArc> &fst,
+    int32 entry_state,
+    int32 nonterminal_symbol,
+    std::unordered_map<int32, int32> *phone_to_arc);
 
 
   inline int32 GetPhoneSymbolFor(enum NonterminalValues n) {
@@ -279,8 +279,8 @@ class GrammarFst {
                     the beginning of the sequence).
    */
   void DecodeSymbol(Label label,
-                    int32 *nonterminal_symbol,
-                    int32 *left_context_phone);
+      int32 *nonterminal_symbol,
+      int32 *left_context_phone);
 
 
   // This function creates and returns an ExpandedState corresponding to a
@@ -305,11 +305,11 @@ class GrammarFst {
   // otherwise it creates the child-instance and returns its newly created
   // instance-id.
   inline int32 GetChildInstanceId(int32 instance_id, int32 nonterminal,
-                                  int32 state);
+      int32 state);
 
   /**
-    Called while expanding states, this function combines information from two
-    arcs: one leaving one sub-fst and one arriving in another sub-fst.
+     Called while expanding states, this function combines information from two
+     arcs: one leaving one sub-fst and one arriving in another sub-fst.
 
       @param [in] leaving_arc  The arc leaving the first FST; must have
                      zero olabel.  The ilabel will have a nonterminal symbol
@@ -337,20 +337,20 @@ class GrammarFst {
                    - ilabel equal to zero (we discard both ilabels, they are
                      not transition-ids but special symbols).
                    - nextstate equal to the nextstate of arriving_arc.
-  */
+   */
   static inline void CombineArcs(const StdArc &leaving_arc,
-                                 const StdArc &arriving_arc,
-                                 float cost_correction,
-                                 StdArc *arc);
+      const StdArc &arriving_arc,
+      float cost_correction,
+      StdArc *arc);
 
   /** Called from the ArcIterator constructor when we encounter an FST state with
       nonzero final-prob, this function first looks up this state_id in
       'expanded_states' member of the corresponding FstInstance, and returns it
       if already present; otherwise it populates the 'expanded_states' map with
       something for this state_id and returns the value.
-  */
+   */
   inline ExpandedState *GetExpandedState(int32 instance_id,
-                                         BaseStateId state_id) {
+      BaseStateId state_id) {
     std::unordered_map<BaseStateId, ExpandedState*> &expanded_states =
         instances_[instance_id].expanded_states;
 
@@ -494,7 +494,7 @@ class GrammarFst {
  */
 template <>
 class ArcIterator<GrammarFst> {
- public:
+public:
   using Arc = typename GrammarFst::Arc;
   using BaseArc = StdArc;
   using StateId = typename Arc::StateId;  // int64
@@ -559,7 +559,7 @@ class ArcIterator<GrammarFst> {
 
   inline const Arc &Value() const { return arc_; }
 
- private:
+private:
 
   inline void CopyArcToTemp() {
     const StdArc &src = data_.arcs[i_];
@@ -598,7 +598,7 @@ class ArcIterator<GrammarFst> {
    a non-const pointer to emphasize that this call does change grammar_fst.
  */
 void CopyToVectorFst(GrammarFst *grammar_fst,
-                     VectorFst<StdArc> *vector_fst);
+    VectorFst<StdArc> *vector_fst);
 
 /**
    This function prepares 'ifst' for use in GrammarFst: it ensures that it has
@@ -636,7 +636,7 @@ void CopyToVectorFst(GrammarFst *grammar_fst,
      @param [in,out] fst  The FST to be (slightly) modified.
  */
 void PrepareForGrammarFst(int32 nonterm_phones_offset,
-                          VectorFst<StdArc> *fst);
+    VectorFst<StdArc> *fst);
 
 
 } // end namespace fst

@@ -35,7 +35,7 @@ typedef fst::LatticeWeightTpl<BaseFloat> LatticeWeight;
 typedef fst::CompactLatticeWeightTpl<LatticeWeight, int32> CompactLatticeWeight;
 
 typedef fst::CompactLatticeWeightCommonDivisorTpl<LatticeWeight, int32>
-  CompactLatticeWeightCommonDivisor;
+    CompactLatticeWeightCommonDivisor;
 
 typedef fst::ArcTpl<LatticeWeight> LatticeArc;
 
@@ -52,22 +52,22 @@ typedef fst::VectorFst<CompactLatticeArc> CompactLattice;
 // most similar Kaldi functions would do.
 
 bool WriteCompactLattice(std::ostream &os, bool binary,
-                         const CompactLattice &clat);
+    const CompactLattice &clat);
 bool WriteLattice(std::ostream &os, bool binary,
-                  const Lattice &lat);
+    const Lattice &lat);
 
 // the following function requires that *clat be
 // NULL when called.
 bool ReadCompactLattice(std::istream &is, bool binary,
-                        CompactLattice **clat);
+    CompactLattice **clat);
 // the following function requires that *lat be
 // NULL when called.
 bool ReadLattice(std::istream &is, bool binary,
-                 Lattice **lat);
+    Lattice **lat);
 
 
 class CompactLatticeHolder {
- public:
+public:
   typedef CompactLattice T;
 
   CompactLatticeHolder() { t_ = NULL; }
@@ -100,12 +100,12 @@ class CompactLatticeHolder {
   }
 
   ~CompactLatticeHolder() { Clear(); }
- private:
+private:
   T *t_;
 };
 
 class LatticeHolder {
- public:
+public:
   typedef Lattice T;
 
   LatticeHolder() { t_ = NULL; }
@@ -138,7 +138,7 @@ class LatticeHolder {
   }
 
   ~LatticeHolder() { Clear(); }
- private:
+private:
   T *t_;
 };
 

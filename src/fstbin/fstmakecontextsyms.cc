@@ -38,18 +38,18 @@
 
     Example output:
 
-  fstrandgen C.fst | fstprint --isymbols=context_syms.txt --osymbols=phones.txt
-0	1	#-1	b
-1	2	<eps>/b/<eps>	#$
-2	3	#1	#1
-3	4	#0	#0
-4	5	#0	#0
-5	6	#0	#0
-6	7	#0	#0
-7	8	#0	#0
-8	9	#1	#1
-9
-*/
+   fstrandgen C.fst | fstprint --isymbols=context_syms.txt --osymbols=phones.txt
+   0	1	#-1	b
+   1	2	<eps>/b/<eps>	#$
+   2	3	#1	#1
+   3	4	#0	#0
+   4	5	#0	#0
+   5	6	#0	#0
+   6	7	#0	#0
+   7	8	#0	#0
+   8	9	#1	#1
+   9
+ */
 
 
 int main(int argc, char *argv[]) {

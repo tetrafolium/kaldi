@@ -40,8 +40,8 @@ namespace nnet1 {
  * FrameOffset example 11frames: -5 -4 -3 -2 -1 0 1 2 3 4 5
  */
 class Splice: public Component {
- public:
-  Splice(int32 dim_in, int32 dim_out):
+public:
+  Splice(int32 dim_in, int32 dim_out) :
     Component(dim_in, dim_out)
   { }
 
@@ -104,14 +104,14 @@ class Splice: public Component {
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     cu::Splice(in, frame_offsets_, out);
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // WARNING!!! WARNING!!! WARNING!!!
     // THIS BACKPROPAGATION CAN BE USED ONLY WITH 'PER-UTTERANCE' TRAINING!
     // IN MINI-BATCH TRAINING, THIS <Splice> COMPONENT HAS TO BE PART OF THE
@@ -119,7 +119,7 @@ class Splice: public Component {
 
     // dims,
     int32 input_dim = in.NumCols(),
-          num_frames = out_diff.NumRows();
+        num_frames = out_diff.NumRows();
     // Copy offsets to 'host',
     std::vector<int32> offsets(frame_offsets_.Dim());
     frame_offsets_.CopyToVec(&offsets);
@@ -127,15 +127,15 @@ class Splice: public Component {
     for (int32 i = 0; i < offsets.size(); i++) {
       int32 o_i = offsets.at(i);
       int32 n_rows = num_frames - abs(o_i),
-            src_row = std::max(-o_i, 0),
-            tgt_row = std::max(o_i, 0);
+          src_row = std::max(-o_i, 0),
+          tgt_row = std::max(o_i, 0);
       const CuSubMatrix<BaseFloat> src = out_diff.Range(src_row, n_rows, i*input_dim, input_dim);
       CuSubMatrix<BaseFloat> tgt = in_diff->RowRange(tgt_row, n_rows);
       tgt.AddMat(1.0, src, kNoTrans);
     }
   }
 
- protected:
+protected:
   CuArray<int32> frame_offsets_;
 };
 
@@ -144,8 +144,8 @@ class Splice: public Component {
  * Rearrange the matrix columns according to the indices in copy_from_indices_
  */
 class CopyComponent: public Component {
- public:
-  CopyComponent(int32 dim_in, int32 dim_out):
+public:
+  CopyComponent(int32 dim_in, int32 dim_out) :
     Component(dim_in, dim_out)
   { }
 
@@ -210,18 +210,18 @@ class CopyComponent: public Component {
 
   std::string Info() const {
     return std::string("\n  min ") + ToString(copy_from_indices_.Min()) +
-                         ", max "  + ToString(copy_from_indices_.Max());
+           ", max "  + ToString(copy_from_indices_.Max());
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     cu::Copy(in, copy_from_indices_,out);
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     static bool warning_displayed = false;
     if (!warning_displayed) {
       KALDI_WARN << Component::TypeToMarker(GetType()) << " : "
@@ -232,7 +232,7 @@ class CopyComponent: public Component {
     in_diff->SetZero();
   }
 
- protected:
+protected:
   CuArray<int32> copy_from_indices_;
 };
 
@@ -242,8 +242,8 @@ class CopyComponent: public Component {
  * Rescale the matrix-rows to have unit length (L2-norm).
  */
 class LengthNormComponent: public Component {
- public:
-  LengthNormComponent(int32 dim_in, int32 dim_out):
+public:
+  LengthNormComponent(int32 dim_in, int32 dim_out) :
     Component(dim_in, dim_out)
   { }
 
@@ -254,7 +254,7 @@ class LengthNormComponent: public Component {
   ComponentType GetType() const { return kLengthNormComponent; }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // resize vector when needed,
     if (row_scales_.Dim() != in.NumRows()) {
       row_scales_.Resize(in.NumRows());
@@ -271,14 +271,14 @@ class LengthNormComponent: public Component {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     in_diff->CopyFromMat(out_diff);
     in_diff->MulRowsVec(row_scales_);  // diff_by_x(s * x) = s,
   }
 
- private:
+private:
   CuMatrix<BaseFloat> l2_aux_;  ///< auxiliary matrix for L2 norm computation,
   CuVector<BaseFloat> row_scales_;  ///< normalization scale of each row,
 };
@@ -289,8 +289,8 @@ class LengthNormComponent: public Component {
  * (can be used for global mean normalization)
  */
 class AddShift : public UpdatableComponent {
- public:
-  AddShift(int32 dim_in, int32 dim_out):
+public:
+  AddShift(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out),
     shift_data_(dim_in)
   { }
@@ -353,33 +353,33 @@ class AddShift : public UpdatableComponent {
 
   std::string Info() const {
     return std::string("\n  shift_data") +
-      MomentStatistics(shift_data_) +
-      ", lr-coef " + ToString(learn_rate_coef_);
+           MomentStatistics(shift_data_) +
+           ", lr-coef " + ToString(learn_rate_coef_);
   }
 
   std::string InfoGradient() const {
     return std::string("\n  shift_data_grad") +
-      MomentStatistics(shift_data_grad_) +
-      ", lr-coef " + ToString(learn_rate_coef_);
+           MomentStatistics(shift_data_grad_) +
+           ", lr-coef " + ToString(learn_rate_coef_);
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // copy, add the shift,
     out->CopyFromMat(in);
     out->AddVecToRows(1.0, shift_data_, 1.0);
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // the derivative of additive constant is zero...
     in_diff->CopyFromMat(out_diff);
   }
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     // we use following hyperparameters from the option class,
     const BaseFloat lr = opts_.learn_rate;
     // gradient,
@@ -391,7 +391,7 @@ class AddShift : public UpdatableComponent {
 
   void SetLearnRateCoef(BaseFloat c) { learn_rate_coef_ = c; }
 
- protected:
+protected:
   CuVector<BaseFloat> shift_data_;
   CuVector<BaseFloat> shift_data_grad_;
 };
@@ -402,8 +402,8 @@ class AddShift : public UpdatableComponent {
  * (can be used for global variance normalization)
  */
 class Rescale : public UpdatableComponent {
- public:
-  Rescale(int32 dim_in, int32 dim_out):
+public:
+  Rescale(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out),
     scale_data_(dim_in)
   { }
@@ -466,34 +466,34 @@ class Rescale : public UpdatableComponent {
 
   std::string Info() const {
     return std::string("\n  scale_data") +
-      MomentStatistics(scale_data_) +
-      ", lr-coef " + ToString(learn_rate_coef_);
+           MomentStatistics(scale_data_) +
+           ", lr-coef " + ToString(learn_rate_coef_);
   }
 
   std::string InfoGradient() const {
     return std::string("\n  scale_data_grad") +
-      MomentStatistics(scale_data_grad_) +
-      ", lr-coef " + ToString(learn_rate_coef_);
+           MomentStatistics(scale_data_grad_) +
+           ", lr-coef " + ToString(learn_rate_coef_);
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // copy, rescale the data,
     out->CopyFromMat(in);
     out->MulColsVec(scale_data_);
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // derivatives are scaled with the scale_data_,
     in_diff->CopyFromMat(out_diff);
     in_diff->MulColsVec(scale_data_);
   }
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     // we use following hyperparameters from the option class,
     const BaseFloat lr = opts_.learn_rate;
     // gradient,
@@ -507,7 +507,7 @@ class Rescale : public UpdatableComponent {
 
   void SetLearnRateCoef(BaseFloat c) { learn_rate_coef_ = c; }
 
- protected:
+protected:
   CuVector<BaseFloat> scale_data_;
   CuVector<BaseFloat> scale_data_grad_;
 };

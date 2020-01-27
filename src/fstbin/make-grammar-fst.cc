@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 
     if (nonterm_phones_offset < 0)
       KALDI_ERR << "The --nonterm-phones-offset option must be supplied "
-          "and positive.";
+        "and positive.";
 
     if (po.NumArgs() == 2) {
       // this usage pattern calls PrepareForGrammarFst().
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
         fst_out_str = po.GetArg(po.NumArgs());
 
     std::shared_ptr<const ConstFst<StdArc> > top_fst(
-        ReadAsConstFst(top_fst_str));
+      ReadAsConstFst(top_fst_str));
     std::vector<std::pair<int32, std::shared_ptr<const ConstFst<StdArc> > > > pairs;
 
     int32 num_pairs = (po.NumArgs() - 2) / 2;

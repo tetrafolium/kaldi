@@ -28,11 +28,11 @@ namespace fst {
 using std::vector;
 
 bool PrintProxyFstPath(const VectorFst<StdArc> &proxy,
-                       vector<vector<StdArc::Label> > *path,
-                       vector<StdArc::Weight> *cost,
-                       StdArc::StateId cur_state,
-                       vector<StdArc::Label> cur_path,
-                       StdArc::Weight cur_cost) {
+    vector<vector<StdArc::Label> > *path,
+    vector<StdArc::Weight> *cost,
+    StdArc::StateId cur_state,
+    vector<StdArc::Label> cur_path,
+    StdArc::Weight cur_cost) {
 
   if (proxy.Final(cur_state) != StdArc::Weight::Zero()) {
     cur_cost = Times(proxy.Final(cur_state), cur_cost);
@@ -42,7 +42,7 @@ bool PrintProxyFstPath(const VectorFst<StdArc> &proxy,
   }
 
   for (ArcIterator<StdFst> aiter(proxy, cur_state);
-       !aiter.Done(); aiter.Next()) {
+      !aiter.Done(); aiter.Next()) {
     const StdArc &arc = aiter.Value();
     StdArc::Weight temp_cost = Times(arc.weight, cur_cost);
     cur_path.push_back(arc.ilabel);
@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string proxy_rspecifier = po.GetArg(1),
-                kwlist_wspecifier = po.GetArg(2),
-                cost_wspecifier = po.GetOptArg(3);
+        kwlist_wspecifier = po.GetArg(2),
+        cost_wspecifier = po.GetOptArg(3);
 
 
     SequentialTableReader<VectorFstHolder> proxy_reader(proxy_rspecifier);

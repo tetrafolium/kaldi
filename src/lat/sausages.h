@@ -75,13 +75,13 @@ struct MinimumBayesRiskOptions {
 /// either the 1-best MBR output together with the expected Bayes Risk,
 /// or a sausage-like structure.
 class MinimumBayesRisk {
- public:
+public:
   /// Initialize with compact lattice-- any acoustic scaling etc., is assumed
   /// to have been done already.
   /// This does the whole computation.  You get the output with
   /// GetOneBest(), GetBayesRisk(), and GetSausageStats().
   MinimumBayesRisk(const CompactLattice &clat,
-                   MinimumBayesRiskOptions opts = MinimumBayesRiskOptions());
+      MinimumBayesRiskOptions opts = MinimumBayesRiskOptions());
 
   // Uses the provided <words> as <R_> instead of using the lattice best path.
   // Note that the default value of opts.decode_mbr is true. If you provide 1-best
@@ -89,17 +89,17 @@ class MinimumBayesRisk {
   // mismatched with the provided <words> (<words> would be used as the starting
   // point of optimization).
   MinimumBayesRisk(const CompactLattice &clat,
-                   const std::vector<int32> &words,
-                   MinimumBayesRiskOptions opts = MinimumBayesRiskOptions());
+      const std::vector<int32> &words,
+      MinimumBayesRiskOptions opts = MinimumBayesRiskOptions());
   // Uses the provided <words> as <R_> and <times> of bins instead of using the lattice best path.
   // Note that the default value of opts.decode_mbr is true. If you provide 1-best
   // hypothesis from MAP decoding, the output ctm from MBR decoding may be
   // mismatched with the provided <words> (<words> would be used as the starting
   // point of optimization).
   MinimumBayesRisk(const CompactLattice &clat,
-                   const std::vector<int32> &words,
-                   const std::vector<std::pair<BaseFloat,BaseFloat> > &times,
-                   MinimumBayesRiskOptions opts = MinimumBayesRiskOptions());
+      const std::vector<int32> &words,
+      const std::vector<std::pair<BaseFloat,BaseFloat> > &times,
+      MinimumBayesRiskOptions opts = MinimumBayesRiskOptions());
 
   const std::vector<int32> &GetOneBest() const { // gets one-best (with no epsilons)
     return R_;
@@ -140,7 +140,7 @@ class MinimumBayesRisk {
     return gamma_;
   }
 
- private:
+private:
   void PrepareLatticeAndInitStats(CompactLattice *clat);
 
   /// Minimum-Bayes-Risk Decode. Top-level algorithm.  Figure 6 of the paper.
@@ -165,9 +165,9 @@ class MinimumBayesRisk {
 
   /// Figure 4 of the paper; called from AccStats (Fig. 5)
   double EditDistance(int32 N, int32 Q,
-                      Vector<double> &alpha,
-                      Matrix<double> &alpha_dash,
-                      Vector<double> &alpha_dash_arc);
+      Vector<double> &alpha,
+      Matrix<double> &alpha_dash,
+      Vector<double> &alpha_dash_arc);
 
   /// Figure 5 of the paper.  Outputs to gamma_ and L_.
   void AccStats();
@@ -257,7 +257,7 @@ class MinimumBayesRisk {
     // on the 2nd element (posterior), so it'll be like operator
     // > that looks first at the posterior.
     bool operator () (const std::pair<int32, BaseFloat> &a,
-                      const std::pair<int32, BaseFloat> &b) const {
+        const std::pair<int32, BaseFloat> &b) const {
       if (a.second > b.second) return true;
       else if (a.second < b.second) return false;
       else return a.first > b.first;

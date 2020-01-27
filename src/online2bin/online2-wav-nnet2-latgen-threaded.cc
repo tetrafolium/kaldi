@@ -30,10 +30,10 @@
 namespace kaldi {
 
 void GetDiagnosticsAndPrintOutput(const std::string &utt,
-                                  const fst::SymbolTable *word_syms,
-                                  const CompactLattice &clat,
-                                  int64 *tot_num_frames,
-                                  double *tot_like) {
+    const fst::SymbolTable *word_syms,
+    const CompactLattice &clat,
+    int64 *tot_num_frames,
+    double *tot_like) {
   if (clat.NumStates() == 0) {
     KALDI_WARN << "Empty lattice.";
     return;
@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
       const std::vector<std::string> &uttlist = spk2utt_reader.Value();
 
       OnlineIvectorExtractorAdaptationState adaptation_state(
-          feature_info.ivector_extractor_info);
+        feature_info.ivector_extractor_info);
       OnlineCmvnState cmvn_state(global_cmvn_stats);
 
       for (size_t i = 0; i < uttlist.size(); i++) {
@@ -209,8 +209,8 @@ int main(int argc, char *argv[]) {
         SubVector<BaseFloat> data(wave_data.Data(), 0);
 
         SingleUtteranceNnet2DecoderThreaded decoder(
-            nnet2_decoding_config, trans_model, am_nnet,
-            *decode_fst, feature_info, adaptation_state, cmvn_state);
+          nnet2_decoding_config, trans_model, am_nnet,
+          *decode_fst, feature_info, adaptation_state, cmvn_state);
 
         OnlineTimer decoding_timer(utt);
 
@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
         while (samp_offset < data.Dim()) {
           int32 samp_remaining = data.Dim() - samp_offset;
           int32 num_samp = chunk_length < samp_remaining ? chunk_length
-                                                         : samp_remaining;
+              : samp_remaining;
 
           SubVector<BaseFloat> wave_part(data, samp_offset, num_samp);
 
@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
           // the endpointing happens inside this while loop.  The next statement
           // is intended to prevent this from happening.
           while (do_endpointing &&
-                 decoder.NumWaveformPiecesPending() * chunk_length_secs > 2.0)
+              decoder.NumWaveformPiecesPending() * chunk_length_secs > 2.0)
             Sleep(0.5f);
 
           decoder.AcceptWaveform(samp_freq, wave_part);

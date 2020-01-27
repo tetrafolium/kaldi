@@ -34,16 +34,16 @@ namespace kaldi {
    It contains a class intended to be used in preconditioning
    data for neural network training.  See the documentation for class
    FeatureTransformEstimate for more details.
-*/
+ */
 
 struct FeatureTransformEstimateOptions {
   bool remove_offset;
   int32 dim;
   BaseFloat within_class_factor;
   BaseFloat max_singular_value;
-  FeatureTransformEstimateOptions(): remove_offset(true), dim(-1),
-                                     within_class_factor(0.001), max_singular_value(5.0) { }
-  
+  FeatureTransformEstimateOptions() : remove_offset(true), dim(-1),
+    within_class_factor(0.001), max_singular_value(5.0) { }
+
   void Register(OptionsItf *opts) {
     opts->Register("remove-offset", &remove_offset, "If true, output an affine "
                    "transform that makes the projected data mean equal to zero.");
@@ -56,7 +56,7 @@ struct FeatureTransformEstimateOptions {
     opts->Register("max-singular-value", &max_singular_value, "If >0, maximum "
                    "allowed singular value of final transform (they are floored "
                    "to this)");
-  }    
+  }
 };
 
 /**
@@ -114,9 +114,9 @@ struct FeatureTransformEstimateOptions {
       variance is \lambda_i + 1.
       Below, "within-class-factor" is a constant that we set by default to
       0.001.  We scale the i'th dimension of the features by:
-      
+
          \f$  sqrt( (within-class-factor + \lambda_i) / (1 + \lambda_i) ) \f$
-           
+
       If \lambda_i >> 1, this scaling factor approaches 1 (we don't need to
       scale up dimensions with high between-class variance as they already
       naturally have a higher variance than other dimensions.  As \lambda_i
@@ -128,10 +128,10 @@ struct FeatureTransformEstimateOptions {
       \lambda_i), so by scaling the features by approximately sqrt((\lambda_i) /
       (1 + \lambda_i)), the variance becomes approximately \lambda_i [this is
       clear after noting that the variance gets scaled by the square of the
-      feature scale].      
+      feature scale].
  */
 class FeatureTransformEstimate: public LdaEstimate {
- public:
+public:
   /// Estimates the LDA transform matrix m.  If Mfull != NULL, it also outputs
   /// the full matrix (without dimensionality reduction), which is useful for
   /// some purposes.  If opts.remove_offset == true, it will output both matrices
@@ -142,34 +142,34 @@ class FeatureTransformEstimate: public LdaEstimate {
   /// be set to the Cholesky factor of the within-class covariance matrix.
   /// This is used for perturbing features.
   void Estimate(const FeatureTransformEstimateOptions &opts,
-                Matrix<BaseFloat> *M,
-                TpMatrix<BaseFloat> *within_cholesky) const;
- protected:
+      Matrix<BaseFloat> *M,
+      TpMatrix<BaseFloat> *within_cholesky) const;
+protected:
   static void EstimateInternal(const FeatureTransformEstimateOptions &opts,
-                               const SpMatrix<double> &total_covar,
-                               const SpMatrix<double> &between_covar,
-                               const Vector<double> &mean,
-                               Matrix<BaseFloat> *M,
-                               TpMatrix<BaseFloat> *C);
+      const SpMatrix<double> &total_covar,
+      const SpMatrix<double> &between_covar,
+      const Vector<double> &mean,
+      Matrix<BaseFloat> *M,
+      TpMatrix<BaseFloat> *C);
 };
 
 
 class FeatureTransformEstimateMulti: public FeatureTransformEstimate {
- public:
+public:
   /// This is as FeatureTransformEstimate, but for use in
   /// nnet-get-feature-transform-multi.cc, see the usage message
   /// of that program for a description of what it does.
   void Estimate(const FeatureTransformEstimateOptions &opts,
-                const std::vector<std::vector<int32> > &indexes,
-                Matrix<BaseFloat> *M) const;
+      const std::vector<std::vector<int32> > &indexes,
+      Matrix<BaseFloat> *M) const;
 
- private:
+private:
   void EstimateTransformPart(const FeatureTransformEstimateOptions &opts,
-                             const std::vector<int32> &indexes,
-                             const SpMatrix<double> &total_covar,
-                             const SpMatrix<double> &between_covar,
-                             const Vector<double> &mean,
-                             Matrix<BaseFloat> *M) const;
+      const std::vector<int32> &indexes,
+      const SpMatrix<double> &total_covar,
+      const SpMatrix<double> &between_covar,
+      const Vector<double> &mean,
+      Matrix<BaseFloat> *M) const;
 };
 
 

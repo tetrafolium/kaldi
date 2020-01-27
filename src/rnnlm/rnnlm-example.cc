@@ -74,8 +74,8 @@ void RnnlmExample::Read(std::istream &is, bool binary) {
 }
 
 RnnlmExampleSampler::RnnlmExampleSampler(
-    const RnnlmEgsConfig &config, const SamplingLm &arpa_sampling):
-    config_(config), arpa_sampling_(arpa_sampling) {
+  const RnnlmEgsConfig &config, const SamplingLm &arpa_sampling) :
+  config_(config), arpa_sampling_(arpa_sampling) {
   config_.Check();
 
   // The unigram distribution from the LM, modified according to
@@ -115,7 +115,7 @@ RnnlmExampleSampler::RnnlmExampleSampler(
 
   int32 num_words_nonzero_prob = 0;
   for (std::vector<BaseFloat>::iterator iter = unigram_distribution.begin(),
-           end = unigram_distribution.end(); iter != end; ++iter) {
+      end = unigram_distribution.end(); iter != end; ++iter) {
     if (*iter != 0.0) num_words_nonzero_prob++;
     *iter *= scale;
   }
@@ -159,13 +159,13 @@ void RnnlmExampleSampler::SampleForMinibatch(RnnlmExample *minibatch) const {
 
 
 void RnnlmExampleSampler::SampleForGroup(int32 g,
-                                         RnnlmExample *minibatch) const {
+    RnnlmExample *minibatch) const {
   // All words that appear on the output are required to appear in the sample.  we
   // need to figure what this set of words is.
   int32 num_chunks_per_minibatch = config_.num_chunks_per_minibatch;
   std::vector<int32> words_we_must_sample;
   for (int32 t = g * config_.sample_group_size;
-       t < (g + 1) * config_.sample_group_size; t++) {
+      t < (g + 1) * config_.sample_group_size; t++) {
     for (int32 n = 0; n < num_chunks_per_minibatch; n++) {
       int32 i = t * num_chunks_per_minibatch + n;
       int32 output_word = minibatch->output_words[i];
@@ -212,7 +212,7 @@ void RnnlmExampleSampler::SampleForGroup(int32 g,
 }
 
 void RnnlmExampleSampler::RenumberOutputWordsForGroup(
-    int32 g, RnnlmExample *minibatch) const {
+  int32 g, RnnlmExample *minibatch) const {
   int32 sample_group_size = config_.sample_group_size,
       num_samples = config_.num_samples,
       num_chunks_per_minibatch = config_.num_chunks_per_minibatch,
@@ -245,8 +245,8 @@ void RnnlmExampleSampler::RenumberOutputWordsForGroup(
 
 
 void RnnlmExampleSampler::GetHistoriesForGroup(
-    int32 g, const RnnlmExample &minibatch,
-    std::vector<std::pair<std::vector<int32>, BaseFloat> > *hist_weights) const {
+  int32 g, const RnnlmExample &minibatch,
+  std::vector<std::pair<std::vector<int32>, BaseFloat> > *hist_weights) const {
   // initially store as an unordered_map so we can remove duplicates.
 
   // hist_to_weight maps from the history to the (unnormalized) weight for that
@@ -262,7 +262,7 @@ void RnnlmExampleSampler::GetHistoriesForGroup(
   // This block sets up the 'hist_to_weight' map.  Note: sample_group_size
   // will normally be small, like 1, 2 or 4.
   for (int32 t = g * config_.sample_group_size;
-       t < (g + 1) * config_.sample_group_size; t++) {
+      t < (g + 1) * config_.sample_group_size; t++) {
     for (int32 n = 0; n < num_chunks_per_minibatch; n++) {
       int32 i = t * num_chunks_per_minibatch + n;
       BaseFloat this_weight = minibatch.output_weights(i);
@@ -292,10 +292,10 @@ void RnnlmExampleSampler::GetHistoriesForGroup(
 }
 
 void RnnlmExampleSampler::GetHistory(
-    int32 t, int32 n,
-    const RnnlmExample &minibatch,
-    int32 max_history_length,
-    std::vector<int32> *history) const {
+  int32 t, int32 n,
+  const RnnlmExample &minibatch,
+  int32 max_history_length,
+  std::vector<int32> *history) const {
   history->reserve(max_history_length);
   history->clear();
   int32 num_chunks_per_minibatch = config_.num_chunks_per_minibatch;
@@ -328,7 +328,7 @@ void RnnlmExampleSampler::GetHistory(
 
 
 void RnnlmExampleCreator::AcceptSequence(
-    BaseFloat weight, const std::vector<int32> &words) {
+  BaseFloat weight, const std::vector<int32> &words) {
   CheckSequence(weight, words);
   SplitSequenceIntoChunks(weight, words);
   num_sequences_processed_++;
@@ -349,23 +349,23 @@ RnnlmExampleCreator::~RnnlmExampleCreator() {
             << " sequences/chunks into " << num_minibatches_written_
             << " minibatches (" << chunks_.size()
             << " chunks left over)";
- KALDI_LOG << "Overall there were "
-           << words_per_chunk << " words per chunk; "
-           << chunks_per_minibatch << " chunks per minibatch.";
- for (size_t i = 0; i < chunks_.size(); i++)
-   delete chunks_[i];
+  KALDI_LOG << "Overall there were "
+            << words_per_chunk << " words per chunk; "
+            << chunks_per_minibatch << " chunks per minibatch.";
+  for (size_t i = 0; i < chunks_.size(); i++)
+    delete chunks_[i];
 }
 
 RnnlmExampleCreator::SingleMinibatchCreator::SingleMinibatchCreator(
-    const RnnlmEgsConfig &config):
-    config_(config),
-    eg_chunks_(config_.num_chunks_per_minibatch) {
+  const RnnlmEgsConfig &config) :
+  config_(config),
+  eg_chunks_(config_.num_chunks_per_minibatch) {
   for (int32 i = 0; i < config_.num_chunks_per_minibatch; i++)
     empty_eg_chunks_.push_back(i);
 }
 
 bool RnnlmExampleCreator::SingleMinibatchCreator::AcceptChunk(
-    RnnlmExampleCreator::SequenceChunk *chunk) {
+  RnnlmExampleCreator::SequenceChunk *chunk) {
   int32 chunk_len = chunk->Length();
   if (chunk_len == config_.chunk_length) {  // maximum-sized chunk.
     if (empty_eg_chunks_.empty()) {
@@ -427,7 +427,7 @@ RnnlmExampleCreator::SingleMinibatchCreator::~SingleMinibatchCreator() {
 
 
 void RnnlmExampleCreator::SingleMinibatchCreator::CreateMinibatchOneSequence(
-    int32 n, RnnlmExample *minibatch) {
+  int32 n, RnnlmExample *minibatch) {
   // Much of the code here is about figuring out what to do if we haven't
   // completely used up the potential length of the sequence.  We first try
   // giving extra left-context to any split-up pieces of sequence that could potentially
@@ -507,8 +507,8 @@ void RnnlmExampleCreator::SingleMinibatchCreator::CreateMinibatchOneSequence(
 
 
 void RnnlmExampleCreator::SingleMinibatchCreator::Set(
-    int32 n, int32 t, int32 input_word, int32 output_word,
-    BaseFloat weight, RnnlmExample *minibatch) const {
+  int32 n, int32 t, int32 input_word, int32 output_word,
+  BaseFloat weight, RnnlmExample *minibatch) const {
   KALDI_ASSERT(n >= 0 && n < config_.num_chunks_per_minibatch &&
                t >= 0 && t < config_.chunk_length &&
                weight >= 0.0);
@@ -521,7 +521,7 @@ void RnnlmExampleCreator::SingleMinibatchCreator::Set(
 
 
 void RnnlmExampleCreator::SingleMinibatchCreator::CreateMinibatch(
-    RnnlmExample *minibatch) {
+  RnnlmExample *minibatch) {
   minibatch->vocab_size = config_.vocab_size;
   minibatch->num_chunks = config_.num_chunks_per_minibatch;
   minibatch->chunk_length = config_.chunk_length;
@@ -599,7 +599,7 @@ bool RnnlmExampleCreator::ProcessOneMinibatch() {
 
 
 void RnnlmExampleCreator::SplitSequenceIntoChunks(
-    BaseFloat weight, const std::vector<int32> &words) {
+  BaseFloat weight, const std::vector<int32> &words) {
   std::shared_ptr<std::vector<int32> > ptr (new std::vector<int32>());
   ptr->reserve(words.size() + 1);
   ptr->insert(ptr->end(), words.begin(), words.end());
@@ -624,12 +624,12 @@ void RnnlmExampleCreator::SplitSequenceIntoChunks(
 
 // see comment in rnnlm-example.h, by its declaration.
 void RnnlmExampleCreator::ChooseChunkLengths(
-    int32 sequence_length,
-    std::vector<int32> *chunk_lengths) {
+  int32 sequence_length,
+  std::vector<int32> *chunk_lengths) {
   KALDI_ASSERT(sequence_length > config_.chunk_length);
   chunk_lengths->clear();
   int32 tot = sequence_length - config_.min_split_context,
-     chunk_length_no_context = config_.chunk_length - config_.min_split_context;
+      chunk_length_no_context = config_.chunk_length - config_.min_split_context;
   KALDI_ASSERT(chunk_length_no_context > 0);
   // divide 'tot' into pieces of size <= config_.chunk_length - config_.min_split_context.
 
@@ -649,8 +649,8 @@ void RnnlmExampleCreator::ChooseChunkLengths(
 }
 
 void RnnlmExampleCreator::CheckSequence(
-    BaseFloat weight,
-    const std::vector<int32> &words) {
+  BaseFloat weight,
+  const std::vector<int32> &words) {
   KALDI_ASSERT(weight > 0.0);
   int32 bos_symbol = config_.bos_symbol,
       brk_symbol = config_.brk_symbol,
@@ -667,7 +667,7 @@ void RnnlmExampleCreator::CheckSequence(
     // we may rate-limit this warning eventually if people legitimately need to
     // do this.
     KALDI_WARN << "Raw word sequence contains </s> at the end.  "
-        "Is this a bug in your data preparation?  We'll add another one.";
+      "Is this a bug in your data preparation?  We'll add another one.";
   }
 }
 

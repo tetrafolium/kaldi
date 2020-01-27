@@ -50,7 +50,7 @@ namespace nnet2 {
 struct NnetCombineFastConfig {
   int32 initial_model; // If provided, the index of the initial model to start
   // the optimization from.
-  int32 num_lbfgs_iters; 
+  int32 num_lbfgs_iters;
   int32 num_threads;
   BaseFloat initial_impr;
   BaseFloat fisher_floor; // Flooring value we use for Fisher matrix (mainly
@@ -64,12 +64,12 @@ struct NnetCombineFastConfig {
   // the gradient computation.
   int32 max_lbfgs_dim;
   BaseFloat regularizer;
-  
-  NnetCombineFastConfig(): initial_model(-1), num_lbfgs_iters(10),
-                           num_threads(1), initial_impr(0.01), fisher_floor(1.0e-20),
-                           alpha(0.01), fisher_minibatch_size(64), minibatch_size(1024),
-                           max_lbfgs_dim(10), regularizer(0.0) {}
-  
+
+  NnetCombineFastConfig() : initial_model(-1), num_lbfgs_iters(10),
+    num_threads(1), initial_impr(0.01), fisher_floor(1.0e-20),
+    alpha(0.01), fisher_minibatch_size(64), minibatch_size(1024),
+    max_lbfgs_dim(10), regularizer(0.0) {}
+
   void Register(OptionsItf *opts) {
     opts->Register("initial-model", &initial_model, "Specifies where to start the "
                    "optimization from.  If 0 ... #models-1, then specifies the model; "
@@ -96,14 +96,14 @@ struct NnetCombineFastConfig {
     opts->Register("regularizer", &regularizer, "Add to the objective "
                    "function (which is average log-like per frame), -0.5 * "
                    "regularizer * square of parameters.");
-  }  
+  }
 };
 
 void CombineNnetsFast(const NnetCombineFastConfig &combine_config,
-                      const std::vector<NnetExample> &validation_set,
-                      const std::vector<Nnet> &nnets_in,
-                      Nnet *nnet_out);
-  
+    const std::vector<NnetExample> &validation_set,
+    const std::vector<Nnet> &nnets_in,
+    Nnet *nnet_out);
+
 
 
 } // namespace nnet2

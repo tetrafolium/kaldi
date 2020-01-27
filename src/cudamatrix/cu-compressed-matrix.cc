@@ -35,14 +35,14 @@ namespace kaldi {
 
 
 template <typename I>
-CuCompressedMatrix<I>::CuCompressedMatrix(BaseFloat range, bool truncate):
-    data_(NULL), scale_(range / std::numeric_limits<I>::max()),
-    truncate_(truncate), num_rows_(0), num_cols_(0), stride_(0) {
+CuCompressedMatrix<I>::CuCompressedMatrix(BaseFloat range, bool truncate) :
+  data_(NULL), scale_(range / std::numeric_limits<I>::max()),
+  truncate_(truncate), num_rows_(0), num_cols_(0), stride_(0) {
 #if HAVE_CUDA == 1
   KALDI_ASSERT(CuDevice::Instantiate().Enabled());
 #else
   KALDI_ERR << "You instantiated CuCompressedMatrix while GPU use "
-      "was not compiled in.";
+    "was not compiled in.";
 #endif
 }
 
@@ -63,7 +63,7 @@ void CuCompressedMatrix<I>::Destroy() {
 
 template <typename I>
 void CuCompressedMatrix<I>::CopyFromMat(
-    const CuMatrixBase<BaseFloat> &mat) {
+  const CuMatrixBase<BaseFloat> &mat) {
 #if HAVE_CUDA == 1
   KALDI_ASSERT(CuDevice::Instantiate().Enabled());
   if (mat.NumRows() == 0)
@@ -73,7 +73,7 @@ void CuCompressedMatrix<I>::CopyFromMat(
     num_rows_ = mat.NumRows();
     num_cols_ = mat.NumCols();
     data_ = static_cast<I*>(
-        CuDevice::Instantiate().Malloc(sizeof(I) * num_rows_ * num_cols_));
+      CuDevice::Instantiate().Malloc(sizeof(I) * num_rows_ * num_cols_));
     stride_ = num_cols_;
   }
 
@@ -117,8 +117,8 @@ void CuCompressedMatrix<I>::CopyToMat(CuMatrixBase<BaseFloat> *mat) const {
 
 
 CuCompressedMatrixBase *NewCuCompressedMatrix(CuCompressedMatrixType t,
-                                              BaseFloat range,
-                                              bool truncat) {
+    BaseFloat range,
+    bool truncat) {
   if (t == kCompressedMatrixUint8) {
     KALDI_ASSERT(range >= 0);
     return new CuCompressedMatrix<uint8>(range);

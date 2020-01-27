@@ -45,19 +45,19 @@ namespace kaldi {
    You will instantiate this class when you want to decode a single utterance
    using the online-decoding setup for neural nets.  The template will be
    instantiated only for FST = fst::Fst<fst::StdArc> and FST = fst::GrammarFst.
-*/
+ */
 
 template <typename FST>
 class SingleUtteranceNnet3IncrementalDecoderTpl {
- public:
+public:
 
   // Constructor. The pointer 'features' is not being given to this class to own
   // and deallocate, it is owned externally.
   SingleUtteranceNnet3IncrementalDecoderTpl(const LatticeIncrementalDecoderConfig &decoder_opts,
-                                            const TransitionModel &trans_model,
-                                            const nnet3::DecodableNnetSimpleLoopedInfo &info,
-                                            const FST &fst,
-                                            OnlineNnet2FeaturePipeline *features);
+      const TransitionModel &trans_model,
+      const nnet3::DecodableNnetSimpleLoopedInfo &info,
+      const FST &fst,
+      OnlineNnet2FeaturePipeline *features);
 
   /// Initializes the decoding and sets the frame offset of the underlying
   /// decodable object. This method is called by the constructor. You can also
@@ -93,9 +93,9 @@ class SingleUtteranceNnet3IncrementalDecoderTpl {
                   if num_frames_to_include < NumFramesDecoded().
                   Must be true if you have previously called
                   FinalizeDecoding().
-  */
+   */
   const CompactLattice &GetLattice(int32 num_frames_to_include,
-                                      bool use_final_probs = false) {
+      bool use_final_probs = false) {
     return decoder_.GetLattice(num_frames_to_include, use_final_probs);
   }
 
@@ -108,7 +108,7 @@ class SingleUtteranceNnet3IncrementalDecoderTpl {
   /// the graph then it will include those as final-probs, else it will treat
   /// all final-probs as one.
   void GetBestPath(bool end_of_utterance,
-                   Lattice *best_path) const;
+      Lattice *best_path) const;
 
 
   /// This function calls EndpointDetected from online-endpoint.h,
@@ -118,7 +118,7 @@ class SingleUtteranceNnet3IncrementalDecoderTpl {
   const LatticeIncrementalOnlineDecoderTpl<FST> &Decoder() const { return decoder_; }
 
   ~SingleUtteranceNnet3IncrementalDecoderTpl() { }
- private:
+private:
 
   const LatticeIncrementalDecoderConfig &decoder_opts_;
 

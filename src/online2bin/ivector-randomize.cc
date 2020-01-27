@@ -41,15 +41,15 @@ int main(int argc, char *argv[]) {
 
     int32 srand_seed = 0;
     BaseFloat randomize_prob = 0.5;
-    
+
     ParseOptions po(usage);
 
     po.Register("srand", &srand_seed, "Seed for random number generator");
     po.Register("randomize-prob", &randomize_prob, "For each row, replace it with a "
                 "random row with this probability.");
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     int num_done = 0;
     SequentialBaseFloatMatrixReader reader(ivector_rspecifier);
     BaseFloatMatrixWriter writer(ivector_wspecifier);
-    
+
     for (; !reader.Done(); reader.Next(), num_done++) {
       std::string utt = reader.Key();
       const Matrix<BaseFloat> &ivectors_in = reader.Value();

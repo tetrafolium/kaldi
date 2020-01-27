@@ -33,8 +33,8 @@ namespace nnet3 {
 // make a copy of 'nnet', set test modes on that and evaluate its objective.
 // Note: the object that prob_computer->nnet_ refers to should be 'nnet'.
 double ComputeObjf(bool batchnorm_test_mode, bool dropout_test_mode,
-                   const std::vector<NnetExample> &egs, const Nnet &nnet,
-                   NnetComputeProb *prob_computer) {
+    const std::vector<NnetExample> &egs, const Nnet &nnet,
+    NnetComputeProb *prob_computer) {
   if (batchnorm_test_mode || dropout_test_mode) {
     Nnet nnet_copy(nnet);
     if (batchnorm_test_mode)
@@ -47,7 +47,7 @@ double ComputeObjf(bool batchnorm_test_mode, bool dropout_test_mode,
   } else {
     prob_computer->Reset();
     std::vector<NnetExample>::const_iterator iter = egs.begin(),
-                                              end = egs.end();
+        end = egs.end();
     for (; iter != end; ++iter)
       prob_computer->Compute(*iter);
     double tot_weights,
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
                 "maximum number of objective evaluations in order to figure "
                 "out the best number of models to combine. It helps to speedup "
                 "if the number of models provided to this binary is quite "
-                "large (e.g. several hundred)."); 
+                "large (e.g. several hundred).");
     po.Register("batchnorm-test-mode", &batchnorm_test_mode,
                 "If true, set test-mode to true on any BatchNormComponents "
                 "while evaluating objectives.");
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
 
     { // This block adds training examples to "egs".
       SequentialNnetExampleReader example_reader(
-          valid_examples_rspecifier);
+        valid_examples_rspecifier);
       for (; !example_reader.Done(); example_reader.Next())
         egs.push_back(example_reader.Value());
       KALDI_LOG << "Read " << egs.size() << " examples.";
@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
     // then each time before we re-evaluate the objective function, we will add
     // num_to_add models to the moving average.
     int32 num_to_add = (num_nnets + max_objective_evaluations - 1) /
-                       max_objective_evaluations;
+        max_objective_evaluations;
     for (int32 n = 1; n < num_nnets; n++) {
       ReadKaldiObject(po.GetArg(1 + n), &nnet);
       // updates the moving average
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
       RecomputeStats(egs, &best_nnet);
 
 #if HAVE_CUDA==1
-      CuDevice::Instantiate().PrintProfile();
+    CuDevice::Instantiate().PrintProfile();
 #endif
 
     WriteKaldiObject(best_nnet, nnet_wxfilename, binary_write);

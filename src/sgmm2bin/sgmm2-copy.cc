@@ -61,8 +61,8 @@ int main(int argc, char *argv[]) {
       trans_model.Write(ko.Stream(), binary_write);
       am_sgmm.Write(ko.Stream(), binary_write, kSgmmWriteAll);
     }
-    
-    
+
+
     KALDI_LOG << "Written model to " << model_out_filename;
     return 0;
   } catch(const std::exception &e) {

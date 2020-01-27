@@ -23,15 +23,15 @@ namespace kaldi {
 namespace nnet2 {
 
 static BaseFloat ComputeObjfAndGradient(
-    const std::vector<NnetExample> &validation_set,
-    const Vector<double> &log_scale_params,
-    const Nnet &nnet,
-    Vector<double> *gradient) {
+  const std::vector<NnetExample> &validation_set,
+  const Vector<double> &log_scale_params,
+  const Nnet &nnet,
+  Vector<double> *gradient) {
   Vector<BaseFloat> scale_params(log_scale_params);
   scale_params.ApplyExp();
   Nnet nnet_scaled(nnet);
   nnet_scaled.ScaleComponents(scale_params);
-  
+
   Nnet nnet_gradient(nnet);
   bool is_gradient = true;
   nnet_gradient.SetZero(is_gradient);
@@ -61,16 +61,16 @@ static BaseFloat ComputeObjfAndGradient(
   KALDI_ASSERT(i == log_scale_params.Dim());
   return ans;
 }
-                                   
+
 
 void ShrinkNnet(const NnetShrinkConfig &shrink_config,
-                const std::vector<NnetExample> &validation_set,
-                Nnet *nnet) {
+    const std::vector<NnetExample> &validation_set,
+    Nnet *nnet) {
 
   int32 dim = nnet->NumUpdatableComponents();
   KALDI_ASSERT(dim > 0);
   Vector<double> log_scale(dim), gradient(dim); // will be zero.
-  
+
   // Get initial gradient.
   double objf, initial_objf;
 
@@ -80,10 +80,10 @@ void ShrinkNnet(const NnetShrinkConfig &shrink_config,
   lbfgs_options.m = dim; // Store the same number of vectors as the dimension
   // itself, so this is BFGS.
   lbfgs_options.first_step_length = shrink_config.initial_step;
-  
+
   OptimizeLbfgs<double> lbfgs(log_scale,
-                              lbfgs_options);
-  
+      lbfgs_options);
+
   for (int32 i = 0; i < shrink_config.num_bfgs_iters; i++) {
     log_scale.CopyFromVec(lbfgs.GetProposedValue());
     objf = ComputeObjfAndGradient(validation_set, log_scale,
@@ -106,7 +106,7 @@ void ShrinkNnet(const NnetShrinkConfig &shrink_config,
             << scale;
   nnet->ScaleComponents(scale);
 }
- 
-  
+
+
 } // namespace nnet2
 } // namespace kaldi

@@ -31,7 +31,7 @@ namespace nnet3 {
 void RenameOutputs(const std::string &new_name, NnetExample *eg) {
   bool found_output = false;
   for (std::vector<NnetIo>::iterator it = eg->io.begin();
-       it != eg->io.end(); ++it) {
+      it != eg->io.end(); ++it) {
     if (it->name == "output") {
       it->name = new_name;
       found_output = true;
@@ -49,7 +49,7 @@ void ScaleSupervisionWeight(BaseFloat weight, NnetExample *eg) {
 
   bool found_output = false;
   for (std::vector<NnetIo>::iterator it = eg->io.begin();
-       it != eg->io.end(); ++it) {
+      it != eg->io.end(); ++it) {
     if (it->name == "output") {
       it->features.Scale(weight);
       found_output = true;
@@ -80,16 +80,16 @@ int32 GetCount(double expected_count) {
     "output" NnetIo members.
  */
 bool ContainsSingleExample(const NnetExample &eg,
-                           int32 *min_input_t,
-                           int32 *max_input_t,
-                           int32 *min_output_t,
-                           int32 *max_output_t) {
+    int32 *min_input_t,
+    int32 *max_input_t,
+    int32 *min_output_t,
+    int32 *max_output_t) {
   bool done_input = false, done_output = false;
   int32 num_indexes = eg.io.size();
   for (int32 i = 0; i < num_indexes; i++) {
     const NnetIo &io = eg.io[i];
     std::vector<Index>::const_iterator iter = io.indexes.begin(),
-                                        end = io.indexes.end();
+        end = io.indexes.end();
     // Should not have an empty input/output type.
     KALDI_ASSERT(!io.indexes.empty());
     if (io.name == "input" || io.name == "output") {
@@ -143,11 +143,11 @@ bool ContainsSingleExample(const NnetExample &eg,
    Will crash if filtering removes all Indexes of "input" or "output".
  */
 void FilterExample(const NnetExample &eg,
-                   int32 min_input_t,
-                   int32 max_input_t,
-                   int32 min_output_t,
-                   int32 max_output_t,
-                   NnetExample *eg_out) {
+    int32 min_input_t,
+    int32 max_input_t,
+    int32 min_output_t,
+    int32 max_output_t,
+    NnetExample *eg_out) {
   eg_out->io.clear();
   eg_out->io.resize(eg.io.size());
   for (size_t i = 0; i < eg.io.size(); i++) {
@@ -179,7 +179,7 @@ void FilterExample(const NnetExample &eg,
       KALDI_ASSERT(io_in.features.NumRows() == num_indexes);
       std::vector<bool> keep(num_indexes, false);
       std::vector<Index>::const_iterator iter_in = indexes_in.begin(),
-                                          end_in = indexes_in.end();
+          end_in = indexes_in.end();
       std::vector<bool>::iterator iter_out = keep.begin();
       for (; iter_in != end_in; ++iter_in,++iter_out) {
         int32 t = iter_in->t;
@@ -218,13 +218,13 @@ void FilterExample(const NnetExample &eg,
    returning false in situations where frame is an integer, and the eg came from
    the end of a file and has a smaller than normal number of supervised frames.
 
-*/
+ */
 bool SelectFromExample(const NnetExample &eg,
-                       std::string frame_str,
-                       int32 left_context,
-                       int32 right_context,
-                       int32 frame_shift,
-                       NnetExample *eg_out) {
+    std::string frame_str,
+    int32 left_context,
+    int32 right_context,
+    int32 frame_shift,
+    NnetExample *eg_out) {
   static bool warned_left = false, warned_right = false;
   int32 min_input_t, max_input_t,
       min_output_t, max_output_t;
@@ -256,7 +256,7 @@ bool SelectFromExample(const NnetExample &eg,
                  << ", but example only has left-context of "
                  <<  (min_output_t - min_input_t)
                  << " (will warn only once; this may be harmless if "
-          "using any --*left-context-initial options)";
+        "using any --*left-context-initial options)";
     }
     min_input_t = std::max(min_input_t, min_output_t - left_context);
   }
@@ -264,10 +264,10 @@ bool SelectFromExample(const NnetExample &eg,
     if (!warned_right && max_input_t < max_output_t + right_context) {
       warned_right = true;
       KALDI_WARN << "You requested --right-context=" << right_context
-                << ", but example only has right-context of "
-                <<  (max_input_t - max_output_t)
+                 << ", but example only has right-context of "
+                 <<  (max_input_t - max_output_t)
                  << " (will warn only once; this may be harmless if "
-            "using any --*right-context-final options.";
+        "using any --*right-context-final options.";
     }
     max_input_t = std::min(max_input_t, max_output_t + right_context);
   }
@@ -320,7 +320,7 @@ int main(int argc, char *argv[]) {
     // you can set frame to a number to select a single frame with a particular
     // offset, or to 'random' to select a random single frame.
     std::string frame_str,
-      eg_weight_rspecifier, eg_output_name_rspecifier;
+        eg_weight_rspecifier, eg_output_name_rspecifier;
 
     ParseOptions po(usage);
     po.Register("random", &random, "If true, will write frames to output "

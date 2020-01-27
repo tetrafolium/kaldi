@@ -27,13 +27,13 @@ namespace kaldi {
 typedef kaldi::int32 int32;
 
 OnlineTcpVectorSource::OnlineTcpVectorSource(int32 socket)
-    : socket_desc(socket),
-      connected(true),
-      pack_size(512),
-      frame_size(512),
-      last_pack_size(0),
-      last_pack_rem(0),
-      samples_processed(0) {
+  : socket_desc(socket),
+  connected(true),
+  pack_size(512),
+  frame_size(512),
+  last_pack_size(0),
+  last_pack_rem(0),
+  samples_processed(0) {
   pack = new char[pack_size];
   frame = new char[frame_size];
 }

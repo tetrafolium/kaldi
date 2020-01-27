@@ -49,8 +49,8 @@ namespace kaldi {
  */
 template <typename FST>
 class LatticeIncrementalOnlineDecoderTpl:
-      public LatticeIncrementalDecoderTpl<FST, decoder::BackpointerToken> {
- public:
+  public LatticeIncrementalDecoderTpl<FST, decoder::BackpointerToken> {
+public:
   using Arc = typename FST::Arc;
   using Label = typename Arc::Label;
   using StateId = typename Arc::StateId;
@@ -62,16 +62,16 @@ class LatticeIncrementalOnlineDecoderTpl:
   // This version of the constructor does not take ownership of
   // 'fst'.
   LatticeIncrementalOnlineDecoderTpl(const FST &fst,
-    const TransitionModel &trans_model,
-                                const LatticeIncrementalDecoderConfig &config):
-      LatticeIncrementalDecoderTpl<FST, Token>(fst, trans_model, config) { }
+      const TransitionModel &trans_model,
+      const LatticeIncrementalDecoderConfig &config) :
+    LatticeIncrementalDecoderTpl<FST, Token>(fst, trans_model, config) { }
 
   // This version of the initializer takes ownership of 'fst', and will delete
   // it when this object is destroyed.
   LatticeIncrementalOnlineDecoderTpl(const LatticeIncrementalDecoderConfig &config,
-                                FST *fst,
-    const TransitionModel &trans_model):
-      LatticeIncrementalDecoderTpl<FST, Token>(config, fst, trans_model) { }
+      FST *fst,
+      const TransitionModel &trans_model) :
+    LatticeIncrementalDecoderTpl<FST, Token>(config, fst, trans_model) { }
 
 
   struct BestPathIterator {
@@ -82,7 +82,7 @@ class LatticeIncrementalOnlineDecoderTpl:
     // iterator (assuming it's not an epsilon transition).  Note that this
     // is one less than you might reasonably expect, e.g. it's -1 for
     // the nonemitting transitions before the first frame.
-    BestPathIterator(void *t, int32 f): tok(t), frame(f) { }
+    BestPathIterator(void *t, int32 f) : tok(t), frame(f) { }
     bool Done() { return tok == NULL; }
   };
 
@@ -96,7 +96,7 @@ class LatticeIncrementalOnlineDecoderTpl:
   /// final-state of the graph then it will include those as final-probs, else
   /// it will treat all final-probs as one.
   bool GetBestPath(Lattice *ofst,
-                   bool use_final_probs = true) const;
+      bool use_final_probs = true) const;
 
 
 
@@ -108,7 +108,7 @@ class LatticeIncrementalOnlineDecoderTpl:
   /// *final_cost (if non-NULL).
   /// Requires that NumFramesDecoded() > 0.
   BestPathIterator BestPathEnd(bool use_final_probs,
-                               BaseFloat *final_cost = NULL) const;
+      BaseFloat *final_cost = NULL) const;
 
 
   /// This function can be used in conjunction with BestPathEnd() to trace back
@@ -119,7 +119,7 @@ class LatticeIncrementalOnlineDecoderTpl:
   /// the ilabel and olabel, and the (graph and acoustic) weight to the "arc" pointer,
   /// while leaving its "nextstate" variable unchanged.
   BestPathIterator TraceBackBestPath(
-      BestPathIterator iter, LatticeArc *arc) const;
+    BestPathIterator iter, LatticeArc *arc) const;
 
   KALDI_DISALLOW_COPY_AND_ASSIGN(LatticeIncrementalOnlineDecoderTpl);
 };

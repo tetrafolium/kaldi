@@ -33,9 +33,9 @@ namespace nnet3 {
    out into their own AddRows() commands).
  */
 void GetSubmatCounts(
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    std::unordered_map<int32,int32> *submat_counts,
-    std::vector<int32> *submats_with_large_counts) {
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  std::unordered_map<int32,int32> *submat_counts,
+  std::vector<int32> *submats_with_large_counts) {
   auto iter = submat_lists.begin(), end = submat_lists.end();
   for (; iter != end; ++iter) {
     std::vector<std::pair<int32, int32> >::const_iterator
@@ -71,10 +71,10 @@ void GetSubmatCounts(
    into 'split_lists') to 'reduced_submat_lists'.
  */
 void SeparateSubmatsWithLargeCounts(
-    const std::vector<int32> &submats_to_separate,
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    std::vector<std::vector<std::pair<int32, int32> > > *reduced_submat_lists,
-    std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
+  const std::vector<int32> &submats_to_separate,
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  std::vector<std::vector<std::pair<int32, int32> > > *reduced_submat_lists,
+  std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
   KALDI_ASSERT(split_lists->empty() && !submats_to_separate.empty());
   size_t num_to_separate = submats_to_separate.size(),
       num_rows = submat_lists.size();
@@ -91,7 +91,7 @@ void SeparateSubmatsWithLargeCounts(
     std::vector<std::pair<int32, int32> >::const_iterator
         iter = submat_lists[row].begin(), end = submat_lists[row].end();
     std::vector<std::pair<int32, int32> >
-        &reduced_list = (*reduced_submat_lists)[row];
+    &reduced_list = (*reduced_submat_lists)[row];
     // 'reduced_lists' will contain the pairs that don't make it into
     // 'split_lists'.
     for (; iter != end; ++iter) {
@@ -118,8 +118,8 @@ void SeparateSubmatsWithLargeCounts(
 }
 
 void SplitLocations(
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
   size_t num_rows = submat_lists.size(),
       num_output_lists = 0;
   auto iter = submat_lists.begin(), end = submat_lists.end();
@@ -188,9 +188,9 @@ void SplitLocations(
    .second elements into "second_values", and return true.  Otherwise return
    false and the outputs are don't-cares. */
 bool ConvertToIndexes(
-    const std::vector<std::pair<int32, int32> > &location_vector,
-    int32 *first_value,
-    std::vector<int32> *second_values)  {
+  const std::vector<std::pair<int32, int32> > &location_vector,
+  int32 *first_value,
+  std::vector<int32> *second_values)  {
   *first_value = -1;
   second_values->clear();
   second_values->reserve(location_vector.size());
@@ -212,8 +212,8 @@ bool ConvertToIndexes(
 
 // see declaration in header for documentation
 void EnsureContiguousProperty(
-    const std::vector<int32> &indexes,
-    std::vector<std::vector<int32> > *indexes_out) {
+  const std::vector<int32> &indexes,
+  std::vector<std::vector<int32> > *indexes_out) {
   indexes_out->clear();
   indexes_out->reserve(3);
   if (indexes.empty()) return;
@@ -276,12 +276,12 @@ void EnsureContiguousProperty(
                      repeats other than the pair (-1,-1), e.g. if the pair
                      (10,11) appears 4 times in 'list' and that is the most,
                      split_lists->size() == 4.
-*/
+ */
 void SplitPairList(std::vector<std::pair<int32, int32> >& list,
-                   std::vector<std::vector<std::pair<int32, int32> > >* split_lists) {
+    std::vector<std::vector<std::pair<int32, int32> > >* split_lists) {
   split_lists->clear();
   typedef unordered_map<std::pair<int32, int32>,
-                        int32, PairHasher<int32> > MapType;
+          int32, PairHasher<int32> > MapType;
   // this maps a pair not equal to -1,-1, to the number of times we've already seen it.
   MapType pair_to_count;
   int32 cur_num_lists = 0;
@@ -309,8 +309,8 @@ void SplitPairList(std::vector<std::pair<int32, int32> >& list,
 }
 
 void SplitLocationsBackward(
-    const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
-    std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
+  const std::vector<std::vector<std::pair<int32, int32> > > &submat_lists,
+  std::vector<std::vector<std::pair<int32, int32> > > *split_lists) {
   std::vector<std::vector<std::pair<int32, int32> > > split_lists_intermediate;
   // Split the submat_lists
   SplitLocations(submat_lists, &split_lists_intermediate);
@@ -367,8 +367,8 @@ void SplitLocationsBackward(
 // so that indexes[j] == i for all j such that (*reverse_indexes)[i].first <= j
 // && j < (*reverse_indexes)[i].second.
 bool HasContiguousProperty(
-    const std::vector<int32> &indexes,
-    std::vector<std::pair<int32, int32> > *reverse_indexes) {
+  const std::vector<int32> &indexes,
+  std::vector<std::pair<int32, int32> > *reverse_indexes) {
   reverse_indexes->clear();
   int32 num_indexes = indexes.size();
   if (num_indexes == 0)
@@ -414,17 +414,17 @@ bool HasContiguousProperty(
 
 // see comment in header.
 void GetNxList(const std::vector<Index> &indexes,
-               std::vector<std::pair<int32, int32> > *pairs) {
+    std::vector<std::pair<int32, int32> > *pairs) {
   // set of (n,x) pairs
   std::unordered_set<std::pair<int32, int32>, PairHasher<int32> > n_x_set;
 
   for (std::vector<Index>::const_iterator iter = indexes.begin();
-       iter != indexes.end(); ++iter)
+      iter != indexes.end(); ++iter)
     n_x_set.insert(std::pair<int32, int32>(iter->n, iter->x));
   pairs->clear();
   pairs->reserve(n_x_set.size());
   for (std::unordered_set<std::pair<int32, int32>, PairHasher<int32> >::iterator
-           iter = n_x_set.begin(); iter != n_x_set.end(); ++iter)
+      iter = n_x_set.begin(); iter != n_x_set.end(); ++iter)
     pairs->push_back(*iter);
   std::sort(pairs->begin(), pairs->end());
 }
@@ -432,18 +432,18 @@ void GetNxList(const std::vector<Index> &indexes,
 
 // see comment in header.
 void GetTList(const std::vector<Index> &indexes,
-              std::vector<int32> *t_values) {
+    std::vector<int32> *t_values) {
   // set of t values
   std::unordered_set<int32> t_set;
 
   for (std::vector<Index>::const_iterator iter = indexes.begin();
-       iter != indexes.end(); ++iter)
+      iter != indexes.end(); ++iter)
     if (iter->t != kNoTime)
       t_set.insert(iter->t);
   t_values->clear();
   t_values->reserve(t_set.size());
   for (std::unordered_set<int32>::iterator iter = t_set.begin();
-       iter != t_set.end(); ++iter)
+      iter != t_set.end(); ++iter)
     t_values->push_back(*iter);
   std::sort(t_values->begin(), t_values->end());
 }

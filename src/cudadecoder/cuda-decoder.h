@@ -39,12 +39,12 @@ struct CudaDecoderConfig {
   int32 max_active;
 
   CudaDecoderConfig()
-      : default_beam(15.0),
-        lattice_beam(10.0),
-        ntokens_pre_allocated(2000000),
-        main_q_capacity(-1),
-        aux_q_capacity(-1),
-        max_active(10000) {}
+    : default_beam(15.0),
+    lattice_beam(10.0),
+    ntokens_pre_allocated(2000000),
+    main_q_capacity(-1),
+    aux_q_capacity(-1),
+    max_active(10000) {}
 
   void Register(OptionsItf *opts) {
     opts->Register("beam", &default_beam,
@@ -64,40 +64,40 @@ struct CudaDecoderConfig {
                    "reducing performance.");
     std::ostringstream main_q_capacity_desc;
     main_q_capacity_desc
-        << "Advanced - Capacity of the main queue : Maximum number of "
-           "tokens that can be stored *after* pruning for each frame. "
-           "Lower -> less memory usage, Higher -> More accurate. "
-           "Tokens stored in the main queue were already selected "
-           "through a max-active pre-selection. It means that for each "
-           "emitting/non-emitting iteration, we can add at most "
-           "~max-active tokens to the main queue. Typically only the "
-           "emitting iteration creates a large number of tokens. Using "
-           "main-q-capacity=k*max-active with k=4..10 should be safe. "
-           "If main-q-capacity is too small, we will print a warning "
-           "but prevent the overflow. The computation can safely "
-           "continue, but the quality of the output may decrease "
-           "(-1 = set to "
-        << KALDI_CUDA_DECODER_MAX_ACTIVE_MAIN_Q_CAPACITY_FACTOR
-        << "*max-active).";
+      << "Advanced - Capacity of the main queue : Maximum number of "
+      "tokens that can be stored *after* pruning for each frame. "
+      "Lower -> less memory usage, Higher -> More accurate. "
+      "Tokens stored in the main queue were already selected "
+      "through a max-active pre-selection. It means that for each "
+      "emitting/non-emitting iteration, we can add at most "
+      "~max-active tokens to the main queue. Typically only the "
+      "emitting iteration creates a large number of tokens. Using "
+      "main-q-capacity=k*max-active with k=4..10 should be safe. "
+      "If main-q-capacity is too small, we will print a warning "
+      "but prevent the overflow. The computation can safely "
+      "continue, but the quality of the output may decrease "
+      "(-1 = set to "
+      << KALDI_CUDA_DECODER_MAX_ACTIVE_MAIN_Q_CAPACITY_FACTOR
+      << "*max-active).";
     opts->Register("main-q-capacity", &main_q_capacity,
                    main_q_capacity_desc.str());
     std::ostringstream aux_q_capacity_desc;
     aux_q_capacity_desc
-        << "Advanced - Capacity of the auxiliary queue : Maximum "
-           "number of raw tokens that can be stored *before* pruning "
-           "for each frame. Lower -> less memory usage, Higher -> More "
-           "accurate. During the tokens generation, if we detect that "
-           "we are getting close to saturating that capacity, we will "
-           "reduce the beam dynamically (adaptive beam) to keep only "
-           "the best tokens in the remaining space. If the aux queue "
-           "is still too small, we will print an overflow warning, but "
-           "prevent the overflow. The computation can safely continue, "
-           "but the quality of the output may decrease. We strongly "
-           "recommend keeping aux-q-capacity large (>400k), to avoid "
-           "triggering the adaptive beam and/or the overflow "
-           "(-1 = set to "
-        << KALDI_CUDA_DECODER_AUX_Q_MAIN_Q_CAPACITIES_FACTOR
-        << "*main-q-capacity).";
+      << "Advanced - Capacity of the auxiliary queue : Maximum "
+      "number of raw tokens that can be stored *before* pruning "
+      "for each frame. Lower -> less memory usage, Higher -> More "
+      "accurate. During the tokens generation, if we detect that "
+      "we are getting close to saturating that capacity, we will "
+      "reduce the beam dynamically (adaptive beam) to keep only "
+      "the best tokens in the remaining space. If the aux queue "
+      "is still too small, we will print an overflow warning, but "
+      "prevent the overflow. The computation can safely continue, "
+      "but the quality of the output may decrease. We strongly "
+      "recommend keeping aux-q-capacity large (>400k), to avoid "
+      "triggering the adaptive beam and/or the overflow "
+      "(-1 = set to "
+      << KALDI_CUDA_DECODER_AUX_Q_MAIN_Q_CAPACITIES_FACTOR
+      << "*main-q-capacity).";
     opts->Register("aux-q-capacity", &aux_q_capacity,
                    aux_q_capacity_desc.str());
   }
@@ -124,7 +124,7 @@ class DeviceParams;
 class KernelParams;
 
 class CudaDecoder {
- public:
+public:
   // Creating a new CudaDecoder, associated to the FST fst
   // nlanes and nchannels are defined as follow
 
@@ -173,7 +173,7 @@ class CudaDecoder {
   // If the GPU is saturated at nlanes=200,
   // you should not increase that number
   CudaDecoder(const CudaFst &fst, const CudaDecoderConfig &config, int32 nlanes,
-              int32 nchannels);
+      int32 nchannels);
 
   // Reads the config from config
   void ReadConfig(const CudaDecoderConfig &config);
@@ -182,8 +182,8 @@ class CudaDecoder {
   // utterances at a time,
   // we can use nchannels = 10
   CudaDecoder(const CudaFst &fst, const CudaDecoderConfig &config,
-              int32 nchannels)
-      : CudaDecoder(fst, config, nchannels, nchannels) {}
+      int32 nchannels)
+    : CudaDecoder(fst, config, nchannels, nchannels) {}
   ~CudaDecoder();
 
   // InitDecoding initializes the decoding, and should only be used if you
@@ -213,8 +213,8 @@ class CudaDecoder {
   // If max_num_frames is >= 0 it will decode no more than
   // that many frames.
   void AdvanceDecoding(const std::vector<ChannelId> &channels,
-                       std::vector<CudaDecodableInterface *> &decodables,
-                       int32 max_num_frames = -1);
+      std::vector<CudaDecodableInterface *> &decodables,
+      int32 max_num_frames = -1);
 
   // Returns the number of frames already decoded in a given channel
   int32 NumFramesDecoded(ChannelId ichannel) const;
@@ -224,8 +224,8 @@ class CudaDecoder {
   // otherwise it gets the most likely token not taking into account
   // final-probs.
   void GetBestPath(const std::vector<ChannelId> &channels,
-                   std::vector<Lattice *> &fst_out_vec,
-                   bool use_final_probs = true);
+      std::vector<Lattice *> &fst_out_vec,
+      bool use_final_probs = true);
   // It is possible to use a threadsafe version of GetRawLattice, which is
   // ConcurrentGetRawLatticeSingleChannel()
   // Which will do the heavy CPU work associated with GetRawLattice
@@ -241,9 +241,9 @@ class CudaDecoder {
   // on some cpu thread : Call ConcurrentGetRawLatticeSingleChannel on channel 8
   // on some cpu thread : Call ConcurrentGetRawLatticeSingleChannel on channel 6
   void PrepareForGetRawLattice(const std::vector<ChannelId> &channels,
-                               bool use_final_probs);
+      bool use_final_probs);
   void ConcurrentGetRawLatticeSingleChannel(ChannelId ichannel,
-                                            Lattice *fst_out);
+      Lattice *fst_out);
 
   // GetRawLattice gets the lattice decoding traceback (using the lattice-beam
   // in the CudaConfig parameters).
@@ -252,7 +252,7 @@ class CudaDecoder {
   // otherwise it gets the most likely token not taking into account
   // final-probs.
   void GetRawLattice(const std::vector<ChannelId> &channels,
-                     std::vector<Lattice *> &fst_out_vec, bool use_final_probs);
+      std::vector<Lattice *> &fst_out_vec, bool use_final_probs);
   // GetBestCost finds the best cost in the last tokens queue
   // for each channel in channels. If isfinal is true,
   // we also add the final cost to the token costs before
@@ -263,10 +263,10 @@ class CudaDecoder {
   // final state
   // exists in the last token queue of that channel
   void GetBestCost(
-      const std::vector<ChannelId> &channels, bool isfinal,
-      std::vector<std::pair<int32, CostType>> *argmins,
-      std::vector<std::vector<std::pair<int, float>>> *list_lattice_tokens,
-      std::vector<bool> *has_reached_final);
+    const std::vector<ChannelId> &channels, bool isfinal,
+    std::vector<std::pair<int32, CostType> > *argmins,
+    std::vector<std::vector<std::pair<int, float> > > *list_lattice_tokens,
+    std::vector<bool> *has_reached_final);
   // (optional) Giving the decoder access to the cpu thread pool
   // We will use it to compute specific CPU work, such as InitDecodingH2HCopies
   // For recurrent CPU work, such as ComputeH2HCopies, we will use dedicated CPU
@@ -274,7 +274,7 @@ class CudaDecoder {
   // We will launch nworkers of those threads
   void SetThreadPoolAndStartCPUWorkers(ThreadPool *thread_pool, int32 nworkers);
 
- private:
+private:
   // Data allocation. Called in constructor
   void AllocateDeviceData();
   void AllocateHostData();
@@ -303,8 +303,8 @@ class CudaDecoder {
   // executing). If max_num_frames
   // is > 0, we apply that ceiling to the NumFramesToDecode.
   int32 NumFramesToDecode(const std::vector<ChannelId> &channels,
-                          std::vector<CudaDecodableInterface *> &decodables,
-                          int32 max_num_frames);
+      std::vector<CudaDecodableInterface *> &decodables,
+      int32 max_num_frames);
   // Expand the arcs, emitting stage. Must be called after
   // a preprocess_in_place, which happens in PostProcessingMainQueue.
   // ExpandArcsEmitting is called first when decoding a frame,
@@ -417,10 +417,10 @@ class CudaDecoder {
 
   template <typename T>
   void MoveConcatenatedCopyToVector(const LaneId ilane,
-                                    const ChannelId ichannel,
-                                    const std::vector<int32> &lanes_offsets,
-                                    T *h_concat,
-                                    std::vector<std::vector<T>> *vecvec);
+      const ChannelId ichannel,
+      const std::vector<int32> &lanes_offsets,
+      T *h_concat,
+      std::vector<std::vector<T> > *vecvec);
   void WaitForH2HCopies();
   void WaitForInitDecodingH2HCopies();
   // Computes a set of static asserts on the static values
@@ -658,14 +658,14 @@ class CudaDecoder {
   // Keep track of the number of frames decoded in the current file.
   std::vector<int32> num_frames_decoded_;
   // Offsets of each frame in h_all_tokens_info_
-  std::vector<std::vector<int32>> frame_offsets_;
+  std::vector<std::vector<int32> > frame_offsets_;
   // Data storage. We store on host what we will need in
   // GetRawLattice/GetBestPath
-  std::vector<std::vector<InfoToken>> h_all_tokens_info_;
-  std::vector<std::vector<CostType>> h_all_tokens_acoustic_cost_;
-  std::vector<std::vector<InfoToken>> h_all_tokens_extra_prev_tokens_;
-  std::vector<std::vector<float2>>
-      h_all_tokens_extra_prev_tokens_extra_and_acoustic_cost_;
+  std::vector<std::vector<InfoToken> > h_all_tokens_info_;
+  std::vector<std::vector<CostType> > h_all_tokens_acoustic_cost_;
+  std::vector<std::vector<InfoToken> > h_all_tokens_extra_prev_tokens_;
+  std::vector<std::vector<float2> >
+  h_all_tokens_extra_prev_tokens_extra_and_acoustic_cost_;
   std::vector<std::mutex> channel_lock_;  // at some point we should switch to a
                                           // shared_lock (to be able to compute
                                           // partial lattices while still
@@ -675,8 +675,8 @@ class CudaDecoder {
   // For each channel, set by PrepareForGetRawLattice
   // argmin cost, list of the tokens within [best_cost;best_cost+lattice_beam]
   // and if we've reached a final token. Set by PrepareForGetRawLattice.
-  std::vector<std::pair<int32, CostType>> h_all_argmin_cost_;
-  std::vector<std::vector<std::pair<int, float>>> h_all_final_tokens_list_;
+  std::vector<std::pair<int32, CostType> > h_all_argmin_cost_;
+  std::vector<std::vector<std::pair<int, float> > > h_all_final_tokens_list_;
   std::vector<bool> h_all_has_reached_final_;
 
   // Pinned memory arrays. Used for the DeviceToHost copies
@@ -694,10 +694,10 @@ class CudaDecoder {
   std::vector<int32> h_emitting_main_q_end_lane_offsets_;
   std::vector<int32> h_n_extra_prev_tokens_lane_offsets_;
   // Used when calling GetBestCost
-  std::vector<std::pair<int32, CostType>> argmins_;
+  std::vector<std::pair<int32, CostType> > argmins_;
   std::vector<bool> has_reached_final_;
-  std::vector<std::vector<std::pair<int32, CostType>>>
-      list_finals_token_idx_and_cost_;
+  std::vector<std::vector<std::pair<int32, CostType> > >
+  list_finals_token_idx_and_cost_;
   bool compute_max_active_;
   cudaEvent_t nnet3_done_evt_;
   cudaEvent_t d2h_copy_acoustic_evt_;
@@ -730,8 +730,8 @@ class CudaDecoder {
   typedef StateId OutputLatticeState;
   typedef int32 TokenId;
   LatticeStateInternalId GetLatticeStateInternalId(int32 total_ntokens,
-                                                   TokenId token_idx,
-                                                   InfoToken token);
+      TokenId token_idx,
+      InfoToken token);
   // Keeping track of a variety of info about states in the lattice
   // - token_extra_cost. A path going from the current lattice_state to the
   // end has an extra cost
@@ -783,65 +783,65 @@ class CudaDecoder {
   // structures
   // (such as q_curr_frame_todo_, or curr_f_raw_lattice_state_) accordingly
   void AddFinalTokensToLattice(
-      ChannelId ichannel,
-      std::vector<std::pair<TokenId, InfoToken>> *q_curr_frame_todo,
-      std::unordered_map<LatticeStateInternalId, RawLatticeState>
-          *curr_f_raw_lattice_state,
-      Lattice *fst_out);
+    ChannelId ichannel,
+    std::vector<std::pair<TokenId, InfoToken> > *q_curr_frame_todo,
+    std::unordered_map<LatticeStateInternalId, RawLatticeState>
+    *curr_f_raw_lattice_state,
+    Lattice *fst_out);
   // Check if a token should be added to the lattice. If it should, then
   // keep_arc will be true
   void ConsiderTokenForLattice(
-      ChannelId ichannel, int32 iprev, int32 total_ntokens, TokenId token_idx,
-      OutputLatticeState fst_lattice_start, InfoToken *tok_beg,
-      float2 *arc_extra_cost_beg, CostType token_extra_cost,
-      TokenId list_prev_token_idx, int32 list_arc_idx,
-      InfoToken *list_prev_token, CostType *this_arc_prev_token_extra_cost,
-      CostType *acoustic_cost, OutputLatticeState *lattice_src_state,
-      bool *keep_arc, bool *dbg_found_zero);
+    ChannelId ichannel, int32 iprev, int32 total_ntokens, TokenId token_idx,
+    OutputLatticeState fst_lattice_start, InfoToken *tok_beg,
+    float2 *arc_extra_cost_beg, CostType token_extra_cost,
+    TokenId list_prev_token_idx, int32 list_arc_idx,
+    InfoToken *list_prev_token, CostType *this_arc_prev_token_extra_cost,
+    CostType *acoustic_cost, OutputLatticeState *lattice_src_state,
+    bool *keep_arc, bool *dbg_found_zero);
   // Add the arc to the lattice. Also updates what needs to be updated in the
   // GetRawLattice datastructures.
   void AddArcToLattice(
-      int32 list_arc_idx, TokenId list_prev_token_idx,
-      InfoToken list_prev_token, int32 curr_frame_offset,
-      CostType acoustic_cost, CostType this_arc_prev_token_extra_cost,
-      LatticeStateInternalId src_state_internal_id,
-      OutputLatticeState fst_lattice_start,
-      OutputLatticeState to_fst_lattice_state,
-      std::vector<std::pair<TokenId, InfoToken>> *q_curr_frame_todo,
-      std::vector<std::pair<TokenId, InfoToken>> *q_prev_frame_todo,
-      std::unordered_map<LatticeStateInternalId, RawLatticeState>
-          *curr_f_raw_lattice_state,
-      std::unordered_map<LatticeStateInternalId, RawLatticeState>
-          *prev_f_raw_lattice_state,
-      std::unordered_set<int32> *f_arc_idx_added, Lattice *fst_out,
-      bool *must_replay_frame);
+    int32 list_arc_idx, TokenId list_prev_token_idx,
+    InfoToken list_prev_token, int32 curr_frame_offset,
+    CostType acoustic_cost, CostType this_arc_prev_token_extra_cost,
+    LatticeStateInternalId src_state_internal_id,
+    OutputLatticeState fst_lattice_start,
+    OutputLatticeState to_fst_lattice_state,
+    std::vector<std::pair<TokenId, InfoToken> > *q_curr_frame_todo,
+    std::vector<std::pair<TokenId, InfoToken> > *q_prev_frame_todo,
+    std::unordered_map<LatticeStateInternalId, RawLatticeState>
+    *curr_f_raw_lattice_state,
+    std::unordered_map<LatticeStateInternalId, RawLatticeState>
+    *prev_f_raw_lattice_state,
+    std::unordered_set<int32> *f_arc_idx_added, Lattice *fst_out,
+    bool *must_replay_frame);
   // Read a token information
   void GetTokenRawLatticeData(
-      TokenId token_idx, InfoToken token, int32 total_ntokens,
-      std::unordered_map<LatticeStateInternalId, RawLatticeState>
-          *curr_f_raw_lattice_state,
-      CostType *token_extra_cost, OutputLatticeState *to_fst_lattice_state);
+    TokenId token_idx, InfoToken token, int32 total_ntokens,
+    std::unordered_map<LatticeStateInternalId, RawLatticeState>
+    *curr_f_raw_lattice_state,
+    CostType *token_extra_cost, OutputLatticeState *to_fst_lattice_state);
 
   // A token is an instance of an arc. It goes to a FST state (token.next_state)
   // Multiple token in the same frame can go to the same FST state.
   // GetSameFSTStateTokenList
   // returns that list
   void GetSameFSTStateTokenList(ChannelId ichannel, InfoToken &token,
-                                InfoToken **tok_beg,
-                                float2 **arc_extra_cost_beg, int32 *nprevs);
+      InfoToken **tok_beg,
+      float2 **arc_extra_cost_beg, int32 *nprevs);
 
   // Swap datastructures at the end of a frame. prev becomes curr (we go
   // backward)
   //
   void SwapPrevAndCurrLatticeMap(
-      int32 iframe, bool dbg_found_best_path,
-      std::vector<std::pair<TokenId, InfoToken>> *q_curr_frame_todo,
-      std::vector<std::pair<TokenId, InfoToken>> *q_prev_frame_todo,
-      std::unordered_map<LatticeStateInternalId, RawLatticeState>
-          *curr_f_raw_lattice_state,
-      std::unordered_map<LatticeStateInternalId, RawLatticeState>
-          *prev_f_raw_lattice_state,
-      std::unordered_set<int32> *f_arc_idx_added);
+    int32 iframe, bool dbg_found_best_path,
+    std::vector<std::pair<TokenId, InfoToken> > *q_curr_frame_todo,
+    std::vector<std::pair<TokenId, InfoToken> > *q_prev_frame_todo,
+    std::unordered_map<LatticeStateInternalId, RawLatticeState>
+    *curr_f_raw_lattice_state,
+    std::unordered_map<LatticeStateInternalId, RawLatticeState>
+    *prev_f_raw_lattice_state,
+    std::unordered_set<int32> *f_arc_idx_added);
   KALDI_DISALLOW_COPY_AND_ASSIGN(CudaDecoder);
 };
 

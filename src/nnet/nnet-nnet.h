@@ -35,23 +35,23 @@ namespace kaldi {
 namespace nnet1 {
 
 class Nnet {
- public:
+public:
   Nnet();
   ~Nnet();
 
   Nnet(const Nnet& other);  // Allow copy constructor.
   Nnet& operator= (const Nnet& other);  // Allow assignment operator.
 
- public:
+public:
   /// Perform forward pass through the network,
   void Propagate(const CuMatrixBase<BaseFloat> &in,
-                 CuMatrix<BaseFloat> *out);
+      CuMatrix<BaseFloat> *out);
   /// Perform backward pass through the network,
   void Backpropagate(const CuMatrixBase<BaseFloat> &out_diff,
-                     CuMatrix<BaseFloat> *in_diff);
+      CuMatrix<BaseFloat> *in_diff);
   /// Perform forward pass through the network (with 2 swapping buffers),
   void Feedforward(const CuMatrixBase<BaseFloat> &in,
-                   CuMatrix<BaseFloat> *out);
+      CuMatrix<BaseFloat> *out);
 
   /// Dimensionality on network input (input feature dim.),
   int32 InputDim() const;
@@ -164,7 +164,7 @@ class Nnet {
     return opts_;
   }
 
- private:
+private:
   /// Vector which contains all the components composing the neural network,
   /// the components are for example: AffineTransform, Sigmoid, Softmax
   std::vector<Component*> components_;

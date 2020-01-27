@@ -28,9 +28,9 @@
 #include "fstext/kaldi-fst-io.h"
 
 /* some test  examples:
- ( echo "0 0 0 0"; echo "0 0" ) | fstcompile | fstminimizeencoded | fstprint
- ( echo "0 1 0 0"; echo " 0 2 0 0"; echo "1 0"; echo "2 0"; ) | fstcompile | fstminimizeencoded | fstprint
-*/
+   ( echo "0 0 0 0"; echo "0 0" ) | fstcompile | fstminimizeencoded | fstprint
+   ( echo "0 1 0 0"; echo " 0 2 0 0"; echo "1 0"; echo "2 0"; ) | fstcompile | fstminimizeencoded | fstprint
+ */
 
 int main(int argc, char *argv[]) {
   try {
@@ -55,9 +55,9 @@ int main(int argc, char *argv[]) {
 
     std::string fst_in_filename = po.GetOptArg(1),
         fst_out_filename = po.GetOptArg(2);
-    
+
     VectorFst<StdArc> *fst = ReadFstKaldi(fst_in_filename);
-    
+
     MinimizeEncoded(fst, delta);
 
     WriteFstKaldi(*fst, fst_out_filename);

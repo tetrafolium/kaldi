@@ -41,13 +41,13 @@ namespace kaldi {
 /// the resulting step size \k should be close to 1. If \k <<1 or >>1, there
 /// maybe problems with preconditioning or the speaker stats.
 static BaseFloat CalBasisFmllrStepSize(
-    const AffineXformStats &spk_stats,
-    const Matrix<BaseFloat> &spk_stats_tmp_K,
-    const std::vector<SpMatrix<BaseFloat> > &spk_stats_tmp_G,
-    const Matrix<BaseFloat> &delta,
-    const Matrix<BaseFloat> &A,
-    const Matrix<BaseFloat> &S,
-    int32 max_iters);
+  const AffineXformStats &spk_stats,
+  const Matrix<BaseFloat> &spk_stats_tmp_K,
+  const std::vector<SpMatrix<BaseFloat> > &spk_stats_tmp_G,
+  const Matrix<BaseFloat> &delta,
+  const Matrix<BaseFloat> &A,
+  const Matrix<BaseFloat> &S,
+  int32 max_iters);
 
 
 void BasisFmllrAccus::Write(std::ostream &os, bool binary) const {
@@ -64,7 +64,7 @@ void BasisFmllrAccus::Write(std::ostream &os, bool binary) const {
 }
 
 void BasisFmllrAccus::Read(std::istream &is, bool binary,
-                           bool add) {
+    bool add) {
   ExpectToken(is, binary, "<BASISFMLLRACCUS>");
   ExpectToken(is, binary, "<BETA>");
   double tmp_beta = 0;
@@ -89,7 +89,7 @@ void BasisFmllrAccus::ResizeAccus(int32 dim) {
 }
 
 void BasisFmllrAccus::AccuGradientScatter(
-                      const AffineXformStats &spk_stats) {
+  const AffineXformStats &spk_stats) {
 
   // Gradient of auxf w.r.t. xform_spk
   // Eq. (33)
@@ -98,8 +98,8 @@ void BasisFmllrAccus::AccuGradientScatter(
   grad_mat.Scale(spk_stats.beta_);
   grad_mat.AddMat(1.0, spk_stats.K_);
   for (int d = 0; d < dim_; ++d) {
-      Matrix<double> G_d_mat(spk_stats.G_[d]);
-       grad_mat.Row(d).AddVec(-1.0, G_d_mat.Row(d));
+    Matrix<double> G_d_mat(spk_stats.G_[d]);
+    grad_mat.Row(d).AddVec(-1.0, G_d_mat.Row(d));
   }
   // Row stack of gradient matrix
   Vector<BaseFloat> grad_vec((dim_+1) * dim_);
@@ -154,7 +154,7 @@ void BasisFmllrEstimate::Read(std::istream &is, bool binary) {
 }
 
 void BasisFmllrEstimate::ComputeAmDiagPrecond(const AmDiagGmm &am_gmm,
-                                              SpMatrix<double> *pre_cond) {
+    SpMatrix<double> *pre_cond) {
   KALDI_ASSERT(am_gmm.Dim() == dim_);
   if (pre_cond->NumRows() != (dim_ + 1) * dim_)
     pre_cond->Resize((dim_ + 1) * dim_, kSetZero);
@@ -164,7 +164,7 @@ void BasisFmllrEstimate::ComputeAmDiagPrecond(const AmDiagGmm &am_gmm,
   // expected values of fMLLR G statistics
   vector< SpMatrix<double> > G_hat(dim_);
   for (int32 d = 0; d < dim_; ++d)
-       G_hat[d].Resize(dim_ + 1, kSetZero);
+    G_hat[d].Resize(dim_ + 1, kSetZero);
 
   // extend mean vectors with 1  [mule_jm 1]
   Vector<double> extend_mean(dim_ + 1);
@@ -202,7 +202,7 @@ void BasisFmllrEstimate::ComputeAmDiagPrecond(const AmDiagGmm &am_gmm,
   // Eq. (31)
   for (int32 d = 0; d < dim_; d++) {
     H_mat.Range(d * (dim_ + 1), (dim_ + 1), d * (dim_ + 1), (dim_ + 1))
-              .CopyFromSp(G_hat[d]);
+    .CopyFromSp(G_hat[d]);
   }
 
   // add the extra H(1) elements
@@ -217,8 +217,8 @@ void BasisFmllrEstimate::ComputeAmDiagPrecond(const AmDiagGmm &am_gmm,
 }
 
 void BasisFmllrEstimate::EstimateFmllrBasis(
-                              const AmDiagGmm &am_gmm,
-                              const BasisFmllrAccus &basis_accus) {
+  const AmDiagGmm &am_gmm,
+  const BasisFmllrAccus &basis_accus) {
   // Compute the preconditioner
   SpMatrix<double> precond_mat((dim_ + 1) * dim_);
   ComputeAmDiagPrecond(am_gmm, &precond_mat);
@@ -264,14 +264,14 @@ void BasisFmllrEstimate::EstimateFmllrBasis(
   /// The sum of the [per-frame] eigenvalues is roughly equal to
   /// the improvement of log-likelihood of the training data.
   KALDI_LOG << "Sum of the [per-frame] eigenvalues, that is"
-          " the log-likelihood improvement, is " << Lvec_scaled.Sum();
+    " the log-likelihood improvement, is " << Lvec_scaled.Sum();
 }
 
 double BasisFmllrEstimate::ComputeTransform(
-    const AffineXformStats &spk_stats,
-    Matrix<BaseFloat> *out_xform,
-    Vector<BaseFloat> *coefficient,
-    BasisFmllrOptions options) const {
+  const AffineXformStats &spk_stats,
+  Matrix<BaseFloat> *out_xform,
+  Vector<BaseFloat> *coefficient,
+  BasisFmllrOptions options) const {
   if (coefficient == NULL) {
     Vector<BaseFloat> tmp;
     return ComputeTransform(spk_stats, out_xform, &tmp, options);
@@ -372,12 +372,12 @@ double BasisFmllrEstimate::ComputeTransform(
 
 // static
 BaseFloat CalBasisFmllrStepSize(const AffineXformStats &spk_stats,
-  const Matrix<BaseFloat> &spk_stats_tmp_K,
-  const std::vector<SpMatrix<BaseFloat> > &spk_stats_tmp_G,
-  const Matrix<BaseFloat> &delta,
-  const Matrix<BaseFloat> &A,
-  const Matrix<BaseFloat> &S,
-  int32 max_iters) {
+    const Matrix<BaseFloat> &spk_stats_tmp_K,
+    const std::vector<SpMatrix<BaseFloat> > &spk_stats_tmp_G,
+    const Matrix<BaseFloat> &delta,
+    const Matrix<BaseFloat> &A,
+    const Matrix<BaseFloat> &S,
+    int32 max_iters) {
 
   int32 dim = spk_stats.dim_;
   KALDI_ASSERT(dim == delta.NumRows() && dim == S.NumRows());
@@ -385,7 +385,7 @@ BaseFloat CalBasisFmllrStepSize(const AffineXformStats &spk_stats,
   SubMatrix<BaseFloat> delta_Dim(delta, 0, dim, 0, dim);
   // Eq. (46): b = tr(delta K^T) - tr(delta S^T)
   BaseFloat b = TraceMatMat(delta, spk_stats_tmp_K, kTrans)
-                 - TraceMatMat(delta, S, kTrans);
+      - TraceMatMat(delta, S, kTrans);
   // Eq. (47): c = sum_d tr(delta_{d} G_{d} delta_{d})
   BaseFloat c = 0;
   Vector<BaseFloat> G_row_delta(dim + 1);

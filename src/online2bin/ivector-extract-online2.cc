@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
       std::string spk = spk2utt_reader.Key();
       const std::vector<std::string> &uttlist = spk2utt_reader.Value();
       OnlineIvectorExtractorAdaptationState adaptation_state(
-          ivector_info);
+        ivector_info);
       for (size_t i = 0; i < uttlist.size(); i++) {
         std::string utt = uttlist[i];
         if (!feature_reader.HasKey(utt)) {
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
         OnlineMatrixFeature matrix_feature(feats);
 
         OnlineIvectorFeature ivector_feature(ivector_info,
-                                             &matrix_feature);
+            &matrix_feature);
 
         ivector_feature.SetAdaptationState(adaptation_state);
 
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
             num_ivectors = (T + n - 1) / n;
 
         Matrix<BaseFloat> ivectors(num_ivectors,
-                                   ivector_feature.Dim());
+            ivector_feature.Dim());
 
         for (int32 i = 0; i < num_ivectors; i++) {
           int32 t = i * n;

@@ -32,7 +32,7 @@
 namespace kaldi {
 
 class AccumAmDiagGmm {
- public:
+public:
   AccumAmDiagGmm() : total_frames_(0.0), total_log_like_(0.0) {}
   ~AccumAmDiagGmm();
 
@@ -49,28 +49,28 @@ class AccumAmDiagGmm {
   /// Accumulate stats for a single GMM in the model; returns log likelihood.
   /// This does not work with multiple feature transforms.
   BaseFloat AccumulateForGmm(const AmDiagGmm &model,
-                             const VectorBase<BaseFloat> &data,
-                             int32 gmm_index, BaseFloat weight);
+      const VectorBase<BaseFloat> &data,
+      int32 gmm_index, BaseFloat weight);
 
   /// Accumulate stats for a single GMM in the model; uses data1 for
   /// getting posteriors and data2 for stats. Returns log likelihood.
   BaseFloat AccumulateForGmmTwofeats(const AmDiagGmm &model,
-                                     const VectorBase<BaseFloat> &data1,
-                                     const VectorBase<BaseFloat> &data2,
-                                     int32 gmm_index, BaseFloat weight);
+      const VectorBase<BaseFloat> &data1,
+      const VectorBase<BaseFloat> &data2,
+      int32 gmm_index, BaseFloat weight);
 
   /// Accumulates stats for a single GMM in the model using pre-computed
   /// Gaussian posteriors.
   void AccumulateFromPosteriors(const AmDiagGmm &model,
-                                const VectorBase<BaseFloat> &data,
-                                int32 gmm_index,
-                                const VectorBase<BaseFloat> &posteriors);
+      const VectorBase<BaseFloat> &data,
+      int32 gmm_index,
+      const VectorBase<BaseFloat> &posteriors);
 
   /// Accumulate stats for a single Gaussian component in the model.
   void AccumulateForGaussian(const AmDiagGmm &am,
-                             const VectorBase<BaseFloat> &data,
-                             int32 gmm_index, int32 gauss_index,
-                             BaseFloat weight);
+      const VectorBase<BaseFloat> &data,
+      int32 gmm_index, int32 gauss_index,
+      BaseFloat weight);
 
   int32 NumAccs() { return gmm_accumulators_.size(); }
 
@@ -78,7 +78,7 @@ class AccumAmDiagGmm {
 
   BaseFloat TotStatsCount() const; // returns the total count got by summing the count
   // of the actual stats, may differ from TotCount() if e.g. you did I-smoothing.
-  
+
   // Be careful since total_frames_ is not updated in AccumulateForGaussian
   BaseFloat TotCount() const { return total_frames_; }
   BaseFloat TotLogLike() const { return total_log_like_; }
@@ -93,10 +93,10 @@ class AccumAmDiagGmm {
 
   int32 Dim() const {
     return (gmm_accumulators_.empty() || !gmm_accumulators_[0] ?
-            0 : gmm_accumulators_[0]->Dim());
+           0 : gmm_accumulators_[0]->Dim());
   }
 
- private:
+private:
   /// MLE accumulators and update methods for the GMMs
   std::vector<AccumDiagGmm*> gmm_accumulators_;
 
@@ -110,19 +110,19 @@ class AccumAmDiagGmm {
 /// for computing the maximum-likelihood estimates of the parameters of
 /// an acoustic model that uses diagonal Gaussian mixture models as emission densities.
 void MleAmDiagGmmUpdate(const MleDiagGmmOptions &config,
-                        const AccumAmDiagGmm &amdiaggmm_acc,
-                        GmmFlagsType flags,
-                        AmDiagGmm *am_gmm,
-                        BaseFloat *obj_change_out,
-                        BaseFloat *count_out);
+    const AccumAmDiagGmm &amdiaggmm_acc,
+    GmmFlagsType flags,
+    AmDiagGmm *am_gmm,
+    BaseFloat *obj_change_out,
+    BaseFloat *count_out);
 
 /// Maximum A Posteriori update.
 void MapAmDiagGmmUpdate(const MapDiagGmmOptions &config,
-                        const AccumAmDiagGmm &diag_gmm_acc,
-                        GmmFlagsType flags,
-                        AmDiagGmm *gmm,
-                        BaseFloat *obj_change_out,
-                        BaseFloat *count_out);
+    const AccumAmDiagGmm &diag_gmm_acc,
+    GmmFlagsType flags,
+    AmDiagGmm *gmm,
+    BaseFloat *obj_change_out,
+    BaseFloat *count_out);
 
 // These typedefs are needed to write GMMs to and from pipes, for MAP
 // adaptation and decoding.  Note: this doesn't handle the transition

@@ -67,16 +67,16 @@ struct EbwAmSgmm2Options {
   BaseFloat tau_Sigma; ///< Tau value for smoothing covariance-matrices Sigma.
   BaseFloat lrate_Sigma; ///< Learning rate used in updating Sigma-- default 0.5
   BaseFloat min_substate_weight; ///< Minimum allowed weight in a sub-state.
-  
+
   BaseFloat cov_min_value; ///< E.g. 0.5-- the maximum any eigenvalue of a covariance
   /// is allowed to change.  [this is the minimum; the maximum is the inverse of this,
   /// i.e. 2.0 in this case.  For example, 0.9 would constrain the covariance quite tightly,
   /// 0.1 would be a loose setting.
-  
+
   BaseFloat max_cond; ///< large value used in SolveQuadraticProblem.
   BaseFloat epsilon;  ///< very small value used in SolveQuadraticProblem; workaround
   /// for an issue in some implementations of SVD.
-  
+
   EbwAmSgmm2Options() {
     tau_v = 50.0;
     lrate_v = 0.5;
@@ -95,7 +95,7 @@ struct EbwAmSgmm2Options {
 
     min_substate_weight = 1.0e-05;
     cov_min_value = 0.5;
-    
+
     max_cond = 1.0e+05;
     epsilon = 1.0e-40;
   }
@@ -145,91 +145,91 @@ struct EbwAmSgmm2Options {
  *  Contains the functions needed to update the SGMM parameters.
  */
 class EbwAmSgmm2Updater {
- public:
-  explicit EbwAmSgmm2Updater(const EbwAmSgmm2Options &options):
-      options_(options) {}
-  
+public:
+  explicit EbwAmSgmm2Updater(const EbwAmSgmm2Options &options) :
+    options_(options) {}
+
   void Update(const MleAmSgmm2Accs &num_accs,
-              const MleAmSgmm2Accs &den_accs,
-              AmSgmm2 *model,
-              SgmmUpdateFlagsType flags,
-              BaseFloat *auxf_change_out,
-              BaseFloat *count_out);
-    
- protected:
+      const MleAmSgmm2Accs &den_accs,
+      AmSgmm2 *model,
+      SgmmUpdateFlagsType flags,
+      BaseFloat *auxf_change_out,
+      BaseFloat *count_out);
+
+protected:
   // The following two classes relate to multi-core parallelization of some
   // phases of the update.
   friend class EbwUpdateWClass;
   friend class EbwUpdatePhoneVectorsClass;
- private:
+private:
   EbwAmSgmm2Options options_;
 
   Vector<double> gamma_j_;  ///< State occupancies
 
   double UpdatePhoneVectors(const MleAmSgmm2Accs &num_accs,
-                            const MleAmSgmm2Accs &den_accs,
-                            const std::vector< SpMatrix<double> > &H,
-                            AmSgmm2 *model) const;
-  
+      const MleAmSgmm2Accs &den_accs,
+      const std::vector< SpMatrix<double> > &H,
+      AmSgmm2 *model) const;
+
   // Called from UpdatePhoneVectors; updates a subset of states
   // (relates to multi-threading).
   void UpdatePhoneVectorsInternal(const MleAmSgmm2Accs &num_accs,
-                                  const MleAmSgmm2Accs &den_accs,
-                                  const std::vector<SpMatrix<double> > &H,
-                                  AmSgmm2 *model,
-                                  double *auxf_impr,
-                                  int32 num_threads,
-                                  int32 thread_id) const;
+      const MleAmSgmm2Accs &den_accs,
+      const std::vector<SpMatrix<double> > &H,
+      AmSgmm2 *model,
+      double *auxf_impr,
+      int32 num_threads,
+      int32 thread_id) const;
   // Called from UpdatePhoneVectorsInternal
   static void ComputePhoneVecStats(const MleAmSgmm2Accs &accs,
-                                   const AmSgmm2 &model,
-                                   const std::vector<SpMatrix<double> > &H,
-                                   int32 j1,
-                                   int32 m,
-                                   const Vector<double> &w_jm,
-                                   double gamma_jm,
-                                   Vector<double> *g_jm,
-                                   SpMatrix<double> *H_jm);
-                                    
+      const AmSgmm2 &model,
+      const std::vector<SpMatrix<double> > &H,
+      int32 j1,
+      int32 m,
+      const Vector<double> &w_jm,
+      double gamma_jm,
+      Vector<double> *g_jm,
+      SpMatrix<double> *H_jm);
+
   double UpdateM(const MleAmSgmm2Accs &num_accs,
-                 const MleAmSgmm2Accs &den_accs,
-                 const std::vector< SpMatrix<double> > &Q_num,
-                 const std::vector< SpMatrix<double> > &Q_den,
-                 const Vector<double> &gamma_num,
-                 const Vector<double> &gamma_den,
-                 AmSgmm2 *model) const;
-  
+      const MleAmSgmm2Accs &den_accs,
+      const std::vector< SpMatrix<double> > &Q_num,
+      const std::vector< SpMatrix<double> > &Q_den,
+      const Vector<double> &gamma_num,
+      const Vector<double> &gamma_den,
+      AmSgmm2 *model) const;
+
   double UpdateN(const MleAmSgmm2Accs &num_accs,
-                 const MleAmSgmm2Accs &den_accs,
-                 const Vector<double> &gamma_num,
-                 const Vector<double> &gamma_den,
-                 AmSgmm2 *model) const;
-  
+      const MleAmSgmm2Accs &den_accs,
+      const Vector<double> &gamma_num,
+      const Vector<double> &gamma_den,
+      AmSgmm2 *model) const;
+
   double UpdateVars(const MleAmSgmm2Accs &num_accs,
-                    const MleAmSgmm2Accs &den_accs,
-                    const Vector<double> &gamma_num,
-                    const Vector<double> &gamma_den,
-                    const std::vector< SpMatrix<double> > &S_means,
-                    AmSgmm2 *model) const;
+      const MleAmSgmm2Accs &den_accs,
+      const Vector<double> &gamma_num,
+      const Vector<double> &gamma_den,
+      const std::vector< SpMatrix<double> > &S_means,
+      AmSgmm2 *model) const;
 
   /// Note: in the discriminative case we do just one iteration of
   /// updating the w quantities.
   double UpdateW(const MleAmSgmm2Accs &num_accs,
-                 const MleAmSgmm2Accs &den_accs,
-                 const Vector<double> &gamma_num,
-                 const Vector<double> &gamma_den,
-                 AmSgmm2 *model);
+      const MleAmSgmm2Accs &den_accs,
+      const Vector<double> &gamma_num,
+      const Vector<double> &gamma_den,
+      AmSgmm2 *model);
 
 
   double UpdateU(const MleAmSgmm2Accs &num_accs,
-                 const MleAmSgmm2Accs &den_accs,
-                 const Vector<double> &gamma_num,
-                 const Vector<double> &gamma_den,
-                 AmSgmm2 *model);
-  
+      const MleAmSgmm2Accs &den_accs,
+      const Vector<double> &gamma_num,
+      const Vector<double> &gamma_den,
+      AmSgmm2 *model);
+
   double UpdateSubstateWeights(const MleAmSgmm2Accs &num_accs,
-                               const MleAmSgmm2Accs &den_accs,
-                               AmSgmm2 *model);
+      const MleAmSgmm2Accs &den_accs,
+      AmSgmm2 *model);
 
   KALDI_DISALLOW_COPY_AND_ASSIGN(EbwAmSgmm2Updater);
   EbwAmSgmm2Updater() {}  // Prevent unconfigured updater.

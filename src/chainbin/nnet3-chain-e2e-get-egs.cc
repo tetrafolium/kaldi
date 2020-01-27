@@ -36,10 +36,10 @@ namespace nnet3 {
 /**
    This function finds the minimum number of arcs required to
    traverse the input fst from the initial state to a final state.
-*/
+ */
 
 static int32 FindMinimumLengthPath(
-    const fst::StdVectorFst &fst) {
+  const fst::StdVectorFst &fst) {
   using fst::VectorFst;
   using fst::StdArc;
   using fst::StdVectorFst;
@@ -49,7 +49,7 @@ static int32 FindMinimumLengthPath(
   int32 num_states = distance_fst.NumStates();
   for (int32 state = 0; state < num_states; state++) {
     for (fst::MutableArcIterator<StdVectorFst> aiter(&distance_fst, state);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       const StdArc &arc = aiter.Value();
       StdArc arc2(arc);
       if (arc.olabel == 0)
@@ -71,18 +71,18 @@ static int32 FindMinimumLengthPath(
    supervision objects to 'example_writer'.  Note: if normalization_fst is the
    empty FST (with no states), it skips the final stage of egs preparation and
    you should do it later with nnet3-chain-normalize-egs.
-*/
+ */
 
 static bool ProcessFile(const ExampleGenerationConfig &opts,
-                        const TransitionModel &trans_model,
-                        const fst::StdVectorFst &normalization_fst,
-                        const MatrixBase<BaseFloat> &feats,
-                        const MatrixBase<BaseFloat> *ivector_feats,
-                        int32 ivector_period,
-                        const fst::StdVectorFst& training_fst,
-                        const std::string &utt_id,
-                        bool compress,
-                        NnetChainExampleWriter *example_writer) {
+    const TransitionModel &trans_model,
+    const fst::StdVectorFst &normalization_fst,
+    const MatrixBase<BaseFloat> &feats,
+    const MatrixBase<BaseFloat> *ivector_feats,
+    int32 ivector_period,
+    const fst::StdVectorFst& training_fst,
+    const std::string &utt_id,
+    bool compress,
+    NnetChainExampleWriter *example_writer) {
 
   // check feats.NumRows() and if it is not equal to an allowed num-frames
   // delete a few frames from beginning or end
@@ -103,9 +103,9 @@ static bool ProcessFile(const ExampleGenerationConfig &opts,
       KALDI_ERR << "Too much length difference for utterance " << utt_id;
   }
   int32 num_input_frames = feats.NumRows(),
-        factor = opts.frame_subsampling_factor,
-        num_frames_subsampled = (num_input_frames + len_extend_context + factor - 1) / factor,
-        num_output_frames = num_frames_subsampled;
+      factor = opts.frame_subsampling_factor,
+      num_frames_subsampled = (num_input_frames + len_extend_context + factor - 1) / factor,
+      num_output_frames = num_frames_subsampled;
 
 
   chain::Supervision supervision;
@@ -138,9 +138,9 @@ static bool ProcessFile(const ExampleGenerationConfig &opts,
   output_weights.Set(1.0);
 
   NnetChainSupervision nnet_supervision("output", supervision,
-                                        output_weights,
-                                        first_frame,
-                                        opts.frame_subsampling_factor);
+      output_weights,
+      first_frame,
+      opts.frame_subsampling_factor);
 
   NnetChainExample nnet_chain_eg;
   nnet_chain_eg.outputs.resize(1);
@@ -148,16 +148,16 @@ static bool ProcessFile(const ExampleGenerationConfig &opts,
   nnet_chain_eg.inputs.resize(ivector_feats != NULL ? 2 : 1);
 
   int32 left_context = (opts.left_context_initial >= 0 ?
-                        opts.left_context_initial : opts.left_context);
+      opts.left_context_initial : opts.left_context);
   int32 right_context = (opts.right_context_final >= 0 ?
-                         opts.right_context_final : opts.right_context);
+      opts.right_context_final : opts.right_context);
 
 
   int32 tot_input_frames = left_context + num_input_frames +
-                           right_context + len_extend_context;
+      right_context + len_extend_context;
 
   Matrix<BaseFloat> input_frames(tot_input_frames, feats.NumCols(),
-                                 kUndefined);
+      kUndefined);
 
   int32 start_frame = first_frame - left_context;
   for (int32 t = start_frame; t < start_frame + tot_input_frames; t++) {
@@ -166,7 +166,7 @@ static bool ProcessFile(const ExampleGenerationConfig &opts,
     if (t2 >= num_input_frames) t2 = num_input_frames - 1;
     int32 j = t - start_frame;
     SubVector<BaseFloat> src(feats, t2),
-        dest(input_frames, j);
+    dest(input_frames, j);
     dest.CopyFromVec(src);
   }
   NnetIo input_io("input", -left_context, input_frames);
@@ -292,7 +292,7 @@ int main(int argc, char *argv[]) {
     SequentialTableReader<fst::VectorFstHolder> fst_reader(fst_rspecifier);
     NnetChainExampleWriter example_writer(examples_wspecifier);
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
 
     int32 num_err = 0;
 
@@ -318,8 +318,8 @@ int main(int argc, char *argv[]) {
         }
         if (online_ivector_feats != NULL &&
             (abs(features.NumRows() - (online_ivector_feats->NumRows() *
-                                    online_ivector_period)) > length_tolerance
-             || online_ivector_feats->NumRows() == 0)) {
+            online_ivector_period)) > length_tolerance
+            || online_ivector_feats->NumRows() == 0)) {
           KALDI_WARN << "Length difference between feats " << features.NumRows()
                      << " and iVectors " << online_ivector_feats->NumRows()
                      << "exceeds tolerance " << length_tolerance;
@@ -335,7 +335,7 @@ int main(int argc, char *argv[]) {
     }
     if (num_err > 0)
       KALDI_WARN << num_err << " utterances had errors and could "
-          "not be processed.";
+        "not be processed.";
   } catch(const std::exception &e) {
     std::cerr << e.what() << '\n';
     return -1;

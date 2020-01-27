@@ -29,7 +29,7 @@ namespace fst {
 
 template <class Arc>
 void WriteFstKaldi(std::ostream &os, bool binary,
-                   const VectorFst<Arc> &t) {
+    const VectorFst<Arc> &t) {
   bool ok;
   if (binary) {
     // Binary-mode writing.
@@ -43,7 +43,7 @@ void WriteFstKaldi(std::ostream &os, bool binary,
     os << '\n';
     bool acceptor = false, write_one = false;
     FstPrinter<Arc> printer(t, t.InputSymbols(), t.OutputSymbols(),
-                            NULL, acceptor, write_one, "\t");
+        NULL, acceptor, write_one, "\t");
     printer.Print(&os, "<unknown>");
     if (os.fail())
       KALDI_ERR << "Stream failure detected writing FST to stream";
@@ -71,7 +71,7 @@ inline bool StrToWeight(const std::string &s, bool allow_zero, W *w) {
 
 template <class Arc>
 void ReadFstKaldi(std::istream &is, bool binary,
-                  VectorFst<Arc> *fst) {
+    VectorFst<Arc> *fst) {
   typedef typename Arc::Weight Weight;
   typedef typename Arc::StateId StateId;
   if (binary) {
@@ -123,38 +123,38 @@ void ReadFstKaldi(std::istream &is, bool binary,
       Weight w;
       StateId d = s;
       switch (col.size()) {
-        case 1:
-          fst->SetFinal(s, Weight::One());
-          break;
-        case 2:
-          if (!StrToWeight(col[1], true, &w)) ok = false;
-          else fst->SetFinal(s, w);
-          break;
-        case 3: // 3 columns not ok for Lattice format; it's not an acceptor.
-          ok = false;
-          break;
-        case 4:
-          ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
-              ConvertStringToInteger(col[2], &arc.ilabel) &&
-              ConvertStringToInteger(col[3], &arc.olabel);
-          if (ok) {
-            d = arc.nextstate;
-            arc.weight = Weight::One();
-            fst->AddArc(s, arc);
-          }
-          break;
-        case 5:
-          ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
-              ConvertStringToInteger(col[2], &arc.ilabel) &&
-              ConvertStringToInteger(col[3], &arc.olabel) &&
-              StrToWeight(col[4], false, &arc.weight);
-          if (ok) {
-            d = arc.nextstate;
-            fst->AddArc(s, arc);
-          }
-          break;
-        default:
-          ok = false;
+      case 1:
+        fst->SetFinal(s, Weight::One());
+        break;
+      case 2:
+        if (!StrToWeight(col[1], true, &w)) ok = false;
+        else fst->SetFinal(s, w);
+        break;
+      case 3:   // 3 columns not ok for Lattice format; it's not an acceptor.
+        ok = false;
+        break;
+      case 4:
+        ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
+            ConvertStringToInteger(col[2], &arc.ilabel) &&
+            ConvertStringToInteger(col[3], &arc.olabel);
+        if (ok) {
+          d = arc.nextstate;
+          arc.weight = Weight::One();
+          fst->AddArc(s, arc);
+        }
+        break;
+      case 5:
+        ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
+            ConvertStringToInteger(col[2], &arc.ilabel) &&
+            ConvertStringToInteger(col[3], &arc.olabel) &&
+            StrToWeight(col[4], false, &arc.weight);
+        if (ok) {
+          d = arc.nextstate;
+          fst->AddArc(s, arc);
+        }
+        break;
+      default:
+        ok = false;
       }
       while (d >= fst->NumStates()) fst->AddState();
       if (!ok)

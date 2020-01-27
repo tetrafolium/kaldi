@@ -40,7 +40,7 @@ int32 GetCount(double expected_count) {
   return ans;
 }
 void AverageConstPart(int32 const_feat_dim,
-                      DiscriminativeNnetExample *eg) {
+    DiscriminativeNnetExample *eg) {
   if (eg->spk_info.Dim() != 0) {  // already has const part.
     KALDI_ASSERT(eg->spk_info.Dim() == const_feat_dim);
     // and nothing to do.
@@ -57,7 +57,7 @@ void AverageConstPart(int32 const_feat_dim,
                               0.0);
   }
 }
-                      
+
 
 } // namespace nnet2
 } // namespace kaldi
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
         "nnet-copy-egs-discriminative ark:train.degs ark,t:text.degs\n"
         "or:\n"
         "nnet-copy-egs-discriminative ark:train.degs ark:1.degs ark:2.degs\n";
-        
+
     bool random = false;
     int32 srand_seed = 0;
     BaseFloat keep_proportion = 1.0;
@@ -100,11 +100,11 @@ int main(int argc, char *argv[]) {
                 "or not at all with time, and which should be stored as a single "
                 "vector for each example rather than in the feature matrix."
                 "Useful in systems that use iVectors.  Helpful to save space.");
-    
+
     po.Read(argc, argv);
 
     srand(srand_seed);
-    
+
     if (po.NumArgs() < 2) {
       po.PrintUsage();
       exit(1);
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     std::string examples_rspecifier = po.GetArg(1);
 
     SequentialDiscriminativeNnetExampleReader example_reader(
-        examples_rspecifier);
+      examples_rspecifier);
 
     int32 num_outputs = po.NumArgs() - 1;
     std::vector<DiscriminativeNnetExampleWriter*> example_writers(num_outputs);
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
       example_writers[i] = new DiscriminativeNnetExampleWriter(
           po.GetArg(i+2));
 
-    
+
     int64 num_read = 0, num_written = 0, num_frames_written = 0;
     for (; !example_reader.Done(); example_reader.Next(), num_read++) {
       int32 count = GetCount(keep_proportion);
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
             static_cast<int64>(example_reader.Value().num_ali.size());
       }
     }
-    
+
     for (int32 i = 0; i < num_outputs; i++)
       delete example_writers[i];
     KALDI_LOG << "Read " << num_read << " discriminative neural-network training"

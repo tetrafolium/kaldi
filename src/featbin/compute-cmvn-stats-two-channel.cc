@@ -26,13 +26,13 @@ namespace kaldi {
 
 
 /*
-  This function gets the utterances that are the first field of the
-  contents of the file reco2file_and_channel_rxfilename, and sorts
-  them into pairs corresponding to A/B sides, or singletons in case
-  we get one without the other.
+   This function gets the utterances that are the first field of the
+   contents of the file reco2file_and_channel_rxfilename, and sorts
+   them into pairs corresponding to A/B sides, or singletons in case
+   we get one without the other.
  */
 void GetUtterancePairs(const std::string &reco2file_and_channel_rxfilename,
-                       std::vector<std::vector<std::string> > *utt_pairs) {
+    std::vector<std::vector<std::string> > *utt_pairs) {
   Input ki(reco2file_and_channel_rxfilename);
   std::string line;
   std::map<std::string, std::vector<std::string> > call_to_uttlist;
@@ -50,7 +50,7 @@ void GetUtterancePairs(const std::string &reco2file_and_channel_rxfilename,
     call_to_uttlist[call].push_back(utt);
   }
   for (std::map<std::string, std::vector<std::string> >::const_iterator
-         iter = call_to_uttlist.begin(); iter != call_to_uttlist.end(); ++iter) {
+      iter = call_to_uttlist.begin(); iter != call_to_uttlist.end(); ++iter) {
     const std::vector<std::string> &uttlist = iter->second;
     if (uttlist.size() == 2) {
       utt_pairs->push_back(uttlist);
@@ -67,11 +67,11 @@ void GetUtterancePairs(const std::string &reco2file_and_channel_rxfilename,
 }
 
 void AccCmvnStatsForPair(const std::string &utt1, const std::string &utt2,
-                         const MatrixBase<BaseFloat> &feats1,
-                         const MatrixBase<BaseFloat> &feats2,
-                         BaseFloat quieter_channel_weight,
-                         MatrixBase<double> *cmvn_stats1,
-                         MatrixBase<double> *cmvn_stats2) {
+    const MatrixBase<BaseFloat> &feats1,
+    const MatrixBase<BaseFloat> &feats2,
+    BaseFloat quieter_channel_weight,
+    MatrixBase<double> *cmvn_stats1,
+    MatrixBase<double> *cmvn_stats2) {
   KALDI_ASSERT(feats1.NumCols() == feats2.NumCols()); // same dim.
   if (feats1.NumRows() != feats2.NumRows()) {
     KALDI_WARN << "Number of frames differ between " << utt1 << " and " << utt2

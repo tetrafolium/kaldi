@@ -25,16 +25,16 @@ namespace kaldi {
 namespace nnet3 {
 
 NnetChainTrainer::NnetChainTrainer(const NnetChainTrainingOptions &opts,
-                                   const fst::StdVectorFst &den_fst,
-                                   Nnet *nnet):
-    opts_(opts),
-    den_graph_(den_fst, nnet->OutputDim("output")),
-    nnet_(nnet),
-    compiler_(*nnet, opts_.nnet_config.optimize_config,
-              opts_.nnet_config.compiler_config),
-    num_minibatches_processed_(0),
-    max_change_stats_(*nnet),
-    srand_seed_(RandInt(0, 100000)) {
+    const fst::StdVectorFst &den_fst,
+    Nnet *nnet) :
+  opts_(opts),
+  den_graph_(den_fst, nnet->OutputDim("output")),
+  nnet_(nnet),
+  compiler_(*nnet, opts_.nnet_config.optimize_config,
+      opts_.nnet_config.compiler_config),
+  num_minibatches_processed_(0),
+  max_change_stats_(*nnet),
+  srand_seed_(RandInt(0, 100000)) {
   if (opts.nnet_config.zero_component_stats)
     ZeroComponentStats(nnet);
   KALDI_ASSERT(opts.nnet_config.momentum >= 0.0 &&
@@ -51,7 +51,7 @@ NnetChainTrainer::NnetChainTrainer(const NnetChainTrainingOptions &opts,
       KALDI_LOG << "Read computation cache from " << opts.nnet_config.read_cache;
     } catch (...) {
       KALDI_WARN << "Could not open cached computation. "
-                    "Probably this is the first training iteration.";
+        "Probably this is the first training iteration.";
     }
   }
 }
@@ -95,14 +95,14 @@ void NnetChainTrainer::Train(const NnetChainExample &chain_eg) {
 }
 
 void NnetChainTrainer::TrainInternal(const NnetChainExample &eg,
-                                     const NnetComputation &computation) {
+    const NnetComputation &computation) {
   NVTX_RANGE(__func__);
   const NnetTrainerOptions &nnet_config = opts_.nnet_config;
   // note: because we give the 1st arg (nnet_) as a pointer to the
   // constructor of 'computer', it will use that copy of the nnet to
   // store stats.
   NnetComputer computer(nnet_config.compute_config, computation,
-                        nnet_, delta_nnet_);
+      nnet_, delta_nnet_);
 
   // give the inputs to the computer object.
   computer.AcceptInputs(*nnet_, eg.inputs);
@@ -141,14 +141,14 @@ void NnetChainTrainer::TrainInternal(const NnetChainExample &eg,
 }
 
 void NnetChainTrainer::TrainInternalBackstitch(const NnetChainExample &eg,
-                                               const NnetComputation &computation,
-                                               bool is_backstitch_step1) {
+    const NnetComputation &computation,
+    bool is_backstitch_step1) {
   const NnetTrainerOptions &nnet_config = opts_.nnet_config;
   // note: because we give the 1st arg (nnet_) as a pointer to the
   // constructor of 'computer', it will use that copy of the nnet to
   // store stats.
   NnetComputer computer(nnet_config.compute_config, computation,
-                        nnet_, delta_nnet_);
+      nnet_, delta_nnet_);
   // give the inputs to the computer object.
   computer.AcceptInputs(*nnet_, eg.inputs);
   computer.Run();
@@ -202,8 +202,8 @@ void NnetChainTrainer::TrainInternalBackstitch(const NnetChainExample &eg,
 }
 
 void NnetChainTrainer::ProcessOutputs(bool is_backstitch_step2,
-                                      const NnetChainExample &eg,
-                                      NnetComputer *computer) {
+    const NnetChainExample &eg,
+    NnetComputer *computer) {
   NVTX_RANGE(__func__);
   // normally the eg will have just one output named 'output', but
   // we don't assume this.
@@ -221,8 +221,8 @@ void NnetChainTrainer::ProcessOutputs(bool is_backstitch_step2,
 
     const CuMatrixBase<BaseFloat> &nnet_output = computer->GetOutput(sup.name);
     CuMatrix<BaseFloat> nnet_output_deriv(nnet_output.NumRows(),
-                                          nnet_output.NumCols(),
-                                          kUndefined);
+        nnet_output.NumCols(),
+        kUndefined);
 
     bool use_xent = (opts_.chain_config.xent_regularize != 0.0);
     std::string xent_name = sup.name + "-xent";  // typically "output-xent".
@@ -234,7 +234,7 @@ void NnetChainTrainer::ProcessOutputs(bool is_backstitch_step2,
                              sup.supervision, nnet_output,
                              &tot_objf, &tot_l2_term, &tot_weight,
                              &nnet_output_deriv,
-                             (use_xent ? &xent_deriv : NULL));
+        (use_xent ? &xent_deriv : NULL));
 
     if (use_xent) {
       // this block computes the cross-entropy objective.

@@ -29,7 +29,7 @@ void CudaFst::ComputeOffsets(const fst::Fst<StdArc> &fst) {
   // count states since Fst doesn't provide this functionality
   num_states_ = 0;
   for (fst::StateIterator<fst::Fst<StdArc> > iter(fst); !iter.Done();
-       iter.Next())
+      iter.Next())
     ++num_states_;
 
   // allocate and initialize offset arrays
@@ -48,7 +48,7 @@ void CudaFst::ComputeOffsets(const fst::Fst<StdArc> &fst) {
     h_final_[i] = fst.Final(i).Value();
     // count emiting and non_emitting arcs
     for (fst::ArcIterator<fst::Fst<StdArc> > aiter(fst, i); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       StdArc arc = aiter.Value();
       int32 ilabel = arc.ilabel;
       if (ilabel != 0) {  // emitting
@@ -72,11 +72,11 @@ void CudaFst::ComputeOffsets(const fst::Fst<StdArc> &fst) {
 
 void CudaFst::AllocateData(const fst::Fst<StdArc> &fst) {
   d_e_offsets_ = static_cast<unsigned int *>(CuDevice::Instantiate().Malloc(
-      (num_states_ + 1) * sizeof(*d_e_offsets_)));
+        (num_states_ + 1) * sizeof(*d_e_offsets_)));
   d_ne_offsets_ = static_cast<unsigned int *>(CuDevice::Instantiate().Malloc(
-      (num_states_ + 1) * sizeof(*d_ne_offsets_)));
+        (num_states_ + 1) * sizeof(*d_ne_offsets_)));
   d_final_ = static_cast<float *>(
-      CuDevice::Instantiate().Malloc((num_states_) * sizeof(*d_final_)));
+    CuDevice::Instantiate().Malloc((num_states_) * sizeof(*d_final_)));
 
   h_arc_weights_.resize(arc_count_);
   h_arc_nextstate_.resize(arc_count_);
@@ -85,13 +85,13 @@ void CudaFst::AllocateData(const fst::Fst<StdArc> &fst) {
   h_arc_olabels_.resize(arc_count_);
 
   d_arc_weights_ = static_cast<float *>(
-      CuDevice::Instantiate().Malloc(arc_count_ * sizeof(*d_arc_weights_)));
+    CuDevice::Instantiate().Malloc(arc_count_ * sizeof(*d_arc_weights_)));
   d_arc_nextstates_ = static_cast<StateId *>(
-      CuDevice::Instantiate().Malloc(arc_count_ * sizeof(*d_arc_nextstates_)));
+    CuDevice::Instantiate().Malloc(arc_count_ * sizeof(*d_arc_nextstates_)));
 
   // Only the ilabels for the e_arc are needed on the device
   d_arc_pdf_ilabels_ = static_cast<int32 *>(
-      CuDevice::Instantiate().Malloc(e_count_ * sizeof(*d_arc_pdf_ilabels_)));
+    CuDevice::Instantiate().Malloc(e_count_ * sizeof(*d_arc_pdf_ilabels_)));
 }
 
 void CudaFst::PopulateArcs(const fst::Fst<StdArc> &fst) {
@@ -100,7 +100,7 @@ void CudaFst::PopulateArcs(const fst::Fst<StdArc> &fst) {
   int ne_idx = e_count_;  // starts where e_offsets_ ends
   for (int i = 0; i < num_states_; i++) {
     for (fst::ArcIterator<fst::Fst<StdArc> > aiter(fst, i); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       StdArc arc = aiter.Value();
       int idx;
       if (arc.ilabel != 0) {  // emitting
@@ -121,7 +121,7 @@ void CudaFst::PopulateArcs(const fst::Fst<StdArc> &fst) {
 }
 
 void CudaFst::ApplyTransitionModelOnIlabels(
-    const TransitionModel &trans_model) {
+  const TransitionModel &trans_model) {
   // Converting ilabel here, to avoid reindexing when reading nnet3 output
   // We only need to convert the emitting arcs
   // The emitting arcs are the first e_count_ arcs
@@ -136,7 +136,7 @@ void CudaFst::CopyDataToDevice() {
       cudaMemcpyHostToDevice));
   KALDI_DECODER_CUDA_API_CHECK_ERROR(cudaMemcpy(
       d_ne_offsets_, &h_ne_offsets_[0],
-      (num_states_ + 1) * sizeof(*d_ne_offsets_), cudaMemcpyHostToDevice));
+        (num_states_ + 1) * sizeof(*d_ne_offsets_), cudaMemcpyHostToDevice));
   KALDI_DECODER_CUDA_API_CHECK_ERROR(cudaMemcpy(d_final_, &h_final_[0],
                                                 num_states_ * sizeof(*d_final_),
                                                 cudaMemcpyHostToDevice));
@@ -153,7 +153,7 @@ void CudaFst::CopyDataToDevice() {
 }
 
 void CudaFst::Initialize(const fst::Fst<StdArc> &fst,
-                         const TransitionModel *trans_model) {
+    const TransitionModel *trans_model) {
   nvtxRangePushA("CudaFst constructor");
   start_ = fst.Start();
 

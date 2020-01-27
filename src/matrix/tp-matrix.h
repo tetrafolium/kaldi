@@ -36,10 +36,10 @@ template<typename Real>
 class TpMatrix : public PackedMatrix<Real> {
   friend class CuTpMatrix<float>;
   friend class CuTpMatrix<double>;
- public:
+public:
   TpMatrix() : PackedMatrix<Real>() {}
   explicit TpMatrix(MatrixIndexT r, MatrixResizeType resize_type = kSetZero)
-      : PackedMatrix<Real>(r, resize_type) {}
+    : PackedMatrix<Real>(r, resize_type) {}
   TpMatrix(const TpMatrix<Real>& orig) : PackedMatrix<Real>(orig) {}
 
   /// Copy constructor from CUDA TpMatrix
@@ -48,7 +48,7 @@ class TpMatrix : public PackedMatrix<Real> {
 
 
   template<typename OtherReal> explicit TpMatrix(const TpMatrix<OtherReal>& orig)
-      : PackedMatrix<Real>(orig) {}
+    : PackedMatrix<Real>(orig) {}
 
   Real operator() (MatrixIndexT r, MatrixIndexT c) const {
     if (static_cast<UnsignedMatrixIndexT>(c) >
@@ -95,7 +95,7 @@ class TpMatrix : public PackedMatrix<Real> {
   /// CopyFromMat copies the lower triangle of M into *this
   /// (or the upper triangle, if Trans == kTrans).
   void CopyFromMat(const MatrixBase<Real> &M,
-                   MatrixTransposeType Trans = kNoTrans);
+      MatrixTransposeType Trans = kNoTrans);
 
   /// This is implemented in ../cudamatrix/cu-tp-matrix.cc
   void CopyFromMat(const CuTpMatrix<Real> &other);

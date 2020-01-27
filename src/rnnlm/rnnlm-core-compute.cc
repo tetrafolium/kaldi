@@ -27,11 +27,11 @@ namespace rnnlm {
 
 
 BaseFloat RnnlmCoreComputer::Compute(
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    BaseFloat *weight,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv) {
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  BaseFloat *weight,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv) {
   using namespace nnet3;
 
   bool need_model_derivative = false;
@@ -72,33 +72,33 @@ BaseFloat RnnlmCoreComputer::Compute(
 
 
 void RnnlmCoreComputer::ProvideInput(
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    nnet3::NnetComputer *computer) {
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  nnet3::NnetComputer *computer) {
   int32 embedding_dim = word_embedding.NumCols();
   CuMatrix<BaseFloat> input_embeddings(derived.cu_input_words.Dim(),
-                                       embedding_dim,
-                                       kUndefined);
+      embedding_dim,
+      kUndefined);
   input_embeddings.CopyRows(word_embedding,
                             derived.cu_input_words);
   computer->AcceptInput("input", &input_embeddings);
 }
 
 
-RnnlmCoreComputer::RnnlmCoreComputer(const nnet3::Nnet &nnet):
-    nnet_(nnet),
-    compiler_(nnet),  // for now we don't make available other options
-    num_minibatches_processed_(0),
-    objf_info_(10) { }
+RnnlmCoreComputer::RnnlmCoreComputer(const nnet3::Nnet &nnet) :
+  nnet_(nnet),
+  compiler_(nnet),    // for now we don't make available other options
+  num_minibatches_processed_(0),
+  objf_info_(10) { }
 
 BaseFloat RnnlmCoreComputer::ProcessOutput(
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    nnet3::NnetComputer *computer,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv,
-    BaseFloat *weight_out) {
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  nnet3::NnetComputer *computer,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv,
+  BaseFloat *weight_out) {
   // 'output' is the output of the neural network.  The row-index
   // combines the time (with higher stride) and the member 'n'
   // of the minibatch (with stride 1); the number of columns is

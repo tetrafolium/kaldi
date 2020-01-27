@@ -46,7 +46,7 @@
    which is an FST with a special interface that allows
    only a single arc with a non-epsilon input symbol
    out of each state.
-*/
+ */
 
 #include <algorithm>
 #include <string>
@@ -73,7 +73,7 @@ namespace fst {
 /// like caching.
 template<class Arc>
 class DeterministicOnDemandFst {
- public:
+public:
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Weight Weight;
   typedef typename Arc::Label Label;
@@ -98,7 +98,7 @@ class DeterministicOnDemandFst {
  */
 template<class Arc>
 class BackoffDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
- public:
+public:
   typedef typename Arc::Weight Weight;
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Label Label;
@@ -111,7 +111,7 @@ class BackoffDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
 
   bool GetArc(StateId s, Label ilabel, Arc *oarc);
 
- private:
+private:
   inline StateId GetBackoffState(StateId s, Weight *w);
 
   const Fst<Arc> &fst_;
@@ -125,17 +125,17 @@ class BackoffDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
    weights less than one.
 
    It's specialized for StdArc because there is no generic way to scale weights.
-*/
+ */
 class ScaleDeterministicOnDemandFst:  public DeterministicOnDemandFst<StdArc> {
- public:
+public:
   typedef StdArc::Weight Weight;
   typedef StdArc::StateId StateId;
   typedef StdArc::Label Label;
 
   // Constructor does not take ownership of 'det_fst'.
   ScaleDeterministicOnDemandFst(float scale,
-                                DeterministicOnDemandFst<StdArc> *det_fst):
-      scale_(scale), det_fst_(*det_fst) { }
+      DeterministicOnDemandFst<StdArc> *det_fst) :
+    scale_(scale), det_fst_(*det_fst) { }
 
   StateId Start() { return det_fst_.Start(); }
 
@@ -155,23 +155,23 @@ class ScaleDeterministicOnDemandFst:  public DeterministicOnDemandFst<StdArc> {
     }
   }
 
- private:
+private:
   float scale_;
   DeterministicOnDemandFst<StdArc> &det_fst_;
 };
 
 /**
-  The class UnweightedNgramFst is a DeterministicOnDemandFst whose states encode
-  an n-gram history. Conceptually, for n-gram order n and k labels, the FST is an
-  unweighted acceptor with about k^(n-1) states (ignoring end effects). However,
-  the FST is created on demand and doesn't need the label vocabulary; GetArc
-  matches on any input label. This class is primarily used together with
-  ComposeDeterministicOnDemandFst to expand the n-gram history of lattices, ensuring
-  that each arc has a sufficiently long unique word history.
+   The class UnweightedNgramFst is a DeterministicOnDemandFst whose states encode
+   an n-gram history. Conceptually, for n-gram order n and k labels, the FST is an
+   unweighted acceptor with about k^(n-1) states (ignoring end effects). However,
+   the FST is created on demand and doesn't need the label vocabulary; GetArc
+   matches on any input label. This class is primarily used together with
+   ComposeDeterministicOnDemandFst to expand the n-gram history of lattices, ensuring
+   that each arc has a sufficiently long unique word history.
  */
 template<class Arc>
 class UnweightedNgramFst: public DeterministicOnDemandFst<Arc> {
- public:
+public:
   typedef typename Arc::Weight Weight;
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Label Label;
@@ -184,9 +184,9 @@ class UnweightedNgramFst: public DeterministicOnDemandFst<Arc> {
 
   bool GetArc(StateId s, Label ilabel, Arc *oarc);
 
- private:
+private:
   typedef unordered_map<std::vector<Label>,
-    StateId, kaldi::VectorHasher<Label> > MapType;
+          StateId, kaldi::VectorHasher<Label> > MapType;
   // The order of the n-gram.
   int n_;
   MapType state_map_;
@@ -197,7 +197,7 @@ class UnweightedNgramFst: public DeterministicOnDemandFst<Arc> {
 
 template<class Arc>
 class ComposeDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
- public:
+public:
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Weight Weight;
   typedef typename Arc::Label Label;
@@ -207,7 +207,7 @@ class ComposeDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
   /// but they are not const as the DeterministicOnDemandFst's data-access
   /// functions are not const, for reasons relating to caching.
   ComposeDeterministicOnDemandFst(DeterministicOnDemandFst<Arc> *fst1,
-                                  DeterministicOnDemandFst<Arc> *fst2);
+      DeterministicOnDemandFst<Arc> *fst2);
 
   virtual StateId Start() { return start_state_; }
 
@@ -215,7 +215,7 @@ class ComposeDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
 
   virtual bool GetArc(StateId s, Label ilabel, Arc *oarc);
 
- private:
+private:
   DeterministicOnDemandFst<Arc> *fst1_;
   DeterministicOnDemandFst<Arc> *fst2_;
   typedef unordered_map<std::pair<StateId, StateId>, StateId, kaldi::PairHasher<StateId> > MapType;
@@ -228,14 +228,14 @@ class ComposeDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
 
 template<class Arc>
 class CacheDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
- public:
+public:
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Weight Weight;
   typedef typename Arc::Label Label;
 
   /// We don't take ownership of this pointer.  The argument is "really" const.
   CacheDeterministicOnDemandFst(DeterministicOnDemandFst<Arc> *fst,
-                                StateId num_cached_arcs = 100000);
+      StateId num_cached_arcs = 100000);
 
   virtual StateId Start() { return fst_->Start(); }
 
@@ -244,7 +244,7 @@ class CacheDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
 
   virtual bool GetArc(StateId s, Label ilabel, Arc *oarc);
 
- private:
+private:
   // Get index for cached arc.
   inline size_t GetIndex(StateId src_state, Label ilabel);
 
@@ -260,14 +260,14 @@ class CacheDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
 /// to the initial-state of the LM, and </s> be encoded in the final-probs.
 template<class Arc>
 class LmExampleDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
- public:
+public:
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Weight Weight;
   typedef typename Arc::Label Label;
 
   LmExampleDeterministicOnDemandFst(void *lm,
-                                    Label bos_symbol,
-                                    Label eos_symbol);
+      Label bos_symbol,
+      Label eos_symbol);
 
 
   virtual StateId Start() { return start_state_; }
@@ -277,7 +277,7 @@ class LmExampleDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
 
   virtual bool GetArc(StateId s, Label ilabel, Arc *oarc);
 
- private:
+private:
   // Get index for cached arc.
   inline size_t GetIndex(StateId src_state, Label ilabel);
 
@@ -301,8 +301,8 @@ class LmExampleDeterministicOnDemandFst: public DeterministicOnDemandFst<Arc> {
 // This does not call Connect.
 template<class Arc>
 void ComposeDeterministicOnDemand(const Fst<Arc> &fst1,
-                                  DeterministicOnDemandFst<Arc> *fst2,
-                                  MutableFst<Arc> *fst_composed);
+    DeterministicOnDemandFst<Arc> *fst2,
+    MutableFst<Arc> *fst_composed);
 
 /**
    This function does
@@ -317,11 +317,11 @@ void ComposeDeterministicOnDemand(const Fst<Arc> &fst1,
    is that the DeterministicOnDemandFst interface only supports lookup
    by ilabel (see its function GetArc).
    This does not call Connect().
-*/
+ */
 template<class Arc>
 void ComposeDeterministicOnDemandInverse(const Fst<Arc> &fst1,
-                                         DeterministicOnDemandFst<Arc> *fst2,
-                                         MutableFst<Arc> *fst_composed);
+    DeterministicOnDemandFst<Arc> *fst2,
+    MutableFst<Arc> *fst_composed);
 
 
 

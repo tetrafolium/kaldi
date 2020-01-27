@@ -32,7 +32,7 @@ const int kSupervisionMaxStates = 200000;  // we can later make this
 // attempts determinization (with limited max-states) and minimization;
 // returns true on success
 bool TryDeterminizeMinimize(int32 supervision_max_states,
-                            fst::StdVectorFst *supervision_fst) {
+    fst::StdVectorFst *supervision_fst) {
   if (supervision_fst->NumStates() >= supervision_max_states) {
     KALDI_WARN << "Not attempting determinization as number of states "
                << "is too large " << supervision_fst->NumStates();
@@ -80,9 +80,9 @@ void SupervisionOptions::Check() const {
 }
 
 bool AlignmentToProtoSupervision(const SupervisionOptions &opts,
-                                 const std::vector<int32> &phones,
-                                 const std::vector<int32> &durations,
-                                 ProtoSupervision *proto_supervision) {
+    const std::vector<int32> &phones,
+    const std::vector<int32> &durations,
+    ProtoSupervision *proto_supervision) {
   opts.Check();
   KALDI_ASSERT(phones.size() > 0 && phones.size() == durations.size());
   std::vector<int32> labels(phones.size());
@@ -100,22 +100,22 @@ bool AlignmentToProtoSupervision(const SupervisionOptions &opts,
     int32 phone = phones[i], duration = durations[i];
     KALDI_ASSERT(phone > 0 && duration > 0);
     int32 t_start = std::max<int32>(0, (current_frame - opts.left_tolerance)),
-            t_end = std::min<int32>(num_frames,
-                                    (current_frame + duration + opts.right_tolerance)),
-       t_start_subsampled = (t_start + factor - 1) / factor,
-       t_end_subsampled = (t_end + factor - 1) / factor;
+        t_end = std::min<int32>(num_frames,
+            (current_frame + duration + opts.right_tolerance)),
+        t_start_subsampled = (t_start + factor - 1) / factor,
+        t_end_subsampled = (t_end + factor - 1) / factor;
 
     // note: if opts.Check() passed, the following assert should pass too.
     KALDI_ASSERT(t_end_subsampled > t_start_subsampled &&
                  t_end_subsampled <= num_frames_subsampled);
     for (int32 t_subsampled = t_start_subsampled;
-         t_subsampled < t_end_subsampled; t_subsampled++)
+        t_subsampled < t_end_subsampled; t_subsampled++)
       proto_supervision->allowed_phones[t_subsampled].push_back(phone);
     current_frame += duration;
   }
   KALDI_ASSERT(current_frame == num_frames);
   for (int32 t_subsampled = 0; t_subsampled < num_frames_subsampled;
-       t_subsampled++) {
+      t_subsampled++) {
     KALDI_ASSERT(!proto_supervision->allowed_phones[t_subsampled].empty());
     SortAndUniq(&(proto_supervision->allowed_phones[t_subsampled]));
   }
@@ -124,12 +124,12 @@ bool AlignmentToProtoSupervision(const SupervisionOptions &opts,
 }
 
 bool AlignmentToProtoSupervision(
-    const SupervisionOptions &opts,
-    const std::vector<std::pair<int32, int32> > &phones_durations,
-    ProtoSupervision *proto_supervision) {
+  const SupervisionOptions &opts,
+  const std::vector<std::pair<int32, int32> > &phones_durations,
+  ProtoSupervision *proto_supervision) {
   KALDI_ASSERT(phones_durations.size() > 0);
   std::vector<int32> phones(phones_durations.size()),
-      durations(phones_durations.size());
+  durations(phones_durations.size());
   for (size_t size = phones_durations.size(), i = 0; i < size; i++) {
     phones[i] = phones_durations[i].first;
     durations[i] = phones_durations[i].second;
@@ -141,13 +141,13 @@ bool AlignmentToProtoSupervision(
 
 bool ProtoSupervision::operator == (const ProtoSupervision &other) const {
   return (allowed_phones == other.allowed_phones &&
-          fst::Equal(fst, other.fst));
+         fst::Equal(fst, other.fst));
 }
 
 bool PhoneLatticeToProtoSupervisionInternal(
-    const SupervisionOptions &opts,
-    const CompactLattice &lat,
-    ProtoSupervision *proto_supervision) {
+  const SupervisionOptions &opts,
+  const CompactLattice &lat,
+  ProtoSupervision *proto_supervision) {
   opts.Check();
   if (lat.NumStates() == 0) {
     KALDI_WARN << "Empty lattice provided";
@@ -159,7 +159,7 @@ bool PhoneLatticeToProtoSupervisionInternal(
   std::vector<int32> state_times;
   int32 num_frames = CompactLatticeStateTimes(lat, &state_times),
       factor = opts.frame_subsampling_factor,
-    num_frames_subsampled = (num_frames + factor - 1) / factor;
+      num_frames_subsampled = (num_frames + factor - 1) / factor;
   for (int32 state = 0; state < num_states; state++)
     proto_supervision->fst.AddState();
   proto_supervision->fst.SetStart(lat.Start());
@@ -170,7 +170,7 @@ bool PhoneLatticeToProtoSupervisionInternal(
   for (int32 state = 0; state < num_states; state++) {
     int32 state_time = state_times[state];
     for (fst::ArcIterator<CompactLattice> aiter(lat, state); !aiter.Done();
-         aiter.Next()) {
+        aiter.Next()) {
       const CompactLatticeArc &lat_arc = aiter.Value();
       int32 next_state_time = state_time + lat_arc.weight.String().size();
       int32 phone = lat_arc.ilabel;  // It's an acceptor so ilabel == ollabel.
@@ -186,13 +186,13 @@ bool PhoneLatticeToProtoSupervisionInternal(
                     lat_arc.nextstate));
 
       int32 t_begin = std::max<int32>(0, (state_time - opts.left_tolerance)),
-              t_end = std::min<int32>(num_frames,
-                                      (next_state_time + opts.right_tolerance)),
-              t_begin_subsampled = (t_begin + factor - 1)/ factor,
-              t_end_subsampled = (t_end + factor - 1)/ factor;
-    for (int32 t_subsampled = t_begin_subsampled;
-         t_subsampled < t_end_subsampled; t_subsampled++)
-      proto_supervision->allowed_phones[t_subsampled].push_back(phone);
+          t_end = std::min<int32>(num_frames,
+              (next_state_time + opts.right_tolerance)),
+          t_begin_subsampled = (t_begin + factor - 1)/ factor,
+          t_end_subsampled = (t_end + factor - 1)/ factor;
+      for (int32 t_subsampled = t_begin_subsampled;
+          t_subsampled < t_end_subsampled; t_subsampled++)
+        proto_supervision->allowed_phones[t_subsampled].push_back(phone);
     }
     if (lat.Final(state) != CompactLatticeWeight::Zero()) {
       proto_supervision->fst.SetFinal(state, fst::TropicalWeight(
@@ -207,7 +207,7 @@ bool PhoneLatticeToProtoSupervisionInternal(
     }
   }
   for (int32 t_subsampled = 0; t_subsampled < num_frames_subsampled;
-       t_subsampled++) {
+      t_subsampled++) {
     KALDI_ASSERT(!proto_supervision->allowed_phones[t_subsampled].empty());
     SortAndUniq(&(proto_supervision->allowed_phones[t_subsampled]));
   }
@@ -215,8 +215,8 @@ bool PhoneLatticeToProtoSupervisionInternal(
 }
 
 bool PhoneLatticeToProtoSupervision(const SupervisionOptions &opts,
-                                    const CompactLattice &lat,
-                                    ProtoSupervision *proto_supervision) {
+    const CompactLattice &lat,
+    ProtoSupervision *proto_supervision) {
 
   if (!PhoneLatticeToProtoSupervisionInternal(opts, lat, proto_supervision))
     return false;
@@ -254,10 +254,10 @@ bool TimeEnforcerFst::GetArc(StateId s, Label ilabel, fst::StdArc* oarc) {
 }
 
 bool TrainingGraphToSupervisionE2e(
-    const fst::StdVectorFst &training_graph,
-    const TransitionModel &trans_model,
-    int32 num_frames,
-    Supervision *supervision) {
+  const fst::StdVectorFst &training_graph,
+  const TransitionModel &trans_model,
+  int32 num_frames,
+  Supervision *supervision) {
   using fst::VectorFst;
   using fst::StdArc;
   using fst::StdVectorFst;
@@ -268,7 +268,7 @@ bool TrainingGraphToSupervisionE2e(
   int32 num_states = trans2word_fst.NumStates();
   for (int32 state = 0; state < num_states; state++) {
     for (fst::MutableArcIterator<StdVectorFst> aiter(&trans2word_fst, state);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       const StdArc &arc = aiter.Value();
       if (arc.ilabel == 0) {
         KALDI_WARN << "Utterance rejected due to eps on input label";
@@ -291,11 +291,11 @@ bool TrainingGraphToSupervisionE2e(
 }
 
 bool ProtoSupervisionToSupervision(
-    const ContextDependencyInterface &ctx_dep,
-    const TransitionModel &trans_model,
-    const ProtoSupervision &proto_supervision,
-    bool convert_to_pdfs,
-    Supervision *supervision) {
+  const ContextDependencyInterface &ctx_dep,
+  const TransitionModel &trans_model,
+  const ProtoSupervision &proto_supervision,
+  bool convert_to_pdfs,
+  Supervision *supervision) {
   using fst::VectorFst;
   using fst::StdArc;
   VectorFst<StdArc> phone_fst(proto_supervision.fst);
@@ -311,10 +311,10 @@ bool ProtoSupervisionToSupervision(
 
   // inv_cfst will be expanded on the fly, as needed.
   fst::InverseContextFst inv_cfst(subsequential_symbol,
-                                  trans_model.GetPhones(),
-                                  disambig_syms,
-                                  ctx_dep.ContextWidth(),
-                                  ctx_dep.CentralPosition());
+      trans_model.GetPhones(),
+      disambig_syms,
+      ctx_dep.ContextWidth(),
+      ctx_dep.CentralPosition());
 
 
   VectorFst<StdArc> context_dep_fst;
@@ -375,8 +375,8 @@ bool ProtoSupervisionToSupervision(
   // are 'allowed' to appear on.  This will also convert the FST to have pdf-ids
   // plus one as the labels
   TimeEnforcerFst enforcer_fst(trans_model,
-                               convert_to_pdfs,
-                               proto_supervision.allowed_phones);
+      convert_to_pdfs,
+      proto_supervision.allowed_phones);
   ComposeDeterministicOnDemand(transition_id_fst,
                                &enforcer_fst,
                                &(supervision->fst));
@@ -409,9 +409,9 @@ bool ProtoSupervisionToSupervision(
 
 
 SupervisionSplitter::SupervisionSplitter(
-    const Supervision &supervision):
-    supervision_(supervision),
-    frame_(supervision_.fst.NumStates(), -1) {
+  const Supervision &supervision) :
+  supervision_(supervision),
+  frame_(supervision_.fst.NumStates(), -1) {
   const fst::StdVectorFst &fst(supervision_.fst);
   // The fst in struct Supervision is supposed to be epsilon-free and
   // topologically sorted; this function relies on those properties to
@@ -422,13 +422,13 @@ SupervisionSplitter::SupervisionSplitter(
                << "testing code)";
   }
   int32 num_frames = supervision_.frames_per_sequence *
-                     supervision_.num_sequences;
+      supervision_.num_sequences;
   int32 ans = ComputeFstStateTimes(fst, &frame_);
   KALDI_ASSERT(ans == num_frames);
 }
 
 void SupervisionSplitter::GetFrameRange(int32 begin_frame, int32 num_frames,
-                                        Supervision *out_supervision) const {
+    Supervision *out_supervision) const {
   int32 end_frame = begin_frame + num_frames;
   // Note: end_frame is not included in the range of frames that the
   // output supervision object covers; it's one past the end.
@@ -439,11 +439,11 @@ void SupervisionSplitter::GetFrameRange(int32 begin_frame, int32 num_frames,
       std::lower_bound(frame_.begin(), frame_.end(), begin_frame),
       end_iter = std::lower_bound(begin_iter, frame_.end(), end_frame);
   KALDI_ASSERT(*begin_iter == begin_frame &&
-               (begin_iter == frame_.begin() || begin_iter[-1] < begin_frame));
+      (begin_iter == frame_.begin() || begin_iter[-1] < begin_frame));
   // even if end_frame == supervision_.num_frames, there should be a state with
   // that frame index.
   KALDI_ASSERT(end_iter[-1] < end_frame &&
-               (end_iter < frame_.end() || *end_iter == end_frame));
+      (end_iter < frame_.end() || *end_iter == end_frame));
   int32 begin_state = begin_iter - frame_.begin(),
       end_state = end_iter - frame_.begin();
 
@@ -459,9 +459,9 @@ void SupervisionSplitter::GetFrameRange(int32 begin_frame, int32 num_frames,
 }
 
 void SupervisionSplitter::CreateRangeFst(
-    int32 begin_frame, int32 end_frame,
-    int32 begin_state, int32 end_state,
-    fst::StdVectorFst *fst) const {
+  int32 begin_frame, int32 end_frame,
+  int32 begin_state, int32 end_state,
+  fst::StdVectorFst *fst) const {
   // There will be a special pre-start state that has epsilon transitions to all
   // states whose frame equals begin_frame; we'll later do RmEpsilon to remove
   // these.  Next we will include all states begin_state <= s < end_state in the
@@ -531,7 +531,7 @@ void SortBreadthFirstSearch(fst::StdVectorFst *fst) {
     state_order[state] = num_output++;
     queue.pop_front();
     for (fst::ArcIterator<fst::StdVectorFst> aiter(*fst, state);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       int32 nextstate = aiter.Value().nextstate;
       if (!seen[nextstate]) {
         seen[nextstate] = true;
@@ -663,7 +663,7 @@ void Supervision::Read(std::istream &is, bool binary) {
 }
 
 int32 ComputeFstStateTimes(const fst::StdVectorFst &fst,
-                           std::vector<int32> *state_times) {
+    std::vector<int32> *state_times) {
   if (fst.Start() != 0)  // this is implied by our properties.
     KALDI_ERR << "Expecting input FST start state to be zero";
   int32 num_states = fst.NumStates();
@@ -676,7 +676,7 @@ int32 ComputeFstStateTimes(const fst::StdVectorFst &fst,
     if (next_state_time <= 0)  // i.e. (*state_times)[state] < 0
       KALDI_ERR << "Input FST does not have required properties.";
     for (fst::ArcIterator<fst::StdVectorFst> aiter(fst, state);
-         !aiter.Done(); aiter.Next()) {
+        !aiter.Done(); aiter.Next()) {
       const fst::StdArc &arc = aiter.Value();
       KALDI_ASSERT(arc.ilabel != 0);
       int32 &next_state_ref = (*state_times)[arc.nextstate];
@@ -708,17 +708,17 @@ int32 ComputeFstStateTimes(const fst::StdVectorFst &fst,
   return total_length;
 }
 
-Supervision::Supervision(const Supervision &other):
-    weight(other.weight), num_sequences(other.num_sequences),
-    frames_per_sequence(other.frames_per_sequence),
-    label_dim(other.label_dim), fst(other.fst),
-    e2e_fsts(other.e2e_fsts), alignment_pdfs(other.alignment_pdfs) { }
+Supervision::Supervision(const Supervision &other) :
+  weight(other.weight), num_sequences(other.num_sequences),
+  frames_per_sequence(other.frames_per_sequence),
+  label_dim(other.label_dim), fst(other.fst),
+  e2e_fsts(other.e2e_fsts), alignment_pdfs(other.alignment_pdfs) { }
 
 
 // This static function is called by MergeSupervision if the supervisions
 // are end2end. It simply puts all e2e FST's into 1 supervision.
 void MergeSupervisionE2e(const std::vector<const Supervision*> &input,
-                          Supervision *output_supervision) {
+    Supervision *output_supervision) {
   KALDI_ASSERT(!input.empty());
   KALDI_ASSERT(input[0]->e2e_fsts.size() == 1);
   *output_supervision = *(input[0]);
@@ -738,7 +738,7 @@ void MergeSupervisionE2e(const std::vector<const Supervision*> &input,
 }
 
 void MergeSupervision(const std::vector<const Supervision*> &input,
-                      Supervision *output_supervision) {
+    Supervision *output_supervision) {
   KALDI_ASSERT(!input.empty());
   int32 label_dim = input[0]->label_dim,
       num_inputs = input.size();
@@ -784,31 +784,31 @@ void MergeSupervision(const std::vector<const Supervision*> &input,
 // and we don't do SortBreadthFirstSearch (the graph has self-loops so it can't
 // be sorted).
 bool AddWeightToSupervisionFstE2e(const fst::StdVectorFst &normalization_fst,
-                                  Supervision *supervision) {
-    KALDI_ASSERT(supervision->num_sequences == 1);
-    KALDI_ASSERT(supervision->e2e_fsts.size() == 1);
-    // Remove epsilons before composing.  'normalization_fst' has no epsilons so
-    // the composed result will be epsilon free.
-    fst::StdVectorFst supervision_fst_noeps(supervision->e2e_fsts[0]);
-    fst::RmEpsilon(&supervision_fst_noeps);
+    Supervision *supervision) {
+  KALDI_ASSERT(supervision->num_sequences == 1);
+  KALDI_ASSERT(supervision->e2e_fsts.size() == 1);
+  // Remove epsilons before composing.  'normalization_fst' has no epsilons so
+  // the composed result will be epsilon free.
+  fst::StdVectorFst supervision_fst_noeps(supervision->e2e_fsts[0]);
+  fst::RmEpsilon(&supervision_fst_noeps);
 
-    // Note: by default, 'Compose' will call 'Connect', so if the
-    // resulting FST is not connected, it will end up empty.
-    fst::StdVectorFst composed_fst;
-    fst::Compose(supervision_fst_noeps, normalization_fst,
+  // Note: by default, 'Compose' will call 'Connect', so if the
+  // resulting FST is not connected, it will end up empty.
+  fst::StdVectorFst composed_fst;
+  fst::Compose(supervision_fst_noeps, normalization_fst,
                  &composed_fst);
-    if (composed_fst.NumStates() == 0)
-      return false;
-    // Projection should not be necessary, as both FSTs are acceptors.
+  if (composed_fst.NumStates() == 0)
+    return false;
+  // Projection should not be necessary, as both FSTs are acceptors.
 
-    supervision->e2e_fsts[0] = composed_fst;
-    KALDI_ASSERT(supervision->fst.Properties(fst::kAcceptor, true) == fst::kAcceptor);
-    KALDI_ASSERT(supervision->fst.Properties(fst::kIEpsilons, true) == 0);
-    return true;
+  supervision->e2e_fsts[0] = composed_fst;
+  KALDI_ASSERT(supervision->fst.Properties(fst::kAcceptor, true) == fst::kAcceptor);
+  KALDI_ASSERT(supervision->fst.Properties(fst::kIEpsilons, true) == 0);
+  return true;
 }
 
 bool AddWeightToSupervisionFst(const fst::StdVectorFst &normalization_fst,
-                               Supervision *supervision) {
+    Supervision *supervision) {
   if (!supervision->e2e_fsts.empty())
     return AddWeightToSupervisionFstE2e(normalization_fst, supervision);
 
@@ -847,8 +847,8 @@ bool AddWeightToSupervisionFst(const fst::StdVectorFst &normalization_fst,
 }
 
 void SplitIntoRanges(int32 num_frames,
-                     int32 frames_per_range,
-                     std::vector<int32> *range_starts) {
+    int32 frames_per_range,
+    std::vector<int32> *range_starts) {
   if (frames_per_range > num_frames) {
     range_starts->clear();
     return;  // there is no room for even one range.
@@ -902,8 +902,8 @@ void SplitIntoRanges(int32 num_frames,
 
 bool Supervision::operator == (const Supervision &other) const {
   return weight == other.weight && num_sequences == other.num_sequences &&
-      frames_per_sequence == other.frames_per_sequence &&
-      label_dim == other.label_dim && fst::Equal(fst, other.fst);
+         frames_per_sequence == other.frames_per_sequence &&
+         label_dim == other.label_dim && fst::Equal(fst, other.fst);
 }
 
 void Supervision::Check(const TransitionModel &trans_mdl) const {
@@ -914,7 +914,7 @@ void Supervision::Check(const TransitionModel &trans_mdl) const {
   if (num_sequences <= 0)
     KALDI_ERR << "Invalid num_sequences: " << num_sequences;
   if (!(label_dim == trans_mdl.NumPdfs() ||
-        label_dim == trans_mdl.NumTransitionIds()))
+      label_dim == trans_mdl.NumTransitionIds()))
     KALDI_ERR << "Invalid label-dim: " << label_dim
               << ", expected " << trans_mdl.NumPdfs()
               << " or " << trans_mdl.NumTransitionIds();
@@ -925,8 +925,8 @@ void Supervision::Check(const TransitionModel &trans_mdl) const {
 }
 
 void GetWeightsForRanges(int32 range_length,
-                         const std::vector<int32> &range_starts,
-                         std::vector<Vector<BaseFloat> > *weights) {
+    const std::vector<int32> &range_starts,
+    std::vector<Vector<BaseFloat> > *weights) {
   KALDI_ASSERT(range_length > 0);
   int32 num_ranges = range_starts.size();
   weights->resize(num_ranges);
@@ -937,7 +937,7 @@ void GetWeightsForRanges(int32 range_length,
   for (int32 i = 0; i + 1 < num_ranges; i++) {
     int32 j = i + 1;
     int32 i_start = range_starts[i], i_end = i_start + range_length,
-          j_start = range_starts[j];
+        j_start = range_starts[j];
     KALDI_ASSERT(j_start > i_start);
     if (i_end > j_start) {
       Vector<BaseFloat> &i_weights = (*weights)[i], &j_weights = (*weights)[j];
@@ -947,7 +947,7 @@ void GetWeightsForRanges(int32 range_length,
       // approximately equal size, called the left, middle and right region.
       int32 left_length = overlap_length / 3,
           middle_length = (overlap_length - left_length) / 2,
-           right_length = overlap_length - left_length - middle_length;
+          right_length = overlap_length - left_length - middle_length;
       KALDI_ASSERT(left_length >= 0 && middle_length >= 0 && right_length >= 0 &&
                    left_length + middle_length + right_length == overlap_length);
       // set the weight of the left region to be zero for the right (j) range.
@@ -970,8 +970,8 @@ void GetWeightsForRanges(int32 range_length,
 }
 
 bool ConvertSupervisionToUnconstrained(
-    const TransitionModel &trans_mdl,
-    Supervision *supervision) {
+  const TransitionModel &trans_mdl,
+  Supervision *supervision) {
   KALDI_ASSERT(supervision->label_dim == trans_mdl.NumTransitionIds() &&
                supervision->fst.NumStates() > 0 &&
                supervision->e2e_fsts.empty() &&
@@ -987,7 +987,7 @@ bool ConvertSupervisionToUnconstrained(
     // stats in `nnet3-chain-acc-lda-stats`.
     fst::UniformArcSelector<fst::StdArc> selector;
     fst::RandGenOptions<fst::UniformArcSelector<fst::StdArc> > randgen_opts(
-        selector);
+      selector);
     fst::StdVectorFst single_path_fst;
     fst::RandGen(supervision->fst, &single_path_fst, randgen_opts);
     fst::GetLinearSymbolSequence(single_path_fst, &(supervision->alignment_pdfs),
@@ -1012,7 +1012,7 @@ bool ConvertSupervisionToUnconstrained(
     for (int32 s = 0; s < num_states; s++) {
       for (fst::MutableArcIterator<fst::StdVectorFst> aiter(
                &(supervision->fst), s);
-           !aiter.Done();  aiter.Next()) {
+          !aiter.Done(); aiter.Next()) {
         fst::StdArc arc = aiter.Value();
         // First replace all output labels with epsilon.
         arc.olabel = 0;
@@ -1045,7 +1045,7 @@ bool ConvertSupervisionToUnconstrained(
                                            &(supervision->e2e_fsts[0]));
     if (is_partial) {
       KALDI_WARN << "Partial FST generated when determinizing supervision; "
-          "abandoning this chunk.";
+        "abandoning this chunk.";
       return false;
     }
     supervision->fst.DeleteStates();
@@ -1058,7 +1058,7 @@ bool ConvertSupervisionToUnconstrained(
   }
 
   {  // Add self-loops to the FST.  (At this point we move it to
-    // supervision->e2e_fsts[0]).
+     // supervision->e2e_fsts[0]).
 
     // There are be no disambiguation symbols here.
     std::vector<int32> disambig_syms;
@@ -1083,7 +1083,7 @@ bool ConvertSupervisionToUnconstrained(
     int32 num_states = e2e_fst.NumStates();
     for (int32 s = 0; s < num_states; s++) {
       for (fst::MutableArcIterator<fst::StdVectorFst> aiter(&e2e_fst, s);
-           !aiter.Done();  aiter.Next()) {
+          !aiter.Done(); aiter.Next()) {
         fst::StdArc arc = aiter.Value();
         // There will be a few zero ilabels at this point, due to how
         // AddSelfLoops() works (it calls MakePrecedingInputSymbolsSame(), which
@@ -1107,7 +1107,7 @@ bool ConvertSupervisionToUnconstrained(
                                            &(supervision->e2e_fsts[0]));
     if (is_partial) {
       KALDI_WARN << "Partial FST generated when determinizing supervision; "
-          "abandoning this chunk.";
+        "abandoning this chunk.";
       return false;
     }
     fst::Minimize(&(supervision->e2e_fsts[0]));

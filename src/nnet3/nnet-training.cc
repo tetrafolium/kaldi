@@ -25,13 +25,13 @@ namespace kaldi {
 namespace nnet3 {
 
 NnetTrainer::NnetTrainer(const NnetTrainerOptions &config,
-                         Nnet *nnet):
-    config_(config),
-    nnet_(nnet),
-    compiler_(*nnet, config_.optimize_config, config_.compiler_config),
-    num_minibatches_processed_(0),
-    max_change_stats_(*nnet),
-    srand_seed_(RandInt(0, 100000)) {
+    Nnet *nnet) :
+  config_(config),
+  nnet_(nnet),
+  compiler_(*nnet, config_.optimize_config, config_.compiler_config),
+  num_minibatches_processed_(0),
+  max_change_stats_(*nnet),
+  srand_seed_(RandInt(0, 100000)) {
   if (config.zero_component_stats)
     ZeroComponentStats(nnet);
   KALDI_ASSERT(config.momentum >= 0.0 &&
@@ -48,7 +48,7 @@ NnetTrainer::NnetTrainer(const NnetTrainerOptions &config,
       KALDI_LOG << "Read computation cache from " << config_.read_cache;
     } else {
       KALDI_WARN << "Could not open cached computation. "
-                    "Probably this is the first training iteration.";
+        "Probably this is the first training iteration.";
     }
   }
 }
@@ -89,12 +89,12 @@ void NnetTrainer::Train(const NnetExample &eg) {
 }
 
 void NnetTrainer::TrainInternal(const NnetExample &eg,
-                                const NnetComputation &computation) {
+    const NnetComputation &computation) {
   // note: because we give the 1st arg (nnet_) as a pointer to the
   // constructor of 'computer', it will use that copy of the nnet to
   // store stats.
   NnetComputer computer(config_.compute_config, computation,
-                        nnet_, delta_nnet_);
+      nnet_, delta_nnet_);
   // give the inputs to the computer object.
   computer.AcceptInputs(*nnet_, eg.io);
   computer.Run();
@@ -129,13 +129,13 @@ void NnetTrainer::TrainInternal(const NnetExample &eg,
 }
 
 void NnetTrainer::TrainInternalBackstitch(const NnetExample &eg,
-                                          const NnetComputation &computation,
-                                          bool is_backstitch_step1) {
+    const NnetComputation &computation,
+    bool is_backstitch_step1) {
   // note: because we give the 1st arg (nnet_) as a pointer to the
   // constructor of 'computer', it will use that copy of the nnet to
   // store stats.
   NnetComputer computer(config_.compute_config, computation,
-                        nnet_, delta_nnet_);
+      nnet_, delta_nnet_);
   // give the inputs to the computer object.
   computer.AcceptInputs(*nnet_, eg.io);
   computer.Run();
@@ -189,8 +189,8 @@ void NnetTrainer::TrainInternalBackstitch(const NnetExample &eg,
 }
 
 void NnetTrainer::ProcessOutputs(bool is_backstitch_step2,
-                                 const NnetExample &eg,
-                                 NnetComputer *computer) {
+    const NnetExample &eg,
+    NnetComputer *computer) {
   // normally the eg will have just one output named 'output', but
   // we don't assume this.
   // In backstitch training, the output-name with the "_backstitch" suffix is
@@ -240,12 +240,12 @@ bool NnetTrainer::PrintTotalStats() const {
 }
 
 void ObjectiveFunctionInfo::UpdateStats(
-    const std::string &output_name,
-    int32 minibatches_per_phase,
-    int32 minibatch_counter,
-    BaseFloat this_minibatch_weight,
-    BaseFloat this_minibatch_tot_objf,
-    BaseFloat this_minibatch_tot_aux_objf) {
+  const std::string &output_name,
+  int32 minibatches_per_phase,
+  int32 minibatch_counter,
+  BaseFloat this_minibatch_weight,
+  BaseFloat this_minibatch_tot_objf,
+  BaseFloat this_minibatch_tot_aux_objf) {
   int32 phase = minibatch_counter / minibatches_per_phase;
   if (phase != current_phase) {
     KALDI_ASSERT(phase > current_phase);
@@ -267,9 +267,9 @@ void ObjectiveFunctionInfo::UpdateStats(
 }
 
 void ObjectiveFunctionInfo::PrintStatsForThisPhase(
-    const std::string &output_name,
-    int32 minibatches_per_phase,
-    int32 phase) const {
+  const std::string &output_name,
+  int32 minibatches_per_phase,
+  int32 phase) const {
   int32 start_minibatch = current_phase * minibatches_per_phase,
       end_minibatch = phase * minibatches_per_phase - 1;
 
@@ -311,8 +311,8 @@ void ObjectiveFunctionInfo::PrintStatsForThisPhase(
 
 bool ObjectiveFunctionInfo::PrintTotalStats(const std::string &name) const {
   BaseFloat objf = (tot_objf / tot_weight),
-        aux_objf = (tot_aux_objf / tot_weight),
-        sum_objf = objf + aux_objf;
+      aux_objf = (tot_aux_objf / tot_weight),
+      sum_objf = objf + aux_objf;
   if (tot_aux_objf == 0.0) {
     KALDI_LOG << "Overall average objective function for '" << name << "' is "
               << (tot_objf / tot_weight) << " over " << tot_weight << " frames.";
@@ -337,12 +337,12 @@ NnetTrainer::~NnetTrainer() {
 }
 
 void ComputeObjectiveFunction(const GeneralMatrix &supervision,
-                              ObjectiveType objective_type,
-                              const std::string &output_name,
-                              bool supply_deriv,
-                              NnetComputer *computer,
-                              BaseFloat *tot_weight,
-                              BaseFloat *tot_objf) {
+    ObjectiveType objective_type,
+    const std::string &output_name,
+    bool supply_deriv,
+    NnetComputer *computer,
+    BaseFloat *tot_weight,
+    BaseFloat *tot_objf) {
   const CuMatrixBase<BaseFloat> &output = computer->GetOutput(output_name);
 
   if (output.NumCols() != supervision.NumCols())
@@ -351,65 +351,65 @@ void ComputeObjectiveFunction(const GeneralMatrix &supervision,
               << " (nnet) vs. " << supervision.NumCols() << " (egs)\n";
 
   switch (objective_type) {
-    case kLinear: {
-      // objective is x * y.
-      switch (supervision.Type()) {
-        case kSparseMatrix: {
-          const SparseMatrix<BaseFloat> &post = supervision.GetSparseMatrix();
-          CuSparseMatrix<BaseFloat> cu_post(post);
-          // The cross-entropy objective is computed by a simple dot product,
-          // because after the LogSoftmaxLayer, the output is already in the form
-          // of log-likelihoods that are normalized to sum to one.
-          *tot_weight = cu_post.Sum();
-          *tot_objf = TraceMatSmat(output, cu_post, kTrans);
-          if (supply_deriv) {
-            CuMatrix<BaseFloat> output_deriv(output.NumRows(), output.NumCols(),
-                                             kUndefined);
-            cu_post.CopyToMat(&output_deriv);
-            computer->AcceptInput(output_name, &output_deriv);
-          }
-          break;
-        }
-        case kFullMatrix: {
-          // there is a redundant matrix copy in here if we're not using a GPU
-          // but we don't anticipate this code branch being used in many cases.
-          CuMatrix<BaseFloat> cu_post(supervision.GetFullMatrix());
-          *tot_weight = cu_post.Sum();
-          *tot_objf = TraceMatMat(output, cu_post, kTrans);
-          if (supply_deriv)
-            computer->AcceptInput(output_name, &cu_post);
-          break;
-        }
-        case kCompressedMatrix: {
-          Matrix<BaseFloat> post;
-          supervision.GetMatrix(&post);
-          CuMatrix<BaseFloat> cu_post;
-          cu_post.Swap(&post);
-          *tot_weight = cu_post.Sum();
-          *tot_objf = TraceMatMat(output, cu_post, kTrans);
-          if (supply_deriv)
-            computer->AcceptInput(output_name, &cu_post);
-          break;
-        }
+  case kLinear: {
+    // objective is x * y.
+    switch (supervision.Type()) {
+    case kSparseMatrix: {
+      const SparseMatrix<BaseFloat> &post = supervision.GetSparseMatrix();
+      CuSparseMatrix<BaseFloat> cu_post(post);
+      // The cross-entropy objective is computed by a simple dot product,
+      // because after the LogSoftmaxLayer, the output is already in the form
+      // of log-likelihoods that are normalized to sum to one.
+      *tot_weight = cu_post.Sum();
+      *tot_objf = TraceMatSmat(output, cu_post, kTrans);
+      if (supply_deriv) {
+        CuMatrix<BaseFloat> output_deriv(output.NumRows(), output.NumCols(),
+            kUndefined);
+        cu_post.CopyToMat(&output_deriv);
+        computer->AcceptInput(output_name, &output_deriv);
       }
       break;
     }
-    case kQuadratic: {
-      // objective is -0.5 (x - y)^2
-      CuMatrix<BaseFloat> diff(supervision.NumRows(),
-                               supervision.NumCols(),
-                               kUndefined);
-      diff.CopyFromGeneralMat(supervision);
-      diff.AddMat(-1.0, output);
-      *tot_weight = diff.NumRows();
-      *tot_objf = -0.5 * TraceMatMat(diff, diff, kTrans);
+    case kFullMatrix: {
+      // there is a redundant matrix copy in here if we're not using a GPU
+      // but we don't anticipate this code branch being used in many cases.
+      CuMatrix<BaseFloat> cu_post(supervision.GetFullMatrix());
+      *tot_weight = cu_post.Sum();
+      *tot_objf = TraceMatMat(output, cu_post, kTrans);
       if (supply_deriv)
-        computer->AcceptInput(output_name, &diff);
+        computer->AcceptInput(output_name, &cu_post);
       break;
     }
-    default:
-      KALDI_ERR << "Objective function type " << objective_type
-                << " not handled.";
+    case kCompressedMatrix: {
+      Matrix<BaseFloat> post;
+      supervision.GetMatrix(&post);
+      CuMatrix<BaseFloat> cu_post;
+      cu_post.Swap(&post);
+      *tot_weight = cu_post.Sum();
+      *tot_objf = TraceMatMat(output, cu_post, kTrans);
+      if (supply_deriv)
+        computer->AcceptInput(output_name, &cu_post);
+      break;
+    }
+    }
+    break;
+  }
+  case kQuadratic: {
+    // objective is -0.5 (x - y)^2
+    CuMatrix<BaseFloat> diff(supervision.NumRows(),
+        supervision.NumCols(),
+        kUndefined);
+    diff.CopyFromGeneralMat(supervision);
+    diff.AddMat(-1.0, output);
+    *tot_weight = diff.NumRows();
+    *tot_objf = -0.5 * TraceMatMat(diff, diff, kTrans);
+    if (supply_deriv)
+      computer->AcceptInput(output_name, &diff);
+    break;
+  }
+  default:
+    KALDI_ERR << "Objective function type " << objective_type
+              << " not handled.";
   }
 }
 

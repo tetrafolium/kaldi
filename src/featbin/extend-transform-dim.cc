@@ -24,7 +24,7 @@
 
 namespace kaldi {
 void IncreaseTransformDimension(int32 new_dimension,
-                       Matrix<BaseFloat> *mat) {
+    Matrix<BaseFloat> *mat) {
   int32 d = mat->NumRows();
   if (new_dimension < d)
     KALDI_ERR << "--new-dimension argument invalid or not specified: "
@@ -41,11 +41,11 @@ void IncreaseTransformDimension(int32 new_dimension,
     for (int32 i = d; i < new_dimension; i++)
       (*mat)(i, i) = 1.0; // set new dims to unit matrix.
     for (int32 i = 0; i < d; i++) // and set offset [last column]
-      (*mat)(i, new_dimension) = offset(i);          
+      (*mat)(i, new_dimension) = offset(i);
   } else {
     KALDI_ERR << "Input matrix has unexpected dimension " << d
               << " x " << mat->NumCols();
-  }  
+  }
 }
 
 } // end namespace kaldi
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         "dimensions in the same way.\n"
         "Usage: extend-transform-dim [options] (transform-A-rspecifier|transform-A-rxfilename) (transform-out-wspecifier|transform-out-wxfilename)\n"
         "E.g.: extend-transform-dim --new-dimension=117 in.mat big.mat\n";
-    
+
     bool binary = true;
     int32 new_dimension = -1;
     ParseOptions po(usage);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
     po.Register("binary", &binary, "Write in binary mode (only relevant if output is a wxfilename)");
     po.Register("new-dimension", &new_dimension,
                 "Larger dimension we are changing matrix to");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -84,14 +84,14 @@ int main(int argc, char *argv[]) {
 
     bool in_is_rspecifier =
         (ClassifyRspecifier(transform_in_fn, NULL, NULL)
-         != kNoRspecifier),
+        != kNoRspecifier),
         out_is_wspecifier =
         (ClassifyWspecifier(transform_out_fn, NULL, NULL, NULL)
-         != kNoWspecifier);
-    
+        != kNoWspecifier);
+
     if (in_is_rspecifier != out_is_wspecifier)
       KALDI_ERR << "Either none or both of the (input, output) must be a Table.";
-    
+
     if (in_is_rspecifier) {
       SequentialBaseFloatMatrixReader reader(transform_in_fn);
       BaseFloatMatrixWriter writer(transform_out_fn);

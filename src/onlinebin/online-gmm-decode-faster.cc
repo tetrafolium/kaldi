@@ -30,7 +30,7 @@
 
 int main(int argc, char *argv[]) {
 #ifndef KALDI_NO_PORTAUDIO
-    try {
+  try {
     using namespace kaldi;
     using namespace fst;
 
@@ -102,23 +102,23 @@ int main(int argc, char *argv[]) {
 
     std::vector<int32> silence_phones;
     if (!SplitStringToIntegers(silence_phones_str, ":", false, &silence_phones))
-        KALDI_ERR << "Invalid silence-phones string " << silence_phones_str;
+      KALDI_ERR << "Invalid silence-phones string " << silence_phones_str;
     if (silence_phones.empty())
-        KALDI_ERR << "No silence phones given!";
+      KALDI_ERR << "No silence phones given!";
 
     TransitionModel trans_model;
     AmDiagGmm am_gmm;
     {
-        bool binary;
-        Input ki(model_rxfilename, &binary);
-        trans_model.Read(ki.Stream(), binary);
-        am_gmm.Read(ki.Stream(), binary);
+      bool binary;
+      Input ki(model_rxfilename, &binary);
+      trans_model.Read(ki.Stream(), binary);
+      am_gmm.Read(ki.Stream(), binary);
     }
 
     fst::SymbolTable *word_syms = NULL;
     if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
-        KALDI_ERR << "Could not read symbol table from file "
-                    << word_syms_filename;
+      KALDI_ERR << "Could not read symbol table from file "
+                << word_syms_filename;
 
     fst::Fst<fst::StdArc> *decode_fst = ReadDecodeGraph(fst_rxfilename);
 
@@ -133,13 +133,13 @@ int main(int argc, char *argv[]) {
     int32 window_size = right_context + left_context + 1;
     decoder_opts.batch_size = std::max(decoder_opts.batch_size, window_size);
     OnlineFasterDecoder decoder(*decode_fst, decoder_opts,
-                                silence_phones, trans_model);
+        silence_phones, trans_model);
     VectorFst<LatticeArc> out_fst;
     OnlinePaSource au_src(kTimeout, kSampleFreq, kPaRingSize, kPaReportInt);
     Mfcc mfcc(mfcc_opts);
     FeInput fe_input(&au_src, &mfcc,
-                     frame_length * (kSampleFreq / 1000),
-                     frame_shift * (kSampleFreq / 1000));
+        frame_length * (kSampleFreq / 1000),
+        frame_shift * (kSampleFreq / 1000));
     OnlineCmnInput cmn_input(&fe_input, cmn_window, min_cmn_window);
     OnlineFeatInputItf *feat_transform = 0;
     if (lda_mat_rspecifier != "") {
@@ -154,10 +154,10 @@ int main(int argc, char *argv[]) {
 
     // feature_reading_opts contains number of retries, batch size.
     OnlineFeatureMatrix feature_matrix(feature_reading_opts,
-                                       feat_transform);
+        feat_transform);
 
     OnlineDecodableDiagGmmScaled decodable(am_gmm, trans_model, acoustic_scale,
-                                           &feature_matrix);
+        &feature_matrix);
     bool partial_res = false;
     decoder.InitDecoding();
     while (1) {

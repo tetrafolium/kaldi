@@ -22,8 +22,8 @@
 namespace kaldi {
 
 OnlineCudaFeaturePipeline::OnlineCudaFeaturePipeline(
-    const OnlineNnet2FeaturePipelineConfig &config)
-    : info_(config), spectral_feat(NULL), ivector(NULL) {
+  const OnlineNnet2FeaturePipelineConfig &config)
+  : info_(config), spectral_feat(NULL), ivector(NULL) {
   spectral_feat = NULL;
   cmvn = NULL;
   ivector = NULL;
@@ -40,7 +40,7 @@ OnlineCudaFeaturePipeline::OnlineCudaFeaturePipeline(
     OnlineCmvnState cmvn_state(global_cmvn_stats);
     CudaOnlineCmvnState cu_cmvn_state(cmvn_state);
     cmvn = new CudaOnlineCmvn(info_.cmvn_opts, cu_cmvn_state);
-  } 
+  }
 
   if (info_.use_ivectors) {
     OnlineIvectorExtractionConfig ivector_extraction_opts;
@@ -53,7 +53,7 @@ OnlineCudaFeaturePipeline::OnlineCudaFeaturePipeline(
     ivector_extraction_opts.greedy_ivector_extractor = true;
 
     ivector = new IvectorExtractorFastCuda(ivector_extraction_opts);
-  } 
+  }
 }
 
 OnlineCudaFeaturePipeline::~OnlineCudaFeaturePipeline() {
@@ -63,9 +63,9 @@ OnlineCudaFeaturePipeline::~OnlineCudaFeaturePipeline() {
 }
 
 void OnlineCudaFeaturePipeline::ComputeFeatures(
-    const CuVectorBase<BaseFloat> &cu_wave, BaseFloat sample_freq,
-    CuMatrix<BaseFloat> *input_features,
-    CuVector<BaseFloat> *ivector_features) {
+  const CuVectorBase<BaseFloat> &cu_wave, BaseFloat sample_freq,
+  CuMatrix<BaseFloat> *input_features,
+  CuVector<BaseFloat> *ivector_features) {
   if (info_.feature_type == "mfcc" || info_.feature_type == "fbank") {
     // Fbank called via the MFCC codepath
     // MFCC

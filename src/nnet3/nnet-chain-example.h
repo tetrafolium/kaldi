@@ -87,10 +87,10 @@ struct NnetChainSupervision {
   /// in a vanilla setup, but we plan to try setups where the output periodicity
   /// is slower than the input, so in this case it might be 2 or 3.
   NnetChainSupervision(const std::string &name,
-                       const chain::Supervision &supervision,
-                       const VectorBase<BaseFloat> &deriv_weights,
-                       int32 first_frame,
-                       int32 frame_skip);
+      const chain::Supervision &supervision,
+      const VectorBase<BaseFloat> &deriv_weights,
+      int32 first_frame,
+      int32 frame_skip);
 
   NnetChainSupervision(const NnetChainSupervision &other);
 
@@ -151,10 +151,10 @@ struct NnetChainExampleStructureHasher {
 /// NnetChainExample without looking at the value of the features.
 struct NnetChainExampleStructureCompare {
   bool operator () (const NnetChainExample &a,
-                    const NnetChainExample &b) const;
+      const NnetChainExample &b) const;
   // We also provide a version of this that works from pointers.
   bool operator () (const NnetChainExample *a,
-                    const NnetChainExample *b) const {
+      const NnetChainExample *b) const {
     return (*this)(*a, *b);
   }
 };
@@ -170,8 +170,8 @@ struct NnetChainExampleStructureCompare {
 /// changed inside the function; this is a trick to allow us to use the
 /// MergeExamples() routine while avoiding having to rewrite code.
 void MergeChainExamples(bool compress,
-                        std::vector<NnetChainExample> *input,
-                        NnetChainExample *output);
+    std::vector<NnetChainExample> *input,
+    NnetChainExample *output);
 
 
 
@@ -190,8 +190,8 @@ void MergeChainExamples(bool compress,
     subsampling factor is worked out from the time spacing between the indexes
     in the output.  */
 void ShiftChainExampleTimes(int32 frame_shift,
-                           const std::vector<std::string> &exclude_names,
-                           NnetChainExample *eg);
+    const std::vector<std::string> &exclude_names,
+    NnetChainExample *eg);
 
 /**  This function takes a NnetChainExample and produces a ComputationRequest.
      Assumes you don't want the derivatives w.r.t. the inputs; if you do, you
@@ -206,14 +206,14 @@ void ShiftChainExampleTimes(int32 frame_shift,
      supplied to the nnet computation if 'use_xent_derivative' is true (we
      propagate back the xent derivative to the model only in training, not in
      model-combination in nnet3-chain-combine).
-*/
+ */
 void GetChainComputationRequest(const Nnet &nnet,
-                                const NnetChainExample &eg,
-                                bool need_model_derivative,
-                                bool store_component_stats,
-                                bool use_xent_regularization,
-                                bool use_xent_derivative,
-                                ComputationRequest *computation_request);
+    const NnetChainExample &eg,
+    bool need_model_derivative,
+    bool store_component_stats,
+    bool use_xent_regularization,
+    bool use_xent_derivative,
+    ComputationRequest *computation_request);
 
 
 
@@ -232,9 +232,9 @@ int32 GetChainNnetExampleSize(const NnetChainExample &a);
 /// same strucure (i.e. the same input and output indexes), and outputting them
 /// in suitable minibatches as defined by ExampleMergingConfig.
 class ChainExampleMerger {
- public:
+public:
   ChainExampleMerger(const ExampleMergingConfig &config,
-                     NnetChainExampleWriter *writer);
+      NnetChainExampleWriter *writer);
 
   // This function accepts an example, and if possible, writes a merged example
   // out.  The ownership of the pointer 'a' is transferred to this class when
@@ -252,7 +252,7 @@ class ChainExampleMerger {
   int32 ExitStatus() { Finish(); return (num_egs_written_ > 0 ? 0 : 1); }
 
   ~ChainExampleMerger() { Finish(); };
- private:
+private:
   // called by Finish() and AcceptExample().  Merges, updates the stats, and
   // writes.  The 'egs' is non-const only because the egs are temporarily
   // changed inside MergeChainEgs.  The pointer 'egs' is still owned
@@ -267,10 +267,10 @@ class ChainExampleMerger {
 
   // Note: the "key" into the egs is the first element of the vector.
   typedef unordered_map<NnetChainExample*,
-                        std::vector<NnetChainExample*>,
-                        NnetChainExampleStructureHasher,
-                        NnetChainExampleStructureCompare> MapType;
-MapType eg_to_egs_;
+          std::vector<NnetChainExample*>,
+          NnetChainExampleStructureHasher,
+          NnetChainExampleStructureCompare> MapType;
+  MapType eg_to_egs_;
 };
 
 

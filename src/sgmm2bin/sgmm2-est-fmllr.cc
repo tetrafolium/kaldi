@@ -33,14 +33,14 @@ using std::vector;
 namespace kaldi {
 
 void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
-                            const Matrix<BaseFloat> &transformed_feats, // if already fMLLR
-                            const std::vector<std::vector<int32> > &gselect,
-                            const Posterior &post,
-                            const TransitionModel &trans_model,
-                            const AmSgmm2 &am_sgmm,
-                            BaseFloat logdet,
-                            Sgmm2PerSpkDerivedVars *spk_vars,
-                            FmllrSgmm2Accs *spk_stats) {
+    const Matrix<BaseFloat> &transformed_feats,                         // if already fMLLR
+    const std::vector<std::vector<int32> > &gselect,
+    const Posterior &post,
+    const TransitionModel &trans_model,
+    const AmSgmm2 &am_sgmm,
+    BaseFloat logdet,
+    Sgmm2PerSpkDerivedVars *spk_vars,
+    FmllrSgmm2Accs *spk_stats) {
   kaldi::Sgmm2PerFrameDerivedVars per_frame_vars;
 
   Posterior pdf_post;
@@ -50,7 +50,7 @@ void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
     // transformed feats for this, if available.
     am_sgmm.ComputePerFrameVars(transformed_feats.Row(t), gselect[t],
                                 *spk_vars, &per_frame_vars);
-    
+
 
     for (size_t j = 0; j < pdf_post[t].size(); j++) {
       int32 pdf_id = pdf_post[t][j].first;
@@ -77,13 +77,13 @@ int main(int argc, char *argv[]) {
         "--gselect option is mandatory.\n"
         "Usage: sgmm2-est-fmllr [options] <model-in> <feature-rspecifier> "
         "<post-rspecifier> <mats-wspecifier>\n";
-    
+
     ParseOptions po(usage);
     string spk2utt_rspecifier, spkvecs_rspecifier, fmllr_rspecifier,
         gselect_rspecifier;
     BaseFloat min_count = 100;
     Sgmm2FmllrConfig fmllr_opts;
-    
+
     po.Register("spk2utt", &spk2utt_rspecifier,
                 "File to read speaker to utterance-list map from.");
     po.Register("spkvec-min-count", &min_count,
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
     }
     if (gselect_rspecifier == "")
       KALDI_ERR << "--gselect option is required.";
-    
+
     RandomAccessPosteriorReader post_reader(post_rspecifier);
     RandomAccessBaseFloatVectorReader spkvecs_reader(spkvecs_rspecifier);
     RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier);
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
           }
           const std::vector<std::vector<int32> > &gselect =
               gselect_reader.Value(utt);
-          
+
           Matrix<BaseFloat> transformed_feats(feats);
           for (int32 r = 0; r < transformed_feats.NumRows(); r++) {
             SubVector<BaseFloat> row(transformed_feats, r);
@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
                                  logdet, &spk_vars, &spk_stats);
           num_done++;
         }  // end looping over all utterances of the current speaker
-        
+
         BaseFloat impr, spk_frame_count;
         // Compute the FMLLR transform and write it out.
         spk_stats.Update(am_sgmm, fmllr_globals, fmllr_opts, &fmllr_xform,
@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
         }
         const std::vector<std::vector<int32> > &gselect =
             gselect_reader.Value(utt);
-        
+
         if (fmllr_reader.IsOpen()) {
           if (fmllr_reader.HasKey(utt)) {
             fmllr_xform.CopyFromMat(fmllr_reader.Value(utt));
@@ -254,13 +254,13 @@ int main(int argc, char *argv[]) {
           fmllr_xform.SetUnit();
           logdet = 0.0;
         }
-        
+
         Matrix<BaseFloat> transformed_feats(feats);
         for (int32 r = 0; r < transformed_feats.NumRows(); r++) {
           SubVector<BaseFloat> row(transformed_feats, r);
           ApplyAffineTransform(fmllr_xform, &row);
         }
-        
+
         Sgmm2PerSpkDerivedVars spk_vars;
         if (spkvecs_reader.IsOpen()) {
           if (spkvecs_reader.HasKey(utt)) {
@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
                                post, trans_model, am_sgmm,
                                logdet, &spk_vars, &spk_stats);
         num_done++;
-        
+
         BaseFloat impr, spk_frame_count;
         // Compute the FMLLR transform and write it out.
         spk_stats.Update(am_sgmm, fmllr_globals, fmllr_opts, &fmllr_xform,

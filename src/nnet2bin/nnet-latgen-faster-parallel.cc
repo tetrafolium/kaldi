@@ -83,10 +83,10 @@ int main(int argc, char *argv[]) {
     bool determinize = config.determinize_lattice;
     CompactLatticeWriter compact_lattice_writer;
     LatticeWriter lattice_writer;
-    if (! (determinize ? compact_lattice_writer.Open(lattice_wspecifier)
-           : lattice_writer.Open(lattice_wspecifier)))
+    if (!(determinize ? compact_lattice_writer.Open(lattice_wspecifier)
+        : lattice_writer.Open(lattice_wspecifier)))
       KALDI_ERR << "Could not open table for writing lattices: "
-                 << lattice_wspecifier;
+                << lattice_wspecifier;
 
     TaskSequencer<DecodeUtteranceLatticeFasterClass> sequencer(sequencer_config);
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
     if (word_syms_filename != "")
       if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
         KALDI_ERR << "Could not read symbol table from file "
-                   << word_syms_filename;
+                  << word_syms_filename;
 
     // We support reading in a vector to describe each speaker, if the neural
     // net requires this (i.e. it was trained with this).

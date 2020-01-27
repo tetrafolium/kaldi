@@ -44,7 +44,7 @@ namespace kaldi {
 
 static bool prefixp(const std::string& pfx, const std::string& str) {
   return pfx.length() <= str.length() &&
-    std::equal(pfx.begin(), pfx.end(), str.begin());
+         std::equal(pfx.begin(), pfx.end(), str.begin());
 }
 
 static std::string cygprefix("/cygdrive/");
@@ -58,9 +58,9 @@ static std::string MapCygwinPathNoTmp(const std::string &filename) {
   if (filename == "/dev/null")
     return "\\\\.\\nul";
   if (prefixp("/dev/", filename)) {
-      KALDI_ERR << "Unable to resolve path '" << filename
-                << "' - only have /dev/null here.";
-      return "\\\\.\\invalid";
+    KALDI_ERR << "Unable to resolve path '" << filename
+              << "' - only have /dev/null here.";
+    return "\\\\.\\invalid";
   }
 
   // /cygdrive/?[/....]
@@ -69,7 +69,7 @@ static std::string MapCygwinPathNoTmp(const std::string &filename) {
       && filename.size() >= preflen + 1 && isalpha(filename[preflen])
       && (filename.size() == preflen + 1 || filename[preflen + 1] == '/')) {
     return std::string() + filename[preflen] + ':' +
-       (filename.size() > preflen + 1 ? filename.substr(preflen + 1) : "/");
+           (filename.size() > preflen + 1 ? filename.substr(preflen + 1) : "/");
   }
 
   KALDI_WARN << "Unable to resolve path '" << filename

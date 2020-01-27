@@ -79,7 +79,7 @@ namespace kaldi {
    BackoffDeterministicOnDemandFst wrapped in ScaleDeterministicOnDemandFst)
    with the RNNLM language model (the name of FST TBD, Hainan needs to write
    this).
-*/
+ */
 
 
 
@@ -121,10 +121,10 @@ struct ComposeLatticePrunedOptions {
   // heuristics will be less accurate).
   BaseFloat growth_ratio;
 
-  ComposeLatticePrunedOptions(): lattice_compose_beam(6.0),
-                                 max_arcs(100000),
-                                 initial_num_arcs(100),
-                                 growth_ratio(1.5) { }
+  ComposeLatticePrunedOptions() : lattice_compose_beam(6.0),
+    max_arcs(100000),
+    initial_num_arcs(100),
+    growth_ratio(1.5) { }
   void Register(OptionsItf *po) {
     po->Register("lattice-compose-beam", &lattice_compose_beam,
                  "Beam used in pruned lattice composition, which determines how "
@@ -166,10 +166,10 @@ struct ComposeLatticePrunedOptions {
                    lattice semiring.
  */
 void ComposeCompactLatticePruned(
-    const ComposeLatticePrunedOptions &opts,
-    const CompactLattice &clat,
-    fst::DeterministicOnDemandFst<fst::StdArc> *det_fst,
-    CompactLattice* composed_clat);
+  const ComposeLatticePrunedOptions &opts,
+  const CompactLattice &clat,
+  fst::DeterministicOnDemandFst<fst::StdArc> *det_fst,
+  CompactLattice* composed_clat);
 
 
 

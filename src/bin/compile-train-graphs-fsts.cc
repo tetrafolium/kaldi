@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
                 "more memory.  E.g. 500");
     po.Register("read-disambig-syms", &disambig_rxfilename, "File containing "
                 "list of disambiguation symbols in phone symbol table");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 5) {
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
     SequentialTableReader<fst::VectorFstHolder> fst_reader(fsts_rspecifier);
     TableWriter<fst::VectorFstHolder> fst_writer(fsts_wspecifier);
-    
+
     int num_succeed = 0, num_fail = 0;
 
     if (batch_size == 1) {  // We treat batch_size of 1 as a special case in order
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
         keys.clear();
         grammars.clear();
         for (; !fst_reader.Done() &&
-                static_cast<int32>(grammars.size()) < batch_size;
+            static_cast<int32>(grammars.size()) < batch_size;
             fst_reader.Next()) {
           keys.push_back(fst_reader.Key());
           grammars.push_back(new VectorFst<StdArc>(fst_reader.Value()));

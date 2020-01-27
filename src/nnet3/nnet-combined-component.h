@@ -112,7 +112,7 @@ namespace nnet3 {
  *
  */
 class ConvolutionComponent: public UpdatableComponent {
- public:
+public:
   enum TensorVectorizationType  {
     kYzx = 0,
     kZyx = 1
@@ -143,20 +143,20 @@ class ConvolutionComponent: public UpdatableComponent {
   }
 
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &, // out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update_in,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &,                   // out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update_in,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
   void Update(const std::string &debug_info,
-              const CuMatrixBase<BaseFloat> &in_value,
-              const CuMatrixBase<BaseFloat> &out_deriv,
-              const std::vector<CuSubMatrix<BaseFloat> *>& out_deriv_batch);
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      const std::vector<CuSubMatrix<BaseFloat> *>& out_deriv_batch);
 
 
   virtual void Read(std::istream &is, bool binary);
@@ -175,32 +175,32 @@ class ConvolutionComponent: public UpdatableComponent {
 
   // Some functions that are specific to this class.
   void SetParams(const VectorBase<BaseFloat> &bias,
-                 const MatrixBase<BaseFloat> &filter);
+      const MatrixBase<BaseFloat> &filter);
   const CuVector<BaseFloat> &BiasParams() const { return bias_params_; }
   const CuMatrix<BaseFloat> &LinearParams() const { return filter_params_; }
   void Init(int32 input_x_dim, int32 input_y_dim, int32 input_z_dim,
-            int32 filt_x_dim, int32 filt_y_dim,
-            int32 filt_x_step, int32 filt_y_step, int32 num_filters,
-            TensorVectorizationType input_vectorization,
-            BaseFloat param_stddev, BaseFloat bias_stddev);
+      int32 filt_x_dim, int32 filt_y_dim,
+      int32 filt_x_step, int32 filt_y_step, int32 num_filters,
+      TensorVectorizationType input_vectorization,
+      BaseFloat param_stddev, BaseFloat bias_stddev);
   // there is no filt_z_dim parameter as the length of the filter along
   // z-dimension is same as the input
   void Init(int32 input_x_dim, int32 input_y_dim, int32 input_z_dim,
-            int32 filt_x_dim, int32 filt_y_dim,
-            int32 filt_x_step, int32 filt_y_step,
-            TensorVectorizationType input_vectorization,
-            std::string matrix_filename);
+      int32 filt_x_dim, int32 filt_y_dim,
+      int32 filt_x_step, int32 filt_y_step,
+      TensorVectorizationType input_vectorization,
+      std::string matrix_filename);
 
   // resize the component, setting the parameters to zero, while
   // leaving any other configuration values the same
   void Resize(int32 input_dim, int32 output_dim);
 
   void Update(const std::string &debug_info,
-              const CuMatrixBase<BaseFloat> &in_value,
-              const CuMatrixBase<BaseFloat> &out_deriv);
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_deriv);
 
 
- private:
+private:
   int32 input_x_dim_;   // size of the input along x-axis
                         // (e.g. number of time steps)
 
@@ -244,71 +244,71 @@ class ConvolutionComponent: public UpdatableComponent {
   // to the output of each filter).
 
   void InputToInputPatches(const CuMatrixBase<BaseFloat>& in,
-                           CuMatrix<BaseFloat> *patches) const;
+      CuMatrix<BaseFloat> *patches) const;
   void InderivPatchesToInderiv(const CuMatrix<BaseFloat>& in_deriv_patches,
-                               CuMatrixBase<BaseFloat> *in_deriv) const;
+      CuMatrixBase<BaseFloat> *in_deriv) const;
   const ConvolutionComponent &operator = (const ConvolutionComponent &other); // Disallow.
 };
 
 
 /*
-  LstmNonlinearityComponent is a component that implements part of an LSTM, by
-  combining together the sigmoids and tanh's, plus some diagonal terms, into
-  a single block.
-  We will refer to the LSTM formulation used in
+   LstmNonlinearityComponent is a component that implements part of an LSTM, by
+   combining together the sigmoids and tanh's, plus some diagonal terms, into
+   a single block.
+   We will refer to the LSTM formulation used in
 
-  Long Short-Term Memory Recurrent Neural Network Architectures for Large Scale Acoustic Modeling"
-  by H. Sak et al,
-  http://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43905.pdf.
+   Long Short-Term Memory Recurrent Neural Network Architectures for Large Scale Acoustic Modeling"
+   by H. Sak et al,
+   http://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43905.pdf.
 
-  Suppose the cell dimension is C.  Then outside this component, we compute
-  the 4 * C-dimensional quantity consisting of 4 blocks as follows, by a single
-  matrix multiplication:
+   Suppose the cell dimension is C.  Then outside this component, we compute
+   the 4 * C-dimensional quantity consisting of 4 blocks as follows, by a single
+   matrix multiplication:
 
-  i_part = W_{ix} x_t + W_{im} m_{t-1} + b_i
-  f_part = W_{fx} x_t + W_{fm} m_{t-1} + b_f
-  c_part = W_{cx} x_t + W_{cm} m_{t-1} + b_c
-  o_part = W_{cx} x_t + W_{om} m_{t-1} + b_o
+   i_part = W_{ix} x_t + W_{im} m_{t-1} + b_i
+   f_part = W_{fx} x_t + W_{fm} m_{t-1} + b_f
+   c_part = W_{cx} x_t + W_{cm} m_{t-1} + b_c
+   o_part = W_{cx} x_t + W_{om} m_{t-1} + b_o
 
-  The part of the computation that takes place in this component is as follows.
-  Its input is of dimension 5C [however, search for 'dropout' below],
-  consisting of 5 blocks: (i_part, f_part, c_part, o_part, and c_{t-1}).  Its
-  output is of dimension 2C, consisting of 2 blocks: c_t and m_t.
+   The part of the computation that takes place in this component is as follows.
+   Its input is of dimension 5C [however, search for 'dropout' below],
+   consisting of 5 blocks: (i_part, f_part, c_part, o_part, and c_{t-1}).  Its
+   output is of dimension 2C, consisting of 2 blocks: c_t and m_t.
 
-  To recap: the input is (i_part, f_part, c_part, o_part, c_{t-1}); the output is (c_t, m_t).
+   To recap: the input is (i_part, f_part, c_part, o_part, c_{t-1}); the output is (c_t, m_t).
 
-  This component has parameters, 3C of them in total: the diagonal matrices w_i, w_f
-  and w_o.
+   This component has parameters, 3C of them in total: the diagonal matrices w_i, w_f
+   and w_o.
 
 
-  In the forward pass (Propagate), this component computes the following:
+   In the forward pass (Propagate), this component computes the following:
 
      i_t = Sigmoid(i_part + w_{ic}*c_{t-1})   (1)
      f_t = Sigmoid(f_part + w_{fc}*c_{t-1})   (2)
      c_t = f_t*c_{t-1} + i_t * Tanh(c_part)   (3)
      o_t = Sigmoid(o_part + w_{oc}*c_t)       (4)
      m_t = o_t * Tanh(c_t)                    (5)
-    # note: the outputs are just c_t and m_t.
+ # note: the outputs are just c_t and m_t.
 
-  [Note regarding dropout: optionally the input-dimension may be 5C + 3 instead
-  of 5C in this case, the last three input dimensions will be interpreted as
-  per-frame dropout masks on i_t, f_t and o_t respectively, so that on the RHS of
-  (3), i_t is replaced by i_t * i_t_scale, and likewise for f_t and o_t.]
+   [Note regarding dropout: optionally the input-dimension may be 5C + 3 instead
+   of 5C in this case, the last three input dimensions will be interpreted as
+   per-frame dropout masks on i_t, f_t and o_t respectively, so that on the RHS of
+   (3), i_t is replaced by i_t * i_t_scale, and likewise for f_t and o_t.]
 
-  The backprop is as you would think, but for the "self-repair" we need to pass
-  in additional vectors (of the same dim as the parameters of the layer) that
-  dictate whether or not we add an additional term to the backpropagated
-  derivatives.  (This term helps force the input to the nonlinearities into the
-  range where the derivatives are not too small).
+   The backprop is as you would think, but for the "self-repair" we need to pass
+   in additional vectors (of the same dim as the parameters of the layer) that
+   dictate whether or not we add an additional term to the backpropagated
+   derivatives.  (This term helps force the input to the nonlinearities into the
+   range where the derivatives are not too small).
 
-  This component stores stats of the same form as are normally stored by the
-  StoreStats() functions for the sigmoid and tanh units, i.e. averages of the
-  activations and derivatives, but this is done inside the Backprop() functions.
-  [the StoreStats() functions don't take the input data as an argument, so
-  storing this data that way is impossible, and anyway it's more efficient to
-  do it as part of backprop.]
+   This component stores stats of the same form as are normally stored by the
+   StoreStats() functions for the sigmoid and tanh units, i.e. averages of the
+   activations and derivatives, but this is done inside the Backprop() functions.
+   [the StoreStats() functions don't take the input data as an argument, so
+   storing this data that way is impossible, and anyway it's more efficient to
+   do it as part of backprop.]
 
-  Configuration values accepted:
+   Configuration values accepted:
          cell-dim          e.g. cell-dim=1024  Cell dimension.  The input
                           dimension of this component is cell-dim * 5, and the
                           output dimension is cell-dim * 2.  Note: this
@@ -331,31 +331,31 @@ class ConvolutionComponent: public UpdatableComponent {
                           want to change unless dealing with an objective function
                           that has smaller or larger dynamic range than normal, in
                           which case you might want to make it smaller or larger.
-*/
+ */
 class LstmNonlinearityComponent: public UpdatableComponent {
- public:
+public:
 
   virtual int32 InputDim() const;
   virtual int32 OutputDim() const;
   virtual std::string Info() const;
   virtual void InitFromConfig(ConfigLine *cfl);
-  LstmNonlinearityComponent(): use_dropout_(false) { }
+  LstmNonlinearityComponent() : use_dropout_(false) { }
   virtual std::string Type() const { return "LstmNonlinearityComponent"; }
   virtual int32 Properties() const {
     return kSimpleComponent|kUpdatableComponent|kBackpropNeedsInput;
   }
 
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &, // out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update_in,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &,                   // out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update_in,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -375,17 +375,17 @@ class LstmNonlinearityComponent: public UpdatableComponent {
 
   // Some functions that are specific to this class:
   explicit LstmNonlinearityComponent(
-      const LstmNonlinearityComponent &other);
+    const LstmNonlinearityComponent &other);
 
   void Init(int32 cell_dim, bool use_dropout,
-            BaseFloat param_stddev,
-            BaseFloat tanh_self_repair_threshold,
-            BaseFloat sigmoid_self_repair_threshold,
-            BaseFloat self_repair_scale);
+      BaseFloat param_stddev,
+      BaseFloat tanh_self_repair_threshold,
+      BaseFloat sigmoid_self_repair_threshold,
+      BaseFloat self_repair_scale);
 
   virtual void ConsolidateMemory();
 
- private:
+private:
 
   // Initializes the natural-gradient object with the configuration we
   // use for this object, which for now is hardcoded at the C++ level.
@@ -439,7 +439,7 @@ class LstmNonlinearityComponent: public UpdatableComponent {
   OnlineNaturalGradient preconditioner_;
 
   const LstmNonlinearityComponent &operator
-      = (const LstmNonlinearityComponent &other); // Disallow.
+  = (const LstmNonlinearityComponent &other);     // Disallow.
 };
 
 
@@ -486,11 +486,11 @@ class LstmNonlinearityComponent: public UpdatableComponent {
  *
  */
 class MaxpoolingComponent: public Component {
- public:
+public:
 
-  MaxpoolingComponent(): input_x_dim_(0), input_y_dim_(0), input_z_dim_(0),
-                           pool_x_size_(0), pool_y_size_(0), pool_z_size_(0),
-                           pool_x_step_(0), pool_y_step_(0), pool_z_step_(0) { }
+  MaxpoolingComponent() : input_x_dim_(0), input_y_dim_(0), input_z_dim_(0),
+    pool_x_size_(0), pool_y_size_(0), pool_z_size_(0),
+    pool_x_step_(0), pool_y_step_(0), pool_z_step_(0) { }
   // constructor using another component
   MaxpoolingComponent(const MaxpoolingComponent &component);
 
@@ -506,16 +506,16 @@ class MaxpoolingComponent: public Component {
   }
 
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *, // to_update,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *,                   // to_update,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary); // This Read function
   // requires that the Component has the correct type.
@@ -525,11 +525,11 @@ class MaxpoolingComponent: public Component {
   virtual Component* Copy() const { return new MaxpoolingComponent(*this); }
 
 
- protected:
+protected:
   void InputToInputPatches(const CuMatrixBase<BaseFloat>& in,
-                           CuMatrix<BaseFloat> *patches) const;
+      CuMatrix<BaseFloat> *patches) const;
   void InderivPatchesToInderiv(const CuMatrix<BaseFloat>& in_deriv_patches,
-                               CuMatrixBase<BaseFloat> *in_deriv) const;
+      CuMatrixBase<BaseFloat> *in_deriv) const;
   virtual void Check() const;
 
 
@@ -555,59 +555,59 @@ class MaxpoolingComponent: public Component {
 
 
 /**
-  GruNonlinearityComponent is a component that implements part of a
-  Gated Recurrent Unit (GRU).  This is more efficient in time and
-  memory than stitching it together using more basic components.
-  For a brief summary of what this actually computes, search
-  for 'recap' below; the first part of this comment establishes
-  the context.
+   GruNonlinearityComponent is a component that implements part of a
+   Gated Recurrent Unit (GRU).  This is more efficient in time and
+   memory than stitching it together using more basic components.
+   For a brief summary of what this actually computes, search
+   for 'recap' below; the first part of this comment establishes
+   the context.
 
-  This component supports two cases: the regular GRU
- (as described in "Empirical Evaluation of
- Gated Recurrent Neural Networks on Sequence Modeling",
- https://arxiv.org/pdf/1412.3555.pdf),
-  and our "projected GRU" which takes ideas from the
- paper we'll abbreviate as "LSTM based RNN architectures for LVCSR",
- https://arxiv.org/pdf/1402.1128.pdf.
+   This component supports two cases: the regular GRU
+   (as described in "Empirical Evaluation of
+   Gated Recurrent Neural Networks on Sequence Modeling",
+   https://arxiv.org/pdf/1412.3555.pdf),
+   and our "projected GRU" which takes ideas from the
+   paper we'll abbreviate as "LSTM based RNN architectures for LVCSR",
+   https://arxiv.org/pdf/1402.1128.pdf.
 
- Before describing what this component does, we'll establish
- some notation for the GRU.
+   Before describing what this component does, we'll establish
+   some notation for the GRU.
 
- First, the regular (non-projected) GRU.  In order to unify the notation with
- our "projected GRU", we'll use slightly different variable names.  We'll also
- ignore the bias terms for purposes of this exposition (let them be implicit).
+   First, the regular (non-projected) GRU.  In order to unify the notation with
+   our "projected GRU", we'll use slightly different variable names.  We'll also
+   ignore the bias terms for purposes of this exposition (let them be implicit).
 
 
-  Regular GRU:
+   Regular GRU:
 
    z_t = \sigmoid ( U^z x_t + W^z y_{t-1} )   # update gate, dim == cell_dim
    r_t = \sigmoid ( U^r x_t + W^r y_{t-1} )   # reset gate, dim == cell_dim
    h_t = \tanh ( U^h x_t + W^h ( y_{t-1} \dot r_t ) )   # dim == cell_dim
    y_t = ( 1 - z_t ) \dot h_t  +  z_t \dot y_{t-1}  # dim == cell_dim
 
- For the "projected GRU", the 'cell_dim x cell_dim' full-matrix expressions W^z
- W^r and W^h that participate in the expressions for z_t, r_t and h_t are
- replaced with skinny matrices of dimension 'cell_dim x recurrent_dim'
- (where recurrent_dim < cell_dim) and the output is replaced by
- a lower-dimension projection of the hidden state, of dimension
- 'recurrent_dim + non_recurrent_dim < cell_dim', instead of the
- full 'cell_dim'.  We rename y_t to c_t (this name is inspired by LSTMs), and
- we now let the output (still called y_t) be a projection of c_t.
- s_t is a dimension range of the output y_t.    Parameters of the
- projected GRU:
+   For the "projected GRU", the 'cell_dim x cell_dim' full-matrix expressions W^z
+   W^r and W^h that participate in the expressions for z_t, r_t and h_t are
+   replaced with skinny matrices of dimension 'cell_dim x recurrent_dim'
+   (where recurrent_dim < cell_dim) and the output is replaced by
+   a lower-dimension projection of the hidden state, of dimension
+   'recurrent_dim + non_recurrent_dim < cell_dim', instead of the
+   full 'cell_dim'.  We rename y_t to c_t (this name is inspired by LSTMs), and
+   we now let the output (still called y_t) be a projection of c_t.
+   s_t is a dimension range of the output y_t.    Parameters of the
+   projected GRU:
            cell_dim > 0
            recurrent_dim > 0
            non_recurrent_dim > 0  (where non_recurrent_dim + recurrent_dim < cell_dim).
 
 
-  Equations:
+   Equations:
 
    z_t = \sigmoid ( U^z x_t + W^z s_{t-1} )   # update gate, dim(z_t) == cell_dim
    r_t = \sigmoid ( U^r x_t + W^r s_{t-1} )   # reset gate, dim(r_t) == recurrent_dim
    h_t = \tanh ( U^h x_t + W^h ( s_{t-1} \dot r_t ) )   # dim(h_t) == cell_dim
    c_t = ( 1 - z_t ) \dot h_t  +  z_t \dot c_{t-1}  # dim(c_t) == cell_dim
    y_t = W^y c_t      # dim(y_t) = recurrent_dim + non_recurrent_dim.  This is
-                      # the output of the GRU.
+ # the output of the GRU.
    s_t = y_t[0:recurrent_dim-1]  # dimension range of y_t, dim(s_t) = recurrent_dim.
 
 
@@ -653,7 +653,7 @@ class MaxpoolingComponent: public Component {
    activations and derivatives, but this is done inside the Backprop() functions.
 
 
-  The main configuration values that are accepted:
+   The main configuration values that are accepted:
          cell-dim         e.g. cell-dim=1024  Cell dimension.
          recurrent-dim    e.g. recurrent-dim=256.  If not specified, we assume
                           this is a non-projected GRU.
@@ -671,8 +671,8 @@ class MaxpoolingComponent: public Component {
                           which case you might want to make it smaller or
                           larger.
 
-  Values inherited from UpdatableComponent (see its declaration in
-  nnet-component-itf.h for details):
+   Values inherited from UpdatableComponent (see its declaration in
+   nnet-component-itf.h for details):
       learning-rate
       learning-rate-factor
       max-change
@@ -709,9 +709,9 @@ class MaxpoolingComponent: public Component {
     where:
          h_t = \tanh( hpart_t + W^h (y_{t-1} \dot r_t))
          y_t = (1 - z_t) \dot h_t + z_t \dot y_{t-1}.
-*/
+ */
 class GruNonlinearityComponent: public UpdatableComponent {
- public:
+public:
 
   virtual int32 InputDim() const;
   virtual int32 OutputDim() const;
@@ -720,20 +720,20 @@ class GruNonlinearityComponent: public UpdatableComponent {
   GruNonlinearityComponent() { }
   virtual std::string Type() const { return "GruNonlinearityComponent"; }
   virtual int32 Properties() const {
-    return kSimpleComponent|kUpdatableComponent|kBackpropNeedsInput|\
-        kBackpropNeedsOutput|kBackpropAdds;
+    return kSimpleComponent|kUpdatableComponent|kBackpropNeedsInput| \
+           kBackpropNeedsOutput|kBackpropAdds;
   }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &, // out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update_in,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &,                   // out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update_in,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -754,9 +754,9 @@ class GruNonlinearityComponent: public UpdatableComponent {
 
   // Some functions that are specific to this class:
   explicit GruNonlinearityComponent(
-      const GruNonlinearityComponent &other);
+    const GruNonlinearityComponent &other);
 
- private:
+private:
 
   void Check() const;  // checks dimensions, etc.
 
@@ -774,7 +774,7 @@ class GruNonlinearityComponent: public UpdatableComponent {
      members value_sum_, deriv_sum, self_repair_total_, and count_.
    */
   void TanhStatsAndSelfRepair(const CuMatrixBase<BaseFloat> &h_t,
-                              CuMatrixBase<BaseFloat> *h_t_deriv);
+      CuMatrixBase<BaseFloat> *h_t_deriv);
 
   /*  This function is responsible for updating the w_h_ matrix
       (taking into account the learning rate).
@@ -787,7 +787,7 @@ class GruNonlinearityComponent: public UpdatableComponent {
                         term as it affects the derivative w.r.t. W^h.
    */
   void UpdateParameters(const CuMatrixBase<BaseFloat> &sdotr,
-                        const CuMatrixBase<BaseFloat> &h_t_deriv);
+      const CuMatrixBase<BaseFloat> &h_t_deriv);
 
 
   int32 cell_dim_;  // cell dimension, e.g. 1024.
@@ -841,29 +841,29 @@ class GruNonlinearityComponent: public UpdatableComponent {
   OnlineNaturalGradient preconditioner_out_;
 
   const GruNonlinearityComponent &operator
-      = (const GruNonlinearityComponent &other); // Disallow.
+  = (const GruNonlinearityComponent &other);     // Disallow.
 };
 
 
 /**
-  OutputGruNonlinearityComponent is a component that implements part of a
-  Output Gated Recurrent Unit (OGRU).  Compare with the traditional GRU, it uses
-  output gate instead reset gate, and the formula of h_t will be different. 
-  You can regard it as a variant of GRU.
-  This code is more efficient in time and memory than stitching it together
-  using more basic components.
-  For a brief summary of what this actually computes, search for 'recap' below;
-  the first part of this comment establishes the context. For more information
-  about GRU, please check the summary of GruNonlinearityComponent.
+   OutputGruNonlinearityComponent is a component that implements part of a
+   Output Gated Recurrent Unit (OGRU).  Compare with the traditional GRU, it uses
+   output gate instead reset gate, and the formula of h_t will be different.
+   You can regard it as a variant of GRU.
+   This code is more efficient in time and memory than stitching it together
+   using more basic components.
+   For a brief summary of what this actually computes, search for 'recap' below;
+   the first part of this comment establishes the context. For more information
+   about GRU, please check the summary of GruNonlinearityComponent.
 
- Before describing what this component does, we'll establish
- some notation for the OGRU.
+   Before describing what this component does, we'll establish
+   some notation for the OGRU.
 
- We use the same notation with previous GRU. We'll also
- ignore the bias terms for purposes of this exposition (let them be implicit).
+   We use the same notation with previous GRU. We'll also
+   ignore the bias terms for purposes of this exposition (let them be implicit).
 
 
-  Regular OGRU:
+   Regular OGRU:
 
    z_t = \sigmoid ( U^z x_t + W^z y_{t-1} )   # update gate, dim == cell_dim
    o_t = \sigmoid ( U^o x_t + W^o y_{t-1} )   # output gate, dim == cell_dim
@@ -871,28 +871,28 @@ class GruNonlinearityComponent: public UpdatableComponent {
    c_t = ( 1 - z_t ) \dot h_t  +  z_t \dot c_{t-1}  # dim == cell_dim
    y_t = ( c_t \dot o_t )
 
- For the "projected OGRU", the 'cell_dim x cell_dim' full-matrix expressions W^z
- W^o that participate in the expressions for z_t, o_t are
- replaced with skinny matrices of dimension 'cell_dim x recurrent_dim'
- (where recurrent_dim < cell_dim) and the output is replaced by
- a lower-dimension projection of the hidden state, of dimension
- 'recurrent_dim + non_recurrent_dim < cell_dim', instead of the
- full 'cell_dim'.
- s_t is a dimension range of the output y_t.    Parameters of the
- projected OGRU:
+   For the "projected OGRU", the 'cell_dim x cell_dim' full-matrix expressions W^z
+   W^o that participate in the expressions for z_t, o_t are
+   replaced with skinny matrices of dimension 'cell_dim x recurrent_dim'
+   (where recurrent_dim < cell_dim) and the output is replaced by
+   a lower-dimension projection of the hidden state, of dimension
+   'recurrent_dim + non_recurrent_dim < cell_dim', instead of the
+   full 'cell_dim'.
+   s_t is a dimension range of the output y_t.    Parameters of the
+   projected OGRU:
            cell_dim > 0
            recurrent_dim > 0
            non_recurrent_dim > 0  (where non_recurrent_dim + recurrent_dim <= cell_dim).
 
 
-  Equations:
+   Equations:
 
    z_t = \sigmoid ( U^z x_t + W^z s_{t-1} )   # update gate, dim(z_t) == cell_dim
    o_t = \sigmoid ( U^o x_t + W^o s_{t-1} )   # output gate, dim(o_t) == cell_dim
    h_t = \tanh ( U^h x_t + W^h \dot c_{t-1} )   # dim(h_t) == cell_dim
    c_t = ( 1 - z_t ) \dot h_t  +  z_t \dot c_{t-1}  # dim(c_t) == cell_dim
    y_t = ( c_t \dot o_t) W^y  # dim(y_t) = recurrent_dim + non_recurrent_dim.
-                              # This is the output of the OGRU.
+ # This is the output of the OGRU.
    s_t = y_t[0:recurrent_dim-1]  # dimension range of y_t, dim(s_t) = recurrent_dim.
 
 
@@ -930,7 +930,7 @@ class GruNonlinearityComponent: public UpdatableComponent {
    activations and derivatives, but this is done inside the Backprop() functions.
 
 
-  The main configuration values that are accepted:
+   The main configuration values that are accepted:
          cell-dim         e.g. cell-dim=1024  Cell dimension.
          recurrent-dim    e.g. recurrent-dim=256.  If not specified, we assume
                           this is a non-projected GRU.
@@ -948,8 +948,8 @@ class GruNonlinearityComponent: public UpdatableComponent {
                           which case you might want to make it smaller or
                           larger.
 
-  Values inherited from UpdatableComponent (see its declaration in
-  nnet-component-itf.h for details):
+   Values inherited from UpdatableComponent (see its declaration in
+   nnet-component-itf.h for details):
       learning-rate
       learning-rate-factor
       max-change
@@ -975,9 +975,9 @@ class GruNonlinearityComponent: public UpdatableComponent {
     where:
          h_t = \tanh( hpart_t + W^h \dot c_{t-1} )
          c_t = (1 - z_t) \dot h_t + z_t \dot c_{t-1}.
-*/
+ */
 class OutputGruNonlinearityComponent: public UpdatableComponent {
- public:
+public:
 
   virtual int32 InputDim() const;
   virtual int32 OutputDim() const;
@@ -986,20 +986,20 @@ class OutputGruNonlinearityComponent: public UpdatableComponent {
   OutputGruNonlinearityComponent() { }
   virtual std::string Type() const { return "OutputGruNonlinearityComponent"; }
   virtual int32 Properties() const {
-    return kSimpleComponent|kUpdatableComponent|kBackpropNeedsInput|\
-        kBackpropNeedsOutput|kBackpropAdds;
+    return kSimpleComponent|kUpdatableComponent|kBackpropNeedsInput| \
+           kBackpropNeedsOutput|kBackpropAdds;
   }
   virtual void* Propagate(const ComponentPrecomputedIndexes *indexes,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const std::string &debug_info,
-                        const ComponentPrecomputedIndexes *indexes,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &, // out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        void *memo,
-                        Component *to_update_in,
-                        CuMatrixBase<BaseFloat> *in_deriv) const;
+      const ComponentPrecomputedIndexes *indexes,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &,                   // out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      void *memo,
+      Component *to_update_in,
+      CuMatrixBase<BaseFloat> *in_deriv) const;
 
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -1020,9 +1020,9 @@ class OutputGruNonlinearityComponent: public UpdatableComponent {
 
   // Some functions that are specific to this class:
   explicit OutputGruNonlinearityComponent(
-      const OutputGruNonlinearityComponent &other);
+    const OutputGruNonlinearityComponent &other);
 
- private:
+private:
 
   void Check() const;  // checks dimensions, etc.
 
@@ -1040,7 +1040,7 @@ class OutputGruNonlinearityComponent: public UpdatableComponent {
      members value_sum_, deriv_sum, self_repair_total_, and count_.
    */
   void TanhStatsAndSelfRepair(const CuMatrixBase<BaseFloat> &h_t,
-                              CuMatrixBase<BaseFloat> *h_t_deriv);
+      CuMatrixBase<BaseFloat> *h_t_deriv);
 
   /*  This function is responsible for updating the w_h_ matrix
       (taking into account the learning rate).
@@ -1053,7 +1053,7 @@ class OutputGruNonlinearityComponent: public UpdatableComponent {
                         term as it affects the derivative w.r.t. W^h.
    */
   void UpdateParameters(const CuMatrixBase<BaseFloat> &c_t1_value,
-                        const CuMatrixBase<BaseFloat> &h_t_deriv);
+      const CuMatrixBase<BaseFloat> &h_t_deriv);
 
 
   int32 cell_dim_;  // cell dimension, e.g. 1024.
@@ -1098,7 +1098,7 @@ class OutputGruNonlinearityComponent: public UpdatableComponent {
   OnlineNaturalGradient preconditioner_;
 
   const OutputGruNonlinearityComponent &operator
-      = (const OutputGruNonlinearityComponent &other); // Disallow.
+  = (const OutputGruNonlinearityComponent &other);     // Disallow.
 };
 
 

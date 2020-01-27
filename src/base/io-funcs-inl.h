@@ -32,7 +32,7 @@ namespace kaldi {
 
 // Template that covers integers.
 template<class T>  void WriteBasicType(std::ostream &os,
-                                       bool binary, T t) {
+    bool binary, T t) {
   // Compile time assertion that this is not called with a wrong type.
   KALDI_ASSERT_IS_INTEGER_TYPE(T);
   if (binary) {
@@ -53,7 +53,7 @@ template<class T>  void WriteBasicType(std::ostream &os,
 
 // Template that covers integers.
 template<class T> inline void ReadBasicType(std::istream &is,
-                                            bool binary, T *t) {
+    bool binary, T *t) {
   KALDI_PARANOID_ASSERT(t != NULL);
   // Compile time assertion that this is not called with a wrong type.
   KALDI_ASSERT_IS_INTEGER_TYPE(T);
@@ -63,7 +63,7 @@ template<class T> inline void ReadBasicType(std::istream &is,
       KALDI_ERR << "ReadBasicType: encountered end of stream.";
     char len_c = static_cast<char>(len_c_in), len_c_expected
       = (std::numeric_limits<T>::is_signed ? 1 :  -1)
-      * static_cast<char>(sizeof(*t));
+        * static_cast<char>(sizeof(*t));
     if (len_c !=  len_c_expected) {
       KALDI_ERR << "ReadBasicType: did not get expected integer type, "
                 << static_cast<int>(len_c)
@@ -91,7 +91,7 @@ template<class T> inline void ReadBasicType(std::istream &is,
 // Template that covers integers.
 template<class T>
 inline void WriteIntegerPairVector(std::ostream &os, bool binary,
-                                   const std::vector<std::pair<T, T> > &v) {
+    const std::vector<std::pair<T, T> > &v) {
   // Compile time assertion that this is not called with a wrong type.
   KALDI_ASSERT_IS_INTEGER_TYPE(T);
   if (binary) {
@@ -110,7 +110,7 @@ inline void WriteIntegerPairVector(std::ostream &os, bool binary,
     // for efficiency use binary.
     os << "[ ";
     typename std::vector<std::pair<T, T> >::const_iterator iter = v.begin(),
-                                                            end = v.end();
+        end = v.end();
     for (; iter != end; ++iter) {
       if (sizeof(T) == 1)
         os << static_cast<int16>(iter->first) << ','
@@ -129,7 +129,7 @@ inline void WriteIntegerPairVector(std::ostream &os, bool binary,
 // Template that covers integers.
 template<class T>
 inline void ReadIntegerPairVector(std::istream &is, bool binary,
-                                  std::vector<std::pair<T, T> > *v) {
+    std::vector<std::pair<T, T> > *v) {
   KALDI_ASSERT_IS_INTEGER_TYPE(T);
   KALDI_ASSERT(v != NULL);
   if (binary) {
@@ -150,7 +150,7 @@ inline void ReadIntegerPairVector(std::istream &is, bool binary,
     }
   } else {
     std::vector<std::pair<T, T> > tmp_v;  // use temporary so v doesn't use extra memory
-                           // due to resizing.
+    // due to resizing.
     is >> std::ws;
     if (is.peek() != static_cast<int>('[')) {
       KALDI_ERR << "ReadIntegerPairVector: expected to see [, saw "
@@ -170,7 +170,7 @@ inline void ReadIntegerPairVector(std::istream &is, bool binary,
         is >> next_t2 >> std::ws;
         if (is.fail()) goto bad;
         else
-            tmp_v.push_back(std::make_pair<T, T>((T)next_t1, (T)next_t2));
+          tmp_v.push_back(std::make_pair<T, T>((T)next_t1, (T)next_t2));
       } else {
         T next_t1, next_t2;
         is >> next_t1;
@@ -182,7 +182,7 @@ inline void ReadIntegerPairVector(std::istream &is, bool binary,
         is >> next_t2 >> std::ws;
         if (is.fail()) goto bad;
         else
-            tmp_v.push_back(std::pair<T, T>(next_t1, next_t2));
+          tmp_v.push_back(std::pair<T, T>(next_t1, next_t2));
       }
     }
     is.get();  // get the final ']'.
@@ -190,13 +190,13 @@ inline void ReadIntegerPairVector(std::istream &is, bool binary,
     // uses less permanent memory.
   }
   if (!is.fail()) return;
- bad:
+bad:
   KALDI_ERR << "ReadIntegerPairVector: read failure at file position "
             << is.tellg();
 }
 
 template<class T> inline void WriteIntegerVector(std::ostream &os, bool binary,
-                                                 const std::vector<T> &v) {
+    const std::vector<T> &v) {
   // Compile time assertion that this is not called with a wrong type.
   KALDI_ASSERT_IS_INTEGER_TYPE(T);
   if (binary) {
@@ -230,8 +230,8 @@ template<class T> inline void WriteIntegerVector(std::ostream &os, bool binary,
 
 
 template<class T> inline void ReadIntegerVector(std::istream &is,
-                                                bool binary,
-                                                std::vector<T> *v) {
+    bool binary,
+    std::vector<T> *v) {
   KALDI_ASSERT_IS_INTEGER_TYPE(T);
   KALDI_ASSERT(v != NULL);
   if (binary) {
@@ -266,13 +266,13 @@ template<class T> inline void ReadIntegerVector(std::istream &is,
         is >> next_t >> std::ws;
         if (is.fail()) goto bad;
         else
-            tmp_v.push_back((T)next_t);
+          tmp_v.push_back((T)next_t);
       } else {
         T next_t;
         is >> next_t >> std::ws;
         if (is.fail()) goto bad;
         else
-            tmp_v.push_back(next_t);
+          tmp_v.push_back(next_t);
       }
     }
     is.get();  // get the final ']'.
@@ -280,7 +280,7 @@ template<class T> inline void ReadIntegerVector(std::istream &is,
     // uses less permanent memory.
   }
   if (!is.fail()) return;
- bad:
+bad:
   KALDI_ERR << "ReadIntegerVector: read failure at file position "
             << is.tellg();
 }

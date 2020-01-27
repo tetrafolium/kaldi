@@ -31,8 +31,8 @@
 namespace kaldi {
 
 void GetFeatureMeanAndVariance(const std::string &feat_rspecifier,
-                               Vector<BaseFloat> *inv_var_out,                               
-                               Vector<BaseFloat> *mean_out) {
+    Vector<BaseFloat> *inv_var_out,
+    Vector<BaseFloat> *mean_out) {
   double count = 0.0;
   Vector<double> x_stats, x2_stats;
 
@@ -80,14 +80,14 @@ int main(int argc, char *argv[]) {
         "Usage:  gmm-init-model-flat [options] <tree-in> <topo-file> <model-out> [<features-rspecifier>]\n"
         "e.g.: \n"
         "  gmm-init-model-flat tree topo 1.mdl ark:feats.scp\n";
-    
+
     bool binary = true;
     int32 dim = 40;
 
     ParseOptions po(usage);
     po.Register("binary", &binary, "Write output in binary mode");
     po.Register("dim", &dim, "Dimension of model (this matters only if not providing features).");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() < 3 || po.NumArgs() > 4) {
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     ContextDependency ctx_dep;
     ReadKaldiObject(tree_filename, &ctx_dep);
 
-    HmmTopology topo; 
+    HmmTopology topo;
     ReadKaldiObject(topo_filename, &topo);
 
     Vector<BaseFloat> global_inverse_var, global_mean;
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
     }
     for (int i = 0; i < num_pdfs; i++)
       am_gmm.AddPdf(gmm);
-    
+
     TransitionModel trans_model(ctx_dep, topo);
 
     {

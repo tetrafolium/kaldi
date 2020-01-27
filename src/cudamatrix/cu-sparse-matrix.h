@@ -41,22 +41,22 @@ namespace kaldi {
 
 template <typename Real>
 Real TraceMatSmat(const CuMatrixBase<Real> &A,
-                  const CuSparseMatrix<Real> &B,
-                  MatrixTransposeType trans = kNoTrans);
+    const CuSparseMatrix<Real> &B,
+    MatrixTransposeType trans = kNoTrans);
 
 template<class Real>
 class CuSparseMatrix {
 public:
-  friend class CuMatrixBase<float> ;
-  friend class CuMatrixBase<double> ;
-  friend class CuMatrixBase<Real> ;
-  friend class CuVectorBase<float> ;
-  friend class CuVectorBase<double> ;
-  friend class CuVectorBase<Real> ;
+  friend class CuMatrixBase<float>;
+  friend class CuMatrixBase<double>;
+  friend class CuMatrixBase<Real>;
+  friend class CuVectorBase<float>;
+  friend class CuVectorBase<double>;
+  friend class CuVectorBase<Real>;
 
   friend Real TraceMatSmat<Real>(const CuMatrixBase<Real> &A,
-                                 const CuSparseMatrix<Real> &B,
-                                 MatrixTransposeType trans);
+      const CuSparseMatrix<Real> &B,
+      MatrixTransposeType trans);
 
   MatrixIndexT NumRows() const;
 
@@ -66,7 +66,7 @@ public:
 
   template<typename OtherReal>
   void CopyToMat(CuMatrixBase<OtherReal> *dest, MatrixTransposeType trans =
-                     kNoTrans) const;
+      kNoTrans) const;
 
   Real Sum() const;
 
@@ -86,14 +86,14 @@ public:
   /// Copy from GPU-based matrix, supporting transposition.  Resizes *this
   /// as needed.
   void CopyFromSmat(const CuSparseMatrix<Real> &smat,
-                    MatrixTransposeType trans = kNoTrans);
+      MatrixTransposeType trans = kNoTrans);
 
   /// Select a subset of the rows of a CuSparseMatrix.
   /// Sets *this to only the rows of 'smat_other' that are listed
   /// in 'row_indexes'.
   /// 'row_indexes' must satisfy 0 <= row_indexes[i] < smat_other.NumRows().
   void SelectRows(const CuArray<int32> &row_indexes,
-                  const CuSparseMatrix<Real> &smat_other);
+      const CuSparseMatrix<Real> &smat_other);
 
   /// Copy to CPU-based matrix. We will add the transpose option later when it
   /// is necessary.
@@ -121,21 +121,21 @@ public:
 
   /// Default constructor
   CuSparseMatrix() :
-      num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
-          NULL) {
+    num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
+      NULL) {
   }
 
   /// Constructor from CPU-based sparse matrix.
   explicit CuSparseMatrix(const SparseMatrix<Real> &smat) :
-      num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
+    num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
       NULL) {
     this->CopyFromSmat(smat);
   }
 
   /// Constructor from GPU-based sparse matrix (supports transposition).
   CuSparseMatrix(const CuSparseMatrix<Real> &smat, MatrixTransposeType trans =
-                     kNoTrans) :
-      num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
+      kNoTrans) :
+    num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
       NULL) {
     this->CopyFromSmat(smat, trans);
   }
@@ -151,7 +151,7 @@ public:
   /// If trans == kTrans, the result will be the transpose
   /// of the sparse matrix described above.
   CuSparseMatrix(const CuArray<int32> &indexes, int32 dim,
-                 MatrixTransposeType trans = kNoTrans);
+      MatrixTransposeType trans = kNoTrans);
 
   /// Constructor from an array of indexes and an array of
   /// weights; requires indexes.Dim() == weights.Dim().
@@ -164,8 +164,8 @@ public:
   /// If trans == kTrans, the result will be the transpose
   /// of the sparse matrix described above.
   CuSparseMatrix(const CuArray<int32> &indexes,
-                 const CuVectorBase<Real> &weights, int32 dim,
-                 MatrixTransposeType trans = kNoTrans);
+      const CuVectorBase<Real> &weights, int32 dim,
+      MatrixTransposeType trans = kNoTrans);
 
   ~CuSparseMatrix() {
     Destroy();
@@ -185,7 +185,7 @@ protected:
   /// Users of this class won't normally have to use Resize.
   /// 'nnz' should be determined beforehand when calling this API.
   void Resize(const MatrixIndexT num_rows, const MatrixIndexT num_cols,
-              const MatrixIndexT nnz, MatrixResizeType resize_type = kSetZero);
+      const MatrixIndexT nnz, MatrixResizeType resize_type = kSetZero);
 
   /// Returns pointer to the data array of length nnz_ that holds all nonzero
   /// values in zero-based CSR format

@@ -33,14 +33,14 @@
 namespace kaldi {
 
 bool ReadData(SequentialBaseFloatMatrixReader& feature_reader,
-              RandomAccessPosteriorReader& target_reader,
-              RandomAccessBaseFloatVectorReader& weights_reader,
-              int32 length_tolerance,
-              Matrix<BaseFloat>* feats,
-              Posterior* targets,
-              Vector<BaseFloat>* weights,
-              int32* num_no_tgt_mat,
-              int32* num_other_error) {
+    RandomAccessPosteriorReader& target_reader,
+    RandomAccessBaseFloatVectorReader& weights_reader,
+    int32 length_tolerance,
+    Matrix<BaseFloat>* feats,
+    Posterior* targets,
+    Vector<BaseFloat>* weights,
+    int32* num_no_tgt_mat,
+    int32* num_other_error) {
 
   // We're looking for the 1st valid utterance...
   for ( ; !feature_reader.Done(); feature_reader.Next()) {
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
         "The updates are per-utterance.\n"
         "\n"
         "Usage: nnet-train-multistream [options] "
-          "<feature-rspecifier> <targets-rspecifier> <model-in> [<model-out>]\n"
+        "<feature-rspecifier> <targets-rspecifier> <model-in> [<model-out>]\n"
         "e.g.: nnet-train-lstm-streams scp:feature.scp ark:posterior.ark nnet.init nnet.iter1\n";
 
     ParseOptions po(usage);
@@ -174,8 +174,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string feature_rspecifier = po.GetArg(1),
-      targets_rspecifier = po.GetArg(2),
-      model_filename = po.GetArg(3);
+        targets_rspecifier = po.GetArg(2),
+        model_filename = po.GetArg(3);
 
     std::string target_model_filename;
     if (!crossvalidate) {
@@ -222,8 +222,8 @@ int main(int argc, char *argv[]) {
               << " STARTED";
 
     int32 num_done = 0,
-          num_no_tgt_mat = 0,
-          num_other_error = 0;
+        num_no_tgt_mat = 0,
+        num_other_error = 0;
 
     // book-keeping for multi-stream training,
     std::vector<Matrix<BaseFloat> > feats_utt(num_streams);
@@ -444,12 +444,12 @@ int main(int argc, char *argv[]) {
     }
 
     KALDI_LOG << "Done " << num_done << " files, "
-      << num_no_tgt_mat << " with no tgt_mats, "
-      << num_other_error << " with other errors. "
-      << "[" << (crossvalidate ? "CROSS-VALIDATION" : "TRAINING")
-      << ", " << time.Elapsed() / 60 << " min, processing "
-      << total_frames / time.Elapsed() << " frames per sec, "
-      << "GPU_time " << 100.*time_gpu/time.Elapsed() << "% ]";
+              << num_no_tgt_mat << " with no tgt_mats, "
+              << num_other_error << " with other errors. "
+              << "[" << (crossvalidate ? "CROSS-VALIDATION" : "TRAINING")
+              << ", " << time.Elapsed() / 60 << " min, processing "
+              << total_frames / time.Elapsed() << " frames per sec, "
+              << "GPU_time " << 100.*time_gpu/time.Elapsed() << "% ]";
 
     if (objective_function == "xent") {
       KALDI_LOG << xent.Report();

@@ -88,8 +88,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string transcript_rspecifier,
-                costs_rspecifier,
-                fst_wspecifier;
+        costs_rspecifier,
+        fst_wspecifier;
 
     if ( po.NumArgs() == 2 ) {
       transcript_rspecifier  = po.GetArg(1);

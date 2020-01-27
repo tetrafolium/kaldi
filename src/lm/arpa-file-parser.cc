@@ -30,9 +30,9 @@
 namespace kaldi {
 
 ArpaFileParser::ArpaFileParser(const ArpaParseOptions& options,
-                               fst::SymbolTable* symbols)
-    : options_(options), symbols_(symbols),
-      line_number_(0), warning_count_(0) {
+    fst::SymbolTable* symbols)
+  : options_(options), symbols_(symbols),
+  line_number_(0), warning_count_(0) {
 }
 
 ArpaFileParser::~ArpaFileParser() {
@@ -53,8 +53,8 @@ void ArpaFileParser::Read(std::istream &is) {
   if (symbols_ != NULL &&
       options_.oov_handling == ArpaParseOptions::kReplaceWithUnk &&
       (options_.unk_symbol <= 0 ||
-       options_.unk_symbol == options_.bos_symbol ||
-       options_.unk_symbol == options_.eos_symbol))
+      options_.unk_symbol == options_.bos_symbol ||
+      options_.unk_symbol == options_.eos_symbol))
     KALDI_ERR << "When symbol table is given and OOV mode is kReplaceWithUnk, "
               << "UNK symbol is required, must not be epsilon, and "
               << "differ from both BOS and EOS symbols. Given:"
@@ -211,18 +211,18 @@ void ArpaFileParser::Read(std::istream &is) {
             word = symbols_->Find(col[1 + index]);
             if (word == -1) { // fst::kNoSymbol
               switch (options_.oov_handling) {
-                case ArpaParseOptions::kReplaceWithUnk:
-                  word = options_.unk_symbol;
-                  break;
-                case ArpaParseOptions::kSkipNGram:
-                  if (ShouldWarn())
-                    KALDI_WARN << LineReference() << " skipped: word '"
-                               << col[1 + index] << "' not in symbol table";
-                  skip_ngram = true;
-                  break;
-                default:
-                  PARSE_ERR << "word '"  << col[1 + index]
-                            << "' not in symbol table";
+              case ArpaParseOptions::kReplaceWithUnk:
+                word = options_.unk_symbol;
+                break;
+              case ArpaParseOptions::kSkipNGram:
+                if (ShouldWarn())
+                  KALDI_WARN << LineReference() << " skipped: word '"
+                             << col[1 + index] << "' not in symbol table";
+                skip_ngram = true;
+                break;
+              default:
+                PARSE_ERR << "word '"  << col[1 + index]
+                          << "' not in symbol table";
               }
             }
           }
@@ -275,7 +275,7 @@ std::string ArpaFileParser::LineReference() const {
 
 bool ArpaFileParser::ShouldWarn() {
   return (warning_count_ != -1) &&
-    (++warning_count_ <= static_cast<uint32>(options_.max_warnings));
+         (++warning_count_ <= static_cast<uint32>(options_.max_warnings));
 }
 
 }  // namespace kaldi

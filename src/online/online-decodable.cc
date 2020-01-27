@@ -25,11 +25,11 @@
 namespace kaldi {
 
 OnlineDecodableDiagGmmScaled::OnlineDecodableDiagGmmScaled(
-    const AmDiagGmm &am, const TransitionModel &trans_model,
-    const BaseFloat scale, OnlineFeatureMatrix *input_feats):  
-      features_(input_feats), ac_model_(am),
-      ac_scale_(scale), trans_model_(trans_model),
-      feat_dim_(input_feats->Dim()), cur_frame_(-1) {
+  const AmDiagGmm &am, const TransitionModel &trans_model,
+  const BaseFloat scale, OnlineFeatureMatrix *input_feats) :
+  features_(input_feats), ac_model_(am),
+  ac_scale_(scale), trans_model_(trans_model),
+  feat_dim_(input_feats->Dim()), cur_frame_(-1) {
   if (!input_feats->IsValidFrame(0)) {
     // It's not safe to throw from a constructor, so please check
     // this condition yourself before reaching this point in the code.

@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
 #endif
 
     std::string nnet1_rxfilename = po.GetArg(1),
-                nnet2_rxfilename = po.GetArg(2),
-                examples_rspecifier = po.GetOptArg(3);
+        nnet2_rxfilename = po.GetArg(2),
+        examples_rspecifier = po.GetOptArg(3);
 
     Nnet nnet1, nnet2;
     ReadKaldiObject(nnet1_rxfilename, &nnet1);
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 
         NnetComputeProb prob_computer(compute_prob_opts, interp_nnet);
         std::vector<NnetExample>::const_iterator eg_iter = examples.begin(),
-                                                 eg_end = examples.end();
+            eg_end = examples.end();
         for (; eg_iter != eg_end; ++eg_iter)
           prob_computer.Compute(*eg_iter);
         const SimpleObjectiveInfo *objf_info = prob_computer.GetObjective("output");
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
                 << PrintVectorPerUpdatableComponent(nnet1, dot_prod);
 
       Vector<BaseFloat> baseline_prod(num_updatable),
-          new_prod(num_updatable);
+      new_prod(num_updatable);
       ComponentDotProducts(nnet1, nnet1, &baseline_prod);
       ComponentDotProducts(nnet2, nnet2, &new_prod);
       baseline_prod.ApplyPow(0.5);

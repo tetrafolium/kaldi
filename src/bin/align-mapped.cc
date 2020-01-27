@@ -78,17 +78,17 @@ int main(int argc, char *argv[]) {
     VectorFst<StdArc> *lex_fst = fst::ReadFstKaldi(lex_in_filename);
     // ownership will be taken by gc.
 
-    std::vector<int32> disambig_syms;    
+    std::vector<int32> disambig_syms;
     if (disambig_rxfilename != "")
       if (!ReadIntegerVectorSimple(disambig_rxfilename, &disambig_syms))
         KALDI_ERR << "fstcomposecontext: Could not read disambiguation symbols from "
                   << disambig_rxfilename;
-    
+
     TrainingGraphCompiler gc(trans_model, ctx_dep, lex_fst, disambig_syms,
-                             gopts);
+        gopts);
 
     lex_fst = NULL;  // we gave ownership to gc.
-    
+
     SequentialBaseFloatMatrixReader loglikes_reader(feature_rspecifier);
     RandomAccessInt32VectorReader transcript_reader(transcript_rspecifier);
     Int32VectorWriter alignment_writer(alignment_wspecifier);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
       VectorFst<StdArc> decode_fst;
       if (!gc.CompileGraphFromText(transcript, &decode_fst)) {
         KALDI_WARN << "Problem creating decoding graph for utterance " <<
-            utt <<" [serious error]";
+          utt <<" [serious error]";
         num_err++;
         continue;
       }

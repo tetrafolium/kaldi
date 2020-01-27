@@ -30,16 +30,16 @@ namespace kaldi {
 namespace nnet3 {
 
 class NnetComputerFromEg {
- public:
-  NnetComputerFromEg(const Nnet &nnet):
-      nnet_(nnet), compiler_(nnet) { }
+public:
+  NnetComputerFromEg(const Nnet &nnet) :
+    nnet_(nnet), compiler_(nnet) { }
 
   // Compute the output (which will have the same number of rows as the number
-  // of Indexes in the output with the name 'output_name' of the eg), 
+  // of Indexes in the output with the name 'output_name' of the eg),
   // and put it in "*output".
   // An output with the name 'output_name' is expected to exist in the network.
-  void Compute(const NnetExample &eg, const std::string &output_name, 
-               Matrix<BaseFloat> *output) {
+  void Compute(const NnetExample &eg, const std::string &output_name,
+      Matrix<BaseFloat> *output) {
     ComputationRequest request;
     bool need_backprop = false, store_stats = false;
     GetComputationRequest(nnet_, eg, need_backprop, store_stats, &request);
@@ -54,7 +54,7 @@ class NnetComputerFromEg {
     output->Resize(nnet_output.NumRows(), nnet_output.NumCols());
     nnet_output.CopyToMat(output);
   }
- private:
+private:
   const Nnet &nnet_;
   CachingOptimizingCompiler compiler_;
 

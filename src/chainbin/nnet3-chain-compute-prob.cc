@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     ReadFstKaldi(den_fst_rxfilename, &den_fst);
 
     NnetChainComputeProb chain_prob_computer(nnet_opts, chain_opts, den_fst,
-                                            nnet);
+        nnet);
 
     SequentialNnetChainExampleReader example_reader(examples_rspecifier);
 

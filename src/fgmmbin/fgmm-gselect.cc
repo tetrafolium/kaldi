@@ -38,10 +38,10 @@ int main(int argc, char *argv[]) {
         "The --gselect option (which takes an rspecifier) limits selection to a subset\n"
         "of indices:\n"
         "e.g.: fgmm-gselect \"--gselect=ark:gunzip -c bigger.gselect.gz|\" --n=20 1.gmm \"ark:feature-command |\" \"ark,t:|gzip -c >1.gselect.gz\"\n";
-    
+
     ParseOptions po(usage);
     int32 num_gselect = 50;
-    std::string gselect_rspecifier;    
+    std::string gselect_rspecifier;
     std::string likelihood_wspecifier;
     po.Register("n", &num_gselect, "Number of Gaussians to keep per frame\n");
     po.Register("write-likes", &likelihood_wspecifier, "Wspecifier for likelihoods per "
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     std::string model_filename = po.GetArg(1),
         feature_rspecifier = po.GetArg(2),
         gselect_wspecifier = po.GetArg(3);
-    
+
     FullGmm fgmm;
     ReadKaldiObject(model_filename, &fgmm);
     KALDI_ASSERT(num_gselect > 0);
@@ -70,10 +70,10 @@ int main(int argc, char *argv[]) {
                  << "Note: this means the Gaussian selection is pointless.";
       num_gselect = num_gauss;
     }
-    
+
     double tot_like = 0.0;
     kaldi::int64 tot_t = 0;
-    
+
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
     Int32VectorVectorWriter gselect_writer(gselect_wspecifier);
     RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier); // may be ""
@@ -105,10 +105,10 @@ int main(int argc, char *argv[]) {
                                              num_gselect, &(gselect[i]));
       } else { // No "preselect" [i.e. no existing gselect]: simple case.
         for (int32 i = 0; i < mat.NumRows(); i++)
-          tot_like_this_file += 
+          tot_like_this_file +=
               fgmm.GaussianSelection(mat.Row(i), num_gselect, &(gselect[i]));
       }
-      
+
       gselect_writer.Write(utt, gselect);
       if (num_done % 10 == 0)
         KALDI_LOG << "For " << num_done << "'th file, average UBM likelihood over "
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
                   << (tot_like_this_file/tot_t_this_file);
       tot_t += tot_t_this_file;
       tot_like += tot_like_this_file;
-      
+
       if(likelihood_wspecifier != "")
         likelihood_writer.Write(utt, tot_like_this_file);
       num_done++;
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
     KALDI_LOG << "Done " << num_done << " files, " << num_err
               << " with errors, average UBM log-likelihood is "
               << (tot_like/tot_t) << " over " << tot_t << " frames.";
-    
+
     if (num_done != 0) return 0;
     else return 1;
   } catch(const std::exception &e) {

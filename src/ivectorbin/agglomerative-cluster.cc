@@ -30,21 +30,21 @@ int main(int argc, char *argv[]) {
   typedef kaldi::int32 int32;
   try {
     const char *usage =
-      "Cluster utterances by similarity score, used in diarization.\n"
-      "Takes a table of score matrices indexed by recording, with the\n"
-      "rows/columns corresponding to the utterances of that recording in\n"
-      "sorted order and a reco2utt file that contains the mapping from\n"
-      "recordings to utterances, and outputs a list of labels in the form\n"
-      "<utt> <label>.  Clustering is done using agglomerative hierarchical\n"
-      "clustering with a score threshold as stop criterion.  By default, the\n"
-      "program reads in similarity scores, but with --read-costs=true\n"
-      "the scores are interpreted as costs (i.e. a smaller value indicates\n"
-      "utterance similarity).\n"
-      "Usage: agglomerative-cluster [options] <scores-rspecifier> "
-      "<reco2utt-rspecifier> <labels-wspecifier>\n"
-      "e.g.: \n"
-      " agglomerative-cluster ark:scores.ark ark:reco2utt \n"
-      "   ark,t:labels.txt\n";
+        "Cluster utterances by similarity score, used in diarization.\n"
+        "Takes a table of score matrices indexed by recording, with the\n"
+        "rows/columns corresponding to the utterances of that recording in\n"
+        "sorted order and a reco2utt file that contains the mapping from\n"
+        "recordings to utterances, and outputs a list of labels in the form\n"
+        "<utt> <label>.  Clustering is done using agglomerative hierarchical\n"
+        "clustering with a score threshold as stop criterion.  By default, the\n"
+        "program reads in similarity scores, but with --read-costs=true\n"
+        "the scores are interpreted as costs (i.e. a smaller value indicates\n"
+        "utterance similarity).\n"
+        "Usage: agglomerative-cluster [options] <scores-rspecifier> "
+        "<reco2utt-rspecifier> <labels-wspecifier>\n"
+        "e.g.: \n"
+        " agglomerative-cluster ark:scores.ark ark:reco2utt \n"
+        "   ark,t:labels.txt\n";
 
     ParseOptions po(usage);
     std::string reco2num_spk_rspecifier;
@@ -79,8 +79,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string scores_rspecifier = po.GetArg(1),
-      reco2utt_rspecifier = po.GetArg(2),
-      label_wspecifier = po.GetArg(3);
+        reco2utt_rspecifier = po.GetArg(2),
+        label_wspecifier = po.GetArg(3);
 
     SequentialBaseFloatMatrixReader scores_reader(scores_rspecifier);
     RandomAccessTokenVectorReader reco2utt_reader(reco2utt_rspecifier);

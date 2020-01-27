@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     fst::MapFstOptions mapfst_opts(cache_opts);
     fst::StdToLatticeMapper<BaseFloat> mapper;
     fst::MapFst<StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> >
-        lm_fst(*std_lm_fst, mapper, mapfst_opts);
+    lm_fst(*std_lm_fst, mapper, mapfst_opts);
     delete std_lm_fst;
 
     // The next fifteen or so lines are a kind of optimization and
@@ -87,8 +87,8 @@ int main(int argc, char *argv[]) {
     // (because it's the arcs of the LM FST we want to do lookup
     // on).
     fst::TableComposeOptions compose_opts(fst::TableMatcherOptions(),
-                                          true, fst::SEQUENCE_FILTER,
-                                          fst::MATCH_INPUT);
+        true, fst::SEQUENCE_FILTER,
+        fst::MATCH_INPUT);
 
     // The following is an optimization for the TableCompose
     // composition: it stores certain tables that enable fast

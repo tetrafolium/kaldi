@@ -94,9 +94,9 @@ int main(int argc, char *argv[]) {
       lm_to_add_fst = fst::ReadAndPrepareLmFst(lm_to_add_rxfilename);
     }
     fst::BackoffDeterministicOnDemandFst<StdArc> lm_to_subtract_det_backoff(
-        *lm_to_subtract_fst);
+      *lm_to_subtract_fst);
     fst::ScaleDeterministicOnDemandFst lm_to_subtract_det_scale(
-        -lm_scale, &lm_to_subtract_det_backoff);
+      -lm_scale, &lm_to_subtract_det_backoff);
 
 
     fst::DeterministicOnDemandFst<StdArc> *lm_to_add_orig = NULL,
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
       // arguments to the composition; either way should work.  They are both
       // acceptors so the result is the same either way.
       fst::ComposeDeterministicOnDemandFst<StdArc> combined_lms(
-          &lm_to_subtract_det_scale, lm_to_add);
+        &lm_to_subtract_det_scale, lm_to_add);
 
       CompactLattice composed_clat;
       ComposeCompactLatticePruned(compose_opts,

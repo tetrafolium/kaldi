@@ -43,7 +43,7 @@ namespace rnnlm {
                         probabilities given by 'probs'.
  */
 void SampleWithoutReplacement(const std::vector<double> &probs,
-                              std::vector<int32> *sample);
+    std::vector<int32> *sample);
 
 
 
@@ -72,9 +72,9 @@ void SampleWithoutReplacement(const std::vector<double> &probs,
                             'cdf_start + 2' with probability 0.25.
      @return                Returns a pointer cdf_start <= p < cdf_end, with probability
                             proportional to p[1] - p[0].
-*/
+ */
 const double* SampleFromCdf(const double *cdf_start,
-                            const double *cdf_end);
+    const double *cdf_end);
 
 
 /**
@@ -85,7 +85,7 @@ const double* SampleFromCdf(const double *cdf_start,
    pairs.
  */
 class Sampler {
- public:
+public:
   // Initialize the class.  The unigram probabilities (which you can think
   // of as the probability for each word if we don't know the history) are given.
   // each element of unigram_probs should be >= 0, and they should sum to
@@ -131,9 +131,9 @@ class Sampler {
   ///                            The list will not be sorted, but it will be unique
   ///                            on the int.  Its size will equal num_words_to_sample.
   void SampleWords(int32 num_words_to_sample,
-                   BaseFloat unigram_weight,
-                   const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
-                   std::vector<std::pair<int32, BaseFloat> > *sample) const;
+      BaseFloat unigram_weight,
+      const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
+      std::vector<std::pair<int32, BaseFloat> > *sample) const;
 
   /// This is an alternative version of SampleWords() which allows you to
   /// specify a list of words that must be sampled (i.e. after scaling, they
@@ -147,13 +147,13 @@ class Sampler {
   /// See the comments for the other version of SampleWords() to understand the
   /// interface, which is otherwise the same.
   void SampleWords(int32 num_words_to_sample,
-                   BaseFloat unigram_weight,
-                   const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
-                   const std::vector<int32> &words_we_must_sample,
-                   std::vector<std::pair<int32, BaseFloat> > *sample) const;
+      BaseFloat unigram_weight,
+      const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
+      const std::vector<int32> &words_we_must_sample,
+      std::vector<std::pair<int32, BaseFloat> > *sample) const;
 
 
- private:
+private:
 
   // This structure represents a contiguous range of symbols; 'start' and 'end'
   // are pointers into the contents of 'unigram_cdf_'.  Let
@@ -180,8 +180,8 @@ class Sampler {
     bool operator < (const Interval &other) const {
       return prob < other.prob;
     }
-    Interval(double p, const double *s, const double *e):
-        prob(p), start(s), end(e) { }
+    Interval(double p, const double *s, const double *e) :
+      prob(p), start(s), end(e) { }
   };
 
   /// Given a distribution over words which we will write as p(i)
@@ -196,8 +196,8 @@ class Sampler {
   /// 'total_p' is the sum of (*intervals)[i].prob; it is provided
   /// to this function so that it doesn't have to compute it itself.
   static void NormalizeIntervals(int32 num_words_to_sample,
-                                 double total_p,
-                                 std::vector<Interval> *intervals);
+      double total_p,
+      std::vector<Interval> *intervals);
 
   /// Sample from the distribution q(i) represented by 'intervals'.
   ///  @param [in] intervals  The vector of Intervals to sample from.
@@ -213,7 +213,7 @@ class Sampler {
   ///                    'num_words_to_sample' at exit.  This vector will not
   ///                    be sorted.
   void SampleFromIntervals(const std::vector<Interval> &intervals,
-                           std::vector<std::pair<int32, BaseFloat> > *sample) const;
+      std::vector<std::pair<int32, BaseFloat> > *sample) const;
 
   // This helper function, used inside SampleWords(), combines the unigram and
   // higher-order portions of the distribution into a single unified format
@@ -222,8 +222,8 @@ class Sampler {
   // that it sums to num_words_to_sample.
   // Returns the sum of the probabilities of the intervals.
   double GetInitialIntervals(BaseFloat unigram_weight,
-                             const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
-                             std::vector<Interval> *intervals) const;
+      const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
+      std::vector<Interval> *intervals) const;
 
 
 
@@ -254,7 +254,7 @@ void CheckDistribution(const Distribution &d);
 // Weights a Distribution by multiplying all the .second elements by
 // 'weight'.  'weight' must be > 0.0.
 void WeightDistribution(BaseFloat weight,
-                        Distribution *d);
+    Distribution *d);
 
 // Returns the sum of the .second elements of a Distribution.
 BaseFloat TotalOfDistribution(const Distribution &d);
@@ -263,8 +263,8 @@ BaseFloat TotalOfDistribution(const Distribution &d);
 // Merges two distributions, summing the probabilities of any elements that
 // occur in both.
 void MergeDistributions(const Distribution &d1,
-                        const Distribution &d2,
-                        Distribution *d);
+    const Distribution &d2,
+    Distribution *d);
 
 
 

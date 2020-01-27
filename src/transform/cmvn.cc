@@ -33,10 +33,10 @@ void AccCmvnStats(const VectorBase<BaseFloat> &feats, BaseFloat weight, MatrixBa
   KALDI_ASSERT(stats->NumRows() == 2 && stats->NumCols() == dim + 1);
   // Remove these __restrict__ modifiers if they cause compilation problems.
   // It's just an optimization.
-   double *__restrict__ mean_ptr = stats->RowData(0),
-       *__restrict__ var_ptr = stats->RowData(1),
-       *__restrict__ count_ptr = mean_ptr + dim;
-   const BaseFloat * __restrict__ feats_ptr = feats.Data();
+  double *__restrict__ mean_ptr = stats->RowData(0),
+  *__restrict__ var_ptr = stats->RowData(1),
+  *__restrict__ count_ptr = mean_ptr + dim;
+  const BaseFloat * __restrict__ feats_ptr = feats.Data();
   *count_ptr += weight;
   // Careful-- if we change the format of the matrix, the "mean_ptr < count_ptr"
   // statement below might become wrong.
@@ -47,8 +47,8 @@ void AccCmvnStats(const VectorBase<BaseFloat> &feats, BaseFloat weight, MatrixBa
 }
 
 void AccCmvnStats(const MatrixBase<BaseFloat> &feats,
-                  const VectorBase<BaseFloat> *weights,
-                  MatrixBase<double> *stats) {
+    const VectorBase<BaseFloat> *weights,
+    MatrixBase<double> *stats) {
   int32 num_frames = feats.NumRows();
   if (weights != NULL) {
     KALDI_ASSERT(weights->Dim() == num_frames);
@@ -62,8 +62,8 @@ void AccCmvnStats(const MatrixBase<BaseFloat> &feats,
 }
 
 void ApplyCmvn(const MatrixBase<double> &stats,
-               bool var_norm,
-               MatrixBase<BaseFloat> *feats) {
+    bool var_norm,
+    MatrixBase<BaseFloat> *feats) {
   KALDI_ASSERT(feats != NULL);
   int32 dim = stats.NumCols() - 1;
   if (stats.NumRows() > 2 || stats.NumRows() < 1 || feats->NumCols() != dim) {
@@ -115,8 +115,8 @@ void ApplyCmvn(const MatrixBase<double> &stats,
 }
 
 void ApplyCmvnReverse(const MatrixBase<double> &stats,
-                      bool var_norm,
-                      MatrixBase<BaseFloat> *feats) {
+    bool var_norm,
+    MatrixBase<BaseFloat> *feats) {
   KALDI_ASSERT(feats != NULL);
   int32 dim = stats.NumCols() - 1;
   if (stats.NumRows() > 2 || stats.NumRows() < 1 || feats->NumCols() != dim) {
@@ -166,7 +166,7 @@ void ApplyCmvnReverse(const MatrixBase<double> &stats,
 
 
 void FakeStatsForSomeDims(const std::vector<int32> &dims,
-                          MatrixBase<double> *stats) {
+    MatrixBase<double> *stats) {
   KALDI_ASSERT(stats->NumRows() == 2 && stats->NumCols() > 1);
   int32 dim = stats->NumCols() - 1;
   double count = (*stats)(0, dim);

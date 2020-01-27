@@ -89,7 +89,7 @@ bool CompactLatticeNormalize(CompactLattice *clat, BaseFloat weight) {
 // This is a wrapper for SplitStringToFloats, with added checks to make sure
 // the weights are valid probabilities.
 void SplitStringToWeights(const string &full, const char *delim,
-                          vector<BaseFloat> *out) {
+    vector<BaseFloat> *out) {
   vector<BaseFloat> tmp;
   SplitStringToFloats(full, delim, true /*omit empty strings*/, &tmp);
   if (tmp.size() != out->size()) {
@@ -99,7 +99,7 @@ void SplitStringToWeights(const string &full, const char *delim,
   }
   BaseFloat sum = 0;
   for (vector<BaseFloat>::const_iterator itr = tmp.begin();
-       itr != tmp.end(); ++itr) {
+      itr != tmp.end(); ++itr) {
     if (*itr < 0.0) {
       KALDI_WARN << "Cannot use negative weight: " << *itr << "; input string: "
                  << full << "\n\tUsing uniform weights.";
@@ -110,7 +110,7 @@ void SplitStringToWeights(const string &full, const char *delim,
   if (sum != 1.0) {
     KALDI_WARN << "Weights sum to " << sum << " instead of 1: renormalizing";
     for (vector<BaseFloat>::iterator itr = tmp.begin();
-         itr != tmp.end(); ++itr)
+        itr != tmp.end(); ++itr)
       (*itr) /= sum;
   }
   out->swap(tmp);
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
     // Input lattices
     SequentialCompactLatticeReader clat_reader1(lats_rspecifier1);
     vector<RandomAccessCompactLatticeReader*> clat_reader_vec(
-        num_args-2, static_cast<RandomAccessCompactLatticeReader*>(NULL));
+      num_args-2, static_cast<RandomAccessCompactLatticeReader*>(NULL));
     vector<string> clat_rspec_vec(num_args-2);
     for (int32 i = 2; i < num_args; ++i) {
       clat_reader_vec[i-2] = new RandomAccessCompactLatticeReader(po.GetArg(i));

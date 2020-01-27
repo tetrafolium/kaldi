@@ -30,9 +30,9 @@ namespace kaldi {
 namespace nnet3 {
 
 class NnetComputerFromEg {
- public:
-  NnetComputerFromEg(const Nnet &nnet):
-      nnet_(nnet), compiler_(nnet) { }
+public:
+  NnetComputerFromEg(const Nnet &nnet) :
+    nnet_(nnet), compiler_(nnet) { }
 
   // Compute the output (which will have the same number of rows as the number
   // of Indexes in the output of the eg), and put it in "output".
@@ -51,7 +51,7 @@ class NnetComputerFromEg {
     output->Resize(nnet_output.NumRows(), nnet_output.NumCols());
     nnet_output.CopyToMat(output);
   }
- private:
+private:
   const Nnet &nnet_;
   CachingOptimizingCompiler compiler_;
 

@@ -24,11 +24,11 @@ namespace kaldi {
 namespace rnnlm {
 
 void GetRnnlmComputationRequest(
-    const RnnlmExample &minibatch,
-    bool need_model_derivative,
-    bool need_input_derivative,
-    bool store_component_stats,
-    nnet3::ComputationRequest *request) {
+  const RnnlmExample &minibatch,
+  bool need_model_derivative,
+  bool need_input_derivative,
+  bool store_component_stats,
+  nnet3::ComputationRequest *request) {
 
   request->inputs.clear();
   request->inputs.resize(1);
@@ -38,7 +38,7 @@ void GetRnnlmComputationRequest(
   request->store_component_stats = store_component_stats;
 
   nnet3::IoSpecification &input_spec = request->inputs[0],
-      &output_spec = request->outputs[0];
+  &output_spec = request->outputs[0];
   input_spec.name = "input";
   output_spec.name = "output";
 
@@ -56,7 +56,7 @@ void GetRnnlmComputationRequest(
   }
   output_spec.indexes = input_spec.indexes;
   output_spec.has_deriv = (need_model_derivative ||
-                           need_input_derivative);
+      need_input_derivative);
   input_spec.has_deriv = need_input_derivative;
 }
 
@@ -72,17 +72,17 @@ void RnnlmExampleDerived::Swap(RnnlmExampleDerived *other) {
 // This is called from ProcessRnnlmOutput() when we are doing importance
 // sampling.
 static void ProcessRnnlmOutputSampling(
-    const RnnlmObjectiveOptions &objective_config,
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    const CuMatrixBase<BaseFloat> &nnet_output,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv,
-    CuMatrixBase<BaseFloat> *nnet_output_deriv,
-    BaseFloat *weight,
-    BaseFloat *objf_num,
-    BaseFloat *objf_den,
-    BaseFloat *objf_den_exact) {
+  const RnnlmObjectiveOptions &objective_config,
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  const CuMatrixBase<BaseFloat> &nnet_output,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv,
+  CuMatrixBase<BaseFloat> *nnet_output_deriv,
+  BaseFloat *weight,
+  BaseFloat *objf_num,
+  BaseFloat *objf_den,
+  BaseFloat *objf_den_exact) {
   KALDI_ASSERT(weight != NULL && objf_den != NULL);  // Others are optional.
 
   // In the case where minibatch.sample_group_size == 1, meaning for each 't' value we
@@ -98,15 +98,15 @@ static void ProcessRnnlmOutputSampling(
   KALDI_ASSERT(nnet_output.NumRows() == num_sample_groups * rows_per_group);
 
   CuMatrix<BaseFloat> word_logprobs(rows_per_group,
-                                    samples_per_group);
+      samples_per_group);
   // 'sampled_word_embedding' will contain those rows of 'word_embedding' that
   // pertain to the words sampled in this group.
   CuMatrix<BaseFloat> sampled_word_embedding(samples_per_group,
-                                             embedding_dim,
-                                             kUndefined);
+      embedding_dim,
+      kUndefined);
 
   CuVector<BaseFloat> output_word_logprobs(rows_per_group * num_sample_groups,
-                                           kUndefined);
+      kUndefined);
 
   if (weight) *weight = minibatch.output_weights.Sum();
   if (objf_den) *objf_den = 0.0;
@@ -118,15 +118,15 @@ static void ProcessRnnlmOutputSampling(
   for (int32 t = 0; t < num_sample_groups; t++) {
 
     CuSubArray<int32> sampled_words_part(derived.cu_sampled_words,
-                                         t * samples_per_group,
-                                         samples_per_group),
-        output_words_part(derived.cu_output_words,
+        t * samples_per_group,
+        samples_per_group),
+    output_words_part(derived.cu_output_words,
                           t * rows_per_group,
                           rows_per_group);
     CuSubVector<BaseFloat> output_weights_part(minibatch.output_weights,
-                                               t * rows_per_group,
-                                               rows_per_group),
-        sample_inv_probs_part(minibatch.sample_inv_probs,
+        t * rows_per_group,
+        rows_per_group),
+    sample_inv_probs_part(minibatch.sample_inv_probs,
                               t * samples_per_group,
                               samples_per_group);
 
@@ -134,8 +134,8 @@ static void ProcessRnnlmOutputSampling(
                                     sampled_words_part);
 
     CuSubMatrix<BaseFloat> nnet_output_part(nnet_output,
-                                            rows_per_group * t, rows_per_group,
-                                            0, nnet_output.NumCols());
+        rows_per_group * t, rows_per_group,
+        0, nnet_output.NumCols());
     word_logprobs.AddMatMat(1.0, nnet_output_part, kNoTrans,
                             sampled_word_embedding, kTrans, 0.0);
 
@@ -144,8 +144,8 @@ static void ProcessRnnlmOutputSampling(
     // Get the logprobs of the correct words.
     if (objf_num != NULL) {
       CuSubVector<BaseFloat> this_output_word_logprobs(
-          output_word_logprobs,
-          t * rows_per_group, rows_per_group);
+        output_word_logprobs,
+        t * rows_per_group, rows_per_group);
       this_output_word_logprobs.CopyElements(word_logprobs, kNoTrans,
                                              output_words_part);
     }
@@ -219,8 +219,8 @@ static void ProcessRnnlmOutputSampling(
     //                      sampled_word_embedding, kTrans, 0.0);
     if (nnet_output_deriv) {
       CuSubMatrix<BaseFloat> nnet_output_deriv_part(
-          *nnet_output_deriv, rows_per_group * t, rows_per_group,
-          0, nnet_output.NumCols());
+        *nnet_output_deriv, rows_per_group * t, rows_per_group,
+        0, nnet_output.NumCols());
       nnet_output_deriv_part.AddMatMat(-1.0, word_logprobs, kNoTrans,
                                        sampled_word_embedding, kNoTrans, 1.0);
     }
@@ -244,17 +244,17 @@ static void ProcessRnnlmOutputSampling(
 // This is called from ProcessRnnlmOutput() when we are not doing importance
 // sampling.
 static void ProcessRnnlmOutputNoSampling(
-    const RnnlmObjectiveOptions &objective_config,
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    const CuMatrixBase<BaseFloat> &nnet_output,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv,
-    CuMatrixBase<BaseFloat> *nnet_output_deriv,
-    BaseFloat *weight,
-    BaseFloat *objf_num,
-    BaseFloat *objf_den,
-    BaseFloat *objf_den_exact) {
+  const RnnlmObjectiveOptions &objective_config,
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  const CuMatrixBase<BaseFloat> &nnet_output,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv,
+  CuMatrixBase<BaseFloat> *nnet_output_deriv,
+  BaseFloat *weight,
+  BaseFloat *objf_num,
+  BaseFloat *objf_den,
+  BaseFloat *objf_den_exact) {
   KALDI_ASSERT(weight != NULL && objf_den != NULL);  // Others are optional.
 
   int32 embedding_dim = word_embedding.NumCols();
@@ -264,7 +264,7 @@ static void ProcessRnnlmOutputNoSampling(
 
   // 'word_logprobs' contains the unnormalized logprobs of the words.
   CuMatrix<BaseFloat> word_logprobs(nnet_output.NumRows(),
-                                    num_words);
+      num_words);
   word_logprobs.AddMatMat(1.0, nnet_output, kNoTrans,
                           word_embedding, kTrans, 0.0);
 
@@ -282,7 +282,7 @@ static void ProcessRnnlmOutputNoSampling(
 
     // the -1 is to remove epsilon.
     CuMatrix<BaseFloat> word_probs(nnet_output.NumRows(),
-                                   num_words - 1, kUndefined);
+        num_words - 1, kUndefined);
     word_probs.CopyFromMat(word_logprobs.ColRange(1, num_words - 1));
     word_probs.ApplyExpLimited(-80.0, 80.0);
     CuVector<BaseFloat> row_sums(nnet_output.NumRows());
@@ -313,8 +313,8 @@ static void ProcessRnnlmOutputNoSampling(
     // skipping over the epsilon symbol (which we don't want to include in the
     // sum because it can never be output) by removing the first row.
     CuSubMatrix<BaseFloat> q_noeps(word_logprobs,
-                                   0, word_logprobs.NumRows(),
-                                   1, num_words - 1);
+        0, word_logprobs.NumRows(),
+        1, num_words - 1);
     // den_term(i) = 1.0 - (\sum_w q(i,w))
     CuVector<BaseFloat> den_term(word_logprobs.NumRows(), kUndefined);
     den_term.Set(1.0);
@@ -376,8 +376,8 @@ static void ProcessRnnlmOutputNoSampling(
   // w.r.t. the unnormalized log-likelihoods 'l' (with the 0th row, for epsilon,
   // not included).
   CuSubMatrix<BaseFloat> l_deriv_noeps(word_logprobs,
-                                       0, word_logprobs.NumRows(),
-                                       1, num_words - 1);
+      0, word_logprobs.NumRows(),
+      1, num_words - 1);
 
   // The following statements are doing the backprop w.r.t. the statement:
   //  word_logprobs.AddMatMat(1.0, nnet_output, kNoTrans,
@@ -387,13 +387,13 @@ static void ProcessRnnlmOutputNoSampling(
   // derivative w.r.t the unnormalized log-likelihoods.
   if (word_embedding_deriv) {
     CuSubMatrix<BaseFloat> word_embedding_deriv_noeps(
-        *word_embedding_deriv, 1, num_words - 1, 0, embedding_dim);
+      *word_embedding_deriv, 1, num_words - 1, 0, embedding_dim);
     word_embedding_deriv_noeps.AddMatMat(-1.0, l_deriv_noeps, kTrans,
                                          nnet_output, kNoTrans, 1.0);
   }
   if (nnet_output_deriv) {
     CuSubMatrix<BaseFloat> word_embedding_noeps(
-        word_embedding, 1, num_words - 1, 0, embedding_dim);
+      word_embedding, 1, num_words - 1, 0, embedding_dim);
     nnet_output_deriv->AddMatMat(-1.0, l_deriv_noeps, kNoTrans,
                                  word_embedding_noeps, kNoTrans, 1.0);
   }
@@ -403,17 +403,17 @@ static void ProcessRnnlmOutputNoSampling(
 // sampling, when [minibatch-size, num-word] matrix it too large to allocate on
 // GPU memory
 static void ProcessRnnlmOutputNoSamplingBatched(
-    const RnnlmObjectiveOptions &objective_config,
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    const CuMatrixBase<BaseFloat> &nnet_output,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv,
-    CuMatrixBase<BaseFloat> *nnet_output_deriv,
-    BaseFloat *weight,
-    BaseFloat *objf_num,
-    BaseFloat *objf_den,
-    BaseFloat *objf_den_exact) {
+  const RnnlmObjectiveOptions &objective_config,
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  const CuMatrixBase<BaseFloat> &nnet_output,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv,
+  CuMatrixBase<BaseFloat> *nnet_output_deriv,
+  BaseFloat *weight,
+  BaseFloat *objf_num,
+  BaseFloat *objf_den,
+  BaseFloat *objf_den_exact) {
   KALDI_ASSERT(weight != NULL && objf_den != NULL);  // Others are optional.
 
   int32 embedding_dim = word_embedding.NumCols();
@@ -458,15 +458,15 @@ static void ProcessRnnlmOutputNoSamplingBatched(
       CuArray<int32> cu_output_words(output_words);
 
       CuSparseMatrix<BaseFloat> smat(cu_output_words,
-        CuSubVector<BaseFloat>(minibatch.output_weights, this_start, this_size),
-        num_words);
+          CuSubVector<BaseFloat>(minibatch.output_weights, this_start, this_size),
+          num_words);
       this_output_words_smat.Swap(&smat);
       *objf_num += TraceMatSmat(word_logprobs,
                                 this_output_words_smat, kTrans);
     }
 
     CuSubVector<BaseFloat> this_output_weights(minibatch.output_weights,
-                                              this_start, this_size);
+        this_start, this_size);
     if (objf_den_exact) {
       // This code is not as optimized as it could be, but we don't take this
       // branch in training so efficiency doesn't matter as much.
@@ -501,8 +501,8 @@ static void ProcessRnnlmOutputNoSamplingBatched(
       // skipping over the epsilon symbol (which we don't want to include in the
       // sum because it can never be output) by removing the first row.
       CuSubMatrix<BaseFloat> q_noeps(word_logprobs,
-                                     0, word_logprobs.NumRows(),
-                                     1, num_words - 1);
+          0, word_logprobs.NumRows(),
+          1, num_words - 1);
       // den_term(i) = 1.0 - (\sum_w q(i,w))
       CuVector<BaseFloat> den_term(word_logprobs.NumRows(), kUndefined);
       den_term.Set(1.0);
@@ -561,8 +561,8 @@ static void ProcessRnnlmOutputNoSamplingBatched(
     // w.r.t. the unnormalized log-likelihoods 'l' (with the 0th row, for epsilon,
     // not included).
     CuSubMatrix<BaseFloat> l_deriv_noeps(word_logprobs,
-                                         0, this_size,
-                                         1, num_words - 1);
+        0, this_size,
+        1, num_words - 1);
 
     // The following statements are doing the backprop w.r.t. the statement:
     //  word_logprobs.AddMatMat(1.0, nnet_output, kNoTrans,
@@ -572,15 +572,15 @@ static void ProcessRnnlmOutputNoSamplingBatched(
     // derivative w.r.t the unnormalized log-likelihoods.
     if (word_embedding_deriv) {
       CuSubMatrix<BaseFloat> word_embedding_deriv_noeps(
-          *word_embedding_deriv, 1, num_words - 1, 0, embedding_dim);
+        *word_embedding_deriv, 1, num_words - 1, 0, embedding_dim);
       word_embedding_deriv_noeps.AddMatMat(-1.0, l_deriv_noeps, kTrans,
                     nnet_output.RowRange(this_start, this_size), kNoTrans, 1.0);
     }
     if (nnet_output_deriv) {
       CuSubMatrix<BaseFloat> word_embedding_noeps(
-          word_embedding, 1, num_words - 1, 0, embedding_dim);
+        word_embedding, 1, num_words - 1, 0, embedding_dim);
       nnet_output_deriv->RowRange(this_start, this_size).
-                         AddMatMat(-1.0, l_deriv_noeps, kNoTrans,
+      AddMatMat(-1.0, l_deriv_noeps, kNoTrans,
                                    word_embedding_noeps, kNoTrans, 1.0);
     }
     this_start += this_size;
@@ -588,17 +588,17 @@ static void ProcessRnnlmOutputNoSamplingBatched(
 }
 
 void ProcessRnnlmOutput(
-    const RnnlmObjectiveOptions &objective_config,
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    const CuMatrixBase<BaseFloat> &nnet_output,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv,
-    CuMatrixBase<BaseFloat> *nnet_output_deriv,
-    BaseFloat *weight,
-    BaseFloat *objf_num,
-    BaseFloat *objf_den,
-    BaseFloat *objf_den_exact) {
+  const RnnlmObjectiveOptions &objective_config,
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  const CuMatrixBase<BaseFloat> &nnet_output,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv,
+  CuMatrixBase<BaseFloat> *nnet_output_deriv,
+  BaseFloat *weight,
+  BaseFloat *objf_num,
+  BaseFloat *objf_den,
+  BaseFloat *objf_den_exact) {
   int32 num_chunks = minibatch.num_chunks,
       chunk_length = minibatch.chunk_length;
   KALDI_ASSERT(nnet_output.NumRows() == num_chunks * chunk_length &&
@@ -632,8 +632,8 @@ void ProcessRnnlmOutput(
 }
 
 void GetRnnlmExampleDerived(const RnnlmExample &minibatch,
-                            bool need_embedding_deriv,
-                            RnnlmExampleDerived *derived) {
+    bool need_embedding_deriv,
+    RnnlmExampleDerived *derived) {
   derived->cu_input_words = minibatch.input_words;
 
   bool using_sampling = !(minibatch.sampled_words.empty());
@@ -643,20 +643,20 @@ void GetRnnlmExampleDerived(const RnnlmExample &minibatch,
   } else {
     CuArray<int32> cu_output_words(minibatch.output_words);
     CuSparseMatrix<BaseFloat> output_words_smat(cu_output_words,
-                                                minibatch.output_weights,
-                                                minibatch.vocab_size);
+        minibatch.output_weights,
+        minibatch.vocab_size);
     derived->output_words_smat.Swap(&output_words_smat);
   }
 
   if (need_embedding_deriv) {
     CuSparseMatrix<BaseFloat> input_words_smat(derived->cu_input_words,
-                                               minibatch.vocab_size, kTrans);
+        minibatch.vocab_size, kTrans);
     derived->input_words_smat.Swap(&input_words_smat);
   }
 }
 
 void RenumberRnnlmExample(RnnlmExample *minibatch,
-                          std::vector<int32> *active_words) {
+    std::vector<int32> *active_words) {
   KALDI_ASSERT(!minibatch->sampled_words.empty());
   unordered_set<int32> active_words_set;
   active_words_set.insert(minibatch->input_words.begin(),

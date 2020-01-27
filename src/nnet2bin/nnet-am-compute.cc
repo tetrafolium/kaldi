@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
     SequentialBaseFloatMatrixReader feature_reader(features_rspecifier);
     BaseFloatMatrixWriter writer(features_or_loglikes_wspecifier);
 
-    for (; !feature_reader.Done();  feature_reader.Next()) {
+    for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string utt = feature_reader.Key();
       const Matrix<BaseFloat> &feats  = feature_reader.Value();
 
@@ -117,13 +117,13 @@ int main(int argc, char *argv[]) {
       Matrix<BaseFloat> output(output_frames, output_dim);
       CuMatrix<BaseFloat> cu_feats(feats);
       CuMatrix<BaseFloat> cu_output(output);
-      if (chunk_size > 0 && chunk_size < feats.NumRows()) {      
+      if (chunk_size > 0 && chunk_size < feats.NumRows()) {
         NnetComputationChunked(nnet, cu_feats, chunk_size, &cu_output);
       } else {
         NnetComputation(nnet, cu_feats, pad_input, &cu_output);
       }
       cu_output.Swap(&output);
-      
+
       if (divide_by_priors) {
         output.MulColsVec(inv_priors); // scales each column by the corresponding element
         // of inv_priors.

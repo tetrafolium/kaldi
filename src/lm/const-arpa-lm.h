@@ -194,7 +194,7 @@ namespace kaldi {
        of LmState whose address differs too much from the parent address. See
        above how we handle the leaf case.
     5. With the information in step 4, create the class ConstArpaLm.
-*/
+ */
 
 // Forward declaration of Auxiliary struct ArpaLine.
 struct ArpaLine;
@@ -203,13 +203,16 @@ union Int32AndFloat {
   int32 i;
   float f;
 
-  Int32AndFloat() {}
-  Int32AndFloat(int32 input_i) : i(input_i) {}
-  Int32AndFloat(float input_f) : f(input_f) {}
+  Int32AndFloat() {
+  }
+  Int32AndFloat(int32 input_i) : i(input_i) {
+  }
+  Int32AndFloat(float input_f) : f(input_f) {
+  }
 };
 
 class ConstArpaLm {
- public:
+public:
 
   // Default constructor, will be used if you are going to load the ConstArpaLm
   // format language model from disk.
@@ -224,15 +227,15 @@ class ConstArpaLm {
   // Special constructor, will be used when you initialize ConstArpaLm from
   // scratch through this constructor.
   ConstArpaLm(const int32 bos_symbol, const int32 eos_symbol,
-              const int32 unk_symbol, const int32 ngram_order,
-              const int32 num_words, const int32 overflow_buffer_size,
-              const int64 lm_states_size, int32** unigram_states,
-              int32** overflow_buffer, int32* lm_states) :
-      bos_symbol_(bos_symbol), eos_symbol_(eos_symbol),
-      unk_symbol_(unk_symbol), ngram_order_(ngram_order),
-      num_words_(num_words), overflow_buffer_size_(overflow_buffer_size),
-      lm_states_size_(lm_states_size), unigram_states_(unigram_states),
-      overflow_buffer_(overflow_buffer), lm_states_(lm_states) {
+      const int32 unk_symbol, const int32 ngram_order,
+      const int32 num_words, const int32 overflow_buffer_size,
+      const int64 lm_states_size, int32** unigram_states,
+      int32** overflow_buffer, int32* lm_states) :
+    bos_symbol_(bos_symbol), eos_symbol_(eos_symbol),
+    unk_symbol_(unk_symbol), ngram_order_(ngram_order),
+    num_words_(num_words), overflow_buffer_size_(overflow_buffer_size),
+    lm_states_size_(lm_states_size), unigram_states_(unigram_states),
+    overflow_buffer_(overflow_buffer), lm_states_(lm_states) {
     KALDI_ASSERT(unigram_states_ != NULL);
     KALDI_ASSERT(overflow_buffer_ != NULL);
     KALDI_ASSERT(lm_states_ != NULL);
@@ -240,7 +243,7 @@ class ConstArpaLm {
     KALDI_ASSERT(bos_symbol_ < num_words_ && bos_symbol_ > 0);
     KALDI_ASSERT(eos_symbol_ < num_words_ && eos_symbol_ > 0);
     KALDI_ASSERT(unk_symbol_ < num_words_ &&
-                 (unk_symbol_ > 0 || unk_symbol_ == -1));
+        (unk_symbol_ > 0 || unk_symbol_ == -1));
     lm_states_end_ = lm_states_ + lm_states_size_ - 1;
     memory_assigned_ = false;
     initialized_ = true;
@@ -278,7 +281,7 @@ class ConstArpaLm {
   int32 UnkSymbol() const { return unk_symbol_; }
   int32 NgramOrder() const { return ngram_order_; }
 
- private:
+private:
   // Function that loads data from stream to the class.
   void ReadInternal(std::istream &is, bool binary);
 
@@ -291,7 +294,7 @@ class ConstArpaLm {
   // Loops up n-gram probability for given word sequence. Backoff is handled by
   // recursively calling this function.
   float GetNgramLogprobRecurse(const int32 word,
-                               const std::vector<int32>& hist) const;
+      const std::vector<int32>& hist) const;
 
   // Given a word sequence, find the address of the corresponding LmState.
   // Returns NULL if no corresponding LmState is found.
@@ -315,11 +318,11 @@ class ConstArpaLm {
   // Decodes <child_info> to get log probability and child LmState. In the leaf
   // case, only <logprob> will be returned, and <child_address> will be NULL.
   void DecodeChildInfo(const int32 child_info, int32* parent,
-                       int32** child_lm_state, float* logprob) const;
+      int32** child_lm_state, float* logprob) const;
 
   void WriteArpaRecurse(int32* lm_state,
-                        const std::vector<int32>& seq,
-                        std::vector<ArpaLine> *output) const;
+      const std::vector<int32>& seq,
+      std::vector<ArpaLine> *output) const;
 
   // We assign memory in Read(). If it is called, we have to release memory in
   // the destructor.
@@ -385,12 +388,12 @@ class ConstArpaLm {
 };
 
 /**
- This class wraps a ConstArpaLm format language model with the interface defined
- in DeterministicOnDemandFst.
+   This class wraps a ConstArpaLm format language model with the interface defined
+   in DeterministicOnDemandFst.
  */
 class ConstArpaLmDeterministicFst
   : public fst::DeterministicOnDemandFst<fst::StdArc> {
- public:
+public:
   typedef fst::StdArc::Weight Weight;
   typedef fst::StdArc::StateId StateId;
   typedef fst::StdArc::Label Label;
@@ -407,9 +410,9 @@ class ConstArpaLmDeterministicFst
 
   virtual bool GetArc(StateId s, Label ilabel, fst::StdArc* oarc);
 
- private:
+private:
   typedef unordered_map<std::vector<Label>,
-                        StateId, VectorHasher<Label> > MapType;
+          StateId, VectorHasher<Label> > MapType;
   StateId start_state_;
   MapType wseq_to_state_;
   std::vector<std::vector<Label> > state_to_wseq_;
@@ -420,8 +423,8 @@ class ConstArpaLmDeterministicFst
 // format. We assume that the words in the input Arpa format language model have
 // been converted into integers.
 bool BuildConstArpaLm(const ArpaParseOptions& options,
-                      const std::string& arpa_rxfilename,
-                      const std::string& const_arpa_wxfilename);
+    const std::string& arpa_rxfilename,
+    const std::string& const_arpa_wxfilename);
 
 }  // namespace kaldi
 

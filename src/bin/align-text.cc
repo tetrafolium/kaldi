@@ -23,7 +23,7 @@
 #include <algorithm>
 
 bool IsNotToken(const std::string &token) {
-  return ! kaldi::IsToken(token);
+  return !kaldi::IsToken(token);
 }
 
 int main(int argc, char *argv[]) {
@@ -105,12 +105,12 @@ int main(int argc, char *argv[]) {
       }
 
       // Verify that the special symbol is not in the string.
-      if (std::find(text1.begin(), text1.end(), special_symbol) != text1.end()){
+      if (std::find(text1.begin(), text1.end(), special_symbol) != text1.end()) {
         KALDI_ERR << "In text1, the utterance " << key
                   << " contains the special symbol '" << special_symbol
                   << "'. This is not allowed.";
       }
-      if (std::find(text2.begin(), text2.end(), special_symbol) != text2.end()){
+      if (std::find(text2.begin(), text2.end(), special_symbol) != text2.end()) {
         KALDI_ERR << "In text2, the utterance " << key
                   << " contains the special symbol '" << special_symbol
                   << "'. This is not allowed.";

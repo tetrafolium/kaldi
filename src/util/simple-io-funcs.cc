@@ -22,7 +22,7 @@
 namespace kaldi {
 
 bool WriteIntegerVectorSimple(const std::string &wxfilename,
-                              const std::vector<int32> &list) {
+    const std::vector<int32> &list) {
   kaldi::Output ko;
   // false, false is: text-mode, no Kaldi header.
   if (!ko.Open(wxfilename, false, false)) return false;
@@ -31,7 +31,7 @@ bool WriteIntegerVectorSimple(const std::string &wxfilename,
 }
 
 bool ReadIntegerVectorSimple(const std::string &rxfilename,
-                             std::vector<int32> *list) {
+    std::vector<int32> *list) {
   kaldi::Input ki;
   if (!ki.OpenTextMode(rxfilename)) return false;
   std::istream &is = ki.Stream();
@@ -44,7 +44,7 @@ bool ReadIntegerVectorSimple(const std::string &rxfilename,
 }
 
 bool WriteIntegerVectorVectorSimple(const std::string &wxfilename,
-                                 const std::vector<std::vector<int32> > &list) {
+    const std::vector<std::vector<int32> > &list) {
   kaldi::Output ko;
   // false, false is: text-mode, no Kaldi header.
   if (!ko.Open(wxfilename, false, false)) return false;
@@ -60,7 +60,7 @@ bool WriteIntegerVectorVectorSimple(const std::string &wxfilename,
 }
 
 bool ReadIntegerVectorVectorSimple(const std::string &rxfilename,
-                                   std::vector<std::vector<int32> > *list) {
+    std::vector<std::vector<int32> > *list) {
   kaldi::Input ki;
   if (!ki.OpenTextMode(rxfilename)) return false;
   std::istream &is = ki.Stream();

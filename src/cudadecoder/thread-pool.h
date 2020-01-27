@@ -1,17 +1,17 @@
 // cudadecoder/thread-pool.h
 // Source:  https://github.com/progschj/ThreadPool
-// Modified to add a priority queue 
+// Modified to add a priority queue
 // Ubtained under this license:
 /*
-Copyright (c) 2012 Jakob Progsch, Václav Zeman
+   Copyright (c) 2012 Jakob Progsch, Václav Zeman
 
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any damages
+   arising from the use of this software.
 
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
+   Permission is granted to anyone to use this software for any purpose,
+   including commercial applications, and to alter it and redistribute it
+   freely, subject to the following restrictions:
 
    1. The origin of this software must not be misrepresented; you must not
    claim that you wrote the original software. If you use this software
@@ -23,7 +23,7 @@ freely, subject to the following restrictions:
 
    3. This notice may not be removed or altered from any source
    distribution.
-*/
+ */
 
 #ifndef KALDI_CUDA_DECODER_THREAD_POOL_H_
 #define KALDI_CUDA_DECODER_THREAD_POOL_H_
@@ -48,26 +48,26 @@ enum ThreadPoolPriority  { THREAD_POOL_LOW_PRIORITY, THREAD_POOL_NORMAL_PRIORITY
 class ThreadPool {
 public:
   ThreadPool(size_t);
-  template <class F, class... Args>
-  auto enqueue(ThreadPoolPriority priority, F &&f, Args &&... args)
-      -> std::future<typename std::result_of<F(Args...)>::type>;
-  template <class F, class... Args>
-  auto enqueue(F &&f, Args &&... args)
-      -> std::future<typename std::result_of<F(Args...)>::type>;
+  template <class F, class ... Args>
+  auto enqueue(ThreadPoolPriority priority, F &&f, Args && ... args)
+  ->std::future<typename std::result_of<F(Args...)>::type>;
+  template <class F, class ... Args>
+  auto enqueue(F &&f, Args && ... args)
+  ->std::future<typename std::result_of<F(Args...)>::type>;
   ~ThreadPool();
 
- private:
+private:
   // need to keep track of threads so we can join them
   std::vector<std::thread> workers;
   // the task queue
   struct Task {
-	  std::function<void()> func;
-          // Ordered first by priority, then FIFO order
-          // tasks created first will have a higher priority_with_fifo.second
-          std::pair<ThreadPoolPriority, long long> priority_with_fifo;
+    std::function<void()> func;
+    // Ordered first by priority, then FIFO order
+    // tasks created first will have a higher priority_with_fifo.second
+    std::pair<ThreadPoolPriority, long long> priority_with_fifo;
   };
   friend bool operator<(const ThreadPool::Task &lhs,
-                        const ThreadPool::Task &rhs);
+      const ThreadPool::Task &rhs);
 
   std::priority_queue<Task> tasks;
   long long task_counter;
@@ -80,47 +80,49 @@ public:
 };
 
 inline bool operator<(const ThreadPool::Task &lhs,
-                      const ThreadPool::Task &rhs) {
+    const ThreadPool::Task &rhs) {
   return lhs.priority_with_fifo < rhs.priority_with_fifo;
 }
 
 // the constructor just launches some amount of workers
 inline ThreadPool::ThreadPool(size_t threads)
-    : task_counter(LONG_MAX), stop(false) {
+  : task_counter(LONG_MAX), stop(false) {
   for (size_t i = 0; i < threads; ++i)
     workers.emplace_back([this] {
-      for (;;) {
-        Task task;
+          for (;;) {
+            Task task;
 
-	{
-          std::unique_lock<std::mutex> lock(this->queue_mutex);
-          this->condition.wait(
-              lock, [this] { return this->stop || !this->tasks.empty(); });
-          if (this->stop && this->tasks.empty()) return;
-          if (!tasks.empty()) {
-            task = std::move(this->tasks.top());
-            this->tasks.pop();
-        }
-	}
-        task.func();
-      }
+            {
+              std::unique_lock<std::mutex> lock(this->queue_mutex);
+              this->condition.wait(
+              lock, [this] {
+                return this->stop || !this->tasks.empty();
+                                                                        });
+              if (this->stop && this->tasks.empty()) return;
+              if (!tasks.empty()) {
+                task = std::move(this->tasks.top());
+                this->tasks.pop();
+              }
+            }
+            task.func();
+          }
     });
 }
 
 // add new work item to the pool : normal priority
-template <class F, class... Args>
-auto ThreadPool::enqueue(F &&f, Args &&... args)
-    -> std::future<typename std::result_of<F(Args...)>::type> {
+template <class F, class ... Args>
+auto ThreadPool::enqueue(F &&f, Args && ... args)
+->std::future<typename std::result_of<F(Args...)>::type> {
   return enqueue(THREAD_POOL_NORMAL_PRIORITY, std::forward<F>(f), std::forward<Args>(args)...);
 }
 
 // add new work item to the pool
-template <class F, class... Args>
-auto ThreadPool::enqueue(ThreadPoolPriority priority, F &&f, Args &&... args)
-    -> std::future<typename std::result_of<F(Args...)>::type> {
+template <class F, class ... Args>
+auto ThreadPool::enqueue(ThreadPoolPriority priority, F &&f, Args && ... args)
+->std::future<typename std::result_of<F(Args...)>::type> {
   using return_type = typename std::result_of<F(Args...)>::type;
 
-  auto func = std::make_shared<std::packaged_task<return_type()>>(
+  auto func = std::make_shared<std::packaged_task<return_type()> >(
       std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 
   std::future<return_type> res = func->get_future();
@@ -131,7 +133,9 @@ auto ThreadPool::enqueue(ThreadPoolPriority priority, F &&f, Args &&... args)
     if (stop)
       throw std::runtime_error("enqueue on stopped ThreadPool");
     Task task;
-    task.func = [func]() { (*func)(); };
+    task.func = [func]() {
+          (*func)();
+        };
     long long task_fifo_id = task_counter--;
     // The following if will temporarly break the FIFO order
     // (leading to a perf drop for a few seconds)

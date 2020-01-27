@@ -24,12 +24,12 @@ namespace kaldi {
 
 
 TrainingGraphCompiler::TrainingGraphCompiler(const TransitionModel &trans_model,
-                                             const ContextDependency &ctx_dep,  // Does not maintain reference to this.
-                                             fst::VectorFst<fst::StdArc> *lex_fst,
-                                             const std::vector<int32> &disambig_syms,
-                                             const TrainingGraphCompilerOptions &opts):
-    trans_model_(trans_model), ctx_dep_(ctx_dep), lex_fst_(lex_fst),
-    disambig_syms_(disambig_syms), opts_(opts) {
+    const ContextDependency &ctx_dep,                                           // Does not maintain reference to this.
+    fst::VectorFst<fst::StdArc> *lex_fst,
+    const std::vector<int32> &disambig_syms,
+    const TrainingGraphCompilerOptions &opts) :
+  trans_model_(trans_model), ctx_dep_(ctx_dep), lex_fst_(lex_fst),
+  disambig_syms_(disambig_syms), opts_(opts) {
   using namespace fst;
   const std::vector<int32> &phone_syms = trans_model_.GetPhones();  // needed to create context fst.
 
@@ -62,8 +62,8 @@ TrainingGraphCompiler::TrainingGraphCompiler(const TransitionModel &trans_model,
 }
 
 bool TrainingGraphCompiler::CompileGraphFromText(
-    const std::vector<int32> &transcript,
-    fst::VectorFst<fst::StdArc> *out_fst) {
+  const std::vector<int32> &transcript,
+  fst::VectorFst<fst::StdArc> *out_fst) {
   using namespace fst;
   VectorFst<StdArc> word_fst;
   MakeLinearAcceptor(transcript, &word_fst);
@@ -71,7 +71,7 @@ bool TrainingGraphCompiler::CompileGraphFromText(
 }
 
 bool TrainingGraphCompiler::CompileGraph(const fst::VectorFst<fst::StdArc> &word_fst,
-                                         fst::VectorFst<fst::StdArc> *out_fst) {
+    fst::VectorFst<fst::StdArc> *out_fst) {
   using namespace fst;
   KALDI_ASSERT(lex_fst_ !=NULL);
   KALDI_ASSERT(out_fst != NULL);
@@ -86,10 +86,10 @@ bool TrainingGraphCompiler::CompileGraph(const fst::VectorFst<fst::StdArc> &word
 
   // inv_cfst will be expanded on the fly, as needed.
   InverseContextFst inv_cfst(subsequential_symbol_,
-                             phone_syms,
-                             disambig_syms_,
-                             ctx_dep_.ContextWidth(),
-                             ctx_dep_.CentralPosition());
+      phone_syms,
+      disambig_syms_,
+      ctx_dep_.ContextWidth(),
+      ctx_dep_.CentralPosition());
 
 
   VectorFst<StdArc> ctx2word_fst;
@@ -143,8 +143,8 @@ bool TrainingGraphCompiler::CompileGraph(const fst::VectorFst<fst::StdArc> &word
 
 
 bool TrainingGraphCompiler::CompileGraphsFromText(
-    const std::vector<std::vector<int32> > &transcripts,
-    std::vector<fst::VectorFst<fst::StdArc>*> *out_fsts) {
+  const std::vector<std::vector<int32> > &transcripts,
+  std::vector<fst::VectorFst<fst::StdArc>*> *out_fsts) {
   using namespace fst;
   std::vector<const VectorFst<StdArc>* > word_fsts(transcripts.size());
   for (size_t i = 0; i < transcripts.size(); i++) {
@@ -159,8 +159,8 @@ bool TrainingGraphCompiler::CompileGraphsFromText(
 }
 
 bool TrainingGraphCompiler::CompileGraphs(
-    const std::vector<const fst::VectorFst<fst::StdArc>* > &word_fsts,
-    std::vector<fst::VectorFst<fst::StdArc>* > *out_fsts) {
+  const std::vector<const fst::VectorFst<fst::StdArc>* > &word_fsts,
+  std::vector<fst::VectorFst<fst::StdArc>* > *out_fsts) {
 
   using namespace fst;
   KALDI_ASSERT(lex_fst_ !=NULL);
@@ -172,10 +172,10 @@ bool TrainingGraphCompiler::CompileGraphs(
 
   // inv_cfst will be expanded on the fly, as needed.
   InverseContextFst inv_cfst(subsequential_symbol_,
-                             phone_syms,
-                             disambig_syms_,
-                             ctx_dep_.ContextWidth(),
-                             ctx_dep_.CentralPosition());
+      phone_syms,
+      disambig_syms_,
+      ctx_dep_.ContextWidth(),
+      ctx_dep_.CentralPosition());
 
   for (size_t i = 0; i < word_fsts.size(); i++) {
     VectorFst<StdArc> phone2word_fst;

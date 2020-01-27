@@ -32,10 +32,10 @@ namespace kaldi {
 namespace nnet3 {
 
 class NnetChainLdaStatsAccumulator {
- public:
+public:
   NnetChainLdaStatsAccumulator(BaseFloat rand_prune,
-                               const Nnet &nnet):
-      rand_prune_(rand_prune), nnet_(nnet), compiler_(nnet) { }
+      const Nnet &nnet) :
+    rand_prune_(rand_prune), nnet_(nnet), compiler_(nnet) { }
 
 
   void AccStats(const NnetChainExample &eg) {
@@ -73,9 +73,9 @@ class NnetChainLdaStatsAccumulator {
                 << stats_wxfilename;
     }
   }
- private:
+private:
   void AccStatsFst(const NnetChainExample &eg,
-                   const CuMatrixBase<BaseFloat> &nnet_output) {
+      const CuMatrixBase<BaseFloat> &nnet_output) {
     BaseFloat rand_prune = rand_prune_;
 
     if (eg.outputs.size() != 1 || eg.outputs[0].name != "output")
@@ -135,7 +135,7 @@ class NnetChainLdaStatsAccumulator {
 
 
   void AccStatsAlignment(const NnetChainExample &eg,
-                          const CuMatrixBase<BaseFloat> &nnet_output) {
+      const CuMatrixBase<BaseFloat> &nnet_output) {
     BaseFloat rand_prune = rand_prune_;
 
     if (eg.outputs.size() != 1 || eg.outputs[0].name != "output")

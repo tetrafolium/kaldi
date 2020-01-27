@@ -25,8 +25,8 @@
 using namespace kaldi;
 
 int ComputeLogPosteriors(ParseOptions &po,
-  const LogisticRegressionConfig &config,
-  bool apply_log) {
+    const LogisticRegressionConfig &config,
+    bool apply_log) {
   std::string model = po.GetArg(1),
       vector_rspecifier = po.GetArg(2),
       log_posteriors_wspecifier = po.GetArg(3);
@@ -55,7 +55,7 @@ int ComputeLogPosteriors(ParseOptions &po,
 }
 
 int32 ComputeScores(ParseOptions &po, const LogisticRegressionConfig &config,
-                    bool apply_log) {
+    bool apply_log) {
   std::string model_rspecifier = po.GetArg(1),
       trials_rspecifier = po.GetArg(2),
       vector_rspecifier = po.GetArg(3),
@@ -126,27 +126,27 @@ int main(int argc, char *argv[]) {
         "Usage2: logistic-regression-eval <model> <trials-file> <input-vectors-rspecifier>\n"
         "                                <output-scores-file>\n";
 
-  ParseOptions po(usage);
+    ParseOptions po(usage);
 
-  bool apply_log = true;
-  po.Register("apply-log", &apply_log,
+    bool apply_log = true;
+    po.Register("apply-log", &apply_log,
               "If false, apply Exp to the log posteriors output. This is "
               "helpful when combining posteriors from multiple logistic "
               "regression models.");
-  LogisticRegressionConfig config;
-  config.Register(&po);
-  po.Read(argc, argv);
+    LogisticRegressionConfig config;
+    config.Register(&po);
+    po.Read(argc, argv);
 
-  if (po.NumArgs() != 3 && po.NumArgs() != 4) {
-    po.PrintUsage();
-    exit(1);
-  }
+    if (po.NumArgs() != 3 && po.NumArgs() != 4) {
+      po.PrintUsage();
+      exit(1);
+    }
 
-  if (po.NumArgs() == 4) {
-    return ComputeScores(po, config, apply_log);
-  } else {
-    return ComputeLogPosteriors(po, config, apply_log);
-  }
+    if (po.NumArgs() == 4) {
+      return ComputeScores(po, config, apply_log);
+    } else {
+      return ComputeLogPosteriors(po, config, apply_log);
+    }
 
   } catch(const std::exception &e) {
     std::cerr << e.what();

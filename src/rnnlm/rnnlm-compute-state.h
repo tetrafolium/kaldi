@@ -43,13 +43,13 @@ struct RnnlmComputeStateComputationOptions {
   int32 brk_index;
   nnet3::NnetOptimizeOptions optimize_config;
   nnet3::NnetComputeOptions compute_config;
-  RnnlmComputeStateComputationOptions():
-      debug_computation(false),
-      normalize_probs(false),
-      bos_index(-1),
-      eos_index(-1),
-      brk_index(-1)
-      { }
+  RnnlmComputeStateComputationOptions() :
+    debug_computation(false),
+    normalize_probs(false),
+    bos_index(-1),
+    eos_index(-1),
+    brk_index(-1)
+  { }
 
   void Register(OptionsItf *opts) {
     opts->Register("debug-computation", &debug_computation, "If true, turn on "
@@ -76,16 +76,16 @@ struct RnnlmComputeStateComputationOptions {
 };
 
 /*
-  This class const references to the word-embedding, nnet3 part of rnnlm and
-the RnnlmComputeStateComputationOptions. It handles the computation of the nnet3
-object
-*/
+   This class const references to the word-embedding, nnet3 part of rnnlm and
+   the RnnlmComputeStateComputationOptions. It handles the computation of the nnet3
+   object
+ */
 class RnnlmComputeStateInfo  {
- public:
+public:
   RnnlmComputeStateInfo(
-      const RnnlmComputeStateComputationOptions &opts,
-      const kaldi::nnet3::Nnet &rnnlm,
-      const CuMatrix<BaseFloat> &word_embedding_mat);
+    const RnnlmComputeStateComputationOptions &opts,
+    const kaldi::nnet3::Nnet &rnnlm,
+    const CuMatrix<BaseFloat> &word_embedding_mat);
 
   const RnnlmComputeStateComputationOptions &opts;
   const kaldi::nnet3::Nnet &rnnlm;
@@ -96,14 +96,14 @@ class RnnlmComputeStateInfo  {
 };
 
 /*
-  This class handles the neural net computation; it's mostly accessed
-  via other wrapper classes. 
- 
-  Each time this class takes a new word and advance the NNET computation by
-  one step, and works out log-prob of words to be used in lattice rescoring. */
+   This class handles the neural net computation; it's mostly accessed
+   via other wrapper classes.
+
+   Each time this class takes a new word and advance the NNET computation by
+   one step, and works out log-prob of words to be used in lattice rescoring. */
 
 class RnnlmComputeState {
- public:
+public:
   /// We compile the computation and generate the state after the BOS history.
   RnnlmComputeState(const RnnlmComputeStateInfo &info, int32 bos_index);
 
@@ -125,7 +125,7 @@ class RnnlmComputeState {
   void GetLogProbOfWords(CuMatrixBase<BaseFloat>* output) const;
   /// Advance the state of the RNNLM by appending this word to the word sequence.
   void AddWord(int32 word_index);
- private:
+private:
   /// This function does the computation for the next chunk.
   void AdvanceChunk();
 

@@ -31,17 +31,17 @@ namespace nnet2 {
 struct NnetSimpleTrainerConfig {
   int32 minibatch_size;
   int32 minibatches_per_phase;
-  
-  NnetSimpleTrainerConfig(): minibatch_size(500),
-                             minibatches_per_phase(50) { }
-  
+
+  NnetSimpleTrainerConfig() : minibatch_size(500),
+    minibatches_per_phase(50) { }
+
   void Register (OptionsItf *opts) {
     opts->Register("minibatch-size", &minibatch_size,
                    "Number of samples per minibatch of training data.");
     opts->Register("minibatches-per-phase", &minibatches_per_phase,
                    "Number of minibatches to wait before printing training-set "
                    "objective.");
-  }  
+  }
 };
 
 
@@ -53,10 +53,10 @@ struct NnetSimpleTrainerConfig {
 /// weight of the examples (typically equal to the number of examples) and the
 /// total logprob objective function.
 int64 TrainNnetSimple(const NnetSimpleTrainerConfig &config,
-                      Nnet *nnet,
-                      SequentialNnetExampleReader *reader,
-                      double *tot_weight = NULL,
-                      double *tot_logprob = NULL);
+    Nnet *nnet,
+    SequentialNnetExampleReader *reader,
+    double *tot_weight = NULL,
+    double *tot_logprob = NULL);
 
 } // namespace nnet2
 } // namespace kaldi

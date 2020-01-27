@@ -24,18 +24,18 @@ namespace kaldi {
 namespace nnet3 {
 
 NnetChainComputeProb::NnetChainComputeProb(
-    const NnetComputeProbOptions &nnet_config,
-    const chain::ChainTrainingOptions &chain_config,
-    const fst::StdVectorFst &den_fst,
-    const Nnet &nnet):
-    nnet_config_(nnet_config),
-    chain_config_(chain_config),
-    den_graph_(den_fst, nnet.OutputDim("output")),
-    nnet_(nnet),
-    compiler_(nnet, nnet_config_.optimize_config, nnet_config_.compiler_config),
-    deriv_nnet_owned_(true),
-    deriv_nnet_(NULL),
-    num_minibatches_processed_(0) {
+  const NnetComputeProbOptions &nnet_config,
+  const chain::ChainTrainingOptions &chain_config,
+  const fst::StdVectorFst &den_fst,
+  const Nnet &nnet) :
+  nnet_config_(nnet_config),
+  chain_config_(chain_config),
+  den_graph_(den_fst, nnet.OutputDim("output")),
+  nnet_(nnet),
+  compiler_(nnet, nnet_config_.optimize_config, nnet_config_.compiler_config),
+  deriv_nnet_owned_(true),
+  deriv_nnet_(NULL),
+  num_minibatches_processed_(0) {
   if (nnet_config_.compute_deriv) {
     deriv_nnet_ = new Nnet(nnet_);
     ScaleNnet(0.0, deriv_nnet_);
@@ -48,18 +48,18 @@ NnetChainComputeProb::NnetChainComputeProb(
 
 
 NnetChainComputeProb::NnetChainComputeProb(
-    const NnetComputeProbOptions &nnet_config,
-    const chain::ChainTrainingOptions &chain_config,
-    const fst::StdVectorFst &den_fst,
-    Nnet *nnet):
-    nnet_config_(nnet_config),
-    chain_config_(chain_config),
-    den_graph_(den_fst, nnet->OutputDim("output")),
-    nnet_(*nnet),
-    compiler_(*nnet, nnet_config_.optimize_config, nnet_config_.compiler_config),
-    deriv_nnet_owned_(false),
-    deriv_nnet_(nnet),
-    num_minibatches_processed_(0) {
+  const NnetComputeProbOptions &nnet_config,
+  const chain::ChainTrainingOptions &chain_config,
+  const fst::StdVectorFst &den_fst,
+  Nnet *nnet) :
+  nnet_config_(nnet_config),
+  chain_config_(chain_config),
+  den_graph_(den_fst, nnet->OutputDim("output")),
+  nnet_(*nnet),
+  compiler_(*nnet, nnet_config_.optimize_config, nnet_config_.compiler_config),
+  deriv_nnet_owned_(false),
+  deriv_nnet_(nnet),
+  num_minibatches_processed_(0) {
   KALDI_ASSERT(den_graph_.NumPdfs() > 0);
   KALDI_ASSERT(nnet_config.store_component_stats && !nnet_config.compute_deriv);
 }
@@ -103,7 +103,7 @@ void NnetChainComputeProb::Compute(const NnetChainExample &chain_eg) {
                              use_xent_derivative, &request);
   std::shared_ptr<const NnetComputation> computation = compiler_.Compile(request);
   NnetComputer computer(nnet_config_.compute_config, *computation,
-                        nnet_, deriv_nnet_);
+      nnet_, deriv_nnet_);
   // give the inputs to the computer object.
   computer.AcceptInputs(nnet_, chain_eg.inputs);
   computer.Run();
@@ -113,7 +113,7 @@ void NnetChainComputeProb::Compute(const NnetChainExample &chain_eg) {
 }
 
 void NnetChainComputeProb::ProcessOutputs(const NnetChainExample &eg,
-                                         NnetComputer *computer) {
+    NnetComputer *computer) {
   // There will normally be just one output here, named 'output',
   // but the code is more general than this.
   std::vector<NnetChainSupervision>::const_iterator iter = eg.outputs.begin(),
@@ -141,8 +141,8 @@ void NnetChainComputeProb::ProcessOutputs(const NnetChainExample &eg,
     ComputeChainObjfAndDeriv(chain_config_, den_graph_,
                              sup.supervision, nnet_output,
                              &tot_like, &tot_l2_term, &tot_weight,
-                             (nnet_config_.compute_deriv ? &nnet_output_deriv :
-                              NULL), (use_xent ? &xent_deriv : NULL));
+        (nnet_config_.compute_deriv ? &nnet_output_deriv :
+        NULL), (use_xent ? &xent_deriv : NULL));
 
     // note: in this context we don't want to apply 'sup.deriv_weights' because
     // this code is used only in combination, where it's part of an L-BFGS
@@ -209,7 +209,7 @@ bool NnetChainComputeProb::PrintTotalStats() const {
 
 
 const ChainObjectiveInfo* NnetChainComputeProb::GetObjective(
-    const std::string &output_name) const {
+  const std::string &output_name) const {
   unordered_map<std::string, ChainObjectiveInfo, StringHasher>::const_iterator
       iter = objf_info_.find(output_name);
   if (iter != objf_info_.end())
@@ -222,7 +222,7 @@ double NnetChainComputeProb::GetTotalObjective(double *total_weight) const {
   double tot_objectives = 0.0;
   double tot_weight = 0.0;
   unordered_map<std::string, ChainObjectiveInfo, StringHasher>::const_iterator
-    iter = objf_info_.begin(), end = objf_info_.end();
+      iter = objf_info_.begin(), end = objf_info_.end();
   for (; iter != end; ++iter) {
     tot_objectives += iter->second.tot_like + iter->second.tot_l2_term;
     tot_weight += iter->second.tot_weight;
@@ -235,9 +235,9 @@ double NnetChainComputeProb::GetTotalObjective(double *total_weight) const {
 static bool HasXentOutputs(const Nnet &nnet) {
   const std::vector<std::string> node_names = nnet.GetNodeNames();
   for (std::vector<std::string>::const_iterator it = node_names.begin();
-        it != node_names.end(); ++it) {
+      it != node_names.end(); ++it) {
     int32 node_index = nnet.GetNodeIndex(*it);
-    if (nnet.IsOutputNode(node_index) && 
+    if (nnet.IsOutputNode(node_index) &&
         it->find("-xent") != std::string::npos) {
       return true;
     }
@@ -246,14 +246,14 @@ static bool HasXentOutputs(const Nnet &nnet) {
 }
 
 void RecomputeStats(const std::vector<NnetChainExample> &egs,
-                    const chain::ChainTrainingOptions &chain_config_in,
-                    const fst::StdVectorFst &den_fst,
-                    Nnet *nnet) {
+    const chain::ChainTrainingOptions &chain_config_in,
+    const fst::StdVectorFst &den_fst,
+    Nnet *nnet) {
   KALDI_LOG << "Recomputing stats on nnet (affects batch-norm)";
   chain::ChainTrainingOptions chain_config(chain_config_in);
   if (HasXentOutputs(*nnet) &&
       chain_config.xent_regularize == 0) {
-    // this forces it to compute the output for xent outputs, 
+    // this forces it to compute the output for xent outputs,
     // usually 'output-xent', which
     // means that we'll be computing batch-norm stats for any
     // components in that branch that have batch-norm.

@@ -140,7 +140,7 @@ void AgglomerativeClusterer::MergeClusters(int32 i, int32 j) {
   for (it = active_clusters_.begin(); it != active_clusters_.end(); ++it) {
     // The new cost is the sum of the costs of the new cluster's parents
     BaseFloat new_cost = cluster_cost_map_[EncodePair(*it, i)] +
-                         cluster_cost_map_[EncodePair(*it, j)];
+        cluster_cost_map_[EncodePair(*it, j)];
     uint32 new_key = EncodePair(*it, count_);
     cluster_cost_map_[new_key] = new_cost;
     BaseFloat norm = clust1->size * (clusters_map_[*it])->size;
@@ -164,18 +164,18 @@ void AgglomerativeClusterer::AddClustersToSecondPass() {
 
     // Compute new cluster pair costs
     for (it2 = second_pass_active_clusters_.begin();
-         it2 != second_pass_active_clusters_.end(); ++it2) {
+        it2 != second_pass_active_clusters_.end(); ++it2) {
       AhcCluster *clust2 = second_pass_clusters_map_[*it2];
       uint32 new_key = EncodePair(count, *it2);
 
       BaseFloat new_cost = 0.0;
       std::vector<int32>::iterator utt_it1, utt_it2;
       for (utt_it1 = clust1->utt_ids.begin();
-           utt_it1 != clust1->utt_ids.end(); ++utt_it1) {
-         for (utt_it2 = clust2->utt_ids.begin();
-              utt_it2 != clust2->utt_ids.end(); ++utt_it2) {
-           new_cost += costs_(*utt_it1, *utt_it2);
-         }
+          utt_it1 != clust1->utt_ids.end(); ++utt_it1) {
+        for (utt_it2 = clust2->utt_ids.begin();
+            utt_it2 != clust2->utt_ids.end(); ++utt_it2) {
+          new_cost += costs_(*utt_it1, *utt_it2);
+        }
       }
 
       second_pass_cluster_cost_map_[new_key] = new_cost;
@@ -214,24 +214,24 @@ void AgglomerativeClusterer::AssignClusters() {
     AhcCluster *cluster = clusters_map_[*it];
     std::vector<int32>::iterator utt_it;
     for (utt_it = cluster->utt_ids.begin();
-         utt_it != cluster->utt_ids.end(); ++utt_it)
+        utt_it != cluster->utt_ids.end(); ++utt_it)
       (*assignments_)[*utt_it] = label_id;
     delete cluster;
   }
 }
 
 void AgglomerativeCluster(
-    const Matrix<BaseFloat> &costs,
-    BaseFloat threshold,
-    int32 min_clusters,
-    int32 first_pass_max_points,
-    BaseFloat max_cluster_fraction,
-    std::vector<int32> *assignments_out) {
+  const Matrix<BaseFloat> &costs,
+  BaseFloat threshold,
+  int32 min_clusters,
+  int32 first_pass_max_points,
+  BaseFloat max_cluster_fraction,
+  std::vector<int32> *assignments_out) {
   KALDI_ASSERT(min_clusters >= 0);
   KALDI_ASSERT(max_cluster_fraction >= 1.0 / min_clusters);
   AgglomerativeClusterer ac(costs, threshold, min_clusters,
-                            first_pass_max_points, max_cluster_fraction,
-                            assignments_out);
+      first_pass_max_points, max_cluster_fraction,
+      assignments_out);
   ac.Cluster();
 }
 

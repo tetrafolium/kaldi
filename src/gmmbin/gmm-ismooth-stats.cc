@@ -35,17 +35,17 @@ int main(int argc, char *argv[]) {
         "e.g.: gmm-ismooth-stats --tau=100 ml.acc num.acc smoothed.acc\n"
         "or: gmm-ismooth-stats --tau=50 --smooth-from-model 1.mdl num.acc smoothed.acc\n"
         "or: gmm-ismooth-stats --tau=100 num.acc num.acc smoothed.acc\n";
-        
+
     bool binary_write = false;
     bool smooth_from_model = false;
     BaseFloat tau = 100;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("smooth-from-model", &smooth_from_model, "If true, "
                 "expect first argument to be a model file");
     po.Register("tau", &tau, "Tau value for I-smoothing");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 3) {
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
       tot_count_before = dst_stats.TotStatsCount();
       IsmoothStatsAmDiagGmm(src_stats, tau, &dst_stats);
       tot_count_after = dst_stats.TotStatsCount();
-      
+
       Output ko(stats_out_filename, binary_write);
       dst_transition_accs.Write(ko.Stream(), binary_write);
       dst_stats.Write(ko.Stream(), binary_write);

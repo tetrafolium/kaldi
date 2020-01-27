@@ -26,23 +26,23 @@ namespace rnnlm {
 
 
 RnnlmTrainer::RnnlmTrainer(bool train_embedding,
-                           const RnnlmCoreTrainerOptions &core_config,
-                           const RnnlmEmbeddingTrainerOptions &embedding_config,
-                           const RnnlmObjectiveOptions &objective_config,
-                           const CuSparseMatrix<BaseFloat> *word_feature_mat,
-                           CuMatrix<BaseFloat> *embedding_mat,
-                           nnet3::Nnet *rnnlm):
-    train_embedding_(train_embedding),
-    core_config_(core_config),
-    embedding_config_(embedding_config),
-    objective_config_(objective_config),
-    rnnlm_(rnnlm),
-    core_trainer_(NULL),
-    embedding_mat_(embedding_mat),
-    embedding_trainer_(NULL),
-    word_feature_mat_(word_feature_mat),
-    num_minibatches_processed_(0),
-    srand_seed_(RandInt(0, 100000)) {
+    const RnnlmCoreTrainerOptions &core_config,
+    const RnnlmEmbeddingTrainerOptions &embedding_config,
+    const RnnlmObjectiveOptions &objective_config,
+    const CuSparseMatrix<BaseFloat> *word_feature_mat,
+    CuMatrix<BaseFloat> *embedding_mat,
+    nnet3::Nnet *rnnlm) :
+  train_embedding_(train_embedding),
+  core_config_(core_config),
+  embedding_config_(embedding_config),
+  objective_config_(objective_config),
+  rnnlm_(rnnlm),
+  core_trainer_(NULL),
+  embedding_mat_(embedding_mat),
+  embedding_trainer_(NULL),
+  word_feature_mat_(word_feature_mat),
+  num_minibatches_processed_(0),
+  srand_seed_(RandInt(0, 100000)) {
 
 
   int32 rnnlm_input_dim = rnnlm_->InputDim("input"),
@@ -67,8 +67,8 @@ RnnlmTrainer::RnnlmTrainer(bool train_embedding,
     int32 feature_dim = word_feature_mat_->NumCols();
     if (feature_dim != embedding_mat_->NumRows()) {
       KALDI_ERR << "Word-feature mat (e.g. from --read-sparse-word-features) "
-          "has num-cols/feature-dim=" << word_feature_mat_->NumCols()
-              << " but embedding matrix has num-rows/feature-dim="
+        "has num-cols/feature-dim=" << word_feature_mat_->NumCols()
+                << " but embedding matrix has num-rows/feature-dim="
                 << embedding_mat_->NumRows() << " (mismatch).";
     }
   }
@@ -78,9 +78,9 @@ RnnlmTrainer::RnnlmTrainer(bool train_embedding,
 void RnnlmTrainer::Train(RnnlmExample *minibatch) {
   // check the minibatch for sanity.
   if (minibatch->vocab_size != VocabSize())
-      KALDI_ERR << "Vocabulary size mismatch: expected "
-                << VocabSize() << ", got "
-                << minibatch->vocab_size;
+    KALDI_ERR << "Vocabulary size mismatch: expected "
+              << VocabSize() << ", got "
+              << minibatch->vocab_size;
 
   current_minibatch_.Swap(minibatch);
   num_minibatches_processed_++;
@@ -117,7 +117,7 @@ void RnnlmTrainer::Train(RnnlmExample *minibatch) {
 
 
 void RnnlmTrainer::GetWordEmbedding(CuMatrix<BaseFloat> *word_embedding_storage,
-                                    CuMatrix<BaseFloat> **word_embedding) {
+    CuMatrix<BaseFloat> **word_embedding) {
   RnnlmExample &minibatch = current_minibatch_;
   bool sampling = !minibatch.sampled_words.empty();
 
@@ -155,7 +155,7 @@ void RnnlmTrainer::GetWordEmbedding(CuMatrix<BaseFloat> *word_embedding_storage,
 
 
 void RnnlmTrainer::TrainWordEmbedding(
-    CuMatrixBase<BaseFloat> *word_embedding_deriv) {
+  CuMatrixBase<BaseFloat> *word_embedding_deriv) {
   RnnlmExample &minibatch = current_minibatch_;
   bool sampling = !minibatch.sampled_words.empty();
 
@@ -175,7 +175,7 @@ void RnnlmTrainer::TrainWordEmbedding(
       word_feature_mat_transpose_.CopyFromSmat(*word_feature_mat_, kTrans);
 
     CuMatrix<BaseFloat> feature_embedding_deriv(embedding_mat_->NumRows(),
-                                                embedding_mat_->NumCols());
+        embedding_mat_->NumCols());
     const CuSparseMatrix<BaseFloat> &word_features_trans =
         (sampling ? active_word_features_trans_ : word_feature_mat_transpose_);
 
@@ -192,8 +192,8 @@ void RnnlmTrainer::TrainWordEmbedding(
 }
 
 void RnnlmTrainer::TrainBackstitchWordEmbedding(
-    bool is_backstitch_step1,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv) {
+  bool is_backstitch_step1,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv) {
   RnnlmExample &minibatch = current_minibatch_;
   bool sampling = !minibatch.sampled_words.empty();
 
@@ -214,7 +214,7 @@ void RnnlmTrainer::TrainBackstitchWordEmbedding(
       word_feature_mat_transpose_.CopyFromSmat(*word_feature_mat_, kTrans);
 
     CuMatrix<BaseFloat> feature_embedding_deriv(embedding_mat_->NumRows(),
-                                                embedding_mat_->NumCols());
+        embedding_mat_->NumCols());
     const CuSparseMatrix<BaseFloat> &word_features_trans =
         (sampling ? active_word_features_trans_ : word_feature_mat_transpose_);
 
@@ -262,7 +262,7 @@ void RnnlmTrainer::TrainInternal() {
       TrainBackstitchWordEmbedding(is_backstitch_step1, &word_embedding_deriv);
   } else {
     core_trainer_->Train(current_minibatch_, derived_, *word_embedding,
-                         (train_embedding_ ? &word_embedding_deriv : NULL));
+        (train_embedding_ ? &word_embedding_deriv : NULL));
     if (train_embedding_)
       TrainWordEmbedding(&word_embedding_deriv);
   }

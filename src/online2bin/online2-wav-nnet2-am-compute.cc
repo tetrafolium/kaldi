@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
       const std::vector<std::string> &uttlist = spk2utt_reader.Value();
 
       OnlineIvectorExtractorAdaptationState adaptation_state(
-          feature_info.ivector_extractor_info);
+        feature_info.ivector_extractor_info);
       OnlineCmvnState cmvn_state(global_cmvn_stats);
 
       for (size_t i = 0; i < uttlist.size(); i++) {
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
         while (samp_offset < data.Dim()) {
           int32 samp_remaining = data.Dim() - samp_offset;
           int32 num_samp = chunk_length < samp_remaining ? chunk_length
-                                                         : samp_remaining;
+              : samp_remaining;
 
           SubVector<BaseFloat> wave_part(data, samp_offset, num_samp);
           feature_pipeline.AcceptWaveform(samp_freq, wave_part);
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
         }
 
         int32 feats_num_frames = feature_pipeline.NumFramesReady(),
-              feats_dim = feature_pipeline.Dim();
+            feats_dim = feature_pipeline.Dim();
         Matrix<BaseFloat> feats(feats_num_frames, feats_dim);
 
         for (int32 i = 0; i < feats_num_frames; i++) {
@@ -172,9 +172,9 @@ int main(int argc, char *argv[]) {
         feature_pipeline.GetCmvnState(&cmvn_state);
 
         int32 output_frames = feats.NumRows(),
-              output_dim = nnet.OutputDim();
+            output_dim = nnet.OutputDim();
         CuMatrix<BaseFloat> output(output_frames, output_dim),
-                            feats_cu(feats);
+        feats_cu(feats);
 
         if (!pad_input)
           output_frames -= nnet.LeftContext() + nnet.RightContext();

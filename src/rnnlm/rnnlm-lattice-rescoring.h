@@ -1,6 +1,6 @@
 // rnnlm/rnnlm-lattice-rescoring.h
 //
-// Copyright 2017 Johns Hopkins University (author: Daniel Povey) 
+// Copyright 2017 Johns Hopkins University (author: Daniel Povey)
 //           2017 Yiming Wang
 //           2017 Hainan Xu
 //
@@ -34,8 +34,8 @@ namespace kaldi {
 namespace rnnlm {
 
 class KaldiRnnlmDeterministicFst
-    : public fst::DeterministicOnDemandFst<fst::StdArc> {
- public:
+  : public fst::DeterministicOnDemandFst<fst::StdArc> {
+public:
   typedef fst::StdArc::Weight Weight;
   typedef fst::StdArc::StateId StateId;
   typedef fst::StdArc::Label Label;
@@ -57,7 +57,7 @@ class KaldiRnnlmDeterministicFst
 
   virtual bool GetArc(StateId s, Label ilabel, fst::StdArc* oarc);
 
- private:
+private:
   typedef unordered_map
       <std::vector<Label>, StateId, VectorHasher<Label> > MapType;
   StateId start_state_;

@@ -30,21 +30,21 @@ namespace kaldi {
 namespace nnet3 {
 
 
-TdnnComponent::TdnnComponent():
-    orthonormal_constraint_(0.0),
-    use_natural_gradient_(true) { }
+TdnnComponent::TdnnComponent() :
+  orthonormal_constraint_(0.0),
+  use_natural_gradient_(true) { }
 
 
 TdnnComponent::TdnnComponent(
-    const TdnnComponent &other):
-    UpdatableComponent(other),  // initialize base-class
-    time_offsets_(other.time_offsets_),
-    linear_params_(other.linear_params_),
-    bias_params_(other.bias_params_),
-    orthonormal_constraint_(other.orthonormal_constraint_),
-    use_natural_gradient_(other.use_natural_gradient_),
-    preconditioner_in_(other.preconditioner_in_),
-    preconditioner_out_(other.preconditioner_out_) {
+  const TdnnComponent &other) :
+  UpdatableComponent(other),    // initialize base-class
+  time_offsets_(other.time_offsets_),
+  linear_params_(other.linear_params_),
+  bias_params_(other.bias_params_),
+  orthonormal_constraint_(other.orthonormal_constraint_),
+  use_natural_gradient_(other.use_natural_gradient_),
+  preconditioner_in_(other.preconditioner_in_),
+  preconditioner_out_(other.preconditioner_out_) {
   Check();
 }
 
@@ -56,8 +56,8 @@ void TdnnComponent::Check() const {
                                time_offsets_.end()).size() ==
                time_offsets_.size() &&
                linear_params_.NumCols() % time_offsets_.size() == 0 &&
-               (bias_params_.Dim() == 0 ||
-                bias_params_.Dim() == linear_params_.NumRows()));
+      (bias_params_.Dim() == 0 ||
+      bias_params_.Dim() == linear_params_.NumRows()));
 }
 
 std::string TdnnComponent::Info() const {
@@ -110,8 +110,8 @@ void TdnnComponent::InitFromConfig(ConfigLine *cfl) {
       !SplitStringToIntegers(time_offsets, ",", false, &time_offsets_) ||
       time_offsets_.empty()) {
     KALDI_ERR << "Bad initializer: there is a problem with "
-        "time-offsets, input-dim or output-dim (not defined?): "
-        << cfl->WholeLine();
+      "time-offsets, input-dim or output-dim (not defined?): "
+              << cfl->WholeLine();
   }
 
   if (std::set<int32>(time_offsets_.begin(),
@@ -179,9 +179,9 @@ void TdnnComponent::InitFromConfig(ConfigLine *cfl) {
 }
 
 void* TdnnComponent::Propagate(
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in,
-    CuMatrixBase<BaseFloat> *out) const {
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *out) const {
   const PrecomputedIndexes *indexes =
       dynamic_cast<const PrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL);
@@ -203,22 +203,22 @@ void* TdnnComponent::Propagate(
                                                   indexes->row_stride,
                                                   indexes->row_offsets[i]);
     CuSubMatrix<BaseFloat> linear_params_part(linear_params_,
-                                              0, linear_params_.NumRows(),
-                                              i * input_dim, input_dim);
+        0, linear_params_.NumRows(),
+        i * input_dim, input_dim);
     out->AddMatMat(1.0, in_part, kNoTrans, linear_params_part, kTrans, 1.0);
   }
   return NULL;
 }
 
 void TdnnComponent::Backprop(
-    const std::string &debug_info,
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &, // out_value
-    const CuMatrixBase<BaseFloat> &out_deriv,
-    void*, // memo
-    Component *to_update_in,
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const std::string &debug_info,
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &,   // out_value
+  const CuMatrixBase<BaseFloat> &out_deriv,
+  void*,   // memo
+  Component *to_update_in,
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("TdnnComponent::Backprop");
   const PrecomputedIndexes *indexes =
       dynamic_cast<const PrecomputedIndexes*>(indexes_in);
@@ -234,8 +234,8 @@ void TdnnComponent::Backprop(
           GetInputPart(*in_deriv, out_deriv.NumRows(),
                        indexes->row_stride, indexes->row_offsets[i]);
       CuSubMatrix<BaseFloat> linear_params_part(linear_params_,
-                                                0, linear_params_.NumRows(),
-                                                i * input_dim, input_dim);
+          0, linear_params_.NumRows(),
+          i * input_dim, input_dim);
       // note: this component has the property kBackpropAdds, which is why the
       // final 1.0 is there in the following call (otherwise we'd have to zero
       // *in_deriv first).
@@ -260,9 +260,9 @@ void TdnnComponent::Backprop(
 }
 
 void TdnnComponent::UpdateSimple(
-    const PrecomputedIndexes &indexes,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &out_deriv) {
+  const PrecomputedIndexes &indexes,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &out_deriv) {
   NVTX_RANGE("UpdateSimple");
 
   if (bias_params_.Dim() != 0)
@@ -276,17 +276,17 @@ void TdnnComponent::UpdateSimple(
                      indexes.row_stride,
                      indexes.row_offsets[i]);
     CuSubMatrix<BaseFloat> linear_params_part(linear_params_,
-                                              0, linear_params_.NumRows(),
-                                              i * input_dim, input_dim);
+        0, linear_params_.NumRows(),
+        i * input_dim, input_dim);
     linear_params_part.AddMatMat(learning_rate_, out_deriv, kTrans,
                                  in_value_part, kNoTrans, 1.0);
   }
 }
 
 void TdnnComponent::UpdateNaturalGradient(
-    const PrecomputedIndexes &indexes,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &out_deriv) {
+  const PrecomputedIndexes &indexes,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &out_deriv) {
   NVTX_RANGE("UpdateNaturalGradient");
 
   int32 num_offsets = time_offsets_.size(),
@@ -294,12 +294,12 @@ void TdnnComponent::UpdateNaturalGradient(
       input_dim = in_value.NumCols(),
       spliced_input_dim = num_offsets * input_dim,
       augmented_input_dim =
-        spliced_input_dim + (bias_params_.Dim() != 0 ? 1 : 0);
+      spliced_input_dim + (bias_params_.Dim() != 0 ? 1 : 0);
 
   // in_value_temp is the fully spliced input with a column of ones appended to
   // it.
   CuMatrix<BaseFloat> in_value_temp(num_rows,
-                                    augmented_input_dim);
+      augmented_input_dim);
   if (bias_params_.Dim() != 0) {
     // set the last column of in_value_temp to 1.0
     in_value_temp.Range(0, num_rows, spliced_input_dim, 1).Set(1.0);
@@ -307,9 +307,9 @@ void TdnnComponent::UpdateNaturalGradient(
 
   for (int32 i = 0; i < num_offsets; i++) {
     CuSubMatrix<BaseFloat> in_value_temp_part(in_value_temp,
-                                              0, num_rows,
-                                              i * input_dim, input_dim),
-        in_value_part = GetInputPart(in_value,
+        0, num_rows,
+        i * input_dim, input_dim),
+    in_value_part = GetInputPart(in_value,
                                      num_rows,
                                      indexes.row_stride,
                                      indexes.row_offsets[i]);
@@ -341,16 +341,16 @@ void TdnnComponent::UpdateNaturalGradient(
   }
 
   CuSubMatrix<BaseFloat> in_value_precon_part(in_value_temp,
-                                              0, num_rows,
-                                              0, spliced_input_dim);
+      0, num_rows,
+      0, spliced_input_dim);
 
   linear_params_.AddMatMat(local_lrate, out_deriv_temp, kTrans,
                            in_value_precon_part, kNoTrans, 1.0);
 }
 
 void TdnnComponent::ReorderIndexes(
-    std::vector<Index> *input_indexes,
-    std::vector<Index> *output_indexes) const {
+  std::vector<Index> *input_indexes,
+  std::vector<Index> *output_indexes) const {
   using namespace time_height_convolution;
 
   // The following figures out a regular structure for the input and
@@ -455,9 +455,9 @@ void TdnnComponent::Read(std::istream &is, bool binary) {
 }
 
 void TdnnComponent::GetInputIndexes(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    std::vector<Index> *desired_indexes) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  std::vector<Index> *desired_indexes) const {
   KALDI_ASSERT(output_index.t != kNoTime);
   size_t size = time_offsets_.size();
   desired_indexes->resize(size);
@@ -470,10 +470,10 @@ void TdnnComponent::GetInputIndexes(
 
 
 bool TdnnComponent::IsComputable(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    const IndexSet &input_index_set,
-    std::vector<Index> *used_inputs) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  const IndexSet &input_index_set,
+  std::vector<Index> *used_inputs) const {
   KALDI_ASSERT(output_index.t != kNoTime);
   size_t size = time_offsets_.size();
   Index index(output_index);
@@ -498,10 +498,10 @@ bool TdnnComponent::IsComputable(
 
 // static
 CuSubMatrix<BaseFloat> TdnnComponent::GetInputPart(
-      const CuMatrixBase<BaseFloat> &input_matrix,
-      int32 num_output_rows,
-      int32 row_stride,
-      int32 row_offset) {
+  const CuMatrixBase<BaseFloat> &input_matrix,
+  int32 num_output_rows,
+  int32 row_stride,
+  int32 row_offset) {
   KALDI_ASSERT(row_offset >= 0 && row_stride >= 1 &&
                input_matrix.NumRows() >=
                row_offset + (row_stride * num_output_rows) - (row_stride - 1));
@@ -514,7 +514,7 @@ CuSubMatrix<BaseFloat> TdnnComponent::GetInputPart(
 }
 
 void TdnnComponent::ModifyComputationIo(
-    time_height_convolution::ConvolutionComputationIo *io) {
+  time_height_convolution::ConvolutionComputationIo *io) {
   if (io->t_step_out == 0) {
     // the 't_step' values may be zero if there was only one (input or output)
     // index so the time-stride could not be determined.  This code fixes them
@@ -538,10 +538,10 @@ void TdnnComponent::ModifyComputationIo(
 }
 
 ComponentPrecomputedIndexes* TdnnComponent::PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const {
+  const MiscComputationInfo &misc_info,
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  bool need_backprop) const {
   using namespace time_height_convolution;
   // The following figures out a regular structure for the input and
   // output indexes, in case there were gaps (which is unlikely in typical
@@ -608,7 +608,7 @@ void TdnnComponent::Scale(BaseFloat scale) {
 }
 
 void TdnnComponent::Add(BaseFloat alpha,
-                        const Component &other_in) {
+    const Component &other_in) {
   const TdnnComponent *other =
       dynamic_cast<const TdnnComponent*>(&other_in);
   KALDI_ASSERT(other != NULL);
@@ -619,7 +619,7 @@ void TdnnComponent::Add(BaseFloat alpha,
 
 void TdnnComponent::PerturbParams(BaseFloat stddev) {
   CuMatrix<BaseFloat> temp_mat(linear_params_.NumRows(),
-                               linear_params_.NumCols(), kUndefined);
+      linear_params_.NumCols(), kUndefined);
   temp_mat.SetRandn();
   linear_params_.AddMat(stddev, temp_mat);
   if (bias_params_.Dim() != 0) {
@@ -630,7 +630,7 @@ void TdnnComponent::PerturbParams(BaseFloat stddev) {
 }
 
 BaseFloat TdnnComponent::DotProduct(
-    const UpdatableComponent &other_in) const {
+  const UpdatableComponent &other_in) const {
   const TdnnComponent *other =
       dynamic_cast<const TdnnComponent*>(&other_in);
   KALDI_ASSERT(other != NULL);
@@ -643,11 +643,11 @@ BaseFloat TdnnComponent::DotProduct(
 int32 TdnnComponent::NumParameters() const {
   // note: bias_param_.Dim() may actually be zero.
   return linear_params_.NumRows() * linear_params_.NumCols() +
-      bias_params_.Dim();
+         bias_params_.Dim();
 }
 
 void TdnnComponent::Vectorize(
-    VectorBase<BaseFloat> *params) const {
+  VectorBase<BaseFloat> *params) const {
   KALDI_ASSERT(params->Dim() == NumParameters());
   int32 linear_size = linear_params_.NumRows() * linear_params_.NumCols(),
       bias_size = bias_params_.Dim();
@@ -657,7 +657,7 @@ void TdnnComponent::Vectorize(
 }
 
 void TdnnComponent::UnVectorize(
-    const VectorBase<BaseFloat> &params) {
+  const VectorBase<BaseFloat> &params) {
   KALDI_ASSERT(params.Dim() == NumParameters());
   int32 linear_size = linear_params_.NumRows() * linear_params_.NumCols(),
       bias_size = bias_params_.Dim();
@@ -677,7 +677,7 @@ TdnnComponent::PrecomputedIndexes::Copy() const {
 }
 
 void TdnnComponent::PrecomputedIndexes::Write(
-    std::ostream &os, bool binary) const {
+  std::ostream &os, bool binary) const {
   WriteToken(os, binary, "<TdnnComponentPrecomputedIndexes>");
   WriteToken(os, binary, "<RowStride>");
   WriteBasicType(os, binary, row_stride);
@@ -687,7 +687,7 @@ void TdnnComponent::PrecomputedIndexes::Write(
 }
 
 void TdnnComponent::PrecomputedIndexes::Read(
-    std::istream &is, bool binary) {
+  std::istream &is, bool binary) {
   ExpectOneOrTwoTokens(is, binary,
                        "<TdnnComponentPrecomputedIndexes>",
                        "<RowStride>");

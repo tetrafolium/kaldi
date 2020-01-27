@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
         } else {
           KALDI_ERR << "Failed to read input stats file " << po.GetArg(i + 2);
         }
-      }      
+      }
     } else {
       for (int i = 2, max = po.NumArgs(); i <= max; i++) {
         std::string stats_in_filename = po.GetArg(i);

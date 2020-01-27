@@ -128,11 +128,11 @@
 
 #define KALDI_CUDA_DECODER_1D_KERNEL_LOOP(i, n)                \
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < (n); \
-       i += blockDim.x * gridDim.x)
+      i += blockDim.x * gridDim.x)
 
 #define KALDI_CUDA_DECODER_1D_BLOCK_OFFSET_KERNEL_LOOP(offset, th_idx, n) \
   for (int offset = blockIdx.x * blockDim.x, th_idx = threadIdx.x;        \
-       offset < (n); offset += blockDim.x * gridDim.x)
+      offset < (n); offset += blockDim.x * gridDim.x)
 
 #define KALDI_CUDA_DECODER_IS_LAST_1D_THREAD() (threadIdx.x == (blockDim.x - 1))
 
@@ -208,7 +208,7 @@ class DeviceMatrix {
     KALDI_ASSERT(ncols_ > 0);
     KALDI_ASSERT(!data_);
     data_ = static_cast<T *>(CuDevice::Instantiate().Malloc(
-        (size_t)nrows_ * ncols_ * sizeof(*data_)));
+          (size_t)nrows_ * ncols_ * sizeof(*data_)));
     KALDI_ASSERT(data_);
   }
   void Free() {
@@ -216,11 +216,11 @@ class DeviceMatrix {
     CuDevice::Instantiate().Free(data_);
   }
 
- protected:
+protected:
   int32 ncols_;
   int32 nrows_;
 
- public:
+public:
   DeviceMatrix() : data_(NULL), ncols_(0), nrows_(0) {}
 
   virtual ~DeviceMatrix() {
@@ -259,11 +259,11 @@ class HostMatrix {
     cudaFreeHost(data_);
   }
 
- protected:
+protected:
   int32 ncols_;
   int32 nrows_;
 
- public:
+public:
   HostMatrix() : data_(NULL), ncols_(0), nrows_(0) {}
 
   virtual ~HostMatrix() {
@@ -318,7 +318,7 @@ struct ChannelMatrixView {
 // Helps with code clarity/debugging
 template <typename T>
 class DeviceLaneMatrix : public DeviceMatrix<T> {
- public:
+public:
   LaneMatrixView<T> GetView() { return {this->MutableData(), this->ncols_}; }
 
   T *lane(const int32 ilane) {
@@ -328,7 +328,7 @@ class DeviceLaneMatrix : public DeviceMatrix<T> {
 
 template <typename T>
 class HostLaneMatrix : public HostMatrix<T> {
- public:
+public:
   LaneMatrixView<T> GetView() { return {this->MutableData(), this->ncols_}; }
 
   T *lane(const int32 ilane) {
@@ -338,7 +338,7 @@ class HostLaneMatrix : public HostMatrix<T> {
 
 template <typename T>
 class DeviceChannelMatrix : public DeviceMatrix<T> {
- public:
+public:
   ChannelMatrixView<T> GetView() { return {this->MutableData(), this->ncols_}; }
   T *channel(const int32 ichannel) {
     return &this->MutableData()[ichannel * this->ncols_];
@@ -453,15 +453,15 @@ struct ChannelCounters {
 };
 
 class CudaDecoderException : public std::exception {
- public:
+public:
   CudaDecoderException(const char *str_, const char *file_, int line_,
-                       const bool recoverable_)
-      : str(str_),
-        file(file_),
-        line(line_),
-        buffer(std::string(file) + ":" + std::to_string(line) + " :" +
-               std::string(str)),
-        recoverable(recoverable_) {}
+      const bool recoverable_)
+    : str(str_),
+    file(file_),
+    line(line_),
+    buffer(std::string(file) + ":" + std::to_string(line) + " :" +
+        std::string(str)),
+    recoverable(recoverable_) {}
   const char *what() const throw() { return buffer.c_str(); }
 
   const char *str;
@@ -506,7 +506,7 @@ struct __align__(8) InfoToken {
 // Device function, used to set a in an InfoToken the [offset,size] related to
 // InfoToken.GetSameFSTStateTokensList
 __device__ __inline__ void SetSameFSTStateTokensList(int32 offset, int32 size,
-                                                     InfoToken *info_token) {
+    InfoToken *info_token) {
   // We always have size > 0
   *info_token = {offset, -size};
 }

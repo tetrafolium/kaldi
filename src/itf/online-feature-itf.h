@@ -44,10 +44,10 @@ namespace kaldi {
    can call GetFrame for any frame less than NumFramesReady(), and when
    implementing a child class you must not make assumptions about the
    order in which the user makes these calls.
-*/
+ */
 
 class OnlineFeatureInterface {
- public:
+public:
   virtual int32 Dim() const = 0; /// returns the feature dimension.
 
   /// Returns the total number of frames, since the start of the utterance, that
@@ -80,7 +80,7 @@ class OnlineFeatureInterface {
   /// may be overridden for efficiency by child classes (since sometimes
   /// it's more efficient to do things in a batch).
   virtual void GetFrames(const std::vector<int32> &frames,
-                         MatrixBase<BaseFloat> *feats) {
+      MatrixBase<BaseFloat> *feats) {
     KALDI_ASSERT(static_cast<int32>(frames.size()) == feats->NumRows());
     for (size_t i = 0; i < frames.size(); i++) {
       SubVector<BaseFloat> feat(*feats, i);
@@ -104,12 +104,12 @@ class OnlineFeatureInterface {
 /// Add a virtual class for "source" features such as MFCC or PLP or pitch
 /// features.
 class OnlineBaseFeature: public OnlineFeatureInterface {
- public:
+public:
   /// This would be called from the application, when you get more wave data.
   /// Note: the sampling_rate is typically only provided so the code can assert
   /// that it matches the sampling rate expected in the options.
   virtual void AcceptWaveform(BaseFloat sampling_rate,
-                              const VectorBase<BaseFloat> &waveform) = 0;
+      const VectorBase<BaseFloat> &waveform) = 0;
 
   /// InputFinished() tells the class you won't be providing any
   /// more waveform.  This will help flush out the last few frames

@@ -41,8 +41,8 @@ using tensorflow::Status;
 
 // read a unigram count file of the OOSs and generate extra OOS costs for words
 void SetUnkPenalties(const string &filename,
-                     const fst::SymbolTable& fst_word_symbols,
-                     std::vector<float> *out) {
+    const fst::SymbolTable& fst_word_symbols,
+    std::vector<float> *out) {
   if (filename == "")
     return;
   out->resize(fst_word_symbols.NumSymbols(), 0);  // default is 0
@@ -65,7 +65,7 @@ void SetUnkPenalties(const string &filename,
 
 // Read tensorflow checkpoint files
 void KaldiTfRnnlmWrapper::ReadTfModel(const std::string &tf_model_path,
-                                      int32 num_threads) {
+    int32 num_threads) {
   tensorflow::SessionOptions session_options;
   tensorflow::RunOptions run_options;
 
@@ -74,7 +74,7 @@ void KaldiTfRnnlmWrapper::ReadTfModel(const std::string &tf_model_path,
 
   Status status = tensorflow::LoadSavedModel(
       session_options, run_options, tf_model_path,
-      {tensorflow::kSavedModelTagServe},
+    {tensorflow::kSavedModelTagServe},
       &bundle_);
   if (!status.ok()) {
     KALDI_ERR << status.ToString();
@@ -90,7 +90,7 @@ void KaldiTfRnnlmWrapper::ReadTfModel(const std::string &tf_model_path,
 
   auto&& signature = signature_it->second;
 
-  const std::vector<std::pair<const char*, std::string&>> input_params = {
+  const std::vector<std::pair<const char*, std::string&> > input_params = {
     {"context", context_tensor_name_},
     {"word_id", word_id_tensor_name_},
   };
@@ -105,7 +105,7 @@ void KaldiTfRnnlmWrapper::ReadTfModel(const std::string &tf_model_path,
     // printf("%s: %s\n", pair.first, pair.second.c_str());
   }
 
-  const std::vector<std::pair<const char*, std::string&>> output_params = {
+  const std::vector<std::pair<const char*, std::string&> > output_params = {
     {"log_prob", log_prob_tensor_name_},
     {"rnn_out", rnn_out_tensor_name_},
     {"rnn_states", rnn_states_tensor_name_},
@@ -139,18 +139,18 @@ void KaldiTfRnnlmWrapper::ReadTfModel(const std::string &tf_model_path,
 }
 
 KaldiTfRnnlmWrapper::KaldiTfRnnlmWrapper(
-    const KaldiTfRnnlmWrapperOpts &opts,
-    const std::string &rnn_wordlist,
-    const std::string &word_symbol_table_rxfilename,
-    const std::string &unk_prob_file,
-    const std::string &tf_model_path): opts_(opts) {
+  const KaldiTfRnnlmWrapperOpts &opts,
+  const std::string &rnn_wordlist,
+  const std::string &word_symbol_table_rxfilename,
+  const std::string &unk_prob_file,
+  const std::string &tf_model_path) : opts_(opts) {
   ReadTfModel(tf_model_path, opts.num_threads);
 
   fst::SymbolTable *fst_word_symbols = NULL;
   if (!(fst_word_symbols =
-        fst::SymbolTable::ReadText(word_symbol_table_rxfilename))) {
+      fst::SymbolTable::ReadText(word_symbol_table_rxfilename))) {
     KALDI_ERR << "Could not read symbol table from file "
-        << word_symbol_table_rxfilename;
+              << word_symbol_table_rxfilename;
   }
 
   fst_label_to_word_.resize(fst_word_symbols->NumSymbols());
@@ -159,8 +159,8 @@ KaldiTfRnnlmWrapper::KaldiTfRnnlmWrapper(
     fst_label_to_word_[i] = fst_word_symbols->Find(i);
     if (fst_label_to_word_[i] == "") {
       KALDI_ERR << "Could not find word for integer " << i << " in the word "
-          << "symbol table, mismatched symbol table or you have discoutinuous "
-          << "integers in your symbol table?";
+                << "symbol table, mismatched symbol table or you have discoutinuous "
+                << "integers in your symbol table?";
     }
   }
 
@@ -221,7 +221,7 @@ void KaldiTfRnnlmWrapper::AcquireInitialTensors() {
   {
     std::vector<Tensor> state;
     status = bundle_.session->Run(std::vector<std::pair<string, Tensor> >(),
-                           {initial_state_tensor_name_}, {}, &state);
+            {initial_state_tensor_name_}, {}, &state);
     if (!status.ok()) {
       KALDI_ERR << status.ToString();
     }
@@ -248,11 +248,11 @@ void KaldiTfRnnlmWrapper::AcquireInitialTensors() {
 }
 
 BaseFloat KaldiTfRnnlmWrapper::GetLogProb(int32 word,
-                                          int32 fst_word,
-                                          const Tensor &context_in,
-                                          const Tensor &cell_in,
-                                          Tensor *context_out,
-                                          Tensor *new_cell) {
+    int32 fst_word,
+    const Tensor &context_in,
+    const Tensor &cell_in,
+    Tensor *context_out,
+    Tensor *new_cell) {
   Tensor thisword(tensorflow::DT_INT32, {1, 1});
   thisword.scalar<int32>()() = word;
 
@@ -267,9 +267,9 @@ BaseFloat KaldiTfRnnlmWrapper::GetLogProb(int32 word,
     // The session will initialize the outputs
     // Run the session, evaluating our "c" operation from the graph
     Status status = bundle_.session->Run(inputs,
-        {log_prob_tensor_name_,
-         rnn_out_tensor_name_,
-         rnn_states_tensor_name_}, {}, &outputs);
+            {log_prob_tensor_name_,
+             rnn_out_tensor_name_,
+             rnn_states_tensor_name_}, {}, &outputs);
     if (!status.ok()) {
       KALDI_ERR << status.ToString();
     }
@@ -279,7 +279,7 @@ BaseFloat KaldiTfRnnlmWrapper::GetLogProb(int32 word,
   } else {
     // Run the session, evaluating our "c" operation from the graph
     Status status = bundle_.session->Run(inputs,
-        {log_prob_tensor_name_}, {}, &outputs);
+            {log_prob_tensor_name_}, {}, &outputs);
     if (!status.ok()) {
       KALDI_ERR << status.ToString();
     }
@@ -313,7 +313,7 @@ int KaldiTfRnnlmWrapper::FstLabelToRnnLabel(int i) const {
 }
 
 TfRnnlmDeterministicFst::TfRnnlmDeterministicFst(int32 max_ngram_order,
-                                             KaldiTfRnnlmWrapper *rnnlm) {
+    KaldiTfRnnlmWrapper *rnnlm) {
   KALDI_ASSERT(rnnlm != NULL);
   max_ngram_order_ = max_ngram_order;
   rnnlm_ = rnnlm;
@@ -369,7 +369,7 @@ fst::StdArc::Weight TfRnnlmDeterministicFst::Final(StateId s) {
 }
 
 bool TfRnnlmDeterministicFst::GetArc(StateId s, Label ilabel,
-                                     fst::StdArc *oarc) {
+    fst::StdArc *oarc) {
   KALDI_ASSERT(static_cast<size_t>(s) < state_to_wseq_.size());
 
   std::vector<Label> wseq = state_to_wseq_[s];
@@ -394,7 +394,7 @@ bool TfRnnlmDeterministicFst::GetArc(StateId s, Label ilabel,
   }
 
   std::pair<const std::vector<Label>, StateId> wseq_state_pair(
-      wseq, static_cast<Label>(state_to_wseq_.size()));
+    wseq, static_cast<Label>(state_to_wseq_.size()));
 
   // Attemps to insert the current <lseq_state_pair>. If the pair already exists
   // then it returns false.

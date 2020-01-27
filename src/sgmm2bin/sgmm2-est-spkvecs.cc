@@ -34,12 +34,12 @@ using std::vector;
 namespace kaldi {
 
 void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
-                            const Posterior &post,
-                            const TransitionModel &trans_model,
-                            const AmSgmm2 &am_sgmm,
-                            const vector< vector<int32> > &gselect,
-                            Sgmm2PerSpkDerivedVars *spk_vars,
-                            MleSgmm2SpeakerAccs *spk_stats) {
+    const Posterior &post,
+    const TransitionModel &trans_model,
+    const AmSgmm2 &am_sgmm,
+    const vector< vector<int32> > &gselect,
+    Sgmm2PerSpkDerivedVars *spk_vars,
+    MleSgmm2SpeakerAccs *spk_stats) {
   kaldi::Sgmm2PerFrameDerivedVars per_frame_vars;
 
   KALDI_ASSERT(gselect.size() == feats.NumRows());
@@ -48,7 +48,7 @@ void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
   for (size_t i = 0; i < post.size(); i++) {
     am_sgmm.ComputePerFrameVars(feats.Row(i), gselect[i],
                                 *spk_vars, &per_frame_vars);
-    
+
     for (size_t j = 0; j < pdf_post[i].size(); j++) {
       int32 pdf_id = pdf_post[i][j].first;
       spk_stats->Accumulate(am_sgmm, per_frame_vars, pdf_id,
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
         "Usage: sgmm2-est-spkvecs [options] <model-in> <feature-rspecifier> "
         "<post-rspecifier> <vecs-wspecifier>\n"
         "note: --gselect option is required.";
-    
+
     ParseOptions po(usage);
     string gselect_rspecifier, spk2utt_rspecifier, spkvecs_rspecifier;
     BaseFloat min_count = 100;
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     }
     if (gselect_rspecifier == "")
       KALDI_ERR << "--gselect option is mandatory.";
-    
+
     string model_rxfilename = po.GetArg(1),
         feature_rspecifier = po.GetArg(2),
         post_rspecifier = po.GetArg(3),
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
           }
           const std::vector<std::vector<int32> > &gselect =
               gselect_reader.Value(utt);
-          
+
           AccumulateForUtterance(feats, post, trans_model, am_sgmm,
                                  gselect, &spk_vars, &spk_stats);
           num_done++;
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
     } else {  // per-utterance adaptation
       SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
       for (; !feature_reader.Done(); feature_reader.Next()) {
-        string utt = feature_reader.Key();        
+        string utt = feature_reader.Key();
         const Matrix<BaseFloat> &feats = feature_reader.Value();
         if (!post_reader.HasKey(utt) ||
             post_reader.Value(utt).size() != feats.NumRows()) {
@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
             continue;
           }
         }  // else spk_vars is "empty"
-        
+
         num_done++;
 
         if (!gselect_reader.HasKey(utt) ||
@@ -228,7 +228,7 @@ int main(int argc, char *argv[]) {
             gselect_reader.Value(utt);
 
         spk_stats.Clear();
-        
+
         AccumulateForUtterance(feats, post, trans_model, am_sgmm,
                                gselect, &spk_vars, &spk_stats);
 

@@ -38,8 +38,8 @@ namespace nnet1 {
  * Our pooling supports overlaps, overlaps occur when (pool_step_ < pool_size_).
  */
 class AveragePoolingComponent : public Component {
- public:
-  AveragePoolingComponent(int32 dim_in, int32 dim_out):
+public:
+  AveragePoolingComponent(int32 dim_in, int32 dim_out) :
     Component(dim_in, dim_out),
     pool_size_(0),
     pool_step_(0),
@@ -101,7 +101,7 @@ class AveragePoolingComponent : public Component {
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // useful dims
     int32 num_patches = input_dim_ / pool_stride_;
     int32 num_pools = 1 + (num_patches - pool_size_) / pool_step_;
@@ -120,9 +120,9 @@ class AveragePoolingComponent : public Component {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // useful dims
     int32 num_patches = input_dim_ / pool_stride_;
     int32 num_pools = 1 + (num_patches - pool_size_) / pool_step_;
@@ -157,10 +157,10 @@ class AveragePoolingComponent : public Component {
     }
   }
 
- private:
+private:
   int32 pool_size_,    // input patches used for pooling
-        pool_step_,    // shift used for pooling (allow overlapping pools)
-        pool_stride_;  // stride used to cut input to a vector of matrices
+      pool_step_,      // shift used for pooling (allow overlapping pools)
+      pool_stride_;    // stride used to cut input to a vector of matrices
 };
 
 }  // namespace nnet1

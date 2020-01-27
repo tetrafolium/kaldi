@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier);
 
     RandomAccessBaseFloatVectorReaderMapped spkvecs_reader(spkvecs_rspecifier,
-                                                           utt2spk_rspecifier);
+        utt2spk_rspecifier);
 
     Int32VectorWriter alignment_writer(alignment_wspecifier);
     BaseFloatVectorWriter per_frame_acwt_writer(per_frame_acwt_wspecifier);
@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
       }
 
       DecodableAmSgmm2Scaled sgmm_decodable(am_sgmm, trans_model, features, gselect,
-                                            log_prune, acoustic_scale, &spk_vars);
+          log_prune, acoustic_scale, &spk_vars);
 
       AlignUtteranceWrapper(align_config, utt,
                             acoustic_scale, &decode_fst, &sgmm_decodable,

@@ -47,9 +47,9 @@ namespace chain {
    If limit were zero, this would be the same as l2 regularization with scale 'scale'.
  */
 static void PenalizeOutOfRange(const CuMatrixBase<BaseFloat> &in_value,
-                               BaseFloat limit,
-                               BaseFloat scale,
-                               CuMatrixBase<BaseFloat> *out_deriv) {
+    BaseFloat limit,
+    BaseFloat scale,
+    CuMatrixBase<BaseFloat> *out_deriv) {
   KALDI_ASSERT(SameDim(in_value, *out_deriv) && limit > 0 && scale >= 0);
   if (scale == 0)
     return;
@@ -58,7 +58,7 @@ static void PenalizeOutOfRange(const CuMatrixBase<BaseFloat> &in_value,
     CuTimer tim;
     dim3 dimBlock(CU2DBLOCK, CU2DBLOCK);
     dim3 dimGrid(n_blocks(in_value.NumCols(), CU2DBLOCK),
-                 n_blocks(in_value.NumRows(), CU2DBLOCK));
+        n_blocks(in_value.NumRows(), CU2DBLOCK));
     cuda_penalize_out_of_range(dimGrid, dimBlock, limit, scale,
                                in_value.Data(), in_value.Dim(),
                                out_deriv->Stride(), out_deriv->Data());
@@ -86,14 +86,14 @@ static void PenalizeOutOfRange(const CuMatrixBase<BaseFloat> &in_value,
 
 
 void ComputeChainObjfAndDerivE2e(const ChainTrainingOptions &opts,
-                                 const DenominatorGraph &den_graph,
-                                 const Supervision &supervision,
-                                 const CuMatrixBase<BaseFloat> &nnet_output,
-                                 BaseFloat *objf,
-                                 BaseFloat *l2_term,
-                                 BaseFloat *weight,
-                                 CuMatrixBase<BaseFloat> *nnet_output_deriv,
-                                 CuMatrix<BaseFloat> *xent_output_deriv) {
+    const DenominatorGraph &den_graph,
+    const Supervision &supervision,
+    const CuMatrixBase<BaseFloat> &nnet_output,
+    BaseFloat *objf,
+    BaseFloat *l2_term,
+    BaseFloat *weight,
+    CuMatrixBase<BaseFloat> *nnet_output_deriv,
+    CuMatrix<BaseFloat> *xent_output_deriv) {
   NVTX_RANGE(__func__);
   BaseFloat num_logprob_weighted, den_logprob_weighted;
   bool denominator_ok = true;
@@ -116,8 +116,8 @@ void ComputeChainObjfAndDerivE2e(const ChainTrainingOptions &opts,
     // memory use, as we can set 'xent_deriv' to nonempty after
     // we've freed the memory in this object.
     DenominatorComputation denominator(opts, den_graph,
-                                       supervision.num_sequences,
-                                       nnet_output);
+        supervision.num_sequences,
+        nnet_output);
 
     den_logprob_weighted = supervision.weight * denominator.Forward();
     if (nnet_output_deriv)
@@ -138,7 +138,7 @@ void ComputeChainObjfAndDerivE2e(const ChainTrainingOptions &opts,
 
   {
     GenericNumeratorComputation numerator(opts.numerator_opts,
-                                          supervision, nnet_output);
+        supervision, nnet_output);
     // note: supervision.weight is included as a factor in the derivative from
     // the numerator object, as well as the returned logprob.
     if (xent_output_deriv) {
@@ -153,10 +153,10 @@ void ComputeChainObjfAndDerivE2e(const ChainTrainingOptions &opts,
       num_logprob_weighted = numerator.ComputeObjf();
     }
     if (!numerator_ok)
-        KALDI_WARN << "Numerator forward-backward failed.";
+      KALDI_WARN << "Numerator forward-backward failed.";
   }
   numerator_ok = numerator_ok &&
-                 (num_logprob_weighted - num_logprob_weighted == 0);
+      (num_logprob_weighted - num_logprob_weighted == 0);
 
   *objf = num_logprob_weighted - den_logprob_weighted;
   if (!((*objf) - (*objf) == 0) || !denominator_ok || !numerator_ok) {
@@ -182,8 +182,8 @@ void ComputeChainObjfAndDerivE2e(const ChainTrainingOptions &opts,
   // of 'incorrect' pdf-ids.
   if (GetVerboseLevel() >= 1 && nnet_output_deriv != NULL && RandInt(0, 10) == 0) {
     int32 tot_frames = nnet_output_deriv->NumRows(),
- frames_per_sequence = supervision.frames_per_sequence,
-       num_sequences = supervision.num_sequences;
+        frames_per_sequence = supervision.frames_per_sequence,
+        num_sequences = supervision.num_sequences;
     CuVector<BaseFloat> row_products(tot_frames);
     row_products.AddDiagMat2(1.0, *nnet_output_deriv, kNoTrans, 0.0);
     Vector<BaseFloat> row_products_cpu(row_products);
@@ -205,14 +205,14 @@ void ComputeChainObjfAndDerivE2e(const ChainTrainingOptions &opts,
 
 
 void ComputeChainObjfAndDeriv(const ChainTrainingOptions &opts,
-                              const DenominatorGraph &den_graph,
-                              const Supervision &supervision,
-                              const CuMatrixBase<BaseFloat> &nnet_output,
-                              BaseFloat *objf,
-                              BaseFloat *l2_term,
-                              BaseFloat *weight,
-                              CuMatrixBase<BaseFloat> *nnet_output_deriv,
-                              CuMatrix<BaseFloat> *xent_output_deriv) {
+    const DenominatorGraph &den_graph,
+    const Supervision &supervision,
+    const CuMatrixBase<BaseFloat> &nnet_output,
+    BaseFloat *objf,
+    BaseFloat *l2_term,
+    BaseFloat *weight,
+    CuMatrixBase<BaseFloat> *nnet_output_deriv,
+    CuMatrix<BaseFloat> *xent_output_deriv) {
   NVTX_RANGE(__func__);
   if (!supervision.e2e_fsts.empty()) {
     ComputeChainObjfAndDerivE2e(opts, den_graph, supervision,
@@ -230,8 +230,8 @@ void ComputeChainObjfAndDeriv(const ChainTrainingOptions &opts,
     // memory use, as we can set 'xent_deriv' to nonempty after
     // we've freed the memory in this object.
     DenominatorComputation denominator(opts, den_graph,
-                                       supervision.num_sequences,
-                                       nnet_output);
+        supervision.num_sequences,
+        nnet_output);
 
     den_logprob_weighted = supervision.weight * denominator.Forward();
     if (nnet_output_deriv)
@@ -297,8 +297,8 @@ void ComputeChainObjfAndDeriv(const ChainTrainingOptions &opts,
   // of 'incorrect' pdf-ids.
   if (GetVerboseLevel() >= 1 && nnet_output_deriv != NULL && RandInt(0, 10) == 0) {
     int32 tot_frames = nnet_output_deriv->NumRows(),
- frames_per_sequence = supervision.frames_per_sequence,
-       num_sequences = supervision.num_sequences;
+        frames_per_sequence = supervision.frames_per_sequence,
+        num_sequences = supervision.num_sequences;
     CuVector<BaseFloat> row_products(tot_frames);
     row_products.AddDiagMat2(1.0, *nnet_output_deriv, kNoTrans, 0.0);
     Vector<BaseFloat> row_products_cpu(row_products);

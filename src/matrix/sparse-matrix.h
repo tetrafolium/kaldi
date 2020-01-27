@@ -39,7 +39,7 @@ namespace kaldi {
 
 template <typename Real>
 class SparseVector {
- public:
+public:
   MatrixIndexT Dim() const { return dim_; }
 
   Real Sum() const;
@@ -50,7 +50,7 @@ class SparseVector {
   // *vec += alpha * *this.
   template <class OtherReal>
   void AddToVec(Real alpha,
-                VectorBase<OtherReal> *vec) const;
+      VectorBase<OtherReal> *vec) const;
 
   template <class OtherReal>
   void CopyFromSvec(const SparseVector<OtherReal> &other);
@@ -89,13 +89,13 @@ class SparseVector {
   /// distributed.  Useful in testing.
   void SetRandn(BaseFloat zero_prob);
 
-  SparseVector(): dim_(0) { }
+  SparseVector() : dim_(0) { }
 
-  explicit SparseVector(MatrixIndexT dim): dim_(dim) { KALDI_ASSERT(dim >= 0); }
+  explicit SparseVector(MatrixIndexT dim) : dim_(dim) { KALDI_ASSERT(dim >= 0); }
 
   // constructor from pairs; does not assume input pairs are sorted and uniq
   SparseVector(MatrixIndexT dim,
-               const std::vector<std::pair<MatrixIndexT, Real> > &pairs);
+      const std::vector<std::pair<MatrixIndexT, Real> > &pairs);
 
   // constructor from a VectorBase that keeps only the nonzero elements of 'vec'.
   explicit SparseVector(const VectorBase<Real> &vec);
@@ -111,7 +111,7 @@ class SparseVector {
   /// Scale all elements of sparse vector.
   void Scale(Real alpha);
 
- private:
+private:
   MatrixIndexT dim_;
   // pairs of (row-index, value).  Stored in sorted order with no duplicates.
   // For now we use std::vector, but we could change this.
@@ -121,13 +121,13 @@ class SparseVector {
 
 template <typename Real>
 Real VecSvec(const VectorBase<Real> &vec,
-             const SparseVector<Real> &svec);
+    const SparseVector<Real> &svec);
 
 
 
 template <typename Real>
 class SparseMatrix {
- public:
+public:
   MatrixIndexT NumRows() const;
 
   MatrixIndexT NumCols() const;
@@ -146,7 +146,7 @@ class SparseMatrix {
   /// Copy to matrix.  It must already have the correct size.
   template <class OtherReal>
   void CopyToMat(MatrixBase<OtherReal> *other,
-                 MatrixTransposeType t = kNoTrans) const;
+      MatrixTransposeType t = kNoTrans) const;
 
   /// Copies the values of all the elements in SparseMatrix into a VectorBase
   /// object.
@@ -155,16 +155,16 @@ class SparseMatrix {
   /// Copies data from another sparse matrix.
   template<class OtherReal>
   void CopyFromSmat(const SparseMatrix<OtherReal> &other,
-                    MatrixTransposeType trans = kNoTrans);
+      MatrixTransposeType trans = kNoTrans);
 
   /// Does *other = *other + alpha * *this.
   void AddToMat(BaseFloat alpha, MatrixBase<Real> *other,
-                MatrixTransposeType t = kNoTrans) const;
+      MatrixTransposeType t = kNoTrans) const;
 
   SparseMatrix<Real> &operator = (const SparseMatrix<Real> &other);
 
   SparseMatrix(const SparseMatrix<Real> &other, MatrixTransposeType trans =
-                   kNoTrans) {
+      kNoTrans) {
     this->CopyFromSmat(other, trans);
   }
 
@@ -181,8 +181,8 @@ class SparseMatrix {
   // Posterior. indexed first by row-index; the pairs are (column-index, value),
   // and the constructor does not require them to be sorted and uniq.
   SparseMatrix(
-      int32 dim,
-      const std::vector<std::vector<std::pair<MatrixIndexT, Real> > > &pairs);
+    int32 dim,
+    const std::vector<std::vector<std::pair<MatrixIndexT, Real> > > &pairs);
 
   /// Sets up to a pseudo-randomly initialized matrix, with each element zero
   /// with probability zero_prob and else normally distributed- mostly for
@@ -203,7 +203,7 @@ class SparseMatrix {
   /// in 'row_indexes'.
   /// 'row_indexes' must satisfy 0 <= row_indexes[i] < smat_other.NumRows().
   void SelectRows(const std::vector<int32> &row_indexes,
-                  const SparseMatrix<Real> &smat_other);
+      const SparseMatrix<Real> &smat_other);
 
 
   /// Sets *this to all the rows of *inputs appended together; this
@@ -227,7 +227,7 @@ class SparseMatrix {
   /// If trans == kTrans, the result will be the transpose
   /// of the sparse matrix described above.
   SparseMatrix(const std::vector<int32> &indexes, int32 dim,
-               MatrixTransposeType trans = kNoTrans);
+      MatrixTransposeType trans = kNoTrans);
 
   /// Constructor from an array of indexes and an array of
   /// weights; requires indexes.Dim() == weights.Dim().
@@ -240,13 +240,13 @@ class SparseMatrix {
   /// If trans == kTrans, the result will be the transpose
   /// of the sparse matrix described above.
   SparseMatrix(const std::vector<int32> &indexes,
-               const VectorBase<Real> &weights, int32 dim,
-               MatrixTransposeType trans = kNoTrans);
+      const VectorBase<Real> &weights, int32 dim,
+      MatrixTransposeType trans = kNoTrans);
 
   /// Resizes the matrix; analogous to Matrix::Resize().  resize_type ==
   /// kUndefined behaves the same as kSetZero.
   void Resize(MatrixIndexT rows, MatrixIndexT cols,
-              MatrixResizeType resize_type = kSetZero);
+      MatrixResizeType resize_type = kSetZero);
 
   /// Scale all elements in sparse matrix.
   void Scale(Real alpha);
@@ -255,7 +255,7 @@ class SparseMatrix {
   // see Matrix::AddSmat().  There is not very extensive functionality for
   // SparseMat just yet (e.g. no matrix multiply); we will add things as needed
   // and as it seems necessary.
- private:
+private:
   // vector of SparseVectors, all of same dime (use an stl vector for now; this
   // could change).
   std::vector<SparseVector<Real> > rows_;
@@ -264,8 +264,8 @@ class SparseMatrix {
 
 template<typename Real>
 Real TraceMatSmat(const MatrixBase<Real> &A,
-                  const SparseMatrix<Real> &B,
-                  MatrixTransposeType trans = kNoTrans);
+    const SparseMatrix<Real> &B,
+    MatrixTransposeType trans = kNoTrans);
 
 
 enum GeneralMatrixType {
@@ -280,7 +280,7 @@ enum GeneralMatrixType {
 /// and write a single object type.  It is useful for neural-net training
 /// targets which might be sparse or not, and might be compressed or not.
 class GeneralMatrix {
- public:
+public:
   /// Returns the type of the matrix: kSparseMatrix, kCompressedMatrix or
   /// kFullMatrix.  If this matrix is empty, returns kFullMatrix.
   GeneralMatrixType Type() const;
@@ -330,21 +330,21 @@ class GeneralMatrix {
   /// Copies contents, regardless of type, to "mat", which must be correctly
   /// sized.  See also GetMatrix(), which will size its output for you.
   void CopyToMat(MatrixBase<BaseFloat> *mat,
-                 MatrixTransposeType trans = kNoTrans) const;
+      MatrixTransposeType trans = kNoTrans) const;
 
   /// Copies contents, regardless of type, to "cu_mat", which must be
   /// correctly sized.  Implemented in ../cudamatrix/cu-sparse-matrix.cc
   void CopyToMat(CuMatrixBase<BaseFloat> *cu_mat,
-                 MatrixTransposeType trans = kNoTrans) const;
+      MatrixTransposeType trans = kNoTrans) const;
 
   /// Adds alpha times *this to mat.
   void AddToMat(BaseFloat alpha, MatrixBase<BaseFloat> *mat,
-                MatrixTransposeType trans = kNoTrans) const;
+      MatrixTransposeType trans = kNoTrans) const;
 
   /// Adds alpha times *this to cu_mat.
   /// Implemented in ../cudamatrix/cu-sparse-matrix.cc
   void AddToMat(BaseFloat alpha, CuMatrixBase<BaseFloat> *cu_mat,
-                MatrixTransposeType trans = kNoTrans) const;
+      MatrixTransposeType trans = kNoTrans) const;
 
   /// Scale each element of matrix by alpha.
   void Scale(BaseFloat alpha);
@@ -377,7 +377,7 @@ class GeneralMatrix {
   void Clear();
   // shallow swap
   void Swap(GeneralMatrix *other);
- private:
+private:
   // We don't explicitly store the type of the matrix.  Rather, we make
   // sure that only one of the matrices is ever nonempty, and the Type()
   // returns that one, or kFullMatrix if all are empty.
@@ -392,7 +392,7 @@ class GeneralMatrix {
 /// Does not preserve compression, if inputs were compressed; you have to
 /// re-compress manually, if that's what you need.
 void AppendGeneralMatrixRows(const std::vector<const GeneralMatrix *> &src,
-                             GeneralMatrix *mat);
+    GeneralMatrix *mat);
 
 
 /// Outputs a SparseMatrix<Real> containing only the rows r of "in" such that
@@ -400,23 +400,23 @@ void AppendGeneralMatrixRows(const std::vector<const GeneralMatrix *> &src,
 /// must contain at least one "true" element.
 template <typename Real>
 void FilterSparseMatrixRows(const SparseMatrix<Real> &in,
-                            const std::vector<bool> &keep_rows,
-                            SparseMatrix<Real> *out);
+    const std::vector<bool> &keep_rows,
+    SparseMatrix<Real> *out);
 
 /// Outputs a Matrix<Real> containing only the rows r of "in" such that
 /// keep_keep_rows[r] == true.  keep_rows.size() must equal in.NumRows(), and
 /// keep_rows must contain at least one "true" element.
 template <typename Real>
 void FilterMatrixRows(const Matrix<Real> &in,
-                      const std::vector<bool> &keep_rows,
-                      Matrix<Real> *out);
+    const std::vector<bool> &keep_rows,
+    Matrix<Real> *out);
 
 /// Outputs a Matrix<Real> containing only the rows r of "in" such that
 /// keep_rows[r] == true.  keep_rows.size() must equal in.NumRows(), and rows
 /// must contain at least one "true" element.
 void FilterCompressedMatrixRows(const CompressedMatrix &in,
-                                const std::vector<bool> &keep_rows,
-                                Matrix<BaseFloat> *out);
+    const std::vector<bool> &keep_rows,
+    Matrix<BaseFloat> *out);
 
 
 /// Outputs a GeneralMatrix containing only the rows r of "in" such that
@@ -425,8 +425,8 @@ void FilterCompressedMatrixRows(const CompressedMatrix &in,
 /// kCompressedMatrix, the result will not be compressed; otherwise, the type
 /// is preserved.
 void FilterGeneralMatrixRows(const GeneralMatrix &in,
-                             const std::vector<bool> &keep_rows,
-                             GeneralMatrix *out);
+    const std::vector<bool> &keep_rows,
+    GeneralMatrix *out);
 
 /// This function extracts a row-range of a GeneralMatrix and writes
 /// as a GeneralMatrix containing the same type of underlying
@@ -438,10 +438,10 @@ void FilterGeneralMatrixRows(const GeneralMatrix &in,
 /// re-compressing the underlying CompressedMatrix, and causes
 /// less accuracy loss due to re-compression (no loss in most cases).
 void ExtractRowRangeWithPadding(
-    const GeneralMatrix &in,
-    int32 row_offset,
-    int32 num_rows,
-    GeneralMatrix *out);
+  const GeneralMatrix &in,
+  int32 row_offset,
+  int32 num_rows,
+  GeneralMatrix *out);
 
 
 /// @} end of \addtogroup matrix_group

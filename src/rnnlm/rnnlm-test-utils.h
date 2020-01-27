@@ -45,7 +45,7 @@ void GetForbiddenSymbols(std::set<std::string> *forbidden_symbols);
 ///                      and different from the symbols listed in
 ///                      'forbidden_symbols'.
 void GetTestSentences(const std::set<std::string> &forbidden_symbols,
-                      std::vector<std::vector<std::string> > *sentences);
+    std::vector<std::vector<std::string> > *sentences);
 
 
 
@@ -53,16 +53,16 @@ void GetTestSentences(const std::set<std::string> &forbidden_symbols,
 /// </s> -> 2, <brk> -> 3, and any symbols that appear in 'sentences' to
 /// other values.
 fst::SymbolTable *GetSymbolTable(
-    const std::vector<std::vector<std::string> > &sentences);
+  const std::vector<std::vector<std::string> > &sentences);
 
 
 /// Converts the data in 'string_sentences' into integers via the
 /// symbol table 'symbol_table', and writes to 'int_sentences'.
 /// All words must be covered in the symbol table.a
 void ConvertToInteger(
-    const std::vector<std::vector<std::string> > &string_sentences,
-    const fst::SymbolTable &symbol_table,
-    std::vector<std::vector<int32> > *int_sentences);
+  const std::vector<std::vector<std::string> > &string_sentences,
+  const fst::SymbolTable &symbol_table,
+  std::vector<std::vector<int32> > *int_sentences);
 
 /**
    This function estimates a backoff n-gram language model from the data in
@@ -88,11 +88,11 @@ void ConvertToInteger(
                              the language model in ARPA format.
  */
 void EstimateAndWriteLanguageModel(
-    int32 ngram_order,
-    const fst::SymbolTable &symbol_table,
-    const std::vector<std::vector<int32> > &sentences,
-    int32 bos_symbol, int32 eos_symbol,
-    std::ostream &os);
+  int32 ngram_order,
+  const fst::SymbolTable &symbol_table,
+  const std::vector<std::vector<int32> > &sentences,
+  int32 bos_symbol, int32 eos_symbol,
+  std::ostream &os);
 
 
 

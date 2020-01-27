@@ -37,13 +37,13 @@ namespace nnet2 {
 
 
 /*
-  This neural net is basically a series of Components, and is a fairly
-  passive object that mainly acts as a store for the Components.  Training
-  is handled by a separate class NnetTrainer(), and extracting likelihoods
-  for decoding is handled by DecodableNnetCpu(). 
-  
-  There are a couple of things that make this class more than just a vector of
-  Components.
+   This neural net is basically a series of Components, and is a fairly
+   passive object that mainly acts as a store for the Components.  Training
+   is handled by a separate class NnetTrainer(), and extracting likelihoods
+   for decoding is handled by DecodableNnetCpu().
+
+   There are a couple of things that make this class more than just a vector of
+   Components.
 
    (1) It handles frame splicing (temporal context.)
    We'd like to encompass the approach described in
@@ -57,25 +57,25 @@ namespace nnet2 {
    least utterance-specific part that does not vary with the frame index.
    These features are provided separately from the frame-specific ones, to avoid
    redundancy.
-*/
+ */
 
 
 class Nnet {
- public:
-  
+public:
+
   /// Returns number of components-- think of this as similar to # of layers, but
   /// e.g. the nonlinearity and the linear part count as separate components,
   /// so the number of components will be more than the number of layers.
   int32 NumComponents() const { return components_.size(); }
 
   const Component &GetComponent(int32 c) const;
-  
+
   Component &GetComponent(int32 c);
 
   /// Sets the c'th component to "component", taking ownership of the pointer
   /// and deleting the corresponding one that we own.
   void SetComponent(int32 c, Component *component);
-  
+
   /// Returns the left-context summed over all the Components... this is the
   /// entire left-context in frames, that the network requires.
   int32 LeftContext() const;
@@ -83,7 +83,7 @@ class Nnet {
   /// Returns the right-context summed over all the Components... this is the
   /// entire right-context in frames, that the network requires.
   int32 RightContext() const;
-  
+
   /// The output dimension of the network -- typically
   /// the number of pdfs.
   int32 OutputDim() const;
@@ -91,8 +91,8 @@ class Nnet {
   /// Dimension of the input features, e.g. 13 or 40.  Does not
   /// take account of frame splicing-- that is done with the "chunk"
   /// mechanism, where you provide chunks of features over time.
-  int32 InputDim() const; 
-  
+  int32 InputDim() const;
+
   /// Uses the output of the Context() functions of the network, to compute a
   /// vector of size NumComponents() + 1 indexed by component-index c, of the
   /// chunk-info at the input of each layer c, where the c+1'th element contains
@@ -101,8 +101,8 @@ class Nnet {
   /// produce exactly 1 output frame per chunk, then this should equal 1 +
   /// LeftContext() + RightContext().
   void ComputeChunkInfo(int32 input_chunk_size,
-                        int32 num_chunks,
-                        std::vector<ChunkInfo> *chunk_info_out) const;
+      int32 num_chunks,
+      std::vector<ChunkInfo> *chunk_info_out) const;
 
   void ZeroStats(); // zeroes the stats on the nonlinear layers.
 
@@ -113,14 +113,14 @@ class Nnet {
   /// Returns the index of the lowest-numbered component which is updatable, or
   /// NumComponents() if none are updatable.
   int32 FirstUpdatableComponent() const;
-  
+
   /// Returns the index of the highest-numbered component which is updatable, or
   /// -1 if none are updatable.
   int32 LastUpdatableComponent() const;
 
   /// Returns the number of updatable components.
   int32 NumUpdatableComponents() const;
-  
+
   /// Scales the parameters of each of the updatable components.
   /// Here, scale_params is a vector of size equal to
   /// NumUpdatableComponents()
@@ -131,7 +131,7 @@ class Nnet {
 
   /// Calls SetDropoutScale for all the dropout nodes.
   void SetDropoutScale(BaseFloat scale);
-  
+
   /// Replace any components of type AffineComponentPreconditioned with
   /// components of type AffineComponent.
   void RemovePreconditioning();
@@ -140,17 +140,17 @@ class Nnet {
   /// components of type AffineComponentPreconditionedOnline.  E.g. rank_in =
   /// 20, rank_out = 80, num_samples_history = 2000.0, alpha = 4.0
   void SwitchToOnlinePreconditioning(int32 rank_in, int32 rank_out,
-                                     int32 update_period,
-                                     BaseFloat num_samples_history,
-                                     BaseFloat alpha);
-  
+      int32 update_period,
+      BaseFloat num_samples_history,
+      BaseFloat alpha);
+
   /// For each updatatable component, adds to it
   /// the corresponding element of "other" times the
   /// appropriate element of "scales" (which has the
   /// same format as for ScaleComponents(), i.e.
   /// one entry for each updatable component).
   void AddNnet(const VectorBase<BaseFloat> &scales,
-               const Nnet &other);
+      const Nnet &other);
 
   /// Scales all the Components with the same scale.  This applies to
   /// UpdatableComponents, and (unlike the ScaleComponents function) to
@@ -162,7 +162,7 @@ class Nnet {
   /// to UpdatableComponents, and (unlike the other AddNnet function) to
   /// SoftmaxComponents.
   void AddNnet(BaseFloat alpha,
-               const Nnet &other);
+      const Nnet &other);
 
   /// Turns the last affine layer into two layers of the same type, with a
   /// smaller dimension in between-- we're keeping the top singular values of
@@ -174,8 +174,8 @@ class Nnet {
   /// multithreading reasons (otherwise you could do AddNnet(alpha, *iter) and then
   /// other->Scale(beta).
   void AddNnet(BaseFloat alpha,
-               Nnet *other,
-               BaseFloat beta);
+      Nnet *other,
+      BaseFloat beta);
 
   /// Removes final components from the neural network (used for
   /// debugging).
@@ -190,16 +190,16 @@ class Nnet {
   /// work for all pairs of such layers.  It currently only works where
   /// one of each pair is an AffineComponent.
   void Collapse(bool match_updatableness);
-  
+
 
   /// Sets the index_ values of the components.
-  void SetIndexes(); 
-  
+  void SetIndexes();
+
   Nnet(const Nnet &other); // Copy constructor.
 
   Nnet(const Nnet &nnet1, const Nnet &nnet2); // Constructor that takes two
   // nnets: it concatenates the layers.
-  
+
   Nnet() {}
 
   Nnet &operator = (const Nnet &other); // assignment operator.
@@ -221,13 +221,13 @@ class Nnet {
   /// Appends this component to the components already in the neural net.
   /// Takes ownership of the pointer.
   void Append(Component *new_component);
-  
+
   virtual ~Nnet() { Destroy(); }
 
   std::string Info() const; // some human-readable summary info.
 
   void Destroy();
-  
+
   void Write(std::ostream &os, bool binary) const;
 
   void Read(std::istream &is, bool binary);
@@ -242,7 +242,7 @@ class Nnet {
   /// resizes the final affine and softmax components.  If your system has a
   /// SumGroupComponent before the final softmax, it will be discarded.
   void ResizeOutputLayer(int32 new_num_pdfs);
-  
+
 
   /// Scale all the learning rates in the neural net by this factor.
   void ScaleLearningRates(BaseFloat factor);
@@ -261,15 +261,15 @@ class Nnet {
   /// Get all the learning rates in the neural net (the output
   /// must have dim equal to NumUpdatableComponents()).
   void GetLearningRates(VectorBase<BaseFloat> *learning_rates) const;
-  
+
   // This sets *dot_prod to the dot prod of *this . validation_gradient,
   // separately for each updatable component.  The vector must have size equal
   // to this->NumUpdatableComponents().  Warning: previously it had to have size
   // equal to this->NumComponents()).  This is used in updating learning rates
   // and shrinkage rates.
   void ComponentDotProducts(
-      const Nnet &other,
-      VectorBase<BaseFloat> *dot_prod) const;
+    const Nnet &other,
+    VectorBase<BaseFloat> *dot_prod) const;
 
   void Check() const; // Consistency check.
 
@@ -283,10 +283,10 @@ class Nnet {
   virtual int32 GetParameterDim() const;
   virtual void Vectorize(VectorBase<BaseFloat> *params) const;
   virtual void UnVectorize(const VectorBase<BaseFloat> &params);
-  
+
   friend class NnetUpdater;
   friend class DecodableNnet;
- private:
+private:
   std::vector<Component*> components_;
 };
 
@@ -296,7 +296,7 @@ class Nnet {
 /// and SpliceComponent, followed by a final AffineComponent and
 /// SoftmaxComponent.  The parameters will all be randomly initialized.
 Nnet *GenRandomNnet(int32 input_dim,
-                    int32 output_dim);
+    int32 output_dim);
 
 
 

@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     }
     if (gselect_rspecifier == "")
       KALDI_ERR << "--gselect option is required";
-    
+
     std::string model_filename = po.GetArg(1),
         feature_rspecifier = po.GetArg(2),
         posteriors_rspecifier = po.GetArg(3),
@@ -78,12 +78,12 @@ int main(int argc, char *argv[]) {
     RandomAccessPosteriorReader posteriors_reader(posteriors_rspecifier);
     RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier);
     RandomAccessBaseFloatVectorReaderMapped spkvecs_reader(spkvecs_rspecifier,
-                                                           utt2spk_rspecifier);
+        utt2spk_rspecifier);
 
     Sgmm2PerFrameDerivedVars per_frame_vars;
-    
+
     Sgmm2GauPostWriter gpost_writer(gpost_wspecifier);
-    
+
     int32 num_done = 0, num_err = 0;
     for (; !feature_reader.Done(); feature_reader.Next()) {
       const Matrix<BaseFloat> &mat = feature_reader.Value();
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
                   << (tot_like/tot_t);
       gpost_writer.Write(utt, gpost);
     }
-    
+
     KALDI_LOG << "Overall like per frame (Gaussian only) = "
               << (tot_like/tot_t) << " over " << tot_t << " frames.";
 

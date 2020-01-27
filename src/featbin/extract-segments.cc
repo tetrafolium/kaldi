@@ -23,14 +23,14 @@
 #include "feat/wave-reader.h"
 
 /*! @brief This is the main program for extracting segments from a wav file
- - usage :
+   - usage :
      - extract-segments [options ..]  <scriptfile > <segments-file> <wav-written-specifier>
      - "scriptfile" must contain full path of the wav file.
      - "segments-file" should have the information of the segments that needs to be extracted from wav file
      - the format of the segments file : speaker_name wavfilename start_time(in secs) end_time(in secs) channel-id(0 or 1)
      - The channel-id is 0 for the left channel and 1 for the right channel.  This is not required for mono recordings.
      - "wav-written-specifier" is the output segment format
-*/
+ */
 int main(int argc, char *argv[]) {
   try {
     using namespace kaldi;
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
       if (start < 0 || (end != -1.0 && end <= 0) ||
           ((start >= end) && (end > 0))) {
         KALDI_WARN << ("Invalid line in segments file "
-                       "[empty or invalid segment]: ") << line;
+        "[empty or invalid segment]: ") << line;
         continue;
       }
       int32 channel = -1;  // -1 means channel is unspecified.
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
       const Matrix<BaseFloat> &wave_data = wave.Data();
       BaseFloat samp_freq = wave.SampFreq();  // Sampling fequency.
       int32 num_samp = wave_data.NumCols(),  // Number of samples in recording.
-        num_chan = wave_data.NumRows();  // Number of channels in recording.
+          num_chan = wave_data.NumRows(); // Number of channels in recording.
       BaseFloat file_length = num_samp / samp_freq;  // In seconds.
 
       // Start must be within the wave data, otherwise skip the segment.
@@ -165,8 +165,8 @@ int main(int argc, char *argv[]) {
         if (num_chan == 1) channel = 0;
         else {
           KALDI_ERR << ("Your data has multiple channels. You must "
-                        "specify the channel in the segments file. "
-                        "Skipping segment ") << segment;
+          "specify the channel in the segments file. "
+          "Skipping segment ") << segment;
         }
       } else {
         if (channel >= num_chan) {
@@ -180,13 +180,13 @@ int main(int argc, char *argv[]) {
       // conversion requires a proper rounding.
       int32 start_samp = static_cast<int32>(start * samp_freq + 0.5f),
           end_samp = static_cast<int32>(end * samp_freq + 0.5f);
-    
-      if (end_samp > num_samp) 
+
+      if (end_samp > num_samp)
         end_samp = num_samp;
-     
+
       // Get the range of data from the orignial wave_data matrix.
       SubMatrix<BaseFloat> segment_matrix(wave_data, channel, 1,
-                                          start_samp, end_samp - start_samp);
+          start_samp, end_samp - start_samp);
       WaveData segment_wave(samp_freq, segment_matrix);
       writer.Write(segment, segment_wave);  // Write the range in wave format.
       num_success++;

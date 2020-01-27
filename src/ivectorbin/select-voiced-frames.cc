@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     int32 num_done = 0, num_err = 0;
 
-    for (;!feat_reader.Done(); feat_reader.Next()) {
+    for (; !feat_reader.Done(); feat_reader.Next()) {
       std::string utt = feat_reader.Key();
       const Matrix<BaseFloat> &feat = feat_reader.Value();
       if (feat.NumRows() == 0) {

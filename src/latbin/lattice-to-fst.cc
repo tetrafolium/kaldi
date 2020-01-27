@@ -35,19 +35,19 @@ int main(int argc, char *argv[]) {
     BaseFloat acoustic_scale = 0.0;
     BaseFloat lm_scale = 0.0;
     bool rm_eps = true;
-    
+
     const char *usage =
         "Turn lattices into normal FSTs, retaining only the word labels\n"
         "By default, removes all weights and also epsilons (configure with\n"
         "with --acoustic-scale, --lm-scale and --rm-eps)\n"
         "Usage: lattice-to-fst [options] lattice-rspecifier fsts-wspecifier\n"
         " e.g.: lattice-to-fst  ark:1.lats ark:1.fsts\n";
-      
+
     ParseOptions po(usage);
     po.Register("acoustic-scale", &acoustic_scale, "Scaling factor for acoustic likelihoods");
     po.Register("lm-scale", &lm_scale, "Scaling factor for graph/lm costs");
     po.Register("rm-eps", &rm_eps, "Remove epsilons in resulting FSTs (in lazy way; may not remove all)");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -56,15 +56,15 @@ int main(int argc, char *argv[]) {
     }
 
     vector<vector<double> > scale = fst::LatticeScale(lm_scale, acoustic_scale);
-    
+
     std::string lats_rspecifier = po.GetArg(1),
         fsts_wspecifier = po.GetArg(2);
-    
+
     SequentialCompactLatticeReader lattice_reader(lats_rspecifier);
     TableWriter<fst::VectorFstHolder> fst_writer(fsts_wspecifier);
-    
+
     int32 n_done = 0; // there is no failure mode, barring a crash.
-    
+
     for (; !lattice_reader.Done(); lattice_reader.Next()) {
       std::string key = lattice_reader.Key();
       CompactLattice clat = lattice_reader.Value();
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
         // the words are on the output, and we want the word labels.
       }
       if (rm_eps) RemoveEpsLocal(&fst);
-      
+
       fst_writer.Write(key, fst);
       n_done++;
     }

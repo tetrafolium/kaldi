@@ -28,11 +28,11 @@ namespace kaldi {
 
 
 class CovarianceStats {
- public:
-  CovarianceStats(int32 dim): tot_covar_(dim),
-                              between_covar_(dim),
-                              num_spk_(0),
-                              num_utt_(0) { }
+public:
+  CovarianceStats(int32 dim) : tot_covar_(dim),
+    between_covar_(dim),
+    num_spk_(0),
+    num_utt_(0) { }
 
   /// get total covariance, normalized per number of frames.
   void GetTotalCovar(SpMatrix<double> *tot_covar) const {
@@ -71,7 +71,7 @@ class CovarianceStats {
     num_spk_ += other.num_spk_;
     num_utt_ += other.num_utt_;
   }
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(CovarianceStats);
   SpMatrix<double> tot_covar_;
   SpMatrix<double> between_covar_;
@@ -82,8 +82,8 @@ class CovarianceStats {
 
 template<class Real>
 void ComputeNormalizingTransform(const SpMatrix<Real> &covar,
-                                 Real floor,
-                                 MatrixBase<Real> *proj) {
+    Real floor,
+    MatrixBase<Real> *proj) {
   int32 dim = covar.NumRows();
   Matrix<Real> U(dim, dim);
   Vector<Real> s(dim);
@@ -105,11 +105,11 @@ void ComputeNormalizingTransform(const SpMatrix<Real> &covar,
 }
 
 void ComputeLdaTransform(
-    const std::map<std::string, Vector<BaseFloat> *> &utt2ivector,
-    const std::map<std::string, std::vector<std::string> > &spk2utt,
-    BaseFloat total_covariance_factor,
-    BaseFloat covariance_floor,
-    MatrixBase<BaseFloat> *lda_out) {
+  const std::map<std::string, Vector<BaseFloat> *> &utt2ivector,
+  const std::map<std::string, std::vector<std::string> > &spk2utt,
+  BaseFloat total_covariance_factor,
+  BaseFloat covariance_floor,
+  MatrixBase<BaseFloat> *lda_out) {
   KALDI_ASSERT(!utt2ivector.empty());
   int32 lda_dim = lda_out->NumRows(), dim = lda_out->NumCols();
   KALDI_ASSERT(dim == utt2ivector.begin()->second->Dim());
@@ -184,8 +184,8 @@ void ComputeLdaTransform(
 }
 
 void ComputeAndSubtractMean(
-    std::map<std::string, Vector<BaseFloat> *> utt2ivector,
-    Vector<BaseFloat> *mean_out) {
+  std::map<std::string, Vector<BaseFloat> *> utt2ivector,
+  Vector<BaseFloat> *mean_out) {
   int32 dim = utt2ivector.begin()->second->Dim();
   size_t num_ivectors = utt2ivector.size();
   Vector<double> mean(dim);
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
 
     int32 lda_dim = 100; // Dimension we reduce to
     BaseFloat total_covariance_factor = 0.0,
-              covariance_floor = 1.0e-06;
+        covariance_floor = 1.0e-06;
     bool binary = true;
 
     po.Register("dim", &lda_dim, "Dimension we keep with the LDA transform");

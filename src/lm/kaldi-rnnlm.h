@@ -45,21 +45,21 @@ struct KaldiRnnlmWrapperOpts {
 };
 
 class KaldiRnnlmWrapper {
- public:
+public:
   KaldiRnnlmWrapper(const KaldiRnnlmWrapperOpts &opts,
-                    const std::string &unk_prob_rspecifier,
-                    const std::string &word_symbol_table_rxfilename,
-                    const std::string &rnnlm_rxfilename);
+      const std::string &unk_prob_rspecifier,
+      const std::string &word_symbol_table_rxfilename,
+      const std::string &rnnlm_rxfilename);
 
   int32 GetHiddenLayerSize() const { return rnnlm_.getHiddenLayerSize(); }
 
   int32 GetEos() const { return eos_; }
 
   BaseFloat GetLogProb(int32 word, const std::vector<int32> &wseq,
-                       const std::vector<float> &context_in,
-                       std::vector<float> *context_out);
+      const std::vector<float> &context_in,
+      std::vector<float> *context_out);
 
- private:
+private:
   rnnlm::CRnnLM rnnlm_;
   std::vector<std::string> label_to_word_;
   int32 eos_;
@@ -68,8 +68,8 @@ class KaldiRnnlmWrapper {
 };
 
 class RnnlmDeterministicFst
-    : public fst::DeterministicOnDemandFst<fst::StdArc> {
- public:
+  : public fst::DeterministicOnDemandFst<fst::StdArc> {
+public:
   typedef fst::StdArc::Weight Weight;
   typedef fst::StdArc::StateId StateId;
   typedef fst::StdArc::Label Label;
@@ -87,9 +87,9 @@ class RnnlmDeterministicFst
 
   virtual bool GetArc(StateId s, Label ilabel, fst::StdArc* oarc);
 
- private:
+private:
   typedef unordered_map<std::vector<Label>,
-                        StateId, VectorHasher<Label> > MapType;
+          StateId, VectorHasher<Label> > MapType;
   StateId start_state_;
   MapType wseq_to_state_;
   std::vector<std::vector<Label> > state_to_wseq_;

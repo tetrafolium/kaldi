@@ -24,13 +24,13 @@ namespace kaldi {
 namespace nnet2 {
 
 class LimitRankClass {
- public:
+public:
   LimitRankClass(const NnetLimitRankOpts &opts,
-                 int32 c,
-                 Nnet *nnet): opts_(opts), c_(c), nnet_(nnet) { }
+      int32 c,
+      Nnet *nnet) : opts_(opts), c_(c), nnet_(nnet) { }
   void operator () () {
     AffineComponent *ac = dynamic_cast<AffineComponent*>(
-        &(nnet_->GetComponent(c_)));
+      &(nnet_->GetComponent(c_)));
     KALDI_ASSERT(ac != NULL);
 
     // We'll limit the rank of just the linear part, keeping the bias vector full.
@@ -87,9 +87,9 @@ class LimitRankClass {
     KALDI_ASSERT(ans > 0 && ans <= std::min(rows, cols));
     return ans;
   }
-  
+
   ~LimitRankClass() { }
- private:
+private:
   const NnetLimitRankOpts &opts_;
   int32 c_;
   Nnet *nnet_;
@@ -97,7 +97,7 @@ class LimitRankClass {
 
 
 void LimitRankParallel(const NnetLimitRankOpts &opts,
-                            Nnet *nnet) {
+    Nnet *nnet) {
   TaskSequencerConfig task_config;
   task_config.num_threads = opts.num_threads;
   TaskSequencer<LimitRankClass> tc(task_config);

@@ -27,41 +27,41 @@
 #include "fstext/kaldi-fst-io.h"
 
 /*
-  A couple of test examples:
+   A couple of test examples:
 
-  pushd ~/tmpdir
-  # (1) with no disambig syms.
-  ( echo "0 1 1 1"; echo "1 2 2 2"; echo "2 3 3 3"; echo "3 0" ) | fstcompile | fstcomposecontext ilabels.sym > tmp.fst
-  ( echo "<eps> 0"; echo "a 1"; echo "b 2"; echo "c 3" ) > phones.txt
-  fstmakecontextsyms phones.txt ilabels.sym > context.txt
-  fstprint --isymbols=context.txt --osymbols=phones.txt tmp.fst
-  # and the result is:
+   pushd ~/tmpdir
+ # (1) with no disambig syms.
+   ( echo "0 1 1 1"; echo "1 2 2 2"; echo "2 3 3 3"; echo "3 0" ) | fstcompile | fstcomposecontext ilabels.sym > tmp.fst
+   ( echo "<eps> 0"; echo "a 1"; echo "b 2"; echo "c 3" ) > phones.txt
+   fstmakecontextsyms phones.txt ilabels.sym > context.txt
+   fstprint --isymbols=context.txt --osymbols=phones.txt tmp.fst
+ # and the result is:
 
-WARNING (fstcomposecontext[5.4]:main():fstcomposecontext.cc:130) Disambiguation symbols list is empty; this likely indicates an error in data preparation.
-0	1	<eps>	a
-1	2	<eps>/a/b	b
-2	3	a/b/c	c
-3	4	b/c/<eps>	<eps>
-4
+   WARNING (fstcomposecontext[5.4]:main():fstcomposecontext.cc:130) Disambiguation symbols list is empty; this likely indicates an error in data preparation.
+   0	1	<eps>	a
+   1	2	<eps>/a/b	b
+   2	3	a/b/c	c
+   3	4	b/c/<eps>	<eps>
+   4
 
 
-  # (2) with disambig syms:
-  ( echo 4; echo 5) > disambig.list
-  ( echo "<eps> 0"; echo "a 1"; echo "b 2"; echo "c 3"; echo "#0 4"; echo "#1 5") > phones.txt
-  ( echo "0 1 1 1"; echo "1 2 2 2"; echo " 2 3 4 4"; echo "3 4 3 3"; echo "4 5 5 5"; echo "5 0" ) | fstcompile > in.fst
-  fstcomposecontext --read-disambig-syms=disambig.list ilabels.sym in.fst tmp.fst
-  fstmakecontextsyms phones.txt ilabels.sym > context.txt
-  cp phones.txt phones_disambig.txt;  ( echo "#0 4"; echo "#1 5" ) >> phones_disambig.txt
-  fstprint --isymbols=context.txt --osymbols=phones_disambig.txt tmp.fst
+ # (2) with disambig syms:
+   ( echo 4; echo 5) > disambig.list
+   ( echo "<eps> 0"; echo "a 1"; echo "b 2"; echo "c 3"; echo "#0 4"; echo "#1 5") > phones.txt
+   ( echo "0 1 1 1"; echo "1 2 2 2"; echo " 2 3 4 4"; echo "3 4 3 3"; echo "4 5 5 5"; echo "5 0" ) | fstcompile > in.fst
+   fstcomposecontext --read-disambig-syms=disambig.list ilabels.sym in.fst tmp.fst
+   fstmakecontextsyms phones.txt ilabels.sym > context.txt
+   cp phones.txt phones_disambig.txt;  ( echo "#0 4"; echo "#1 5" ) >> phones_disambig.txt
+   fstprint --isymbols=context.txt --osymbols=phones_disambig.txt tmp.fst
 
-0	1	#-1	a
-1	2	<eps>/a/b	b
-2	3	#0	#0
-3	4	a/b/c	c
-4	5	#1	#1
-5	6	b/c/<eps>	<eps>
+   0	1	#-1	a
+   1	2	<eps>/a/b	b
+   2	3	#0	#0
+   3	4	a/b/c	c
+   4	5	#1	#1
+   5	6	b/c/<eps>	<eps>
 
-*/
+ */
 
 int main(int argc, char *argv[]) {
   try {
@@ -69,22 +69,22 @@ int main(int argc, char *argv[]) {
     using namespace fst;
     using kaldi::int32;
     /*
-        # fstcomposecontext composes efficiently with a context fst
-        # that it generates.  Without --disambig-syms specified, it
-        # assumes that all input symbols of in.fst are phones.
-        # It adds the subsequential symbol itself (it does not
-        # appear in the output so doesn't need to be specified by the user).
-        # the disambig.list is a list of disambiguation symbols on the LHS
-        # of in.fst.  The symbols on the LHS of out.fst are indexes into
-        # the ilabels.list file, which is a kaldi-format file containing a
-        # vector<vector<int32> >, which specifies what the labels mean in
-        # terms of windows of symbols.
+     # fstcomposecontext composes efficiently with a context fst
+     # that it generates.  Without --disambig-syms specified, it
+     # assumes that all input symbols of in.fst are phones.
+     # It adds the subsequential symbol itself (it does not
+     # appear in the output so doesn't need to be specified by the user).
+     # the disambig.list is a list of disambiguation symbols on the LHS
+     # of in.fst.  The symbols on the LHS of out.fst are indexes into
+     # the ilabels.list file, which is a kaldi-format file containing a
+     # vector<vector<int32> >, which specifies what the labels mean in
+     # terms of windows of symbols.
         fstcomposecontext  ilabels.sym  [ in.fst [ out.fst ] ]
          --disambig-syms=disambig.list
          --context-size=3
          --central-position=1
          --binary=false
-    */
+     */
 
     const char *usage =
         "Composes on the left with a dynamically created context FST\n"
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 
     if ( (disambig_wxfilename != "") && (disambig_rxfilename == "") )
       KALDI_ERR << "fstcomposecontext: cannot specify --write-disambig-syms if "
-          "not specifying --read-disambig-syms\n";
+        "not specifying --read-disambig-syms\n";
 
     std::vector<int32> disambig_in;
     if (disambig_rxfilename != "")
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
       // The grammar-FST case. See ../doc/grammar.dox for an intro.
       if (context_width != 2 || central_position != 1) {
         KALDI_ERR << "Grammar-fst graph creation only supports models with left-"
-            "biphone context.  (--nonterm-phones-offset option was supplied).";
+          "biphone context.  (--nonterm-phones-offset option was supplied).";
       }
       ComposeContextLeftBiphone(nonterm_phones_offset,  disambig_in,
                                 *fst, &composed_fst, &ilabels);

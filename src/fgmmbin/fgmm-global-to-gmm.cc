@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     const char *usage =
         "Convert single full-covariance GMM to single diagonal-covariance GMM.\n"
         "Usage: fgmm-global-to-gmm [options] 1.fgmm 1.gmm\n";
-        
+
     bool binary = true;
     ParseOptions po(usage);
     po.Register("binary", &binary, "Write output in binary mode");
@@ -43,9 +43,9 @@ int main(int argc, char *argv[]) {
 
     std::string fgmm_rxfilename = po.GetArg(1),
         gmm_wxfilename = po.GetArg(2);
-    
+
     FullGmm fgmm;
-    
+
     {
       bool binary_read;
       Input ki(fgmm_rxfilename, &binary_read);

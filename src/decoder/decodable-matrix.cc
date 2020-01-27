@@ -22,11 +22,11 @@
 namespace kaldi {
 
 DecodableMatrixMapped::DecodableMatrixMapped(
-    const TransitionModel &tm,
-    const MatrixBase<BaseFloat> &likes,
-    int32 frame_offset):
-    trans_model_(tm), likes_(&likes), likes_to_delete_(NULL),
-    frame_offset_(frame_offset) {
+  const TransitionModel &tm,
+  const MatrixBase<BaseFloat> &likes,
+  int32 frame_offset) :
+  trans_model_(tm), likes_(&likes), likes_to_delete_(NULL),
+  frame_offset_(frame_offset) {
   stride_ = likes.Stride();
   raw_data_ = likes.Data() - (stride_ * frame_offset);
 
@@ -37,10 +37,10 @@ DecodableMatrixMapped::DecodableMatrixMapped(
 }
 
 DecodableMatrixMapped::DecodableMatrixMapped(
-    const TransitionModel &tm, const Matrix<BaseFloat> *likes,
-    int32 frame_offset):
-    trans_model_(tm), likes_(likes), likes_to_delete_(likes),
-    frame_offset_(frame_offset) {
+  const TransitionModel &tm, const Matrix<BaseFloat> *likes,
+  int32 frame_offset) :
+  trans_model_(tm), likes_(likes), likes_to_delete_(likes),
+  frame_offset_(frame_offset) {
   stride_ = likes->Stride();
   raw_data_ = likes->Data() - (stride_ * frame_offset_);
   if (likes->NumCols() != tm.NumPdfs())
@@ -79,7 +79,7 @@ DecodableMatrixMapped::~DecodableMatrixMapped() {
 
 
 void DecodableMatrixMappedOffset::AcceptLoglikes(
-    Matrix<BaseFloat> *loglikes, int32 frames_to_discard) {
+  Matrix<BaseFloat> *loglikes, int32 frames_to_discard) {
   if (loglikes->NumRows() == 0) return;
   KALDI_ASSERT(loglikes->NumCols() == trans_model_.NumPdfs());
   KALDI_ASSERT(frames_to_discard <= loglikes_.NumRows() &&

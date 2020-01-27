@@ -41,14 +41,14 @@ template<class Label, class StringId> class StringRepository {
   // representation of sequences of Labels.  It is to save memory, and to save compute.
   // We treat sequences of length zero and one separately, for efficiency.
 
- public:
+public:
   class VectorKey { // Hash function object.
-   public:
+public:
     size_t operator()(const std::vector<Label> *vec) const {
       assert(vec != NULL);
       size_t hash = 0, factor = 1;
       for (typename std::vector<Label>::const_iterator it = vec->begin();
-           it != vec->end(); it++) {
+          it != vec->end(); it++) {
         hash += factor*(*it);
         factor *= 103333;  // just an arbitrary prime number.
       }
@@ -56,7 +56,7 @@ template<class Label, class StringId> class StringRepository {
     }
   };
   class VectorEqual {  // Equality-operator function object.
-   public:
+public:
     size_t operator()(const std::vector<Label> *vec1, const std::vector<Label> *vec2) const {
       return (*vec1 == *vec2);
     }
@@ -103,7 +103,7 @@ template<class Label, class StringId> class StringRepository {
       size_t sz = v.size();
       assert(sz >= prefix_len);
       std::vector<Label> v_noprefix(sz - prefix_len);
-      for (size_t i = 0;i < sz-prefix_len;i++) v_noprefix[i] = v[i+prefix_len];
+      for (size_t i = 0; i < sz-prefix_len; i++) v_noprefix[i] = v[i+prefix_len];
       return IdOfSeq(v_noprefix);
     }
   }
@@ -128,7 +128,7 @@ template<class Label, class StringId> class StringRepository {
     Destroy();
   }
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(StringRepository);
 
   StringId IdOfSeqInternal(const std::vector<Label> &v) {
@@ -158,7 +158,7 @@ template<class Label, class StringId> class StringRepository {
 
 template<class F> class DeterminizerStar {
   typedef typename F::Arc Arc;
- public:
+public:
   // Output to Gallic acceptor (so the strings go on weights, and there is a 1-1 correspondence
   // between our states and the states in ofst.  If destroy == true, release memory as we go
   // (but we cannot output again).
@@ -174,15 +174,15 @@ template<class F> class DeterminizerStar {
   // Initializer.  After initializing the object you will typically call
   // Determinize() and then one of the Output functions.
   DeterminizerStar(const Fst<Arc> &ifst, float delta = kDelta,
-                   int max_states = -1, bool allow_partial = false):
-      ifst_(ifst.Copy()), delta_(delta), max_states_(max_states),
-      determinized_(false), allow_partial_(allow_partial),
-      is_partial_(false), equal_(delta),
-      hash_(ifst.Properties(kExpanded, false) ?
-              down_cast<const ExpandedFst<Arc>*,
-              const Fst<Arc> >(&ifst)->NumStates()/2 + 3 : 20,
-            hasher_, equal_),
-      epsilon_closure_(ifst_, max_states, &repository_, delta) { }
+      int max_states = -1, bool allow_partial = false) :
+    ifst_(ifst.Copy()), delta_(delta), max_states_(max_states),
+    determinized_(false), allow_partial_(allow_partial),
+    is_partial_(false), equal_(delta),
+    hash_(ifst.Properties(kExpanded, false) ?
+        down_cast<const ExpandedFst<Arc>*,
+        const Fst<Arc> >(&ifst)->NumStates()/2 + 3 : 20,
+        hasher_, equal_),
+    epsilon_closure_(ifst_, max_states, &repository_, delta) { }
 
   void Determinize(bool *debug_ptr) {
     assert(!determinized_);
@@ -241,7 +241,7 @@ template<class F> class DeterminizerStar {
   ~DeterminizerStar() {
     FreeMostMemory();
   }
- private:
+private:
   typedef typename Arc::Label Label;
   typedef typename Arc::Weight Weight;
   typedef typename Arc::StateId InputStateId;
@@ -258,7 +258,7 @@ template<class F> class DeterminizerStar {
     Weight weight;
     bool operator != (const Element &other) const  {
       return (state != other.state || string != other.string ||
-              weight != other.weight);
+             weight != other.weight);
     }
   };
 
@@ -286,11 +286,11 @@ template<class F> class DeterminizerStar {
   // difference.
 
   class SubsetKey {
-   public:
+public:
     size_t operator ()(const std::vector<Element> * subset) const {  // hashes only the state and string.
       size_t hash = 0, factor = 1;
       for (typename std::vector<Element>::const_iterator iter = subset->begin();
-           iter != subset->end(); ++iter) {
+          iter != subset->end(); ++iter) {
         hash *= factor;
         hash += iter->state + 103333 * iter->string;
         factor *= 23531;  // these numbers are primes.
@@ -302,9 +302,9 @@ template<class F> class DeterminizerStar {
   // This is the equality operator on subsets.  It checks for exact match on state-id
   // and string, and approximate match on weights.
   class SubsetEqual {
-   public:
+public:
     bool operator ()(const std::vector<Element> *s1,
-                     const std::vector<Element> *s2) const {
+        const std::vector<Element> *s2) const {
       size_t sz = s1->size();
       assert(sz >= 0);
       if (sz != s2->size()) return false;
@@ -312,21 +312,21 @@ template<class F> class DeterminizerStar {
           iter1_end = s1->end(), iter2 = s2->begin();
       for (; iter1 < iter1_end; ++iter1, ++iter2) {
         if (iter1->state != iter2->state ||
-           iter1->string != iter2->string ||
-           ! ApproxEqual(iter1->weight, iter2->weight, delta_))
+            iter1->string != iter2->string ||
+            !ApproxEqual(iter1->weight, iter2->weight, delta_))
           return false;
       }
       return true;
     }
     float delta_;
-    SubsetEqual(float delta): delta_(delta) {}
-    SubsetEqual(): delta_(kDelta) {}
+    SubsetEqual(float delta) : delta_(delta) {}
+    SubsetEqual() : delta_(kDelta) {}
   };
 
   // Operator that says whether two Elements have the same states.
   // Used only for debug.
   class SubsetEqualStates {
-   public:
+public:
     bool operator ()(const std::vector<Element> *s1, const std::vector<Element> *s2) const {
       size_t sz = s1->size();
       assert(sz>=0);
@@ -344,9 +344,9 @@ template<class F> class DeterminizerStar {
   typedef unordered_map<const std::vector<Element>*, OutputStateId, SubsetKey, SubsetEqual> SubsetHash;
 
   class EpsilonClosure {
-   public:
+public:
     EpsilonClosure(const Fst<Arc> *ifst, int max_states,
-        StringRepository<Label, StringId> *repository, float delta):
+        StringRepository<Label, StringId> *repository, float delta) :
       ifst_(ifst), max_states_(max_states), repository_(repository),
       delta_(delta) {
 
@@ -356,9 +356,9 @@ template<class F> class DeterminizerStar {
     // Called by ProcessSubset.
     // Has no side effects except on the repository.
     void GetEpsilonClosure(const std::vector<Element> &input_subset,
-                        std::vector<Element> *output_subset);
+        std::vector<Element> *output_subset);
 
-   private:
+private:
     struct EpsilonClosureInfo {
       EpsilonClosureInfo() {}
       EpsilonClosureInfo(const Element &e, const Weight &w, bool i) :
@@ -416,9 +416,9 @@ template<class F> class DeterminizerStar {
     // - then we save it to queue_2 s.t. if it's empty, we directly return
     // the input set
     void ExpandOneElement(const Element &elem,
-                          bool sorted,
-                          const Weight &unprocessed_weight,
-                          bool save_to_queue_2 = false);
+        bool sorted,
+        const Weight &unprocessed_weight,
+        bool save_to_queue_2 = false);
 
     // no pointers below would take the ownership
     const Fst<Arc> *ifst_;
@@ -478,7 +478,7 @@ template<class F> class DeterminizerStar {
   // Lexicographical order, with comparing the state only for "Element".
 
   class PairComparator {
-   public:
+public:
     inline bool operator () (const std::pair<Label, Element> &p1, const std::pair<Label, Element> &p2) {
       if (p1.first < p2.first) return true;
       else if (p1.first > p2.first) return false;
@@ -507,7 +507,7 @@ template<class F> class DeterminizerStar {
       for (; iter != end; ++iter) {
         const Element &elem = *iter;
         for (ArcIterator<Fst<Arc> > aiter(*ifst_, elem.state);
-             !aiter.Done(); aiter.Next()) {
+            !aiter.Done(); aiter.Next()) {
           const Arc &arc = aiter.Value();
           if (arc.ilabel != 0) {  // Non-epsilon transition -- ignore epsilons here.
             std::pair<Label, Element> this_pr;
@@ -559,7 +559,7 @@ template<class F> class DeterminizerStar {
       std::vector<Element> *new_subset = new std::vector<Element>(subset);
       OutputStateId new_state_id = (OutputStateId) output_arcs_.size();
       bool ans = hash_.insert(std::pair<const std::vector<Element>*,
-                                        OutputStateId>(new_subset,
+              OutputStateId>(new_subset,
                                                        new_state_id)).second;
       assert(ans);
       output_arcs_.push_back(std::vector<TempArc>());
@@ -623,8 +623,8 @@ template<class F> class DeterminizerStar {
 
 template<class F>
 bool DeterminizeStar(F &ifst, MutableFst<typename F::Arc> *ofst,
-                     float delta, bool *debug_ptr, int max_states,
-                     bool allow_partial) {
+    float delta, bool *debug_ptr, int max_states,
+    bool allow_partial) {
   ofst->SetOutputSymbols(ifst.OutputSymbols());
   ofst->SetInputSymbols(ifst.InputSymbols());
   DeterminizerStar<F> det(ifst, delta, max_states, allow_partial);
@@ -636,9 +636,9 @@ bool DeterminizeStar(F &ifst, MutableFst<typename F::Arc> *ofst,
 
 template<class F>
 bool DeterminizeStar(F &ifst,
-                     MutableFst<GallicArc<typename F::Arc> > *ofst, float delta,
-                     bool *debug_ptr, int max_states,
-                     bool allow_partial) {
+    MutableFst<GallicArc<typename F::Arc> > *ofst, float delta,
+    bool *debug_ptr, int max_states,
+    bool allow_partial) {
   ofst->SetOutputSymbols(ifst.InputSymbols());
   ofst->SetInputSymbols(ifst.InputSymbols());
   DeterminizerStar<F> det(ifst, delta, max_states, allow_partial);
@@ -649,13 +649,13 @@ bool DeterminizeStar(F &ifst,
 
 template<class F>
 void DeterminizerStar<F>::EpsilonClosure::
-            GetEpsilonClosure(const std::vector<Element> &input_subset,
-                                       std::vector<Element> *output_subset) {
+GetEpsilonClosure(const std::vector<Element> &input_subset,
+    std::vector<Element> *output_subset) {
   ecinfo_.resize(0);
   size_t size = input_subset.size();
   // find whether input fst is known to be sorted in input label.
   bool sorted =
-          ((ifst_->Properties(kILabelSorted, false) & kILabelSorted) != 0);
+      ((ifst_->Properties(kILabelSorted, false) & kILabelSorted) != 0);
 
   // size is still the input_subset.size()
   for (size_t i = 0; i < size; i++) {
@@ -743,7 +743,7 @@ void DeterminizerStar<F>::EpsilonClosure::
 
 template<class F>
 void DeterminizerStar<F>::EpsilonClosure::
-     AddOneElement(const Element &elem, const Weight &unprocessed_weight) {
+AddOneElement(const Element &elem, const Weight &unprocessed_weight) {
   // first we try to find the element info in the ecinfo_ vector
   int index = -1;
   if (elem.state < id_to_index_.size()) {
@@ -792,7 +792,7 @@ void DeterminizerStar<F>::EpsilonClosure::
     }
 
     info.weight_to_process =
-          Plus(info.weight_to_process, unprocessed_weight);
+        Plus(info.weight_to_process, unprocessed_weight);
 
     if (!info.in_queue) {
       // this is because the code in "else" below: the
@@ -803,7 +803,7 @@ void DeterminizerStar<F>::EpsilonClosure::
       // to the queue only when the change is big enough;
       // otherwise we just store the weight, until before returning
       // we add the element.weight and weight_to_process together
-      if (! ApproxEqual(weight, info.element.weight, delta_)) {
+      if (!ApproxEqual(weight, info.element.weight, delta_)) {
         // add extra part of weight to queue.
         info.in_queue = true;
         queue_.push_back(elem.state);
@@ -814,16 +814,16 @@ void DeterminizerStar<F>::EpsilonClosure::
 
 template<class F>
 void DeterminizerStar<F>::EpsilonClosure::ExpandOneElement(
-                                          const Element &elem,
-                                          bool sorted,
-                                          const Weight &unprocessed_weight,
-                                          bool save_to_queue_2) {
+  const Element &elem,
+  bool sorted,
+  const Weight &unprocessed_weight,
+  bool save_to_queue_2) {
   StringId str = elem.string; // copy it here because there is an iterator-
-                // - invalidation problem (it really happens for some FSTs)
+  // - invalidation problem (it really happens for some FSTs)
 
   // now we are going to propagate the "unprocessed_weight"
   for (ArcIterator<Fst<Arc> > aiter(*ifst_, elem.state);
-       !aiter.Done(); aiter.Next()) {
+      !aiter.Done(); aiter.Next()) {
     const Arc &arc = aiter.Value();
     if (sorted && arc.ilabel > 0) {
       break;
@@ -837,7 +837,7 @@ void DeterminizerStar<F>::EpsilonClosure::ExpandOneElement(
     next_elem.state = arc.nextstate;
     next_elem.weight = Weight::Zero();
     Weight next_unprocessed_weight
-                   = Times(unprocessed_weight, arc.weight);
+      = Times(unprocessed_weight, arc.weight);
 
     // now must append strings
     if (arc.olabel == 0) {
@@ -860,7 +860,7 @@ void DeterminizerStar<F>::EpsilonClosure::ExpandOneElement(
 
 template<class F>
 void DeterminizerStar<F>::Output(MutableFst<GallicArc<Arc> > *ofst,
-                                   bool destroy) {
+    bool destroy) {
   assert(determinized_);
   if (destroy) determinized_ = false;
   typedef GallicWeight<Label, Weight> ThisGallicWeight;
@@ -873,7 +873,7 @@ void DeterminizerStar<F>::Output(MutableFst<GallicArc<Arc> > *ofst,
   if (nStates == 0) {
     return;
   }
-  for (StateId s = 0;s < nStates;s++) {
+  for (StateId s = 0; s < nStates; s++) {
     OutputStateId news = ofst->AddState();
     assert(news == s);
   }
@@ -889,7 +889,7 @@ void DeterminizerStar<F>::Output(MutableFst<GallicArc<Arc> > *ofst,
       std::vector<Label> seq;
       repository_.SeqOfId(temp_arc.ostring, &seq);
       StringWeight<Label, STRING_LEFT> string_weight;
-      for (size_t i = 0;i < seq.size();i++) string_weight.PushBack(seq[i]);
+      for (size_t i = 0; i < seq.size(); i++) string_weight.PushBack(seq[i]);
       ThisGallicWeight gallic_weight(string_weight, temp_arc.weight);
 
       if (temp_arc.nextstate == kNoStateId) {  // is really final weight.
@@ -940,7 +940,7 @@ void DeterminizerStar<F>::Output(MutableFst<Arc> *ofst, bool destroy) {
         // Make a sequence of states going to a final state, with the strings as labels.
         // Put the weight on the first arc.
         OutputStateId cur_state = this_state;
-        for (size_t i = 0; i < seq.size();i++) {
+        for (size_t i = 0; i < seq.size(); i++) {
           OutputStateId next_state = ofst->AddState();
           Arc arc;
           arc.nextstate = next_state;
@@ -955,7 +955,7 @@ void DeterminizerStar<F>::Output(MutableFst<Arc> *ofst, bool destroy) {
         OutputStateId cur_state = this_state;
         // Have to be careful with this integer comparison (i+1 < seq.size()) because unsigned.
         // i < seq.size()-1 could fail for zero-length sequences.
-        for (size_t i = 0; i+1 < seq.size();i++) {
+        for (size_t i = 0; i+1 < seq.size(); i++) {
           // for all but the last element of seq, create new state.
           OutputStateId next_state = ofst->AddState();
           Arc arc;
@@ -1113,11 +1113,11 @@ void DeterminizerStar<F>::Debug() {
   }
   if (cur_state == kNoStateId)
     KALDI_WARN << "Traceback did not reach start state "
-    << "(possibly debug-code error)";
+               << "(possibly debug-code error)";
 
   std::stringstream ss;
   ss << "Traceback follows in format "
-    << "ilabel (olabel olabel) ilabel (olabel) ... :";
+     << "ilabel (olabel olabel) ilabel (olabel) ... :";
   for (ssize_t i = traceback.size() - 1; i >= 0; i--) {
     ss << ' ' << traceback[i].first << " ( ";
     std::vector<Label> seq;

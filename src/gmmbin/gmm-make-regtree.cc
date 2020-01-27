@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
       bool ans = GetPdfsForPhones(trans_model, sil_phones, &sil_pdfs);
       if (!ans)
         KALDI_WARN << "Pdfs associated with silence phones are not only "
-            "associated with silence phones: your speech-silence split "
-            "may not be meaningful.";
+          "associated with silence phones: your speech-silence split "
+          "may not be meaningful.";
     }
 
     kaldi::RegressionTree regtree;

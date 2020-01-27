@@ -28,7 +28,7 @@
 namespace kaldi {
 // this enums equal to CblasTrans and CblasNoTrans constants from CBLAS library
 // we are writing them as literals because we don't want to include here matrix/kaldi-blas.h,
-// which puts many symbols into global scope (like "real") via the header f2c.h 
+// which puts many symbols into global scope (like "real") via the header f2c.h
 typedef enum {
   kTrans    = 112, // = CblasTrans
   kNoTrans  = 111  // = CblasNoTrans
@@ -85,12 +85,12 @@ template<typename T> class OtherReal { };  // useful in reading+writing routines
                                            // to switch double and float.
 /// A specialized class for switching from float to double.
 template<> class OtherReal<float> {
- public:
+public:
   typedef double Real;
 };
 /// A specialized class for switching from double to float.
 template<> class OtherReal<double> {
- public:
+public:
   typedef float Real;
 };
 

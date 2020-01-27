@@ -26,12 +26,12 @@ namespace nnet2 {
 
 
 void AffineComponent::Widen(int32 new_dim,
-                            BaseFloat param_stddev,
-                            BaseFloat bias_stddev,
-                            std::vector<NonlinearComponent*> c2, // will usually
+    BaseFloat param_stddev,
+    BaseFloat bias_stddev,
+    std::vector<NonlinearComponent*> c2,                         // will usually
                                                                  // have just
                                                                  // one element.
-                            AffineComponent *c3) {
+    AffineComponent *c3) {
   int32 old_dim = this->OutputDim(), extra_dim = new_dim - old_dim;
   KALDI_ASSERT(!c2.empty());
   if (new_dim <= old_dim) {
@@ -39,7 +39,7 @@ void AffineComponent::Widen(int32 new_dim,
                << new_dim << " <= old dim " << old_dim;
     return;
   }
-  
+
   this->bias_params_.Resize(new_dim,
                             kCopyData);
   this->bias_params_.Range(old_dim, extra_dim).SetRandn();
@@ -53,14 +53,14 @@ void AffineComponent::Widen(int32 new_dim,
 
   for (size_t i = 0; i < c2.size(); i++) // Change dimension of nonlinear
     c2[i]->SetDim(new_dim);              // components
-    
+
   // Change dimension of next affine component [extend with zeros,
   // so the existing outputs do not change in value]
   c3->linear_params_.Resize(c3->OutputDim(), new_dim, kCopyData);
 }
 
 void WidenNnet(const NnetWidenConfig &widen_config,
-               Nnet *nnet) {
+    Nnet *nnet) {
 
   int32 C = nnet->NumComponents();
   int32 num_widened = 0;
@@ -85,7 +85,7 @@ void WidenNnet(const NnetWidenConfig &widen_config,
         sqrt(1.0 * c1->InputDim());
     KALDI_LOG << "Widening component " << c << " from "
               << c1->OutputDim() << " to " << widen_config.hidden_layer_dim;
-    
+
     c1->Widen(widen_config.hidden_layer_dim,
               param_stddev, widen_config.bias_stddev,
               c2, c3);
@@ -93,8 +93,8 @@ void WidenNnet(const NnetWidenConfig &widen_config,
   }
   nnet->Check();
   KALDI_LOG << "Widened " << num_widened << " components.";
-}  
+}
 
-  
+
 } // namespace nnet2
 } // namespace kaldi

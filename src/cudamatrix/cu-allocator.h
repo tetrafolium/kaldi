@@ -64,8 +64,8 @@ struct CuAllocatorOptions {
   // memory low addresses.
   int32 num_subregions;
 
-  CuAllocatorOptions():
-      cache_memory(true), memory_proportion(0.5), num_subregions(20) { }
+  CuAllocatorOptions() :
+    cache_memory(true), memory_proportion(0.5), num_subregions(20) { }
 
   void Register(OptionsItf *po) {
     po->Register("cuda-cache-memory", &cache_memory, "True if you want "
@@ -148,10 +148,10 @@ namespace kaldi {
    that size.  (Note: we can allocate blocks that span sub-regions, so this
    approach does not limit the block size we can allocate).
 
-*/
+ */
 
 class CuMemoryAllocator {
- public:
+public:
   /// Allocates memory on the CUDA device, of size 'size'.  size == 0 is not
   /// allowed and is an error.
   void* Malloc(size_t size);
@@ -195,7 +195,7 @@ class CuMemoryAllocator {
 
   ~CuMemoryAllocator();
 
- private:
+private:
 
   struct SubRegion;
 
@@ -203,7 +203,7 @@ class CuMemoryAllocator {
     char *begin;  // The beginning of the block (in CUDA memory)
     char *end;  // the end of the block (in CUDA memory)
     SubRegion *subregion;  // Pointer to the SubRegion to which this memory
-                            // block belongs.
+                           // block belongs.
     bool allocated;  // True if this MemoryBlock has currently been given to the
                      // user; false if not.
 

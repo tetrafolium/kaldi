@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string lm_to_subtract_rxfilename, lats_rspecifier, rnn_word_list,
-      word_symbols_rxfilename, rnnlm_rxfilename, lats_wspecifier, unk_prob_file;
+        word_symbols_rxfilename, rnnlm_rxfilename, lats_wspecifier, unk_prob_file;
     if (po.NumArgs() == 6) {
       lm_to_subtract_rxfilename = po.GetArg(1),
       word_symbols_rxfilename = po.GetArg(2);
@@ -125,15 +125,15 @@ int main(int argc, char *argv[]) {
       lm_to_subtract_fst = fst::ReadAndPrepareLmFst(
           lm_to_subtract_rxfilename);
       lm_to_subtract_det_backoff =
-        new fst::BackoffDeterministicOnDemandFst<StdArc>(*lm_to_subtract_fst);
+          new fst::BackoffDeterministicOnDemandFst<StdArc>(*lm_to_subtract_fst);
       lm_to_subtract_det_scale =
-           new fst::ScaleDeterministicOnDemandFst(-lm_scale,
+          new fst::ScaleDeterministicOnDemandFst(-lm_scale,
                                                   lm_to_subtract_det_backoff);
     }
 
     // Reads the TF language model.
     KaldiTfRnnlmWrapper rnnlm(opts, rnn_word_list, word_symbols_rxfilename,
-                                unk_prob_file, rnnlm_rxfilename);
+        unk_prob_file, rnnlm_rxfilename);
 
     // Reads and writes as compact lattice.
     SequentialCompactLatticeReader compact_lattice_reader(lats_rspecifier);
@@ -142,11 +142,11 @@ int main(int argc, char *argv[]) {
     int32 n_done = 0, n_fail = 0;
 
     TfRnnlmDeterministicFst* lm_to_add_orig =
-      new TfRnnlmDeterministicFst(max_ngram_order, &rnnlm);
+        new TfRnnlmDeterministicFst(max_ngram_order, &rnnlm);
 
     for (; !compact_lattice_reader.Done(); compact_lattice_reader.Next()) {
       fst::DeterministicOnDemandFst<StdArc> *lm_to_add =
-         new fst::ScaleDeterministicOnDemandFst(lm_scale, lm_to_add_orig);
+          new fst::ScaleDeterministicOnDemandFst(lm_scale, lm_to_add_orig);
 
       std::string key = compact_lattice_reader.Key();
       CompactLattice clat = compact_lattice_reader.Value();
@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
       TopSortCompactLatticeIfNeeded(&clat);
 
       fst::ComposeDeterministicOnDemandFst<StdArc> combined_lms(
-          lm_to_subtract_det_scale, lm_to_add);
+        lm_to_subtract_det_scale, lm_to_add);
 
       // Composes lattice with language model.
       CompactLattice composed_clat;

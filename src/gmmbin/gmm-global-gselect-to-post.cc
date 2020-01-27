@@ -41,14 +41,14 @@ int main(int argc, char *argv[]) {
         "Usage:  gmm-global-gselect-to-post [options] <model-in> <feature-rspecifier> "
         "<gselect-rspecifier> <post-wspecifier>\n"
         "e.g.: gmm-global-gselect-to-post 1.dubm ark:- 'ark:gunzip -c 1.gselect|' ark:-\n";
-        
+
     ParseOptions po(usage);
 
     BaseFloat min_post = 0.0;
     po.Register("min-post", &min_post, "If nonzero, posteriors below this "
                 "threshold will be pruned away and the rest will be renormalized "
                 "to sum to one.");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 4) {
@@ -60,10 +60,10 @@ int main(int argc, char *argv[]) {
         feature_rspecifier = po.GetArg(2),
         gselect_rspecifier = po.GetArg(3),
         post_wspecifier = po.GetArg(4);
-    
+
     DiagGmm gmm;
     ReadKaldiObject(model_rxfilename, &gmm);
-    
+
     double tot_loglike = 0.0, tot_frames = 0.0;
     int64 tot_posts = 0;
 
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
       int32 num_frames = mat.NumRows();
       // typedef std::vector<std::vector<std::pair<int32, BaseFloat> > > Posterior;
       Posterior post(num_frames);
-      
+
       if (!gselect_reader.HasKey(utt)) {
         KALDI_WARN << "No gselect information for utterance " << utt;
         num_err++;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 
       double this_tot_loglike = 0;
       bool utt_ok = true;
-      
+
       for (int32 t = 0; t < num_frames; t++) {
         SubVector<BaseFloat> frame(mat, t);
         const std::vector<int32> &this_gselect = gselect[t];
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
       }
       if (!utt_ok) {
         KALDI_WARN << "Skipping utterance " << utt
-                  << " because bad posterior-sum encountered (NaN?)";
+                   << " because bad posterior-sum encountered (NaN?)";
         num_err++;
       } else {
         post_writer.Write(utt, post);

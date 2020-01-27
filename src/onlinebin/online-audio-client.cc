@@ -57,8 +57,8 @@ int main(int argc, char** argv) {
 
     const char *usage =
         "Sends an audio file to the KALDI audio server (onlinebin/online-audio-server-decode-faster)\n"
-            "and prints the result optionally saving it to an HTK label file or WebVTT subtitles file\n\n"
-            "e.g.: ./online-audio-client 192.168.50.12 9012 'scp:wav_files.scp'\n\n";
+        "and prints the result optionally saving it to an HTK label file or WebVTT subtitles file\n\n"
+        "e.g.: ./online-audio-client 192.168.50.12 9012 'scp:wav_files.scp'\n\n";
     ParseOptions po(usage);
 
     bool htk = false, vtt = false;
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
     }
 
     KALDI_VLOG(2) << "Connected to KALDI server at host " << server_addr_str
-        << " port " << server_port;
+                  << " port " << server_port;
 
     char* pack_buffer = new char[packet_size];
 
@@ -139,12 +139,12 @@ int main(int argc, char** argv) {
           this_chan = 0;
           if (num_chan != 1)
             KALDI_WARN << "Channel not specified but you have data with "
-                << num_chan << " channels; defaulting to zero";
+                       << num_chan << " channels; defaulting to zero";
         } else {
           if (this_chan >= num_chan) {
             KALDI_WARN << "File with id " << wav_key << " has " << num_chan
-                << " channels but you specified channel " << channel
-                << ", producing no output.";
+                       << " channels but you specified channel " << channel
+                       << ", producing no output.";
             continue;
           }
         }

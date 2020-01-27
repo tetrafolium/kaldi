@@ -21,15 +21,15 @@
 namespace kaldi {
 
 CudaOnlineBatchedCmvn::CudaOnlineBatchedCmvn(
-    const OnlineCmvnOptions &opts, const CudaOnlineCmvnState &cmvn_state,
-    int32_t feat_dim, int32_t chunk_size, int32_t num_channels,
-    int32_t stats_coarsening_factor)
-    : opts_(opts),
-      cmvn_state_(cmvn_state),
-      feat_dim_(feat_dim),
-      chunk_size_(chunk_size),
-      num_channels_(num_channels),
-      stats_coarsening_factor_(stats_coarsening_factor) {
+  const OnlineCmvnOptions &opts, const CudaOnlineCmvnState &cmvn_state,
+  int32_t feat_dim, int32_t chunk_size, int32_t num_channels,
+  int32_t stats_coarsening_factor)
+  : opts_(opts),
+  cmvn_state_(cmvn_state),
+  feat_dim_(feat_dim),
+  chunk_size_(chunk_size),
+  num_channels_(num_channels),
+  stats_coarsening_factor_(stats_coarsening_factor) {
   // This constraint could probably be removed by estimating partial frames
   KALDI_ASSERT(opts_.cmn_window % stats_coarsening_factor_ == 0);
   KALDI_ASSERT(chunk_size % stats_coarsening_factor_ == 0);
@@ -44,8 +44,8 @@ CudaOnlineBatchedCmvn::~CudaOnlineBatchedCmvn() {}
 
 // Computes a chunk of features for each channel included in channels
 void CudaOnlineBatchedCmvn::ComputeFeaturesBatched(
-    int32_t num_lanes, const LaneDesc *lanes,
-    const CuMatrixBase<BaseFloat> &feats_in, CuMatrix<BaseFloat> *feats_out) {
+  int32_t num_lanes, const LaneDesc *lanes,
+  const CuMatrixBase<BaseFloat> &feats_in, CuMatrix<BaseFloat> *feats_out) {
   if (num_lanes == 0) return;
 
   // Step 1:

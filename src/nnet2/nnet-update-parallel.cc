@@ -27,37 +27,37 @@ namespace nnet2 {
 
 
 class DoBackpropParallelClass: public MultiThreadable {
- public:
+public:
   // This constructor is only called for a temporary object
   // that we pass to the RunMultiThreaded function.
   DoBackpropParallelClass(const Nnet &nnet,
-                          ExamplesRepository *repository,
-                          double *tot_weight_ptr,
-                          double *log_prob_ptr,
-                          Nnet *nnet_to_update,
-                          bool store_separate_gradients):
-      nnet_(nnet), repository_(repository),
-      nnet_to_update_(nnet_to_update),
-      nnet_to_update_orig_(nnet_to_update),
-      store_separate_gradients_(store_separate_gradients),
-      tot_weight_ptr_(tot_weight_ptr),
-      log_prob_ptr_(log_prob_ptr),
-      tot_weight_(0.0),
-      log_prob_(0.0) { }
+      ExamplesRepository *repository,
+      double *tot_weight_ptr,
+      double *log_prob_ptr,
+      Nnet *nnet_to_update,
+      bool store_separate_gradients) :
+    nnet_(nnet), repository_(repository),
+    nnet_to_update_(nnet_to_update),
+    nnet_to_update_orig_(nnet_to_update),
+    store_separate_gradients_(store_separate_gradients),
+    tot_weight_ptr_(tot_weight_ptr),
+    log_prob_ptr_(log_prob_ptr),
+    tot_weight_(0.0),
+    log_prob_(0.0) { }
 
   // The following constructor is called multiple times within
   // the RunMultiThreaded template function.
-  DoBackpropParallelClass(const DoBackpropParallelClass &other):
-      MultiThreadable(other),
-      nnet_(other.nnet_),
-      repository_(other.repository_),
-      nnet_to_update_(other.nnet_to_update_),
-      nnet_to_update_orig_(other.nnet_to_update_orig_),
-      store_separate_gradients_(other.store_separate_gradients_),
-      tot_weight_ptr_(other.tot_weight_ptr_),
-      log_prob_ptr_(other.log_prob_ptr_),
-      tot_weight_(0),
-      log_prob_(0.0) {
+  DoBackpropParallelClass(const DoBackpropParallelClass &other) :
+    MultiThreadable(other),
+    nnet_(other.nnet_),
+    repository_(other.repository_),
+    nnet_to_update_(other.nnet_to_update_),
+    nnet_to_update_orig_(other.nnet_to_update_orig_),
+    store_separate_gradients_(other.store_separate_gradients_),
+    tot_weight_ptr_(other.tot_weight_ptr_),
+    log_prob_ptr_(other.log_prob_ptr_),
+    tot_weight_(0),
+    log_prob_(0.0) {
     if (store_separate_gradients_) {
       // To ensure correctness, we work on separate copies of the gradient
       // object, which we'll sum at the end.  This is used for exact gradient
@@ -107,7 +107,7 @@ class DoBackpropParallelClass: public MultiThreadable {
     *log_prob_ptr_ += log_prob_;
     *tot_weight_ptr_ += tot_weight_;
   }
- private:
+private:
   const Nnet &nnet_;
   ExamplesRepository *repository_;
   Nnet *nnet_to_update_;
@@ -122,10 +122,10 @@ class DoBackpropParallelClass: public MultiThreadable {
 
 #if HAVE_CUDA == 1
 double DoBackpropSingleThreaded(const Nnet &nnet,
-                                int32 minibatch_size,
-                                SequentialNnetExampleReader *examples_reader,
-                                double *tot_weight_out,
-                                Nnet *nnet_to_update) {
+    int32 minibatch_size,
+    SequentialNnetExampleReader *examples_reader,
+    double *tot_weight_out,
+    Nnet *nnet_to_update) {
   double ans = 0.0, tot_weight = 0.0;
   KALDI_ASSERT(minibatch_size > 0);
   while (!examples_reader->Done()) {
@@ -145,10 +145,10 @@ double DoBackpropSingleThreaded(const Nnet &nnet,
 
 
 double DoBackpropParallel(const Nnet &nnet,
-                          int32 minibatch_size,
-                          SequentialNnetExampleReader *examples_reader,
-                          double *tot_weight,
-                          Nnet *nnet_to_update) {
+    int32 minibatch_size,
+    SequentialNnetExampleReader *examples_reader,
+    double *tot_weight,
+    Nnet *nnet_to_update) {
 #if HAVE_CUDA == 1
   // Our GPU code won't work with multithreading; we do this
   // to enable it to work with this code in the single-threaded
@@ -168,8 +168,8 @@ double DoBackpropParallel(const Nnet &nnet,
   const bool store_separate_gradients = (nnet_to_update != &nnet);
 
   DoBackpropParallelClass c(nnet, &repository, tot_weight,
-                            &tot_log_prob, nnet_to_update,
-                            store_separate_gradients);
+      &tot_log_prob, nnet_to_update,
+      store_separate_gradients);
 
   {
     // The initialization of the following class spawns the threads that
@@ -200,18 +200,18 @@ double DoBackpropParallel(const Nnet &nnet,
 
 
 double DoBackpropSingleThreaded(const Nnet &nnet,
-                                int32 minibatch_size,
-                                const std::vector<NnetExample> &egs,
-                                double *tot_weight,
-                                Nnet *nnet_to_update) {
+    int32 minibatch_size,
+    const std::vector<NnetExample> &egs,
+    double *tot_weight,
+    Nnet *nnet_to_update) {
   double ans = 0.0;
   *tot_weight = TotalNnetTrainingWeight(egs);
   for (size_t i = 0; i < egs.size(); i += minibatch_size) {
     std::vector<NnetExample>::const_iterator end_iter =
-      (i + minibatch_size > egs.size() ? egs.end() :
-       egs.begin() + i + minibatch_size);
+        (i + minibatch_size > egs.size() ? egs.end() :
+        egs.begin() + i + minibatch_size);
     std::vector<NnetExample> this_egs(egs.begin() + i,
-                                              end_iter);
+        end_iter);
     ans += DoBackprop(nnet, this_egs, nnet_to_update);
   }
   return ans;
@@ -219,11 +219,11 @@ double DoBackpropSingleThreaded(const Nnet &nnet,
 
 
 double DoBackpropParallel(const Nnet &nnet,
-                          int32 minibatch_size,
-                          int32 num_threads,
-                          const std::vector<NnetExample> &egs,
-                          double *tot_weight,
-                          Nnet *nnet_to_update) {
+    int32 minibatch_size,
+    int32 num_threads,
+    const std::vector<NnetExample> &egs,
+    double *tot_weight,
+    Nnet *nnet_to_update) {
   if (num_threads == 1) // support GPUs: special case for 1 thread.
     return DoBackpropSingleThreaded(nnet, minibatch_size, egs,
                                     tot_weight, nnet_to_update);
@@ -235,8 +235,8 @@ double DoBackpropParallel(const Nnet &nnet,
   const bool store_separate_gradients = (nnet_to_update != &nnet);
 
   DoBackpropParallelClass c(nnet, &repository, tot_weight,
-                            &tot_log_prob, nnet_to_update,
-                            store_separate_gradients);
+      &tot_log_prob, nnet_to_update,
+      store_separate_gradients);
 
   {
     // The initialization of the following class spawns the threads that
@@ -249,7 +249,7 @@ double DoBackpropParallel(const Nnet &nnet,
 
       // We waste a little time copying the examples here, but it's very minor.
       std::vector<NnetExample> examples(egs.begin() + offset,
-                                                egs.begin() + offset + this_minibatch_size);
+          egs.begin() + offset + this_minibatch_size);
 
       repository.AcceptExamples(&examples);
     }

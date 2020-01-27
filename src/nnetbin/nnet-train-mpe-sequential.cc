@@ -43,9 +43,9 @@ namespace kaldi {
 namespace nnet1 {
 
 void LatticeAcousticRescore(const Matrix<BaseFloat> &log_like,
-                            const TransitionModel &trans_model,
-                            const std::vector<int32> &state_times,
-                            Lattice *lat) {
+    const TransitionModel &trans_model,
+    const std::vector<int32> &state_times,
+    Lattice *lat) {
   kaldi::uint64 props = lat->Properties(fst::kFstProperties, false);
   if (!(props & fst::kTopSorted))
     KALDI_ERR << "Input lattice must be topologically sorted.";
@@ -58,14 +58,14 @@ void LatticeAcousticRescore(const Matrix<BaseFloat> &log_like,
       time_to_state[state_times[i]].push_back(i);
     else
       KALDI_ASSERT(state_times[i] == log_like.NumRows()
-                   && "There appears to be lattice/feature mismatch.");
+          && "There appears to be lattice/feature mismatch.");
   }
 
   for (int32 t = 0; t < log_like.NumRows(); t++) {
     for (size_t i = 0; i < time_to_state[t].size(); i++) {
       int32 state = time_to_state[t][i];
       for (fst::MutableArcIterator<Lattice> aiter(lat, state); !aiter.Done();
-           aiter.Next()) {
+          aiter.Next()) {
         LatticeArc arc = aiter.Value();
         int32 trans_id = arc.ilabel;
         if (trans_id != 0) {  // Non-epsilon input label on arc
@@ -88,15 +88,15 @@ int main(int argc, char *argv[]) {
   typedef kaldi::int32 int32;
   try {
     const char *usage =
-      "Perform one iteration of MPE/sMBR training using SGD with per-utterance"
-      "updates.\n"
+        "Perform one iteration of MPE/sMBR training using SGD with per-utterance"
+        "updates.\n"
 
-      "Usage:  nnet-train-mpe-sequential [options] "
-      "<model-in> <transition-model-in> <feature-rspecifier> "
-      "<den-lat-rspecifier> <ali-rspecifier> [<model-out>]\n"
+        "Usage:  nnet-train-mpe-sequential [options] "
+        "<model-in> <transition-model-in> <feature-rspecifier> "
+        "<den-lat-rspecifier> <ali-rspecifier> [<model-out>]\n"
 
-      "e.g.: nnet-train-mpe-sequential nnet.init trans.mdl scp:feats.scp "
-      "scp:denlats.scp ark:ali.ark nnet.iter1\n";
+        "e.g.: nnet-train-mpe-sequential nnet.init trans.mdl scp:feats.scp "
+        "scp:denlats.scp ark:ali.ark nnet.iter1\n";
 
     ParseOptions po(usage);
 
@@ -217,9 +217,9 @@ int main(int argc, char *argv[]) {
     KALDI_LOG << "TRAINING STARTED";
 
     int32 num_done = 0,
-          num_no_ref_ali = 0,
-          num_no_den_lat = 0,
-          num_other_error = 0;
+        num_no_ref_ali = 0,
+        num_no_den_lat = 0,
+        num_other_error = 0;
 
     kaldi::int64 total_frames = 0;
     double total_frame_acc = 0.0, utt_frame_acc;
@@ -251,8 +251,8 @@ int main(int argc, char *argv[]) {
       }
       if (mat.NumRows() > max_frames) {
         KALDI_WARN << "Skipping " << utt
-          << " that has " << mat.NumRows() << " frames,"
-          << " it is longer than '--max-frames'" << max_frames;
+                   << " that has " << mat.NumRows() << " frames,"
+                   << " it is longer than '--max-frames'" << max_frames;
         num_other_error++;
         continue;
       }
@@ -281,9 +281,9 @@ int main(int argc, char *argv[]) {
       // check for temporal length of denominator lattices
       if (max_time != mat.NumRows()) {
         KALDI_WARN << "Duration mismatch!"
-          << " denominator lattice " << max_time
-          << " features " << mat.NumRows() << ","
-          << " skipping " << utt;
+                   << " denominator lattice " << max_time
+                   << " features " << mat.NumRows() << ","
+                   << " skipping " << utt;
         num_other_error++;
         continue;
       }
@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
                     << (utt_frame_acc/num_frames) << " over " << num_frames
                     << " frames,"
                     << " diff-range(" << nnet_diff.Min() << ","
-                                      << nnet_diff.Max() << ")";
+                    << nnet_diff.Max() << ")";
 
       // 7) backpropagate through the nnet, update,
       nnet.Backpropagate(nnet_diff, NULL);
@@ -350,8 +350,8 @@ int main(int argc, char *argv[]) {
       if (num_done % 100 == 0) {
         time_now = time.Elapsed();
         KALDI_VLOG(1) << "After " << num_done << " utterances: "
-          << "time elapsed = " << time_now / 60 << " min; "
-          << "processed " << total_frames / time_now << " frames per sec.";
+                      << "time elapsed = " << time_now / 60 << " min; "
+                      << "processed " << total_frames / time_now << " frames per sec.";
 #if HAVE_CUDA == 1
         // check that GPU computes accurately,
         CuDevice::Instantiate().CheckGpuHealth();

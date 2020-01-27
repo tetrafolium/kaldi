@@ -31,14 +31,14 @@ namespace kaldi {
 namespace rnnlm {
 
 /*
-  The class RnnlmTrainer is for training an RNNLM (one individual training job, not
-  the top-level logic about learning rate schedules, parameter averaging, and the
-  like); it contains the most of the logic that the command-line program rnnlm-train
-  implements.
-*/
+   The class RnnlmTrainer is for training an RNNLM (one individual training job, not
+   the top-level logic about learning rate schedules, parameter averaging, and the
+   like); it contains the most of the logic that the command-line program rnnlm-train
+   implements.
+ */
 
 class RnnlmTrainer {
- public:
+public:
   /**
      Constructor
       @param [in] train_embedding  True if the user wants us to
@@ -66,14 +66,14 @@ class RnnlmTrainer {
                              word_feature_mat to get the word embedding matrix.
       @param [in,out] rnnlm  The RNNLM to be trained.  The class will retain
                              this pointer and modify the neural net in-place.
-  */
+   */
   RnnlmTrainer(bool train_embedding,
-               const RnnlmCoreTrainerOptions &core_config,
-               const RnnlmEmbeddingTrainerOptions &embedding_config,
-               const RnnlmObjectiveOptions &objective_config,
-               const CuSparseMatrix<BaseFloat> *word_feature_mat,
-               CuMatrix<BaseFloat> *embedding_mat,
-               nnet3::Nnet *rnnlm);
+      const RnnlmCoreTrainerOptions &core_config,
+      const RnnlmEmbeddingTrainerOptions &embedding_config,
+      const RnnlmObjectiveOptions &objective_config,
+      const CuSparseMatrix<BaseFloat> *word_feature_mat,
+      CuMatrix<BaseFloat> *embedding_mat,
+      nnet3::Nnet *rnnlm);
 
 
 
@@ -87,7 +87,7 @@ class RnnlmTrainer {
 
   int32 NumMinibatchesProcessed() { return num_minibatches_processed_; }
 
- private:
+private:
 
   int32 VocabSize();
 
@@ -105,7 +105,7 @@ class RnnlmTrainer {
   /// case, 'word_embedding_storage' will be resized and written to
   /// appropriately.
   void GetWordEmbedding(CuMatrix<BaseFloat> *word_embedding_storage,
-                        CuMatrix<BaseFloat> **word_embedding);
+      CuMatrix<BaseFloat> **word_embedding);
 
 
   /// This function trains the word-embedding matrix for the minibatch we're
@@ -122,8 +122,8 @@ class RnnlmTrainer {
 
   /// The backstitch version of the above function.
   void TrainBackstitchWordEmbedding(
-      bool is_backstitch_step1,
-      CuMatrixBase<BaseFloat> *word_embedding_deriv);
+    bool is_backstitch_step1,
+    CuMatrixBase<BaseFloat> *word_embedding_deriv);
 
   bool train_embedding_;  // true if we are training the embedding.
   const RnnlmCoreTrainerOptions &core_config_;

@@ -29,15 +29,15 @@ int main(int argc, char *argv[]) {
     typedef kaldi::int32 int32;
     using namespace kaldi;
     const char *usage =
-      "Apply online cepstral mean (and possibly variance) computation online,\n"
-      "using the same code as used for online decoding in the 'new' setup in\n"
-      "online2/ and online2bin/.'\n"
-      "The computation is done on the device in serial. " 
-      "spk2utt is not supported.\n"
-      "\n"
-      "Usage: apply-cmvn-online-cuda [options] <global-cmvn-stats> <feature-rspecifier> "
-      "<feature-wspecifier>\n"
-      "e.g. apply-cmvn-online-cuda 'matrix-sum scp:data/train/cmvn.scp -|' data/train/split8/1/feats.scp ark:-\n";
+        "Apply online cepstral mean (and possibly variance) computation online,\n"
+        "using the same code as used for online decoding in the 'new' setup in\n"
+        "online2/ and online2bin/.'\n"
+        "The computation is done on the device in serial. "
+        "spk2utt is not supported.\n"
+        "\n"
+        "Usage: apply-cmvn-online-cuda [options] <global-cmvn-stats> <feature-rspecifier> "
+        "<feature-wspecifier>\n"
+        "e.g. apply-cmvn-online-cuda 'matrix-sum scp:data/train/cmvn.scp -|' data/train/split8/1/feats.scp ark:-\n";
 
     ParseOptions po(usage);
 
@@ -52,14 +52,14 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     g_cuda_allocator.SetOptions(g_allocator_options);
     CuDevice::Instantiate().SelectGpuId("yes");
     CuDevice::Instantiate().AllowMultithreading();
 
     std::string global_stats_rxfilename = po.GetArg(1),
-      feature_rspecifier = po.GetArg(2),
-      feature_wspecifier = po.GetArg(3);
+        feature_rspecifier = po.GetArg(2),
+        feature_wspecifier = po.GetArg(3);
 
     // global_cmvn_stats helps us initialize to online CMVN to
     // reasonable values at the beginning of the utterance.
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     BaseFloatMatrixWriter feature_writer(feature_wspecifier);
     int32 num_done = 0;
     int64 tot_t = 0;
-      
+
     OnlineCmvnState cmvn_state(global_cmvn_stats);
     CudaOnlineCmvnState cu_cmvn_state(cmvn_state);
     CudaOnlineCmvn cuda_cmvn(cmvn_opts, cu_cmvn_state);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
     }
 
     KALDI_LOG << "Applied online CMVN to " << num_done << " files, or "
-      << tot_t << " frames.";
+              << tot_t << " frames.";
     return (num_done != 0 ? 0 : 1);
   } catch(const std::exception &e) {
     std::cerr << e.what();

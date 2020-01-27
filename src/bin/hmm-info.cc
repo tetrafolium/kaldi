@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
         "Usage:  hmm-info [options] <model-in>\n"
         "e.g.:\n"
         " hmm-info trans.mdl\n";
-    
+
     ParseOptions po(usage);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 1) {

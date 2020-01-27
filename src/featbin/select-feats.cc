@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
         int32 ncol = ranges[i].second - f + 1;
 
         feats.Range(0, feats.NumRows(), offsets[i], ncol)
-          .CopyFromMat(kaldi_reader.Value().Range(0, feats.NumRows(), f, ncol));
+        .CopyFromMat(kaldi_reader.Value().Range(0, feats.NumRows(), f, ncol));
       }
 
       kaldi_writer.Write(kaldi_reader.Key(), feats);

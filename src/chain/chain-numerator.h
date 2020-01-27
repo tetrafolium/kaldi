@@ -51,7 +51,7 @@ namespace chain {
 
 class NumeratorComputation {
 
- public:
+public:
 
   /// Initialize the objcect.  Note: we expect the 'nnet_output' to have the
   /// same number of rows as supervision.num_frames * supervision.num_sequences,
@@ -67,7 +67,7 @@ class NumeratorComputation {
   /// SingleHmmForwardBackward needs (we can just transpose, instead of doing a
   /// 3d tensor rearrangement).
   NumeratorComputation(const Supervision &supervision,
-                       const CuMatrixBase<BaseFloat> &nnet_output);
+      const CuMatrixBase<BaseFloat> &nnet_output);
 
   // TODO: we could enable a Viterbi mode.
 
@@ -80,7 +80,7 @@ class NumeratorComputation {
   // deriv_weight) to 'nnet_output_deriv'.
   void Backward(CuMatrixBase<BaseFloat> *nnet_output_deriv);
 
- private:
+private:
 
   const Supervision &supervision_;
 
@@ -129,9 +129,9 @@ class NumeratorComputation {
   // convert time-index in the FST to a row-index in the nnet-output (to account
   // for the fact that the sequences are interleaved in the nnet-output).
   inline int32 ComputeRowIndex(int32 t, int32 frames_per_sequence,
-                               int32 num_sequences) {
+      int32 num_sequences) {
     return t / frames_per_sequence +
-        num_sequences * (t % frames_per_sequence);
+           num_sequences * (t % frames_per_sequence);
   }
 
 };

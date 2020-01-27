@@ -31,7 +31,7 @@ namespace kaldi {
 
 template <typename FST>
 bool LatticeFasterOnlineDecoderTpl<FST>::TestGetBestPath(
-    bool use_final_probs) const {
+  bool use_final_probs) const {
   Lattice lat1;
   {
     Lattice raw_lat;
@@ -54,7 +54,7 @@ bool LatticeFasterOnlineDecoderTpl<FST>::TestGetBestPath(
 // Outputs an FST corresponding to the single best path through the lattice.
 template <typename FST>
 bool LatticeFasterOnlineDecoderTpl<FST>::GetBestPath(Lattice *olat,
-                                                     bool use_final_probs) const {
+    bool use_final_probs) const {
   olat->DeleteStates();
   BaseFloat final_graph_cost;
   BestPathIterator iter = BestPathEnd(use_final_probs, &final_graph_cost);
@@ -76,8 +76,8 @@ bool LatticeFasterOnlineDecoderTpl<FST>::GetBestPath(Lattice *olat,
 
 template <typename FST>
 typename LatticeFasterOnlineDecoderTpl<FST>::BestPathIterator LatticeFasterOnlineDecoderTpl<FST>::BestPathEnd(
-    bool use_final_probs,
-    BaseFloat *final_cost_out) const {
+  bool use_final_probs,
+  BaseFloat *final_cost_out) const {
   if (this->decoding_finalized_ && !use_final_probs)
     KALDI_ERR << "You cannot call FinalizeDecoding() and then call "
               << "BestPathEnd() with use_final_probs == false";
@@ -87,7 +87,7 @@ typename LatticeFasterOnlineDecoderTpl<FST>::BestPathIterator LatticeFasterOnlin
   unordered_map<Token*, BaseFloat> final_costs_local;
 
   const unordered_map<Token*, BaseFloat> &final_costs =
-      (this->decoding_finalized_ ? this->final_costs_ :final_costs_local);
+      (this->decoding_finalized_ ? this->final_costs_ : final_costs_local);
   if (!this->decoding_finalized_ && use_final_probs)
     this->ComputeFinalCosts(&final_costs_local, NULL, NULL);
 
@@ -97,7 +97,7 @@ typename LatticeFasterOnlineDecoderTpl<FST>::BestPathIterator LatticeFasterOnlin
   BaseFloat best_final_cost = 0;
   Token *best_tok = NULL;
   for (Token *tok = this->active_toks_.back().toks;
-       tok != NULL; tok = tok->next) {
+      tok != NULL; tok = tok->next) {
     BaseFloat cost = tok->tot_cost, final_cost = 0.0;
     if (use_final_probs && !final_costs.empty()) {
       // if we are instructed to use final-probs, and any final tokens were
@@ -130,14 +130,14 @@ typename LatticeFasterOnlineDecoderTpl<FST>::BestPathIterator LatticeFasterOnlin
 
 template <typename FST>
 typename LatticeFasterOnlineDecoderTpl<FST>::BestPathIterator LatticeFasterOnlineDecoderTpl<FST>::TraceBackBestPath(
-    BestPathIterator iter, LatticeArc *oarc) const {
+  BestPathIterator iter, LatticeArc *oarc) const {
   KALDI_ASSERT(!iter.Done() && oarc != NULL);
   Token *tok = static_cast<Token*>(iter.tok);
   int32 cur_t = iter.frame, ret_t = cur_t;
   if (tok->backpointer != NULL) {
     ForwardLinkT *link;
     for (link = tok->backpointer->links;
-         link != NULL; link = link->next) {
+        link != NULL; link = link->next) {
       if (link->next_tok == tok) { // this is the link to "tok"
         oarc->ilabel = link->ilabel;
         oarc->olabel = link->olabel;
@@ -166,9 +166,9 @@ typename LatticeFasterOnlineDecoderTpl<FST>::BestPathIterator LatticeFasterOnlin
 
 template <typename FST>
 bool LatticeFasterOnlineDecoderTpl<FST>::GetRawLatticePruned(
-    Lattice *ofst,
-    bool use_final_probs,
-    BaseFloat beam) const {
+  Lattice *ofst,
+  bool use_final_probs,
+  BaseFloat beam) const {
   typedef LatticeArc Arc;
   typedef Arc::StateId StateId;
   typedef Arc::Weight Weight;
@@ -205,7 +205,7 @@ bool LatticeFasterOnlineDecoderTpl<FST>::GetRawLatticePruned(
   // First initialize the queue and states.  Put the initial state on the queue;
   // this is the last token in the list active_toks_[0].toks.
   for (Token *tok = this->active_toks_[0].toks;
-       tok != NULL; tok = tok->next) {
+      tok != NULL; tok = tok->next) {
     if (tok->next == NULL) {
       tok_map[tok] = ofst->AddState();
       ofst->SetStart(tok_map[tok]);
@@ -229,8 +229,8 @@ bool LatticeFasterOnlineDecoderTpl<FST>::GetRawLatticePruned(
     StateId cur_state = iter->second;
 
     for (ForwardLinkT *l = cur_tok->links;
-         l != NULL;
-         l = l->next) {
+        l != NULL;
+        l = l->next) {
       Token *next_tok = l->next_tok;
       if (next_tok->extra_cost < beam) {
         // so both the current and the next token are good; create the arc
@@ -243,10 +243,10 @@ bool LatticeFasterOnlineDecoderTpl<FST>::GetRawLatticePruned(
           nextstate = tok_map[next_tok];
         }
         BaseFloat cost_offset = (l->ilabel != 0 ?
-                                 this->cost_offsets_[cur_frame] : 0);
+            this->cost_offsets_[cur_frame] : 0);
         Arc arc(l->ilabel, l->olabel,
-                Weight(l->graph_cost, l->acoustic_cost - cost_offset),
-                nextstate);
+            Weight(l->graph_cost, l->acoustic_cost - cost_offset),
+            nextstate);
         ofst->AddArc(cur_state, arc);
       }
     }

@@ -33,7 +33,7 @@ fst::Fst<fst::StdArc> *ReadNetwork(std::string filename) {
   // read decoding network FST
   Input ki(filename); // use ki.Stream() instead of is.
   if (!ki.Stream().good()) KALDI_ERR << "Could not open decoding-graph FST "
-                                      << filename;
+                                     << filename;
 
   fst::FstHeader hdr;
   if (!hdr.Read(ki.Stream(), "<unknown>")) {
@@ -82,9 +82,9 @@ int main(int argc, char *argv[])
         "this decoder applies the difference during decoding\n"
         "Usage:  gmm-decode-biglm-faster [options] model-in fst-in oldlm-fst-in newlm-fst-in features-rspecifier words-wspecifier [alignments-wspecifier [lattice-wspecifier]]\n";
     ParseOptions po(usage);
-    bool allow_partial = true;    
+    bool allow_partial = true;
     BaseFloat acoustic_scale = 0.1;
-    
+
     std::string word_syms_filename;
     BiglmFasterDecoderOptions decoder_opts;
     decoder_opts.Register(&po, true);  // true == include obscure settings.
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     Int32VectorWriter alignment_writer(alignment_wspecifier);
 
     CompactLatticeWriter clat_writer(lattice_wspecifier);
-    
+
     fst::SymbolTable *word_syms = NULL;
     if (word_syms_filename != "") {
       word_syms = fst::SymbolTable::ReadText(word_syms_filename);
@@ -142,10 +142,10 @@ int main(int argc, char *argv[])
     // large process: the page-table entries are duplicated, which requires a
     // lot of virtual memory.
     Fst<StdArc> *decode_fst = ReadNetwork(fst_rxfilename);
-    
+
     VectorFst<StdArc> *old_lm_fst = ReadFstKaldi(old_lm_fst_rxfilename);
     ApplyProbabilityScale(-1.0, old_lm_fst); // Negate old LM probs...
-    
+
     VectorFst<StdArc> *new_lm_fst = ReadFstKaldi(new_lm_fst_rxfilename);
 
 
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     int num_success = 0, num_fail = 0;
 
     Timer timer;
-    
+
     for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string key = feature_reader.Key();
       Matrix<BaseFloat> features (feature_reader.Value());
@@ -167,13 +167,13 @@ int main(int argc, char *argv[])
       fst::BackoffDeterministicOnDemandFst<StdArc> old_lm_dfst(*old_lm_fst);
       fst::BackoffDeterministicOnDemandFst<StdArc> new_lm_dfst(*new_lm_fst);
       fst::ComposeDeterministicOnDemandFst<StdArc> compose_dfst(&old_lm_dfst,
-                                                                &new_lm_dfst);
+          &new_lm_dfst);
       fst::CacheDeterministicOnDemandFst<StdArc> cache_dfst(&compose_dfst);
-      
+
       BiglmFasterDecoder decoder(*decode_fst, decoder_opts, &cache_dfst);
-      
+
       DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model, features,
-                                             acoustic_scale);
+          acoustic_scale);
       decoder.Decode(&gmm_decodable);
 
       std::cerr << "Length of file is "<<features.NumRows()<<'\n';
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
       fst::VectorFst<LatticeArc> decoded;  // linear FST.
 
       if ( (allow_partial || decoder.ReachedFinal())
-           && decoder.GetBestPath(&decoded) ) {
+          && decoder.GetBestPath(&decoded) ) {
         if (!decoder.ReachedFinal())
           KALDI_WARN << "Decoder did not reach end-state, "
                      << "outputting partial traceback since --allow-partial=true";
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
         words_writer.Write(key, words);
         if (alignment_writer.IsOpen())
           alignment_writer.Write(key, alignment);
-          
+
         if (lattice_wspecifier != "") {
           if (acoustic_scale != 0.0) // We'll write the lattice without acoustic scaling
             fst::ScaleLattice(fst::AcousticLatticeScale(1.0 / acoustic_scale), &decoded);
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
           ConvertLattice(decoded, &clat, true);
           clat_writer.Write(key, clat);
         }
-          
+
         if (word_syms != NULL) {
           std::cerr << key << ' ';
           for (size_t i = 0; i < words.size(); i++) {
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
     KALDI_LOG << "Overall log-likelihood per frame is " << (tot_like/frame_count) << " over "
               << frame_count<<" frames.";
 
-    delete word_syms;    
+    delete word_syms;
     delete decode_fst;
     delete old_lm_fst;
     delete new_lm_fst;

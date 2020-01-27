@@ -27,7 +27,7 @@ namespace rnnlm {
 void RnnlmEmbeddingTrainerOptions::Check() const {
   KALDI_ASSERT(print_interval > 0 &&
                momentum >= 0.0 && momentum < 1.0 &&
-               learning_rate > 0.0 &&
+      learning_rate > 0.0 &&
                natural_gradient_alpha > 0.0 &&
                natural_gradient_rank > 0 &&
                natural_gradient_update_period >= 1 &&
@@ -36,12 +36,12 @@ void RnnlmEmbeddingTrainerOptions::Check() const {
 
 
 RnnlmEmbeddingTrainer::RnnlmEmbeddingTrainer(
-    const RnnlmEmbeddingTrainerOptions &config,
-    CuMatrix<BaseFloat> *embedding_mat):
-    config_(config),
-    embedding_mat_(embedding_mat),
-    num_minibatches_(0),
-    max_change_count_(0) {
+  const RnnlmEmbeddingTrainerOptions &config,
+  CuMatrix<BaseFloat> *embedding_mat) :
+  config_(config),
+  embedding_mat_(embedding_mat),
+  num_minibatches_(0),
+  max_change_count_(0) {
   KALDI_ASSERT(embedding_mat->NumRows() > 0);
   initial_embedding_mat_.Resize(embedding_mat->NumRows(),
                                 embedding_mat->NumCols(),
@@ -66,7 +66,7 @@ void RnnlmEmbeddingTrainer::SetNaturalGradientOptions() {
 
 
 void RnnlmEmbeddingTrainer::Train(
-    CuMatrixBase<BaseFloat> *embedding_deriv) {
+  CuMatrixBase<BaseFloat> *embedding_deriv) {
 
   // If relevant, do the following:
   // "embedding_deriv += - 2 * l2_regularize * embedding_mat_"
@@ -114,8 +114,8 @@ void RnnlmEmbeddingTrainer::Train(
 }
 
 void RnnlmEmbeddingTrainer::TrainBackstitch(
-    bool is_backstitch_step1,
-    CuMatrixBase<BaseFloat> *embedding_deriv) {
+  bool is_backstitch_step1,
+  CuMatrixBase<BaseFloat> *embedding_deriv) {
 
   // backstitch training is incompatible with momentum > 0
   KALDI_ASSERT(config_.momentum == 0.0);
@@ -163,8 +163,8 @@ void RnnlmEmbeddingTrainer::TrainBackstitch(
 }
 
 void RnnlmEmbeddingTrainer::Train(
-    const CuArrayBase<int32> &active_words,
-    CuMatrixBase<BaseFloat> *embedding_deriv) {
+  const CuArrayBase<int32> &active_words,
+  CuMatrixBase<BaseFloat> *embedding_deriv) {
 
   KALDI_ASSERT(active_words.Dim() == embedding_deriv->NumRows());
 
@@ -213,9 +213,9 @@ void RnnlmEmbeddingTrainer::Train(
 }
 
 void RnnlmEmbeddingTrainer::TrainBackstitch(
-    bool is_backstitch_step1,
-    const CuArrayBase<int32> &active_words,
-    CuMatrixBase<BaseFloat> *embedding_deriv) {
+  bool is_backstitch_step1,
+  const CuArrayBase<int32> &active_words,
+  CuMatrixBase<BaseFloat> *embedding_deriv) {
 
   // backstitch training is incompatible with momentum > 0
   KALDI_ASSERT(config_.momentum == 0.0);
@@ -270,9 +270,9 @@ void RnnlmEmbeddingTrainer::PrintStats() {
   KALDI_LOG << "Processed a total of " << num_minibatches_ << " minibatches."
             << "max-change was enforced "
             << (100.0 * max_change_count_) /
-               (num_minibatches_ *
-               (config_.backstitch_training_scale == 0.0 ? 1.0 :
-               1.0 + 1.0 / config_.backstitch_training_interval))
+  (num_minibatches_ *
+  (config_.backstitch_training_scale == 0.0 ? 1.0 :
+  1.0 + 1.0 / config_.backstitch_training_interval))
             << " % of the time.";
 
   Matrix<BaseFloat> delta_embedding_mat(*embedding_mat_);

@@ -35,7 +35,7 @@ namespace fst {
 // string (typically a template argument of the CompactLatticeWeightTpl).
 
 template<class IntType> class LatticeStringRepository {
- public:
+public:
   struct Entry {
     const Entry *parent; // NULL for empty string.
     IntType i;
@@ -43,7 +43,7 @@ template<class IntType> class LatticeStringRepository {
       return (parent == other.parent && i == other.i);
     }
     Entry() { }
-    Entry(const Entry &e): parent(e.parent), i(e.i) {}
+    Entry(const Entry &e) : parent(e.parent), i(e.i) {}
   };
   // Note: all Entry* pointers returned in function calls are
   // owned by the repository itself, not by the caller!
@@ -86,7 +86,7 @@ template<class IntType> class LatticeStringRepository {
     ConvertToVector(b, &b_vec);
     const Entry *ans = NULL;
     for(size_t i = 0; i < a_vec.size() && i < b_vec.size() &&
-            a_vec[i] == b_vec[i]; i++)
+        a_vec[i] == b_vec[i]; i++)
       ans = Successor(ans, a_vec[i]);
     return ans;
   }
@@ -94,7 +94,7 @@ template<class IntType> class LatticeStringRepository {
   // removes any elements from b that are not part of
   // a common prefix with a.
   void ReduceToCommonPrefix(const Entry *a,
-                            std::vector<IntType> *b) {
+      std::vector<IntType> *b) {
     size_t a_size = Size(a), b_size = b->size();
     while (a_size> b_size) {
       a = a->parent;
@@ -151,12 +151,12 @@ template<class IntType> class LatticeStringRepository {
     out->resize(length);
     if (entry != NULL) {
       typename std::vector<IntType>::reverse_iterator iter = out->rbegin();
-    while (entry != NULL) {
-      *iter = entry->i;
-      entry = entry->parent;
+      while (entry != NULL) {
+        *iter = entry->i;
+        entry = entry->parent;
         ++iter;
+      }
     }
-  }
   }
 
   const Entry *ConvertFromVector(const std::vector<IntType> &vec) {
@@ -170,8 +170,8 @@ template<class IntType> class LatticeStringRepository {
 
   void Destroy() {
     for (typename SetType::iterator iter = set_.begin();
-         iter != set_.end();
-         ++iter)
+        iter != set_.end();
+        ++iter)
       delete *iter;
     SetType tmp;
     tmp.swap(set_);
@@ -188,12 +188,12 @@ template<class IntType> class LatticeStringRepository {
   void Rebuild(const std::vector<const Entry*> &to_keep) {
     SetType tmp_set;
     for (typename std::vector<const Entry*>::const_iterator
-             iter = to_keep.begin();
-         iter != to_keep.end(); ++iter)
+        iter = to_keep.begin();
+        iter != to_keep.end(); ++iter)
       RebuildHelper(*iter, &tmp_set);
     // Now delete all elems not in tmp_set.
     for (typename SetType::iterator iter = set_.begin();
-         iter != set_.end(); ++iter) {
+        iter != set_.end(); ++iter) {
       if (tmp_set.count(*iter) == 0)
         delete (*iter); // delete the Entry; not needed.
     }
@@ -205,17 +205,17 @@ template<class IntType> class LatticeStringRepository {
     return set_.size() * sizeof(Entry) * 2; // this is a lower bound
     // on the size this structure might take.
   }
- private:
+private:
   class EntryKey { // Hash function object.
-   public:
+public:
     inline size_t operator()(const Entry *entry) const {
       size_t prime = 49109;
       return static_cast<size_t>(entry->i)
-          + prime * reinterpret_cast<size_t>(entry->parent);
+             + prime * reinterpret_cast<size_t>(entry->parent);
     }
   };
   class EntryEqual {
-   public:
+public:
     inline bool operator()(const Entry *e1, const Entry *e2) const {
       return (*e1 == *e2);
     }
@@ -256,7 +256,7 @@ template<class IntType> class LatticeStringRepository {
 // w2.  This requires that there be a total order on the weights.
 
 template<class Weight, class IntType> class LatticeDeterminizer {
- public:
+public:
   // Output to Gallic acceptor (so the strings go on weights, and there is a 1-1 correspondence
   // between our states and the states in ofst.  If destroy == true, release memory as we go
   // (but we cannot output again).
@@ -280,7 +280,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
     if (nStates == 0) {
       return;
     }
-    for (StateId s = 0;s < nStates;s++) {
+    for (StateId s = 0; s < nStates; s++) {
       OutputStateId news = ofst->AddState();
       assert(news == s);
     }
@@ -290,7 +290,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
       std::vector<TempArc> &this_vec(output_arcs_[this_state]);
       typename std::vector<TempArc>::const_iterator iter = this_vec.begin(), end = this_vec.end();
 
-      for (;iter != end; ++iter) {
+      for (; iter != end; ++iter) {
         const TempArc &temp_arc(*iter);
         CompactArc new_arc;
         std::vector<Label> seq;
@@ -326,7 +326,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
     if (destroy)
       FreeMostMemory();
     // Add basic states-- but we will add extra ones to account for strings on output.
-    for (OutputStateId s = 0;s < nStates;s++) {
+    for (OutputStateId s = 0; s < nStates; s++) {
       OutputStateId news = ofst->AddState();
       assert(news == s);
     }
@@ -359,7 +359,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
           OutputStateId cur_state = this_state;
           // Have to be careful with this integer comparison (i+1 < seq.size()) because unsigned.
           // i < seq.size()-1 could fail for zero-length sequences.
-          for (size_t i = 0; i+1 < seq.size();i++) {
+          for (size_t i = 0; i+1 < seq.size(); i++) {
             // for all but the last element of seq, create new state.
             OutputStateId next_state = ofst->AddState();
             Arc arc;
@@ -398,10 +398,10 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // shallow copy.  We do it like this for memory safety, rather than
   // keeping a reference or pointer to ifst_.
   LatticeDeterminizer(const Fst<Arc> &ifst,
-                      DeterminizeLatticeOptions opts):
-      num_arcs_(0), num_elems_(0), ifst_(ifst.Copy()), opts_(opts),
-      equal_(opts_.delta), determinized_(false),
-      minimal_hash_(3, hasher_, equal_), initial_hash_(3, hasher_, equal_) {
+      DeterminizeLatticeOptions opts) :
+    num_arcs_(0), num_elems_(0), ifst_(ifst.Copy()), opts_(opts),
+    equal_(opts_.delta), determinized_(false),
+    minimal_hash_(3, hasher_, equal_), initial_hash_(3, hasher_, equal_) {
     KALDI_ASSERT(Weight::Properties() & kIdempotent); // this algorithm won't
     // work correctly otherwise.
   }
@@ -449,8 +449,8 @@ template<class Weight, class IntType> class LatticeDeterminizer {
 
     // the following loop covers strings present in initial_hash_.
     for (typename InitialSubsetHash::const_iterator
-             iter = initial_hash_.begin();
-         iter != initial_hash_.end(); ++iter) {
+        iter = initial_hash_.begin();
+        iter != initial_hash_.end(); ++iter) {
       const std::vector<Element> &vec = *(iter->first);
       Element elem = iter->second;
       for (size_t i = 0; i < vec.size(); i++)
@@ -516,16 +516,16 @@ template<class Weight, class IntType> class LatticeDeterminizer {
           elems_size = num_elems_ * sizeof(Element),
           total_size = repo_size + arcs_size + elems_size;
       KALDI_WARN << "Memory allocation error doing lattice determinization; using "
-          << total_size << " bytes (max = " << opts_.max_mem
-          << " (repo,arcs,elems) = ("
-          << repo_size << "," << arcs_size << "," << elems_size << ")";
+                 << total_size << " bytes (max = " << opts_.max_mem
+                 << " (repo,arcs,elems) = ("
+                 << repo_size << "," << arcs_size << "," << elems_size << ")";
       return (determinized_ = false);
     } catch (const std::runtime_error &) {
       KALDI_WARN << "Caught exception doing lattice determinization";
       return (determinized_ = false);
     }
   }
- private:
+private:
 
   typedef typename Arc::Label Label;
   typedef typename Arc::StateId StateId;  // use this when we don't know if it's input or output.
@@ -545,7 +545,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
     Weight weight;
     bool operator != (const Element &other) const {
       return (state != other.state || string != other.string ||
-              weight != other.weight);
+             weight != other.weight);
     }
     // This operator is only intended to support sorting in EpsilonClosure()
     bool operator < (const Element &other) const {
@@ -576,7 +576,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // difference.
 
   class SubsetKey {
-   public:
+public:
     size_t operator ()(const std::vector<Element> * subset) const {  // hashes only the state and string.
       size_t hash = 0, factor = 1;
       for (typename std::vector<Element>::const_iterator iter= subset->begin(); iter != subset->end(); ++iter) {
@@ -591,7 +591,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // This is the equality operator on subsets.  It checks for exact match on state-id
   // and string, and approximate match on weights.
   class SubsetEqual {
-   public:
+public:
     bool operator ()(const std::vector<Element> * s1, const std::vector<Element> * s2) const {
       size_t sz = s1->size();
       assert(sz>=0);
@@ -600,20 +600,20 @@ template<class Weight, class IntType> class LatticeDeterminizer {
           iter1_end = s1->end(), iter2=s2->begin();
       for (; iter1 < iter1_end; ++iter1, ++iter2) {
         if (iter1->state != iter2->state ||
-           iter1->string != iter2->string ||
-            ! ApproxEqual(iter1->weight, iter2->weight, delta_)) return false;
+            iter1->string != iter2->string ||
+            !ApproxEqual(iter1->weight, iter2->weight, delta_)) return false;
       }
       return true;
     }
     float delta_;
-    SubsetEqual(float delta): delta_(delta) {}
-    SubsetEqual(): delta_(kDelta) {}
+    SubsetEqual(float delta) : delta_(delta) {}
+    SubsetEqual() : delta_(kDelta) {}
   };
 
   // Operator that says whether two Elements have the same states.
   // Used only for debug.
   class SubsetEqualStates {
-   public:
+public:
     bool operator ()(const std::vector<Element> * s1, const std::vector<Element> * s2) const {
       size_t sz = s1->size();
       assert(sz>=0);
@@ -630,7 +630,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // Define the hash type we use to map subsets (in minimal
   // representation) to OutputStateId.
   typedef std::unordered_map<const std::vector<Element>*, OutputStateId,
-                        SubsetKey, SubsetEqual> MinimalSubsetHash;
+          SubsetKey, SubsetEqual> MinimalSubsetHash;
 
   // Define the hash type we use to map subsets (in initial
   // representation) to OutputStateId, together with an
@@ -638,7 +638,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // as an OutputStateId even though it's declared as InputStateId;
   // these types are the same anyway].
   typedef std::unordered_map<const std::vector<Element>*, Element,
-                        SubsetKey, SubsetEqual> InitialSubsetHash;
+          SubsetKey, SubsetEqual> InitialSubsetHash;
 
 
   // converts the representation of the subset from canonical (all states) to
@@ -663,7 +663,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // If it creates a new OutputStateId, it adds it to the queue.
   OutputStateId MinimalToStateId(const std::vector<Element> &subset) {
     typename MinimalSubsetHash::const_iterator iter
-        = minimal_hash_.find(&subset);
+      = minimal_hash_.find(&subset);
     if (iter != minimal_hash_.end()) // Found a matching subset.
       return iter->second;
     OutputStateId ans = static_cast<OutputStateId>(output_arcs_.size());
@@ -680,10 +680,10 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // Given a normalized initial subset of elements (i.e. before epsilon closure),
   // compute the corresponding output-state.
   OutputStateId InitialToStateId(const std::vector<Element> &subset_in,
-                                 Weight *remaining_weight,
-                                 StringId *common_prefix) {
+      Weight *remaining_weight,
+      StringId *common_prefix) {
     typename InitialSubsetHash::const_iterator iter
-        = initial_hash_.find(&subset_in);
+      = initial_hash_.find(&subset_in);
     if (iter != initial_hash_.end()) { // Found a matching subset.
       const Element &elem = iter->second;
       *remaining_weight = elem.weight;
@@ -702,7 +702,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
     ConvertToMinimal(&subset); // remove all but emitting and final states.
 
     Element elem; // will be used to store remaining weight and string, and
-                 // OutputStateId, in initial_hash_;
+                  // OutputStateId, in initial_hash_;
     NormalizeSubset(&subset, &elem.weight, &elem.string); // normalize subset; put
     // common string and weight in "elem".  The subset is now a minimal,
     // normalized subset.
@@ -731,7 +731,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // in lattice-weight.h.
   // this is the same as that, but optimized for our data structures.
   inline int Compare(const Weight &a_w, StringId a_str,
-                     const Weight &b_w, StringId b_str) const {
+      const Weight &b_w, StringId b_str) const {
     int weight_comp = fst::Compare(a_w, b_w);
     if (weight_comp != 0) return weight_comp;
     // now comparing strings.
@@ -864,7 +864,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
       Weight this_final_weight = Times(elem.weight, ifst_->Final(elem.state));
       StringId this_final_string = elem.string;
       if (this_final_weight != Weight::Zero() &&
-         (!is_final || Compare(this_final_weight, this_final_string,
+          (!is_final || Compare(this_final_weight, this_final_string,
                                final_weight, final_string) == 1)) { // the new
         // (weight, string) pair is more in semiring than our current
         // one.
@@ -889,8 +889,8 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // removing any common string prefix (putting it in common_str),
   // and dividing by the total weight (putting it in tot_weight).
   void NormalizeSubset(std::vector<Element> *elems,
-                       Weight *tot_weight,
-                       StringId *common_str) {
+      Weight *tot_weight,
+      StringId *common_str) {
     if(elems->empty()) { // just set common_str, tot_weight
       KALDI_WARN << "[empty subset]"; // TEMP
       // to defaults and return...
@@ -994,7 +994,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
   // "Element" member of the pair.
 
   class PairComparator {
-   public:
+public:
     inline bool operator () (const std::pair<Label, Element> &p1, const std::pair<Label, Element> &p2) {
       if (p1.first < p2.first) return true;
       else if (p1.first > p2.first) return false;
@@ -1025,9 +1025,9 @@ template<class Weight, class IntType> class LatticeDeterminizer {
       // Push back into "all_elems", elements corresponding to all
       // non-epsilon-input transitions out of all states in "minimal_subset".
       typename std::vector<Element>::const_iterator iter = minimal_subset.begin(), end = minimal_subset.end();
-      for (;iter != end; ++iter) {
+      for (; iter != end; ++iter) {
         const Element &elem = *iter;
-        for (ArcIterator<Fst<Arc> > aiter(*ifst_, elem.state); ! aiter.Done(); aiter.Next()) {
+        for (ArcIterator<Fst<Arc> > aiter(*ifst_, elem.state); !aiter.Done(); aiter.Next()) {
           const Arc &arc = aiter.Value();
           if (arc.ilabel != 0
               && arc.weight != Weight::Zero()) {  // Non-epsilon transition -- ignore epsilons here.
@@ -1155,8 +1155,8 @@ template<class Weight, class IntType> class LatticeDeterminizer {
     if (ifst_->Final(state) != Weight::Zero())
       isymbol_or_final_[state] = static_cast<char>(OSF_YES);
     for (ArcIterator<Fst<Arc> > aiter(*ifst_, state);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       const Arc &arc = aiter.Value();
       if (arc.ilabel != 0 && arc.weight != Weight::Zero()) {
         isymbol_or_final_[state] = static_cast<char>(OSF_YES);
@@ -1189,7 +1189,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
          Note, we don't put anything in the initial_hash_.  The initial_hash_ is only
          a lookaside buffer anyway, so this isn't a problem-- it will get populated
          later if it needs to be.
-      */
+       */
       Element elem;
       elem.state = start_id;
       elem.weight = Weight::One();
@@ -1214,9 +1214,9 @@ template<class Weight, class IntType> class LatticeDeterminizer {
 
 
   std::vector<std::vector<Element>* > output_states_; // maps from output state to
-                                            // minimal representation [normalized].
-                                            // View pointers as owned in
-                                            // minimal_hash_.
+  // minimal representation [normalized].
+  // View pointers as owned in
+  // minimal_hash_.
   std::vector<std::vector<TempArc> > output_arcs_;  // essentially an FST in our format.
 
   int num_arcs_; // keep track of memory usage: number of arcs in output_arcs_
@@ -1240,7 +1240,7 @@ template<class Weight, class IntType> class LatticeDeterminizer {
                                      // we convert to minimal representation and
                                      // normalize, there may be an extra weight
                                      // and string.  Owns the pointers
-                                    // in its keys.
+                                     // in its keys.
   std::vector<OutputStateId> queue_; // Queue of output-states to process.  Starts with
   // state 0, and increases and then (hopefully) decreases in length during
   // determinization.  LIFO queue (queue discipline doesn't really matter).
@@ -1262,9 +1262,9 @@ template<class Weight, class IntType> class LatticeDeterminizer {
 // or possibly TropicalWeightTpl<float>, and IntType would be int32.
 template<class Weight, class IntType>
 bool DeterminizeLattice(const Fst<ArcTpl<Weight> > &ifst,
-                        MutableFst<ArcTpl<Weight> > *ofst,
-                        DeterminizeLatticeOptions opts,
-                        bool *debug_ptr) {
+    MutableFst<ArcTpl<Weight> > *ofst,
+    DeterminizeLatticeOptions opts,
+    bool *debug_ptr) {
   ofst->SetInputSymbols(ifst.InputSymbols());
   ofst->SetOutputSymbols(ifst.OutputSymbols());
   LatticeDeterminizer<Weight, IntType> det(ifst, opts);
@@ -1279,9 +1279,9 @@ bool DeterminizeLattice(const Fst<ArcTpl<Weight> > &ifst,
 // or possibly TropicalWeightTpl<float>, and IntType would be int32.
 template<class Weight, class IntType>
 bool DeterminizeLattice(const Fst<ArcTpl<Weight> >&ifst,
-                        MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > >*ofst,
-                        DeterminizeLatticeOptions opts,
-                        bool *debug_ptr) {
+    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > >*ofst,
+    DeterminizeLatticeOptions opts,
+    bool *debug_ptr) {
   ofst->SetInputSymbols(ifst.InputSymbols());
   ofst->SetOutputSymbols(ifst.OutputSymbols());
   LatticeDeterminizer<Weight, IntType> det(ifst, opts);

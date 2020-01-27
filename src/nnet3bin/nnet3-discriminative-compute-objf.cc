@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
       tmodel.Read(ki.Stream(), binary);
       am_nnet.Read(ki.Stream(), binary);
     }
-    
+
     Nnet* nnet = &(am_nnet.GetNnet());
 
     if (batchnorm_test_mode)
@@ -88,10 +88,10 @@ int main(int argc, char *argv[]) {
     if (dropout_test_mode)
       SetDropoutTestMode(true, nnet);
 
-    NnetDiscriminativeComputeObjf discriminative_objf_computer(nnet_opts, 
-                                              discriminative_opts, 
-                                              tmodel, am_nnet.Priors(), 
-                                              *nnet);
+    NnetDiscriminativeComputeObjf discriminative_objf_computer(nnet_opts,
+        discriminative_opts,
+        tmodel, am_nnet.Priors(),
+        *nnet);
 
     SequentialNnetDiscriminativeExampleReader example_reader(examples_rspecifier);
 

@@ -44,9 +44,9 @@ namespace rnnlm {
    'options' object and a symbol table, and then call Read() (the one-argument
    form accepting only a std::istream, inherited from class ArpaFileParser), to
    read from the file.
-*/
+ */
 class SamplingLm : public ArpaFileParser {
- public:
+public:
   friend class SamplingLmTest;
 
   typedef std::vector<int32> HistType;
@@ -56,8 +56,8 @@ class SamplingLm : public ArpaFileParser {
 
   // ARPA LM file is read by function "void Read(std::istream &is)"
   // in ArpaFileParser. Only text mode is supported.
-  SamplingLm(ArpaParseOptions options, fst::SymbolTable* symbols):
-      ArpaFileParser(options, symbols) { }
+  SamplingLm(ArpaParseOptions options, fst::SymbolTable* symbols) :
+    ArpaFileParser(options, symbols) { }
 
   // This constructor reads the object directly from class SamplingLmEstimator,
   // which is much faster than dealing with the ARPA format.  It also allows
@@ -68,7 +68,7 @@ class SamplingLm : public ArpaFileParser {
 
   // This constructor is to be used prior to calling the 2-argument
   // Read() that readss the result of calling Write().
-  SamplingLm(): ArpaFileParser(ArpaParseOptions(), NULL) { }
+  SamplingLm() : ArpaFileParser(ArpaParseOptions(), NULL) { }
 
   // Writes this object to disk in a non-ARPA format that
   // can be read by the following Read() function.
@@ -102,14 +102,14 @@ class SamplingLm : public ArpaFileParser {
   // the output 'non_unigram_probs' will not necessarily be equal to 1.0, but
   // it will be equal to the total of the weights of histories in 'histories'.
   BaseFloat GetDistribution(const WeightedHistType &histories,
-             std::unordered_map<int32, BaseFloat> *non_unigram_probs) const;
+      std::unordered_map<int32, BaseFloat> *non_unigram_probs) const;
 
 
   // This is an alternative interface to GetDistribution() that outputs a list
   // of pairs (word-id, weight), that's sorted and unique on word-id, instead of
   // an unordered_map.
   BaseFloat GetDistribution(const WeightedHistType &histories,
-            std::vector<std::pair<int32, BaseFloat> > *non_unigram_probs) const;
+      std::vector<std::pair<int32, BaseFloat> > *non_unigram_probs) const;
 
   // Return the n-gram order, e.g. 1 for a unigram LM, 2 for a bigram.
   int32 Order() const { return higher_order_probs_.size() + 1; }
@@ -119,7 +119,7 @@ class SamplingLm : public ArpaFileParser {
 
   // The vocabulary size is defined as the highest-numbered word plus one.
   int32 VocabSize() const { return unigram_probs_.size(); }
- protected:
+protected:
   // ArpaFileParser overrides.
   virtual void HeaderAvailable();
   virtual void ConsumeNGram(const NGram& ngram);
@@ -163,10 +163,10 @@ class SamplingLm : public ArpaFileParser {
                                be included in this sum.
    */
   void AddBackoffToHistoryStates(
-      const WeightedHistType &histories,
-      WeightedHistType *histories_closure,
-      BaseFloat *total_weight,
-      BaseFloat *unigram_weight) const;
+    const WeightedHistType &histories,
+    WeightedHistType *histories_closure,
+    BaseFloat *total_weight,
+    BaseFloat *unigram_weight) const;
 
 
   // Called from ReadComplete(), this function ensures that the
@@ -197,7 +197,7 @@ class SamplingLm : public ArpaFileParser {
     // 'wrong' type of LM, there is a possibility it will be negative; warnings
     // will be printed in this case.
     std::vector<std::pair<int32, BaseFloat> > words_and_probs;
-    HistoryState(): backoff_prob(1.0) { }
+    HistoryState() : backoff_prob(1.0) { }
   };
 
 
@@ -223,9 +223,9 @@ class SamplingLm : public ArpaFileParser {
   //  @return                  Returns the probability *not* the log-prob
   //                           of the word 'word' given history 'history'.
   BaseFloat GetProbWithBackoff(
-      const std::vector<int32> &history,
-      const HistoryState *state,
-      int32 word) const;
+    const std::vector<int32> &history,
+    const HistoryState *state,
+    int32 word) const;
 
 
   // Unigram probabilities, indexed by word-id.  These will sum to one.
@@ -239,7 +239,7 @@ class SamplingLm : public ArpaFileParser {
   // Indexed by n-gram order minus two, then by history, to a
   // HistoryState.
   std::vector<std::unordered_map<HistType, HistoryState,
-                                 VectorHasher<int32> > > higher_order_probs_;
+      VectorHasher<int32> > > higher_order_probs_;
 };
 
 }  // end of namespace rnnlm

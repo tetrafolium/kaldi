@@ -78,9 +78,9 @@ namespace kaldi {
    currently accessible if you call NumFramesReady().  You will likely not need
    to call IsLastFrame(), but we implement it to only return true for the last
    frame of the file once we've decided to terminate decoding.
-*/
+ */
 class DecodableInterface {
- public:
+public:
   /// Returns the log likelihood, which will be negated in the decoder.
   /// The "frame" starts from zero.  You should verify that NumFramesReady() > frame
   /// before calling this.

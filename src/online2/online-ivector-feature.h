@@ -102,13 +102,13 @@ struct OnlineIvectorExtractionConfig {
   // by calling SetAdaptationState()).
   BaseFloat max_remembered_frames;
 
-  OnlineIvectorExtractionConfig(): online_cmvn_iextractor(false),
-                                   ivector_period(10), num_gselect(5),
-                                   min_post(0.025), posterior_scale(0.1),
-                                   max_count(0.0), num_cg_iters(15),
-                                   use_most_recent_ivector(true),
-                                   greedy_ivector_extractor(false),
-                                   max_remembered_frames(1000) { }
+  OnlineIvectorExtractionConfig() : online_cmvn_iextractor(false),
+    ivector_period(10), num_gselect(5),
+    min_post(0.025), posterior_scale(0.1),
+    max_count(0.0), num_cg_iters(15),
+    use_most_recent_ivector(true),
+    greedy_ivector_extractor(false),
+    max_remembered_frames(1000) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("lda-matrix", &lda_mat_rxfilename, "Filename of LDA matrix, "
@@ -199,7 +199,7 @@ struct OnlineIvectorExtractionInfo {
   OnlineIvectorExtractionInfo();
 
   void Check() const;
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(OnlineIvectorExtractionInfo);
 };
 
@@ -218,15 +218,15 @@ struct OnlineIvectorExtractorAdaptationState {
   OnlineIvectorEstimationStats ivector_stats;
 
   /// This constructor initializes adaptation-state with no prior speaker history.
-  OnlineIvectorExtractorAdaptationState(const OnlineIvectorExtractionInfo &info):
-      cmvn_state(info.global_cmvn_stats),
-      ivector_stats(info.extractor.IvectorDim(),
-                    info.extractor.PriorOffset(),
-                    info.max_count) { }
+  OnlineIvectorExtractorAdaptationState(const OnlineIvectorExtractionInfo &info) :
+    cmvn_state(info.global_cmvn_stats),
+    ivector_stats(info.extractor.IvectorDim(),
+        info.extractor.PriorOffset(),
+        info.max_count) { }
 
   /// Copy constructor
   OnlineIvectorExtractorAdaptationState(
-      const OnlineIvectorExtractorAdaptationState &other);
+    const OnlineIvectorExtractorAdaptationState &other);
 
   /// Scales down the stats if needed to ensure the number of frames in the
   /// speaker-specific CMVN stats does not exceed max_remembered_frames
@@ -235,7 +235,7 @@ struct OnlineIvectorExtractorAdaptationState {
   /// factor is necessary because those stats have already been scaled
   /// by that factor.]
   void LimitFrames(BaseFloat max_remembered_frames,
-                   BaseFloat posterior_scale);
+      BaseFloat posterior_scale);
 
   void Write(std::ostream &os, bool binary) const;
   void Read(std::istream &is, bool binary);
@@ -252,7 +252,7 @@ struct OnlineIvectorExtractorAdaptationState {
 /// it obtains iVectors.
 
 class OnlineIvectorFeature: public OnlineFeatureInterface {
- public:
+public:
   /// Constructor.  base_feature is for example raw MFCC or PLP or filterbank
   /// features, whatever was used to train the iVector extractor.
   /// "info" contains all the configuration information as well as
@@ -260,7 +260,7 @@ class OnlineIvectorFeature: public OnlineFeatureInterface {
   /// Caution: the class keeps a const reference to "info", so don't
   /// delete it while this class or others copied from it still exist.
   explicit OnlineIvectorFeature(const OnlineIvectorExtractionInfo &info,
-                                OnlineFeatureInterface *base_feature);
+      OnlineFeatureInterface *base_feature);
 
   // This version of the constructor accepts per-frame weights (relates to
   // downweighting silence).  This is intended for use in offline operation,
@@ -283,14 +283,14 @@ class OnlineIvectorFeature: public OnlineFeatureInterface {
   /// utterances of the same speaker; this will generally be called after
   /// constructing a new instance of this class.
   void SetAdaptationState(
-      const OnlineIvectorExtractorAdaptationState &adaptation_state);
+    const OnlineIvectorExtractorAdaptationState &adaptation_state);
 
 
   /// Get the adaptation state; you may want to call this before destroying this
   /// object, to get adaptation state that can be used to improve decoding of
   /// later utterances of this speaker.
   void GetAdaptationState(
-      OnlineIvectorExtractorAdaptationState *adaptation_state) const;
+    OnlineIvectorExtractorAdaptationState *adaptation_state) const;
 
   virtual ~OnlineIvectorFeature();
 
@@ -318,16 +318,16 @@ class OnlineIvectorFeature: public OnlineFeatureInterface {
   // (ideally just after calling AcceptWaveform), or never call it for the
   // lifetime of this object.
   void UpdateFrameWeights(
-      const std::vector<std::pair<int32, BaseFloat> > &delta_weights);
+    const std::vector<std::pair<int32, BaseFloat> > &delta_weights);
 
- private:
+private:
 
   // This accumulates i-vector stats for a set of frames, specified as pairs
   // (t, weight).  The weights do not have to be positive.  (In the online
   // silence-weighting that we do, negative weights can occur if we change our
   // minds about the assignment of a frame as silence vs. non-silence).
   void UpdateStatsForFrames(
-      const std::vector<std::pair<int32, BaseFloat> > &frame_weights);
+    const std::vector<std::pair<int32, BaseFloat> > &frame_weights);
 
   // Returns a modified version of info_.min_post, which is opts_.min_post if
   // weight is 1.0 or -1.0, but gets larger if fabs(weight) is small... but no
@@ -376,8 +376,8 @@ class OnlineIvectorFeature: public OnlineFeatureInterface {
   /// (default is std::less) so that the lowest-numbered frame, not the highest-numbered
   /// one, will be returned by top().
   std::priority_queue<std::pair<int32, BaseFloat>,
-                      std::vector<std::pair<int32, BaseFloat> >,
-                      std::greater<std::pair<int32, BaseFloat> > > delta_weights_;
+      std::vector<std::pair<int32, BaseFloat> >,
+      std::greater<std::pair<int32, BaseFloat> > > delta_weights_;
 
   /// this is only used for validating that the frame-weighting code is not buggy.
   std::vector<BaseFloat> current_frame_weight_debug_;
@@ -430,8 +430,8 @@ struct OnlineSilenceWeightingConfig {
     return !silence_phones_str.empty() && silence_weight != 1.0;
   }
 
-  OnlineSilenceWeightingConfig():
-      silence_weight(1.0), max_state_duration(-1) { }
+  OnlineSilenceWeightingConfig() :
+    silence_weight(1.0), max_state_duration(-1) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("silence-phones", &silence_phones_str, "(RE weighting in "
@@ -461,7 +461,7 @@ struct OnlineSilenceWeightingConfig {
 // limitation, so data from a very long run of the same transition-id will get
 // weighted down.  (this is often associated with misrecognition or silence).
 class OnlineSilenceWeighting {
- public:
+public:
   // Note: you would initialize a new copy of this object for each new
   // utterance.
   // The frame-subsampling-factor is used for newer nnet3 models, especially
@@ -470,8 +470,8 @@ class OnlineSilenceWeighting {
   // models.
 
   OnlineSilenceWeighting(const TransitionModel &trans_model,
-                         const OnlineSilenceWeightingConfig &config,
-                         int32 frame_subsampling_factor = 1);
+      const OnlineSilenceWeightingConfig &config,
+      int32 frame_subsampling_factor = 1);
 
   bool Active() const { return config_.Active(); }
 
@@ -509,18 +509,18 @@ class OnlineSilenceWeighting {
   //
   // Returned frame-index is in pipeline frames from the pipeline start.
   void GetDeltaWeights(
-      int32 num_frames_ready, int32 first_decoder_frame,
-      std::vector<std::pair<int32, BaseFloat> > *delta_weights);
+    int32 num_frames_ready, int32 first_decoder_frame,
+    std::vector<std::pair<int32, BaseFloat> > *delta_weights);
 
   // A method for backward compatibility, same as above, but for a single
   // utterance.
   void GetDeltaWeights(
-      int32 num_frames_ready,
-      std::vector<std::pair<int32, BaseFloat> > *delta_weights) {
+    int32 num_frames_ready,
+    std::vector<std::pair<int32, BaseFloat> > *delta_weights) {
     GetDeltaWeights(num_frames_ready, 0, delta_weights);
   }
 
- private:
+private:
   const TransitionModel &trans_model_;
   const OnlineSilenceWeightingConfig &config_;
 
@@ -538,7 +538,7 @@ class OnlineSilenceWeighting {
     // weight we "want" it to use (any difference between the two will
     // be output when the user calls GetDeltaWeights().
     BaseFloat current_weight;
-    FrameInfo(): token(NULL), transition_id(-1), current_weight(0.0) {}
+    FrameInfo() : token(NULL), transition_id(-1), current_weight(0.0) {}
   };
 
   // This contains information about any previously computed traceback;

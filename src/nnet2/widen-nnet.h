@@ -34,10 +34,10 @@ struct NnetWidenConfig {
   int32 hidden_layer_dim;
   BaseFloat param_stddev_factor;
   BaseFloat bias_stddev;
-  
-  NnetWidenConfig(): hidden_layer_dim(-1),
-                     param_stddev_factor(1.0),
-                     bias_stddev(0.5) { }
+
+  NnetWidenConfig() : hidden_layer_dim(-1),
+    param_stddev_factor(1.0),
+    bias_stddev(0.5) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("hidden-layer-dim", &hidden_layer_dim, "[required option]: "
@@ -47,7 +47,7 @@ struct NnetWidenConfig {
                    "transform (multiply by 1/sqrt of input-dim)");
     opts->Register("bias-stddev", &bias_stddev, "Standard deviation of added "
                    "bias parameters");
-  }  
+  }
 };
 
 /**
@@ -55,8 +55,8 @@ struct NnetWidenConfig {
    dimensions to the target. */
 
 void WidenNnet(const NnetWidenConfig &widen_config,
-               Nnet *nnet);
-  
+    Nnet *nnet);
+
 
 
 } // namespace nnet2

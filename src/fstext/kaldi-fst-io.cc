@@ -79,8 +79,8 @@ Fst<StdArc> *ReadFstKaldiGeneric(std::string rxfilename, bool throw_on_err) {
   }
   if (!fst) {
     if(throw_on_err) {
-     KALDI_ERR << "Could not read fst from "
-               << kaldi::PrintableRxfilename(rxfilename);
+      KALDI_ERR << "Could not read fst from "
+                << kaldi::PrintableRxfilename(rxfilename);
     } else {
       KALDI_WARN << "Could not read fst from "
                  << kaldi::PrintableRxfilename(rxfilename)
@@ -113,7 +113,7 @@ void ReadFstKaldi(std::string rxfilename, fst::StdVectorFst *ofst) {
 }
 
 void WriteFstKaldi(const VectorFst<StdArc> &fst,
-                   std::string wxfilename) {
+    std::string wxfilename) {
   if (wxfilename == "") wxfilename = "-"; // interpret "" as stdout,
   // for compatibility with OpenFst conventions.
   bool write_binary = true, write_header = false;

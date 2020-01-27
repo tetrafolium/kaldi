@@ -33,7 +33,7 @@ namespace kaldi {
    type via 'new').
  */
 class CuCompressedMatrixBase {
- public:
+public:
 
   /// Sets *this to an appropriately compressed copy of 'mat', which
   /// includes resizing *this.  The details of how this is done will be
@@ -70,7 +70,7 @@ class CuCompressedMatrixBase {
  */
 template <typename I>
 class CuCompressedMatrix: public CuCompressedMatrixBase {
- public:
+public:
 
   /// Constructor which sets 'scale_' according to
   /// scale_ = range / std::numeric_limits<I>::max().
@@ -98,7 +98,7 @@ class CuCompressedMatrix: public CuCompressedMatrixBase {
 
   virtual ~CuCompressedMatrix() { Destroy(); }
 
- private:
+private:
   // If there was data in 'data_', frees it, and sets it to NULL.
   void Destroy();
 
@@ -153,8 +153,8 @@ enum  CuCompressedMatrixType {
    enabled.
  */
 CuCompressedMatrixBase *NewCuCompressedMatrix(CuCompressedMatrixType t,
-                                              BaseFloat range,
-                                              bool truncate = true);
+    BaseFloat range,
+    bool truncate = true);
 
 
 } // namespace kaldi

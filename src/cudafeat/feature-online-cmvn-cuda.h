@@ -33,24 +33,24 @@ struct CudaOnlineCmvnState {
 
   CudaOnlineCmvnState(){};
   CudaOnlineCmvnState(const OnlineCmvnState &cmvn_state)
-      : global_cmvn_stats(cmvn_state.global_cmvn_stats),
-        speaker_cmvn_stats(cmvn_state.speaker_cmvn_stats) {}
+    : global_cmvn_stats(cmvn_state.global_cmvn_stats),
+    speaker_cmvn_stats(cmvn_state.speaker_cmvn_stats) {}
 
   CudaOnlineCmvnState(const CudaOnlineCmvnState &cmvn_state)
-      : global_cmvn_stats(cmvn_state.global_cmvn_stats),
-        speaker_cmvn_stats(cmvn_state.speaker_cmvn_stats) {}
+    : global_cmvn_stats(cmvn_state.global_cmvn_stats),
+    speaker_cmvn_stats(cmvn_state.speaker_cmvn_stats) {}
 };
 
 class CudaOnlineCmvn {
- public:
+public:
   CudaOnlineCmvn(const OnlineCmvnOptions &opts, const CudaOnlineCmvnState &cmvn_state)
-      : opts_(opts), cmvn_state_(cmvn_state){};
+    : opts_(opts), cmvn_state_(cmvn_state){};
   ~CudaOnlineCmvn(){};
 
   void ComputeFeatures(const CuMatrixBase<BaseFloat> &feats_in,
-                       CuMatrix<BaseFloat> *feats_out);
+      CuMatrix<BaseFloat> *feats_out);
 
- private:
+private:
   const OnlineCmvnOptions &opts_;
   const CudaOnlineCmvnState &cmvn_state_;
 };

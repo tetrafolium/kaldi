@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     ReadKaldiObject(ivector_extractor_rxfilename, &extractor);
 
     WriteKaldiObject(extractor, ivector_extractor_wxfilename, binary);
-  
+
     return 0;
   } catch(const std::exception &e) {
     std::cerr << e.what();

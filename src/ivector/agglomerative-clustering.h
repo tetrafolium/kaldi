@@ -40,12 +40,12 @@ namespace kaldi {
 /// contained in the cluster.
 struct AhcCluster {
   int32 id,
-    parent1,
-    parent2,
-    size;
+      parent1,
+      parent2,
+      size;
   std::vector<int32> utt_ids;
   AhcCluster(int32 id, int32 p1, int32 p2, std::vector<int32> utts)
-      : id(id), parent1(p1), parent2(p2), utt_ids(utts) {
+    : id(id), parent1(p1), parent2(p2), utt_ids(utts) {
     size = utts.size();
   }
 };
@@ -53,17 +53,17 @@ struct AhcCluster {
 /// The AgglomerativeClusterer class contains the necessary mechanisms for the
 /// actual clustering algorithm.
 class AgglomerativeClusterer {
- public:
+public:
   AgglomerativeClusterer(
-      const Matrix<BaseFloat> &costs,
-      BaseFloat threshold,
-      int32 min_clusters,
-      int32 first_pass_max_points,
-      BaseFloat max_cluster_fraction,
-      std::vector<int32> *assignments_out)
-      : costs_(costs), threshold_(threshold), min_clusters_(min_clusters),
-        first_pass_max_points_(first_pass_max_points),
-        assignments_(assignments_out) {
+    const Matrix<BaseFloat> &costs,
+    BaseFloat threshold,
+    int32 min_clusters,
+    int32 first_pass_max_points,
+    BaseFloat max_cluster_fraction,
+    std::vector<int32> *assignments_out)
+    : costs_(costs), threshold_(threshold), min_clusters_(min_clusters),
+    first_pass_max_points_(first_pass_max_points),
+    assignments_(assignments_out) {
     num_points_ = costs.NumRows();
 
     // The max_cluster_size_ is a hard limit on the number points in a cluster.
@@ -93,7 +93,7 @@ class AgglomerativeClusterer {
   // Clusters points using two pass algorithm.
   void ClusterTwoPass();
 
- private:
+private:
   // Encodes cluster pair into a 32bit unsigned integer.
   uint32 EncodePair(int32 i, int32 j);
   // Decodes cluster pair from a 32bit unsigned integer.
@@ -124,7 +124,7 @@ class AgglomerativeClusterer {
   // Elements contain pairs of cluster IDs and their cost.
   typedef std::pair<BaseFloat, uint32> QueueElement;
   typedef std::priority_queue<QueueElement, std::vector<QueueElement>,
-    std::greater<QueueElement>  > QueueType;
+          std::greater<QueueElement>  > QueueType;
   QueueType queue_, second_pass_queue_;
 
   // Map from cluster IDs to cost between them
@@ -178,12 +178,12 @@ class AgglomerativeClusterer {
  *
  */
 void AgglomerativeCluster(
-    const Matrix<BaseFloat> &costs,
-    BaseFloat threshold,
-    int32 min_clusters,
-    int32 first_pass_max_points,
-    BaseFloat max_cluster_fraction,
-    std::vector<int32> *assignments_out);
+  const Matrix<BaseFloat> &costs,
+  BaseFloat threshold,
+  int32 min_clusters,
+  int32 first_pass_max_points,
+  BaseFloat max_cluster_fraction,
+  std::vector<int32> *assignments_out);
 
 }  // end namespace kaldi.
 

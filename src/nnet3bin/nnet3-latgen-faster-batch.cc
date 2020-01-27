@@ -33,10 +33,10 @@
 namespace kaldi {
 
 void HandleOutput(bool determinize,
-                  const fst::SymbolTable *word_syms,
-                  nnet3::NnetBatchDecoder *decoder,
-                  CompactLatticeWriter *clat_writer,
-                  LatticeWriter *lat_writer) {
+    const fst::SymbolTable *word_syms,
+    nnet3::NnetBatchDecoder *decoder,
+    CompactLatticeWriter *clat_writer,
+    LatticeWriter *lat_writer) {
   // Write out any lattices that are ready.
   std::string output_utterance_id, sentence;
   if (determinize) {
@@ -144,21 +144,21 @@ int main(int argc, char *argv[]) {
     bool determinize = decoder_opts.determinize_lattice;
     CompactLatticeWriter compact_lattice_writer;
     LatticeWriter lattice_writer;
-    if (! (determinize ? compact_lattice_writer.Open(lattice_wspecifier)
-           : lattice_writer.Open(lattice_wspecifier)))
+    if (!(determinize ? compact_lattice_writer.Open(lattice_wspecifier)
+        : lattice_writer.Open(lattice_wspecifier)))
       KALDI_ERR << "Could not open table for writing lattices: "
-                 << lattice_wspecifier;
+                << lattice_wspecifier;
 
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
     RandomAccessBaseFloatVectorReaderMapped ivector_reader(
-        ivector_rspecifier, utt2spk_rspecifier);
+      ivector_rspecifier, utt2spk_rspecifier);
 
     fst::SymbolTable *word_syms = NULL;
     if (word_syms_filename != "")
       if (!(word_syms = fst::SymbolTable::ReadText(word_syms_filename)))
         KALDI_ERR << "Could not read symbol table from file "
-                   << word_syms_filename;
+                  << word_syms_filename;
 
 
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
@@ -168,10 +168,10 @@ int main(int argc, char *argv[]) {
     int32 num_success;
     {
       NnetBatchComputer computer(compute_opts, am_nnet.GetNnet(),
-                                 am_nnet.Priors());
+          am_nnet.Priors());
       NnetBatchDecoder decoder(*decode_fst, decoder_opts,
-                               trans_model, word_syms, allow_partial,
-                               num_threads, &computer);
+          trans_model, word_syms, allow_partial,
+          num_threads, &computer);
 
       for (; !feature_reader.Done(); feature_reader.Next()) {
         std::string utt = feature_reader.Key();

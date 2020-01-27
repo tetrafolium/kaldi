@@ -42,12 +42,12 @@ BaseFloat DecodableAmSgmm2::LogLikelihoodForPdf(int32 frame, int32 pdf_id) {
 
 
     SubVector<BaseFloat> data(*feature_matrix_, frame);
-    
+
     sgmm_.ComputePerFrameVars(data, (*gselect_)[frame], *spk_,
                               &per_frame_vars_);
   }
   return sgmm_.LogLikelihood(per_frame_vars_, pdf_id, &sgmm_cache_, spk_,
-                             log_prune_);  
+                             log_prune_);
 }
 
 

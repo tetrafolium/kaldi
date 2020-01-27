@@ -85,21 +85,21 @@ int main(int argc, char *argv[]) {
     // ownership will be taken by gc.
     VectorFst<StdArc> *lex_fst = fst::ReadFstKaldi(lex_in_filename);
 
-    std::vector<int32> disambig_syms;    
+    std::vector<int32> disambig_syms;
     if (disambig_rxfilename != "")
       if (!ReadIntegerVectorSimple(disambig_rxfilename, &disambig_syms))
         KALDI_ERR << "fstcomposecontext: Could not read disambiguation symbols from "
                   << disambig_rxfilename;
-    
+
     TrainingGraphCompiler gc(trans_model, ctx_dep, lex_fst, disambig_syms,
-                             gopts);
+        gopts);
 
     lex_fst = NULL;  // we gave ownership to gc.
-    
+
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
     RandomAccessInt32VectorReader transcript_reader(transcript_rspecifier);
     Int32VectorWriter alignment_writer(alignment_wspecifier);
-    
+
     int32 num_done = 0, num_err = 0, num_retry = 0;
     double tot_like = 0.0;
     kaldi::int64 frame_count = 0;
@@ -128,9 +128,9 @@ int main(int argc, char *argv[]) {
       }
 
       DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model, features,
-                                             acoustic_scale);
+          acoustic_scale);
 
-      
+
       AlignUtteranceWrapper(align_config, utt,
                             acoustic_scale, &decode_fst, &gmm_decodable,
                             &alignment_writer, NULL,

@@ -24,9 +24,9 @@
 namespace kaldi {
 
 BaseFloat SentenceLevelConfidence(const CompactLattice &clat,
-                                  int32 *num_paths,
-                                  std::vector<int32> *best_sentence,
-                                  std::vector<int32> *second_best_sentence) {
+    int32 *num_paths,
+    std::vector<int32> *best_sentence,
+    std::vector<int32> *second_best_sentence) {
   /* It may seem strange that the first thing we do is to convert the
      CompactLattice to a Lattice, given that we may have just created the
      CompactLattice by determinizing a Lattice.  However, this is not just
@@ -36,10 +36,10 @@ BaseFloat SentenceLevelConfidence(const CompactLattice &clat,
      taken would be quadratic in the length in words of the CompactLattice,
      because of the alignment information getting appended as vectors.
      That's why we convert back to Lattice.
-  */
+   */
   Lattice lat;
   ConvertLattice(clat, &lat);
-  
+
   std::vector<Lattice> lats;
   NbestAsFsts(lat, 2, &lats);
   int32 n = lats.size();
@@ -77,15 +77,15 @@ BaseFloat SentenceLevelConfidence(const CompactLattice &clat,
     }
     if (ans < 0) ans = 0;
     return ans;
-  }  
+  }
 }
 
 
 
 BaseFloat SentenceLevelConfidence(const Lattice &lat,
-                                  int32 *num_paths,
-                                  std::vector<int32> *best_sentence,
-                                  std::vector<int32> *second_best_sentence) {
+    int32 *num_paths,
+    std::vector<int32> *best_sentence,
+    std::vector<int32> *second_best_sentence) {
   int32 max_sentence_length = LongestSentenceLength(lat);
   fst::DeterminizeLatticePrunedOptions determinize_opts;
   // The basic idea of expanding only up to "max_sentence_length * 2" arcs,
@@ -106,7 +106,7 @@ BaseFloat SentenceLevelConfidence(const Lattice &lat,
   Lattice inverse_lat(lat);
   fst::Invert(&inverse_lat); // Swap input and output symbols.
   DeterminizeLatticePruned(inverse_lat, prune_beam, &clat, determinize_opts);
-  
+
   // Call the version of this function that takes a CompactLattice.
   return SentenceLevelConfidence(clat, num_paths,
                                  best_sentence, second_best_sentence);

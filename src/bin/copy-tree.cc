@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     const char *usage =
         "Copy decision tree (possibly changing binary/text format)\n"
         "Usage:  copy-tree [--binary=false] <tree-in> <tree-out>\n";
-        
+
     bool binary = true;
     ParseOptions po(usage);
     po.Register("binary", &binary, "Write output in binary mode");

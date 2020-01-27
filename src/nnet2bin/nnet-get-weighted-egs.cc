@@ -43,26 +43,26 @@ int32 GetCount(double expected_count) {
 }
 
 static void ProcessFile(const MatrixBase<BaseFloat> &feats,
-                        const Posterior &pdf_post,
-                        const std::string &utt_id,
-                        const Vector<BaseFloat> &weights,
-                        int32 left_context,
-                        int32 right_context,
-                        int32 const_feat_dim,
-                        BaseFloat keep_proportion,
-                        BaseFloat weight_threshold,
-                        bool use_frame_selection,
-                        bool use_frame_weights,
-                        int64 *num_frames_written,
-                        int64 *num_frames_skipped,
-                        NnetExampleWriter *example_writer) {
+    const Posterior &pdf_post,
+    const std::string &utt_id,
+    const Vector<BaseFloat> &weights,
+    int32 left_context,
+    int32 right_context,
+    int32 const_feat_dim,
+    BaseFloat keep_proportion,
+    BaseFloat weight_threshold,
+    bool use_frame_selection,
+    bool use_frame_weights,
+    int64 *num_frames_written,
+    int64 *num_frames_skipped,
+    NnetExampleWriter *example_writer) {
   KALDI_ASSERT(feats.NumRows() == static_cast<int32>(pdf_post.size()));
   int32 feat_dim = feats.NumCols();
   KALDI_ASSERT(const_feat_dim < feat_dim);
   int32 basic_feat_dim = feat_dim - const_feat_dim;
   NnetExample eg;
   Matrix<BaseFloat> input_frames(left_context + 1 + right_context,
-                                 basic_feat_dim);
+      basic_feat_dim);
   eg.left_context = left_context;
   // TODO: modify this code, and this binary itself, to support the --num-frames
   // option to allow multiple frames per eg.
@@ -84,7 +84,7 @@ static void ProcessFile(const MatrixBase<BaseFloat> &feats,
       if (const_feat_dim > 0) {
         // we'll normally reach here if we're using online-estimated iVectors.
         SubVector<BaseFloat> const_part(feats.Row(i),
-                                        basic_feat_dim, const_feat_dim);
+            basic_feat_dim, const_feat_dim);
         eg.spk_info.CopyFromVec(const_part);
       }
       if (use_frame_selection) {
@@ -130,14 +130,14 @@ int main(int argc, char *argv[]) {
         "   ark:- \n"
         "Note: the --left-context and --right-context would be derived from\n"
         "the output of nnet-info.";
-        
-    
+
+
     int32 left_context = 0, right_context = 0, const_feat_dim = 0;
     int32 srand_seed = 0;
     BaseFloat keep_proportion = 1.0;
     BaseFloat weight_threshold = 0.0;
     bool use_frame_selection = true, use_frame_weights=false;
-    
+
     ParseOptions po(usage);
     po.Register("left-context", &left_context, "Number of frames of left context "
                 "the neural net requires.");
@@ -156,11 +156,11 @@ int main(int argc, char *argv[]) {
                 "above this threshold.");
     po.Register("use-frame-selection", &use_frame_selection, "Remove the frames below threshold.");
     po.Register("use-frame-weights", &use_frame_weights, "Scale the error derivatives by the weight");
-    
+
     po.Read(argc, argv);
 
     srand(srand_seed);
-    
+
     if (po.NumArgs() != 4) {
       po.PrintUsage();
       exit(1);
@@ -176,11 +176,11 @@ int main(int argc, char *argv[]) {
     RandomAccessPosteriorReader pdf_post_reader(pdf_post_rspecifier);
     RandomAccessBaseFloatVectorReader weights_reader(weights_rspecifier);
     NnetExampleWriter example_writer(examples_wspecifier);
-    
+
     int32 num_done = 0, num_err = 0;
     int64 num_frames_written = 0;
     int64 num_frames_skipped = 0;
-    
+
     for (; !feat_reader.Done(); feat_reader.Next()) {
       std::string key = feat_reader.Key();
       const Matrix<BaseFloat> &feats = feat_reader.Value();
@@ -199,14 +199,14 @@ int main(int argc, char *argv[]) {
           KALDI_ERR << "No weights for utterance " << key;
           //ProcessFile(feats, pdf_post, NULL,
           //    left_context, right_context, const_feat_dim, keep_proportion,
-          //    weight_threshold, false, false, &num_frames_written, 
+          //    weight_threshold, false, false, &num_frames_written,
           //    &num_frames_skipped, &example_writer);
         } else {
           Vector<BaseFloat> weights = weights_reader.Value(key);
           if (weights.Dim() != static_cast<int32>(pdf_post.size())) {
             KALDI_WARN << "Weights for utterance " << key
-              << " have wrong size, " << weights.Dim()
-              << " vs. " << pdf_post.size();
+                       << " have wrong size, " << weights.Dim()
+                       << " vs. " << pdf_post.size();
             num_err++;
             continue;
           }

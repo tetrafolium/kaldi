@@ -42,7 +42,7 @@ namespace fst {
 struct TableMatcherOptions {
   float table_ratio;  // we construct the table if it would be at least this full.
   int min_table_size;
-  TableMatcherOptions(): table_ratio(0.25), min_table_size(4) { }
+  TableMatcherOptions() : table_ratio(0.25), min_table_size(4) { }
 };
 
 
@@ -51,7 +51,7 @@ struct TableMatcherOptions {
 // we want to cache tables for multiple compositions.
 template<class F, class BackoffMatcher = SortedMatcher<F> >
 class TableMatcherImpl : public MatcherBase<typename F::Arc> {
- public:
+public:
   typedef F FST;
   typedef typename F::Arc Arc;
   typedef typename Arc::Label Label;
@@ -61,18 +61,18 @@ class TableMatcherImpl : public MatcherBase<typename F::Arc> {
   typedef typename Arc::Weight Weight;
 
 
- public:
+public:
 
   TableMatcherImpl(const FST &fst, MatchType match_type,
-                   const TableMatcherOptions &opts = TableMatcherOptions()):
-      match_type_(match_type),
-      fst_(fst.Copy()),
-      loop_(match_type == MATCH_INPUT ?
-            Arc(kNoLabel, 0, Weight::One(), kNoStateId) :
-            Arc(0, kNoLabel, Weight::One(), kNoStateId)),
-      aiter_(NULL),
-      s_(kNoStateId), opts_(opts),
-      backoff_matcher_(fst, match_type)
+      const TableMatcherOptions &opts = TableMatcherOptions()) :
+    match_type_(match_type),
+    fst_(fst.Copy()),
+    loop_(match_type == MATCH_INPUT ?
+        Arc(kNoLabel, 0, Weight::One(), kNoStateId) :
+        Arc(0, kNoLabel, Weight::One(), kNoStateId)),
+    aiter_(NULL),
+    s_(kNoStateId), opts_(opts),
+    backoff_matcher_(fst, match_type)
   {
     assert(opts_.min_table_size > 0);
     if (match_type == MATCH_INPUT)
@@ -124,13 +124,13 @@ class TableMatcherImpl : public MatcherBase<typename F::Arc> {
         return;
       }
       ArcIterator<FST> aiter(*fst_, s);
-      aiter.SetFlags(kArcNoCache|(match_type_ == MATCH_OUTPUT?kArcOLabelValue:kArcILabelValue),
+      aiter.SetFlags(kArcNoCache|(match_type_ == MATCH_OUTPUT ? kArcOLabelValue : kArcILabelValue),
                      kArcNoCache|kArcValueFlags);
       // the statement above, says: "Don't cache stuff; and I only need the ilabel/olabel
       // to be computed.
       aiter.Seek(num_arcs - 1);
       Label highest_label = (match_type_ == MATCH_OUTPUT ?
-                             aiter.Value().olabel : aiter.Value().ilabel);
+          aiter.Value().olabel : aiter.Value().ilabel);
       if ((highest_label+1) * opts_.table_ratio > num_arcs) {
         this_table_ = empty;
         backoff_matcher_.SetState(s);
@@ -141,7 +141,7 @@ class TableMatcherImpl : public MatcherBase<typename F::Arc> {
       ArcId pos = 0;
       for (aiter.Seek(0); !aiter.Done(); aiter.Next(), pos++) {
         Label label = (match_type_ == MATCH_OUTPUT ?
-                       aiter.Value().olabel : aiter.Value().ilabel);
+            aiter.Value().olabel : aiter.Value().ilabel);
         assert((size_t)label <= (size_t)highest_label);  // also checks >= 0.
         if ((*this_table_)[label] == kNoStateId) (*this_table_)[label] = pos;
         // set this_table_[label] to first position where arc has this
@@ -166,7 +166,7 @@ class TableMatcherImpl : public MatcherBase<typename F::Arc> {
       // matches real epsilons but not the self-loop.
       match_label_ = (match_label_ == kNoLabel ? 0 : match_label_);
       if (static_cast<size_t>(match_label_) < tables_[s_]->size() &&
-         (*(tables_[s_]))[match_label_] != kNoStateId) {
+          (*(tables_[s_]))[match_label_] != kNoStateId) {
         aiter_->Seek( (*(tables_[s_]))[match_label_] );  // label exists.
         return true;
       }
@@ -197,7 +197,7 @@ class TableMatcherImpl : public MatcherBase<typename F::Arc> {
       if (aiter_->Done())
         return true;
       Label label = (match_type_ == MATCH_OUTPUT ?
-                     aiter_->Value().olabel : aiter_->Value().ilabel);
+          aiter_->Value().olabel : aiter_->Value().ilabel);
       return (label != match_label_);
     } else
       return backoff_matcher_.Done();
@@ -218,7 +218,7 @@ class TableMatcherImpl : public MatcherBase<typename F::Arc> {
   virtual uint64 Properties(uint64 props) const { return props; } // simple matcher that does
   // not change its FST, so properties are properties of FST it is applied to
 
- private:
+private:
   virtual void SetState_(StateId s) { SetState(s); }
   virtual bool Find_(Label label) { return Find(label); }
   virtual bool Done_() const { return Done(); }
@@ -241,7 +241,7 @@ class TableMatcherImpl : public MatcherBase<typename F::Arc> {
 
 template<class F, class BackoffMatcher = SortedMatcher<F> >
 class TableMatcher : public MatcherBase<typename F::Arc> {
- public:
+public:
   typedef F FST;
   typedef typename F::Arc Arc;
   typedef typename Arc::Label Label;
@@ -252,12 +252,12 @@ class TableMatcher : public MatcherBase<typename F::Arc> {
   typedef TableMatcherImpl<F, BackoffMatcher> Impl;
 
   TableMatcher(const FST &fst, MatchType match_type,
-               const TableMatcherOptions &opts = TableMatcherOptions())
-      : impl_(std::make_shared<Impl>(fst, match_type, opts)) { }
+      const TableMatcherOptions &opts = TableMatcherOptions())
+    : impl_(std::make_shared<Impl>(fst, match_type, opts)) { }
 
   TableMatcher(const TableMatcher<FST, BackoffMatcher> &matcher,
-               bool safe = false)
-      : impl_(matcher.impl_) {
+      bool safe = false)
+    : impl_(matcher.impl_) {
     if (safe == true) {
       LOG(FATAL) << "TableMatcher: Safe copy not supported";
     }
@@ -285,7 +285,7 @@ class TableMatcher : public MatcherBase<typename F::Arc> {
 
   virtual uint64 Properties(uint64 props) const { return impl_->Properties(props); } // simple matcher that does
   // not change its FST, so properties are properties of FST it is applied to
- private:
+private:
   std::shared_ptr<Impl> impl_;
 
   virtual void SetState_(StateId s) { impl_->SetState(s); }
@@ -303,18 +303,18 @@ struct TableComposeOptions: public TableMatcherOptions {
   MatchType table_match_type;
 
   explicit TableComposeOptions(const TableMatcherOptions &mo,
-                               bool c = true, ComposeFilter ft = SEQUENCE_FILTER,
-                               MatchType tms = MATCH_OUTPUT)
-      : TableMatcherOptions(mo), connect(c), filter_type(ft), table_match_type(tms) { }
+      bool c = true, ComposeFilter ft = SEQUENCE_FILTER,
+      MatchType tms = MATCH_OUTPUT)
+    : TableMatcherOptions(mo), connect(c), filter_type(ft), table_match_type(tms) { }
   TableComposeOptions() : connect(true), filter_type(SEQUENCE_FILTER),
-                          table_match_type(MATCH_OUTPUT) { }
+    table_match_type(MATCH_OUTPUT) { }
 };
 
 
 template<class Arc>
 void TableCompose(const Fst<Arc> &ifst1, const Fst<Arc> &ifst2,
-                  MutableFst<Arc> *ofst,
-                  const TableComposeOptions &opts = TableComposeOptions()) {
+    MutableFst<Arc> *ofst,
+    const TableComposeOptions &opts = TableComposeOptions()) {
   typedef Fst<Arc> F;
   CacheOptions nopts;
   nopts.gc_limit = 0;  // Cache only the last state for fastest copy.
@@ -324,7 +324,7 @@ void TableCompose(const Fst<Arc> &ifst1, const Fst<Arc> &ifst2,
     impl_opts.matcher1 = new TableMatcher<F>(ifst1, MATCH_OUTPUT, opts);
     *ofst = ComposeFst<Arc>(ifst1, ifst2, impl_opts);
   } else {
-    assert(opts.table_match_type == MATCH_INPUT) ;
+    assert(opts.table_match_type == MATCH_INPUT);
     // ComposeFstImplOptions templated on matcher for fst1, matcher for fst2.
     ComposeFstImplOptions<SortedMatcher<F>, TableMatcher<F> > impl_opts(nopts);
     impl_opts.matcher2 = new TableMatcher<F>(ifst2, MATCH_INPUT, opts);
@@ -340,14 +340,14 @@ template<class F>
 struct TableComposeCache {
   TableMatcher<F> *matcher;
   TableComposeOptions opts;
-  TableComposeCache(const TableComposeOptions &opts = TableComposeOptions()): matcher (NULL), opts(opts) {}
+  TableComposeCache(const TableComposeOptions &opts = TableComposeOptions()) : matcher (NULL), opts(opts) {}
   ~TableComposeCache() { delete(matcher); }
 };
 
 template<class Arc>
 void TableCompose(const Fst<Arc> &ifst1, const Fst<Arc> &ifst2,
-                  MutableFst<Arc> *ofst,
-                  TableComposeCache<Fst<Arc> > *cache) {
+    MutableFst<Arc> *ofst,
+    TableComposeCache<Fst<Arc> > *cache) {
   typedef Fst<Arc> F;
   assert(cache != NULL);
   CacheOptions nopts;
@@ -360,7 +360,7 @@ void TableCompose(const Fst<Arc> &ifst1, const Fst<Arc> &ifst2,
     // be thread-safe-- anway I don't understand this part.
     *ofst = ComposeFst<Arc>(ifst1, ifst2, impl_opts);
   } else {
-    assert(cache->opts.table_match_type == MATCH_INPUT) ;
+    assert(cache->opts.table_match_type == MATCH_INPUT);
     ComposeFstImplOptions<SortedMatcher<F>, TableMatcher<F> > impl_opts(nopts);
     if (cache->matcher == NULL)
       cache->matcher = new TableMatcher<F>(ifst2, MATCH_INPUT, cache->opts);

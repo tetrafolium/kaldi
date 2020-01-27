@@ -32,12 +32,12 @@ namespace kaldi {
 
 
 class DecodableMatrixScaledMapped: public DecodableInterface {
- public:
+public:
   // This constructor creates an object that will not delete "likes" when done.
   DecodableMatrixScaledMapped(const TransitionModel &tm,
-                              const Matrix<BaseFloat> &likes,
-                              BaseFloat scale): trans_model_(tm), likes_(&likes),
-                                                scale_(scale), delete_likes_(false) {
+      const Matrix<BaseFloat> &likes,
+      BaseFloat scale) : trans_model_(tm), likes_(&likes),
+    scale_(scale), delete_likes_(false) {
     if (likes.NumCols() != tm.NumPdfs())
       KALDI_ERR << "DecodableMatrixScaledMapped: mismatch, matrix has "
                 << likes.NumCols() << " rows but transition-model has "
@@ -47,10 +47,10 @@ class DecodableMatrixScaledMapped: public DecodableInterface {
   // This constructor creates an object that will delete "likes"
   // when done.
   DecodableMatrixScaledMapped(const TransitionModel &tm,
-                              BaseFloat scale,
-                              const Matrix<BaseFloat> *likes):
-      trans_model_(tm), likes_(likes),
-      scale_(scale), delete_likes_(true) {
+      BaseFloat scale,
+      const Matrix<BaseFloat> *likes) :
+    trans_model_(tm), likes_(likes),
+    scale_(scale), delete_likes_(true) {
     if (likes->NumCols() != tm.NumPdfs())
       KALDI_ERR << "DecodableMatrixScaledMapped: mismatch, matrix has "
                 << likes->NumCols() << " rows but transition-model has "
@@ -75,7 +75,7 @@ class DecodableMatrixScaledMapped: public DecodableInterface {
   virtual ~DecodableMatrixScaledMapped() {
     if (delete_likes_) delete likes_;
   }
- private:
+private:
   const TransitionModel &trans_model_;  // for tid to pdf mapping
   const Matrix<BaseFloat> *likes_;
   BaseFloat scale_;
@@ -96,19 +96,19 @@ class DecodableMatrixScaledMapped: public DecodableInterface {
    SubMatrix.
  */
 class DecodableMatrixMapped: public DecodableInterface {
- public:
+public:
   // This constructor creates an object that will not delete "likes" when done.
   // the frame_offset is the frame the row 0 of 'likes' corresponds to, would be
   // greater than one if this is not the first chunk of likelihoods.
   DecodableMatrixMapped(const TransitionModel &tm,
-                        const MatrixBase<BaseFloat> &likes,
-                        int32 frame_offset = 0);
+      const MatrixBase<BaseFloat> &likes,
+      int32 frame_offset = 0);
 
   // This constructor creates an object that will delete "likes"
   // when done.
   DecodableMatrixMapped(const TransitionModel &tm,
-                        const Matrix<BaseFloat> *likes,
-                        int32 frame_offset = 0);
+      const Matrix<BaseFloat> *likes,
+      int32 frame_offset = 0);
 
   virtual int32 NumFramesReady() const;
 
@@ -121,7 +121,7 @@ class DecodableMatrixMapped: public DecodableInterface {
 
   virtual ~DecodableMatrixMapped();
 
- private:
+private:
   const TransitionModel &trans_model_;  // for tid to pdf mapping
   const MatrixBase<BaseFloat> *likes_;
   const Matrix<BaseFloat> *likes_to_delete_;
@@ -148,11 +148,11 @@ class DecodableMatrixMapped: public DecodableInterface {
    See also DecodableMatrixMapped, which supports the same type of thing but
    with a different interface where you are expected to re-construct the
    object each time you want to decode.
-*/
+ */
 class DecodableMatrixMappedOffset: public DecodableInterface {
- public:
-  DecodableMatrixMappedOffset(const TransitionModel &tm):
-      trans_model_(tm), frame_offset_(0), input_is_finished_(false) { }
+public:
+  DecodableMatrixMappedOffset(const TransitionModel &tm) :
+    trans_model_(tm), frame_offset_(0), input_is_finished_(false) { }
 
   // this is not part of the generic Decodable interface.
   int32 FirstAvailableFrame() const { return frame_offset_; }
@@ -164,7 +164,7 @@ class DecodableMatrixMappedOffset: public DecodableInterface {
   // under some circumstances do a shallow copy using Swap().  This function
   // appends loglikes to any existing likelihoods you've previously supplied.
   void AcceptLoglikes(Matrix<BaseFloat> *loglikes,
-                      int32 frames_to_discard);
+      int32 frames_to_discard);
 
   void InputIsFinished() { input_is_finished_ = true; }
 
@@ -191,7 +191,7 @@ class DecodableMatrixMappedOffset: public DecodableInterface {
 
   // nothing special to do in destructor.
   virtual ~DecodableMatrixMappedOffset() { }
- private:
+private:
   const TransitionModel &trans_model_;  // for tid to pdf mapping
   Matrix<BaseFloat> loglikes_;
   int32 frame_offset_;
@@ -210,9 +210,9 @@ class DecodableMatrixMappedOffset: public DecodableInterface {
 
 
 class DecodableMatrixScaled: public DecodableInterface {
- public:
+public:
   DecodableMatrixScaled(const Matrix<BaseFloat> &likes,
-                        BaseFloat scale):
+      BaseFloat scale) :
     likes_(likes), scale_(scale) { }
 
   virtual int32 NumFramesReady() const { return likes_.NumRows(); }
@@ -235,7 +235,7 @@ class DecodableMatrixScaled: public DecodableInterface {
   // Indices are one-based!  This is for compatibility with OpenFst.
   virtual int32 NumIndices() const { return likes_.NumCols(); }
 
- private:
+private:
   const Matrix<BaseFloat> &likes_;
   BaseFloat scale_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableMatrixScaled);

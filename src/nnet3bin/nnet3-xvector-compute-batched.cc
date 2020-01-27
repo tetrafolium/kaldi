@@ -97,7 +97,7 @@ void DivideIntoPieces(int32 a, int32 b, std::vector<int32> *pieces) {
 
 
 class BatchedXvectorComputer {
- public:
+public:
   /**
        @param [in]  opts  Options class; warning, it keeps a reference to it.
        @param [in]  nnet  The neural net we'll be computing with; assumed to have
@@ -109,15 +109,15 @@ class BatchedXvectorComputer {
    */
 
   BatchedXvectorComputer(const BatchedXvectorComputerOptions &opts,
-                         const Nnet &nnet,
-                         int32 total_context);
+      const Nnet &nnet,
+      int32 total_context);
 
   /**
      Accepts an utterance to process into an xvector, and, if one or more
      batches become full, processes the batch.
    */
   void AcceptUtterance(const std::string &utt,
-                      const Matrix<BaseFloat> &input);
+      const Matrix<BaseFloat> &input);
 
 
   /**  Returns true if at least one xvector is pending output (i.e. that
@@ -137,7 +137,7 @@ class BatchedXvectorComputer {
        @param [out] xvector  The xvector will be written to here.
    */
   void OutputXvector(std::string *utt,
-                     Vector<BaseFloat> *xvector);
+      Vector<BaseFloat> *xvector);
 
 
   /**
@@ -149,7 +149,7 @@ class BatchedXvectorComputer {
   void Flush();
 
 
- private:
+private:
 
   struct XvectorTask {
     std::string utt_id;
@@ -195,7 +195,7 @@ class BatchedXvectorComputer {
                     num_frames is less than opts_.chunk_length.)
    */
   void SplitUtteranceIntoChunks(int32 num_frames,
-                                std::vector<int32> *start_frames);
+      std::vector<int32> *start_frames);
 
   /** This adds a newly created XvectorTask at the tail of the singly linked
       list whose (head,tail) are results_head_, results_tail_.
@@ -224,8 +224,8 @@ class BatchedXvectorComputer {
                 must be <= input.NumRows().
    */
   void AddChunkToBatch(XvectorTask *task,
-                       const Matrix<BaseFloat> &input,
-                       int32 chunk_start);
+      const Matrix<BaseFloat> &input,
+      int32 chunk_start);
 
   const BatchedXvectorComputerOptions &opts_;
   int32 total_context_;
@@ -240,7 +240,7 @@ class BatchedXvectorComputer {
      sequences are interleaved (will be faster since this corresponds to how
      nnet3 keeps things in memory), i.e. row 0 of input_feats_ is time t=0
      for chunk n=0; and row 1 of input_feats_ is time t=0 for chunk n=1.
-  */
+   */
   Matrix<BaseFloat> input_feats_;
 
 
@@ -251,7 +251,7 @@ class BatchedXvectorComputer {
   /**  position_in_batch_ is the number of chunks that we have filled in in
        the input_feats_ matrix and tasks_this_batch_.  When it reaches
        opts_.batch_size we will do the actual computation.
-  */
+   */
   int32 position_in_batch_;
 
   /**
@@ -273,7 +273,7 @@ class BatchedXvectorComputer {
 
 BatchedXvectorComputer::XvectorTask*
 BatchedXvectorComputer::CreateTask(
-    const std::string &utt, int32 num_chunks) {
+  const std::string &utt, int32 num_chunks) {
   XvectorTask *task = new XvectorTask;
   task->utt_id = utt;
   task->num_chunks = num_chunks;
@@ -291,15 +291,15 @@ BatchedXvectorComputer::CreateTask(
 }
 
 BatchedXvectorComputer::BatchedXvectorComputer(
-    const BatchedXvectorComputerOptions &opts,
-    const Nnet &nnet,
-    int32 total_context):
-    opts_(opts),
-    total_context_(total_context),
-    nnet_(nnet),
-    position_in_batch_(0),
-    results_head_(NULL),
-    results_tail_(NULL) {
+  const BatchedXvectorComputerOptions &opts,
+  const Nnet &nnet,
+  int32 total_context) :
+  opts_(opts),
+  total_context_(total_context),
+  nnet_(nnet),
+  position_in_batch_(0),
+  results_head_(NULL),
+  results_tail_(NULL) {
 
   tasks_this_batch_.resize(opts_.batch_size);
 
@@ -311,7 +311,7 @@ BatchedXvectorComputer::BatchedXvectorComputer(
                       feature_dim_);
 
   CachingOptimizingCompiler compiler(nnet, opts.optimize_config,
-                                     opts.compiler_config);
+      opts.compiler_config);
 
   {  // This block creates computation_.
     ComputationRequest request;
@@ -338,11 +338,11 @@ BatchedXvectorComputer::BatchedXvectorComputer(
     output.name = "output";
     output.has_deriv = false;
     output.indexes.resize(opts_.batch_size);
-    for (int32 n = 0; n < opts_.batch_size; n++){
-        Index index;
-        index.n = n;
-        index.t = 0;
-        output.indexes[n] = index;
+    for (int32 n = 0; n < opts_.batch_size; n++) {
+      Index index;
+      index.n = n;
+      index.t = 0;
+      output.indexes[n] = index;
     }
     request.outputs.push_back(output);
     computation_ = compiler.Compile(request);
@@ -350,9 +350,9 @@ BatchedXvectorComputer::BatchedXvectorComputer(
 }
 
 void BatchedXvectorComputer::AddChunkToBatch(
-    XvectorTask *task,
-    const Matrix<BaseFloat> &input,
-    int32 chunk_start) {
+  XvectorTask *task,
+  const Matrix<BaseFloat> &input,
+  int32 chunk_start) {
   int32 n = position_in_batch_++;
   KALDI_ASSERT(n >= 0 && n < opts_.batch_size);
   tasks_this_batch_[n] = task;
@@ -383,7 +383,7 @@ bool BatchedXvectorComputer::XvectorReady() const {
 }
 
 void BatchedXvectorComputer::OutputXvector(std::string *utt,
-                                           Vector<BaseFloat> *xvector) {
+    Vector<BaseFloat> *xvector) {
   KALDI_ASSERT(XvectorReady());
   *utt = results_head_->utt_id;
   xvector->Swap(&(results_head_->xvector));
@@ -406,7 +406,7 @@ void BatchedXvectorComputer::ComputeOneBatch() {
   CuMatrix<BaseFloat> cu_input_feats(input_feats_);
   Nnet *nnet_to_update = NULL;  // we're not doing any update.
   NnetComputer computer(opts_.compute_config, *computation_,
-                        nnet_, nnet_to_update);
+      nnet_, nnet_to_update);
   computer.AcceptInput("input", &cu_input_feats);
   computer.Run();
   CuMatrix<BaseFloat> cu_output;
@@ -422,12 +422,12 @@ void BatchedXvectorComputer::ComputeOneBatch() {
   }
   position_in_batch_ = 0;
   std::fill(tasks_this_batch_.begin(), tasks_this_batch_.end(),
-            (XvectorTask*)NULL);
+      (XvectorTask*)NULL);
 }
 
 void BatchedXvectorComputer::AcceptUtterance(
-    const std::string &utt,
-    const Matrix<BaseFloat> &input) {
+  const std::string &utt,
+  const Matrix<BaseFloat> &input) {
   std::vector<int32> chunk_starts;
   int32 num_frames = input.NumRows();
   SplitUtteranceIntoChunks(num_frames, &chunk_starts);
@@ -443,7 +443,7 @@ void BatchedXvectorComputer::AcceptUtterance(
 }
 
 void BatchedXvectorComputer::SplitUtteranceIntoChunks(
-    int32 num_frames, std::vector<int32> *start_frames) {
+  int32 num_frames, std::vector<int32> *start_frames) {
   start_frames->clear();
   if (num_frames <= opts_.chunk_size) {
     if (num_frames == opts_.chunk_size || opts_.pad_input)
@@ -575,8 +575,8 @@ int main(int argc, char *argv[]) {
 #endif
 
     std::string nnet_rxfilename = po.GetArg(1),
-                feature_rspecifier = po.GetArg(2),
-                vector_wspecifier = po.GetArg(3);
+        feature_rspecifier = po.GetArg(2),
+        vector_wspecifier = po.GetArg(3);
 
     Nnet nnet;
     ReadKaldiObject(nnet_rxfilename, &nnet);

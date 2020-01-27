@@ -63,13 +63,13 @@ struct CommandAttributes {
   // true if this command has side effects e.g. on the model (such as
   // Backprop on an updatable component, or StoreStats).
   bool has_side_effects;
-  CommandAttributes(): has_side_effects(false) { }
+  CommandAttributes() : has_side_effects(false) { }
 };
 
 
 /// This function is to be used in debugging; it produces human-readable output.
 void PrintCommandAttributes(std::ostream &os,
-                            const std::vector<CommandAttributes> &attributes);
+    const std::vector<CommandAttributes> &attributes);
 
 
 enum AccessType {
@@ -119,7 +119,7 @@ enum AccessType {
     after the operation would in that case depend on the original contents.
  */
 class ComputationVariables {
- public:
+public:
   // This function must only be called once per object.
   void Init(const NnetComputation &computation);
 
@@ -134,22 +134,22 @@ class ComputationVariables {
   // those depends on the pre-existing contents, so it would not be correct to
   // consider it just a write operation).
   void RecordAccessForSubmatrix(
-      int32 submatrix_index,
-      AccessType access_type,
-      CommandAttributes *ca) const;
+    int32 submatrix_index,
+    AccessType access_type,
+    CommandAttributes *ca) const;
 
   /// Appends to variables_indexes the sorted list of variables corresponding to
   /// a matrix index.
   void AppendVariablesForMatrix(
-      int32 matrix_index,
-      std::vector<int32> *variable_indexes) const;
+    int32 matrix_index,
+    std::vector<int32> *variable_indexes) const;
 
 
   // Appends to variable_indexes the sorted list of variables corresponding to a
   // submatrix index.
   void AppendVariablesForSubmatrix(
-      int32 submatrix_index,
-      std::vector<int32> *variable_indexes) const;
+    int32 submatrix_index,
+    std::vector<int32> *variable_indexes) const;
 
   // note: variables are zero-indexed.
   int32 NumVariables() const { return num_variables_; }
@@ -161,7 +161,7 @@ class ComputationVariables {
   std::string DescribeVariable(int32 variable) const;
 
   NnetComputation::SubMatrixInfo VariableInfo(int32 variable) const;
- private:
+private:
   // sets up split_points_, matrix_to_variable_index_, and num_variables_.
   // called from constructor.
   void ComputeSplitPoints(const NnetComputation &computation);
@@ -221,8 +221,8 @@ class ComputationVariables {
 struct Access {
   int32 command_index;
   AccessType access_type;
-  Access(int32 command_index, AccessType access_type):
-      command_index(command_index), access_type(access_type) { }
+  Access(int32 command_index, AccessType access_type) :
+    command_index(command_index), access_type(access_type) { }
   bool operator < (const Access &other) const {
     return command_index < other.command_index;
   }
@@ -241,9 +241,9 @@ struct Access {
                      a vector of accesses, sorted by command index; each
                      command will only be listed once in this vector.  */
 void ComputeVariableAccesses(
-    const ComputationVariables &variables,
-    const std::vector<CommandAttributes> &command_attributes,
-    std::vector<std::vector<Access> > *variable_accesses);
+  const ComputationVariables &variables,
+  const std::vector<CommandAttributes> &command_attributes,
+  std::vector<std::vector<Access> > *variable_accesses);
 
 
 struct MatrixAccesses {
@@ -268,8 +268,8 @@ struct MatrixAccesses {
   /// true if this matrix is an output of the computation (i.e. either an
   /// output-value or an input-deriv).
   bool is_output;
-  MatrixAccesses(): allocate_command(-1), deallocate_command(-1),
-                    is_input(false), is_output(false) { }
+  MatrixAccesses() : allocate_command(-1), deallocate_command(-1),
+    is_input(false), is_output(false) { }
 };
 
 /**
@@ -279,15 +279,15 @@ struct MatrixAccesses {
    by matrix index (the same index as computation.matrices).
  */
 void ComputeMatrixAccesses(
-    const Nnet &nnet,
-    const NnetComputation &computation,
-    const ComputationVariables &variables,
-    const std::vector<CommandAttributes> &command_attributes,
-    std::vector<MatrixAccesses> *matrix_accesses);
+  const Nnet &nnet,
+  const NnetComputation &computation,
+  const ComputationVariables &variables,
+  const std::vector<CommandAttributes> &command_attributes,
+  std::vector<MatrixAccesses> *matrix_accesses);
 
 /// This function is to be used in debugging; it produces human-readable output.
 void PrintMatrixAccesses(std::ostream &os,
-                         const std::vector<MatrixAccesses> &matrix_accesses);
+    const std::vector<MatrixAccesses> &matrix_accesses);
 
 /// This struct exists to set up various pieces of analysis; it helps avoid the
 /// repetition of code where we compute all these things in sequence.
@@ -306,13 +306,13 @@ struct Analyzer {
 /// the extended comment above class VariableMergingOptimizer).
 /// Be careful about the meaninhg of 'access'- read the comments carefully.
 class ComputationAnalysis {
- public:
+public:
   /// This class stores the const references provided to its constructor ->
   /// be careful about changing them or deallocating them during the
   /// lifetime of this object.
   ComputationAnalysis(const NnetComputation &computation,
-                      const Analyzer &analyzer): computation_(computation),
-                                                 analyzer_(analyzer) { }
+      const Analyzer &analyzer) : computation_(computation),
+    analyzer_(analyzer) { }
 
   /// Returns the first command (read or write) that accesses any part of 's'
   /// except for zeroing it (i.e. kSetConst with zero alpha).
@@ -359,7 +359,7 @@ class ComputationAnalysis {
   /// (i.e. not the empty matrix).
   int32 LastMatrixAccess(int32 m) const;
 
- private:
+private:
   const NnetComputation &computation_;
   const Analyzer &analyzer_;
 };
@@ -370,7 +370,7 @@ class ComputationAnalysis {
 /// all the submatrix indexes that refer to matrix m.  Note,
 /// (*mat_to_submat)[0] will be the empty vector.
 void ComputeMatrixToSubmatrix(const NnetComputation &computation,
-                              std::vector<std::vector<int32> > *mat_to_submat);
+    std::vector<std::vector<int32> > *mat_to_submat);
 
 
 /**
@@ -382,10 +382,10 @@ int32 MaxMemoryUsage(const NnetComputation &computation);
 
 // computes a vector of attributes, one for each Command in the computation.
 void ComputeCommandAttributes(
-    const Nnet &nnet,
-    const NnetComputation &computation,
-    const ComputationVariables &variables,
-    std::vector<CommandAttributes> *attributes);
+  const Nnet &nnet,
+  const NnetComputation &computation,
+  const ComputationVariables &variables,
+  std::vector<CommandAttributes> *attributes);
 
 
 struct CheckComputationOptions {
@@ -399,8 +399,8 @@ struct CheckComputationOptions {
   // with another).
   bool check_unused_variables;
 
-  CheckComputationOptions():
-      check_rewrite(false), check_unused_variables(true) { }
+  CheckComputationOptions() :
+    check_rewrite(false), check_unused_variables(true) { }
 };
 
 
@@ -409,12 +409,12 @@ struct CheckComputationOptions {
 // computations and modify them in such a way that they can be checked by this
 // class (and then do extra checks).
 class ComputationChecker {
- public:
+public:
   ComputationChecker(const CheckComputationOptions &config,
-                     const Nnet &nnet,
-                     const NnetComputation &computation);
+      const Nnet &nnet,
+      const NnetComputation &computation);
   void Check();  // call this only once.
- private:
+private:
   // Various dimension consistency checks and checks on properties.
   void CheckComputationIndexes() const;
   // Checks for a situation where an undefined variable is read.
@@ -438,16 +438,16 @@ class ComputationChecker {
 /// This utility function works out from a computation, the command-indexes of
 /// the commands of the given type.
 void GetCommandsOfType(const NnetComputation &computation,
-                       CommandType t,
-                       std::vector<int32> *command_indexes);
+    CommandType t,
+    std::vector<int32> *command_indexes);
 
 /// This is a convenience interface for class ComputationChecker.  Call it with
 /// check_rewrite = true only if the computation is pre-optimization.
 /// If the computation is an 'online' computation, this function treats
 /// it specially.
 void CheckComputation(const Nnet &nnet,
-                      const NnetComputation &computation,
-                      bool check_rewrite = false);
+    const NnetComputation &computation,
+    bool check_rewrite = false);
 
 // This function returns the maximum amount of memory (in bytes) that the
 // computation uses at any point (this would be GPU memory if the computation

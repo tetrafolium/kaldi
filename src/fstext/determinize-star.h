@@ -63,7 +63,7 @@ namespace fst {
    memory the subsets of states, together with their leftover strings and their
    weights.  The only difference is we detect input epsilon transitions and
    treat them "specially".
-*/
+ */
 
 
 // This algorithm will be slightly faster if you sort the input fst on input label.
@@ -84,13 +84,13 @@ namespace fst {
     Caution, the return status is un-intuitive: this function will return false if
     determinization completed normally, and true if it was stopped early by
     reaching the 'max-states' limit, and a partial FST was generated.
-*/
+ */
 template<class F>
 bool DeterminizeStar(F &ifst, MutableFst<typename F::Arc> *ofst,
-                     float delta = kDelta,
-                     bool *debug_ptr = NULL,
-                     int max_states = -1,
-                     bool allow_partial = false);
+    float delta = kDelta,
+    bool *debug_ptr = NULL,
+    int max_states = -1,
+    bool allow_partial = false);
 
 
 
@@ -106,12 +106,12 @@ bool DeterminizeStar(F &ifst, MutableFst<typename F::Arc> *ofst,
     Caution, the return status is un-intuitive: this function will return false if
     determinization completed normally, and true if it was stopped early by
     reaching the 'max-states' limit, and a partial FST was generated.
-*/
+ */
 template<class F>
 bool DeterminizeStar(F &ifst, MutableFst<GallicArc<typename F::Arc> > *ofst,
-                     float delta = kDelta, bool *debug_ptr = NULL,
-                     int max_states = -1,
-                     bool allow_partial = false);
+    float delta = kDelta, bool *debug_ptr = NULL,
+    int max_states = -1,
+    bool allow_partial = false);
 
 
 /// @} end "addtogroup fst_extensions"

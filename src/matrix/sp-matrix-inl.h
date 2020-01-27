@@ -30,11 +30,11 @@ namespace kaldi {
 
 template<>
 double SolveQuadraticProblem(const SpMatrix<double> &H, const VectorBase<double> &g,
-                             const SolverOptions &opts, VectorBase<double> *x);
+    const SolverOptions &opts, VectorBase<double> *x);
 
 template<>
 float SolveQuadraticProblem(const SpMatrix<float> &H, const VectorBase<float> &g,
-                            const SolverOptions &opts, VectorBase<float> *x);
+    const SolverOptions &opts, VectorBase<float> *x);
 
 }  // namespace kaldi
 

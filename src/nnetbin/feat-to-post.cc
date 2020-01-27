@@ -29,12 +29,12 @@ int main(int argc, char *argv[]) {
   typedef kaldi::int32 int32;
   try {
     const char *usage =
-      "Convert features into posterior format, which is the generic format \n"
-      "of NN training targets in Karel's nnet1 tools.\n"
-      "(speed is not an issue for reasonably low NN-output dimensions)\n"
-      "Usage:  feat-to-post [options] feat-rspecifier posteriors-wspecifier\n"
-      "e.g.:\n"
-      " feat-to-post scp:feats.scp ark:feats.post\n";
+        "Convert features into posterior format, which is the generic format \n"
+        "of NN training targets in Karel's nnet1 tools.\n"
+        "(speed is not an issue for reasonably low NN-output dimensions)\n"
+        "Usage:  feat-to-post [options] feat-rspecifier posteriors-wspecifier\n"
+        "e.g.:\n"
+        " feat-to-post scp:feats.scp ark:feats.post\n";
 
     ParseOptions po(usage);
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
       num_done++;
       const Matrix<BaseFloat> &mat = feats_reader.Value();
       int32 num_frames = mat.NumRows(),
-        num_dims = mat.NumCols();
+          num_dims = mat.NumCols();
       // Posterior is vector<vector<pair<int32, BaseFloat> > >
       Posterior post(num_frames);
       // Fill posterior with matrix values,

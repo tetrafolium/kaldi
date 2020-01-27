@@ -47,13 +47,13 @@ struct RnnlmCoreTrainerOptions {
   BaseFloat backstitch_training_scale;
   int32 backstitch_training_interval;
 
-  RnnlmCoreTrainerOptions():
-      print_interval(100),
-      momentum(0.0),
-      max_param_change(2.0),
-      l2_regularize_factor(1.0),
-      backstitch_training_scale(0.0),
-      backstitch_training_interval(1) { }
+  RnnlmCoreTrainerOptions() :
+    print_interval(100),
+    momentum(0.0),
+    max_param_change(2.0),
+    l2_regularize_factor(1.0),
+    backstitch_training_scale(0.0),
+    backstitch_training_interval(1) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("momentum", &momentum, "Momentum constant to apply during "
@@ -86,20 +86,20 @@ struct RnnlmCoreTrainerOptions {
 
 
 class ObjectiveTracker {
- public:
+public:
   ObjectiveTracker(int32 reporting_interval);
 
 
   void AddStats(BaseFloat weight, BaseFloat num_objf,
-                BaseFloat den_objf,
-                BaseFloat exact_den_objf = 0.0);
+      BaseFloat den_objf,
+      BaseFloat exact_den_objf = 0.0);
 
 
   ~ObjectiveTracker();  // Prints stats for the final interval, and the overall
                         // stats.
 
 
- private:
+private:
   // prints the stats for the current interval.
   void PrintStatsThisInterval() const;
   // zeroes the stats for the current interval and adds them to
@@ -114,7 +114,7 @@ class ObjectiveTracker {
                                      // objective is to be divided by this.
   double num_objf_this_interval_;  // numerator term in objective
   double den_objf_this_interval_;  // denominator term in objective, to be
-                                  // added to numerator term.
+                                   // added to numerator term.
   // exact_den_objf_this_interval_ is the exact version of the denominator term,
   // of the form log(sum(...)) instead of sum(...).  This is included for
   // debugging and diagnostic purposes, and it will be zero if we're using
@@ -139,15 +139,15 @@ class ObjectiveTracker {
     these embeddings, it is not responsible for updating them.
  */
 class RnnlmCoreTrainer {
- public:
+public:
   /** Constructor.
        @param [in] config  Structure that holds configuration options
        @param [in,out] nnet   The neural network that is to be trained.
                               Will be modified each time you call Train().
    */
   RnnlmCoreTrainer(const RnnlmCoreTrainerOptions &config,
-                   const RnnlmObjectiveOptions &objective_config,
-                   nnet3::Nnet *nnet);
+      const RnnlmObjectiveOptions &objective_config,
+      nnet3::Nnet *nnet);
 
   /* Train on one minibatch.
        @param [in] minibatch  The RNNLM minibatch to train on, containing
@@ -165,22 +165,22 @@ class RnnlmCoreTrainer {
                             consistent with the word-ids present in 'minibatch'.
        @param [out] word_embedding_deriv  If supplied, the derivative of the
                             objective function w.r.t. the word embedding will be
-                            *added* to this location; it must have the same
+   * added* to this location; it must have the same
                             dimension as 'word_embedding'.
    */
   void Train(const RnnlmExample &minibatch,
-             const RnnlmExampleDerived &derived,
-             const CuMatrixBase<BaseFloat> &word_embedding,
-             CuMatrixBase<BaseFloat> *word_embedding_deriv = NULL);
+      const RnnlmExampleDerived &derived,
+      const CuMatrixBase<BaseFloat> &word_embedding,
+      CuMatrixBase<BaseFloat> *word_embedding_deriv = NULL);
 
   // The backstitch version of the above function. Depending
   // on whether is_backstitch_step1 is true, It could be either the first
   // (backward) step, or the second (forward) step of backstitch.
   void TrainBackstitch(bool is_backstitch_step1,
-                       const RnnlmExample &minibatch,
-                       const RnnlmExampleDerived &derived,
-                       const CuMatrixBase<BaseFloat> &word_embedding,
-                       CuMatrixBase<BaseFloat> *word_embedding_deriv = NULL);
+      const RnnlmExample &minibatch,
+      const RnnlmExampleDerived &derived,
+      const CuMatrixBase<BaseFloat> &word_embedding,
+      CuMatrixBase<BaseFloat> *word_embedding_deriv = NULL);
 
   // Prints out the final stats.
   void PrintTotalStats() const;
@@ -194,30 +194,30 @@ class RnnlmCoreTrainer {
   void ConsolidateMemory();
 
   ~RnnlmCoreTrainer();
- private:
+private:
 
   void ProvideInput(const RnnlmExample &minibatch,
-                    const RnnlmExampleDerived &derived,
-                    const CuMatrixBase<BaseFloat> &word_embedding,
-                    nnet3::NnetComputer *computer);
+      const RnnlmExampleDerived &derived,
+      const CuMatrixBase<BaseFloat> &word_embedding,
+      nnet3::NnetComputer *computer);
 
   /** Process the output of the neural net and record the objective function
       in objf_info_.
-   @param [in] is_backstitch_step1  If true update stats otherwise not.
-   @param [in] minibatch  The minibatch for which we're proessing the output.
-   @param [in] derived  Derived quantities from the minibatch.
-   @param [in] word_embedding  The word embedding, with the same numbering as
+     @param [in] is_backstitch_step1  If true update stats otherwise not.
+     @param [in] minibatch  The minibatch for which we're proessing the output.
+     @param [in] derived  Derived quantities from the minibatch.
+     @param [in] word_embedding  The word embedding, with the same numbering as
                       used in the minibatch (may be subsampled at this point).
-   @param [out] word_embedding_deriv  If non-NULL, the part of the derivative
+     @param [out] word_embedding_deriv  If non-NULL, the part of the derivative
                       w.r.t. the word-embedding that arises from the output
                       computation will be *added* to here.
-  */
+   */
   void ProcessOutput(bool is_backstitch_step1,
-                     const RnnlmExample &minibatch,
-                     const RnnlmExampleDerived &derived,
-                     const CuMatrixBase<BaseFloat> &word_embedding,
-                     nnet3::NnetComputer *computer,
-                     CuMatrixBase<BaseFloat> *word_embedding_deriv = NULL);
+      const RnnlmExample &minibatch,
+      const RnnlmExampleDerived &derived,
+      const CuMatrixBase<BaseFloat> &word_embedding,
+      nnet3::NnetComputer *computer,
+      CuMatrixBase<BaseFloat> *word_embedding_deriv = NULL);
 
   // Applies per-component max-change and global max-change to all updatable
   // components in *delta_nnet_, and use *delta_nnet_ to update parameters

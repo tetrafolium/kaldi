@@ -42,7 +42,7 @@
 namespace kaldi {
 
 class TcpServer {
- public:
+public:
   explicit TcpServer(int read_timeout);
   ~TcpServer();
 
@@ -58,7 +58,7 @@ class TcpServer {
 
   void Disconnect();
 
- private:
+private:
   struct ::sockaddr_in h_addr_;
   int32 server_desc_, client_desc_;
   int16 *samp_buf_;
@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
     // objects.  It takes a pointer to am_nnet because if it has iVectors it has
     // to modify the nnet to accept iVectors at intervals.
     nnet3::DecodableNnetSimpleLoopedInfo decodable_info(decodable_opts,
-                                                        &am_nnet);
+        &am_nnet);
 
     KALDI_VLOG(1) << "Loading FST...";
 
@@ -235,17 +235,17 @@ int main(int argc, char *argv[]) {
 
       OnlineNnet2FeaturePipeline feature_pipeline(feature_info);
       SingleUtteranceNnet3Decoder decoder(decoder_opts, trans_model,
-                                          decodable_info,
-                                          *decode_fst, &feature_pipeline);
+          decodable_info,
+          *decode_fst, &feature_pipeline);
 
       while (!eos) {
 
         decoder.InitDecoding(frame_offset);
         OnlineSilenceWeighting silence_weighting(
-            trans_model,
-            feature_info.silence_weighting_config,
-            decodable_opts.frame_subsampling_factor);
-        std::vector<std::pair<int32, BaseFloat>> delta_weights;
+          trans_model,
+          feature_info.silence_weighting_config,
+          decodable_opts.frame_subsampling_factor);
+        std::vector<std::pair<int32, BaseFloat> > delta_weights;
 
         while (true) {
           eos = !server.ReadChunk(chunk_len);

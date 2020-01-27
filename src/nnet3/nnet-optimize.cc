@@ -127,23 +127,23 @@ void NnetOptimizeOptions::Write(std::ostream &os, bool binary) const {
 
 bool NnetOptimizeOptions::operator == (const NnetOptimizeOptions &other) const {
   return (other.optimize == optimize &&
-          other.consolidate_model_update == consolidate_model_update &&
-          other.propagate_in_place == propagate_in_place &&
-          other.backprop_in_place == backprop_in_place &&
-          other.optimize_row_ops == optimize_row_ops &&
-          other.split_row_ops == split_row_ops &&
-          other.convert_addition == convert_addition &&
-          other.remove_assignments == remove_assignments &&
-          other.allow_left_merge == allow_left_merge &&
-          other.allow_right_merge == allow_right_merge &&
-          other.initialize_undefined == initialize_undefined &&
-          other.move_sizing_commands == move_sizing_commands &&
-          other.allocate_from_other == allocate_from_other &&
-          other.min_deriv_time == min_deriv_time &&
-          other.max_deriv_time == max_deriv_time &&
-          other.max_deriv_time_relative == max_deriv_time_relative &&
-          other.snip_row_ops == snip_row_ops &&
-          other.memory_compression_level == memory_compression_level);
+         other.consolidate_model_update == consolidate_model_update &&
+         other.propagate_in_place == propagate_in_place &&
+         other.backprop_in_place == backprop_in_place &&
+         other.optimize_row_ops == optimize_row_ops &&
+         other.split_row_ops == split_row_ops &&
+         other.convert_addition == convert_addition &&
+         other.remove_assignments == remove_assignments &&
+         other.allow_left_merge == allow_left_merge &&
+         other.allow_right_merge == allow_right_merge &&
+         other.initialize_undefined == initialize_undefined &&
+         other.move_sizing_commands == move_sizing_commands &&
+         other.allocate_from_other == allocate_from_other &&
+         other.min_deriv_time == min_deriv_time &&
+         other.max_deriv_time == max_deriv_time &&
+         other.max_deriv_time_relative == max_deriv_time_relative &&
+         other.snip_row_ops == snip_row_ops &&
+         other.memory_compression_level == memory_compression_level);
 }
 
 // move commands that resize and zero matrices to as late/early as possible.
@@ -185,7 +185,7 @@ void MoveSizingCommands(const Nnet &nnet, NnetComputation *computation) {
   // 'command_reordering' contains (new-number, old-number) of commands.
   // the new-number is multiplied by 3 for reasons explained above.
   std::vector<std::pair<int32,int32> >
-      command_reordering(num_commands);
+  command_reordering(num_commands);
   // Note: for now we include the second-elements-of-pairs (i.e.  the zeroing
   // commands that follow allocation commands) here; we'll ignore them later.
   for (int32 c = 0; c < num_commands; c++) {
@@ -260,7 +260,7 @@ void MoveSizingCommands(const Nnet &nnet, NnetComputation *computation) {
 // This function removes commands of type kSetConst (with alpha=0.0), where
 // possible.
 void RemoveUnnecessaryZeroing(const Nnet &nnet,
-                              NnetComputation *computation) {
+    NnetComputation *computation) {
   Analyzer a;
   a.Init(nnet, *computation);
 
@@ -277,7 +277,7 @@ void RemoveUnnecessaryZeroing(const Nnet &nnet,
     NnetComputation::Command *command =
         &(computation->commands[zeroing_command_index]);
     if (!(command->command_type == kSetConst &&
-          command->alpha == 0.0)) {
+        command->alpha == 0.0)) {
       continue;  // First command is not a zeroing command
     }
     // OK, the first command that accesses this matrix is a zeroing command;
@@ -314,20 +314,20 @@ void RemoveUnnecessaryZeroing(const Nnet &nnet,
 }
 
 /*
-  This function is called from RemoveUnnecessaryAllocation.  The input is two
-  sorted, unique lists, of (deallocation-commands, allocation-commands)
-  e.g. (d1, d2, d3.. ), (a1, a2, a3..); and to the output is *appended* a list
-  of pairs (d, a).  Each output pair must satisfy the property that d < a, and
-  no member of the input lists may appear more than once in the output pairs
-  (although it's OK for input a and d values not to appear in any output pairs).
+   This function is called from RemoveUnnecessaryAllocation.  The input is two
+   sorted, unique lists, of (deallocation-commands, allocation-commands)
+   e.g. (d1, d2, d3.. ), (a1, a2, a3..); and to the output is *appended* a list
+   of pairs (d, a).  Each output pair must satisfy the property that d < a, and
+   no member of the input lists may appear more than once in the output pairs
+   (although it's OK for input a and d values not to appear in any output pairs).
 
-  The goal of the implementation is to output as many pairs as possible, and
-  secondarily for the pairs to be as close as possible to each other (to avoid
-  wasting too much memory).  I'm not sure if this implementation achieves that.
-*/
+   The goal of the implementation is to output as many pairs as possible, and
+   secondarily for the pairs to be as close as possible to each other (to avoid
+   wasting too much memory).  I'm not sure if this implementation achieves that.
+ */
 static void ComputeCommandPairs(
-    const std::pair<std::vector<int32>, std::vector<int32> > &lists,
-    std::vector<std::pair<int32,int32> > *pairs) {
+  const std::pair<std::vector<int32>, std::vector<int32> > &lists,
+  std::vector<std::pair<int32,int32> > *pairs) {
   std::vector<int32> d_list = lists.first;
 
   std::set<int32> a_set;
@@ -353,7 +353,7 @@ static void ComputeCommandPairs(
 }
 
 void RemoveUnnecessaryAllocation(const Nnet &nnet,
-                                 NnetComputation *computation) {
+    NnetComputation *computation) {
   // For each size of matrix and stride-type, represented as a pair<int32,int32>
   // (the num-rows, and the num-cols * (stride-type == kDefaultStride ? 1 : -1), we
   // accumulate a list of indexes of deallocation commands that
@@ -367,8 +367,8 @@ void RemoveUnnecessaryAllocation(const Nnet &nnet,
   // (deallocation-commands, allocation-commands).  The order may seem
   // backwards, but that's the order of the pairs we are looking for.
   typedef unordered_map<std::pair<int32,int32>,
-      std::pair<std::vector<int32>,std::vector<int32> >,
-      PairHasher<int32> > MapType;
+          std::pair<std::vector<int32>,std::vector<int32> >,
+          PairHasher<int32> > MapType;
   MapType pair_map;
   int32 num_commands = computation->commands.size();
   for (int32 command_index = 0; command_index < num_commands; command_index++) {
@@ -379,7 +379,7 @@ void RemoveUnnecessaryAllocation(const Nnet &nnet,
           num_rows = computation->matrices[m].num_rows,
           num_cols = computation->matrices[m].num_cols,
           num_cols_mod = num_cols * (
-              computation->matrices[m].stride_type == kDefaultStride ? 1 : -1);
+        computation->matrices[m].stride_type == kDefaultStride ? 1 : -1);
       std::pair<int32,int32> p(num_rows, num_cols_mod);
       std::pair<std::vector<int32>,std::vector<int32> > &lists = pair_map[p];
       if (command.command_type == kDeallocMatrix)
@@ -398,8 +398,8 @@ void RemoveUnnecessaryAllocation(const Nnet &nnet,
     int32 dealloc_index = command_pairs[i].first,
         alloc_index = command_pairs[i].second;
     NnetComputation::Command
-        &dealloc_command = computation->commands[dealloc_index],
-        &alloc_command = computation->commands[alloc_index];
+    &dealloc_command = computation->commands[dealloc_index],
+    &alloc_command = computation->commands[alloc_index];
     KALDI_ASSERT(dealloc_command.command_type ==
                  kDeallocMatrix);
     KALDI_ASSERT(alloc_command.command_type ==
@@ -415,8 +415,8 @@ void RemoveUnnecessaryAllocation(const Nnet &nnet,
 
 
 void VariableMergingOptimization(const NnetOptimizeOptions &config,
-                                 const Nnet &nnet,
-                                 NnetComputation *computation) {
+    const Nnet &nnet,
+    NnetComputation *computation) {
   bool changed = true;
   while (changed) {
     changed = false;
@@ -428,7 +428,7 @@ void VariableMergingOptimization(const NnetOptimizeOptions &config,
 
 
 void ConvertAdditionToAssignment(const Nnet &nnet,
-                                 NnetComputation *computation) {
+    NnetComputation *computation) {
   Analyzer analyzer;
   analyzer.Init(nnet, *computation);
   ComputationAnalysis analysis(*computation, analyzer);
@@ -436,46 +436,46 @@ void ConvertAdditionToAssignment(const Nnet &nnet,
   for (int32 command = 0; command < num_commands; command++) {
     NnetComputation::Command &c = computation->commands[command];
     switch (c.command_type) {
-      case kMatrixAdd: case kAddRows: case kAddRowsMulti:
-      case kAddToRowsMulti: {
-        const std::vector<int32> &submatrices_written =
-            analyzer.command_attributes[command].submatrices_written;
-        KALDI_ASSERT(!submatrices_written.empty());
-        std::vector<int32>::const_iterator iter = submatrices_written.begin(),
-            end = submatrices_written.end();
-        bool can_convert = true;
-        for (; iter != end; ++iter) {
-          int32 submatrix_written = *iter;
-          int32 first_access_command = analysis.FirstNontrivialAccess(
+    case kMatrixAdd: case kAddRows: case kAddRowsMulti:
+    case kAddToRowsMulti: {
+      const std::vector<int32> &submatrices_written =
+          analyzer.command_attributes[command].submatrices_written;
+      KALDI_ASSERT(!submatrices_written.empty());
+      std::vector<int32>::const_iterator iter = submatrices_written.begin(),
+          end = submatrices_written.end();
+      bool can_convert = true;
+      for (; iter != end; ++iter) {
+        int32 submatrix_written = *iter;
+        int32 first_access_command = analysis.FirstNontrivialAccess(
               submatrix_written);
-          // first_access_command is first command other than zeroing and
-          // allocation that accesses this submatrix.  It can be assumed to be a
-          // write command, since it makes no sense to read a variable before
-          // it's written to.  If it's before this command then we need to add
-          // rather than copy; we can't do the conversion to a copy command.
-          if (first_access_command != command) {
-            can_convert = false;
-            break;
-          }
+        // first_access_command is first command other than zeroing and
+        // allocation that accesses this submatrix.  It can be assumed to be a
+        // write command, since it makes no sense to read a variable before
+        // it's written to.  If it's before this command then we need to add
+        // rather than copy; we can't do the conversion to a copy command.
+        if (first_access_command != command) {
+          can_convert = false;
+          break;
         }
-        if (can_convert) {  // convert to a copy command.
-          switch (c.command_type) {
-            case kMatrixAdd: c.command_type = kMatrixCopy;
-              break;
-            case kAddRows: c.command_type = kCopyRows;
-               break;
-            case kAddRowsMulti: c.command_type = kCopyRowsMulti;
-              break;
-            // note: kCopyToRowsMulti does not currently support alpha != 1.0.
-            case kAddToRowsMulti: if (c.alpha == 1.0) c.command_type = kCopyToRowsMulti;
-              break;
-            default: KALDI_ERR << "Unexpected command type.";
-          }
-        }
-        break;
       }
-      default:
-        break;
+      if (can_convert) {    // convert to a copy command.
+        switch (c.command_type) {
+        case kMatrixAdd: c.command_type = kMatrixCopy;
+          break;
+        case kAddRows: c.command_type = kCopyRows;
+          break;
+        case kAddRowsMulti: c.command_type = kCopyRowsMulti;
+          break;
+        // note: kCopyToRowsMulti does not currently support alpha != 1.0.
+        case kAddToRowsMulti: if (c.alpha == 1.0) c.command_type = kCopyToRowsMulti;
+          break;
+        default: KALDI_ERR << "Unexpected command type.";
+        }
+      }
+      break;
+    }
+    default:
+      break;
     }
   }
 }
@@ -499,9 +499,9 @@ int32 MaxOutputTimeInRequest(const ComputationRequest &request) {
 
 
 void Optimize(const NnetOptimizeOptions &config,
-              const Nnet &nnet,
-              int32 max_output_time_in_request,
-              NnetComputation *computation) {
+    const Nnet &nnet,
+    int32 max_output_time_in_request,
+    NnetComputation *computation) {
   if (GetVerboseLevel() >= 3) {
     CheckComputation(nnet, *computation, true);
     KALDI_LOG << "Before optimization, max memory use (bytes) = "
@@ -541,7 +541,7 @@ void Optimize(const NnetOptimizeOptions &config,
 
 
   if (config.optimize &&  (config.snip_row_ops || config.optimize_row_ops ||
-                           config.split_row_ops)) {
+      config.split_row_ops)) {
     bool must_renumber = false;
     if (config.snip_row_ops && SnipRowOps(computation))
       must_renumber = true;
@@ -567,7 +567,7 @@ void Optimize(const NnetOptimizeOptions &config,
 
   if (config.optimize &&
       (config.remove_assignments || config.backprop_in_place ||
-       config.propagate_in_place)) {
+      config.propagate_in_place)) {
     VariableMergingOptimization(config, nnet, computation);
     if (GetVerboseLevel() >= 3)
       CheckComputation(nnet, *computation, false);
@@ -633,28 +633,28 @@ void Optimize(const NnetOptimizeOptions &config,
 
 
 CachingOptimizingCompiler::CachingOptimizingCompiler(
-    const Nnet &nnet,
-    const CachingOptimizingCompilerOptions config):
-    nnet_(nnet), config_(config),
-    seconds_taken_total_(0.0), seconds_taken_compile_(0.0),
-    seconds_taken_optimize_(0.0), seconds_taken_expand_(0.0),
-    seconds_taken_check_(0.0), seconds_taken_indexes_(0.0),
-    seconds_taken_io_(0.0), cache_(config.cache_capacity),
-    nnet_left_context_(-1), nnet_right_context_(-1) { }
+  const Nnet &nnet,
+  const CachingOptimizingCompilerOptions config) :
+  nnet_(nnet), config_(config),
+  seconds_taken_total_(0.0), seconds_taken_compile_(0.0),
+  seconds_taken_optimize_(0.0), seconds_taken_expand_(0.0),
+  seconds_taken_check_(0.0), seconds_taken_indexes_(0.0),
+  seconds_taken_io_(0.0), cache_(config.cache_capacity),
+  nnet_left_context_(-1), nnet_right_context_(-1) { }
 
 CachingOptimizingCompiler::CachingOptimizingCompiler(
-    const Nnet &nnet,
-    const NnetOptimizeOptions &opt_config,
-    const CachingOptimizingCompilerOptions config):
-    nnet_(nnet), config_(config), opt_config_(opt_config),
-    seconds_taken_total_(0.0), seconds_taken_compile_(0.0),
-    seconds_taken_optimize_(0.0), seconds_taken_expand_(0.0),
-    seconds_taken_check_(0.0), seconds_taken_indexes_(0.0),
-    seconds_taken_io_(0.0), cache_(config.cache_capacity),
-    nnet_left_context_(-1), nnet_right_context_(-1) { }
+  const Nnet &nnet,
+  const NnetOptimizeOptions &opt_config,
+  const CachingOptimizingCompilerOptions config) :
+  nnet_(nnet), config_(config), opt_config_(opt_config),
+  seconds_taken_total_(0.0), seconds_taken_compile_(0.0),
+  seconds_taken_optimize_(0.0), seconds_taken_expand_(0.0),
+  seconds_taken_check_(0.0), seconds_taken_indexes_(0.0),
+  seconds_taken_io_(0.0), cache_(config.cache_capacity),
+  nnet_left_context_(-1), nnet_right_context_(-1) { }
 
 void CachingOptimizingCompiler::GetSimpleNnetContext(
-    int32 *nnet_left_context, int32 *nnet_right_context) {
+  int32 *nnet_left_context, int32 *nnet_right_context) {
   if (nnet_left_context_ == -1) {
     ComputeSimpleNnetContext(nnet_, &nnet_left_context_,
                              &nnet_right_context_);
@@ -714,7 +714,7 @@ CachingOptimizingCompiler::~CachingOptimizingCompiler() {
 }
 
 std::shared_ptr<const NnetComputation> CachingOptimizingCompiler::Compile(
-    const ComputationRequest  &in_request) {
+  const ComputationRequest  &in_request) {
   Timer timer;
   std::shared_ptr<const NnetComputation>  ans = CompileInternal(in_request);
   seconds_taken_total_ += timer.Elapsed();
@@ -722,7 +722,7 @@ std::shared_ptr<const NnetComputation> CachingOptimizingCompiler::Compile(
 }
 
 std::shared_ptr<const NnetComputation> CachingOptimizingCompiler::CompileInternal(
-    const ComputationRequest  &request) {
+  const ComputationRequest  &request) {
   std::shared_ptr<const NnetComputation> ans = cache_.Find(request);
   if (ans != NULL) {
     return ans;
@@ -739,7 +739,7 @@ std::shared_ptr<const NnetComputation> CachingOptimizingCompiler::CompileInterna
 
 
 const NnetComputation *CachingOptimizingCompiler::CompileNoShortcut(
-    const ComputationRequest &request) {
+  const ComputationRequest &request) {
 
   Compiler compiler(request, nnet_);
   // note: 'opts' only contains 'output_debug_info', which is true by default.
@@ -806,7 +806,7 @@ const NnetComputation *CachingOptimizingCompiler::CompileNoShortcut(
 
 
 const NnetComputation *CachingOptimizingCompiler::CompileViaShortcut(
-    const ComputationRequest &request) {
+  const ComputationRequest &request) {
   int32 num_n_values;
   ComputationRequest mini_request;
   if (!RequestIsDecomposable(request, &mini_request, &num_n_values))
@@ -850,8 +850,8 @@ const NnetComputation *CachingOptimizingCompiler::CompileViaShortcut(
 /// 'segments', so the commands in the segment (not including
 /// kNoOperationMarker) are numbered from start ... end - 1.
 static void SplitComputationIntoSegments(
-    const NnetComputation &computation,
-    std::vector<std::pair<int32, int32> > *segments) {
+  const NnetComputation &computation,
+  std::vector<std::pair<int32, int32> > *segments) {
 
   int32 num_commands = computation.commands.size();
   segments->clear();
@@ -867,7 +867,7 @@ static void SplitComputationIntoSegments(
 
 
 void ConsolidateIoOperations(const Nnet &nnet,
-                             NnetComputation *computation) {
+    NnetComputation *computation) {
   // These segments, represented as (start-index, end-index),
   // are segments of the computation separated by kNoOperationMarker.
   std::vector<std::pair<int32, int32> > segments;

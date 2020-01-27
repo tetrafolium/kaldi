@@ -21,9 +21,9 @@
 
 namespace kaldi {
 
-OnlineTimingStats::OnlineTimingStats():
-    num_utts_(0), total_audio_(0.0), total_time_taken_(0.0),
-    total_time_waited_(0.0), max_delay_(0.0) {
+OnlineTimingStats::OnlineTimingStats() :
+  num_utts_(0), total_audio_(0.0), total_time_taken_(0.0),
+  total_time_waited_(0.0), max_delay_(0.0) {
 }
 
 void OnlineTimingStats::Print(bool online){
@@ -59,8 +59,8 @@ void OnlineTimingStats::Print(bool online){
   }
 }
 
-OnlineTimer::OnlineTimer(const std::string &utterance_id):
-    utterance_id_(utterance_id), waited_(0.0), utterance_length_(0.0) { }
+OnlineTimer::OnlineTimer(const std::string &utterance_id) :
+  utterance_id_(utterance_id), waited_(0.0), utterance_length_(0.0) { }
 
 void OnlineTimer::WaitUntil(double cur_utterance_length) {
   double elapsed = timer_.Elapsed();
@@ -106,7 +106,7 @@ void OnlineTimer::OutputStats(OnlineTimingStats *stats) {
   KALDI_VLOG(2) << "Latency " << wait_time << " seconds out of "
                 << utterance_length_ << ", for utterance "
                 << utterance_id_;
-  
+
   stats->num_utts_++;
   stats->total_audio_ += utterance_length_;
   stats->total_time_taken_ += processing_time;

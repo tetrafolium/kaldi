@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 
     AccumDiagGmm gmm_accs;
     gmm_accs.Resize(gmm, StringToGmmFlags(update_flags_str));
-    
+
     double tot_like = 0.0, tot_weight = 0.0;
 
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
           continue;
         }
       }
-      
+
       if (gselect_rspecifier != "") {
         if (!gselect_reader.HasKey(key)) {
           KALDI_WARN << "No gselect information for utterance " << key;
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
           num_err++;
           continue;
         }
-        
+
         for (int32 i = 0; i < file_frames; i++) {
           BaseFloat weight = (weights.Dim() != 0) ? weights(i) : 1.0;
           if (weight == 0.0) continue;

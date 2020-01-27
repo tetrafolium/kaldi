@@ -38,10 +38,10 @@ namespace kaldi {
 /** A class for estimating Maximum Likelihood Linear Transform, also known
     as global Semi-tied Covariance (STC), for GMMs.
     The resulting transform left-multiplies the feature vector.
-*/
+ */
 class MlltAccs {
- public:
-  MlltAccs(): rand_prune_(0.0), beta_(0.0) { }
+public:
+  MlltAccs() : rand_prune_(0.0), beta_(0.0) { }
 
   /// Need rand_prune >= 0.
   /// The larger it is, the faster it will be.  Zero is exact.
@@ -67,35 +67,35 @@ class MlltAccs {
   ///  @param [out] objf_impr_out  The objective function improvement
   ///  @param [out] count_out  The data-count
   void Update(MatrixBase<BaseFloat> *M,
-              BaseFloat *objf_impr_out,
-              BaseFloat *count_out) const {
+      BaseFloat *objf_impr_out,
+      BaseFloat *count_out) const {
     Update(beta_, G_, M, objf_impr_out, count_out);
   }
 
   // A static version of the Update function, so it can
   // be called externally, given the right stats.
   static void Update(double beta,
-                     const std::vector<SpMatrix<double> > &G,
-                     MatrixBase<BaseFloat> *M,
-                     BaseFloat *objf_impr_out,
-                     BaseFloat *count_out);
+      const std::vector<SpMatrix<double> > &G,
+      MatrixBase<BaseFloat> *M,
+      BaseFloat *objf_impr_out,
+      BaseFloat *count_out);
 
 
   void AccumulateFromPosteriors(const DiagGmm &gmm,
-                                const VectorBase<BaseFloat> &data,
-                                const VectorBase<BaseFloat> &posteriors);
+      const VectorBase<BaseFloat> &data,
+      const VectorBase<BaseFloat> &posteriors);
 
   // Returns GMM likelihood.
   BaseFloat AccumulateFromGmm(const DiagGmm &gmm,
-                              const VectorBase<BaseFloat> &data,
-                              BaseFloat weight);  // e.g. weight = 1.0
+      const VectorBase<BaseFloat> &data,
+      BaseFloat weight);                          // e.g. weight = 1.0
 
   BaseFloat AccumulateFromGmmPreselect(const DiagGmm &gmm,
-                                       const std::vector<int32> &gselect,
-                                       const VectorBase<BaseFloat> &data,
-                                       BaseFloat weight);  // e.g. weight = 1.0
+      const std::vector<int32> &gselect,
+      const VectorBase<BaseFloat> &data,
+      BaseFloat weight);                                   // e.g. weight = 1.0
 
-  
+
   // premultiplies the means of the model by M.  typically called
   // after update.
   // removed since we now do this using different code.

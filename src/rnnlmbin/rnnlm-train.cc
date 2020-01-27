@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
         rnnlm_wxfilename == "" ||
         embedding_rxfilename == "") {
       KALDI_WARN << "--read-rnnlm, --write-rnnlm and --read-embedding "
-          "options are required.";
+        "options are required.";
       po.PrintUsage();
       exit(1);
     }
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
     if (!IsSimpleNnet(rnnlm))
       KALDI_ERR << "Input RNNLM in " << rnnlm_rxfilename
                 << " is not the type of neural net we were looking for; "
-          "failed IsSimpleNnet().";
+        "failed IsSimpleNnet().";
 
     CuMatrix<BaseFloat> embedding_mat;
     ReadKaldiObject(embedding_rxfilename, &embedding_mat);
@@ -161,9 +161,9 @@ int main(int argc, char *argv[]) {
       bool train_embedding = (embedding_wxfilename != "");
 
       RnnlmTrainer trainer(
-          train_embedding, core_config, embedding_config, objective_config,
-          (word_features_rxfilename != "" ? &word_feature_mat : NULL),
-          &embedding_mat, &rnnlm);
+        train_embedding, core_config, embedding_config, objective_config,
+        (word_features_rxfilename != "" ? &word_feature_mat : NULL),
+        &embedding_mat, &rnnlm);
 
       SequentialRnnlmExampleReader example_reader(examples_rspecifier);
 

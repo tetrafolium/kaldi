@@ -32,13 +32,13 @@
 namespace kaldi {
 
 /*
-  Class for applying linear approximations to VTLN transforms;
-  see \ref transform_lvtln.
-*/
+   Class for applying linear approximations to VTLN transforms;
+   see \ref transform_lvtln.
+ */
 
 
 class LinearVtln {
- public:
+public:
   LinearVtln() { } // This initializer will probably be used prior to calling
   // Read().
 
@@ -62,13 +62,13 @@ class LinearVtln {
 
   /// Compute the transform for the speaker.
   void ComputeTransform(const FmllrDiagGmmAccs &accs,
-                        std::string norm_type,  // type of regular fMLLR computation: "none", "offset", "diag"
-                        BaseFloat logdet_scale,  // scale on logdet (1.0 is "correct" but less may work better)
-                        MatrixBase<BaseFloat> *Ws,  // output fMLLR transform, should be size dim x dim+1
-                        int32 *class_idx,  // the transform that was chosen...
-                        BaseFloat *logdet_out,
-                        BaseFloat *objf_impr = NULL,  // versus no transform
-                        BaseFloat *count = NULL);
+      std::string norm_type,                    // type of regular fMLLR computation: "none", "offset", "diag"
+      BaseFloat logdet_scale,                    // scale on logdet (1.0 is "correct" but less may work better)
+      MatrixBase<BaseFloat> *Ws,                    // output fMLLR transform, should be size dim x dim+1
+      int32 *class_idx,                    // the transform that was chosen...
+      BaseFloat *logdet_out,
+      BaseFloat *objf_impr = NULL,                    // versus no transform
+      BaseFloat *count = NULL);
 
   void Read(std::istream &is, bool binary);
 
@@ -79,17 +79,17 @@ class LinearVtln {
   // This computes the offset term for this class given these
   // stats.
   void GetOffset(const FmllrDiagGmmAccs &speaker_stats,
-                 int32 class_idx,
-                 VectorBase<BaseFloat> *offset) const;
+      int32 class_idx,
+      VectorBase<BaseFloat> *offset) const;
 
   friend class LinearVtlnStats;
- protected:
+protected:
   int32 default_class_;  // transform we return if we have no data.
   std::vector<Matrix<BaseFloat> > A_;  // Square parts of the FMLLR matrices.
   std::vector<BaseFloat> logdets_;
   std::vector<BaseFloat> warps_; // This variable can be used to store the
                                  // warp factors that each transform correspond to.
-  
+
 
 };
 

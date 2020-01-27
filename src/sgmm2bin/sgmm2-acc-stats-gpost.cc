@@ -69,9 +69,9 @@ int main(int argc, char *argv[]) {
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
     RandomAccessSgmm2GauPostReader gpost_reader(gpost_rspecifier);
     RandomAccessBaseFloatVectorReaderMapped spkvecs_reader(spkvecs_rspecifier,
-                                                           utt2spk_rspecifier);
+        utt2spk_rspecifier);
     RandomAccessTokenReader utt2spk_map(utt2spk_rspecifier);
-    
+
     AmSgmm2 am_sgmm;
     TransitionModel trans_model;
     {
@@ -88,11 +88,11 @@ int main(int argc, char *argv[]) {
 
     double tot_t = 0.0;
     kaldi::Sgmm2PerFrameDerivedVars per_frame_vars;
-    
+
     int32 num_done = 0, num_err = 0;
     std::string cur_spk;
     Sgmm2PerSpkDerivedVars spk_vars;
-    
+
     for (; !feature_reader.Done(); feature_reader.Next()) {
       std::string utt = feature_reader.Key();
       std::string spk = utt;
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
 
       if (spk != cur_spk && cur_spk != "")
         sgmm_accs.CommitStatsForSpk(am_sgmm, spk_vars);
-      
+
       if (spk != cur_spk || spk_vars.Empty()) {
         spk_vars.Clear();
         if (spkvecs_reader.IsOpen()) {
@@ -122,8 +122,8 @@ int main(int argc, char *argv[]) {
         } // else spk_vars is "empty"
       }
 
-      cur_spk = spk;      
-      
+      cur_spk = spk;
+
       const Matrix<BaseFloat> &mat = feature_reader.Value();
       if (!gpost_reader.HasKey(utt) ||
           gpost_reader.Value(utt).size() != mat.NumRows()) {
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
         continue;
       }
       const Sgmm2GauPost &gpost = gpost_reader.Value(utt);
-      
+
       num_done++;
       BaseFloat tot_weight = 0.0;
 
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
         for (size_t j = 0; j < gpost[i].tids.size(); j++) {
           int32 tid = gpost[i].tids[j],  // transition identifier.
               pdf_id = trans_model.TransitionIdToPdf(tid);
-          
+
           BaseFloat weight = gpost[i].posteriors[j].Sum();
           trans_model.Accumulate(weight, tid, &transition_accs);
           sgmm_accs.AccumulateFromPosteriors(am_sgmm, per_frame_vars,
@@ -157,10 +157,10 @@ int main(int argc, char *argv[]) {
 
       tot_t += tot_weight;
       if (num_done % 50 == 0)
-        KALDI_LOG << "Processed " << num_done << " utterances";      
+        KALDI_LOG << "Processed " << num_done << " utterances";
     }
     sgmm_accs.CommitStatsForSpk(am_sgmm, spk_vars); // for last speaker
-    
+
     KALDI_LOG << "Overall number of frames is " << tot_t;
     KALDI_LOG << "Done " << num_done << " files, "
               << num_err << " with errors.";

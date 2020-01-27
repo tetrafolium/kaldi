@@ -42,9 +42,9 @@ int main(int argc, char *argv[]) {
         "nnet3-chain-normalize-egs dir/normalization.fst ark:train_in.cegs ark:train_out.cegs\n";
 
     BaseFloat normalization_fst_scale = 1.0;
-    
+
     ParseOptions po(usage);
-    po.Register("normalization-fst-scale", &normalization_fst_scale, 
+    po.Register("normalization-fst-scale", &normalization_fst_scale,
                 "Scale the weights from the "
                 "'normalization' FST before applying them to the examples. "
                 "(Useful for semi-supervised training)");
@@ -57,8 +57,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string normalization_fst_rxfilename = po.GetArg(1),
-                         examples_rspecifier = po.GetArg(2),
-                         examples_wspecifier = po.GetArg(3);
+        examples_rspecifier = po.GetArg(2),
+        examples_wspecifier = po.GetArg(3);
 
     fst::StdVectorFst normalization_fst;
     ReadFstKaldi(normalization_fst_rxfilename, &normalization_fst);

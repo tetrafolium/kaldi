@@ -47,16 +47,16 @@ namespace cuda_decoder {
 // BatchedThreadedNnet3CudaPipeline
 struct BatchedThreadedNnet3CudaPipelineConfig {
   BatchedThreadedNnet3CudaPipelineConfig()
-      : max_batch_size(200),
-        num_channels(-1),
-        batch_drain_size(10),
-        num_control_threads(2),
-        num_worker_threads(20),
-        determinize_lattice(true),
-        max_pending_tasks(4000),
-        pending_queue_padding(10),
-        num_decoder_copy_threads(2),
-        gpu_feature_extract(true) {};
+    : max_batch_size(200),
+    num_channels(-1),
+    batch_drain_size(10),
+    num_control_threads(2),
+    num_worker_threads(20),
+    determinize_lattice(true),
+    max_pending_tasks(4000),
+    pending_queue_padding(10),
+    num_decoder_copy_threads(2),
+    gpu_feature_extract(true) {};
   void Register(OptionsItf *po) {
     po->Register("max-batch-size", &max_batch_size,
                  "The maximum batch size to be used by the decoder. "
@@ -64,13 +64,13 @@ struct BatchedThreadedNnet3CudaPipelineConfig {
                  "Larger = Faster and more GPU memory used.");
     std::ostringstream num_channels_desc;
     num_channels_desc
-        << "The number of channels "
-           "allocated to the cuda decoder.  This should be larger "
-           "than max_batch_size.  Each channel consumes a small "
-           "amount of memory but also allows us to better overlap "
-           "computation"
-           " (-1 = set to "
-        << KALDI_CUDA_DECODER_CHANNELS_BATCH_SIZE_RATIO << "*max-batch-size).";
+      << "The number of channels "
+      "allocated to the cuda decoder.  This should be larger "
+      "than max_batch_size.  Each channel consumes a small "
+      "amount of memory but also allows us to better overlap "
+      "computation"
+      " (-1 = set to "
+      << KALDI_CUDA_DECODER_CHANNELS_BATCH_SIZE_RATIO << "*max-batch-size).";
     po->Register("num-channels", &num_channels, num_channels_desc.str());
     po->Register("batch-drain-size", &batch_drain_size,
                  "How far to drain the batch before refilling work. This "
@@ -132,165 +132,165 @@ struct BatchedThreadedNnet3CudaPipelineConfig {
  */
 class BatchedThreadedNnet3CudaPipeline {
 public:
- BatchedThreadedNnet3CudaPipeline(
-     const BatchedThreadedNnet3CudaPipelineConfig &config)
-     : config_(config), all_group_tasks_not_done_(0) {
-   config_.ComputeConfig();
- };
+  BatchedThreadedNnet3CudaPipeline(
+    const BatchedThreadedNnet3CudaPipelineConfig &config)
+    : config_(config), all_group_tasks_not_done_(0) {
+    config_.ComputeConfig();
+  };
 
- // allocates reusable objects that are common across all decodings
- void Initialize(const fst::Fst<fst::StdArc> &decode_fst,
-                 const nnet3::AmNnetSimple &nnet,
-                 const TransitionModel &trans_model);
+  // allocates reusable objects that are common across all decodings
+  void Initialize(const fst::Fst<fst::StdArc> &decode_fst,
+      const nnet3::AmNnetSimple &nnet,
+      const TransitionModel &trans_model);
 
- // deallocates reusable objects
- void Finalize();
+  // deallocates reusable objects
+  void Finalize();
 
- // query a specific key to see if compute on it is complete
- bool isFinished(const std::string &key);
+  // query a specific key to see if compute on it is complete
+  bool isFinished(const std::string &key);
 
- // remove an audio file from the decoding and clean up resources
- void CloseDecodeHandle(const std::string &key);
- void CloseAllDecodeHandlesForGroup(const std::string &group);
- void CloseAllDecodeHandles();
+  // remove an audio file from the decoding and clean up resources
+  void CloseDecodeHandle(const std::string &key);
+  void CloseAllDecodeHandlesForGroup(const std::string &group);
+  void CloseAllDecodeHandles();
 
- // Adds a decoding task to the decoder
- // When passing in a vector of data, the caller must ensure the data exists
- // until the CloseDecodeHandle/WaitForAllTasks is called
- // callback is called once task is done and we pass it the final lattice
- // callback can be used to compute lattice rescoring, find best path in
- // lattice, writing lattice to disk, etc.
- // Important: callback is launched in the threadpool. It must be threadsafe.
- // For instance, if writing to disk, or to stdout,
- // use a lock:
- // e.g. :
- // {
- // 	std::lock_guard<std::mutex> lock(global_mutex);
- // 	// write lattice to disk
- //    // lock is released in the destructor of lock_guard<>
- // }
- void OpenDecodeHandle(
-     const std::string &key, const WaveData &wave_data,
-     const std::string &group = std::string(),
-     const std::function<void(CompactLattice &clat)> &callback =
-         std::function<void(CompactLattice &clat)>());
- // When passing in a vector of data, the caller must ensure the data exists
- // until the CloseDecodeHandle is called
- void OpenDecodeHandle(
-     const std::string &key, const VectorBase<BaseFloat> &wave_data,
-     float sample_rate, const std::string &group = std::string(),
-     const std::function<void(CompactLattice &clat)> &callback =
-         std::function<void(CompactLattice &clat)>());
+  // Adds a decoding task to the decoder
+  // When passing in a vector of data, the caller must ensure the data exists
+  // until the CloseDecodeHandle/WaitForAllTasks is called
+  // callback is called once task is done and we pass it the final lattice
+  // callback can be used to compute lattice rescoring, find best path in
+  // lattice, writing lattice to disk, etc.
+  // Important: callback is launched in the threadpool. It must be threadsafe.
+  // For instance, if writing to disk, or to stdout,
+  // use a lock:
+  // e.g. :
+  // {
+  //    std::lock_guard<std::mutex> lock(global_mutex);
+  //    // write lattice to disk
+  //    // lock is released in the destructor of lock_guard<>
+  // }
+  void OpenDecodeHandle(
+    const std::string &key, const WaveData &wave_data,
+    const std::string &group = std::string(),
+    const std::function<void(CompactLattice &clat)> &callback =
+    std::function<void(CompactLattice &clat)>());
+  // When passing in a vector of data, the caller must ensure the data exists
+  // until the CloseDecodeHandle is called
+  void OpenDecodeHandle(
+    const std::string &key, const VectorBase<BaseFloat> &wave_data,
+    float sample_rate, const std::string &group = std::string(),
+    const std::function<void(CompactLattice &clat)> &callback =
+    std::function<void(CompactLattice &clat)>());
 
- // Copies the raw lattice for decoded handle "key" into lat
- bool GetRawLattice(const std::string &key, Lattice *lat);
- // Determinizes raw lattice and returns a compact lattice
- bool GetLattice(const std::string &key, CompactLattice *lat);
+  // Copies the raw lattice for decoded handle "key" into lat
+  bool GetRawLattice(const std::string &key, Lattice *lat);
+  // Determinizes raw lattice and returns a compact lattice
+  bool GetLattice(const std::string &key, CompactLattice *lat);
 
- int32 GetNumberOfTasksPending();
+  int32 GetNumberOfTasksPending();
 
- // Wait for all tasks to complete
- void WaitForAllTasks();
- // Wait for all tasks in the group to complete
- void WaitForGroup(const std::string &group);
- // Check if a group is available. Returns if not.
- bool IsGroupCompleted(const std::string &group);
- // Wait for any group to complete, then returns which group completed
- std::string WaitForAnyGroup();
- // Check if any group is available. If one is available, set its name in *group
- bool IsAnyGroupCompleted(std::string *group);
- inline int NumPendingTasks() {
-   return (tasks_back_ - tasks_front_ + config_.max_pending_tasks + 
-       config_.pending_queue_padding) %
-          (config_.max_pending_tasks + config_.pending_queue_padding);
+  // Wait for all tasks to complete
+  void WaitForAllTasks();
+  // Wait for all tasks in the group to complete
+  void WaitForGroup(const std::string &group);
+  // Check if a group is available. Returns if not.
+  bool IsGroupCompleted(const std::string &group);
+  // Wait for any group to complete, then returns which group completed
+  std::string WaitForAnyGroup();
+  // Check if any group is available. If one is available, set its name in *group
+  bool IsAnyGroupCompleted(std::string *group);
+  inline int NumPendingTasks() {
+    return (tasks_back_ - tasks_front_ + config_.max_pending_tasks +
+           config_.pending_queue_padding) %
+           (config_.max_pending_tasks + config_.pending_queue_padding);
   };
 
 private:
- // Task data used during computation
- // Is cleared when task is completed
- struct TaskData {
-   Vector<BaseFloat> raw_data;  // Wave input data when wave_reader passed
-   std::shared_ptr<SubVector<BaseFloat>>
-       wave_samples;  // Used as a pointer to either the raw
+  // Task data used during computation
+  // Is cleared when task is completed
+  struct TaskData {
+    Vector<BaseFloat> raw_data; // Wave input data when wave_reader passed
+    std::shared_ptr<SubVector<BaseFloat> >
+    wave_samples;     // Used as a pointer to either the raw
                       // data or the samples passed
-   float sample_frequency;
-   Vector<BaseFloat> ivector_features_cpu;
-   Matrix<BaseFloat> input_features_cpu;
-   CuVector<BaseFloat> ivector_features;
-   CuMatrix<BaseFloat> input_features;
-   CuMatrix<BaseFloat> posteriors;
+    float sample_frequency;
+    Vector<BaseFloat> ivector_features_cpu;
+    Matrix<BaseFloat> input_features_cpu;
+    CuVector<BaseFloat> ivector_features;
+    CuMatrix<BaseFloat> input_features;
+    CuMatrix<BaseFloat> posteriors;
 
-   TaskData(const WaveData &wave_data_in)
-       : wave_samples(NULL), sample_frequency(0) {
-     int rows = wave_data_in.Data().NumRows();
-     int cols = wave_data_in.Data().NumCols();
-     int stride = wave_data_in.Data().Stride();
+    TaskData(const WaveData &wave_data_in)
+      : wave_samples(NULL), sample_frequency(0) {
+      int rows = wave_data_in.Data().NumRows();
+      int cols = wave_data_in.Data().NumCols();
+      int stride = wave_data_in.Data().Stride();
 
-     raw_data.Resize(rows * cols, kUndefined);
+      raw_data.Resize(rows * cols, kUndefined);
 
-     if (stride == cols) {
-       // contigious so use one large memory copy
-       memcpy(raw_data.Data(), wave_data_in.Data().Data(),
+      if (stride == cols) {
+        // contigious so use one large memory copy
+        memcpy(raw_data.Data(), wave_data_in.Data().Data(),
               rows * cols * sizeof(BaseFloat));
-     } else {
-       // data is not contigious so we need to copy one row at a time
-       for (int i = 0; i < rows; i++) {
-         memcpy(raw_data.Data() + i * cols, wave_data_in.Data().RowData(i),
+      } else {
+        // data is not contigious so we need to copy one row at a time
+        for (int i = 0; i < rows; i++) {
+          memcpy(raw_data.Data() + i * cols, wave_data_in.Data().RowData(i),
                 cols * sizeof(BaseFloat));
-       }
-     }
-     wave_samples =
-         std::make_shared<SubVector<BaseFloat>>(raw_data, 0, raw_data.Dim());
-     sample_frequency = wave_data_in.SampFreq();
-   };
+        }
+      }
+      wave_samples =
+          std::make_shared<SubVector<BaseFloat> >(raw_data, 0, raw_data.Dim());
+      sample_frequency = wave_data_in.SampFreq();
+    };
 
-   // Init when raw data is passed in.  This data is shallow copied.
-   TaskData(const VectorBase<BaseFloat> &wave_data_in, float sample_rate) {
-     wave_samples = std::make_shared<SubVector<BaseFloat>>(wave_data_in, 0,
+    // Init when raw data is passed in.  This data is shallow copied.
+    TaskData(const VectorBase<BaseFloat> &wave_data_in, float sample_rate) {
+      wave_samples = std::make_shared<SubVector<BaseFloat> >(wave_data_in, 0,
                                                            wave_data_in.Dim());
-     sample_frequency = sample_rate;
-   }
- };
+      sample_frequency = sample_rate;
+    }
+  };
 
- // State needed for each decode task.
- // This state can be passed around by reference or pointer safely
- // and provides a convieniet way to store all decoding state.
- struct TaskState {
-   std::string key;
-   std::string group;  // group for that task. "" is default
-   bool error;
-   std::string error_string;
+  // State needed for each decode task.
+  // This state can be passed around by reference or pointer safely
+  // and provides a convieniet way to store all decoding state.
+  struct TaskState {
+    std::string key;
+    std::string group; // group for that task. "" is default
+    bool error;
+    std::string error_string;
 
-   std::unique_ptr<TaskData> task_data;
+    std::unique_ptr<TaskData> task_data;
 
-   int32 ichannel;              // associated CudaDecoder channel
-   Lattice lat;                 // Raw Lattice output
-   CompactLattice dlat;         // Determinized lattice output.  Only set if
+    int32 ichannel;             // associated CudaDecoder channel
+    Lattice lat;                // Raw Lattice output
+    CompactLattice dlat;        // Determinized lattice output.  Only set if
                                 // determinize-lattice=true
-   std::atomic<bool> finished;  // Tells master thread if task has finished
+    std::atomic<bool> finished; // Tells master thread if task has finished
                                 // execution
 
-   bool determinized;
+    bool determinized;
 
-   // (optional) callback is called task is finished and we have a lattice
-   // ready
-   // that way we can compute all CPU tasks in the threadpool (lattice
-   // rescoring, find best path in lattice, etc.)
-   std::function<void(CompactLattice &clat)> callback;
+    // (optional) callback is called task is finished and we have a lattice
+    // ready
+    // that way we can compute all CPU tasks in the threadpool (lattice
+    // rescoring, find best path in lattice, etc.)
+    std::function<void(CompactLattice &clat)> callback;
 
-   TaskState() : error(false), finished(false), determinized(false) {}
+    TaskState() : error(false), finished(false), determinized(false) {}
 
-   // Init when wave data is passed directly in.  This data is deep copied.
-   void Init(const std::string &key_in, const WaveData &wave_data_in) {
-     task_data.reset(new TaskData(wave_data_in));
-     key = key_in;
-   };
-   // Init when raw data is passed in.  This data is shallow copied.
-   void Init(const std::string &key_in,
-             const VectorBase<BaseFloat> &wave_data_in, float sample_rate) {
-     task_data.reset(new TaskData(wave_data_in, sample_rate));
-     key = key_in;
-   }
+    // Init when wave data is passed directly in.  This data is deep copied.
+    void Init(const std::string &key_in, const WaveData &wave_data_in) {
+      task_data.reset(new TaskData(wave_data_in));
+      key = key_in;
+    };
+    // Init when raw data is passed in.  This data is shallow copied.
+    void Init(const std::string &key_in,
+        const VectorBase<BaseFloat> &wave_data_in, float sample_rate) {
+      task_data.reset(new TaskData(wave_data_in, sample_rate));
+      key = key_in;
+    }
   };
 
   // Creating a new task in the hashmaps
@@ -310,44 +310,44 @@ private:
   // Attempts to fill the batch from the task queue.  May not fully fill the
   // batch.
   void AquireAdditionalTasks(CudaDecoder &cuda_decoder,
-                             ChannelState &channel_state,
-                             std::vector<TaskState *> &tasks);
+      ChannelState &channel_state,
+      std::vector<TaskState *> &tasks);
 
   // Computes Features for a single decode instance.
   void ComputeOneFeatureCPU(TaskState *task);
 
   // Computes features across the tasks[first,tasks.size()
   void ComputeBatchFeatures(int32 first,
-                            std::vector<TaskState *> &tasks,
-                            OnlineCudaFeaturePipeline &feature_pipeline);
+      std::vector<TaskState *> &tasks,
+      OnlineCudaFeaturePipeline &feature_pipeline);
 
   // Computes Nnet across the current decode batch
   void ComputeBatchNnet(nnet3::NnetBatchComputer &computer, int32 first,
-                        std::vector<TaskState *> &tasks);
+      std::vector<TaskState *> &tasks);
 
   // Allocates decodables for tasks in the range of
   // dstates[first,dstates.size())
   void AllocateDecodables(int32 first, std::vector<TaskState *> &tasks,
-                          std::vector<CudaDecodableInterface *> &decodables);
+      std::vector<CudaDecodableInterface *> &decodables);
 
   // Removes all completed channels from the channel list.
   // Also enqueues up work for post processing
   void
   RemoveCompletedChannels(CudaDecoder &cuda_decoder,
-                          ChannelState &channel_state,
-                          std::vector<CudaDecodableInterface *> &decodables,
-                          std::vector<TaskState *> &tasks);
+      ChannelState &channel_state,
+      std::vector<CudaDecodableInterface *> &decodables,
+      std::vector<TaskState *> &tasks);
 
   // For each completed decode perform post processing work and clean up
   void PostDecodeProcessing(CudaDecoder &cuda_decoder,
-                            ChannelState &channel_state,
-                            std::vector<CudaDecodableInterface *> &decodables,
-                            std::vector<TaskState *> &tasks);
+      ChannelState &channel_state,
+      std::vector<CudaDecodableInterface *> &decodables,
+      std::vector<TaskState *> &tasks);
 
   // Calls ConcurrentGetRawLatticeSingleChannel and Determinize
   // on a dedicated CPU worker thread at the end of the decode
   void CompleteTask(CudaDecoder *cuda_decoder, ChannelState *channel_state,
-                    TaskState *state);
+      TaskState *state);
 
   // Determinize one lattice
   void DeterminizeOneLattice(TaskState *task);
@@ -381,9 +381,9 @@ private:
   std::mutex group_tasks_mutex_;
   std::condition_variable group_done_cv_;
   std::unordered_multimap<std::string, TaskState *>
-      tasks_group_lookup_;  // group -> list of tasks
+  tasks_group_lookup_;      // group -> list of tasks
   std::unordered_map<std::string, TaskState>
-      tasks_lookup_;                              // Contains a map of
+  tasks_lookup_;                                  // Contains a map of
                                                   // utterance to TaskState
   std::vector<std::thread> thread_contexts_;      // A list of thread contexts
 };

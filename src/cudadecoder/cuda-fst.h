@@ -42,14 +42,14 @@ typedef StdArc::Label Label;
 // efficiency
 // We then copy the FST to the device (while keeping its original copy on host)
 class CudaFst {
- public:
+public:
   CudaFst()
-      : d_e_offsets_(nullptr),
-        d_ne_offsets_(nullptr),
-        d_arc_weights_(nullptr),
-        d_arc_nextstates_(nullptr),
-        d_arc_pdf_ilabels_(nullptr),
-        d_final_(nullptr){};
+    : d_e_offsets_(nullptr),
+    d_ne_offsets_(nullptr),
+    d_arc_weights_(nullptr),
+    d_arc_nextstates_(nullptr),
+    d_arc_pdf_ilabels_(nullptr),
+    d_final_(nullptr){};
   // Creates a CSR representation of the FST,
   // then copies it to the GPU
   // If a TransitionModel is passed, we'll use it to convert the ilabels id
@@ -58,13 +58,13 @@ class CudaFst {
   // Important: The CudaDecodable won't apply the TransitionModel. If you use a
   // TransitionModel, you need to apply it now
   void Initialize(const fst::Fst<StdArc> &fst,
-                  const TransitionModel *trans_model = NULL);
+      const TransitionModel *trans_model = NULL);
   void Finalize();
 
   inline uint32_t NumStates() const { return num_states_; }
   inline StateId Start() const { return start_; }
 
- private:
+private:
   friend class CudaDecoder;
   // Counts arcs and computes offsets of the fst passed in
   void ComputeOffsets(const fst::Fst<StdArc> &fst);

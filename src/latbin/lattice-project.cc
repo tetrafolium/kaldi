@@ -38,13 +38,13 @@ int main(int argc, char *argv[]) {
         "Usage: lattice-project [options] lattice-rspecifier lattice-wspecifier\n"
         " e.g.: lattice-project ark:1.lats ark:word2word.lats\n"
         "or: lattice-project --project-output=false ark:1.lats ark:tid2tid.lats";
-        
+
     ParseOptions po(usage);
     bool project_output = true;
-    
+
     po.Register("project-output", &project_output, "If true, project on output "
                 "(words), else input (transition-ids)");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -55,9 +55,9 @@ int main(int argc, char *argv[]) {
     std::string lats_rspecifier = po.GetArg(1),
         lats_wspecifier = po.GetArg(2);
 
-    LatticeWriter lattice_writer(lats_wspecifier); 
+    LatticeWriter lattice_writer(lats_wspecifier);
     int32 n_done = 0; // there is no failure mode, barring a crash.
-      
+
     if (project_output) {
       SequentialCompactLatticeReader clat_reader(lats_rspecifier);
       for (; !clat_reader.Done(); clat_reader.Next()) {
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
         RemoveAlignmentsFromCompactLattice(&clat);
         Lattice lat;
         ConvertLattice(clat, &lat);
-        fst::Project(&lat, fst::PROJECT_OUTPUT); // project on words.        
+        fst::Project(&lat, fst::PROJECT_OUTPUT); // project on words.
         lattice_writer.Write(key, lat);
         n_done++;
       }

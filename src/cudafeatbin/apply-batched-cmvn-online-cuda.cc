@@ -38,7 +38,7 @@ struct UtteranceDataHandle {
   int32_t num_frames;
 
   UtteranceDataHandle(const std::string &utt, Matrix<float> &feats)
-      : utt(utt), num_frames(feats.NumRows()) {
+    : utt(utt), num_frames(feats.NumRows()) {
     feats_out.Resize(feats.NumRows(), feats.NumCols(), kUndefined);
     feats_in.Swap(&feats);
   }
@@ -111,8 +111,8 @@ int main(int argc, char *argv[]) {
         sizeof(LaneDesc) * batch_size);
 
     std::string global_stats_rxfilename = po.GetArg(1),
-                feature_rspecifier = po.GetArg(2),
-                feature_wspecifier = po.GetArg(3);
+        feature_rspecifier = po.GetArg(2),
+        feature_wspecifier = po.GetArg(3);
 
     // global_cmvn_stats helps us initialize to online CMVN to
     // reasonable values at the beginning of the utterance.
@@ -150,8 +150,8 @@ int main(int argc, char *argv[]) {
     }
 
     CudaOnlineBatchedCmvn cuda_cmvn(cmvn_opts, cu_cmvn_state, feat_dim,
-                                    chunk_length, num_channels,
-                                    stats_coarsening_factor);
+        chunk_length, num_channels,
+        stats_coarsening_factor);
 
     CuMatrix<BaseFloat> d_batch_in(batch_size * chunk_length, feat_dim);
     CuMatrix<BaseFloat> d_batch_out(batch_size * chunk_length, feat_dim);

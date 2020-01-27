@@ -108,7 +108,7 @@ Real CuSparseMatrix<Real>::FrobeniusNorm() const {
 
 template<typename Real>
 void CuSparseMatrix<Real>::SelectRows(const CuArray<int32> &row_indexes,
-                                      const CuSparseMatrix<Real> &smat_other) {
+    const CuSparseMatrix<Real> &smat_other) {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
     CuTimer tim;
@@ -119,7 +119,7 @@ void CuSparseMatrix<Real>::SelectRows(const CuArray<int32> &row_indexes,
     std::vector<int32> row_indexes_cpu(row_indexes.Dim());
     row_indexes.CopyToVec(&row_indexes_cpu);
     CuSubArray<int> other_row_ptr(smat_other.CsrRowPtr(),
-                                  smat_other.NumRows() + 1);
+        smat_other.NumRows() + 1);
     std::vector<int> other_row_ptr_cpu(smat_other.NumRows() + 1);
     other_row_ptr.CopyToVec(&other_row_ptr_cpu);
     int nnz = 0;
@@ -160,8 +160,8 @@ void CuSparseMatrix<Real>::SelectRows(const CuArray<int32> &row_indexes,
 
 template<typename Real>
 CuSparseMatrix<Real>::CuSparseMatrix(const CuArray<int32> &indexes, int32 dim,
-                                     MatrixTransposeType trans) :
-    num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
+    MatrixTransposeType trans) :
+  num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
     NULL) {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
@@ -192,9 +192,9 @@ CuSparseMatrix<Real>::CuSparseMatrix(const CuArray<int32> &indexes, int32 dim,
 
 template<typename Real>
 CuSparseMatrix<Real>::CuSparseMatrix(const CuArray<int32> &indexes,
-                                     const CuVectorBase<Real> &weights,
-                                     int32 dim, MatrixTransposeType trans) :
-    num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
+    const CuVectorBase<Real> &weights,
+    int32 dim, MatrixTransposeType trans) :
+  num_rows_(0), num_cols_(0), nnz_(0), csr_row_ptr_col_idx_(NULL), csr_val_(
     NULL) {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
@@ -225,23 +225,23 @@ CuSparseMatrix<Real>::CuSparseMatrix(const CuArray<int32> &indexes,
 
 template <typename Real>
 CuSparseMatrix<Real>& CuSparseMatrix<Real>::operator = (
-    const SparseMatrix<Real> &smat) {
+  const SparseMatrix<Real> &smat) {
   this->CopyFromSmat(smat);
   return *this;
 }
 
 template <typename Real>
 CuSparseMatrix<Real>& CuSparseMatrix<Real>::operator = (
-    const CuSparseMatrix<Real> &smat) {
+  const CuSparseMatrix<Real> &smat) {
   this->CopyFromSmat(smat, kNoTrans);
   return *this;
 }
 
 template<typename Real>
 void CuSparseMatrix<Real>::Resize(const MatrixIndexT num_rows,
-                                  const MatrixIndexT num_cols,
-                                  const MatrixIndexT nnz,
-                                  MatrixResizeType resize_type) {
+    const MatrixIndexT num_cols,
+    const MatrixIndexT nnz,
+    MatrixResizeType resize_type) {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
     KALDI_ASSERT(resize_type == kSetZero || resize_type == kUndefined);
@@ -278,7 +278,7 @@ void CuSparseMatrix<Real>::Resize(const MatrixIndexT num_rows,
       num_cols_ = num_cols;
       nnz_ = nnz;
       csr_row_ptr_col_idx_ = static_cast<int*>(CuDevice::Instantiate().Malloc(
-          (num_rows + 1 + nnz) * sizeof(int)));
+            (num_rows + 1 + nnz) * sizeof(int)));
       csr_val_ = static_cast<Real*>(CuDevice::Instantiate().Malloc(
           nnz * sizeof(Real)));
       CuSubArray<int> row_ptr(CsrRowPtr(), NumRows() + 1);
@@ -368,7 +368,7 @@ void CuSparseMatrix<double>::CopyFromSmat(const SparseMatrix<double> &smat);
 
 template<typename Real>
 void CuSparseMatrix<Real>::CopyFromSmat(const CuSparseMatrix<Real>& smat,
-                                        MatrixTransposeType trans) {
+    MatrixTransposeType trans) {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
     if (trans == kNoTrans) {
@@ -379,9 +379,9 @@ void CuSparseMatrix<Real>::CopyFromSmat(const CuSparseMatrix<Real>& smat,
       val_to.CopyFromVec(val_from);
 
       CuSubArray<int> idx_to(csr_row_ptr_col_idx_,
-                             NumRows() + 1 + NumElements());
+          NumRows() + 1 + NumElements());
       CuSubArray<int> idx_from(smat.csr_row_ptr_col_idx_,
-                               smat.NumRows() + 1 + smat.NumElements());
+          smat.NumRows() + 1 + smat.NumElements());
       idx_to.CopyFromArray(idx_from);
 
     } else {
@@ -422,7 +422,7 @@ void CuSparseMatrix<Real>::CopyToSmat(SparseMatrix<OtherReal> *smat) const {
     val.CopyToVec(&val_cpu);
 
     std::vector<std::vector<std::pair<MatrixIndexT, OtherReal> > > pairs(
-        NumRows());
+      NumRows());
     int n = 0;
     for (int i = 0; i < NumRows(); ++i) {
       for (; n < idx_cpu[i + 1]; ++n) {
@@ -522,8 +522,8 @@ template class CuSparseMatrix<double>;
 
 template <typename Real>
 Real TraceMatSmat(const CuMatrixBase<Real> &A,
-                  const CuSparseMatrix<Real> &B,
-                  MatrixTransposeType trans) {
+    const CuSparseMatrix<Real> &B,
+    MatrixTransposeType trans) {
   if (A.NumCols() == 0) {
     KALDI_ASSERT(B.NumCols() == 0);
     return 0.0;
@@ -572,41 +572,41 @@ Real TraceMatSmat(const CuMatrixBase<Real> &A,
 
 template
 float TraceMatSmat(const CuMatrixBase<float> &A,
-                   const CuSparseMatrix<float> &B,
-                   MatrixTransposeType trans);
+    const CuSparseMatrix<float> &B,
+    MatrixTransposeType trans);
 template
 double TraceMatSmat(const CuMatrixBase<double> &A,
-                    const CuSparseMatrix<double> &B,
-                    MatrixTransposeType trans);
+    const CuSparseMatrix<double> &B,
+    MatrixTransposeType trans);
 
 void GeneralMatrix::CopyToMat(CuMatrixBase<BaseFloat> *cu_mat,
-                              MatrixTransposeType trans) const {
+    MatrixTransposeType trans) const {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
     switch (Type()) {
-      case kFullMatrix: {
-        cu_mat->CopyFromMat(mat_);
+    case kFullMatrix: {
+      cu_mat->CopyFromMat(mat_);
+      break;
+    }
+    case kSparseMatrix: {
+      CuSparseMatrix<BaseFloat> smat(smat_);
+      smat.CopyToMat(cu_mat, trans);
+      break;
+    }
+    case kCompressedMatrix: {
+      Matrix<BaseFloat> mat(cmat_);
+      if (trans == kNoTrans) {
+        cu_mat->CopyFromMat(mat);
+        break;
+      } else {
+        CuMatrix<BaseFloat> temp_cu;
+        temp_cu.Swap(&mat);
+        cu_mat->CopyFromMat(temp_cu, kTrans);
         break;
       }
-      case kSparseMatrix: {
-        CuSparseMatrix<BaseFloat> smat(smat_);
-        smat.CopyToMat(cu_mat, trans);
-        break;
-      }
-      case kCompressedMatrix: {
-        Matrix<BaseFloat> mat(cmat_);
-        if (trans == kNoTrans) {
-          cu_mat->CopyFromMat(mat);
-          break;
-        } else {
-          CuMatrix<BaseFloat> temp_cu;
-          temp_cu.Swap(&mat);
-          cu_mat->CopyFromMat(temp_cu, kTrans);
-          break;
-        }
-      }
-      default:
-        KALDI_ERR << "Invalid GeneralMatrix type.";
+    }
+    default:
+      KALDI_ERR << "Invalid GeneralMatrix type.";
     }
     return;
   } else
@@ -620,7 +620,7 @@ void GeneralMatrix::CopyToMat(CuMatrixBase<BaseFloat> *cu_mat,
 template <typename Real>
 template <typename OtherReal>
 void CuSparseMatrix<Real>::CopyToMat(CuMatrixBase<OtherReal> *M,
-                                     MatrixTransposeType trans) const {
+    MatrixTransposeType trans) const {
   if (trans == kNoTrans) {
     KALDI_ASSERT(M->NumRows() == NumRows() && M->NumCols() == NumCols());
   } else {
@@ -661,61 +661,61 @@ void CuSparseMatrix<Real>::CopyToMat(CuMatrixBase<OtherReal> *M,
 // Instantiate the template above.
 template
 void CuSparseMatrix<float>::CopyToMat(CuMatrixBase<float> *M,
-                                      MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 
 template
 void CuSparseMatrix<float>::CopyToMat(CuMatrixBase<double> *M,
-                                      MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 
 template
 void CuSparseMatrix<double>::CopyToMat(CuMatrixBase<float> *M,
-                                       MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 
 template
 void CuSparseMatrix<double>::CopyToMat(CuMatrixBase<double> *M,
-                                       MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 
 
 void GeneralMatrix::AddToMat(BaseFloat alpha,
-                             CuMatrixBase<BaseFloat> *cu_mat,
-                             MatrixTransposeType trans) const {
+    CuMatrixBase<BaseFloat> *cu_mat,
+    MatrixTransposeType trans) const {
   switch (Type()) {
-    case kFullMatrix: {
+  case kFullMatrix: {
 #if HAVE_CUDA == 1
-      if (CuDevice::Instantiate().Enabled()) {
-        CuMatrix<BaseFloat> cu_copy(mat_);
-        cu_mat->AddMat(alpha, cu_copy);
-        break;
-      }
-#endif
-      cu_mat->Mat().AddMat(alpha, mat_);
+    if (CuDevice::Instantiate().Enabled()) {
+      CuMatrix<BaseFloat> cu_copy(mat_);
+      cu_mat->AddMat(alpha, cu_copy);
       break;
     }
-    case kSparseMatrix: {
-#if HAVE_CUDA == 1
-      if (CuDevice::Instantiate().Enabled()) {
-        CuSparseMatrix<BaseFloat> cu_smat(smat_);
-        cu_mat->AddSmat(alpha, cu_smat, trans);
-        break;
-      }
 #endif
-      cu_mat->Mat().AddSmat(alpha, smat_, trans);
+    cu_mat->Mat().AddMat(alpha, mat_);
+    break;
+  }
+  case kSparseMatrix: {
+#if HAVE_CUDA == 1
+    if (CuDevice::Instantiate().Enabled()) {
+      CuSparseMatrix<BaseFloat> cu_smat(smat_);
+      cu_mat->AddSmat(alpha, cu_smat, trans);
       break;
     }
-    case kCompressedMatrix: {
-      Matrix<BaseFloat> mat(cmat_);
-#if HAVE_CUDA == 1
-      if (CuDevice::Instantiate().Enabled()) {
-        CuMatrix<BaseFloat> cu_mat_copy(mat);
-        cu_mat->AddMat(alpha, cu_mat_copy, trans);
-        break;
-      }
 #endif
-      cu_mat->Mat().AddMat(alpha, mat, trans);
+    cu_mat->Mat().AddSmat(alpha, smat_, trans);
+    break;
+  }
+  case kCompressedMatrix: {
+    Matrix<BaseFloat> mat(cmat_);
+#if HAVE_CUDA == 1
+    if (CuDevice::Instantiate().Enabled()) {
+      CuMatrix<BaseFloat> cu_mat_copy(mat);
+      cu_mat->AddMat(alpha, cu_mat_copy, trans);
       break;
     }
-    default:
-      KALDI_ERR << "Invalid GeneralMatrix type.";
+#endif
+    cu_mat->Mat().AddMat(alpha, mat, trans);
+    break;
+  }
+  default:
+    KALDI_ERR << "Invalid GeneralMatrix type.";
   }
 }
 

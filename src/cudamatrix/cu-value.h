@@ -32,15 +32,15 @@ namespace kaldi {
 /// reading a single Real value from the device.
 template<typename Real>
 class CuValue {
- public:
-  CuValue(Real *data): data_(data) { }
-  CuValue(const CuValue &other): data_(other.data_) { }
+public:
+  CuValue(Real *data) : data_(data) { }
+  CuValue(const CuValue &other) : data_(other.data_) { }
 
   inline CuValue operator = (const CuValue<Real> &other) {
 #if HAVE_CUDA == 1
     if (CuDevice::Instantiate().Enabled()) {
       CU_SAFE_CALL(
-        cudaMemcpyAsync(data_, other.data_, sizeof(Real), 
+        cudaMemcpyAsync(data_, other.data_, sizeof(Real),
                         cudaMemcpyDeviceToDevice, cudaStreamPerThread));
       return *this;
     } else
@@ -50,11 +50,11 @@ class CuValue {
       return *this;
     }
   }
-  
+
   inline Real operator = (Real r) { // assignment from Real
 #if HAVE_CUDA == 1
     if (CuDevice::Instantiate().Enabled()) {
-      CU_SAFE_CALL(cudaMemcpyAsync(data_, &r, sizeof(Real), 
+      CU_SAFE_CALL(cudaMemcpyAsync(data_, &r, sizeof(Real),
             cudaMemcpyHostToDevice, cudaStreamPerThread));
       CU_SAFE_CALL(cudaStreamSynchronize(cudaStreamPerThread));
       return r;
@@ -68,21 +68,21 @@ class CuValue {
 
   inline Real operator += (Real r) { return (*this = r + Real(*this)); }
   inline Real operator -= (Real r) { return (*this = Real(*this) - r); }
-    
+
 
   inline operator Real () const { // assignment to Real
 #if HAVE_CUDA == 1
-  if (CuDevice::Instantiate().Enabled()) {
-    Real value;
-    CU_SAFE_CALL(cudaMemcpyAsync(&value, data_, sizeof(Real), 
+    if (CuDevice::Instantiate().Enabled()) {
+      Real value;
+      CU_SAFE_CALL(cudaMemcpyAsync(&value, data_, sizeof(Real),
                  cudaMemcpyDeviceToHost, cudaStreamPerThread));
-    CU_SAFE_CALL(cudaStreamSynchronize(cudaStreamPerThread));
-    return value;
-  } else
+      CU_SAFE_CALL(cudaStreamSynchronize(cudaStreamPerThread));
+      return value;
+    } else
 #endif
     return *data_;
   }
- private:
+private:
   Real *data_;
 }; // class CuValue<Real>
 

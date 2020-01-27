@@ -31,14 +31,14 @@ int main(int argc, char *argv[]) {
   typedef kaldi::int64 int64;
   try {
     const char *usage =
-      "Extract features and ivectors for utterances using the cuda online\n"
-      "feature pipeline. This class models the online feature pipeline.\n"  
-      "\n"
-      "Usage:  compute-online-feats-cuda [options] <wave-rspecifier> "
-      "<ivector-wspecifier> <feats-wspecifier>\n"
-      "e.g.: \n"
-      "  ./compute-online-feats-cuda --config=feature_config wav.scp "
-      "ark,scp:ivector.ark,ivector.scp ark,scp:feat.ark,feat.scp\n";
+        "Extract features and ivectors for utterances using the cuda online\n"
+        "feature pipeline. This class models the online feature pipeline.\n"
+        "\n"
+        "Usage:  compute-online-feats-cuda [options] <wave-rspecifier> "
+        "<ivector-wspecifier> <feats-wspecifier>\n"
+        "e.g.: \n"
+        "  ./compute-online-feats-cuda --config=feature_config wav.scp "
+        "ark,scp:ivector.ark,ivector.scp ark,scp:feat.ark,feat.scp\n";
 
     ParseOptions po(usage);
     // Use online feature config as that is the flow we are trying to model
@@ -58,8 +58,8 @@ int main(int argc, char *argv[]) {
     CuDevice::Instantiate().AllowMultithreading();
 
     std::string wav_rspecifier = po.GetArg(1),
-      ivector_wspecifier = po.GetArg(2),
-      feature_wspecifier = po.GetArg(3);
+        ivector_wspecifier = po.GetArg(2),
+        feature_wspecifier = po.GetArg(3);
 
     OnlineCudaFeaturePipeline feature_pipeline(feature_opts);
 
@@ -69,11 +69,11 @@ int main(int argc, char *argv[]) {
 
     if (!ivector_writer.Open(ivector_wspecifier)) {
       KALDI_ERR << "Could not initialize ivector_writer with wspecifier "
-        << ivector_wspecifier;
+                << ivector_wspecifier;
     }
     if (!feature_writer.Open(feature_wspecifier)) {
       KALDI_ERR << "Could not initialize feature_writer with wspecifier "
-        << feature_wspecifier;
+                << feature_wspecifier;
     }
 
     int32 num_utts = 0, num_success = 0;
@@ -107,12 +107,12 @@ int main(int argc, char *argv[]) {
         num_success++;
       } catch (...) {
         KALDI_WARN << "Failed to compute features for utterance "
-          << utt;
+                   << utt;
         continue;
       }
     }
     KALDI_LOG << "Processed " << num_utts << " utterances with "
-      << num_utts - num_success << " failures.";
+              << num_utts - num_success << " failures.";
     return (num_success != 0 ? 0 : 1);
 
   } catch(const std::exception &e) {

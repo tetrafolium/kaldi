@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
         "\n"
         "Usage: lattice-add-penalty [options] <lattice-rspecifier> <lattice-wspecifier>\n"
         " e.g.: lattice-add-penalty --word-ins-penalty=1.0 ark:- ark:-\n";
-      
+
     ParseOptions po(usage);
-    
+
     BaseFloat word_ins_penalty = 0.0;
 
     po.Register("word-ins-penalty", &word_ins_penalty, "Word insertion penalty");
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 
     std::string lats_rspecifier = po.GetArg(1),
         lats_wspecifier = po.GetArg(2);
-    
+
     SequentialCompactLatticeReader clat_reader(lats_rspecifier);
     CompactLatticeWriter clat_writer(lats_wspecifier); // write as compact.
 

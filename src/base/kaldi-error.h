@@ -89,7 +89,7 @@ struct LogMessageEnvelope {
 class KaldiFatalError : public std::runtime_error {
 public:
   explicit KaldiFatalError(const std::string &message)
-      : std::runtime_error(message) {}
+    : std::runtime_error(message) {}
   explicit KaldiFatalError(const char *message) : std::runtime_error(message) {}
 
   /// Returns the exception name, "kaldi::KaldiFatalError".
@@ -113,7 +113,7 @@ public:
   // The pointers to strings are stored internally, and not owned or copied,
   // so that their storage must outlive this object.
   MessageLogger(LogMessageEnvelope::Severity severity, const char *func,
-                const char *file, int32 line);
+      const char *file, int32 line);
 
   // The stream insertion operator, used in e.g. 'KALDI_LOG << "Message"'.
   template <typename T> MessageLogger &operator<<(const T &val) {
@@ -162,7 +162,7 @@ private:
 /***** KALDI ASSERTS *****/
 
 [[noreturn]] void KaldiAssertFailure_(const char *func, const char *file,
-                                      int32 line, const char *cond_str);
+    int32 line, const char *cond_str);
 
 // Note on KALDI_ASSERT and KALDI_PARANOID_ASSERT:
 //
@@ -185,9 +185,9 @@ private:
 #define KALDI_ASSERT(cond)                                                     \
   do {                                                                         \
     if (cond)                                                                  \
-      (void)0;                                                                 \
+    (void) 0;                                                                 \
     else                                                                       \
-      ::kaldi::KaldiAssertFailure_(__func__, __FILE__, __LINE__, #cond);       \
+    ::kaldi::KaldiAssertFailure_(__func__, __FILE__, __LINE__, #cond);       \
   } while (0)
 #else
 #define KALDI_ASSERT(cond) (void)0
@@ -198,9 +198,9 @@ private:
 #define KALDI_PARANOID_ASSERT(cond)                                            \
   do {                                                                         \
     if (cond)                                                                  \
-      (void)0;                                                                 \
+    (void) 0;                                                                 \
     else                                                                       \
-      ::kaldi::KaldiAssertFailure_(__func__, __FILE__, __LINE__, #cond);       \
+    ::kaldi::KaldiAssertFailure_(__func__, __FILE__, __LINE__, #cond);       \
   } while (0)
 #else
 #define KALDI_PARANOID_ASSERT(cond) (void)0
@@ -210,7 +210,7 @@ private:
 
 /// Type of third-party logging function.
 typedef void (*LogHandler)(const LogMessageEnvelope &envelope,
-                           const char *message);
+    const char *message);
 
 /// Set logging handler. If called with a non-NULL function pointer, the
 /// function pointed by it is called to send messages to a caller-provided log.
@@ -224,7 +224,7 @@ LogHandler SetLogHandler(LogHandler);
 // Functions within internal is exported for testing only, do not use.
 namespace internal {
 bool LocateSymbolRange(const std::string &trace_name, size_t *begin,
-                       size_t *end);
+    size_t *end);
 } // namespace internal
 } // namespace kaldi
 

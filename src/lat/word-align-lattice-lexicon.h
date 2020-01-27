@@ -45,16 +45,16 @@ namespace kaldi {
 
    This function is very simple: it just reads in a series of lines from a text file,
    each with at least two integers on them.
-*/
+ */
 bool ReadLexiconForWordAlign (std::istream &is,
-                              std::vector<std::vector<int32> > *lexicon);
+    std::vector<std::vector<int32> > *lexicon);
 
 
 
 /// This class extracts some information from the lexicon and stores it
 /// in a suitable form for the word-alignment code to use.
 class WordAlignLatticeLexiconInfo {
- public:
+public:
   WordAlignLatticeLexiconInfo(const std::vector<std::vector<int32> > &lexicon);
 
   /// Returns true if this lexicon-entry can appear, intepreted as
@@ -65,7 +65,7 @@ class WordAlignLatticeLexiconInfo {
   /// from the mappings in the first two fields of each line in the lexicon.  This
   /// function maps from each word-id to the lowest member of its equivalence class.
   int32 EquivalenceClassOf(int32 word) const;
- protected:
+protected:
   friend class LatticeLexiconWordAligner;
 
   void UpdateViabilityMap(const std::vector<int32> &lexicon_entry);
@@ -83,13 +83,13 @@ class WordAlignLatticeLexiconInfo {
   /// of co-accessibility test, to see whether it is worth extending this state
   /// by traversing arcs in the input lattice.
   typedef unordered_map<std::vector<int32>,
-                        std::vector<int32>,
-                        VectorHasher<int32> > ViabilityMap;
+          std::vector<int32>,
+          VectorHasher<int32> > ViabilityMap;
 
   /// This is a map from a vector (orig-word-symbol phone1 phone2 ... ) to
   /// the new word-symbol.  [todo: make sure the new word-symbol is always nonzero.]
   typedef unordered_map<std::vector<int32>, int32,
-                        VectorHasher<int32> > LexiconMap;
+          VectorHasher<int32> > LexiconMap;
 
   /// This is a map from the word-id (as present in the original lattice)
   /// to the minimum and maximum #phones of lexicon entries for that word.
@@ -124,9 +124,9 @@ struct WordAlignLatticeLexiconOpts {
   bool allow_duplicate_paths;
   BaseFloat max_expand;
 
-  WordAlignLatticeLexiconOpts(): partial_word_label(0), reorder(true),
-                                 test(false), allow_duplicate_paths(false),
-                                 max_expand(-1.0) { }
+  WordAlignLatticeLexiconOpts() : partial_word_label(0), reorder(true),
+    test(false), allow_duplicate_paths(false),
+    max_expand(-1.0) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("partial-word-label", &partial_word_label, "Numeric id of "
@@ -161,10 +161,10 @@ struct WordAlignLatticeLexiconOpts {
 /// error including when the the lattice seems to have been "forced out"
 /// (did not reach end state, resulting in partial word at end).
 bool WordAlignLatticeLexicon(const CompactLattice &lat,
-                             const TransitionModel &tmodel,
-                             const WordAlignLatticeLexiconInfo &lexicon_info,
-                             const WordAlignLatticeLexiconOpts &opts,
-                             CompactLattice *lat_out);
+    const TransitionModel &tmodel,
+    const WordAlignLatticeLexiconInfo &lexicon_info,
+    const WordAlignLatticeLexiconOpts &opts,
+    CompactLattice *lat_out);
 
 
 /// This function is designed to crash if something went wrong with the
@@ -177,10 +177,10 @@ bool WordAlignLatticeLexicon(const CompactLattice &lat,
 ///   partial-word arcs, with the partial-word label.
 ///   silence arcs, with the silence label.
 void TestWordAlignedLatticeLexicon(const CompactLattice &lat,
-                                   const TransitionModel &tmodel,
-                                   const std::vector<std::vector<int32> > &lexicon,
-                                   const CompactLattice &aligned_lat,
-                                   bool allow_duplicate_paths);
+    const TransitionModel &tmodel,
+    const std::vector<std::vector<int32> > &lexicon,
+    const CompactLattice &aligned_lat,
+    bool allow_duplicate_paths);
 
 } // end namespace kaldi
 #endif

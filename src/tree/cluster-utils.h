@@ -56,8 +56,8 @@ void EnsureClusterableVectorNotNull(std::vector<Clusterable*> *stats);
  * "stats" do not have to be non-NULL.
  */
 void AddToClusters(const std::vector<Clusterable*> &stats,
-                   const std::vector<int32> &assignments,
-                   std::vector<Clusterable*> *clusters);
+    const std::vector<int32> &assignments,
+    std::vector<Clusterable*> *clusters);
 
 
 /// AddToClustersOptimized does the same as AddToClusters (it sums up the stats
@@ -68,9 +68,9 @@ void AddToClusters(const std::vector<Clusterable*> &stats,
 /// sum up all the stats in one cluster (the one with the fewest points in it),
 /// and then subtract from the total.
 void AddToClustersOptimized(const std::vector<Clusterable*> &stats,
-                            const std::vector<int32> &assignments,
-                            const Clusterable &total,
-                            std::vector<Clusterable*> *clusters);
+    const std::vector<int32> &assignments,
+    const Clusterable &total,
+    std::vector<Clusterable*> *clusters);
 
 /// @} end "addtogroup clustering_group_simple"
 
@@ -107,10 +107,10 @@ void AddToClustersOptimized(const std::vector<Clusterable*> &stats,
  *    a negative.  Note that this is not the same as what the other clustering algorithms return.
  */
 BaseFloat ClusterBottomUp(const std::vector<Clusterable*> &points,
-                          BaseFloat thresh,
-                          int32 min_clust,
-                          std::vector<Clusterable*> *clusters_out,
-                          std::vector<int32> *assignments_out);
+    BaseFloat thresh,
+    int32 min_clust,
+    std::vector<Clusterable*> *clusters_out,
+    std::vector<int32> *assignments_out);
 
 /** This is a bottom-up clustering where the points are pre-clustered in a set
  *  of compartments, such that only points in the same compartment are clustered
@@ -121,9 +121,9 @@ BaseFloat ClusterBottomUp(const std::vector<Clusterable*> &points,
  *  The clusters in "clusters_out" are newly allocated and owned by the caller.
  */
 BaseFloat ClusterBottomUpCompartmentalized(
-    const std::vector< std::vector<Clusterable*> > &points, BaseFloat thresh,
-    int32 min_clust, std::vector< std::vector<Clusterable*> > *clusters_out,
-    std::vector< std::vector<int32> > *assignments_out);
+  const std::vector< std::vector<Clusterable*> > &points, BaseFloat thresh,
+  int32 min_clust, std::vector< std::vector<Clusterable*> > *clusters_out,
+  std::vector< std::vector<int32> > *assignments_out);
 
 
 struct RefineClustersOptions {
@@ -131,7 +131,7 @@ struct RefineClustersOptions {
   int32 top_n;  // must be >= 2.
   RefineClustersOptions() : num_iters(100), top_n(5) {}
   RefineClustersOptions(int32 num_iters_in, int32 top_n_in)
-      : num_iters(num_iters_in), top_n(top_n_in) {}
+    : num_iters(num_iters_in), top_n(top_n_in) {}
   // include Write and Read functions because this object gets written/read as
   // part of the QuestionsForKeyOptions class.
   void Write(std::ostream &os, bool binary) const;
@@ -154,9 +154,9 @@ struct RefineClustersOptions {
  *  this is not really a limitation.
  */
 BaseFloat RefineClusters(const std::vector<Clusterable*> &points,
-                         std::vector<Clusterable*> *clusters /*non-NULL*/,
-                         std::vector<int32> *assignments /*non-NULL*/,
-                         RefineClustersOptions cfg = RefineClustersOptions());
+    std::vector<Clusterable*> *clusters /*non-NULL*/,
+    std::vector<int32> *assignments /*non-NULL*/,
+    RefineClustersOptions cfg = RefineClustersOptions());
 
 struct ClusterKMeansOptions {
   RefineClustersOptions refine_cfg;
@@ -164,7 +164,7 @@ struct ClusterKMeansOptions {
   int32 num_tries;  // if >1, try whole procedure >once and pick best.
   bool verbose;
   ClusterKMeansOptions()
-      : refine_cfg(), num_iters(20), num_tries(2), verbose(true)  {}
+    : refine_cfg(), num_iters(20), num_tries(2), verbose(true)  {}
 };
 
 /** ClusterKMeans is a K-means-like clustering algorithm. It starts with
@@ -201,17 +201,17 @@ struct ClusterKMeansOptions {
  *
  */
 BaseFloat ClusterKMeans(const std::vector<Clusterable*> &points,
-                        int32 num_clust,  // exact number of clusters
-                        std::vector<Clusterable*> *clusters_out,  // may be NULL
-                        std::vector<int32> *assignments_out,  // may be NULL
-                        ClusterKMeansOptions cfg = ClusterKMeansOptions());
+    int32 num_clust,                      // exact number of clusters
+    std::vector<Clusterable*> *clusters_out,                      // may be NULL
+    std::vector<int32> *assignments_out,                      // may be NULL
+    ClusterKMeansOptions cfg = ClusterKMeansOptions());
 
 struct TreeClusterOptions  {
   ClusterKMeansOptions kmeans_cfg;
   int32 branch_factor;
   BaseFloat thresh;  // Objf change: if >0, may be used to control number of leaves.
   TreeClusterOptions()
-      : kmeans_cfg(), branch_factor(2), thresh(0) {
+    : kmeans_cfg(), branch_factor(2), thresh(0) {
     kmeans_cfg.verbose = false;
   }
 };
@@ -250,12 +250,12 @@ struct TreeClusterOptions  {
  *                 [other than max_clust] to limit the number of leaves.
  */
 BaseFloat TreeCluster(const std::vector<Clusterable*> &points,
-                      int32 max_clust,  // max number of leaf-level clusters.
-                      std::vector<Clusterable*> *clusters_out,
-                      std::vector<int32> *assignments_out,
-                      std::vector<int32> *clust_assignments_out,
-                      int32 *num_leaves_out,
-                      TreeClusterOptions cfg = TreeClusterOptions());
+    int32 max_clust,                    // max number of leaf-level clusters.
+    std::vector<Clusterable*> *clusters_out,
+    std::vector<int32> *assignments_out,
+    std::vector<int32> *clust_assignments_out,
+    int32 *num_leaves_out,
+    TreeClusterOptions cfg = TreeClusterOptions());
 
 
 /**
@@ -277,12 +277,12 @@ BaseFloat TreeCluster(const std::vector<Clusterable*> &points,
  *  @param cfg [in] Configuration object that controls clustering behavior.  Most
  *                important value is "thresh", which provides an alternative mechanism
  *                [other than max_clust] to limit the number of leaves.
-*/
+ */
 BaseFloat ClusterTopDown(const std::vector<Clusterable*> &points,
-                         int32 max_clust,  // max number of clusters.
-                         std::vector<Clusterable*> *clusters_out,
-                         std::vector<int32> *assignments_out,
-                         TreeClusterOptions cfg = TreeClusterOptions());
+    int32 max_clust,                       // max number of clusters.
+    std::vector<Clusterable*> *clusters_out,
+    std::vector<int32> *assignments_out,
+    TreeClusterOptions cfg = TreeClusterOptions());
 
 /// @} end of "addtogroup clustering_group_algo"
 

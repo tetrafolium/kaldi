@@ -46,7 +46,7 @@ namespace kaldi {
 // thread, because multiple calls to Compute in parallel would not work.
 template<typename Real>
 class SplitRadixComplexFft {
- public:
+public:
   typedef MatrixIndexT Integer;
 
   // N is the number of complex points (must be a power of two, or this
@@ -79,11 +79,11 @@ class SplitRadixComplexFft {
 
   ~SplitRadixComplexFft();
 
- protected:
+protected:
   // temp_buffer_ is allocated only if someone calls Compute with only one Real*
   // argument and we need a temporary buffer while creating interleaved data.
   std::vector<Real> temp_buffer_;
- private:
+private:
   void ComputeTables();
   void ComputeRecursive(Real *xr, Real *xi, Integer logn) const;
   void BitReversePermute(Real *x, Integer logn) const;
@@ -103,13 +103,13 @@ class SplitRadixComplexFft {
 
 template<typename Real>
 class SplitRadixRealFft: private SplitRadixComplexFft<Real> {
- public:
-  SplitRadixRealFft(MatrixIndexT N):  // will fail unless N>=4 and N is a power of 2.
-      SplitRadixComplexFft<Real> (N/2), N_(N) { }
+public:
+  SplitRadixRealFft(MatrixIndexT N) :  // will fail unless N>=4 and N is a power of 2.
+    SplitRadixComplexFft<Real> (N/2), N_(N) { }
 
   // Copy constructor
-  SplitRadixRealFft(const SplitRadixRealFft<Real> &other):
-      SplitRadixComplexFft<Real>(other), N_(other.N_) { }
+  SplitRadixRealFft(const SplitRadixRealFft<Real> &other) :
+    SplitRadixComplexFft<Real>(other), N_(other.N_) { }
 
   /// If forward == true, this function transforms from a sequence of N real points to its complex fourier
   /// transform; otherwise it goes in the reverse direction.  If you call it
@@ -125,7 +125,7 @@ class SplitRadixRealFft: private SplitRadixComplexFft<Real> {
   /// uses a user-supplied buffer.
   void Compute(Real *x, bool forward, std::vector<Real> *temp_buffer) const;
 
- private:
+private:
   // Disallow assignment.
   SplitRadixRealFft &operator =(const SplitRadixRealFft<Real> &other);
   int N_;

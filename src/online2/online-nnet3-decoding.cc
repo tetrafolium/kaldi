@@ -27,17 +27,17 @@ namespace kaldi {
 
 template <typename FST>
 SingleUtteranceNnet3DecoderTpl<FST>::SingleUtteranceNnet3DecoderTpl(
-    const LatticeFasterDecoderConfig &decoder_opts,
-    const TransitionModel &trans_model,
-    const nnet3::DecodableNnetSimpleLoopedInfo &info,
-    const FST &fst,
-    OnlineNnet2FeaturePipeline *features):
-    decoder_opts_(decoder_opts),
-    input_feature_frame_shift_in_seconds_(features->FrameShiftInSeconds()),
-    trans_model_(trans_model),
-    decodable_(trans_model_, info,
-               features->InputFeature(), features->IvectorFeature()),
-    decoder_(fst, decoder_opts_) {
+  const LatticeFasterDecoderConfig &decoder_opts,
+  const TransitionModel &trans_model,
+  const nnet3::DecodableNnetSimpleLoopedInfo &info,
+  const FST &fst,
+  OnlineNnet2FeaturePipeline *features) :
+  decoder_opts_(decoder_opts),
+  input_feature_frame_shift_in_seconds_(features->FrameShiftInSeconds()),
+  trans_model_(trans_model),
+  decodable_(trans_model_, info,
+      features->InputFeature(), features->IvectorFeature()),
+  decoder_(fst, decoder_opts_) {
   decoder_.InitDecoding();
 }
 
@@ -64,7 +64,7 @@ int32 SingleUtteranceNnet3DecoderTpl<FST>::NumFramesDecoded() const {
 
 template <typename FST>
 void SingleUtteranceNnet3DecoderTpl<FST>::GetLattice(bool end_of_utterance,
-                                             CompactLattice *clat) const {
+    CompactLattice *clat) const {
   if (NumFramesDecoded() == 0)
     KALDI_ERR << "You cannot get a lattice if you decoded no frames.";
   Lattice raw_lat;
@@ -80,13 +80,13 @@ void SingleUtteranceNnet3DecoderTpl<FST>::GetLattice(bool end_of_utterance,
 
 template <typename FST>
 void SingleUtteranceNnet3DecoderTpl<FST>::GetBestPath(bool end_of_utterance,
-                                              Lattice *best_path) const {
+    Lattice *best_path) const {
   decoder_.GetBestPath(best_path, end_of_utterance);
 }
 
 template <typename FST>
 bool SingleUtteranceNnet3DecoderTpl<FST>::EndpointDetected(
-    const OnlineEndpointConfig &config) {
+  const OnlineEndpointConfig &config) {
   BaseFloat output_frame_shift =
       input_feature_frame_shift_in_seconds_ *
       decodable_.FrameSubsamplingFactor();
