@@ -9,8 +9,8 @@
 #
 # When --useword2charmap option is applied, an input Chinese words to Chinese characters mapping table \
 # (e.g. a word2char_map likes "195k_chinese_word2char_map" - 1st column of 195k_chinese_word2char_map contains chinese words, \
-# 2nd to end column fields are corresponding seperated chinese characters) \
-# is used for converting the corresponding Chinese words to seperate Chinese characters for scoring. \
+# 2nd to end column fields are corresponding separated chinese characters) \
+# is used for converting the corresponding Chinese words to separate Chinese characters for scoring. \
 # Please make sure the Chinese words in the mapping table is a superset of the Chinese words for decoding if you apply this option.
 
 # begin configuration section.
@@ -27,7 +27,7 @@ if [ $# -ne 3 ]; then
   echo "Usage: local/score_basic_ext.sh [--cmd (run.pl|queue.pl...)] <data-dir> <lang-dir|graph-dir> <decode-dir>"
   echo " Options:"
   echo "    --cmd (run.pl|queue.pl...)      # specify how to run the sub-processes."
-  echo "    --min_lmwt <int>                # minumum LM-weight for lattice rescoring "
+  echo "    --min_lmwt <int>                # minimum LM-weight for lattice rescoring "
   echo "    --max_lmwt <int>                # maximum LM-weight for lattice rescoring "
   echo "    --useword2charmap word2charmap  # use a chinese word to chinese characters mapping "
   exit 1;

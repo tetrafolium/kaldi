@@ -1182,7 +1182,7 @@ void CudaDecoder::AddFinalTokensToLattice(
     // the final_cost to it
     if (inserted) {
       // We want to figure out which FST state this token is associated to
-      // We don't have that info anymore, it wasn't transfered from the GPU
+      // We don't have that info anymore, it wasn't transferred from the GPU
       // We still need it for final tokens, because we need to know which
       // final cost to add in the lattice.
       // To find that original FST state, we need the id of an arc going to
@@ -1247,7 +1247,7 @@ void CudaDecoder::AddArcToLattice(
   // (we go backward)
   OutputLatticeState from_fst_lattice_state;
   // Having the predecessor in the previous frame
-  // <=> that token is associated to an emiting arc
+  // <=> that token is associated to an emitting arc
   bool emitting = (list_prev_token_idx < curr_frame_offset);
   // Checking if the source of that arc is the start state (original state at
   // the beginning of the decode)

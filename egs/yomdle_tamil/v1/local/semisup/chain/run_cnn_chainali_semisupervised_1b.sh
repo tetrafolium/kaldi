@@ -10,7 +10,7 @@
 # http://www.danielpovey.com/files/2018_icassp_semisupervised_mmi.pdf
 # local/semisup/run_semisup.sh shows how to call this.
 
-# We use 3-gram LM trained on 5M lines of auxilary data.
+# We use 3-gram LM trained on 5M lines of auxiliary data.
 # This script uses the same tree as that for the seed model.
 # Unsupervised set: train_unsup (25k tamil line images)
 # unsup_frames_per_eg=150

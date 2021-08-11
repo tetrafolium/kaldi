@@ -57,7 +57,7 @@ for dir in $*; do
 done
 
 # W.r.t. utt2uniq file the script has different behavior compared to other files
-# it is not compulsary for it to exist in src directories, but if it exists in
+# it is not compulsory for it to exist in src directories, but if it exists in
 # even one it should exist in all. We will create the files where necessary
 has_utt2uniq=false
 for in_dir in $*; do

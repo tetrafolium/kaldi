@@ -1244,8 +1244,8 @@ class SegmentsMerger(object):
     appropriate statistics required for this process in objects of
     SegmentStats class.
 
-    Paramters:
-        segments - a reference to the list of inital segments
+    Parameters:
+        segments - a reference to the list of initial segments
         merged_segments - stores all the initial segments as well
                           as the newly created segments
         between_segments - stores the inter-segment "segments"

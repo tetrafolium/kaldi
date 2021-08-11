@@ -8,7 +8,7 @@
 # impulse responses are float32 (4 byte)
 # noises are short (2 byte)
 # Data is multi-channel and each directory has a recording with each channel
-# as a seperate file
+# as a separate file
 # Impulse responses
 
 

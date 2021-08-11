@@ -19,7 +19,7 @@
 #from the soundcard. I tested portaudio on Linux (RedHat and Suse Linux) and
 #on MacOS 10.7. On Linux, it compiles out of the box. For MacOS 10.7,
 #it is necessary to edit the Makefile (this script tries to do that).
-#The script will remove all occurances of
+#The script will remove all occurrences of
 #
 # -Werror (occurs once in the Makefile)
 # -arch i386 (occurs twice in the Makefile)

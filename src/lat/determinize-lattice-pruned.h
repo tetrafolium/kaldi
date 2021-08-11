@@ -44,7 +44,7 @@ namespace fst {
    DeterminizeLatticePruned implements a special form of determinization with
    epsilon removal, optimized for a phase of lattice generation.  This algorithm
    also does pruning at the same time-- the combination is more efficient as it
-   somtimes prevents us from creating a lot of states that would later be pruned
+   sometimes prevents us from creating a lot of states that would later be pruned
    away.  This allows us to increase the lattice-beam and not have the algorithm
    blow up.  Also, because our algorithm processes states in order from those
    that appear on high-scoring paths down to those that appear on low-scoring

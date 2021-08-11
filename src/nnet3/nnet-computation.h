@@ -474,7 +474,7 @@ struct NnetComputation {
   // the indexes.
   void ComputeCudaIndexes();
 
-  // This function produces pretty-print ouput intended to allow a human to
+  // This function produces pretty-print output intended to allow a human to
   // interpret the computation.
   void Print(std::ostream &os, const Nnet &nnet) const;
 

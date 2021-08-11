@@ -84,7 +84,7 @@ END
 
   echo "$0: learning BPE..."
   # it is currently learned with only training text but we can also use all corpus text
-  # to learn BPE. phones are added so that one isolated occurance of every phone exists.
+  # to learn BPE. phones are added so that one isolated occurrence of every phone exists.
   cat data/local/text/cleaned/phones.txt data/local/text/cleaned/train.txt | \
     utils/lang/bpe/prepend_words.py | utils/lang/bpe/learn_bpe.py -s 700 > data/local/bpe.txt || exit 1;
 fi

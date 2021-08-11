@@ -403,7 +403,7 @@ private:
   void LaunchD2HCopies();
   // ComputeH2HCopies
   // At the end of each frame, we copy data back to host
-  // That data was concatenated into a single continous array
+  // That data was concatenated into a single continuous array
   // We then have to unpack it and move it inside host memory
   // This is done by ComputeH2HCopies
   void ComputeH2HCopies();

@@ -36,7 +36,7 @@ logger.info('Starting RNN trainer (train_rnn.py)')
 def get_args():
     """ Get args from stdin.
 
-    We add compulsary arguments as named arguments for readability
+    We add compulsory arguments as named arguments for readability
 
     The common options are defined in the object
     libs.nnet3.train.common.CommonParser.parser.

@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
         "by supplying the costs archive. In that case, the first arc's cost\n"
         "will be set to the value obtained from the archive, i.e. the total\n"
         "cost will be equal to cost. The cost archive can be sparse, i.e.\n"
-        "does not have to include zero-cost transcriptions. It is prefered\n"
+        "does not have to include zero-cost transcriptions. It is preferred\n"
         "for the archive to be sorted (for efficiency).\n"
         "\n"
         "Usage: \n"

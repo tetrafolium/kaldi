@@ -35,7 +35,7 @@ for w in `grep -v sil $dir/silence_phones.txt`; do
   echo "[$w] $w"
 done | cat - $dir/lexicon1_raw_nosil_50k.txt > $dir/lexicon2_raw_50k.txt || exit 1;
 
-# add some specific words, those are only with 100 missing occurences or more
+# add some specific words, those are only with 100 missing occurrences or more
 ( echo "MM M"; \
   echo "HMM HH M"; \
   echo "MM-HMM M HH M"; \

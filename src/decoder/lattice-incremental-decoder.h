@@ -195,7 +195,7 @@ struct LatticeIncrementalDecoderConfig {
  */
 class LatticeIncrementalDeterminizer {
 public:
-  using Label = typename LatticeArc::Label;  /* Actualy the same labels appear
+  using Label = typename LatticeArc::Label;  /* Actually the same labels appear
                                                 in both lattice and compact
                                                 lattice, so we don't use the
                                                 specific type all the time but
@@ -464,7 +464,7 @@ private:
 };
 
 
-/** This is an extention to the "normal" lattice-generating decoder.
+/** This is an extension to the "normal" lattice-generating decoder.
    See \ref lattices_generation \ref decoders_faster and \ref decoders_simple
     for more information.
 

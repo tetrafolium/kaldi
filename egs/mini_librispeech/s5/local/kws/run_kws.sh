@@ -87,7 +87,7 @@ system=exp/chain/tdnn1h_sp_online/decode_tglarge_dev_clean_2/
 if [ $stage -le 4 ]; then
   ## this is not exactly necessary for a single system and single keyword set
   ## but if you have multiple keyword sets, then it avoids having to recompute
-  ## the indices unnecesarily every time (see --indices-dir and --skip-indexing
+  ## the indices unnecessarily every time (see --indices-dir and --skip-indexing
   ## parameters to the search script bellow).
   for lmwt in `seq 8 14` ; do
     steps/make_index.sh --cmd "$cmd" --lmwt $lmwt --acwt 1.0 \

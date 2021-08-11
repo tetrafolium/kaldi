@@ -113,7 +113,7 @@ if [ $stage -le 5 ]; then
   # eval2000
   steps/nnet/make_bn_feats.sh --cmd "$train_cmd" --nj 20 $data/eval2000 $srcdata/eval2000 \
     $nnet $data/eval2000/log $data/eval2000/data || exit 1
-  # trainig data (full set)
+  # training data (full set)
   steps/nnet/make_bn_feats.sh --cmd "$train_cmd" --nj 40 $data/train $srcdata/train \
     $nnet $data/train/log $data/train/data || exit 1
 

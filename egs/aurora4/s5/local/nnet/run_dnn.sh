@@ -5,7 +5,7 @@
 
 # In this recipe we build DNN in four stages:
 # 1) Data preparations : the fMLLR features are stored to disk
-# 2) RBM pre-training : in this unsupervised stage we train stack of RBMs, a good starting point for Cross-entropy trainig
+# 2) RBM pre-training : in this unsupervised stage we train stack of RBMs, a good starting point for Cross-entropy training
 # 3) Frame-level cross-entropy training : in this stage the objective is to classify frames correctly.
 # 4) Sequence-criterion training : in this stage the objective is to classify the whole sequence correctly,
 #     the idea is similar to the 'Discriminative training' in context of GMM-HMMs.

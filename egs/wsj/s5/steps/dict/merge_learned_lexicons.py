@@ -68,7 +68,7 @@ def GetArgs():
         metavar="<lexicon-edits>",
         type=str,
         help=
-        "Output file containing human-readable & editable pronounciation info (and the"
+        "Output file containing human-readable & editable pronunciation info (and the"
         "accept/reject decision made by our algorithm) for those words in ref. vocab,"
         "to which any change has been recommended. The info for each word is like:"
         "------------ an 4086.0 --------------"
@@ -192,7 +192,7 @@ def WriteEditsAndSummary(args, learned_lexicon, ref_lexicon, pd_lexicon,
         num_prons_tot += len(learned_lexicon[word])
         # This count could be smaller than the count read from the dict "counts",
         count = len(stats[word])
-        # since in each sub-utterance, multiple occurences (which is rare) of the same word are compressed into one.
+        # since in each sub-utterance, multiple occurrences (which is rare) of the same word are compressed into one.
         # We use this count here so that in the edit-file, soft counts for each word sum up to one.
         # "flags" contains three binary indicators,
         flags = ['0' for i in range(3)]

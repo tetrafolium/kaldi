@@ -164,7 +164,7 @@ private:
  *  costs between points across the two clusters.
  *
  *  The algorithm takes advantage of the fact that the sum of the pairwise
- *  costs between the points of clusters I and J is equiavlent to the
+ *  costs between the points of clusters I and J is equivalents to the
  *  sum of the pairwise costs between cluster I and the parents of cluster
  *  J. In other words, the total cost between I and J is the sum of the
  *  costs between clusters I and M and clusters I and N, where

@@ -261,7 +261,7 @@ def parse_nnet2_to_nnet3(line_buffer):
     model.priors = parse_priors(line, line_buffer)
 
     if model.components_read != model.num_components:
-        logger.error("Did not read all components succesfully: {0}/{1}".format(
+        logger.error("Did not read all components successfully: {0}/{1}".format(
             model.components_read, model.num_components))
 
     return model

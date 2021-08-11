@@ -571,7 +571,7 @@ public:
           // The following ensures that the start-state of sub-FSTs only has
           // a single arc per left-context phone (the graph-building recipe can
           // end up creating more than one if there were disambiguation symbols,
-          // e.g. for langauge model backoff).
+          // e.g. for language model backoff).
           if (s == fst_->Start() && IsEntryState(s))
             InputDeterminizeSingleState(s, fst_);
         }

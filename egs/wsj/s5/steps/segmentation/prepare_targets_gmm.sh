@@ -81,7 +81,7 @@ in_whole_data_dir=$3
 ali_model_dir=$4  # Model directory used to align the $data_dir to get target 
                   # labels for training SAD. This should typically be a
                   # speaker-adapted system.
-model_dir=$5      # Model direcotry used to decode the whole-recording version
+model_dir=$5      # Model directory used to decode the whole-recording version
                   # of the $data_dir to get target labels for training SAD. This
                   # should typically be a speaker-independent system like
                   # LDA+MLLT system.
@@ -226,7 +226,7 @@ ali_model_id=`basename $ali_model_dir`
 ###############################################################################
 # Get frame-level targets from lattices for nnet training
 # Targets are matrices of 3 columns -- silence, speech and garbage
-# The target values are obtained by summing up posterior probabilites of 
+# The target values are obtained by summing up posterior probabilities of 
 # arcs from lattice-arc-post over silence, speech and garbage phones.
 ###############################################################################
 if [ $stage -le 7 ]; then

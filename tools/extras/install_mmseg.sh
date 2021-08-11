@@ -79,7 +79,7 @@ elif [ ! -z ${mmseg_file_lib64+x} ]; then
 else
   echo >&2 "$0: ERROR: Didn't find ./mmseg-$VERSION/lib/ or ./mmseg-$VERSION/lib64/"
   echo >&2 "  Perhaps your python or system installs python modules into"
-  echo >&2 "  a different dir or some other unknown issues arised. Review the output"
+  echo >&2 "  a different dir or some other unknown issues arose. Review the output"
   echo >&2 "  of the script and try to figure out what went wrong."
   exit 1
 fi

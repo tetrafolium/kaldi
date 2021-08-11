@@ -25,7 +25,7 @@ namespace kaldi {
 
 /**
    ComputeEer computes the Equal Error Rate (EER) for the given scores
-   and returns it as a proportion beween 0 and 1.
+   and returns it as a proportion between 0 and 1.
    If we set the threshold at x, then the target error-rate is the
    proportion of target_scores below x; and the non-target error-rate
    is the proportion of non-target scores above x.  We seek a

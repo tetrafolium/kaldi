@@ -49,8 +49,8 @@ close OUTPUTFILE;
     $line =~ s/\}/\x{0626}/g;   ## YEH WITH HAMZA ABOVE
     $line =~ s/A/\x{0627}/g;    ## ALEF
     $line =~ s/b/\x{0628}/g;    ## BEH
-    $line =~ s/p/\x{0629}/g;    ## TEH MARBUTA
-    $line =~ s/t/\x{062A}/g;    ## TEH
+    $line =~ s/p/\x{0629}/g;    ## THE MARBUTA
+    $line =~ s/t/\x{062A}/g;    ## THE
     $line =~ s/v/\x{062B}/g;    ## THEH
     $line =~ s/j/\x{062C}/g;    ## JEEM
     $line =~ s/H/\x{062D}/g;    ## HAH

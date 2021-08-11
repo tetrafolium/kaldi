@@ -15,7 +15,7 @@ import warnings
 
 
 def GetArgs():
-    # we add compulsary arguments as named arguments for readability
+    # we add compulsory arguments as named arguments for readability
     parser = argparse.ArgumentParser(
         description="""
     **Warning, this script is deprecated.  Please use utils/data/combine_short_segments.sh**

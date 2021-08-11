@@ -116,7 +116,7 @@ if [ $stage -le 0 ] ; then
     done
     touch $indices_dir/.done.index
   else
-    echo "$0: Assuming indexing has been aready done. If you really need to re-run "
+    echo "$0: Assuming indexing has been already done. If you really need to re-run "
     echo "$0: the indexing again, delete the file $indices_dir/.done.index"
   fi
 fi

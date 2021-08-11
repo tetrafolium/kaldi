@@ -191,7 +191,7 @@ void* TdnnComponent::Propagate(
   // if bias_params_.Dim() == 0 we don't need to zero 'out' at
   // this point because in that case we set the flag kPropagateAdds,
   // so the calling code knows that the Propagate function *adds to*
-  // the 'out' matrix, so it should (typicaly) be zeroed before calling
+  // the 'out' matrix, so it should (typically) be zeroed before calling
   // Propagate().
 
   KALDI_ASSERT(indexes->row_offsets.size() == time_offsets_.size());

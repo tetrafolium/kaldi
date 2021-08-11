@@ -392,7 +392,7 @@ fi
 # #Perform rescoring of tri6b be means of faster-rnnlm using Noise contrastive estimation
 # #Note, that could be extremely slow without CUDA
 # #We use smaller direct layer size so that it could be stored in GPU memory (~2Gb)
-# #Suprisingly, bottleneck here is validation rather then learning
+# #Surprisingly, bottleneck here is validation rather then learning
 # #Therefore you can use smaller validation dataset to speed up training
 # wait && local/run_rnnlm.sh \
 #     --rnnlm-ver "faster-rnnlm" \

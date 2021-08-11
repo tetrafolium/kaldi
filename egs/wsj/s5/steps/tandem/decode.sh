@@ -41,7 +41,7 @@ if [ $# != 4 ]; then
    echo "  --cmd (utils/run.pl|utils/queue.pl <queue opts>) # how to run jobs."
    echo "  --transform-dir <trans-dir>                      # dir to find fMLLR transforms "
    echo "  --acwt <float>                                   # acoustic scale used for lattice generation "
-   echo "  --min-lmwt <int>                                 # minumum LM-weight for lattice rescoring "
+   echo "  --min-lmwt <int>                                 # minimum LM-weight for lattice rescoring "
    echo "  --max-lmwt <int>                                 # maximum LM-weight for lattice rescoring "
    echo "                                                   # speaker-adapted decoding"
    exit 1;

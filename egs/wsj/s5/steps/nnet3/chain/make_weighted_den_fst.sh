@@ -47,7 +47,7 @@ if [ $# -lt 2 ]; then
   echo "Options: "
   echo " --cmd (run.pl|queue.pl...)      # Specify how to run jobs.";
   echo "--lm-opts                        # Options for phone LM generation";
-  echo "--num-repeats                    # Comma-separated list of postive integer"
+  echo "--num-repeats                    # Comma-separated list of positive integer"
   echo "                                 # multiplicities, one for each input"
   echo "                                 # alignment directory.  The alignments"
   echo "                                 # from each source will be scaled by"

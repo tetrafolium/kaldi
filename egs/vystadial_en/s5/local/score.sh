@@ -18,7 +18,7 @@ if [ $# -ne 3 ]; then
   echo "Usage: local/score.sh [--cmd (run.pl|queue.pl...)] <data-dir> <lang-dir|graph-dir> <decode-dir>"
   echo " Options:"
   echo "    --cmd (run.pl|queue.pl...)      # specify how to run the sub-processes."
-  echo "    --min_lmw <int>                # minumum LM-weight for lattice rescoring "
+  echo "    --min_lmw <int>                # minimum LM-weight for lattice rescoring "
   echo "    --max_lmw <int>                # maximum LM-weight for lattice rescoring "
   exit 1;
 fi

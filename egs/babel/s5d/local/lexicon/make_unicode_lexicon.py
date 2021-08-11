@@ -8,7 +8,7 @@
 #
 # This script takes a list of either words or words and corresponding
 # morphemes and returns a graphemic lexicon in the "standard" kaldi format,
-# i.e. a single word with its correpsonding pronunciation per line; multiple
+# i.e. a single word with its corresponding pronunciation per line; multiple
 # pronunciations of a word are listed on separate lines.
 #
 # Example:

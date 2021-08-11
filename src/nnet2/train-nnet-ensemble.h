@@ -53,7 +53,7 @@ struct NnetEnsembleTrainerConfig {
 
 // Similar as NnetTrainer, Class NnetEnsembleTrainer first batches
 // up the input into minibatches and feed the data into every nnet in
-// the ensemble, call Propogate to do forward propogation, and
+// the ensemble, call Propagate to do forward propagation, and
 // collect the output posteriors. The posteriors from different
 // nets are averaged and then used to compute the additional term
 // in the objf: (a constant times) the cross-entropy between each

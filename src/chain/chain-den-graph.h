@@ -153,7 +153,7 @@ void MapFstToPdfIdsPlusOne(const TransitionModel &trans_model,
     fst::StdVectorFst *fst);
 
 // Starting from an acceptor on phones that represents some kind of compiled
-// language model (with no disambiguation symbols), this funtion creates the
+// language model (with no disambiguation symbols), this function creates the
 // denominator-graph.  Note: there is similar code in chain-supervision.cc, when
 // creating the supervision graph.
 void CreateDenominatorFst(const ContextDependency &ctx_dep,

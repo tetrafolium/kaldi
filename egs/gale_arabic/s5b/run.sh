@@ -119,5 +119,5 @@ if [ $stage -le 9 ]; then
   local/chain/run_tdnn.sh
 fi
 
-echo "$0: training succedded"
+echo "$0: training succeeded"
 exit 0

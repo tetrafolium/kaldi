@@ -40,7 +40,7 @@ for line in sys.stdin:
                                                end * 100)
         spkId = '%s_spk-%04d' % (basename, spk)
 
-        # only add segments where the Matching Error Rate is below the prescribed threshhold
+        # only add segments where the Matching Error Rate is below the prescribed threshold
         if mer_thresh == None or mer <= mer_thresh:
             print >> segments_file, '%s %s %.2f %.2f' % (segId, basename,
                                                          start, end)

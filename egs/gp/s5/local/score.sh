@@ -14,7 +14,7 @@ max_lmwt=17
 
 if [ $# -ne 3 ]; then
   echo "Usage: local/score.sh [--cmd (run.pl|queue.pl...)] <data-dir> <lang-dir|graph-dir> <decode-dir>"
-  echo "  --min_lmwt <int>                                 # minumum LM-weight for lattice rescoring "
+  echo "  --min_lmwt <int>                                 # minimum LM-weight for lattice rescoring "
   echo "  --max_lmwt <int>                                 # maximum LM-weight for lattice rescoring "
   exit 1;
 fi

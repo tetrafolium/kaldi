@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.realpath(os.path.dirname(sys.argv[0])) + '/')
 
 
 def get_args():
-    # we add compulsary arguments as named arguments for readability
+    # we add compulsory arguments as named arguments for readability
     parser = argparse.ArgumentParser(
         description="Reads an xconfig file and creates config files "
         "for neural net creation and training",

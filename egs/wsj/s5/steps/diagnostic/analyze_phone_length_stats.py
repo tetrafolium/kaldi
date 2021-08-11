@@ -252,7 +252,7 @@ total_phones['internal'] = total_phones['all'] - \
 
 internal_opt_sil_phone_lengths = dict(
     phone_lengths['all'][optional_silence_phone])
-# internal_opt_sil_phone_lenghts is a dict from length to count.
+# internal_opt_sil_phone_lengths is a dict from length to count.
 for length in list(internal_opt_sil_phone_lengths.keys()):
     # subtract the counts for begin and end from the overall counts to get the
     # word-internal count.

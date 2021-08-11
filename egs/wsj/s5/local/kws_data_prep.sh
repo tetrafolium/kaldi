@@ -47,7 +47,7 @@ cat $datadir/wav.scp | \
   }' > $kwsdatadir/utter_id
 
 # Map utterance to the names that will appear in the rttm file. You have 
-# to modify the commands below accoring to your rttm file. In the WSJ case
+# to modify the commands below according to your rttm file. In the WSJ case
 # since each file is an utterance, we assume that the actual file names will 
 # be the "names" in the rttm, so the utterance names map to themselves.
 cat $datadir/wav.scp | \

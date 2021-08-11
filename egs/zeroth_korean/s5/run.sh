@@ -252,7 +252,7 @@ if [ $stage -le 11 ]; then
   fi 
 fi 
 
-echo "$0: GMM trainig is Done"
+echo "$0: GMM training is Done"
 
 if $chain_train; then
   ## Training Chain Acoustic model using clean data set

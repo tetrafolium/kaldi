@@ -18,7 +18,7 @@
 # has, on each line, "word prob".
 
 rnnlm_ver=rnnlm-0.3e
-ensure_normalized_probs=false  # if true then we add the neccesary options to
+ensure_normalized_probs=false  # if true then we add the necessary options to
                                # normalize the probabilities of RNNLM
                                # e.g. when using faster-rnnlm in the nce mode
 

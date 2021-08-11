@@ -165,7 +165,7 @@ def read_ctm(ctm_file, file_and_channel2reco=None):
     """Reads a CTM file and yields elements of a dictionary
         { utterance-id : CTM for the utterance },
     where CTM for the utterance is stored as a list of lines
-    from a CTM correponding to the utterance.
+    from a CTM corresponding to the utterance.
 
     Note: *_reco in the variables usually correspond to utterances rather
     than recordings.

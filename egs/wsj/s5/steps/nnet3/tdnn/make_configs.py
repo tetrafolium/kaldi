@@ -20,7 +20,7 @@ sys.path.insert(0, 'steps')
 
 
 def GetArgs():
-    # we add compulsary arguments as named arguments for readability
+    # we add compulsory arguments as named arguments for readability
     parser = argparse.ArgumentParser(
         description="Writes config files and variables "
         "for TDNNs creation and training",
@@ -243,7 +243,7 @@ def CheckArgs(args):
         args.ivector_dim = common_lib.get_ivector_dim(args.ivector_dir)
 
     if not args.feat_dim > 0:
-        raise Exception("feat-dim has to be postive")
+        raise Exception("feat-dim has to be positive")
 
     if not args.num_targets > 0:
         print(args.num_targets)

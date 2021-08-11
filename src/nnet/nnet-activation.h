@@ -91,7 +91,7 @@ public:
     // This Softmax should be used for a hidden layer, it calculates
     // the true Jacobian of Softmax: J = diag(out) - out*out^T
 
-    // The backpropagation formual is:
+    // The backpropagation formula is:
     // in_diff = out_diff \odot out - out(out_diff^T * out)
     // (where \odot is Hadamard product)
 

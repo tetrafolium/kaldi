@@ -95,7 +95,7 @@ public:
         nnet_basis_[i].Init(basis_proto);
       }
     } else if (basis_filename != "") {
-      // Load 1 initial basis repeateadly,
+      // Load 1 initial basis repeatedly,
       KALDI_LOG << "Reading 'basis' from : " << basis_filename;
       for (int32 i = 0; i < nnet_basis_.size(); i++) {
         nnet_basis_[i].Read(basis_filename);

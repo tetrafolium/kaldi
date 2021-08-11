@@ -9,7 +9,7 @@ import argparse
 import sys
 import warnings
 
-# Collect pronounciation stats from a ctm_prons.txt file of the form output
+# Collect pronunciation stats from a ctm_prons.txt file of the form output
 # by steps/cleanup/debug_lexicon.sh.  This input file has lines of the form:
 #  utt_id word phone1 phone2 .. phoneN
 #  e.g.
@@ -27,7 +27,7 @@ import warnings
 
 def GetArgs():
     parser = argparse.ArgumentParser(
-        description="Accumulate pronounciation statistics from "
+        description="Accumulate pronunciation statistics from "
         "a ctm_prons.txt file.",
         epilog="See steps/cleanup/debug_lexicon.sh for example")
     parser.add_argument(
@@ -35,7 +35,7 @@ def GetArgs():
         metavar="<ctm-prons-file>",
         type=str,
         help=
-        "File containing word-pronounciation alignments obtained from a ctm file; "
+        "File containing word-pronunciation alignments obtained from a ctm file; "
         "It represents phonetic decoding results, aligned with word boundaries obtained"
         "from forced alignments."
         "each line must be <utt_id> <word> <phones>")
@@ -94,7 +94,7 @@ def ReadEntries(file_handle):
 
 
 # Basically, this function generates an "info" list from a ctm_prons file.
-# Each entry in the list represents the pronounciation candidate(s) of a word.
+# Each entry in the list represents the pronunciation candidate(s) of a word.
 # For each non-<eps> word, the entry is a list: [utt_id, word, set(pronunciation_candidates)]. e.g:
 # [911Mothers_2010W-0010916-0012901-1, other, set('AH DH ER', 'AH DH ER K AH N')]
 # For each <eps>, we split the phones it aligns to into two parts: "nonsil_left",
@@ -105,12 +105,12 @@ def ReadEntries(file_handle):
 # only if it's nonsil_right segment is not empty, which may be used when processing
 # the next word.
 #
-# Normally, one non-<eps> word is only aligned to one pronounciation candidate. However
+# Normally, one non-<eps> word is only aligned to one pronunciation candidate. However
 # when there is a preceding/following <eps>, like in the following example, we
 # assume the phones aligned to <eps> should be statistically distributed
 # to its neighboring words (BTW we assume there are no consecutive <eps> within an utterance.)
-# Thus we append the "nonsil_left" segment of these phones to the pronounciation
-# of the preceding word, if the last phone of this pronounciation is not a silence phone,
+# Thus we append the "nonsil_left" segment of these phones to the pronunciation
+# of the preceding word, if the last phone of this pronunciation is not a silence phone,
 # Similarly we can add a pron candidate to the following word.
 #
 # For example, for the following part of a ctm_prons file:
@@ -136,8 +136,8 @@ def ReadEntries(file_handle):
 # [911Mothers_2010W-0010916-0012901-1, that, set('SIL DH AH T')]
 # [911Mothers_2010W-0010916-0012901-1, my, set('M AY')]
 #
-# Then we accumulate pronouciation stats from "info". Basically, for each occurence
-# of a word, each pronounciation candidate gets equal soft counts. e.g. In the above
+# Then we accumulate pronunciation stats from "info". Basically, for each occurrence
+# of a word, each pronunciation candidate gets equal soft counts. e.g. In the above
 # example, each pron candidate of "because" gets a count of 1/4. The stats is stored
 # in a dictionary (word, pron) : count.
 
@@ -212,7 +212,7 @@ def GetStatsFromCtmProns(silphones, optional_silence, non_scored_words,
             count = 1.0 / float(len(prons))
             for pron in prons:
                 phones = pron.strip().split()
-                # post-processing: remove all begining/trailing silence phones.
+                # post-processing: remove all beginning/trailing silence phones.
                 # we allow only candidates that either consist of a single silence
                 # phone, or the silence phones are inside non-silence phones.
                 if len(phones) > 1:

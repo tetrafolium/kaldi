@@ -69,7 +69,7 @@ train_diagnostic_scp_list=
 valid_diagnostic_scp_list=
 combine_scp_list=
 
-# read paramter from $egs_dir[0]/info and cmvn_opts
+# read parameter from $egs_dir[0]/info and cmvn_opts
 # to write in multilingual egs_dir.
 check_params="info/feat_dim info/ivector_dim info/left_context info/right_context info/left_context_initial info/right_context_final cmvn_opts"
 ivec_dim=`cat ${args[0]}/info/ivector_dim`

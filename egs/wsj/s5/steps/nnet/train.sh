@@ -30,7 +30,7 @@ ivector_append_tool=append-vector-to-feats # (optional) the tool for appending i
 
 feat_type=plain
 traps_dct_basis=11    # (feat_type=traps) nr. of DCT basis, 11 is good with splice=10,
-transf=               # (feat_type=transf) import this linear tranform,
+transf=               # (feat_type=transf) import this linear transform,
 splice_after_transf=5 # (feat_type=transf) splice after the linear transform,
 
 feature_transform_proto= # (optional) use this prototype for 'feature_transform',
@@ -39,7 +39,7 @@ feature_transform=  # (optional) directly use this 'feature_transform',
 # labels,
 labels=            # (optional) specify non-default training targets,
                    # (targets need to be in posterior format, see 'ali-to-post', 'feat-to-post'),
-num_tgt=           # (optional) specifiy number of NN outputs, to be used with 'labels=',
+num_tgt=           # (optional) specify number of NN outputs, to be used with 'labels=',
 
 # training scheduler,
 learn_rate=0.008   # initial learning rate,
@@ -469,7 +469,7 @@ steps/nnet/train_scheduler.sh \
   ${config:+ --config $config} \
   $nnet_init "$feats_tr" "$feats_cv" "$labels_tr" "$labels_cv" $dir
 
-echo "$0: Successfuly finished. '$dir'"
+echo "$0: Successfully finished. '$dir'"
 
 sleep 3
 exit 0

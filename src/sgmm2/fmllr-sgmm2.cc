@@ -158,7 +158,7 @@ BaseFloat FmllrSgmm2Accs::Accumulate(const AmSgmm2 &model,
     const Sgmm2PerFrameDerivedVars &frame_vars,
     int32 pdf_index, BaseFloat weight,
     Sgmm2PerSpkDerivedVars *spk) {
-  // Calulate Gaussian posteriors and collect statistics
+  // Calculate Gaussian posteriors and collect statistics
   Matrix<BaseFloat> posteriors;
   BaseFloat log_like = model.ComponentPosteriors(frame_vars, pdf_index,
                                                  spk, &posteriors);

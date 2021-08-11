@@ -201,5 +201,5 @@ done | sort -n -r -k2 >> RESULTS
 echo -e "\n# Detailed WER on all corpus dev sets" >> RESULTS
 local/split_wer_per_corpus.sh $galeData >> RESULTS
 
-echo training succedded
+echo training succeeded
 exit 0

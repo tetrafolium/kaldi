@@ -3,7 +3,7 @@
 set -eu 
 # Adapted from the local/prepare_dict script in 
 # the librispeech recipe. Download and prepare CMU_dict.
-# For childresn speech ASR tasks, since the vocabulary in cmu_kids and 
+# For childrens speech ASR tasks, since the vocabulary in cmu_kids and 
 # cslu_kids is relatively easy comparing to librispeech, we use only the 
 # CMU_dict, and do not handle OOV with G2P.
 # Should be run from egs/cmu_cslu_kids.

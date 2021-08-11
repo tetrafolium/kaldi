@@ -48,7 +48,7 @@ steps/train_mpe.sh --cmd "$train_cmd" data/train data/lang exp/tri2b_ali exp/tri
 
 
   
-echo training mmi mpe succedded
+echo training mmi mpe succeeded
 exit 0
 
 

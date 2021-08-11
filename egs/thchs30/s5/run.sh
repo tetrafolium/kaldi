@@ -34,7 +34,7 @@ cp data/mfcc/test/feats.scp data/mfcc/test_phone && cp data/mfcc/test/cmvn.scp d
 
 
 #prepare language stuff
-#build a large lexicon that invovles words in both the training and decoding.
+#build a large lexicon that involves words in both the training and decoding.
 (
   echo "make word graph ..."
   cd $H; mkdir -p data/{dict,lang,graph} && \
@@ -108,5 +108,5 @@ local/nnet/run_dnn.sh --stage 0 --nj $n  exp/tri4b exp/tri4b_ali exp/tri4b_ali_c
 
 #train dae model
 #python2.6 or above is required for noisy data generation.
-#To speed up the process, pyximport for python is recommeded.
+#To speed up the process, pyximport for python is recommended.
 local/dae/run_dae.sh $thchs || exit 1;

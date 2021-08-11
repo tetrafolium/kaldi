@@ -582,7 +582,7 @@ def parse_writing_conditions(writing_conditions):
 
 def check_writing_condition(wc_dict, base_name):
     """ Given writing condition dictionary, checks if a page image is writing
-        in a specifed writing condition.
+        in a specified writing condition.
         It is used to create subset of dataset based on writing condition.
     Returns
     (bool): True if writing condition matches.

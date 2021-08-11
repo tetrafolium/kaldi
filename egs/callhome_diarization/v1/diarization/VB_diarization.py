@@ -83,7 +83,7 @@ def VB_diarization(X,
                   frames to UBM componets more uncertain)
     sparsityThr - set occupations smaller that this threshold to 0.0 (saves memory
                   as the posteriors are represented by sparse matrix)
-    alphaQInit  - Dirichlet concentraion parameter for initializing q
+    alphaQInit  - Dirichlet concentration parameter for initializing q
     downsample  - perform diarization on input downsampled by this factor
     VtiEV       - C x (R**2+R)/2 matrix normally calculated by VB_diarization when
                   VtiEV is None. However, it can be pre-calculated using function
@@ -341,7 +341,7 @@ def logsumexp(x, axis=0):
     return x
 
 
-# The folowing two functions are only versions optimized for speed using numexpr
+# The following two functions are only versions optimized for speed using numexpr
 # module and can be replaced by logsumexp and np.exp functions to avoid
 # the dependency on the module.
 def logsumexp_ne(x, axis=0):

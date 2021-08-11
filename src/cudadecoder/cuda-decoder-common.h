@@ -397,7 +397,7 @@ struct LaneCounters {
   // since frame 0
   // It is used to set the prev_token index.
   int32 main_q_global_offset;
-  // Same thing, but for main_q_n_extra_prev_tokens (those are also transfered
+  // Same thing, but for main_q_n_extra_prev_tokens (those are also transferred
   // back to host)
   int32 main_q_extra_prev_tokens_global_offset;
   // Minimum token for that frame

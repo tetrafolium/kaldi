@@ -32,7 +32,7 @@ tdnn_affix=_1b
 # configs for transfer learning
 common_egs_dir=
 primary_lr_factor=0.25 # The learning-rate factor for transferred layers from source
-                       # model. e.g. if 0, it fixed the paramters transferred from source.
+                       # model. e.g. if 0, it fixed the parameters transferred from source.
                        # The learning-rate factor for new added layers is 1.0.
 nnet_affix=_online_wsj
 phone_lm_scales="1,10" # comma-separated list of positive integer multiplicities
@@ -42,7 +42,7 @@ phone_lm_scales="1,10" # comma-separated list of positive integer multiplicities
 # model and dirs for source model used for transfer learning
 src_mdl=../../wsj/s5/exp/chain/tdnn1d_sp/final.mdl # Input chain model
                                                     # trained on source dataset (wsj).
-                                                    # This model is transfered to the target domain.
+                                                    # This model is transferred to the target domain.
 
 src_mfcc_config=../../wsj/s5/conf/mfcc_hires.conf # mfcc config used to extract higher dim
                                                   # mfcc features for ivector and DNN training

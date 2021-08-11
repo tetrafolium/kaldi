@@ -181,7 +181,7 @@ _DEFAULT_FILTERS = ['-build/include_alpha']
 
 # We used to check for high-bit characters, but after much discussion we
 # decided those were OK, as long as they were in UTF-8 and didn't represent
-# hard-coded international strings, which belong in a seperate i18n file.
+# hard-coded international strings, which belong in a separate i18n file.
 
 # Headers that we consider STL headers.
 _STL_HEADERS = frozenset([
@@ -455,7 +455,7 @@ class _IncludeState(dict):
         self._last_header = ''
 
     def CanonicalizeAlphabeticalOrder(self, header_path):
-        """Returns a path canonicalized for alphabetical comparisson.
+        """Returns a path canonicalized for alphabetical comparisons.
 
         - replaces "-" with "_" so they both cmp the same.
         - removes '-inl' since we don't require them to be after the main header.
@@ -1769,7 +1769,7 @@ def CheckSpacing(filename, clean_lines, linenum, error):
                 and prev_line[:prevbrace].find('namespace') == -1):
             # OK, we have a blank line at the start of a code block.  Before we
             # complain, we check if it is an exception to the rule: The previous
-            # non-empty line has the paramters of a function header that are indented
+            # non-empty line has the parameters of a function header that are indented
             # 4 spaces (because they did not fit in a 80 column line when placed on
             # the same line as the function name).  We also check for the case where
             # the previous line is indented 6 spaces, which may happen when the
@@ -2703,7 +2703,7 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
                 continue
             # A catch all for tricky sizeof cases, including 'sizeof expression',
             # 'sizeof(*type)', 'sizeof(const type)', 'sizeof(struct StructName)'
-            # requires skipping the next token becasue we split on ' ' and '*'.
+            # requires skipping the next token because we split on ' ' and '*'.
             if tok.startswith('sizeof'):
                 skip_next = True
                 continue
@@ -2960,7 +2960,7 @@ def UpdateIncludeState(filename, include_state, io=codecs):
       io: The io factory to use to read the file. Provided for testability.
 
     Returns:
-      True if a header was succesfully added. False otherwise.
+      True if a header was successfully added. False otherwise.
     """
     headerfile = None
     try:
@@ -3036,7 +3036,7 @@ def CheckForIncludeWhatYouUse(filename,
     # Let's copy the include_state so it is only messed up within this function.
     include_state = include_state.copy()
 
-    # Did we find the header for this file (if any) and succesfully load it?
+    # Did we find the header for this file (if any) and successfully load it?
     header_found = False
 
     # Use the absolute path so that matching works properly.

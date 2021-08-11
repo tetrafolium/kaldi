@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
         "  b) the alignment-csv-filename is an optional parameter. \n"
         "     If present, the alignment i.e. detailed information about what \n"
         "     hypotheses match up with which reference entries will be \n"
-        "     generated. The alignemnt file format is equivalent to \n"
+        "     generated. The alignment file format is equivalent to \n"
         "     the alignment file produced using the F4DE tool. However, we do"
         "     not set some fields and the utterance identifiers are numeric.\n"
         "     You can use the script utils/int2sym.pl and the utterance and \n"
@@ -147,23 +147,23 @@ int main(int argc, char *argv[]) {
     TwvMetrics scores(twv_opts);
     scores.AddAlignment(ali);
 
-    std::cout << "aproximate ATWV = "
+    std::cout << "approximate ATWV = "
               << std::fixed << std::setprecision(4)
               << scores.Atwv() << std::endl;
-    std::cout << "aproximate STWV = "
+    std::cout << "approximate STWV = "
               << std::fixed << std::setprecision(4)
               << scores.Stwv() << std::endl;
 
     float mtwv, mtwv_threshold, otwv;
     scores.GetOracleMeasures(&mtwv, &mtwv_threshold, &otwv);
 
-    std::cout << "aproximate MTWV = "
+    std::cout << "approximate MTWV = "
               << std::fixed << std::setprecision(4)
               << mtwv << std::endl;
-    std::cout << "aproximate MTWV threshold = "
+    std::cout << "approximate MTWV threshold = "
               << std::fixed << std::setprecision(4)
               << mtwv_threshold << std::endl;
-    std::cout << "aproximate OTWV = "
+    std::cout << "approximate OTWV = "
               << std::fixed << std::setprecision(4)
               << otwv << std::endl;
   } catch(const std::exception &e) {

@@ -24,7 +24,7 @@ data_dir=data/train_100k
 # Model directory used to align the $data_dir to get target labels for training
 # SAD. This should typically be a speaker-adapted system.
 sat_model_dir=exp/tri4a
-# Model direcotry used to decode the whole-recording version of the $data_dir to
+# Model directory used to decode the whole-recording version of the $data_dir to
 # get target labels for training SAD. This should typically be a
 # speaker-independent system like LDA+MLLT system.
 model_dir=exp/tri3a

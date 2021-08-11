@@ -30,7 +30,7 @@ word_filter=$(mktemp)
 awk '{ keep_the_word = $1 !~ /^(\[.*\]|<.*>|%.*|!.*|-.*|.*-)$/; print $0, keep_the_word }' \
   $graph/words.txt >$word_filter
 
-# Calcualte the word-length,
+# Calculate the word-length,
 word_length=$(mktemp)
 awk '{if(r==0) { len_hash[$1] = NF-2; } 
       if(r==1) { if(len_hash[$1]) { len = len_hash[$1]; } else { len = -1 }  

@@ -119,7 +119,7 @@ void OptimizeLbfgs<Real>::ComputeNewDirection(Real function_value,
   // The rest of this is computing p_k <-- - H_k \nabla f_k using Algorithm
   // 7.4 of N&W.
   Vector<Real> &q(deriv_), &r(new_x_); // Use deriv_ as a temporary place to put
-  // q, and new_x_ as a temporay place to put r.
+  // q, and new_x_ as a temporary place to put r.
   // The if-statement below is just to get rid of spurious warnings from
   // valgrind about memcpy source and destination overlap, since sometimes q and
   // gradient are the same variable.
@@ -308,7 +308,7 @@ void OptimizeLbfgs<Real>::StepSizeIteration(Real function_value,
     num_wolfe_ii_failures_++;
   }
 
-  // Test whether we've been switching too many times betwen wolfe i) and ii)
+  // Test whether we've been switching too many times between wolfe i) and ii)
   // failures, or overall have an excessive number of failures.  We just give up
   // and restart L-BFGS.  Probably we've almost converged.
   if (num_wolfe_i_failures_ + num_wolfe_ii_failures_ >

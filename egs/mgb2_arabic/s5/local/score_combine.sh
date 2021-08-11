@@ -32,7 +32,7 @@ lat_weights=
 help_message="Usage: "$(basename $0)" [options] <data-dir> <graph-dir|lang-dir> <decode-dir1> <decode-dir2> [decode-dir3 ... ] <out-dir>
 Options:
   --cmd (run.pl|queue.pl...)      # specify how to run the sub-processes.
-  --min-lmwt INT                  # minumum LM-weight for lattice rescoring 
+  --min-lmwt INT                  # minimum LM-weight for lattice rescoring 
   --max-lmwt INT                  # maximum LM-weight for lattice rescoring
   --lat-weights STR               # colon-separated string of lattice weights
 ";

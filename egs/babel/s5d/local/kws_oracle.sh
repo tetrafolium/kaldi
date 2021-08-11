@@ -10,7 +10,7 @@
 # Begin configuration section.
 cmd=run.pl
 acwt=0.09091 #Acoustic weight -- should not be necessary for oracle lattices
-duptime=0.6  #Max time difference in which the occurences of the same KW will be seen as duplicates
+duptime=0.6  #Max time difference in which the occurrences of the same KW will be seen as duplicates
 text=     # an alternative reference text to use. when not specified, the <data-dir>/text will be used
 model=    # acoustic model to use
 extraid=  # kws setup extra ID (kws task was setup using kws_setup.sh --extraid <id>
@@ -85,7 +85,7 @@ fi
 if [ $stage -le 3 ]; then
 
   #TODO: this stage should be probably moved in a single script file
-  # and used accross all the kw search scripts
+  # and used across all the kw search scripts
   duration=`head -1 $kwsdatadir/ecf.xml |\
     grep -o -E "duration=\"[0-9]*[    \.]*[0-9]*\"" |\
     grep -o -E "[0-9]*[\.]*[0-9]*" |\
@@ -99,7 +99,7 @@ if [ $stage -le 3 ]; then
     -  $oracledir/kwslist_orig.xml
 
   #This does not do much -- just adds empty entries for keywords for which
-  #not even one occurence has not been found
+  #not even one occurrence has not been found
   local/fix_kwslist.pl $kwsdatadir/kwlist.xml $oracledir/kwslist_orig.xml $oracledir/kwslist.xml
 fi
 
@@ -125,12 +125,12 @@ if [ $stage -le 4 ]; then
   #-(
   #-echo -n "ATWV-invocab  "
   #-grep Occurrence $oracledir/invocab.sum.txt | cut -d '|' -f 13
-  #-) || echo "Error occured getting the invocab results"
+  #-) || echo "Error occurred getting the invocab results"
 
   #-(
   #-echo -n "ATWV-outvocab "
   #-grep Occurrence $oracledir/outvocab.sum.txt | cut -d '|' -f 13
-  #-) || echo "Error occured getting the outvocab results"
+  #-) || echo "Error occurred getting the outvocab results"
 
   echo "======================================================="
 fi

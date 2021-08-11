@@ -28,7 +28,7 @@ for dvd in $dir1 $dir2 $dir3; do
     echo "$id sox $file -r 16000 -t wav - |"
   done 
 done | sort -u > $gale_data/wav.scp
-echo "$0:data prep audio succeded"
+echo "$0:data prep audio succeeded"
 
 gale_data=$(utils/make_absolute.sh "GALE" );
 top_pwd=`pwd`

@@ -173,7 +173,7 @@ rm $logdir/wav_${name}.*.scp  $logdir/segments.* \
 nf=$(wc -l < $data/feats.scp)
 nu=$(wc -l < $data/utt2spk)
 if [ $nf -ne $nu ]; then
-  echo "$0: It seems not all of the feature files were successfully procesed" \
+  echo "$0: It seems not all of the feature files were successfully proceeds" \
        "($nf != $nu); consider using utils/fix_data_dir.sh $data"
 fi
 

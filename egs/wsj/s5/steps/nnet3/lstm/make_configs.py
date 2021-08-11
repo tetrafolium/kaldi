@@ -16,7 +16,7 @@ sys.path.insert(0, 'steps')
 
 
 def GetArgs():
-    # we add compulsary arguments as named arguments for readability
+    # we add compulsory arguments as named arguments for readability
     parser = argparse.ArgumentParser(
         description="Writes config files and variables "
         "for LSTMs creation and training",
@@ -202,7 +202,7 @@ def CheckArgs(args):
         args.ivector_dim = common_lib.get_ivector_dim(args.ivector_dir)
 
     if not args.feat_dim > 0:
-        raise Exception("feat-dim has to be postive")
+        raise Exception("feat-dim has to be positive")
 
     if not args.num_targets > 0:
         print(args.num_targets)
@@ -315,9 +315,9 @@ def ParseLstmDelayString(lstm_delay):
                     lstm_delay)
             elif len(indexes) == 2 and indexes[0] * indexes[1] >= 0:
                 raise ValueError(
-                    'Warning: {} is not a standard BLSTM mode. There should be a negative delay for the forward, and a postive delay for the backward.'
+                    'Warning: {} is not a standard BLSTM mode. There should be a negative delay for the forward, and a positive delay for the backward.'
                     .format(indexes))
-            # always a negative delay followed by a postive delay
+            # always a negative delay followed by a positive delay
             if len(indexes) == 2 and indexes[0] > 0:
                 indexes[0], indexes[1] = indexes[1], indexes[0]
             lstm_delay_array.append(indexes)

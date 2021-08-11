@@ -222,7 +222,7 @@ steps/train_mmi_fmmi_indirect.sh \
 #  egs/swbd/s5b/local/run_dnn.sh
 #
 # It features:
-# - RBM pre-trainig
+# - RBM pre-training
 # - Frame-based Cross-entropy training
 # - Sequence-discriminative training (sMBR)
 #

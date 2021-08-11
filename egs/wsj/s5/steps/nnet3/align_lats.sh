@@ -93,7 +93,7 @@ if [ -f $srcdir/frame_subsampling_factor ]; then
   frame_subsampling_opt="--frame-subsampling-factor=$frame_subsampling_factor"
   cp $srcdir/frame_subsampling_factor $dir
   if [[ $frame_subsampling_factor -gt 1 ]]; then
-    # Assume a chain system, check agrument sanity.
+    # Assume a chain system, check argument sanity.
     if [[ ! ($scale_opts == *--self-loop-scale=1.0* &&
              $scale_opts == *--transition-scale=1.0* &&
              $acoustic_scale = '1.0') ]]; then

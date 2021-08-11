@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     po.Register("cmn-window", &cmn_window,
         "Number of feat. vectors used in the running average CMN calculation");
     po.Register("min-cmn-window", &min_cmn_window,
-                "Minumum CMN window used at start of decoding (adds "
+                "Minimum CMN window used at start of decoding (adds "
                 "latency only at start)");
 
     po.Read(argc, argv);

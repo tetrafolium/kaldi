@@ -82,7 +82,7 @@ const struct Component::key_value Component::kMarkerMap[] = {
 
 
 const char* Component::TypeToMarker(ComponentType t) {
-  // Retuns the 1st '<string>' corresponding to the type in 'kMarkerMap',
+  // Returns the 1st '<string>' corresponding to the type in 'kMarkerMap',
   int32 N = sizeof(kMarkerMap) / sizeof(kMarkerMap[0]);
   for (int i = 0; i < N; i++) {
     if (kMarkerMap[i].key == t) return kMarkerMap[i].value;

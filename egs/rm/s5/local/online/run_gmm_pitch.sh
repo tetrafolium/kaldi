@@ -30,7 +30,7 @@ steps/online/decode.sh --per-utt true --config conf/decode.config \
 # The baseline WER is:
 # %WER 2.11 [ 265 / 12533, 44 in , 40 del, 181  ub ] exp/tri3b_mmi/decode/wer_7
 
-# You can ignore the folowing; these were when I was debugging a difference between the
+# You can ignore the following; these were when I was debugging a difference between the
 # online and non-online decoding, the commands may be useful as examples.
 # cat exp/tri3b_online/decode/log/decode.*.log  | grep _ | grep -v LOG | grep -v gz | sort > foo
 # cat exp/tri3b_online/decode_endpointing/log/decode.*.log  | grep _ | grep -v LOG | grep -v gz | sort > bar

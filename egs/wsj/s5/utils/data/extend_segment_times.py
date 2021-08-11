@@ -41,7 +41,7 @@ args = parser.parse_args()
 # e.g.
 # utt-1 recording-1 0.62 5.40
 # The output will be in the same format and in the same
-# order, except wiht modified times.
+# order, except with modified times.
 
 # This variable maps from a recording-id to a listof the utterance
 # indexes (as integer indexes into 'entries']

@@ -91,7 +91,7 @@ public:
   /// Dimension of the model.
   int32 ModelDim() const { return model_dim_; }
 
-  // Initializer takes the raw dimension of the features (e.g. 13 for typicaly
+  // Initializer takes the raw dimension of the features (e.g. 13 for typically
   // MFCC features, and the full transform (e.g. an LDA+MLLT transform).  This
   // full transform is the transform extended with the "rejected rows" that
   // we would normally discard; we need them for this type of estimation.

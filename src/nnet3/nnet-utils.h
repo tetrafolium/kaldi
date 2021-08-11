@@ -227,7 +227,7 @@ void FindOrphanNodes(const Nnet &nnet, std::vector<int32> *nodes);
 
 /**
    Config class for the CollapseModel function.  This function
-   is reponsible for collapsing together sequential components where
+   is responsible for collapsing together sequential components where
    doing so could make the test-time operation more efficient.
    For example, dropout components and batch-norm components that
    are in test mode can be combined with the next layer; and if there

@@ -3,7 +3,7 @@ import sys
 import re
 import argparse
 
-# earily parse, will refernece args globally
+# earily parse, will reference args globally
 parser = argparse.ArgumentParser()
 parser.add_argument("working_dir")
 parser.add_argument("--quiet", default=False, action="store_true")

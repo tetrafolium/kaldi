@@ -5,7 +5,7 @@
 # The 'raw' confidences are obtained by Minimum Bayes Risk decoding.
 
 # The input features of logistic regression are:
-# - logit of Minumum Bayer Risk posterior
+# - logit of Minimum Bayer Risk posterior
 # - log of word-length in characters
 # - log of average-depth depth of a lattice at words' position
 # - log of frames per character ratio

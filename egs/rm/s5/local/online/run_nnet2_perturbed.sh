@@ -101,7 +101,7 @@ if [ $stage -le 6 ]; then
   # reduce the final learning rate (when we have a lot of data we like a ratio of 10
   # between the initial and final learning rate).  I also have --add-layers-period 2
   # which is typical when we have enough data, and increase the number of hidden layers
-  # and pnorm dimentions vs. run_online_decoding_nnet2.sh since we have more data.
+  # and pnorm dimensions vs. run_online_decoding_nnet2.sh since we have more data.
   steps/nnet2/train_pnorm_fast.sh --stage $train_stage \
     --splice-width 7 \
     --feat-type raw \

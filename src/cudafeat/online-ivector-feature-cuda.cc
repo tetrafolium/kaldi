@@ -276,7 +276,7 @@ void IvectorExtractorFastCuda::ComputeIvectorFromStats(
   // x = quadratic^-1 * linear
   // ivector+=x
 
-  // Inverting the matrix is unneccessary.  We are only solving a single
+  // Inverting the matrix is unnecessary.  We are only solving a single
   // linear system.  So just use choleskey's to solve for a single ivector
   // Equation being solved: quadratic * ivector = linear
 

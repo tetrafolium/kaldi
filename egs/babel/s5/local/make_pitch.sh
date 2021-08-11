@@ -52,7 +52,7 @@ scp=$data/wav.scp
 
 [ ! -s $KALDI_ROOT ] && KALDI_ROOT=../../..
 
-( # this is for back compatiblity:
+( # this is for back compatibility:
  cd $KALDI_ROOT/tools
  if [ -d sacc ] && [ ! -d pitch_trackers/sacc ]; then
    echo "Linking sacc directory to new location."

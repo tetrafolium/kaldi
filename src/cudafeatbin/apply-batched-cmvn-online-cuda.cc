@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
       }  // end check if done loop
     }    // end while(true)
 
-    // output all utterances.  In an efficeint implementation
+    // output all utterances.  In an efficient implementation
     // this would be done on demand in a threaded manner.  This
     // binary is purely for checking correctness and demonstrating
     // usage and thus this type of optimization is not done.

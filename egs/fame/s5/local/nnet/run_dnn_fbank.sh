@@ -9,7 +9,7 @@
 #
 # 1) RBM pre-training:
 #    in this unsupervised stage we train stack of RBMs, 
-#    a good starting point for frame cross-entropy trainig.
+#    a good starting point for frame cross-entropy training.
 # 2) frame cross-entropy training:
 #    the objective is to classify frames to correct pdfs.
 # 3) sequence-training optimizing sMBR: 

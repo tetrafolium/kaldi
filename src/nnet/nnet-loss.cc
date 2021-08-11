@@ -116,7 +116,7 @@ void Xent::Eval(const VectorBase<BaseFloat> &frame_weights,
   xentropy_aux_.MulRowsVec(frame_weights_);  // w*t*log(y)
   xentropy_.AddRowSumMat(-1.0, CuMatrix<double>(xentropy_aux_));
 
-  // caluculate entropy (in GPU),
+  // calculate entropy (in GPU),
   entropy_aux_ = targets;  // t
   entropy_aux_.Add(1e-20);  // avoid log(0)
   entropy_aux_.ApplyLog();  // log(t)

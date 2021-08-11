@@ -1,7 +1,7 @@
 #! /bin/bash
 #
 # This script demonstrates a lexicon learning recipe, which aims to imrove
-# the pronounciation of abbreviated words in the TED-LIUM lexicon. It assumes
+# the pronunciation of abbreviated words in the TED-LIUM lexicon. It assumes
 # the model exp/tri3 already exists. Please see steps/dict/learn_lexicon_bayesian.sh
 # for explanation of the options. 
 #
@@ -87,7 +87,7 @@ if [ $stage -le 1 ]; then
     $dir || exit 1;
 fi
 
-# Add pronounciation probs to the learned lexicon.
+# Add pronunciation probs to the learned lexicon.
 if [ $stage -le 1 ]; then
   utils/prepare_lang.sh --phone-symbol-table data/lang/phones.txt \
     data/local/dict_learned_nosp $oov_symbol data/local/lang_learned_nosp data/lang_learned_nosp || exit 1;

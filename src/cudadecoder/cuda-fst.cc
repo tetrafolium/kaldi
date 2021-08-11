@@ -46,7 +46,7 @@ void CudaFst::ComputeOffsets(const fst::Fst<StdArc> &fst) {
   h_e_offsets_[0] = 0;
   for (int i = 0; i < num_states_; i++) {
     h_final_[i] = fst.Final(i).Value();
-    // count emiting and non_emitting arcs
+    // count emitting and non_emitting arcs
     for (fst::ArcIterator<fst::Fst<StdArc> > aiter(fst, i); !aiter.Done();
         aiter.Next()) {
       StdArc arc = aiter.Value();

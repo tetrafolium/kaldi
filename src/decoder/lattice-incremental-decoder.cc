@@ -1562,7 +1562,7 @@ bool LatticeIncrementalDeterminizer::AcceptRawLatticeChunk(
   // with that Token.  These are Tokens that were active at the end of the
   // chunk.  The final-probs may arise from beta (backward) costs, introduced
   // for pruning purposes, and/or from final-probs in HCLG.  Those costs will
-  // not be included in anything we store permamently in this class; they used
+  // not be included in anything we store permanently in this class; they used
   // only to guide pruned determinization, and we will use `old_final_costs`
   // later to cancel them out.
   std::unordered_map<Label, BaseFloat> old_final_costs;

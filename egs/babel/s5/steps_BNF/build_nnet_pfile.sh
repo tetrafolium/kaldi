@@ -138,7 +138,7 @@ if [ $stage -le 3 ]; then
 fi
 
 if [ $stage -le 4 ]; then
-  # Split the units accoring to cv_ratio
+  # Split the units according to cv_ratio
   perl steps_BNF/pfile_rconcat.pl -t "$dir" -o $dir/valid.pfile,${cv_ratio} -o $dir/train.pfile $dir/concat/*.pfile 2> $dir/log/pfile_rconcat.log || exit 1;
   rm -r $dir/concat
   echo "## Info of the training pfile: ##"

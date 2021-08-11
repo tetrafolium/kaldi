@@ -56,7 +56,7 @@ def parse_splice_string(splice_string):
                             and (first_right_context >= 0))
                 except AssertionError:
                     raise Exception(
-                        """get_lda.sh script does not support postive left-context or negative right context.
+                        """get_lda.sh script does not support positive left-context or negative right context.
           left context provided is %d and right context provided is %d.""" %
                         (first_left_context, first_right_context))
                 # convolve the current splice indices with the splice indices until last layer

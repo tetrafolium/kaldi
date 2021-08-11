@@ -20,7 +20,7 @@
 . ./cmd.sh || exit 1
 
 # The number of parallel jobs to be started for some parts of the recipe
-# Make sure you have enough resources(CPUs and RAM) to accomodate this number of jobs
+# Make sure you have enough resources(CPUs and RAM) to accommodate this number of jobs
 njobs=2
 
 # This recipe can select subsets of VoxForge's data based on the "Pronunciation dialect"

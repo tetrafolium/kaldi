@@ -141,7 +141,7 @@ def main(_):
                                           config.num_steps)
 
     # Save variables to disk if you want to prevent crash...
-    # Data producer can also be saved to preverse feeding progress.
+    # Data producer can also be saved to perverse feeding progress.
     checkpoint = tf.train.Checkpoint(trainer=trainer,
                                      data_feeder=train_producer)
     manager = tf.train.CheckpointManager(checkpoint, "checkpoints/", 5)

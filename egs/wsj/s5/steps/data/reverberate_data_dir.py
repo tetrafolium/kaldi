@@ -708,7 +708,7 @@ def parse_rir_list(rir_set_para_array, smoothing_weight, sampling_rate=None):
         type=str,
         required=True,
         help=
-        'This id is unique for each RIR and the noise may associate with a particular RIR by refering to this id'
+        'This id is unique for each RIR and the noise may associate with a particular RIR by referring to this id'
     )
     rir_parser.add_argument(
         '--room-id',

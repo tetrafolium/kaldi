@@ -46,7 +46,7 @@ namespace chain {
 /* This extended comment explains how end-to-end (i.e. flat-start) chain
    training is done and how it is mainly different from regular chain training.
 
-   The key differnece with regular chain is that the end-to-end supervision FST
+   The key difference with regular chain is that the end-to-end supervision FST
    (i.e. numerator graph) can have loops and more than one final state (we
    call it 'Generic' numerator in the code). This is because we do not
    have any alignments so we can't split the utterances and we can't remove

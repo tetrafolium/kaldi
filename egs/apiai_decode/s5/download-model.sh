@@ -1,5 +1,5 @@
 #!/bin/bash
-# Downlaods Api.ai chain model into exp/api.ai-model/ (will replace one if exists)
+# Downloads Api.ai chain model into exp/api.ai-model/ (will replace one if exists)
 
 DOWNLOAD_URL="https://github.com/api-ai/api-ai-english-asr-model/releases/download/1.0/api.ai-kaldi-asr-model.zip"
 

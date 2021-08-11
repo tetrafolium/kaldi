@@ -211,7 +211,7 @@ if [ $stage -le 1 ] && $retrain_src_mdl; then
   # Train another SAT system on the given data and put it in $dir/${src_mdl_dir}_retrained
   # this model will be used for phonetic decoding and lattice alignment later on.
   if [ -z $num_leaves ] || [ -z $num_gauss ] ; then
-    # infer the model parameters using the inital GMM
+    # infer the model parameters using the initial GMM
     num_leaves=`gmm-info ${src_mdl_dir}/final.mdl  | grep 'pdfs' | awk '{print $NF-1}'`
     num_gauss=`gmm-info ${src_mdl_dir}/final.mdl  | grep 'gaussians' | awk '{print $NF-1}'`
   fi

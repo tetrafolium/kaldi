@@ -110,7 +110,7 @@ if [ $stage -le 0 ] ; then
     done
     touch $decodedir/kws/.done.index
   else
-    echo "Assuming indexing has been aready done. If you really need to re-run "
+    echo "Assuming indexing has been already done. If you really need to re-run "
     echo "the indexing again, delete the file $decodedir/kws/.done.index"
   fi
 fi

@@ -137,8 +137,8 @@ def Main():
             counts[phones] = count
         # By default we normalize the pron posteriors of each word in each utterance,
         # so that they sum up exactly to one. If a word occurs two times in a utterance,
-        # the effect of this operation is to average the posteriors of these two occurences
-        # so that there's only one "equivalent occurence" of this word in the utterance.
+        # the effect of this operation is to average the posteriors of these two occurrences
+        # so that there's only one "equivalent occurrence" of this word in the utterance.
         # However, this case should be extremely rare if the utterances are already
         # short sub-utterances produced by steps/dict/internal/get_subsegments.py
         for phones in stats[(word, utt)]:
@@ -149,7 +149,7 @@ def Main():
                   count,
                   phones,
                   file=args.stats_file_handle)
-        # # Diagnostics info implying incomplete arc_info or multiple occurences of a word in a utterance:
+        # # Diagnostics info implying incomplete arc_info or multiple occurrences of a word in a utterance:
         # if count_sum < 0.9 or count_sum > 1.1:
         #    print(word, utt, start_frame, count_sum, stats[word, utt], file=sys.stderr)
 

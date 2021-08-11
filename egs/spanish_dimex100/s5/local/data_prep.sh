@@ -66,7 +66,7 @@ function convert_to_16khz
         speaker_id=$(make_speaker_id $i)
 
         mkdir -p "$CORPUS_DIR/$speaker_id/audio_16k/comunes"
-        mkdir -p "$CORPUS_DIR/$speaker_id/audio_16k/individuales"
+        mkdir -p "$CORPUS_DIR/$speaker_id/audio_16k/individuals"
 
         # Common utterances
         for j in $(seq 1 $N_COMMON_UTTERANCES); do
@@ -79,8 +79,8 @@ function convert_to_16khz
         # Individual utterances
         for k in $(seq 1 $N_INDIVIDUAL_UTTERANCES_TRAINING); do
             sentence_id=$(make_sentence_id $k)
-            old_wav_file="$CORPUS_DIR/$speaker_id/audio_editado/individuales/$speaker_id$sentence_id.wav"
-            new_wav_file="$CORPUS_DIR/$speaker_id/audio_16k/individuales/$speaker_id$sentence_id.wav"
+            old_wav_file="$CORPUS_DIR/$speaker_id/audio_editado/individuals/$speaker_id$sentence_id.wav"
+            new_wav_file="$CORPUS_DIR/$speaker_id/audio_16k/individuals/$speaker_id$sentence_id.wav"
             sox "$old_wav_file" -r 16k "$new_wav_file"
         done
     done
@@ -155,7 +155,7 @@ for i in $(seq 1 $N_SPEAKERS); do
     for k in $(seq 1 $N_INDIVIDUAL_UTTERANCES_TRAINING); do
         sentence_id=$(make_sentence_id $k)
         utterance_id="$speaker_id-$sentence_id-i"
-        trans_file="$CORPUS_DIR/$speaker_id/texto/individuales/$speaker_id$sentence_id.txt"
+        trans_file="$CORPUS_DIR/$speaker_id/texto/individuals/$speaker_id$sentence_id.txt"
         iconv -f iso-8859-1 -t utf-8 "$trans_file" > "$trans_file.utf8"
         if [ -f "$trans_file.utf8" ]; then
             transcription=$(cat "$trans_file.utf8")
@@ -175,7 +175,7 @@ for i in $(seq 1 $N_SPEAKERS); do
     for k in $(seq $N_INDIVIDUAL_UTTERANCES_TRAINING $N_INDIVIDUAL_UTTERANCES); do
         sentence_id=$(make_sentence_id $k)
         utterance_id="$speaker_id-$sentence_id-i"
-        trans_file="$CORPUS_DIR/$speaker_id/texto/individuales/$speaker_id$sentence_id.txt"
+        trans_file="$CORPUS_DIR/$speaker_id/texto/individuals/$speaker_id$sentence_id.txt"
         iconv -f iso-8859-1 -t utf-8 "$trans_file" > "$trans_file.utf8"
         if [ -f "$trans_file.utf8" ]; then
             transcription=$(cat "$trans_file.utf8")
@@ -213,7 +213,7 @@ for i in $(seq 1 $N_SPEAKERS); do
     for k in $(seq 1 $N_INDIVIDUAL_UTTERANCES_TRAINING); do
         sentence_id=$(make_sentence_id $k)
         utterance_id="$speaker_id-$sentence_id-i"
-        wav_file="$CORPUS_DIR/$speaker_id/audio_16k/individuales/$speaker_id$sentence_id.wav"
+        wav_file="$CORPUS_DIR/$speaker_id/audio_16k/individuals/$speaker_id$sentence_id.wav"
         if [ -f "$wav_file" ]; then
             echo "$utterance_id $wav_file" >> "data/train/wav.scp"
         fi
@@ -230,7 +230,7 @@ for i in $(seq 1 $N_SPEAKERS); do
     for k in $(seq $N_INDIVIDUAL_UTTERANCES_TRAINING $N_INDIVIDUAL_UTTERANCES); do
         sentence_id=$(make_sentence_id $k)
         utterance_id="$speaker_id-$sentence_id-i"
-        wav_file="$CORPUS_DIR/$speaker_id/audio_16k/individuales/$speaker_id$sentence_id.wav"
+        wav_file="$CORPUS_DIR/$speaker_id/audio_16k/individuals/$speaker_id$sentence_id.wav"
         if [ -f "$wav_file" ]; then
             echo "$utterance_id $wav_file" >> "data/test/wav.scp"
         fi

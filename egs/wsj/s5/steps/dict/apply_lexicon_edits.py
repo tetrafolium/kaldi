@@ -25,7 +25,7 @@ def GetArgs():
         metavar='<lexicon-edits-file>',
         type=str,
         help="Input lexicon edits file containing human-readable & editable"
-        "pronounciation info.  The info for each word is like:"
+        "pronunciation info.  The info for each word is like:"
         "------------ an 4086.0 --------------"
         "R  | Y |  2401.6 |  AH N"
         "R  | Y |  640.8 |  AE N"

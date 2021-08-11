@@ -96,7 +96,7 @@ if [ $stage -le 3 ]; then
         --online-ivector-dir exp/nnet3/ivectors_${data}_segmented_hires \
         $tree_dir/graph${graph_affix} ${datadir}_segmented_hires ${decode_dir} || exit 1
 
-      # resolve ctm overlaping regions, and compute wer
+      # resolve ctm overlapping regions, and compute wer
       local/postprocess_test.sh ${data}_segmented ${tree_dir}/graph${graph_affix} \
         ${decode_dir}
     ) || touch $dir/.error &

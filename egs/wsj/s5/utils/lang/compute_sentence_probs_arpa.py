@@ -11,7 +11,7 @@ import math
 
 parser = argparse.ArgumentParser(
     description=
-    "This script evaluates the log probabilty (default log base is e) of each sentence "
+    "This script evaluates the log probability (default log base is e) of each sentence "
     "from data (in text form), given a language model in arpa form "
     "and a specific ngram order.",
     epilog=
@@ -72,7 +72,7 @@ def check_number(model_file, tot_num):
 
 
 # This function load language model in arpa form and save in a dictionary for
-# computing sentence probabilty of input text file.
+# computing sentence probability of input text file.
 
 
 def load_model(model_file):
