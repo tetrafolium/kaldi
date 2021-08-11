@@ -13,7 +13,6 @@
 # Copyright 2017-2018    Daniel Povey
 # Apache 2.0.
 
-
 # This requires python 3.
 
 import sys
@@ -83,7 +82,8 @@ def read_float(s, pos):
         f = float(tok)
     except:
         print("{0}: at file position {1}, expected float but got {1}".format(
-            sys.argv[0], orig_pos, tok), file=sys.stderr)
+            sys.argv[0], orig_pos, tok),
+              file=sys.stderr)
         return (None, pos)
     return (f, pos)
 
@@ -102,7 +102,8 @@ def read_int(s, pos):
         i = int(tok)
     except:
         print("{0}: at file position {1}, expected int but got {1}".format(
-            tok).format(sys.argv[0], orig_pos, tok), file=sys.stderr)
+            tok).format(sys.argv[0], orig_pos, tok),
+              file=sys.stderr)
         return (None, pos)
     return (i, pos)
 
@@ -118,7 +119,8 @@ def read_vector(s, pos):
     (tok, pos) = read_next_token(s, pos)
     if tok != '[':
         print("{0}: at file position {1}, expected vector but got {1}".format(
-            tok).format(sys.argv[0], pos, tok), file=sys.stderr)
+            tok).format(sys.argv[0], pos, tok),
+              file=sys.stderr)
         return (None, pos)
     v = []
     while True:
@@ -129,12 +131,15 @@ def read_vector(s, pos):
             f = float(tok)
             v.append(f)
         except:
-            print("{0}: at file position {1}, reading vector, expected float but got {1}".
-                  format(sys.argv[0], pos, tok), file=sys.stderr)
+            print(
+                "{0}: at file position {1}, reading vector, expected float but got {1}"
+                .format(sys.argv[0], pos, tok),
+                file=sys.stderr)
             return (None, pos)
     if tok is None:
-        print("{0}: encountered EOF while reading vector.".format(
-            tok).format(sys.argv[0]), file=sys.stderr)
+        print("{0}: encountered EOF while reading vector.".format(tok).format(
+            sys.argv[0]),
+              file=sys.stderr)
         return (None, pos)
     return (np.array(v, dtype=np.float32), pos)
 
@@ -151,7 +156,8 @@ def read_matrix(s, pos):
     (tok, pos) = read_next_token(s, pos)
     if tok != '[':
         print("{0}: at file position {1}, expected matrix but got {1}".format(
-            tok).format(sys.argv[0], pos, tok), file=sys.stderr)
+            tok).format(sys.argv[0], pos, tok),
+              file=sys.stderr)
         return (None, pos)
     # m will be an array of arrays (python arrays, not numpy arrays).
     m = []
@@ -168,8 +174,10 @@ def read_matrix(s, pos):
                     f = float(tok)
                     v.append(f)
                 except:
-                    print("{0}: at file position {1}, reading matrix, expected float but got {2}".format(
-                        sys.argv[0], pos, tok), file=sys.stderr)
+                    print(
+                        "{0}: at file position {1}, reading matrix, expected float but got {2}"
+                        .format(sys.argv[0], pos, tok),
+                        file=sys.stderr)
                     return (None, pos)
 
             (saw_newline, pos) = check_for_newline(s, pos)
@@ -178,8 +186,10 @@ def read_matrix(s, pos):
         if len(v) > 0:
             m.append(v)
         if tok == 'None':
-            print("{0}: matrix starting at position {1} was unexpectedly terminated by EOF.".format(
-                sys.argv[0], pos), file=sys.stderr)
+            print(
+                "{0}: matrix starting at position {1} was unexpectedly terminated by EOF."
+                .format(sys.argv[0], pos),
+                file=sys.stderr)
             break
         if tok == ']':
             break
@@ -188,16 +198,19 @@ def read_matrix(s, pos):
         ans_mat = np.array(m, dtype=np.float32)
     except:
         if tok is None:
-            print("{0}: error converting matrix starting at position {1} into numpy array.".format(
-                sys.argv[0], orig_pos), file=sys.stderr)
+            print(
+                "{0}: error converting matrix starting at position {1} into numpy array."
+                .format(sys.argv[0], orig_pos),
+                file=sys.stderr)
     return (ans_mat, pos)
 
 
 def is_component_type(component_type):
     """Returns True if 'component_type' is a plausible component type, e.g.
     something of the form "<xxxComponent>", otherwise False"""
-    return (isinstance(component_type, str) and len(component_type) >= 13 and
-            component_type[0] == "<" and component_type[-10:] == "Component>")
+    return (isinstance(component_type, str) and len(component_type) >= 13
+            and component_type[0] == "<"
+            and component_type[-10:] == "Component>")
 
 
 def read_generic(s, pos, terminating_token, action_dict):
@@ -234,9 +247,11 @@ def read_generic(s, pos, terminating_token, action_dict):
         if tok in terminating_tokens:
             break
         if tok is None:
-            print("{0}: error reading object starting at position {1}, got EOF "
-                  "while expecting one of: {2}".format(
-                      sys.argv[0], orig_pos, terminating_tokens), file=sys.stderr)
+            print(
+                "{0}: error reading object starting at position {1}, got EOF "
+                "while expecting one of: {2}".format(sys.argv[0], orig_pos,
+                                                     terminating_tokens),
+                file=sys.stderr)
             break
         if tok in action_dict:
             p = action_dict[tok]
@@ -265,28 +280,35 @@ def get_action_dict(component_type):
     # e.g. if component_type is '<SigmoidComponent>', raw_component_type would be
     # 'Sigmoid'
     raw_component_type = component_type[1:-10]
-    if raw_component_type in {'Sigmoid', 'Tanh', 'RectifiedLinear',
-                              'Softmax', 'LogSoftmax', 'NoOp'}:
-        return {'<Dim>': (read_int, 'dim'),
-                '<BlockDim>': (read_int, 'block-dim'),
-                '<ValueAvg>': (read_vector, 'value-avg'),
-                '<DerivAvg>': (read_vector, 'deriv-avg'),
-                '<OderivRms>': (read_vector, 'oderiv-rms'),
-                '<Count>': (read_float, 'count'),
-                '<OderivCount>': (read_float, 'oderiv-count')}
-    if raw_component_type in {'Affine',
-                              'NaturalGradientAffine'}:
+    if raw_component_type in {
+            'Sigmoid', 'Tanh', 'RectifiedLinear', 'Softmax', 'LogSoftmax',
+            'NoOp'
+    }:
+        return {
+            '<Dim>': (read_int, 'dim'),
+            '<BlockDim>': (read_int, 'block-dim'),
+            '<ValueAvg>': (read_vector, 'value-avg'),
+            '<DerivAvg>': (read_vector, 'deriv-avg'),
+            '<OderivRms>': (read_vector, 'oderiv-rms'),
+            '<Count>': (read_float, 'count'),
+            '<OderivCount>': (read_float, 'oderiv-count')
+        }
+    if raw_component_type in {'Affine', 'NaturalGradientAffine'}:
         # We call  '<LinearParams>' to just 'params' for compatibility with
         # LinearComponent.
-        return {'<LinearParams>': (read_matrix, 'params'),
-                '<BiasParams>': (read_vector, 'bias')}
+        return {
+            '<LinearParams>': (read_matrix, 'params'),
+            '<BiasParams>': (read_vector, 'bias')
+        }
     if raw_component_type == 'Linear':
         return {'<Params>': (read_matrix, 'params')}
     if raw_component_type == 'BatchNorm':
-        return {'<Dim>': (read_int, 'dim'),
-                '<Count>': (read_float, 'count'),
-                '<StatsMean>':  (read_vector, 'stats-mean'),
-                '<StatsVar>':  (read_vector, 'stats-var')}
+        return {
+            '<Dim>': (read_int, 'dim'),
+            '<Count>': (read_float, 'count'),
+            '<StatsMean>': (read_vector, 'stats-mean'),
+            '<StatsVar>': (read_vector, 'stats-var')
+        }
     # By default (if we don't know anything about the component type) we just
     # don't read anything.
     return {}
@@ -298,8 +320,7 @@ def get_stdout_from_command(command):
         other shell constructs.  Raises an exception if the command exits
         with nonzero status.
      """
-    p = subprocess.Popen(command, shell=True,
-                         stdout=subprocess.PIPE)
+    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
 
     stdout = p.communicate()[0]
     if p.returncode is not 0:
@@ -321,8 +342,10 @@ def read_component(s, pos):
     """
     (component_type, pos) = read_next_token(s, pos)
     if not is_component_type(component_type):
-        print("{0}: error reading Component: at position {1}, expected <xxxxComponent>,"
-              " got: {2}".format(sys.argv[0], pos, component_type), file=sys.stderr)
+        print(
+            "{0}: error reading Component: at position {1}, expected <xxxxComponent>,"
+            " got: {2}".format(sys.argv[0], pos, component_type),
+            file=sys.stderr)
         while True:
             (tok, pos) = read_next_token(s, pos)
             if tok is None or tok == '<ComponentName>':
@@ -333,7 +356,7 @@ def read_component(s, pos):
     action_dict = get_action_dict(component_type)
     (d, pos) = read_generic(s, pos, terminating_tokens, action_dict)
     if d is not None:
-        d['type'] = component_type             # e.g. '<LinearComponent>'
+        d['type'] = component_type  # e.g. '<LinearComponent>'
         d['raw-type'] = component_type[1:-10]  # e.g. 'Linear'
     return (d, pos)
 
@@ -384,8 +407,9 @@ def read_model(filename):
         if component != None:
             d[component_name] = component
         else:
-            print("{0}: error reading component with name {1} at position {2}".format(
-                sys.argv[0], component_name, component_pos), file=sys.stderr)
+            print("{0}: error reading component with name {1} at position {2}".
+                  format(sys.argv[0], component_name, component_pos),
+                  file=sys.stderr)
 
     return d
 
@@ -411,8 +435,9 @@ def compute_derived_quantities(model):
                 # column-norms after reshaping... this is a kind of pooled column-norm
                 # that makes sense for TDNNs or wherever we have used Append().
                 c['col-norms-3'] = np.sqrt(
-                    np.sum(np.power(c['col-norms'], 2).reshape(3, size/3), axis=0))
-                assert c['col-norms-3'].shape == (size/3,)
+                    np.sum(np.power(c['col-norms'], 2).reshape(3, size / 3),
+                           axis=0))
+                assert c['col-norms-3'].shape == (size / 3, )
 
         if raw_component_type == 'BatchNorm':
             stats_var = c['stats-var']
@@ -437,10 +462,10 @@ def compute_progress(model1, model2):
             if params1.size != params2.size:
                 continue  # can't compare them if sizes differ.
             params_diff = params1 - params2
-            c1['row-change'] = np.sqrt(np.sum(params_diff *
-                                              params_diff, axis=1))
-            c1['col-change'] = np.sqrt(np.sum(params_diff *
-                                              params_diff, axis=0))
+            c1['row-change'] = np.sqrt(
+                np.sum(params_diff * params_diff, axis=1))
+            c1['col-change'] = np.sqrt(
+                np.sum(params_diff * params_diff, axis=0))
             # compute relative change in rows and columns.
             epsilon = 1.0e-20
             if 'row-norms' in c1:
@@ -455,8 +480,9 @@ def compute_progress(model1, model2):
                 # if the input-dim of this layer is divisible by 3, then average the
                 # column changes over 3 blocks... this makes sense for TDNNs or
                 # wherever we have used Append().
-                c1['col-change-3'] = np.sum(
-                    c1['col-change'].reshape(3, size/3), axis=0)
+                c1['col-change-3'] = np.sum(c1['col-change'].reshape(
+                    3, size / 3),
+                                            axis=0)
                 c1['rel-col-change-3'] = c1['col-change-3'] / \
                     (c1['col-norms-3'] + epsilon)
 
@@ -469,8 +495,8 @@ def test():
     assert read_next_token("hello there", 5) == ("there", 11)
     assert read_next_token("hello there", 6) == ("there", 11)
     (a, pos) = read_vector(" [ 1 2 3 ] ", 0)
-    assert pos == 10 and np.array_equal(
-        np.array([1, 2, 3], dtype=np.float32), a)
+    assert pos == 10 and np.array_equal(np.array([1, 2, 3], dtype=np.float32),
+                                        a)
     assert check_for_newline("hello ", 4) == (False, 4)
     assert check_for_newline("hello ", 5) == (False, 6)
     assert check_for_newline("hello \n", 5) == (True, 7)
@@ -480,11 +506,11 @@ def test():
         np.array([[1, 2, 3], [4, 5, 6]], dtype=np.float32), m)
 
     s = "  <ignore_this> 1 <some_vec> [ 1 2 3 ] <end>"
-    (obj, pos) = read_generic(s, 0, "<end>", {
-        '<some_vec>': (read_vector, 'some_vec')})
+    (obj, pos) = read_generic(s, 0, "<end>",
+                              {'<some_vec>': (read_vector, 'some_vec')})
     assert pos == len(s)
-    assert np.array_equal(obj['some_vec'], np.array(
-        [1, 2, 3], dtype=np.float32))
+    assert np.array_equal(obj['some_vec'], np.array([1, 2, 3],
+                                                    dtype=np.float32))
 
     m = read_model('exp/chain_cleaned/tdnn1c_sp_bi/final.mdl')
     compute_derived_quantities(m)
@@ -498,7 +524,8 @@ if __name__ == '__main__':
 
     if len(sys.argv) != 3:
         print("Usage: {0} <nnet3-model-in> <pickled-model-out>".format(
-            sys.argv[0]), file=sys.stderr)
+            sys.argv[0]),
+              file=sys.stderr)
         sys.exit(1)
 
     m = read_model(sys.argv[1])
@@ -507,5 +534,5 @@ if __name__ == '__main__':
             f = open(sys.argv[2], "wb")
             pickle.dump(m, f)
         except:
-            print("{0}: error writing to {1}".format(
-                sys.argv[2]), file=sys.stderr)
+            print("{0}: error writing to {1}".format(sys.argv[2]),
+                  file=sys.stderr)

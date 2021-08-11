@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script normalizes a text file. It performs following normalizations:
     dots/filled-circles to periods, # variuos dashes to regular hyphen, full
     width left/right-paren to regular left/right paren.
@@ -18,7 +17,10 @@ output_file = sys.argv[2]
 
 def main():
 
-    with open(input_file, 'r', encoding='utf-8') as fh, open(output_file, 'w', encoding='utf-8') as fh_out:
+    with open(input_file,
+              'r', encoding='utf-8') as fh, open(output_file,
+                                                 'w',
+                                                 encoding='utf-8') as fh_out:
         for utt, uttid in SnorIter(fh):
             for char in utt:
                 if char == "\u25cf" or char == "\u2022" or char == "\u2219":

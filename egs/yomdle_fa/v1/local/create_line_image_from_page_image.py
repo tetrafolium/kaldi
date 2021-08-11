@@ -32,14 +32,19 @@ parser = argparse.ArgumentParser(
 parser.add_argument('image_dir', type=str, help='Path to full page images')
 parser.add_argument('csv_dir', type=str, help='Path to csv files')
 parser.add_argument('out_dir', type=str, help='Path to output directory')
-parser.add_argument('--im-format', type=str, default='png',
+parser.add_argument('--im-format',
+                    type=str,
+                    default='png',
                     help='What file format are the images')
-parser.add_argument('--padding', type=int, default=100,
+parser.add_argument('--padding',
+                    type=int,
+                    default=100,
                     help='Padding so BBox does not exceed image area')
-parser.add_argument('--head', type=int, default=-1,
+parser.add_argument('--head',
+                    type=int,
+                    default=-1,
                     help='Number of csv files to process')
 args = parser.parse_args()
-
 """
 bounding_box is a named tuple which contains:
              area (float): area of the rectangle
@@ -53,14 +58,14 @@ bounding_box is a named tuple which contains:
              corner_points [(float, float)]: set that contains the corners of the rectangle
 """
 
-bounding_box_tuple = namedtuple('bounding_box_tuple', 'area '
-                                'length_parallel '
-                                'length_orthogonal '
-                                'rectangle_center '
-                                'unit_vector '
-                                'unit_vector_angle '
-                                'corner_points'
-                                )
+bounding_box_tuple = namedtuple(
+    'bounding_box_tuple', 'area '
+    'length_parallel '
+    'length_orthogonal '
+    'rectangle_center '
+    'unit_vector '
+    'unit_vector_angle '
+    'corner_points')
 
 
 def unit_vector(pt0, pt1):
@@ -100,7 +105,7 @@ def bounding_area(index, hull):
     unit_vector: direction of the length_parallel side.
     (it's orthogonal vector can be found with the orthogonal_vector function)
     """
-    unit_vector_p = unit_vector(hull[index], hull[index+1])
+    unit_vector_p = unit_vector(hull[index], hull[index + 1])
     unit_vector_o = orthogonal_vector(unit_vector_p)
 
     dis_p = tuple(np.dot(unit_vector_p, pt) for pt in hull)
@@ -111,12 +116,14 @@ def bounding_area(index, hull):
     len_p = max(dis_p) - min_p
     len_o = max(dis_o) - min_o
 
-    return {'area': len_p * len_o,
-            'length_parallel': len_p,
-            'length_orthogonal': len_o,
-            'rectangle_center': (min_p + float(len_p) / 2, min_o + float(len_o) / 2),
-            'unit_vector': unit_vector_p,
-            }
+    return {
+        'area': len_p * len_o,
+        'length_parallel': len_p,
+        'length_orthogonal': len_o,
+        'rectangle_center':
+        (min_p + float(len_p) / 2, min_o + float(len_o) / 2),
+        'unit_vector': unit_vector_p,
+    }
 
 
 def to_xy_coordinates(unit_vector_angle, point):
@@ -150,8 +157,9 @@ def rotate_points(center_of_rotation, angle, points):
         diff_angle = atan2(diff[1], diff[0]) + angle
         ang.append(diff_angle)
         diff_length = sqrt(sum([d**2 for d in diff]))
-        rot_points.append((center_of_rotation[0] + diff_length * cos(diff_angle),
-                           center_of_rotation[1] + diff_length * sin(diff_angle)))
+        rot_points.append(
+            (center_of_rotation[0] + diff_length * cos(diff_angle),
+             center_of_rotation[1] + diff_length * sin(diff_angle)))
 
     return rot_points
 
@@ -166,10 +174,13 @@ def rectangle_corners(rectangle):
     corner_points = []
     for i1 in (.5, -.5):
         for i2 in (i1, -1 * i1):
-            corner_points.append((rectangle['rectangle_center'][0] + i1 * rectangle['length_parallel'],
-                                  rectangle['rectangle_center'][1] + i2 * rectangle['length_orthogonal']))
+            corner_points.append((rectangle['rectangle_center'][0] +
+                                  i1 * rectangle['length_parallel'],
+                                  rectangle['rectangle_center'][1] +
+                                  i2 * rectangle['length_orthogonal']))
 
-    return rotate_points(rectangle['rectangle_center'], rectangle['unit_vector_angle'], corner_points)
+    return rotate_points(rectangle['rectangle_center'],
+                         rectangle['unit_vector_angle'], corner_points)
 
 
 def get_orientation(origin, p1, p2):
@@ -180,10 +191,8 @@ def get_orientation(origin, p1, p2):
     -------
     integer: Negative if p1 is clockwise of p2.
     """
-    difference = (
-        ((p2[0] - origin[0]) * (p1[1] - origin[1]))
-        - ((p1[0] - origin[0]) * (p2[1] - origin[1]))
-    )
+    difference = (((p2[0] - origin[0]) * (p1[1] - origin[1])) -
+                  ((p1[0] - origin[0]) * (p2[1] - origin[1])))
     return difference
 
 
@@ -255,13 +264,13 @@ def minimum_bounding_box(points):
     hull_ordered = tuple(hull_ordered)
 
     min_rectangle = bounding_area(0, hull_ordered)
-    for i in range(1, len(hull_ordered)-1):
+    for i in range(1, len(hull_ordered) - 1):
         rectangle = bounding_area(i, hull_ordered)
         if rectangle['area'] < min_rectangle['area']:
             min_rectangle = rectangle
 
-    min_rectangle['unit_vector_angle'] = atan2(
-        min_rectangle['unit_vector'][1], min_rectangle['unit_vector'][0])
+    min_rectangle['unit_vector_angle'] = atan2(min_rectangle['unit_vector'][1],
+                                               min_rectangle['unit_vector'][0])
     min_rectangle['rectangle_center'] = to_xy_coordinates(
         min_rectangle['unit_vector_angle'], min_rectangle['rectangle_center'])
 
@@ -272,8 +281,7 @@ def minimum_bounding_box(points):
         rectangle_center=min_rectangle['rectangle_center'],
         unit_vector=min_rectangle['unit_vector'],
         unit_vector_angle=min_rectangle['unit_vector_angle'],
-        corner_points=set(rectangle_corners(min_rectangle))
-    )
+        corner_points=set(rectangle_corners(min_rectangle)))
 
 
 def get_center(im):
@@ -367,7 +375,9 @@ def pad_image(image):
     """
     offset = int(args.padding // 2)
     padded_image = Image.new(
-        'RGB', (image.size[0] + int(args.padding), image.size[1] + int(args.padding)), "white")
+        'RGB',
+        (image.size[0] + int(args.padding), image.size[1] + int(args.padding)),
+        "white")
     padded_image.paste(im=image, box=(offset, offset))
     return padded_image
 
@@ -395,9 +405,11 @@ csv_count = 0
 for filename in sorted(os.listdir(args.csv_dir)):
     if filename.endswith('.csv') and (csv_count < args.head or args.head < 0):
         csv_count = csv_count + 1
-        with open(os.path.join(args.csv_dir, filename), 'r', encoding='utf-8') as f:
-            image_file = os.path.join(args.image_dir, os.path.splitext(filename)[
-                                      0] + '.' + args.im_format)
+        with open(os.path.join(args.csv_dir, filename), 'r',
+                  encoding='utf-8') as f:
+            image_file = os.path.join(
+                args.image_dir,
+                os.path.splitext(filename)[0] + '.' + args.im_format)
             if not os.path.isfile(image_file):
                 continue
             csv_out_file = os.path.join(args.out_dir, 'truth_csv', filename)
@@ -453,17 +465,15 @@ for filename in sorted(os.listdir(args.csv_dir)):
                 rot_points.append(p3_new)
                 rot_points.append(p4_new)
 
-                cropped_bounding_box = bounding_box_tuple(bounding_box.area,
-                                                          bounding_box.length_parallel,
-                                                          bounding_box.length_orthogonal,
-                                                          bounding_box.length_orthogonal,
-                                                          bounding_box.unit_vector,
-                                                          bounding_box.unit_vector_angle,
-                                                          set(rot_points))
+                cropped_bounding_box = bounding_box_tuple(
+                    bounding_box.area, bounding_box.length_parallel,
+                    bounding_box.length_orthogonal,
+                    bounding_box.length_orthogonal, bounding_box.unit_vector,
+                    bounding_box.unit_vector_angle, set(rot_points))
 
                 rotation_angle_in_rad = get_smaller_angle(cropped_bounding_box)
-                img2 = region_initial.rotate(
-                    degrees(rotation_angle_in_rad), resample=Image.BICUBIC)
+                img2 = region_initial.rotate(degrees(rotation_angle_in_rad),
+                                             resample=Image.BICUBIC)
                 x_dash_1, y_dash_1, x_dash_2, y_dash_2, x_dash_3, y_dash_3, x_dash_4, y_dash_4 = rotated_points(
                     cropped_bounding_box, get_center(region_initial))
 
@@ -474,6 +484,6 @@ for filename in sorted(os.listdir(args.csv_dir)):
                 box = (min_x, min_y, max_x, max_y)
                 region_final = img2.crop(box)
                 csv_out_writer.writerow(row)
-                image_out_file = os.path.join(
-                    args.out_dir, 'truth_line_image', row[1])
+                image_out_file = os.path.join(args.out_dir, 'truth_line_image',
+                                              row[1])
                 region_final.save(image_out_file)

@@ -6,7 +6,6 @@
 # code to support having a different self-loop pdf-class).  It is included
 # here for baseline and testing purposes.
 
-
 # Generate a topology file.  This allows control of the number of states in the
 # non-silence HMMs, and in the silence HMMs.  This is a modified version of
 # 'utils/gen_topo.pl' that generates a different type of topology, one that we
@@ -18,15 +17,22 @@
 from __future__ import print_function
 import argparse
 
-
-parser = argparse.ArgumentParser(description="Usage: steps/nnet3/chain/gen_topo.py "
-                                             "<colon-separated-nonsilence-phones> <colon-separated-silence-phones>"
-                                             "e.g.:  steps/nnet3/chain/gen_topo.pl 4:5:6:7:8:9:10 1:2:3\n",
-                                 epilog="See egs/swbd/s5c/local/chain/train_tdnn_a.sh for example of usage.")
-parser.add_argument("nonsilence_phones", type=str,
-                    help="List of non-silence phones as integers, separated by colons, e.g. 4:5:6:7:8:9")
-parser.add_argument("silence_phones", type=str,
-                    help="List of silence phones as integers, separated by colons, e.g. 1:2:3")
+parser = argparse.ArgumentParser(
+    description="Usage: steps/nnet3/chain/gen_topo.py "
+    "<colon-separated-nonsilence-phones> <colon-separated-silence-phones>"
+    "e.g.:  steps/nnet3/chain/gen_topo.pl 4:5:6:7:8:9:10 1:2:3\n",
+    epilog="See egs/swbd/s5c/local/chain/train_tdnn_a.sh for example of usage."
+)
+parser.add_argument(
+    "nonsilence_phones",
+    type=str,
+    help=
+    "List of non-silence phones as integers, separated by colons, e.g. 4:5:6:7:8:9"
+)
+parser.add_argument(
+    "silence_phones",
+    type=str,
+    help="List of silence phones as integers, separated by colons, e.g. 1:2:3")
 
 args = parser.parse_args()
 

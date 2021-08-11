@@ -3,7 +3,6 @@
 #           2017    Google Inc. (vpeddinti@google.com)
 #           2017    Vimal Manohar
 # Apache 2.0.
-
 """ This module contains layers that just map to a single component.
 """
 
@@ -23,13 +22,11 @@ class XconfigRenormComponent(XconfigLayerBase):
       input='[-1]'             [Descriptor giving the input of the layer.]
       target-rms=1.0           [The target RMS of the NormalizeComponent]
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'target-rms': 1.0}
+        self.config = {'input': '[-1]', 'target-rms': 1.0}
 
     def check_configs(self):
         assert self.config['target-rms'] > 0.0
@@ -62,8 +59,9 @@ class XconfigRenormComponent(XconfigLayerBase):
         target_rms = self.config['target-rms']
 
         configs = []
-        line = ('component name={0} type=NormalizeComponent dim={1} target-rms={2}'.format(
-            self.name, input_dim, target_rms))
+        line = (
+            'component name={0} type=NormalizeComponent dim={1} target-rms={2}'
+            .format(self.name, input_dim, target_rms))
         configs.append(line)
         line = ('component-node name={0} component={0} input={1}'.format(
             self.name, input_desc))
@@ -83,14 +81,15 @@ class XconfigBatchnormComponent(XconfigLayerBase):
                                 `fixed-affine-layer` that is to be initialized
                                  via LDA]
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'target-rms': 1.0,
-                       'include-in-init': False}
+        self.config = {
+            'input': '[-1]',
+            'target-rms': 1.0,
+            'include-in-init': False
+        }
 
     def check_configs(self):
         assert self.config['target-rms'] > 0.0
@@ -125,8 +124,9 @@ class XconfigBatchnormComponent(XconfigLayerBase):
         target_rms = self.config['target-rms']
 
         configs = []
-        line = ('component name={0} type=BatchNormComponent dim={1} target-rms={2}'.format(
-            self.name, input_dim, target_rms))
+        line = (
+            'component name={0} type=BatchNormComponent dim={1} target-rms={2}'
+            .format(self.name, input_dim, target_rms))
         configs.append(line)
         line = ('component-node name={0} component={0} input={1}'.format(
             self.name, input_desc))
@@ -142,7 +142,6 @@ class XconfigNoOpComponent(XconfigLayerBase):
     Parameters of the class, and their defaults:
       input='[-1]'             [Descriptor giving the input of the layer.]
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
@@ -198,7 +197,6 @@ class XconfigDeltaLayer(XconfigLayerBase):
     Parameters of the class, and their defaults:
       input='[-1]'             [Descriptor giving the input of the layer]
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
@@ -215,7 +213,7 @@ class XconfigDeltaLayer(XconfigLayerBase):
     def output_dim(self, auxiliary_output=None):
         assert auxiliary_output is None
         input_dim = self.descriptors['input']['dim']
-        return (3*input_dim)
+        return (3 * input_dim)
 
     def get_full_config(self):
         ans = []
@@ -236,19 +234,22 @@ class XconfigDeltaLayer(XconfigLayerBase):
         output_dim = self.output_dim()
 
         configs = []
-        line = ('dim-range-node name={0}_copy1 input-node={0} dim={1} dim-offset=0'.format(
-            input_desc, input_dim))
+        line = (
+            'dim-range-node name={0}_copy1 input-node={0} dim={1} dim-offset=0'
+            .format(input_desc, input_dim))
         configs.append(line)
-        line = ('dim-range-node name={0}_copy2 input-node={0} dim={1} dim-offset=0'.format(
-            input_desc, input_dim))
+        line = (
+            'dim-range-node name={0}_copy2 input-node={0} dim={1} dim-offset=0'
+            .format(input_desc, input_dim))
         configs.append(line)
 
         line = ('component name={0}_2 type=NoOpComponent dim={1}'.format(
             input_desc, output_dim))
         configs.append(line)
-        line = ('component-node name={0}_2 component={0}_2 input=Append(Offset({0},0),'
-                ' Sum(Offset(Scale(-1.0,{0}_copy1),-1), Offset({0},1)), Sum(Offset({0},-2), Offset({0},2),'
-                ' Offset(Scale(-2.0,{0}_copy2),0)))'.format(input_desc))
+        line = (
+            'component-node name={0}_2 component={0}_2 input=Append(Offset({0},0),'
+            ' Sum(Offset(Scale(-1.0,{0}_copy1),-1), Offset({0},1)), Sum(Offset({0},-2), Offset({0},2),'
+            ' Offset(Scale(-2.0,{0}_copy2),0)))'.format(input_desc))
         configs.append(line)
 
         line = ('component name={0} type=BatchNormComponent dim={1}'.format(
@@ -279,18 +280,19 @@ class XconfigLinearComponent(XconfigLayerBase):
       l2-regularize=0.0
 
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'dim': -1,
-                       'orthonormal-constraint': '',
-                       'max-change': 0.75,
-                       'l2-regularize': '',
-                       'param-stddev': '',
-                       'learning-rate-factor': ''}
+        self.config = {
+            'input': '[-1]',
+            'dim': -1,
+            'orthonormal-constraint': '',
+            'max-change': 0.75,
+            'l2-regularize': '',
+            'param-stddev': '',
+            'learning-rate-factor': ''
+        }
 
     def check_configs(self):
         if self.config['dim'] <= 0:
@@ -324,15 +326,18 @@ class XconfigLinearComponent(XconfigLayerBase):
         output_dim = self.config['dim']
 
         opts = ''
-        for opt_name in ['orthonormal-constraint', 'max-change', 'l2-regularize',
-                         'param-stddev', 'learning-rate-factor']:
+        for opt_name in [
+                'orthonormal-constraint', 'max-change', 'l2-regularize',
+                'param-stddev', 'learning-rate-factor'
+        ]:
             value = self.config[opt_name]
             if value != '':
                 opts += ' {0}={1}'.format(opt_name, value)
 
         configs = []
-        line = ('component name={0} type=LinearComponent input-dim={1} output-dim={2} '
-                '{3}'.format(self.name, input_dim, output_dim, opts))
+        line = (
+            'component name={0} type=LinearComponent input-dim={1} output-dim={2} '
+            '{3}'.format(self.name, input_dim, output_dim, opts))
         configs.append(line)
         line = ('component-node name={0} component={0} input={1}'.format(
             self.name, input_desc))
@@ -356,23 +361,24 @@ class XconfigCombineFeatureMapsLayer(XconfigLayerBase):
       This is to be used in convolutional setups as part of how we combine the
       filterbank inputs with ivectors.
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'num-filters1': -1,
-                       'num-filters2': -1,
-                       'num-filters3': 0,
-                       'height': -1}
+        self.config = {
+            'input': '[-1]',
+            'num-filters1': -1,
+            'num-filters2': -1,
+            'num-filters3': 0,
+            'height': -1
+        }
 
     def check_configs(self):
         input_dim = self.descriptors['input']['dim']
-        if (self.config['num-filters1'] <= 0 or
-            self.config['num-filters2'] <= 0 or
-            self.config['num-filters3'] < 0 or
-                self.config['height'] <= 0):
+        if (self.config['num-filters1'] <= 0
+                or self.config['num-filters2'] <= 0
+                or self.config['num-filters3'] < 0
+                or self.config['height'] <= 0):
             raise RuntimeError(
                 "invalid values of num-filters1, num-filters2 and/or height")
         f1 = self.config['num-filters1']
@@ -380,9 +386,10 @@ class XconfigCombineFeatureMapsLayer(XconfigLayerBase):
         f3 = self.config['num-filters3']
         h = self.config['height']
         if input_dim != (f1 + f2 + f3) * h:
-            raise RuntimeError("Expected input-dim={0} based on num-filters1={1}, num-filters2={2}, "
-                               "num-filters3={3} and height={4}, but got input-dim={5}".format(
-                                   (f1 + f2 + f3) * h, f1, f2, f3, h, input_dim))
+            raise RuntimeError(
+                "Expected input-dim={0} based on num-filters1={1}, num-filters2={2}, "
+                "num-filters3={3} and height={4}, but got input-dim={5}".
+                format((f1 + f2 + f3) * h, f1, f2, f3, h, input_dim))
 
     def output_name(self, auxiliary_output=None):
         assert auxiliary_output is None
@@ -422,12 +429,13 @@ class XconfigCombineFeatureMapsLayer(XconfigLayerBase):
             for f in range(num_filters2):
                 column_map.append(height * num_filters1 + h * num_filters2 + f)
             for f in range(num_filters3):
-                column_map.append(
-                    height * (num_filters1 + num_filters2) + h * num_filters3 + f)
+                column_map.append(height * (num_filters1 + num_filters2) +
+                                  h * num_filters3 + f)
 
         configs = []
-        line = ('component name={0} type=PermuteComponent column-map={1} '.format(
-            self.name, ','.join([str(x) for x in column_map])))
+        line = (
+            'component name={0} type=PermuteComponent column-map={1} '.format(
+                self.name, ','.join([str(x) for x in column_map])))
         configs.append(line)
 
         line = ('component-node name={0} component={0} input={1}'.format(
@@ -455,18 +463,19 @@ class XconfigAffineComponent(XconfigLayerBase):
       l2-regularize=0.0
 
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'dim': -1,
-                       'orthonormal-constraint': '',
-                       'max-change': 0.75,
-                       'param-stddev': '',
-                       'bias-stddev': '',
-                       'l2-regularize': ''}
+        self.config = {
+            'input': '[-1]',
+            'dim': -1,
+            'orthonormal-constraint': '',
+            'max-change': 0.75,
+            'param-stddev': '',
+            'bias-stddev': '',
+            'l2-regularize': ''
+        }
 
     def check_configs(self):
         if self.config['dim'] <= 0:
@@ -500,15 +509,18 @@ class XconfigAffineComponent(XconfigLayerBase):
         output_dim = self.config['dim']
 
         opts = ''
-        for opt_name in ['orthonormal-constraint', 'max-change', 'l2-regularize',
-                         'param-stddev', 'bias-stddev']:
+        for opt_name in [
+                'orthonormal-constraint', 'max-change', 'l2-regularize',
+                'param-stddev', 'bias-stddev'
+        ]:
             value = self.config[opt_name]
             if value != '':
                 opts += ' {0}={1}'.format(opt_name, value)
 
         configs = []
-        line = ('component name={0} type=NaturalGradientAffineComponent input-dim={1} output-dim={2} '
-                '{3}'.format(self.name, input_dim, output_dim, opts))
+        line = (
+            'component name={0} type=NaturalGradientAffineComponent input-dim={1} output-dim={2} '
+            '{3}'.format(self.name, input_dim, output_dim, opts))
         configs.append(line)
         line = ('component-node name={0} component={0} input={1}'.format(
             self.name, input_desc))
@@ -535,17 +547,18 @@ class XconfigPerElementScaleComponent(XconfigLayerBase):
       param-stddev=0.0  # affects initialization
       learning-rate-factor=1.0
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'l2-regularize': '',
-                       'max-change': 0.75,
-                       'param-mean': '',
-                       'param-stddev': '',
-                       'learning-rate-factor': ''}
+        self.config = {
+            'input': '[-1]',
+            'l2-regularize': '',
+            'max-change': 0.75,
+            'param-mean': '',
+            'param-stddev': '',
+            'learning-rate-factor': ''
+        }
 
     def check_configs(self):
         pass
@@ -576,15 +589,18 @@ class XconfigPerElementScaleComponent(XconfigLayerBase):
         dim = self.descriptors['input']['dim']
 
         opts = ''
-        for opt_name in ['learning-rate-factor', 'max-change', 'l2-regularize', 'param-mean',
-                         'param-stddev']:
+        for opt_name in [
+                'learning-rate-factor', 'max-change', 'l2-regularize',
+                'param-mean', 'param-stddev'
+        ]:
             value = self.config[opt_name]
             if value != '':
                 opts += ' {0}={1}'.format(opt_name, value)
 
         configs = []
-        line = ('component name={0} type=NaturalGradientPerElementScaleComponent dim={1} {2} '
-                ''.format(self.name, dim, opts))
+        line = (
+            'component name={0} type=NaturalGradientPerElementScaleComponent dim={1} {2} '
+            ''.format(self.name, dim, opts))
         configs.append(line)
         line = ('component-node name={0} component={0} input={1}'.format(
             self.name, input_desc))
@@ -611,17 +627,18 @@ class XconfigPerElementOffsetComponent(XconfigLayerBase):
       param-stddev=0.0  # affects initialization
       learning-rate-factor=1.0
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'l2-regularize': '',
-                       'max-change': 0.75,
-                       'param-mean': '',
-                       'param-stddev': '',
-                       'learning-rate-factor': ''}
+        self.config = {
+            'input': '[-1]',
+            'l2-regularize': '',
+            'max-change': 0.75,
+            'param-mean': '',
+            'param-stddev': '',
+            'learning-rate-factor': ''
+        }
 
     def check_configs(self):
         pass
@@ -652,15 +669,18 @@ class XconfigPerElementOffsetComponent(XconfigLayerBase):
         dim = self.descriptors['input']['dim']
 
         opts = ''
-        for opt_name in ['learning-rate-factor', 'max-change', 'l2-regularize', 'param-mean',
-                         'param-stddev']:
+        for opt_name in [
+                'learning-rate-factor', 'max-change', 'l2-regularize',
+                'param-mean', 'param-stddev'
+        ]:
             value = self.config[opt_name]
             if value != '':
                 opts += ' {0}={1}'.format(opt_name, value)
 
         configs = []
-        line = ('component name={0} type=PerElementOffsetComponent dim={1} {2} '
-                ''.format(self.name, dim, opts))
+        line = (
+            'component name={0} type=PerElementOffsetComponent dim={1} {2} '
+            ''.format(self.name, dim, opts))
         configs.append(line)
         line = ('component-node name={0} component={0} input={1}'.format(
             self.name, input_desc))
@@ -677,14 +697,11 @@ class XconfigDimRangeComponent(XconfigLayerBase):
       dim=-1                   [Dimension of the output.]
       dim-offset=0             [Dimension offset of the input.]
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'dim': -1,
-                       'dim-offset': 0}
+        self.config = {'input': '[-1]', 'dim': -1, 'dim-offset': 0}
 
     def check_configs(self):
         input_dim = self.descriptors['input']['dim']
@@ -697,7 +714,8 @@ class XconfigDimRangeComponent(XconfigLayerBase):
             raise RuntimeError("'dim-offset' must be specified and >= 0.")
         elif self.config['dim-offset'] + self.config['dim'] > input_dim:
             raise RuntimeError(
-                "'dim-offset' plus output dim must be lower than the input dim.")
+                "'dim-offset' plus output dim must be lower than the input dim."
+            )
 
     def output_name(self, auxiliary_output=None):
         assert auxiliary_output is None
@@ -729,7 +747,7 @@ class XconfigDimRangeComponent(XconfigLayerBase):
         dim_offset = self.config['dim-offset']
 
         configs = []
-        line = ('dim-range-node name={0} input-node={1} dim={2} dim-offset={3}'.format(
-            self.name, input_node, output_dim, dim_offset))
+        line = ('dim-range-node name={0} input-node={1} dim={2} dim-offset={3}'
+                .format(self.name, input_node, output_dim, dim_offset))
         configs.append(line)
         return configs

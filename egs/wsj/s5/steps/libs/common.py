@@ -1,10 +1,7 @@
-
-
 # Copyright 2016 Vijayaditya Peddinti.
 #           2016 Vimal Manohar
 #           2017 Johns Hopkins University (author: Daniel Povey)
 # Apache 2.0
-
 """ This module contains several utility functions and classes that are
 commonly used in many kaldi python scripts.
 """
@@ -32,12 +29,11 @@ def send_mail(message, subject, email_id):
     try:
         subprocess.Popen(
             'echo "{message}" | mail -s "{subject}" {email}'.format(
-                message=message,
-                subject=subject,
-                email=email_id), shell=True)
+                message=message, subject=subject, email=email_id),
+            shell=True)
     except Exception as e:
-        logger.info("Unable to send mail due to error:\n {error}".format(
-            error=str(e)))
+        logger.info(
+            "Unable to send mail due to error:\n {error}".format(error=str(e)))
         pass
 
 
@@ -53,20 +49,18 @@ def str_to_bool(value):
 class StrToBoolAction(argparse.Action):
     """ A custom action to convert bools from shell format i.e., true/false
         to python format i.e., True/False """
-
     def __call__(self, parser, namespace, values, option_string=None):
         try:
             setattr(namespace, self.dest, str_to_bool(values))
         except ValueError:
-            raise Exception(
-                "Unknown value {0} for --{1}".format(values, self.dest))
+            raise Exception("Unknown value {0} for --{1}".format(
+                values, self.dest))
 
 
 class NullstrToNoneAction(argparse.Action):
     """ A custom action to convert empty strings passed by shell to None in
     python. This is necessary as shell scripts print null strings when a
     variable is not specified. We could use the more apt None in python. """
-
     def __call__(self, parser, namespace, values, option_string=None):
         if values.strip() == "":
             setattr(namespace, self.dest, None)
@@ -84,7 +78,6 @@ class smart_open(object):
     e.g.: with smart_open(filename, 'w') as fh:
             print ("foo", file=fh)
     """
-
     def __init__(self, filename, mode="r"):
         self.filename = filename
         self.mode = mode
@@ -114,7 +107,6 @@ class smart_open(object):
     e.g.: with smart_open(filename, 'w') as fh:
             print ("foo", file=fh)
     """
-
     def __init__(self, filename, mode="r"):
         self.filename = filename
         self.mode = mode
@@ -171,8 +163,7 @@ def get_command_stdout(command, require_zero_status=True):
 
         See also: execute_command, background_command
     """
-    p = subprocess.Popen(command, shell=True,
-                         stdout=subprocess.PIPE)
+    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
 
     stdout = p.communicate()[0]
     if p.returncode is not 0:
@@ -246,7 +237,7 @@ def get_number_of_leaves_from_tree(alidir):
     stdout = get_command_stdout(
         "tree-info {0}/tree 2>/dev/null | grep num-pdfs".format(alidir))
     parts = stdout.split()
-    assert(parts[0] == "num-pdfs")
+    assert (parts[0] == "num-pdfs")
     num_leaves = int(parts[1])
     if num_leaves == 0:
         raise Exception("Number of leaves is 0")
@@ -258,7 +249,7 @@ def get_number_of_leaves_from_model(dir):
         "am-info {0}/final.mdl 2>/dev/null | grep -w pdfs".format(dir))
     parts = stdout.split()
     # number of pdfs 7115
-    assert(' '.join(parts[0:3]) == "number of pdfs")
+    assert (' '.join(parts[0:3]) == "number of pdfs")
     num_leaves = int(parts[3])
     if num_leaves == 0:
         raise Exception("Number of leaves is 0")
@@ -269,8 +260,10 @@ def get_number_of_jobs(alidir):
     try:
         num_jobs = int(open('{0}/num_jobs'.format(alidir)).readline().strip())
     except (IOError, ValueError) as e:
-        logger.error("Exception while reading the "
-                     "number of alignment jobs: ", exc_info=True)
+        logger.error(
+            "Exception while reading the "
+            "number of alignment jobs: ",
+            exc_info=True)
         raise SystemExit(1)
     return num_jobs
 
@@ -412,16 +405,16 @@ def read_matrix_ascii(file_or_fd):
     if first != ' [':
         logger.error(
             "Kaldi matrix file %s has incorrect format, "
-            "only text format matrix files can be read by this script",
-            fname)
+            "only text format matrix files can be read by this script", fname)
         raise RuntimeError
 
     rows = []
     while True:
         line = fd.readline()
         if len(line) == 0:
-            logger.error("Kaldi matrix file %s has incorrect format; "
-                         "got EOF before end of matrix", fname)
+            logger.error(
+                "Kaldi matrix file %s has incorrect format; "
+                "got EOF before end of matrix", fname)
         if len(line.strip()) == 0:
             continue  # skip empty line
         arr = line.strip().split()
@@ -448,7 +441,7 @@ def read_key(fd):
         str_ += char
     str_ = str_.strip()
     if str_ == '':
-        return None   # end of file,
+        return None  # end of file,
     return str_
 
 
@@ -507,8 +500,8 @@ def compute_idct_matrix(K, N, cepstral_lifter=0):
     normalizer = math.sqrt(2.0 / float(N))
     for k in range(1, K):
         for n in range(0, N):
-            matrix[n][
-                k] = normalizer * math.cos(math.pi / float(N) * (n + 0.5) * k)
+            matrix[n][k] = normalizer * math.cos(math.pi / float(N) *
+                                                 (n + 0.5) * k)
 
     if cepstral_lifter != 0:
         lifter_coeffs = compute_lifter_coeffs(cepstral_lifter, K)

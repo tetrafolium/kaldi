@@ -2,7 +2,6 @@
 #           2016    Vijayaditya Peddinti
 #           2016    Yiming Wang
 # Apache 2.0.
-
 """This library has classes and methods to form neural network computation graphs,
 in the nnet3 framework, using higher level abstractions called 'layers'
 (e.g. sub-graphs like LSTMS ).
@@ -34,6 +33,5 @@ It generates three different configs:
                  in training i.e, it has file paths for LDA transform and
                  other initialization files
 """
-
 
 __all__ = ["utils", "layers", "parser"]

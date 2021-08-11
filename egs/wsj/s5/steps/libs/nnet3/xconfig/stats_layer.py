@@ -1,7 +1,6 @@
 # Copyright 2016    Johns Hopkins University (Author: Daniel Povey)
 #           2016    Vimal Manohar
 # Apache 2.0.
-
 """ This module contains the statistics extraction and pooling layer.
 """
 
@@ -34,32 +33,31 @@ class XconfigStatsLayer(XconfigLayerBase):
                      dimension computed from input]
         config=''   [Required. Defines what stats must be computed.]
     """
-
     def __init__(self, first_token, key_to_value, prev_names=None):
         assert first_token in ['stats-layer']
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input': '[-1]',
-                       'dim': -1,
-                       'config': ''}
+        self.config = {'input': '[-1]', 'dim': -1, 'config': ''}
 
     def set_derived_configs(self):
         config_string = self.config['config']
         if config_string == '':
-            raise RuntimeError("config has to be non-empty",
-                               self.str())
-        m = re.search("(mean|mean\+stddev|mean\+count|mean\+stddev\+count)"
-                      "\((-?\d+):(-?\d+):(-?\d+):(-?\d+)\)",
-                      config_string)
+            raise RuntimeError("config has to be non-empty", self.str())
+        m = re.search(
+            "(mean|mean\+stddev|mean\+count|mean\+stddev\+count)"
+            "\((-?\d+):(-?\d+):(-?\d+):(-?\d+)\)", config_string)
         if m is None:
-            raise RuntimeError("Invalid statistic-config string: {0}".format(
-                config_string), self)
+            raise RuntimeError(
+                "Invalid statistic-config string: {0}".format(config_string),
+                self)
 
-        self._output_stddev = (m.group(1) in ['mean+stddev',
-                                              'mean+stddev+count'])
-        self._output_log_counts = (m.group(1) in ['mean+count',
-                                                  'mean+stddev+count'])
+        self._output_stddev = (m.group(1) in [
+            'mean+stddev', 'mean+stddev+count'
+        ])
+        self._output_log_counts = (m.group(1) in [
+            'mean+count', 'mean+stddev+count'
+        ])
         self._left_context = -int(m.group(2))
         self._input_period = int(m.group(3))
         self._stats_period = int(m.group(4))
@@ -73,10 +71,9 @@ class XconfigStatsLayer(XconfigLayerBase):
             output_dim = output_dim + 1
 
         if self.config['dim'] > 0 and self.config['dim'] != output_dim:
-            raise RuntimeError(
-                "Invalid dim supplied {0:d} != "
-                "actual output dim {1:d}".format(
-                    self.config['dim'], output_dim))
+            raise RuntimeError("Invalid dim supplied {0:d} != "
+                               "actual output dim {1:d}".format(
+                                   self.config['dim'], output_dim))
         self.config['dim'] = output_dim
 
     def check_configs(self):
@@ -100,14 +97,19 @@ class XconfigStatsLayer(XconfigLayerBase):
             'type=StatisticsExtractionComponent input-dim={dim} '
             'input-period={input_period} output-period={output_period} '
             'include-variance={var} '.format(
-                name=self.name, lc=self._left_context, rc=self._right_context,
-                dim=input_dim, input_period=self._input_period,
+                name=self.name,
+                lc=self._left_context,
+                rc=self._right_context,
+                dim=input_dim,
+                input_period=self._input_period,
                 output_period=self._stats_period,
                 var='true' if self._output_stddev else 'false'))
         configs.append(
             'component-node name={name}-extraction-{lc}-{rc} '
             'component={name}-extraction-{lc}-{rc} input={input} '.format(
-                name=self.name, lc=self._left_context, rc=self._right_context,
+                name=self.name,
+                lc=self._left_context,
+                rc=self._right_context,
                 input=input_desc))
 
         stats_dim = 1 + input_dim * (2 if self._output_stddev else 1)
@@ -116,21 +118,27 @@ class XconfigStatsLayer(XconfigLayerBase):
             'type=StatisticsPoolingComponent input-dim={dim} '
             'input-period={input_period} left-context={lc} right-context={rc} '
             'num-log-count-features={count} output-stddevs={var} '.format(
-                name=self.name, lc=self._left_context, rc=self._right_context,
-                dim=stats_dim, input_period=self._stats_period,
+                name=self.name,
+                lc=self._left_context,
+                rc=self._right_context,
+                dim=stats_dim,
+                input_period=self._stats_period,
                 count=1 if self._output_log_counts else 0,
                 var='true' if self._output_stddev else 'false'))
-        configs.append(
-            'component-node name={name}-pooling-{lc}-{rc} '
-            'component={name}-pooling-{lc}-{rc} '
-            'input={name}-extraction-{lc}-{rc} '.format(
-                name=self.name, lc=self._left_context, rc=self._right_context))
+        configs.append('component-node name={name}-pooling-{lc}-{rc} '
+                       'component={name}-pooling-{lc}-{rc} '
+                       'input={name}-extraction-{lc}-{rc} '.format(
+                           name=self.name,
+                           lc=self._left_context,
+                           rc=self._right_context))
         return configs
 
     def output_name(self, auxiliary_output=None):
         return 'Round({name}-pooling-{lc}-{rc}, {period})'.format(
-            name=self.name, lc=self._left_context,
-            rc=self._right_context, period=self._stats_period)
+            name=self.name,
+            lc=self._left_context,
+            rc=self._right_context,
+            period=self._stats_period)
 
     def output_dim(self, auxiliary_outputs=None):
         return self.config['dim']

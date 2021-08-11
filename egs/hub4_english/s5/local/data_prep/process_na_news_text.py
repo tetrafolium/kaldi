@@ -2,7 +2,6 @@
 
 # Copyright 2016    Vimal Manohar
 # Apache 2.0.
-
 """Prepare NA News Text Corpus (LDC95T21)
 or NA New Text Supplement Corpus (LDC98T30)."""
 
@@ -36,13 +35,16 @@ def get_args():
     """Parses command-line arguments."""
 
     parser = argparse.ArgumentParser("Prepare NA News Text corpus (LDC95T21).")
-    parser.add_argument("--verbose", type=int, choices=[0, 1, 2, 3], default=0,
+    parser.add_argument("--verbose",
+                        type=int,
+                        choices=[0, 1, 2, 3],
+                        default=0,
                         help="Use larger verbosity for more verbose logging.")
-    parser.add_argument("file_list",
-                        help="List of compressed source files for NA News Text. "
-                        "e.g: /export/corpora/LDC/LDC95T21/na_news_1/latwp/1994")
-    parser.add_argument("out_file",
-                        help="Output file to write to.")
+    parser.add_argument(
+        "file_list",
+        help="List of compressed source files for NA News Text. "
+        "e.g: /export/corpora/LDC/LDC95T21/na_news_1/latwp/1994")
+    parser.add_argument("out_file", help="Output file to write to.")
 
     args = parser.parse_args()
 
@@ -105,27 +107,26 @@ def _run(args):
         for line in open(args.file_list).readlines():
             try:
                 file_ = line.strip()
-                command = (
-                    "gunzip -c {0} | "
-                    "tools/csr4_utils/pare-sgml.perl | "
-                    "perl tools/csr4_utils/bugproc.perl | "
-                    "perl tools/csr4_utils/numhack.perl | "
-                    "perl tools/csr4_utils/numproc.perl "
-                    "  -xtools/csr4_utils/num_excp | "
-                    "perl tools/csr4_utils/abbrproc.perl "
-                    "  tools/csr4_utils/abbrlist | "
-                    "perl tools/csr4_utils/puncproc.perl -np"
-                    "".format(file_))
+                command = ("gunzip -c {0} | "
+                           "tools/csr4_utils/pare-sgml.perl | "
+                           "perl tools/csr4_utils/bugproc.perl | "
+                           "perl tools/csr4_utils/numhack.perl | "
+                           "perl tools/csr4_utils/numproc.perl "
+                           "  -xtools/csr4_utils/num_excp | "
+                           "perl tools/csr4_utils/abbrproc.perl "
+                           "  tools/csr4_utils/abbrlist | "
+                           "perl tools/csr4_utils/puncproc.perl -np"
+                           "".format(file_))
                 logger.debug("Running command '%s'", command)
 
                 p = subprocess.Popen(command,
-                                     stdout=subprocess.PIPE, shell=True)
+                                     stdout=subprocess.PIPE,
+                                     shell=True)
 
                 stdout = p.communicate()[0]
                 if p.returncode is not 0:
-                    logger.error(
-                        "Command '%s' failed with return status %d",
-                        command, p.returncode)
+                    logger.error("Command '%s' failed with return status %d",
+                                 command, p.returncode)
                     raise RuntimeError
 
                 if not process_file_lines(stdout, writer):

@@ -2,7 +2,6 @@
 
 # Copyright 2017  Vimal Manohar
 # Apache 2.0
-
 """
 This script converts arc-info into targets for training
 speech activity detection network. The output is a matrix archive
@@ -37,23 +36,29 @@ def get_args():
         summed up to get the target matrix values.
         """)
 
-    parser.add_argument("--silence-phones", type=str,
+    parser.add_argument("--silence-phones",
+                        type=str,
                         required=True,
                         help="File containing a list of phones that will be "
                         "treated as silence")
-    parser.add_argument("--garbage-phones", type=str,
+    parser.add_argument("--garbage-phones",
+                        type=str,
                         required=True,
                         help="File containing a list of phones that will be "
                         "treated as garbage class")
-    parser.add_argument("--max-phone-length", type=int, default=50,
+    parser.add_argument("--max-phone-length",
+                        type=int,
+                        default=50,
                         help="""Maximum number of frames allowed for a speech
                         phone above which the arc is treated as garbage.""")
 
-    parser.add_argument("arc_info", type=str,
+    parser.add_argument("arc_info",
+                        type=str,
                         help="Arc info file (output of lattice-arc-post). "
                         "See the help for lattice-arc-post for information "
                         "about the format of this input.")
-    parser.add_argument("targets_file", type=str,
+    parser.add_argument("targets_file",
+                        type=str,
                         help="File to write targets matrix archive in text "
                         "format")
     args = parser.parse_args()
@@ -102,8 +107,9 @@ def run(args):
                     if prev_utt != "":
                         if len(targets) > 0:
                             num_utts += 1
-                            common_lib.write_matrix_ascii(
-                                targets_writer, targets, key=prev_utt)
+                            common_lib.write_matrix_ascii(targets_writer,
+                                                          targets,
+                                                          key=prev_utt)
                         else:
                             num_err += 1
                     prev_utt = utt
@@ -137,7 +143,8 @@ def run(args):
     if prev_utt != "":
         if len(targets) > 0:
             num_utts += 1
-            common_lib.write_matrix_ascii(args.targets_file, targets,
+            common_lib.write_matrix_ascii(args.targets_file,
+                                          targets,
                                           key=prev_utt)
         else:
             num_err += 1

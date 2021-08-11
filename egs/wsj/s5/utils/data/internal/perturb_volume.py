@@ -2,7 +2,6 @@
 
 # Copyright 2017  Vimal Manohar
 # Apache 2.0
-
 """
 This script reads a wav.scp file from the input and perturbs the
 volume of the recordings and writes to stdout the contents of
@@ -27,15 +26,23 @@ def get_args():
         distribution between --scale-low and --scale-high.
         """)
 
-    parser.add_argument("--scale-low", type=float, default=0.125,
+    parser.add_argument("--scale-low",
+                        type=float,
+                        default=0.125,
                         help="Minimum volume scale to be applied.")
-    parser.add_argument("--scale-high", type=float, default=2,
+    parser.add_argument("--scale-high",
+                        type=float,
+                        default=2,
                         help="Maximum volume scale to tbe applid.")
-    parser.add_argument("--reco2vol", type=str, default=None,
+    parser.add_argument("--reco2vol",
+                        type=str,
+                        default=None,
                         help="If supplied, it must be a file of the format "
                         "<reco-id> <volume-scale>, which specifies the "
                         "volume scale to be applied for each recording.")
-    parser.add_argument("--write-reco2vol", type=str, default=None,
+    parser.add_argument("--write-reco2vol",
+                        type=str,
+                        default=None,
                         help="If provided, the volume scale used for each "
                         "recording will be written to this file")
     args = parser.parse_args()
@@ -97,8 +104,10 @@ def run(args):
                 line.strip(), vol))
         elif re.search(':[0-9]+$', line.strip()) is not None:
             print('{id} wav-copy {wav} - | '
-                  'sox --vol {vol} -t wav - -t wav - |'.format(
-                      id=parts[0], wav=' '.join(parts[1:]), vol=vol))
+                  'sox --vol {vol} -t wav - -t wav - |'.format(id=parts[0],
+                                                               wav=' '.join(
+                                                                   parts[1:]),
+                                                               vol=vol))
         else:
             print('{id} sox --vol {vol} -t wav {wav} -t wav - |'.format(
                 id=parts[0], wav=' '.join(parts[1:]), vol=vol))

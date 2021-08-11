@@ -12,22 +12,35 @@ from __future__ import print_function
 import argparse
 import string
 
-parser = argparse.ArgumentParser(description="Usage: steps/nnet3/chain/gen_topo.py "
-                                             "<colon-separated-nonsilence-phones> <colon-separated-silence-phones>"
-                                             "e.g.:  steps/nnet3/chain/gen_topo.pl 4:5:6:7:8:9:10 1:2:3\n",
-                                 epilog="See egs/swbd/s5c/local/chain/train_tdnn_a.sh for example of usage.")
-parser.add_argument("num_nonsil_states", type=int,
+parser = argparse.ArgumentParser(
+    description="Usage: steps/nnet3/chain/gen_topo.py "
+    "<colon-separated-nonsilence-phones> <colon-separated-silence-phones>"
+    "e.g.:  steps/nnet3/chain/gen_topo.pl 4:5:6:7:8:9:10 1:2:3\n",
+    epilog="See egs/swbd/s5c/local/chain/train_tdnn_a.sh for example of usage."
+)
+parser.add_argument("num_nonsil_states",
+                    type=int,
                     help="number of states for nonsilence phones")
-parser.add_argument("num_sil_states", type=int,
+parser.add_argument("num_sil_states",
+                    type=int,
                     help="number of states for silence phones")
-parser.add_argument("num_punctuation_states", type=int,
+parser.add_argument("num_punctuation_states",
+                    type=int,
                     help="number of states for punctuation")
-parser.add_argument("nonsilence_phones", type=str,
-                    help="List of non-silence phones as integers, separated by colons, e.g. 4:5:6:7:8:9")
-parser.add_argument("silence_phones", type=str,
-                    help="List of silence phones as integers, separated by colons, e.g. 1:2:3")
-parser.add_argument("phone_list", type=str,
-                    help="file containing all phones and their corresponding number.")
+parser.add_argument(
+    "nonsilence_phones",
+    type=str,
+    help=
+    "List of non-silence phones as integers, separated by colons, e.g. 4:5:6:7:8:9"
+)
+parser.add_argument(
+    "silence_phones",
+    type=str,
+    help="List of silence phones as integers, separated by colons, e.g. 1:2:3")
+parser.add_argument(
+    "phone_list",
+    type=str,
+    help="file containing all phones and their corresponding number.")
 
 args = parser.parse_args()
 
@@ -47,8 +60,8 @@ with open(args.phone_list) as f:
 print("<Topology>")
 print("<TopologyEntry>")
 print("<ForPhones>")
-print(" ".join([str(x)
-                for x in nonsilence_phones if x not in punctuation_phones]))
+print(" ".join(
+    [str(x) for x in nonsilence_phones if x not in punctuation_phones]))
 print("</ForPhones>")
 for x in range(0, args.num_nonsil_states):
     xp1 = x + 1
@@ -74,7 +87,7 @@ print("<TopologyEntry>")
 print("<ForPhones>")
 print(" ".join([str(x) for x in silence_phones]))
 print("</ForPhones>")
-if(args.num_sil_states > 1):
+if (args.num_sil_states > 1):
     transp = 1.0 / (args.num_sil_states - 1)
 
     state_str = "<State> 0 <PdfClass> 0 "
@@ -92,11 +105,14 @@ if(args.num_sil_states > 1):
         state_str = state_str + "</State>"
         print(state_str)
     second_last = args.num_sil_states - 1
-    print("<State> " + str(second_last) + " <PdfClass> " + str(second_last) + " <Transition> " +
-          str(second_last) + " 0.75 <Transition> " + str(args.num_sil_states) + " 0.25 </State>")
+    print("<State> " + str(second_last) + " <PdfClass> " + str(second_last) +
+          " <Transition> " + str(second_last) + " 0.75 <Transition> " +
+          str(args.num_sil_states) + " 0.25 </State>")
     print("<State> " + str(args.num_sil_states) + " </State>")
 else:
-    print("<State> 0 <PdfClass> 0 <Transition> 0 0.75 <Transition> 1 0.25 </State>")
+    print(
+        "<State> 0 <PdfClass> 0 <Transition> 0 0.75 <Transition> 1 0.25 </State>"
+    )
     print("<State> " + str(args.num_sil_states) + " </State>")
 print("</TopologyEntry>")
 print("</Topology>")

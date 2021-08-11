@@ -13,13 +13,13 @@ from munkres import Munkres
 
 def get_args():
     parser = argparse.ArgumentParser(
-        description="""This script finds best matching of reference and hypothesis speakers.
+        description=
+        """This script finds best matching of reference and hypothesis speakers.
   For the best matching it provides the WER""")
-    parser.add_argument("WER_dir", type=str,
-                        help="path of WER files")
-    parser.add_argument("recording_id", type=str,
-                        help="recording_id name")
-    parser.add_argument("num_speakers", type=str,
+    parser.add_argument("WER_dir", type=str, help="path of WER files")
+    parser.add_argument("recording_id", type=str, help="recording_id name")
+    parser.add_argument("num_speakers",
+                        type=str,
                         help="number of speakers in ref")
     args = parser.parse_args()
     return args
@@ -45,8 +45,8 @@ def get_min_wer(recording_id, num_speakers, WER_dir):
     for i in range(num_speakers):
         total_error_mat[i] = [0] * num_speakers
         all_errors_mat[i] = [0] * num_speakers
-    for i in range(1, num_speakers+1):
-        for j in range(1, num_speakers+1):
+    for i in range(1, num_speakers + 1):
+        for j in range(1, num_speakers + 1):
             filename = '/wer_' + recording_id + \
                 '_' + 'r' + str(i) + 'h' + str(j)
             filename = WER_dir + filename
@@ -55,9 +55,9 @@ def get_min_wer(recording_id, num_speakers, WER_dir):
             deletions = int(deletions)
             sub = int(sub)
             total_error = ins + deletions + sub
-            total_error_mat[i-1][j-1] = total_error
-            all_errors_mat[i-1][j-1] = (total_words,
-                                        total_error, ins, deletions, sub)
+            total_error_mat[i - 1][j - 1] = total_error
+            all_errors_mat[i - 1][j - 1] = (total_words, total_error, ins,
+                                            deletions, sub)
 
     indexes = m.compute(total_error_mat)
     total_errors = total_words = total_ins = total_del = total_sub = 0
@@ -69,10 +69,11 @@ def get_min_wer(recording_id, num_speakers, WER_dir):
         total_ins += int(ins)
         total_del += int(deletions)
         total_sub += int(sub)
-        spk_order = spk_order + str(column+1) + ', '
+        spk_order = spk_order + str(column + 1) + ', '
     spk_order = spk_order + ')'
-    text = "Best error: (#T #E #I #D #S) " + str(total_words) + ', '+str(
-        total_errors) + ', '+str(total_ins) + ', '+str(total_del) + ', '+str(total_sub)
+    text = "Best error: (#T #E #I #D #S) " + str(total_words) + ', ' + str(
+        total_errors) + ', ' + str(total_ins) + ', ' + str(
+            total_del) + ', ' + str(total_sub)
     best_wer_writer.write(" recording_id: " + recording_id + ' ')
     best_wer_writer.write(' best hypothesis speaker order: ' + spk_order + ' ')
     best_wer_writer.write(text + '\n')

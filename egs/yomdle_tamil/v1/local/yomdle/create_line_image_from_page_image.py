@@ -36,16 +36,22 @@ parser = argparse.ArgumentParser(
 parser.add_argument('image_dir', type=str, help='Path to full page images')
 parser.add_argument('csv_dir', type=str, help='Path to csv files')
 parser.add_argument('out_dir', type=str, help='Path to output directory')
-parser.add_argument('output_file', type=str,
+parser.add_argument('output_file',
+                    type=str,
                     help='file containing all line images id')
-parser.add_argument('--padding', type=int, default=100,
+parser.add_argument('--padding',
+                    type=int,
+                    default=100,
                     help='Padding so BBox does not exceed image area')
-parser.add_argument('--ext', type=str, default='.jpg',
+parser.add_argument('--ext',
+                    type=str,
+                    default='.jpg',
                     help='Extention of the line images')
-parser.add_argument("--filter", action="store_true",
-                    help="If true, filter height/width<10 pixels minimum area rectangles")
+parser.add_argument(
+    "--filter",
+    action="store_true",
+    help="If true, filter height/width<10 pixels minimum area rectangles")
 args = parser.parse_args()
-
 """
 bounding_box is a named tuple which contains:
              area (float): area of the rectangle
@@ -59,14 +65,14 @@ bounding_box is a named tuple which contains:
              corner_points [(float, float)]: set that contains the corners of the rectangle
 """
 
-bounding_box_tuple = namedtuple('bounding_box_tuple', 'area '
-                                'length_parallel '
-                                'length_orthogonal '
-                                'rectangle_center '
-                                'unit_vector '
-                                'unit_vector_angle '
-                                'corner_points'
-                                )
+bounding_box_tuple = namedtuple(
+    'bounding_box_tuple', 'area '
+    'length_parallel '
+    'length_orthogonal '
+    'rectangle_center '
+    'unit_vector '
+    'unit_vector_angle '
+    'corner_points')
 
 
 def unit_vector(pt0, pt1):
@@ -106,7 +112,7 @@ def bounding_area(index, hull):
     unit_vector: direction of the length_parallel side.
     (it's orthogonal vector can be found with the orthogonal_vector function)
     """
-    unit_vector_p = unit_vector(hull[index], hull[index+1])
+    unit_vector_p = unit_vector(hull[index], hull[index + 1])
     unit_vector_o = orthogonal_vector(unit_vector_p)
 
     dis_p = tuple(np.dot(unit_vector_p, pt) for pt in hull)
@@ -117,12 +123,14 @@ def bounding_area(index, hull):
     len_p = max(dis_p) - min_p
     len_o = max(dis_o) - min_o
 
-    return {'area': len_p * len_o,
-            'length_parallel': len_p,
-            'length_orthogonal': len_o,
-            'rectangle_center': (min_p + float(len_p) / 2, min_o + float(len_o) / 2),
-            'unit_vector': unit_vector_p,
-            }
+    return {
+        'area': len_p * len_o,
+        'length_parallel': len_p,
+        'length_orthogonal': len_o,
+        'rectangle_center':
+        (min_p + float(len_p) / 2, min_o + float(len_o) / 2),
+        'unit_vector': unit_vector_p,
+    }
 
 
 def to_xy_coordinates(unit_vector_angle, point):
@@ -156,8 +164,9 @@ def rotate_points(center_of_rotation, angle, points):
         diff_angle = atan2(diff[1], diff[0]) + angle
         ang.append(diff_angle)
         diff_length = sqrt(sum([d**2 for d in diff]))
-        rot_points.append((center_of_rotation[0] + diff_length * cos(diff_angle),
-                           center_of_rotation[1] + diff_length * sin(diff_angle)))
+        rot_points.append(
+            (center_of_rotation[0] + diff_length * cos(diff_angle),
+             center_of_rotation[1] + diff_length * sin(diff_angle)))
 
     return rot_points
 
@@ -172,10 +181,13 @@ def rectangle_corners(rectangle):
     corner_points = []
     for i1 in (.5, -.5):
         for i2 in (i1, -1 * i1):
-            corner_points.append((rectangle['rectangle_center'][0] + i1 * rectangle['length_parallel'],
-                                  rectangle['rectangle_center'][1] + i2 * rectangle['length_orthogonal']))
+            corner_points.append((rectangle['rectangle_center'][0] +
+                                  i1 * rectangle['length_parallel'],
+                                  rectangle['rectangle_center'][1] +
+                                  i2 * rectangle['length_orthogonal']))
 
-    return rotate_points(rectangle['rectangle_center'], rectangle['unit_vector_angle'], corner_points)
+    return rotate_points(rectangle['rectangle_center'],
+                         rectangle['unit_vector_angle'], corner_points)
 
 
 def minimum_bounding_box(points):
@@ -201,13 +213,13 @@ def minimum_bounding_box(points):
     hull_ordered = tuple(hull_ordered)
 
     min_rectangle = bounding_area(0, hull_ordered)
-    for i in range(1, len(hull_ordered)-1):
+    for i in range(1, len(hull_ordered) - 1):
         rectangle = bounding_area(i, hull_ordered)
         if rectangle['area'] < min_rectangle['area']:
             min_rectangle = rectangle
 
-    min_rectangle['unit_vector_angle'] = atan2(
-        min_rectangle['unit_vector'][1], min_rectangle['unit_vector'][0])
+    min_rectangle['unit_vector_angle'] = atan2(min_rectangle['unit_vector'][1],
+                                               min_rectangle['unit_vector'][0])
     min_rectangle['rectangle_center'] = to_xy_coordinates(
         min_rectangle['unit_vector_angle'], min_rectangle['rectangle_center'])
 
@@ -218,8 +230,7 @@ def minimum_bounding_box(points):
         rectangle_center=min_rectangle['rectangle_center'],
         unit_vector=min_rectangle['unit_vector'],
         unit_vector_angle=min_rectangle['unit_vector_angle'],
-        corner_points=set(rectangle_corners(min_rectangle))
-    )
+        corner_points=set(rectangle_corners(min_rectangle)))
 
 
 def get_center(im):
@@ -313,7 +324,9 @@ def pad_image(image):
     """
     offset = int(args.padding // 2)
     padded_image = Image.new(
-        'L', (image.size[0] + int(args.padding), image.size[1] + int(args.padding)), "white")
+        'L',
+        (image.size[0] + int(args.padding), image.size[1] + int(args.padding)),
+        "white")
     padded_image.paste(im=image, box=(offset, offset))
     return padded_image
 
@@ -344,8 +357,8 @@ for filename in sorted(file_list):
     filename = str(filename)
     with open(str(filename), 'r', encoding='utf-8') as f:
         base_name = os.path.basename(filename)
-        image_file = os.path.join(
-            args.image_dir, base_name.split('.')[0] + args.ext)
+        image_file = os.path.join(args.image_dir,
+                                  base_name.split('.')[0] + args.ext)
         try:
             im = Image.open(image_file).convert('L')
         except Exception as e:
@@ -389,16 +402,14 @@ for filename in sorted(file_list):
             rot_points.append(p2_new)
             rot_points.append(p3_new)
             rot_points.append(p4_new)
-            cropped_bounding_box = bounding_box_tuple(bounding_box.area,
-                                                      bounding_box.length_parallel,
-                                                      bounding_box.length_orthogonal,
-                                                      bounding_box.length_orthogonal,
-                                                      bounding_box.unit_vector,
-                                                      bounding_box.unit_vector_angle,
-                                                      set(rot_points))
+            cropped_bounding_box = bounding_box_tuple(
+                bounding_box.area, bounding_box.length_parallel,
+                bounding_box.length_orthogonal, bounding_box.length_orthogonal,
+                bounding_box.unit_vector, bounding_box.unit_vector_angle,
+                set(rot_points))
             rotation_angle_in_rad = get_smaller_angle(cropped_bounding_box)
-            img2 = region_initial.rotate(
-                degrees(rotation_angle_in_rad), resample=Image.BICUBIC)
+            img2 = region_initial.rotate(degrees(rotation_angle_in_rad),
+                                         resample=Image.BICUBIC)
             x_dash_1, y_dash_1, x_dash_2, y_dash_2, x_dash_3, y_dash_3, x_dash_4, y_dash_4 = rotated_points(
                 cropped_bounding_box, get_center(region_initial))
             min_x = int(min(x_dash_1, x_dash_2, x_dash_3, x_dash_4))

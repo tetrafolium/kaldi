@@ -19,7 +19,6 @@ Gst.init(None)
 
 class DemoApp(object):
     """GStreamer/Kaldi Demo Application"""
-
     def __init__(self):
         """Initialize a DemoApp object"""
         self.init_gui()
@@ -49,12 +48,14 @@ class DemoApp(object):
         """Initialize the speech components"""
         self.pulsesrc = Gst.ElementFactory.make("pulsesrc", "pulsesrc")
         if self.pulsesrc == None:
-            print("Error loading pulsesrc GST plugin. You probably need the gstreamer1.0-pulseaudio package", file=sys.stderr)
+            print(
+                "Error loading pulsesrc GST plugin. You probably need the gstreamer1.0-pulseaudio package",
+                file=sys.stderr)
             sys.exit()
-        self.audioconvert = Gst.ElementFactory.make(
-            "audioconvert", "audioconvert")
-        self.audioresample = Gst.ElementFactory.make(
-            "audioresample", "audioresample")
+        self.audioconvert = Gst.ElementFactory.make("audioconvert",
+                                                    "audioconvert")
+        self.audioresample = Gst.ElementFactory.make("audioresample",
+                                                     "audioresample")
         self.asr = Gst.ElementFactory.make("onlinegmmdecodefaster", "asr")
         self.fakesink = Gst.ElementFactory.make("fakesink", "fakesink")
 
@@ -62,7 +63,8 @@ class DemoApp(object):
             model_dir = "online-data/models/tri2b_mmi/"
             if not os.path.isdir(model_dir):
                 print("Model (%s) not downloaded. Run run-simulated.sh first" %
-                      model_dir, file=sys.stderr)
+                      model_dir,
+                      file=sys.stderr)
                 sys.exit(1)
             self.asr.set_property("fst", model_dir + "HCLG.fst")
             self.asr.set_property("lda-mat", model_dir + "matrix")
@@ -80,16 +82,22 @@ class DemoApp(object):
                       file=sys.stderr)
             else:
                 print(
-                    "You probably need to set the GST_PLUGIN_PATH envoronment variable", file=sys.stderr)
-                print("Try running: GST_PLUGIN_PATH=../../../src/gst-plugin %s" %
-                      sys.argv[0], file=sys.stderr)
+                    "You probably need to set the GST_PLUGIN_PATH envoronment variable",
+                    file=sys.stderr)
+                print(
+                    "Try running: GST_PLUGIN_PATH=../../../src/gst-plugin %s" %
+                    sys.argv[0],
+                    file=sys.stderr)
             sys.exit()
 
         # initially silence the decoder
         self.asr.set_property("silent", True)
 
         self.pipeline = Gst.Pipeline()
-        for element in [self.pulsesrc, self.audioconvert, self.audioresample, self.asr, self.fakesink]:
+        for element in [
+                self.pulsesrc, self.audioconvert, self.audioresample, self.asr,
+                self.fakesink
+        ]:
             self.pipeline.add(element)
         self.pulsesrc.link(self.audioconvert)
         self.audioconvert.link(self.audioresample)

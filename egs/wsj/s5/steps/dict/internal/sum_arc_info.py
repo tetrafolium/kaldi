@@ -12,15 +12,14 @@ import sys
 class StrToBoolAction(argparse.Action):
     """ A custom action to convert bools from shell format i.e., true/false
         to python format i.e., True/False """
-
     def __call__(self, parser, namespace, values, option_string=None):
         if values == "true":
             setattr(namespace, self.dest, True)
         elif values == "false":
             setattr(namespace, self.dest, False)
         else:
-            raise Exception(
-                "Unknown value {0} for --{1}".format(values, self.dest))
+            raise Exception("Unknown value {0} for --{1}".format(
+                values, self.dest))
 
 
 def GetArgs():
@@ -29,21 +28,35 @@ def GetArgs():
         "for lexicon learning",
         epilog="See steps/dict/learn_lexicon_greedy.sh for example")
 
-    parser.add_argument("--set-sum-to-one", type=str, default=True,
-                        action=StrToBoolAction, choices=["true", "false"],
-                        help="If normalize posteriors such that the sum of "
-                        "pronunciation posteriors of a word in an utterance is 1.")
-    parser.add_argument("arc_info_file", metavar="<arc-info-file>", type=str,
-                        help="File containing per arc statistics; "
-                        "each line must be <utt-id> <word> <start-frame> <duration> <posterior>"
-                        "<phones-with-word-boundary-markers>")
-    parser.add_argument("phone_map", metavar="<phone-map>", type=str,
-                        help="An input phone map used to remove word boundary markers from phones;"
-                        "generated in steps/cleanup/debug_lexicon.sh")
-    parser.add_argument("stats_file", metavar="<out-stats-file>", type=str,
-                        help="Write accumulated statitistics to this file"
-                        "each line is <utt-id> <word> <start-frame> <posterior>"
-                        "<phones-without-word-boundary-markers>")
+    parser.add_argument(
+        "--set-sum-to-one",
+        type=str,
+        default=True,
+        action=StrToBoolAction,
+        choices=["true", "false"],
+        help="If normalize posteriors such that the sum of "
+        "pronunciation posteriors of a word in an utterance is 1.")
+    parser.add_argument(
+        "arc_info_file",
+        metavar="<arc-info-file>",
+        type=str,
+        help="File containing per arc statistics; "
+        "each line must be <utt-id> <word> <start-frame> <duration> <posterior>"
+        "<phones-with-word-boundary-markers>")
+    parser.add_argument(
+        "phone_map",
+        metavar="<phone-map>",
+        type=str,
+        help=
+        "An input phone map used to remove word boundary markers from phones;"
+        "generated in steps/cleanup/debug_lexicon.sh")
+    parser.add_argument(
+        "stats_file",
+        metavar="<out-stats-file>",
+        type=str,
+        help="Write accumulated statitistics to this file"
+        "each line is <utt-id> <word> <start-frame> <posterior>"
+        "<phones-without-word-boundary-markers>")
 
     print(' '.join(sys.argv), file=sys.stderr)
 
@@ -90,8 +103,8 @@ def Main():
             continue
 
         if (len(splits) < 6):
-            raise Exception('Invalid format of line ' + line
-                            + ' in ' + args.arc_info_file)
+            raise Exception('Invalid format of line ' + line + ' in ' +
+                            args.arc_info_file)
 
         utt = splits[0]
         start_frame = int(splits[1])
@@ -130,8 +143,12 @@ def Main():
         # short sub-utterances produced by steps/dict/internal/get_subsegments.py
         for phones in stats[(word, utt)]:
             count = counts[phones] / count_sum
-            print(word, utt, start_frames[(word, utt)],
-                  count, phones, file=args.stats_file_handle)
+            print(word,
+                  utt,
+                  start_frames[(word, utt)],
+                  count,
+                  phones,
+                  file=args.stats_file_handle)
         # # Diagnostics info implying incomplete arc_info or multiple occurences of a word in a utterance:
         # if count_sum < 0.9 or count_sum > 1.1:
         #    print(word, utt, start_frame, count_sum, stats[word, utt], file=sys.stderr)

@@ -5,28 +5,36 @@ import sys
 import argparse
 from collections import defaultdict
 
-
 parser = argparse.ArgumentParser(description="""
  Usage: extend_segment_times.py [options] <input-segments >output-segments
  This program pads the times in a 'segments' file (e.g. data/train/segments)
  with specified left and right context (for cases where there was no
  silence padding in the original segments file)""")
 
-parser.add_argument("--start-padding", type=float, default=0.1,
-                    help="Amount of padding, in seconds, for the start time of "
-                    "each segment (start times <0 will be set to zero).")
-parser.add_argument("--end-padding", type=float, default=0.1,
+parser.add_argument(
+    "--start-padding",
+    type=float,
+    default=0.1,
+    help="Amount of padding, in seconds, for the start time of "
+    "each segment (start times <0 will be set to zero).")
+parser.add_argument("--end-padding",
+                    type=float,
+                    default=0.1,
                     help="Amount of padding, in seconds, for the end time of "
                     "each segment.")
-parser.add_argument("--last-segment-end-padding", type=float, default=0.1,
+parser.add_argument("--last-segment-end-padding",
+                    type=float,
+                    default=0.1,
                     help="Amount of padding, in seconds, for the end time of "
                     "the last segment of each file (maximum allowed).")
-parser.add_argument("--fix-overlapping-segments", type=str,
-                    default='true', choices=['true', 'false'],
-                    help="If true, prevent segments from overlapping as a result "
-                    "of the padding (or that were already overlapping)")
+parser.add_argument(
+    "--fix-overlapping-segments",
+    type=str,
+    default='true',
+    choices=['true', 'false'],
+    help="If true, prevent segments from overlapping as a result "
+    "of the padding (or that were already overlapping)")
 args = parser.parse_args()
-
 
 # the input file will be a sequence of lines which are each of the form:
 # <utterance-id> <recording-id> <start-time> <end-time>
@@ -44,7 +52,6 @@ recording_to_utt_indexes = defaultdict(list)
 # (utterance-id as astring, recording-id as string,
 #  start-time as float, end-time as float)
 entries = []
-
 
 while True:
     line = sys.stdin.readline()
@@ -81,11 +88,11 @@ for recording, utt_indexes in recording_to_utt_indexes.items():
 
     for n in range(len(this_entries) - 1):
         this_end_time = this_entries[n][3]
-        next_start_time = this_entries[n+1][2]
+        next_start_time = this_entries[n + 1][2]
         if this_end_time > next_start_time and args.fix_overlapping_segments == 'true':
             midpoint = 0.5 * (this_end_time + next_start_time)
             this_entries[n][3] = midpoint
-            this_entries[n+1][2] = midpoint
+            this_entries[n + 1][2] = midpoint
             num_times_fixed += 1
 
 
@@ -104,12 +111,13 @@ def FloatToString(f):
 for entry in entries:
     [utt_id, recording_id, start_time, end_time] = entry
     if not start_time < end_time:
-        print("extend_segment_times.py: bad segment after processing (ignoring): " +
-              ' '.join(entry), file=sys.stderr)
+        print(
+            "extend_segment_times.py: bad segment after processing (ignoring): "
+            + ' '.join(entry),
+            file=sys.stderr)
         continue
-    print(utt_id, recording_id, FloatToString(
-        start_time), FloatToString(end_time))
-
+    print(utt_id, recording_id, FloatToString(start_time),
+          FloatToString(end_time))
 
 print("extend_segment_times.py: extended {0} segments; fixed {1} "
       "overlapping segments".format(len(entries), num_times_fixed),

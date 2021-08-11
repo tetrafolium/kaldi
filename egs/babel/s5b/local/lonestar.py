@@ -34,19 +34,21 @@ def KaldiLauncher(lo, **kwargs):
     qdir = os.path.join(lo.qdir, lo.taskname)
     cores = lo.nof_threads
 
-    ce = SSHExecutor(workdir=qdir, debug=debug,
-                     force_workdir=True, catch_output=True)
+    ce = SSHExecutor(workdir=qdir,
+                     debug=debug,
+                     force_workdir=True,
+                     catch_output=True)
     ce.outstring = "out."
     ce.execstring = lo.taskname + "."
 
     hostpool = HostPool(hostlist=HostListByName(), commandexecutor=ce)
 
-    def completion(x): return FileCompletion(
-        taskid=x, stamproot="done.", stampdir=qdir)
+    def completion(x):
+        return FileCompletion(taskid=x, stamproot="done.", stampdir=qdir)
 
     logfiles = list()
     commands = list()
-    for q in range(lo.jobstart, lo.jobend+1):
+    for q in range(lo.jobstart, lo.jobend + 1):
         s = "bash " + lo.queue_scriptfile + " " + str(q)
         commands.append(s)
 
@@ -56,8 +58,10 @@ def KaldiLauncher(lo, **kwargs):
     generator = ListCommandlineGenerator(list=commands, cores=cores)
     tasks = TaskGenerator(generator, completion=completion, debug=debug)
 
-    job = LauncherJob(hostpool=hostpool, taskgenerator=tasks,
-                      debug=debug, **kwargs)
+    job = LauncherJob(hostpool=hostpool,
+                      taskgenerator=tasks,
+                      debug=debug,
+                      **kwargs)
 
     job.run()
     # At this point all the .done files should exist and everything should be finalized.
@@ -75,7 +79,9 @@ def KaldiLauncher(lo, **kwargs):
             sys.stderr.write("ERROR: " + "The following file is missing:\n")
             sys.stderr.write("ERROR: " + "\t" + logfile + "\n")
             sys.stderr.write(
-                "ERROR: " + "That means something went wrong, but we don't know what. Try to figure out what and fix it\n")
+                "ERROR: " +
+                "That means something went wrong, but we don't know what. Try to figure out what and fix it\n"
+            )
             sys.exit(-1)
 
         error_pending = True
@@ -83,14 +89,17 @@ def KaldiLauncher(lo, **kwargs):
             time.sleep(delay)
 
             lines = tail(10, logfile)
-            with_status = [x for x in lines if re.search(
-                r'with status (\d+)', x)]
+            with_status = [
+                x for x in lines if re.search(r'with status (\d+)', x)
+            ]
 
             if len(with_status) == 0:
-                sys.stderr.write("The last line(s) of the log-file " + logfile + " does not seem"
+                sys.stderr.write("The last line(s) of the log-file " +
+                                 logfile + " does not seem"
                                  " to indicate return status as expected\n")
             elif len(with_status) > 1:
-                sys.stderr.write("The last line(s) of the log-file " + logfile + " does seem"
+                sys.stderr.write("The last line(s) of the log-file " +
+                                 logfile + " does seem"
                                  " to indicate multiple return statuses \n")
             else:
                 status_re = re.search(r'with status (\d+)', with_status[0])
@@ -99,20 +108,22 @@ def KaldiLauncher(lo, **kwargs):
                     error_pending = False
                 break
             sys.stderr.write(
-                "INFO: Waiting for status in files, sleeping %d seconds\n" % (delay,))
+                "INFO: Waiting for status in files, sleeping %d seconds\n" %
+                (delay, ))
         if error_pending:
             num_failed += 1
 
     if num_failed != 0:
-        sys.stderr.write(
-            sys.argv[0] + ": " + str(num_failed) + "/" + str(len(logfiles)) + " failed \n")
-        sys.stderr.write(
-            sys.argv[0] + ": See  " + lo.logfile.replace("${PY_LAUNCHER_ID}", "*") + " for details\n")
+        sys.stderr.write(sys.argv[0] + ": " + str(num_failed) + "/" +
+                         str(len(logfiles)) + " failed \n")
+        sys.stderr.write(sys.argv[0] + ": See  " +
+                         lo.logfile.replace("${PY_LAUNCHER_ID}", "*") +
+                         " for details\n")
         sys.exit(-1)
 
     # Remove service files. Be careful not to remove something that might be needed in problem diagnostics
     for i in range(len(commands)):
-        out_file = os.path.join(qdir, ce.outstring+str(i))
+        out_file = os.path.join(qdir, ce.outstring + str(i))
 
         # First, let's wait on files missing (it might be that those are missing
         # just because of slow shared filesystem synchronization
@@ -124,38 +135,47 @@ def KaldiLauncher(lo, **kwargs):
                 if os.path.isfile(out_file):
                     break
             if not os.path.isfile(out_file):
-                sys.stderr.write(
-                    "ERROR: " + "The following file is missing:\n")
+                sys.stderr.write("ERROR: " +
+                                 "The following file is missing:\n")
                 sys.stderr.write("ERROR: " + "\t" + out_file + "\n")
                 sys.stderr.write(
-                    "ERROR: " + "That means something went wrong, but we don't know what. Try to figure out what and fix it\n")
+                    "ERROR: " +
+                    "That means something went wrong, but we don't know what. Try to figure out what and fix it\n"
+                )
                 sys.exit(-1)
 
         if os.stat(out_file).st_size != 0:
-            sys.stderr.write(
-                "ERROR: " + "The following file has non-zero size:\n")
+            sys.stderr.write("ERROR: " +
+                             "The following file has non-zero size:\n")
             sys.stderr.write("ERROR: " + "\t" + out_file + "\n")
             sys.stderr.write(
-                "ERROR: " + "That means something went wrong, but we don't know what. Try to figure out what and fix it\n")
+                "ERROR: " +
+                "That means something went wrong, but we don't know what. Try to figure out what and fix it\n"
+            )
             sys.exit(-1)
         else:
-            exec_file = os.path.join(qdir, ce.execstring+str(i))
-            done_file = os.path.join(qdir, "done."+str(i))
-            if (not os.path.isfile(exec_file)) or (not os.path.isfile(done_file)):
-                sys.stderr.write(
-                    "ERROR: " + "One of the following files is missing:\n")
+            exec_file = os.path.join(qdir, ce.execstring + str(i))
+            done_file = os.path.join(qdir, "done." + str(i))
+            if (not os.path.isfile(exec_file)) or (
+                    not os.path.isfile(done_file)):
+                sys.stderr.write("ERROR: " +
+                                 "One of the following files is missing:\n")
                 sys.stderr.write("ERROR: " + "\t" + exec_file + "\n")
                 sys.stderr.write("ERROR: " + "\t" + done_file + "\n")
                 sys.stderr.write("ERROR: " + "\t" + out_file + "\n")
                 sys.stderr.write(
-                    "ERROR: " + "That means something went wrong, but we don't know what. Try to figure out what and fix it\n")
+                    "ERROR: " +
+                    "That means something went wrong, but we don't know what. Try to figure out what and fix it\n"
+                )
                 sys.exit(-1)
             elif os.stat(done_file).st_size != 0:
-                sys.stderr.write(
-                    "ERROR: " + "The following file has non-zero size:\n")
+                sys.stderr.write("ERROR: " +
+                                 "The following file has non-zero size:\n")
                 sys.stderr.write("ERROR: " + "\t" + done_file + "\n")
                 sys.stderr.write(
-                    "ERROR: " + "That means something went wrong, but we don't know what. Try to figure out what and fix it\n")
+                    "ERROR: " +
+                    "That means something went wrong, but we don't know what. Try to figure out what and fix it\n"
+                )
                 sys.exit(-1)
             else:
                 os.remove(exec_file)
@@ -164,8 +184,9 @@ def KaldiLauncher(lo, **kwargs):
     try:
         os.rmdir(qdir)
     except OSError:
-        sys.stderr.write(
-            "ERROR: " + "Failed to remove the pylauncher task dir " + qdir + "\n")
+        sys.stderr.write("ERROR: " +
+                         "Failed to remove the pylauncher task dir " + qdir +
+                         "\n")
         sys.stderr.write("ERROR: " + "Find out what is wrong and fix it\n")
         sys.exit(-1)
 
@@ -216,7 +237,7 @@ def CmdLineParser(argv):
         jobstart = int(m.group(2))
         jobend = int(m.group(3))
         argv.pop(0)
-    elif(re.match(r"^[A-Za-z_]\w*=\d+$", argv[0])):
+    elif (re.match(r"^[A-Za-z_]\w*=\d+$", argv[0])):
         m = re.match(r"^([A-Za-z_]\w*)=(\d+)$", argv[0])
         jobname = m.group(1)
         jobstart = int(m.group(2))
@@ -264,9 +285,12 @@ def escape_cmd(argv):
 def setup_paths_and_vars(opts):
     cwd = os.getcwd()
 
-    if opts.varname and (opts.varname not in opts.logfile) and (opts.jobstart != opts.jobend):
+    if opts.varname and (opts.varname not in opts.logfile) and (
+            opts.jobstart != opts.jobend):
         print("lonestar.py: you are trying to run a parallel job"
-              "but you are putting the output into just one log file (" + opts.logfile + ")", file=sys.stderr)
+              "but you are putting the output into just one log file (" +
+              opts.logfile + ")",
+              file=sys.stderr)
         sys.exit(1)
 
     if not os.path.isabs(opts.logfile):
@@ -282,13 +306,14 @@ def setup_paths_and_vars(opts):
 
     queue_logfile = os.path.join(qdir, base)
     if opts.varname:
-        queue_logfile = re.sub("\.?"+opts.varname, "", queue_logfile)
+        queue_logfile = re.sub("\.?" + opts.varname, "", queue_logfile)
 
     taskname = os.path.basename(queue_logfile)
     taskname = taskname.replace(".log", "")
     if taskname == "":
         print("lonestar.py: you specified the log file name in such form "
-              "that leads to an empty task name ("+logfile + ")", file=sys.stderr)
+              "that leads to an empty task name (" + logfile + ")",
+              file=sys.stderr)
         sys.exit(1)
 
     if not os.path.isabs(queue_logfile):

@@ -14,7 +14,8 @@ conversationList = open(
     '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/test')
 oneBestTmp = 'exp/sgmm2x_6a_mmi_b0.2/one-best/asr-test'
 provFile = open(
-    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/asr.test', 'w+')
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/asr.test',
+    'w+')
 timLocation = '/export/a04/gkumar/corpora/fishcall/fisher/tim'
 
 

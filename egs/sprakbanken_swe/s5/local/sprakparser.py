@@ -42,7 +42,7 @@ class Session(object):
         self.speaker_id = None
         self.set_speaker_vars(splhandle)
 
-        self. wavdir = False
+        self.wavdir = False
         self.set_path_vars(topfolder, splhandle)
         if self.wavdir:
             self.extract_record_states(splhandle)
@@ -151,7 +151,8 @@ class Session(object):
                 pass
 
     def create_filename(self, uid, file_ending):
-        return "{}.{}.{}.{}".format(self.filestem, self.speaker_id, uid, file_ending)
+        return "{}.{}.{}.{}".format(self.filestem, self.speaker_id, uid,
+                                    file_ending)
 
     def wavpath(self, topfolder):
         prefix, suffix = topfolder.rsplit('/data/', 1)

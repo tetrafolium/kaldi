@@ -26,38 +26,58 @@ import random
 from scipy.spatial import ConvexHull
 from PIL import Image
 from scipy.misc import toimage
-parser = argparse.ArgumentParser(description="Creates line images from page image",
-                                 epilog="E.g.  " +
-                                 sys.argv[0] + "  data/LDC2012T15"
-                                 " data/LDC2013T09 data/LDC2013T15 data/madcat.train.raw.lineid "
-                                 " data/local/lines ",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('database_path1', type=str,
+parser = argparse.ArgumentParser(
+    description="Creates line images from page image",
+    epilog="E.g.  " + sys.argv[0] + "  data/LDC2012T15"
+    " data/LDC2013T09 data/LDC2013T15 data/madcat.train.raw.lineid "
+    " data/local/lines ",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('database_path1',
+                    type=str,
                     help='Path to the downloaded madcat data directory 1')
-parser.add_argument('database_path2', type=str,
+parser.add_argument('database_path2',
+                    type=str,
                     help='Path to the downloaded madcat data directory 2')
-parser.add_argument('database_path3', type=str,
+parser.add_argument('database_path3',
+                    type=str,
                     help='Path to the downloaded madcat data directory 3')
-parser.add_argument('data_splits', type=str,
-                    help='Path to file that contains the train/test/dev split information')
-parser.add_argument('out_dir', type=str,
+parser.add_argument(
+    'data_splits',
+    type=str,
+    help='Path to file that contains the train/test/dev split information')
+parser.add_argument('out_dir',
+                    type=str,
                     help='directory location to write output files')
-parser.add_argument('writing_condition1', type=str,
-                    help='Path to the downloaded (and extracted) writing conditions file 1')
-parser.add_argument('writing_condition2', type=str,
-                    help='Path to the downloaded (and extracted) writing conditions file 2')
-parser.add_argument('writing_condition3', type=str,
-                    help='Path to the downloaded (and extracted) writing conditions file 3')
-parser.add_argument('--padding', type=int, default=400,
+parser.add_argument(
+    'writing_condition1',
+    type=str,
+    help='Path to the downloaded (and extracted) writing conditions file 1')
+parser.add_argument(
+    'writing_condition2',
+    type=str,
+    help='Path to the downloaded (and extracted) writing conditions file 2')
+parser.add_argument(
+    'writing_condition3',
+    type=str,
+    help='Path to the downloaded (and extracted) writing conditions file 3')
+parser.add_argument('--padding',
+                    type=int,
+                    default=400,
                     help='padding across horizontal/verticle direction')
-parser.add_argument('--pixel-scaling', type=int, default=30,
+parser.add_argument('--pixel-scaling',
+                    type=int,
+                    default=30,
                     help='padding across horizontal/verticle direction')
-parser.add_argument("--subset", type=lambda x: (str(x).lower() == 'true'), default=False,
-                    help="only processes subset of data based on writing condition")
-parser.add_argument("--augment", type=lambda x: (str(x).lower() == 'true'), default=False,
+parser.add_argument(
+    "--subset",
+    type=lambda x: (str(x).lower() == 'true'),
+    default=False,
+    help="only processes subset of data based on writing condition")
+parser.add_argument("--augment",
+                    type=lambda x: (str(x).lower() == 'true'),
+                    default=False,
                     help="performs image augmentation")
 args = parser.parse_args()
-
 """
 bounding_box is a named tuple which contains:
              area (float): area of the rectangle
@@ -71,14 +91,14 @@ bounding_box is a named tuple which contains:
              corner_points [(float, float)]: set that contains the corners of the rectangle
 """
 
-bounding_box_tuple = namedtuple('bounding_box_tuple', 'area '
-                                'length_parallel '
-                                'length_orthogonal '
-                                'rectangle_center '
-                                'unit_vector '
-                                'unit_vector_angle '
-                                'corner_points'
-                                )
+bounding_box_tuple = namedtuple(
+    'bounding_box_tuple', 'area '
+    'length_parallel '
+    'length_orthogonal '
+    'rectangle_center '
+    'unit_vector '
+    'unit_vector_angle '
+    'corner_points')
 
 
 def unit_vector(pt0, pt1):
@@ -118,7 +138,7 @@ def bounding_area(index, hull):
     unit_vector: direction of the length_parallel side.
     (it's orthogonal vector can be found with the orthogonal_vector function)
     """
-    unit_vector_p = unit_vector(hull[index], hull[index+1])
+    unit_vector_p = unit_vector(hull[index], hull[index + 1])
     unit_vector_o = orthogonal_vector(unit_vector_p)
 
     dis_p = tuple(np.dot(unit_vector_p, pt) for pt in hull)
@@ -129,12 +149,14 @@ def bounding_area(index, hull):
     len_p = max(dis_p) - min_p
     len_o = max(dis_o) - min_o
 
-    return {'area': len_p * len_o,
-            'length_parallel': len_p,
-            'length_orthogonal': len_o,
-            'rectangle_center': (min_p + float(len_p) / 2, min_o + float(len_o) / 2),
-            'unit_vector': unit_vector_p,
-            }
+    return {
+        'area': len_p * len_o,
+        'length_parallel': len_p,
+        'length_orthogonal': len_o,
+        'rectangle_center':
+        (min_p + float(len_p) / 2, min_o + float(len_o) / 2),
+        'unit_vector': unit_vector_p,
+    }
 
 
 def to_xy_coordinates(unit_vector_angle, point):
@@ -168,8 +190,9 @@ def rotate_points(center_of_rotation, angle, points):
         diff_angle = atan2(diff[1], diff[0]) + angle
         ang.append(diff_angle)
         diff_length = sqrt(sum([d**2 for d in diff]))
-        rot_points.append((center_of_rotation[0] + diff_length * cos(diff_angle),
-                           center_of_rotation[1] + diff_length * sin(diff_angle)))
+        rot_points.append(
+            (center_of_rotation[0] + diff_length * cos(diff_angle),
+             center_of_rotation[1] + diff_length * sin(diff_angle)))
 
     return rot_points
 
@@ -184,10 +207,13 @@ def rectangle_corners(rectangle):
     corner_points = []
     for i1 in (.5, -.5):
         for i2 in (i1, -1 * i1):
-            corner_points.append((rectangle['rectangle_center'][0] + i1 * rectangle['length_parallel'],
-                                  rectangle['rectangle_center'][1] + i2 * rectangle['length_orthogonal']))
+            corner_points.append((rectangle['rectangle_center'][0] +
+                                  i1 * rectangle['length_parallel'],
+                                  rectangle['rectangle_center'][1] +
+                                  i2 * rectangle['length_orthogonal']))
 
-    return rotate_points(rectangle['rectangle_center'], rectangle['unit_vector_angle'], corner_points)
+    return rotate_points(rectangle['rectangle_center'],
+                         rectangle['unit_vector_angle'], corner_points)
 
 
 def minimum_bounding_box(points):
@@ -213,13 +239,13 @@ def minimum_bounding_box(points):
     hull_ordered = tuple(hull_ordered)
 
     min_rectangle = bounding_area(0, hull_ordered)
-    for i in range(1, len(hull_ordered)-1):
+    for i in range(1, len(hull_ordered) - 1):
         rectangle = bounding_area(i, hull_ordered)
         if rectangle['area'] < min_rectangle['area']:
             min_rectangle = rectangle
 
-    min_rectangle['unit_vector_angle'] = atan2(
-        min_rectangle['unit_vector'][1], min_rectangle['unit_vector'][0])
+    min_rectangle['unit_vector_angle'] = atan2(min_rectangle['unit_vector'][1],
+                                               min_rectangle['unit_vector'][0])
     min_rectangle['rectangle_center'] = to_xy_coordinates(
         min_rectangle['unit_vector_angle'], min_rectangle['rectangle_center'])
 
@@ -230,8 +256,7 @@ def minimum_bounding_box(points):
         rectangle_center=min_rectangle['rectangle_center'],
         unit_vector=min_rectangle['unit_vector'],
         unit_vector_angle=min_rectangle['unit_vector_angle'],
-        corner_points=set(rectangle_corners(min_rectangle))
-    )
+        corner_points=set(rectangle_corners(min_rectangle)))
 
 
 def get_center(im):
@@ -325,7 +350,9 @@ def pad_image(image):
     """
     offset = int(args.padding // 2)
     padded_image = Image.new(
-        'RGB', (image.size[0] + int(args.padding), image.size[1] + int(args.padding)), "white")
+        'RGB',
+        (image.size[0] + int(args.padding), image.size[1] + int(args.padding)),
+        "white")
     padded_image.paste(im=image, box=(offset, offset))
     return padded_image
 
@@ -394,7 +421,8 @@ def set_line_image_data(image, line_id, image_file_name, image_fh):
     image_fh.write(image_path + '\n')
 
 
-def get_line_images_from_page_image(image_file_name, madcat_file_path, image_fh):
+def get_line_images_from_page_image(image_file_name, madcat_file_path,
+                                    image_fh):
     """ Given a page image, extracts the line images from it.
     Input
     -----
@@ -413,24 +441,28 @@ def get_line_images_from_page_image(image_file_name, madcat_file_path, image_fh)
         for token_node in token_image:
             word_point = token_node.getElementsByTagName('point')
             for word_node in word_point:
-                word_coordinate = (int(word_node.getAttribute(
-                    'x')), int(word_node.getAttribute('y')))
+                word_coordinate = (int(word_node.getAttribute('x')),
+                                   int(word_node.getAttribute('y')))
                 minimum_bounding_box_input.append(word_coordinate)
         updated_mbb_input = update_minimum_bounding_box_input(
             minimum_bounding_box_input)
-        points_ordered = [updated_mbb_input[index]
-                          for index in ConvexHull(updated_mbb_input).vertices]
+        points_ordered = [
+            updated_mbb_input[index]
+            for index in ConvexHull(updated_mbb_input).vertices
+        ]
         if args.augment:
             for i in range(0, 3):
                 additional_pixel = random.randint(1, args.pixel_scaling)
-                mar = dilate_polygon(points_ordered, (i-1)
-                                     * args.pixel_scaling + additional_pixel + 1)
+                mar = dilate_polygon(points_ordered,
+                                     (i - 1) * args.pixel_scaling +
+                                     additional_pixel + 1)
                 bounding_box = minimum_bounding_box(mar)
-                (x1, y1), (x2, y2), (x3, y3), (x4, y4) = bounding_box.corner_points
-                min_x, min_y = int(min(x1, x2, x3, x4)), int(
-                    min(y1, y2, y3, y4))
-                max_x, max_y = int(max(x1, x2, x3, x4)), int(
-                    max(y1, y2, y3, y4))
+                (x1, y1), (x2, y2), (x3, y3), (x4,
+                                               y4) = bounding_box.corner_points
+                min_x, min_y = int(min(x1, x2, x3,
+                                       x4)), int(min(y1, y2, y3, y4))
+                max_x, max_y = int(max(x1, x2, x3,
+                                       x4)), int(max(y1, y2, y3, y4))
                 box = (min_x, min_y, max_x, max_y)
                 region_initial = im.crop(box)
                 rot_points = []
@@ -441,18 +473,15 @@ def get_line_images_from_page_image(image_file_name, madcat_file_path, image_fh)
                 rot_points.append(p3)
                 rot_points.append(p4)
 
-                cropped_bounding_box = bounding_box_tuple(bounding_box.area,
-                                                          bounding_box.length_parallel,
-                                                          bounding_box.length_orthogonal,
-                                                          bounding_box.length_orthogonal,
-                                                          bounding_box.unit_vector,
-                                                          bounding_box.unit_vector_angle,
-                                                          set(rot_points)
-                                                          )
+                cropped_bounding_box = bounding_box_tuple(
+                    bounding_box.area, bounding_box.length_parallel,
+                    bounding_box.length_orthogonal,
+                    bounding_box.length_orthogonal, bounding_box.unit_vector,
+                    bounding_box.unit_vector_angle, set(rot_points))
 
                 rotation_angle_in_rad = get_smaller_angle(cropped_bounding_box)
-                img2 = region_initial.rotate(
-                    degrees(rotation_angle_in_rad), resample=Image.BICUBIC)
+                img2 = region_initial.rotate(degrees(rotation_angle_in_rad),
+                                             resample=Image.BICUBIC)
                 x_dash_1, y_dash_1, x_dash_2, y_dash_2, x_dash_3, y_dash_3, x_dash_4, y_dash_4 = rotated_points(
                     cropped_bounding_box, get_center(region_initial))
 
@@ -463,8 +492,8 @@ def get_line_images_from_page_image(image_file_name, madcat_file_path, image_fh)
                 box = (min_x, min_y, max_x, max_y)
                 region_final = img2.crop(box)
                 line_id = id + '_scale' + str(i)
-                set_line_image_data(region_final, line_id,
-                                    image_file_name, image_fh)
+                set_line_image_data(region_final, line_id, image_file_name,
+                                    image_fh)
         else:
             bounding_box = minimum_bounding_box(points_ordered)
             (x1, y1), (x2, y2), (x3, y3), (x4, y4) = bounding_box.corner_points
@@ -480,18 +509,15 @@ def get_line_images_from_page_image(image_file_name, madcat_file_path, image_fh)
             rot_points.append(p3)
             rot_points.append(p4)
 
-            cropped_bounding_box = bounding_box_tuple(bounding_box.area,
-                                                      bounding_box.length_parallel,
-                                                      bounding_box.length_orthogonal,
-                                                      bounding_box.length_orthogonal,
-                                                      bounding_box.unit_vector,
-                                                      bounding_box.unit_vector_angle,
-                                                      set(rot_points)
-                                                      )
+            cropped_bounding_box = bounding_box_tuple(
+                bounding_box.area, bounding_box.length_parallel,
+                bounding_box.length_orthogonal, bounding_box.length_orthogonal,
+                bounding_box.unit_vector, bounding_box.unit_vector_angle,
+                set(rot_points))
 
             rotation_angle_in_rad = get_smaller_angle(cropped_bounding_box)
-            img2 = region_initial.rotate(
-                degrees(rotation_angle_in_rad), resample=Image.BICUBIC)
+            img2 = region_initial.rotate(degrees(rotation_angle_in_rad),
+                                         resample=Image.BICUBIC)
             x_dash_1, y_dash_1, x_dash_2, y_dash_2, x_dash_3, y_dash_3, x_dash_4, y_dash_4 = rotated_points(
                 cropped_bounding_box, get_center(region_initial))
 
@@ -513,19 +539,19 @@ def check_file_location(base_name, wc_dict1, wc_dict2, wc_dict3):
     madcat_file_path (string): complete path and name of the madcat xml file
                                corresponding to the page image.
     """
-    madcat_file_path1 = os.path.join(
-        args.database_path1, 'madcat', base_name + '.madcat.xml')
-    madcat_file_path2 = os.path.join(
-        args.database_path2, 'madcat', base_name + '.madcat.xml')
-    madcat_file_path3 = os.path.join(
-        args.database_path3, 'madcat', base_name + '.madcat.xml')
+    madcat_file_path1 = os.path.join(args.database_path1, 'madcat',
+                                     base_name + '.madcat.xml')
+    madcat_file_path2 = os.path.join(args.database_path2, 'madcat',
+                                     base_name + '.madcat.xml')
+    madcat_file_path3 = os.path.join(args.database_path3, 'madcat',
+                                     base_name + '.madcat.xml')
 
-    image_file_path1 = os.path.join(
-        args.database_path1, 'images', base_name + '.tif')
-    image_file_path2 = os.path.join(
-        args.database_path2, 'images', base_name + '.tif')
-    image_file_path3 = os.path.join(
-        args.database_path3, 'images', base_name + '.tif')
+    image_file_path1 = os.path.join(args.database_path1, 'images',
+                                    base_name + '.tif')
+    image_file_path2 = os.path.join(args.database_path2, 'images',
+                                    base_name + '.tif')
+    image_file_path3 = os.path.join(args.database_path3, 'images',
+                                    base_name + '.tif')
 
     if os.path.exists(madcat_file_path1):
         return madcat_file_path1, image_file_path1, wc_dict1
@@ -570,6 +596,7 @@ def check_writing_condition(wc_dict, base_name):
     else:
         return True
 
+
 ### main ###
 
 
@@ -586,16 +613,17 @@ def main():
     splits_data = splits_handle.read().strip().split('\n')
     prev_base_name = ''
     for line in splits_data:
-        base_name = os.path.splitext(
-            os.path.splitext(line.split(' ')[0])[0])[0]
+        base_name = os.path.splitext(os.path.splitext(
+            line.split(' ')[0])[0])[0]
         if prev_base_name != base_name:
             prev_base_name = base_name
             madcat_file_path, image_file_path, wc_dict = check_file_location(
                 base_name, wc_dict1, wc_dict2, wc_dict3)
-            if wc_dict is None or not check_writing_condition(wc_dict, base_name):
+            if wc_dict is None or not check_writing_condition(
+                    wc_dict, base_name):
                 continue
-            get_line_images_from_page_image(
-                image_file_path, madcat_file_path, image_fh)
+            get_line_images_from_page_image(image_file_path, madcat_file_path,
+                                            image_fh)
 
 
 if __name__ == '__main__':

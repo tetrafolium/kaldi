@@ -3,7 +3,6 @@
 # Copyright 2017  Vimal Manohar
 #           2018  Capital One (Author: Zhiyuan Guan)
 # Apache 2.0
-
 """
 This script converts frame-level speech activity detection marks (in kaldi
 integer vector text archive format) into kaldi segments and utt2spk.
@@ -41,37 +40,53 @@ and 2 for speech frames.
 """,
         formatter_class=argparse.RawTextHelpFormatter)
 
-    parser.add_argument("--verbose", type=int, choices=[0, 1, 2, 3],
-                        default=0, help="Higher verbosity for more logging")
+    parser.add_argument("--verbose",
+                        type=int,
+                        choices=[0, 1, 2, 3],
+                        default=0,
+                        help="Higher verbosity for more logging")
 
-    parser.add_argument("--utt2dur", type=str,
+    parser.add_argument("--utt2dur",
+                        type=str,
                         help="File containing durations of utterances.")
 
-    parser.add_argument("--frame-shift", type=float, default=0.01,
+    parser.add_argument("--frame-shift",
+                        type=float,
+                        default=0.01,
                         help="Frame shift to convert frame indexes to time")
 
-    parser.add_argument("--segment-padding", type=float, default=0.2,
+    parser.add_argument("--segment-padding",
+                        type=float,
+                        default=0.2,
                         help="Additional padding on speech segments. But we "
-                             "ensure that the padding does not go beyond the "
-                             "adjacent segment.")
+                        "ensure that the padding does not go beyond the "
+                        "adjacent segment.")
 
-    parser.add_argument("--min-segment-dur", type=float, default=0,
-                        help="Minimum duration (in seconds) required for a segment "
-                             "to be included. This is before any padding. Segments "
-                             "shorter than this duration will be removed.")
+    parser.add_argument(
+        "--min-segment-dur",
+        type=float,
+        default=0,
+        help="Minimum duration (in seconds) required for a segment "
+        "to be included. This is before any padding. Segments "
+        "shorter than this duration will be removed.")
 
-    parser.add_argument("--merge-consecutive-max-dur", type=float, default=0,
-                        help="Merge consecutive segments as long as the merged "
-                             "segment is no longer than this many seconds. The segments "
-                             "are only merged if their boundaries are touching. "
-                             "This is after padding by --segment-padding seconds."
-                             "0 means do not merge. Use 'inf' to not limit the duration.")
+    parser.add_argument(
+        "--merge-consecutive-max-dur",
+        type=float,
+        default=0,
+        help="Merge consecutive segments as long as the merged "
+        "segment is no longer than this many seconds. The segments "
+        "are only merged if their boundaries are touching. "
+        "This is after padding by --segment-padding seconds."
+        "0 means do not merge. Use 'inf' to not limit the duration.")
 
-    parser.add_argument("in_sad", type=str,
+    parser.add_argument("in_sad",
+                        type=str,
                         help="Input file containing alignments in "
-                             "text archive format")
+                        "text archive format")
 
-    parser.add_argument("out_segments", type=str,
+    parser.add_argument("out_segments",
+                        type=str,
                         help="Output kaldi segments file")
 
     args = parser.parse_args()
@@ -89,13 +104,11 @@ and 2 for speech frames.
 
 def to_str(segment):
     assert len(segment) == 3
-    return "[{0:.3f}, {1:.3f}, {2}]".format(segment[0], segment[1],
-                                            segment[2])
+    return "[{0:.3f}, {1:.3f}, {2}]".format(segment[0], segment[1], segment[2])
 
 
 class SegmenterStats(object):
     """Stores stats about the post-process stages"""
-
     def __init__(self):
         self.num_segments_initial = 0
         self.num_short_segments_filtered = 0
@@ -118,22 +131,23 @@ class SegmenterStats(object):
         self.final_duration += other.final_duration
 
     def __str__(self):
-        return ("num-segments-initial={num_segments_initial}, "
-                "num-short-segments-filtered={num_short_segments_filtered}, "
-                "num-merges={num_merges}, "
-                "num-segments-final={num_segments_final}, "
-                "initial-duration={initial_duration}, "
-                "filter-short-duration={filter_short_duration}, "
-                "padding-duration={padding_duration}, "
-                "final-duration={final_duration}".format(
-                    num_segments_initial=self.num_segments_initial,
-                    num_short_segments_filtered=self.num_short_segments_filtered,
-                    num_merges=self.num_merges,
-                    num_segments_final=self.num_segments_final,
-                    initial_duration=self.initial_duration,
-                    filter_short_duration=self.filter_short_duration,
-                    padding_duration=self.padding_duration,
-                    final_duration=self.final_duration))
+        return (
+            "num-segments-initial={num_segments_initial}, "
+            "num-short-segments-filtered={num_short_segments_filtered}, "
+            "num-merges={num_merges}, "
+            "num-segments-final={num_segments_final}, "
+            "initial-duration={initial_duration}, "
+            "filter-short-duration={filter_short_duration}, "
+            "padding-duration={padding_duration}, "
+            "final-duration={final_duration}".format(
+                num_segments_initial=self.num_segments_initial,
+                num_short_segments_filtered=self.num_short_segments_filtered,
+                num_merges=self.num_merges,
+                num_segments_final=self.num_segments_final,
+                initial_duration=self.initial_duration,
+                filter_short_duration=self.filter_short_duration,
+                padding_duration=self.padding_duration,
+                final_duration=self.final_duration))
 
 
 def process_label(text_label):
@@ -153,7 +167,6 @@ def process_label(text_label):
 
 class Segmentation(object):
     """Stores segmentation for an utterances"""
-
     def __init__(self):
         self.segments = None
         self.stats = SegmenterStats()
@@ -171,9 +184,10 @@ class Segmentation(object):
         for i, text_label in enumerate(alignment):
             if prev_label is not None and int(text_label) != prev_label:
                 if prev_label == 2:
-                    self.segments.append(
-                        [float(i - prev_length) * frame_shift,
-                         float(i) * frame_shift, prev_label])
+                    self.segments.append([
+                        float(i - prev_length) * frame_shift,
+                        float(i) * frame_shift, prev_label
+                    ])
                     self.stats.initial_duration += (prev_length * frame_shift)
                 prev_label = process_label(text_label)
                 prev_length = 0
@@ -183,9 +197,10 @@ class Segmentation(object):
             prev_length += 1
 
         if prev_length > 0 and prev_label == 2:
-            self.segments.append(
-                [float(len(alignment) - prev_length) * frame_shift,
-                 float(len(alignment)) * frame_shift, prev_label])
+            self.segments.append([
+                float(len(alignment) - prev_length) * frame_shift,
+                float(len(alignment)) * frame_shift, prev_label
+            ])
             self.stats.initial_duration += (prev_length * frame_shift)
 
         self.stats.num_segments_initial = len(self.segments)
@@ -229,8 +244,8 @@ class Segmentation(object):
             if i >= 1 and self.segments[i - 1][1] > segment[0]:
                 # Padding takes the segment start to before the end the previous segment.
                 # Reduce padding.
-                self.stats.padding_duration -= (
-                    self.segments[i - 1][1] - segment[0])
+                self.stats.padding_duration -= (self.segments[i - 1][1] -
+                                                segment[0])
                 segment[0] = self.segments[i - 1][1]
 
             segment[1] += segment_padding
@@ -244,8 +259,8 @@ class Segmentation(object):
                     and segment[1] > self.segments[i + 1][0]):
                 # Padding takes the segment end beyond the start of the next segment.
                 # Reduce padding.
-                self.stats.padding_duration -= (
-                    segment[1] - self.segments[i + 1][0])
+                self.stats.padding_duration -= (segment[1] -
+                                                self.segments[i + 1][0])
                 segment[1] = self.segments[i + 1][0]
         self.stats.final_duration += self.stats.padding_duration
 
@@ -279,9 +294,11 @@ class Segmentation(object):
         for segment in self.segments:
             seg_id = "{key}-{st:07d}-{end:07d}".format(
                 key=key, st=int(segment[0] * 100), end=int(segment[1] * 100))
-            print("{seg_id} {key} {st:.2f} {end:.2f}".format(
-                seg_id=seg_id, key=key, st=segment[0], end=segment[1]),
-                file=file_handle)
+            print("{seg_id} {key} {st:.2f} {end:.2f}".format(seg_id=seg_id,
+                                                             key=key,
+                                                             st=segment[0],
+                                                             end=segment[1]),
+                  file=file_handle)
 
 
 def run(args):
@@ -305,16 +322,14 @@ def run(args):
 
             if len(parts) < 2:
                 raise RuntimeError("Unable to parse line '{0}' in {1}"
-                                   "".format(line.strip(),
-                                             in_sad_fh))
+                                   "".format(line.strip(), in_sad_fh))
 
             segmentation = Segmentation()
-            segmentation.initialize_segments(
-                parts[1:], args.frame_shift)
+            segmentation.initialize_segments(parts[1:], args.frame_shift)
             segmentation.filter_short_segments(args.min_segment_dur)
-            segmentation.pad_speech_segments(args.segment_padding,
-                                             None if args.utt2dur is None
-                                             else utt2dur[utt_id])
+            segmentation.pad_speech_segments(
+                args.segment_padding,
+                None if args.utt2dur is None else utt2dur[utt_id])
             segmentation.merge_consecutive_segments(
                 args.merge_consecutive_max_dur)
             segmentation.write(utt_id, out_segments_fh)

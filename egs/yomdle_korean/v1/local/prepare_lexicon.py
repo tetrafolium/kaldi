@@ -24,8 +24,9 @@ with open(text_path, 'r', encoding='utf-8') as f:
     for line in f:
         line_vect = line.strip().split(' ')
         for i in range(1, len(line_vect)):
-            char_normalized = unicodedata.normalize(
-                'NFD', line_vect[i]).replace('\n', '')
+            char_normalized = unicodedata.normalize('NFD',
+                                                    line_vect[i]).replace(
+                                                        '\n', '')
             characters = list(char_normalized)
             characters = " ".join(
                 ['SIL' if char == '|' else char for char in characters])

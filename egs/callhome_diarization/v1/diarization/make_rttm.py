@@ -3,7 +3,6 @@
 # Copyright  2016  David Snyder
 #            2017  Matthew Maciejewski
 # Apache 2.0.
-
 """This script converts a segments and labels file to a NIST RTTM
 file. It creates flat segmentation (i.e. no overlapping regions)
 from overlapping segments, e.g. the output of a sliding-window
@@ -43,13 +42,12 @@ def get_args():
     to a NIST RTTM file. It handles overlapping segments (e.g. the
     output of a sliding-window diarization system).""")
 
-    parser.add_argument("segments", type=str,
-                        help="Input segments file")
-    parser.add_argument("labels", type=str,
-                        help="Input labels file")
-    parser.add_argument("rttm_file", type=str,
-                        help="Output RTTM file")
-    parser.add_argument("--rttm-channel", type=int, default=0,
+    parser.add_argument("segments", type=str, help="Input segments file")
+    parser.add_argument("labels", type=str, help="Input labels file")
+    parser.add_argument("rttm_file", type=str, help="Output RTTM file")
+    parser.add_argument("--rttm-channel",
+                        type=int,
+                        default=0,
                         help="The value passed into the RTTM channel field. \
                       Only affects the format of the RTTM file.")
 
@@ -87,13 +85,13 @@ def main():
     for reco in sorted(reco2segs):
         segs = reco2segs[reco].strip().split()
         new_segs = ""
-        for i in range(1, len(segs)-1):
+        for i in range(1, len(segs) - 1):
             start, end, label = segs[i].split(',')
-            next_start, next_end, next_label = segs[i+1].split(',')
+            next_start, next_end, next_label = segs[i + 1].split(',')
             if float(end) > float(next_start):
                 done = False
                 avg = str((float(next_start) + float(end)) / 2.0)
-                segs[i+1] = ','.join([avg, next_end, next_label])
+                segs[i + 1] = ','.join([avg, next_end, next_label])
                 new_segs += " " + start + "," + avg + "," + label
             else:
                 new_segs += " " + start + "," + end + "," + label
@@ -107,11 +105,11 @@ def main():
         segs = reco_line.strip().split()
         reco = segs[0]
         new_segs = ""
-        for i in range(1, len(segs)-1):
+        for i in range(1, len(segs) - 1):
             start, end, label = segs[i].split(',')
-            next_start, next_end, next_label = segs[i+1].split(',')
+            next_start, next_end, next_label = segs[i + 1].split(',')
             if float(end) == float(next_start) and label == next_label:
-                segs[i+1] = ','.join([start, next_end, next_label])
+                segs[i + 1] = ','.join([start, next_end, next_label])
             else:
                 new_segs += " " + start + "," + end + "," + label
         start, end, label = segs[-1].split(',')
@@ -124,8 +122,11 @@ def main():
             reco = segs[0]
             for i in range(1, len(segs)):
                 start, end, label = segs[i].strip().split(',')
-                print("SPEAKER {0} {1} {2:7.3f} {3:7.3f} <NA> <NA> {4} <NA> <NA>".format(
-                    reco, args.rttm_channel, float(start), float(end)-float(start), label), file=rttm_writer)
+                print(
+                    "SPEAKER {0} {1} {2:7.3f} {3:7.3f} <NA> <NA> {4} <NA> <NA>"
+                    .format(reco, args.rttm_channel, float(start),
+                            float(end) - float(start), label),
+                    file=rttm_writer)
 
 
 if __name__ == '__main__':

@@ -2,7 +2,6 @@
 
 # Copyright 2017  Vimal Manohar
 # Apache 2.0
-
 """
 This script gets targets for the whole recording
 by adding 'default_targets' vector read from file specified by
@@ -48,28 +47,40 @@ def get_args():
         something with fractional weights.
         """)
 
-    parser.add_argument("--frame-shift", type=float, default=0.01,
+    parser.add_argument("--frame-shift",
+                        type=float,
+                        default=0.01,
                         help="Frame shift value in seconds")
-    parser.add_argument("--default-targets", type=str, default=None,
+    parser.add_argument("--default-targets",
+                        type=str,
+                        default=None,
                         action=common_lib.NullstrToNoneAction,
                         help="Vector of default targets for out-of-segments "
                         "region")
-    parser.add_argument("--length-tolerance", type=int, default=2,
+    parser.add_argument("--length-tolerance",
+                        type=int,
+                        default=2,
                         help="Tolerate length mismatches of this many frames")
-    parser.add_argument("--verbose", type=int, default=0, choices=[0, 1, 2],
+    parser.add_argument("--verbose",
+                        type=int,
+                        default=0,
+                        choices=[0, 1, 2],
                         help="Verbose level")
 
-    parser.add_argument("--reco2num-frames", type=str, required=True,
+    parser.add_argument("--reco2num-frames",
+                        type=str,
+                        required=True,
                         action=common_lib.NullstrToNoneAction,
                         help="""The number of frames per reco
                         is used to determine the num-rows of the output matrix
                         """)
-    parser.add_argument("reco2utt", type=str,
+    parser.add_argument("reco2utt",
+                        type=str,
                         help="""reco2utt file.
                         The format is <reco> <utt-1> <utt-2> ... <utt-N>""")
-    parser.add_argument("segments", type=str,
-                        help="Input kaldi segments file")
-    parser.add_argument("out_targets_ark", type=str,
+    parser.add_argument("segments", type=str, help="Input kaldi segments file")
+    parser.add_argument("out_targets_ark",
+                        type=str,
                         help="""Output archive to which the
                         recording-level matrix will be written in text
                         format""")
@@ -134,9 +145,10 @@ def run(args):
 
     with common_lib.smart_open(args.out_targets_ark, 'w') as f:
         for reco, utts in reco2utt.items():
-            reco_mat = np.repeat(default_targets, reco2num_frames[reco],
+            reco_mat = np.repeat(default_targets,
+                                 reco2num_frames[reco],
                                  axis=0)
-            utts.sort(key=lambda x: segments[x][1])   # sort on start time
+            utts.sort(key=lambda x: segments[x][1])  # sort on start time
             for i, utt in enumerate(utts):
                 if utt not in segments:
                     num_utt_err += 1
@@ -155,14 +167,14 @@ def run(args):
                 num_utt += 1
 
             if reco_mat.shape[0] > 0:
-                common_lib.write_matrix_ascii(f, reco_mat.tolist(),
-                                              key=reco)
+                common_lib.write_matrix_ascii(f, reco_mat.tolist(), key=reco)
                 num_reco += 1
 
     logger.info("Got default out-of-segment targets for {num_reco} recordings "
                 "containing {num_utt} in-segment regions; "
                 "failed to account {num_utt_err} utterances"
-                "".format(num_reco=num_reco, num_utt=num_utt,
+                "".format(num_reco=num_reco,
+                          num_utt=num_utt,
                           num_utt_err=num_utt_err))
 
     if num_utt == 0 or num_utt_err > num_utt // 2 or num_reco == 0:

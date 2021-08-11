@@ -57,7 +57,8 @@ def match(phoneme, placeholder):
     p = phoneme[:-1]
     if not p in classMap:
         return False
-    return (phoneme[-1:] == placeholder[-1:]) and (classMap[p] == placeholder[:-1])
+    return (phoneme[-1:] == placeholder[-1:]) and (
+        classMap[p] == placeholder[:-1])
 
 
 # Load ligature file
@@ -86,12 +87,13 @@ for line in in_stream:
             for variant in rules[ruleName]:
                 matched = True
                 for offset in range(0, len(variant)):
-                    if not match(phonemes[start+2*offset], variant[offset]):
+                    if not match(phonemes[start + 2 * offset],
+                                 variant[offset]):
                         matched = False
                         break
                 if matched:
-                    out_stream.write(word + " "
-                                     + ((' '.join(phonemes[0:start])) + ' '
-                                        + ruleName + ' '
-                                        + (' '.join(phonemes[start+2*offset+1:]))).strip() + "\n")
+                    out_stream.write(word + " " + (
+                        (' '.join(phonemes[0:start])) + ' ' + ruleName + ' ' +
+                        (' '.join(phonemes[start + 2 * offset +
+                                           1:]))).strip() + "\n")
                     break

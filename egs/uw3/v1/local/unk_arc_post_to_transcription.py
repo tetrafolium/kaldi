@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 # Copyright      2017  Ashish Arora
-
 """ This module will be used by scripts for open vocabulary setup.
  If the hypothesis transcription contains <unk>, then it will replace the 
  <unk> with the word predicted by <unk> model by concatenating phones decoded 
@@ -30,17 +29,35 @@ import os
 import sys
 parser = argparse.ArgumentParser(
     description="""uses phones to convert unk to word""")
-parser.add_argument('phones', type=str, help='File name of a file that contains the'
-                    'symbol-table for phones. Each line must be: <phone> <phoneID>')
-parser.add_argument('words', type=str, help='File name of a file that contains the'
-                    'symbol-table for words. Each line must be: <word> <word-id>')
-parser.add_argument('unk', type=str, default='-', help='File name of a file that'
-                    'contains the ID of <unk>. The content must be: <oov-id>, e.g. 231')
-parser.add_argument('--one-best-arc-post', type=str, default='-', help='A file in arc-post'
-                    'format, which is a list of timing info and posterior of arcs'
-                    'along the one-best path from the lattice')
-parser.add_argument('--output-text', type=str, default='-', help='File containing'
-                    'hypothesis transcription with <unk> recognized by the unk-model')
+parser.add_argument(
+    'phones',
+    type=str,
+    help='File name of a file that contains the'
+    'symbol-table for phones. Each line must be: <phone> <phoneID>')
+parser.add_argument(
+    'words',
+    type=str,
+    help='File name of a file that contains the'
+    'symbol-table for words. Each line must be: <word> <word-id>')
+parser.add_argument(
+    'unk',
+    type=str,
+    default='-',
+    help='File name of a file that'
+    'contains the ID of <unk>. The content must be: <oov-id>, e.g. 231')
+parser.add_argument(
+    '--one-best-arc-post',
+    type=str,
+    default='-',
+    help='A file in arc-post'
+    'format, which is a list of timing info and posterior of arcs'
+    'along the one-best path from the lattice')
+parser.add_argument(
+    '--output-text',
+    type=str,
+    default='-',
+    help='File containing'
+    'hypothesis transcription with <unk> recognized by the unk-model')
 args = parser.parse_args()
 
 ### main ###
@@ -71,11 +88,13 @@ for key_val in word_data_vect:
     word_dict[key_val[1]] = key_val[0]
 unk_val = unk_handle.read().strip().split(" ")[0]
 
-utt_word_dict = dict()  # Dict of list, stores mapping from utteranceID(int) to words(str)
+utt_word_dict = dict(
+)  # Dict of list, stores mapping from utteranceID(int) to words(str)
 for line in arc_post_handle:
     line_vect = line.strip().split("\t")
     if len(line_vect) < 6:  # Check for 1best-arc-post output
-        print("Error: Bad line: '{}'   Expecting 6 fields. Skipping...".format(line),
+        print("Error: Bad line: '{}'   Expecting 6 fields. Skipping...".format(
+            line),
               file=sys.stderr)
         continue
     utt_id = line_vect[0]

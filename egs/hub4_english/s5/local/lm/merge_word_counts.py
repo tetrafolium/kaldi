@@ -2,7 +2,6 @@
 
 # Copyright 2016    Vimal Manohar
 # Apache 2.0.
-
 """This script merges pocolm word_counts and write a new word_counts file.
 A min-count argument is required to only write counts that are above the
 specified minimum count.

@@ -26,25 +26,43 @@ import warnings
 
 
 def GetArgs():
-    parser = argparse.ArgumentParser(description="Accumulate pronounciation statistics from "
-                                     "a ctm_prons.txt file.",
-                                     epilog="See steps/cleanup/debug_lexicon.sh for example")
-    parser.add_argument("ctm_prons_file", metavar="<ctm-prons-file>", type=str,
-                        help="File containing word-pronounciation alignments obtained from a ctm file; "
-                        "It represents phonetic decoding results, aligned with word boundaries obtained"
-                        "from forced alignments."
-                        "each line must be <utt_id> <word> <phones>")
-    parser.add_argument("silence_file", metavar="<silphone-file>", type=str,
+    parser = argparse.ArgumentParser(
+        description="Accumulate pronounciation statistics from "
+        "a ctm_prons.txt file.",
+        epilog="See steps/cleanup/debug_lexicon.sh for example")
+    parser.add_argument(
+        "ctm_prons_file",
+        metavar="<ctm-prons-file>",
+        type=str,
+        help=
+        "File containing word-pronounciation alignments obtained from a ctm file; "
+        "It represents phonetic decoding results, aligned with word boundaries obtained"
+        "from forced alignments."
+        "each line must be <utt_id> <word> <phones>")
+    parser.add_argument("silence_file",
+                        metavar="<silphone-file>",
+                        type=str,
                         help="File containing a list of silence phones.")
-    parser.add_argument("optional_silence_file", metavar="<optional_silence>", type=str,
-                        help="File containing the optional silence phone. We'll be replacing empty prons by this,"
-                        "because empty prons would cause a problem for lattice word alignment.")
-    parser.add_argument("non_scored_words_file", metavar="<non-scored-words-file>", type=str,
+    parser.add_argument(
+        "optional_silence_file",
+        metavar="<optional_silence>",
+        type=str,
+        help=
+        "File containing the optional silence phone. We'll be replacing empty prons by this,"
+        "because empty prons would cause a problem for lattice word alignment."
+    )
+    parser.add_argument("non_scored_words_file",
+                        metavar="<non-scored-words-file>",
+                        type=str,
                         help="File containing a list of non-scored words.")
-    parser.add_argument("stats_file", metavar="<stats-file>", type=str,
-                        help="Write accumulated statitistics to this file; each line represents how many times "
-                        "a specific word-pronunciation pair appears in the phonetic decoding results (ctm_pron_file)."
-                        "each line is <count> <word> <phones>")
+    parser.add_argument(
+        "stats_file",
+        metavar="<stats-file>",
+        type=str,
+        help=
+        "Write accumulated statitistics to this file; each line represents how many times "
+        "a specific word-pronunciation pair appears in the phonetic decoding results (ctm_pron_file)."
+        "each line is <count> <word> <phones>")
     print(' '.join(sys.argv), file=sys.stderr)
 
     args = parser.parse_args()
@@ -73,6 +91,7 @@ def ReadEntries(file_handle):
     for line in file_handle:
         entries.add(line.strip())
     return entries
+
 
 # Basically, this function generates an "info" list from a ctm_prons file.
 # Each entry in the list represents the pronounciation candidate(s) of a word.
@@ -123,7 +142,8 @@ def ReadEntries(file_handle):
 # in a dictionary (word, pron) : count.
 
 
-def GetStatsFromCtmProns(silphones, optional_silence, non_scored_words, ctm_prons_file_handle):
+def GetStatsFromCtmProns(silphones, optional_silence, non_scored_words,
+                         ctm_prons_file_handle):
     info = []
     for line in ctm_prons_file_handle.readlines():
         splits = line.strip().split()
@@ -141,7 +161,8 @@ def GetStatsFromCtmProns(silphones, optional_silence, non_scored_words, ctm_pron
         # KevinStone_2010U-0024782-0025580-1 [NOISE] IY EY
         # which means non-scored-words (except oov symbol <unk>/<UNK>) behaves like <eps>.
         # So we apply the same merging method in these cases.
-        if word == '<eps>' or (word in non_scored_words and word != '<unk>' and word != '<UNK>'):
+        if word == '<eps>' or (word in non_scored_words and word != '<unk>'
+                               and word != '<UNK>'):
             nonsil_left = []
             nonsil_right = []
             for phone in phones:
@@ -167,7 +188,7 @@ def GetStatsFromCtmProns(silphones, optional_silence, non_scored_words, ctm_pron
                         if pron.endswith(sil):
                             ends_with_sil = True
                     if not ends_with_sil:
-                        pron_ext.add(pron+" "+" ".join(nonsil_left))
+                        pron_ext.add(pron + " " + " ".join(nonsil_left))
                 if isinstance(info[-1][2], set):
                     info[-1][2] = info[-1][2].union(pron_ext)
             if len(nonsil_right) > 0:
@@ -177,9 +198,11 @@ def GetStatsFromCtmProns(silphones, optional_silence, non_scored_words, ctm_pron
             prons.add(" ".join(phones))
             # If there's a preceding <eps>/non_scored_words (which means the third field is a string rather than a set of strings),
             # we append it's nonsil_right segment to the pron candidates of the current word.
-            if len(info) > 0 and utt == info[-1][0] and isinstance(info[-1][2], str) and (phones == [] or phones[0] not in silphones):
+            if len(info) > 0 and utt == info[-1][0] and isinstance(
+                    info[-1][2], str) and (phones == []
+                                           or phones[0] not in silphones):
                 # info[-1][2] is the nonsil_right segment of the phones aligned to the last <eps>/non_scored_words.
-                prons.add(info[-1][2]+' '+" ".join(phones))
+                prons.add(info[-1][2] + ' ' + " ".join(phones))
             info.append([utt, word, prons])
     stats = {}
     for utt, word, prons in info:
@@ -218,8 +241,8 @@ def GetStatsFromCtmProns(silphones, optional_silence, non_scored_words, ctm_pron
 
 def WriteStats(stats, file_handle):
     for word_pron, count in stats.items():
-        print('{0} {1} {2}'.format(
-            count, word_pron[0], word_pron[1]), file=file_handle)
+        print('{0} {1} {2}'.format(count, word_pron[0], word_pron[1]),
+              file=file_handle)
     file_handle.close()
 
 
@@ -228,8 +251,8 @@ def Main():
     silphones = ReadEntries(args.silence_file_handle)
     non_scored_words = ReadEntries(args.non_scored_words_file_handle)
     optional_silence = ReadEntries(args.optional_silence_file_handle)
-    stats = GetStatsFromCtmProns(silphones, optional_silence.pop(
-    ), non_scored_words, args.ctm_prons_file_handle)
+    stats = GetStatsFromCtmProns(silphones, optional_silence.pop(),
+                                 non_scored_words, args.ctm_prons_file_handle)
     WriteStats(stats, args.stats_file_handle)
 
 

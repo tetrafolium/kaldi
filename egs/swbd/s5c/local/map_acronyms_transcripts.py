@@ -13,8 +13,10 @@ __author__ = 'Minhua Wu'
 parser = argparse.ArgumentParser(description='format acronyms to a._b._c.')
 parser.add_argument('-i', '--input', help='Input transcripts', required=True)
 parser.add_argument('-o', '--output', help='Output transcripts', required=True)
-parser.add_argument(
-    '-M', '--Map', help='Input acronyms mapping', required=True)
+parser.add_argument('-M',
+                    '--Map',
+                    help='Input acronyms mapping',
+                    required=True)
 args = parser.parse_args()
 
 fin_map = open(args.Map, "r")
@@ -28,7 +30,6 @@ fin_map.close()
 del dict_acronym_noi['I']
 del dict_acronym_noi['i']
 
-
 fin_trans = open(args.input, "r")
 fout_trans = open(args.output, "w")
 for line in fin_trans:
@@ -38,16 +39,16 @@ for line in fin_trans:
     for i in range(L):
         if items[i] == 'I':
             x = 0
-            while(i-1-x >= 0 and re.match(r'^[A-Z]$', items[i-1-x])):
+            while (i - 1 - x >= 0 and re.match(r'^[A-Z]$', items[i - 1 - x])):
                 x += 1
 
             y = 0
-            while(i+1+y < L and re.match(r'^[A-Z]$', items[i+1+y])):
+            while (i + 1 + y < L and re.match(r'^[A-Z]$', items[i + 1 + y])):
                 y += 1
 
-            if x+y > 0:
-                for bias in range(-x, y+1):
-                    items[i+bias] = dict_acronym[items[i+bias]]
+            if x + y > 0:
+                for bias in range(-x, y + 1):
+                    items[i + bias] = dict_acronym[items[i + bias]]
 
     # Second pass mapping (not mapping 'i' and 'I')
     for i in range(len(items)):

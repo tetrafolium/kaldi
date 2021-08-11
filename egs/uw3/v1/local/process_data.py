@@ -15,9 +15,10 @@ import random
 
 parser = argparse.ArgumentParser(
     description="""Creates data/train and data/test.""")
-parser.add_argument(
-    'database_path', help='path to downloaded (and extracted) UW3 corpus')
-parser.add_argument('out_dir', default='data',
+parser.add_argument('database_path',
+                    help='path to downloaded (and extracted) UW3 corpus')
+parser.add_argument('out_dir',
+                    default='data',
                     help='where to create the train and test data directories')
 args = parser.parse_args()
 
@@ -45,8 +46,8 @@ for page in sorted(os.listdir(args.database_path)):
         if line.endswith('.txt'):
             text_path = os.path.join(args.database_path, page, line)
             image_name = line.split('.')[0]
-            image_path = os.path.join(
-                args.database_path, page, image_name + '.png')
+            image_path = os.path.join(args.database_path, page,
+                                      image_name + '.png')
             utt_id = page + '_' + image_name
             gt_fh = open(text_path, 'r')
             text = gt_fh.readlines()[0].strip()

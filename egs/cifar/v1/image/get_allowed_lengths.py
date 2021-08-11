@@ -2,8 +2,6 @@
 
 # Copyright     2017  Hossein Hadian
 # Apache 2.0
-
-
 """ This script finds a set of allowed lengths for a given OCR/HWR data dir.
     The allowed lengths are spaced by a factor (like 10%) and are written
     in an output file named "allowed_lengths.txt" in the output data dir. This
@@ -36,14 +34,20 @@ def get_args():
     parser = argparse.ArgumentParser(description="""This script finds a set of
                                    allowed lengths for a given OCR/HWR data dir.
                                    Intended for chain training.""")
-    parser.add_argument('factor', type=float, default=12,
-                        help='Spacing (in percentage) between allowed lengths.')
-    parser.add_argument('srcdir', type=str,
-                        help='path to source data dir')
-    parser.add_argument('--coverage-factor', type=float, default=0.05,
+    parser.add_argument(
+        'factor',
+        type=float,
+        default=12,
+        help='Spacing (in percentage) between allowed lengths.')
+    parser.add_argument('srcdir', type=str, help='path to source data dir')
+    parser.add_argument('--coverage-factor',
+                        type=float,
+                        default=0.05,
                         help="""Percentage of durations not covered from each
                              side of duration histogram.""")
-    parser.add_argument('--frame-subsampling-factor', type=int, default=3,
+    parser.add_argument('--frame-subsampling-factor',
+                        type=int,
+                        default=3,
                         help="""Chain frame subsampling factor.
                              See steps/nnet3/chain/train.py""")
 
@@ -61,7 +65,7 @@ def read_kaldi_mapfile(path):
             line = line.strip()
             sp_pos = line.find(' ')
             key = line[:sp_pos]
-            val = line[sp_pos+1:]
+            val = line[sp_pos + 1:]
             m[key] = val
     return m
 
@@ -113,33 +117,36 @@ def find_allowed_durations(start_len, end_len, args):
 
     allowed_lengths = []
     length = start_len
-    with open(os.path.join(args.srcdir, 'allowed_lengths.txt'), 'w', encoding='latin-1') as fp:
+    with open(os.path.join(args.srcdir, 'allowed_lengths.txt'),
+              'w',
+              encoding='latin-1') as fp:
         while length < end_len:
             if length % args.frame_subsampling_factor != 0:
                 length = (args.frame_subsampling_factor *
                           (length // args.frame_subsampling_factor))
             allowed_lengths.append(length)
             fp.write("{}\n".format(int(length)))
-            length = max(length * args.factor, length +
-                         args.frame_subsampling_factor)
+            length = max(length * args.factor,
+                         length + args.frame_subsampling_factor)
     return allowed_lengths
 
 
 def main():
     args = get_args()
-    args.factor = 1.0 + args.factor/100.0
+    args.factor = 1.0 + args.factor / 100.0
 
     image2length = read_kaldi_mapfile(
         os.path.join(args.srcdir, 'image2num_frames'))
 
-    start_dur, end_dur = find_duration_range(
-        image2length, args.coverage_factor)
+    start_dur, end_dur = find_duration_range(image2length,
+                                             args.coverage_factor)
     logger.info("Lengths in the range [{},{}] will be covered. "
                 "Coverage rate: {}%".format(start_dur, end_dur,
                                             100.0 - args.coverage_factor * 2))
     logger.info("There will be {} unique allowed lengths "
-                "for the images.".format(int((math.log(float(end_dur)/start_dur)) /
-                                             math.log(args.factor))))
+                "for the images.".format(
+                    int((math.log(float(end_dur) / start_dur)) /
+                        math.log(args.factor))))
 
     allowed_durations = find_allowed_durations(start_dur, end_dur, args)
 

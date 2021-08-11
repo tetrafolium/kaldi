@@ -30,11 +30,26 @@ import scipy.linalg as spl
 # [q sp Li] =
 
 
-def VB_diarization(X, m, iE, w, V, sp=None, q=None,
-                   maxSpeakers=10, maxIters=10,
-                   epsilon=1e-4, loopProb=0.99, statScale=1.0,
-                   alphaQInit=1.0, downsample=None, VtiEV=None, ref=None,
-                   plot=False, sparsityThr=0.001, llScale=1.0, minDur=1):
+def VB_diarization(X,
+                   m,
+                   iE,
+                   w,
+                   V,
+                   sp=None,
+                   q=None,
+                   maxSpeakers=10,
+                   maxIters=10,
+                   epsilon=1e-4,
+                   loopProb=0.99,
+                   statScale=1.0,
+                   alphaQInit=1.0,
+                   downsample=None,
+                   VtiEV=None,
+                   ref=None,
+                   plot=False,
+                   sparsityThr=0.001,
+                   llScale=1.0,
+                   minDur=1):
     """
     This a generalized version of speaker diarization described in:
 
@@ -95,7 +110,7 @@ def VB_diarization(X, m, iE, w, V, sp=None, q=None,
     # Montreal, CRIM, May 2008.
 
     D = X.shape[1]  # feature dimensionality
-    C = len(w)      # number of mixture components
+    C = len(w)  # number of mixture components
     R = V.shape[0]  # subspace rank
     nframes = X.shape[0]
 
@@ -105,7 +120,7 @@ def VB_diarization(X, m, iE, w, V, sp=None, q=None,
     V = V.reshape(V.shape[0], -1)
 
     if sp is None:
-        sp = np.ones(maxSpeakers)/maxSpeakers
+        sp = np.ones(maxSpeakers) / maxSpeakers
     else:
         maxSpeakers = len(sp)
 
@@ -124,18 +139,21 @@ def VB_diarization(X, m, iE, w, V, sp=None, q=None,
 
     #Kx = np.sum(NN * (np.log(w) - np.log(NN)), 1)
     NN = coo_matrix(NN)  # represent zero-order stats using sparse matrix
-    print('Sparsity: ', len(NN.row), float(len(NN.row))/np.prod(NN.shape))
+    print('Sparsity: ', len(NN.row), float(len(NN.row)) / np.prod(NN.shape))
     LL = np.sum(G)  # total log-likelihod as calculated using UBM
 
     mixture_sum = coo_matrix(
-        (np.ones(C*D), (np.repeat(range(C), D), range(C*D))), shape=(C, C*D))
+        (np.ones(C * D), (np.repeat(range(C), D), range(C * D))),
+        shape=(C, C * D))
 
     # G = np.sum((NN.multiply(ll - np.log(w))).toarray(), 1) + Kx  # eq. (15) # Aleready calculated above
 
     # Calculate per-frame first order statistics projected into the R-dim. subspace
     # V^T \Sigma^{-1} F_m
-    F_s = coo_matrix((((X[NN.row]-m[NN.col])*NN.data[:, np.newaxis]).flat,
-                      (NN.row.repeat(D), NN.col.repeat(D)*D+np.tile(range(D), len(NN.col)))), shape=(nframes, D*C))
+    F_s = coo_matrix((((X[NN.row] - m[NN.col]) * NN.data[:, np.newaxis]).flat,
+                      (NN.row.repeat(D),
+                       NN.col.repeat(D) * D + np.tile(range(D), len(NN.col)))),
+                     shape=(nframes, D * C))
     VtiEF = F_s.tocsr().dot((iE.flat * V).T)
     del F_s
     # The code above is only efficient implementation of the following comented code
@@ -146,8 +164,11 @@ def VB_diarization(X, m, iE, w, V, sp=None, q=None,
     if downsample is not None:
         # Downsample NN, VtiEF, G and q by summing the statistic over 'downsample' frames
         # This speeds-up diarization for the price of lowering its frame resolution
-        downsampler = coo_matrix((np.ones(nframes, dtype=np.int64), ((np.ceil(np.arange(nframes)/downsample)).astype(
-            int), np.arange(nframes))), shape=(int(np.ceil((nframes - 1.0) / downsample)) + 1, nframes))
+        downsampler = coo_matrix(
+            (np.ones(nframes, dtype=np.int64),
+             ((np.ceil(np.arange(nframes) / downsample)).astype(int),
+              np.arange(nframes))),
+            shape=(int(np.ceil((nframes - 1.0) / downsample)) + 1, nframes))
         NN = downsampler.dot(NN)
         VtiEF = downsampler.dot(VtiEF)
         G = downsampler.dot(G)
@@ -157,12 +178,14 @@ def VB_diarization(X, m, iE, w, V, sp=None, q=None,
 
     Li = [[LL]]  # for the 0-th iteration,
     if ref is not None:
-        Li[-1] += [DER(downsampler.T.dot(q), ref),
-                   DER(downsampler.T.dot(q), ref, xentropy=True)]
+        Li[-1] += [
+            DER(downsampler.T.dot(q), ref),
+            DER(downsampler.T.dot(q), ref, xentropy=True)
+        ]
 
     lls = np.zeros_like(q)
-    tr = np.eye(minDur*maxSpeakers, k=1)
-    ip = np.zeros(minDur*maxSpeakers)
+    tr = np.eye(minDur * maxSpeakers, k=1)
+    ip = np.zeros(minDur * maxSpeakers)
     for ii in range(maxIters):
         L = 0  # objective function (37) (i.e. VB lower-bound on the evidence)
         # bracket in eq. (34) for all 's'
@@ -180,8 +203,10 @@ def VB_diarization(X, m, iE, w, V, sp=None, q=None,
             # trasition probability matrix. Instead of eq. (30), we need to use
             # forward-backwar algorithm to calculate per-frame speaker posteriors,
             # where 'lls' plays role of HMM output log-probabilities
-            lls[:, sid] = G + VtiEF.dot(a) - 0.5 * NN.dot(mixture_sum.dot(
-                ((invL+np.outer(a, a)).astype(V.dtype).dot(V) * (iE.flat * V)).sum(0)))
+            lls[:, sid] = G + VtiEF.dot(a) - 0.5 * NN.dot(
+                mixture_sum.dot(
+                    ((invL + np.outer(a, a)).astype(V.dtype).dot(V) *
+                     (iE.flat * V)).sum(0)))
             L += 0.5 * (logdet(invL) - np.sum(np.diag(invL) + a**2, 0) + R)
 
         # Construct transition probability matrix with linear chain of 'minDur'
@@ -189,8 +214,8 @@ def VB_diarization(X, m, iE, w, V, sp=None, q=None,
         # self-loop probability 'loopProb' and the transition probabilities to the
         # initial chain states given by vector '(1-loopProb) * sp'. From all other,
         # states, one must move to the next state in the chain with probability one.
-        tr[minDur-1::minDur, 0::minDur] = (1-loopProb)*sp
-        tr[(np.arange(1, maxSpeakers+1)*minDur-1,)*2] += loopProb
+        tr[minDur - 1::minDur, 0::minDur] = (1 - loopProb) * sp
+        tr[(np.arange(1, maxSpeakers + 1) * minDur - 1, ) * 2] += loopProb
         ip[::minDur] = sp
         # per-frame HMM state posteriors. Note that we can have linear chain of minDur states
         # for each speaker.
@@ -203,8 +228,10 @@ def VB_diarization(X, m, iE, w, V, sp=None, q=None,
         Li.append([L])
 
         # ML estimate of speaker prior probabilities (analogue to eq. (38))
-        sp = q[0, ::minDur] + np.exp(logsumexp(lf[:-1, minDur-1::minDur], axis=1)[:, np.newaxis]
-                                     + lb[1:, ::minDur] + lls[1:] + np.log((1-loopProb)*sp)-tll).sum(0)
+        sp = q[0, ::minDur] + np.exp(
+            logsumexp(lf[:-1, minDur - 1::minDur], axis=1)[:, np.newaxis] +
+            lb[1:, ::minDur] + lls[1:] + np.log((1 - loopProb) * sp) -
+            tll).sum(0)
         sp = sp / sp.sum()
 
         # per-frame speaker posteriors (analogue to eq. (30)), obtained by summing
@@ -213,17 +240,22 @@ def VB_diarization(X, m, iE, w, V, sp=None, q=None,
 
         # if reference is provided, report DER, cross-entropy and plot the figures
         if ref is not None:
-            Li[-1] += [DER(downsampler.T.dot(q), ref),
-                       DER(downsampler.T.dot(q), ref, xentropy=True)]
+            Li[-1] += [
+                DER(downsampler.T.dot(q), ref),
+                DER(downsampler.T.dot(q), ref, xentropy=True)
+            ]
 
             if plot:
                 import matplotlib.pyplot
                 if ii == 0:
                     matplotlib.pyplot.clf()
-                matplotlib.pyplot.subplot(maxIters, 1, ii+1)
+                matplotlib.pyplot.subplot(maxIters, 1, ii + 1)
                 matplotlib.pyplot.plot(downsampler.T.dot(q), lw=2)
-                matplotlib.pyplot.imshow(np.atleast_2d(ref), interpolation='none', aspect='auto',
-                                         cmap=matplotlib.pyplot.cm.Pastel1, extent=(0, len(ref), -0.05, 1.05))
+                matplotlib.pyplot.imshow(np.atleast_2d(ref),
+                                         interpolation='none',
+                                         aspect='auto',
+                                         cmap=matplotlib.pyplot.cm.Pastel1,
+                                         extent=(0, len(ref), -0.05, 1.05))
 
             print(ii, Li[-2])
 
@@ -243,8 +275,8 @@ def precalculate_VtiEV(V, iE):
     tril_ind = np.tril_indices(V.shape[0])
     VtiEV = np.empty((V.shape[1], len(tril_ind[0])), V.dtype)
     for c in range(V.shape[1]):
-        VtiEV[c, :] = np.dot(
-            V[:, c, :]*iE[np.newaxis, c, :], V[:, c, :].T)[tril_ind]
+        VtiEV[c, :] = np.dot(V[:, c, :] * iE[np.newaxis, c, :],
+                             V[:, c, :].T)[tril_ind]
     return VtiEV
 
 
@@ -256,6 +288,7 @@ def frame_labels2posterior_mx(labels, maxSpeakers):
     pmx = np.zeros((len(labels), maxSpeakers))
     pmx[np.arange(len(labels)), labels] = 1
     return pmx
+
 
 # Calculates Diarization Error Rate (DER) or per-frame cross-entropy between
 # reference (vector of per-frame zero based integer speaker IDs) and q (per-frame
@@ -273,7 +306,7 @@ def DER(q, ref, expected=True, xentropy=False):
         q = np.zeros_like(q)
         q[range(len(q)), hard_labels] = 1
 
-    err_mx = np.empty((ref.max()+1, q.shape[1]))
+    err_mx = np.empty((ref.max() + 1, q.shape[1]))
     for s in range(err_mx.shape[0]):
         tmpq = q[ref == s, :]
         err_mx[s] = (-np.log(tmpq) if xentropy else tmpq).sum(0)
@@ -283,12 +316,15 @@ def DER(q, ref, expected=True, xentropy=False):
 
     # try all alignments (permutations) of reference and detected speaker
     # could be written in more efficient way using dynamic programing
-    acc = [err_mx[perm[:err_mx.shape[1]], range(err_mx.shape[1])].sum()
-           for perm in permutations(range(err_mx.shape[0]))]
+    acc = [
+        err_mx[perm[:err_mx.shape[1]],
+               range(err_mx.shape[1])].sum()
+        for perm in permutations(range(err_mx.shape[0]))
+    ]
     if xentropy:
-        return min(acc)/float(len(ref))
+        return min(acc) / float(len(ref))
     else:
-        return (len(ref) - max(acc))/float(len(ref))
+        return (len(ref) - max(acc)) / float(len(ref))
 
 
 ###############################################################################
@@ -327,7 +363,7 @@ def exp_ne(x, out=None):
 
 # Convert vector with lower-triangular coefficients into symetric matrix
 def tril_to_sym(tril):
-    R = np.sqrt(len(tril)*2).astype(int)
+    R = np.sqrt(len(tril) * 2).astype(int)
     tril_ind = np.tril_indices(R)
     S = np.empty((R, R))
     S[tril_ind] = tril
@@ -336,7 +372,7 @@ def tril_to_sym(tril):
 
 
 def logdet(A):
-    return 2*np.sum(np.log(np.diag(spl.cholesky(A))))
+    return 2 * np.sum(np.log(np.diag(spl.cholesky(A))))
 
 
 def forward_backward(lls, tr, ip):
@@ -360,10 +396,10 @@ def forward_backward(lls, tr, ip):
     lbw[-1] = 0.0
 
     for ii in range(1, len(lls)):
-        lfw[ii] = lls[ii] + logsumexp(lfw[ii-1] + ltr.T, axis=1)
+        lfw[ii] = lls[ii] + logsumexp(lfw[ii - 1] + ltr.T, axis=1)
 
-    for ii in reversed(range(len(lls)-1)):
-        lbw[ii] = logsumexp(ltr + lls[ii+1] + lbw[ii+1], axis=1)
+    for ii in reversed(range(len(lls) - 1)):
+        lbw[ii] = logsumexp(ltr + lls[ii + 1] + lbw[ii + 1], axis=1)
 
     tll = logsumexp(lfw[-1])
     sp = np.exp(lfw + lbw - tll)

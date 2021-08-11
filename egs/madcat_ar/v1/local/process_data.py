@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 # Copyright  2018  Ashish Arora
-
 """ This script reads MADCAT files and creates the following files (for the
     data subset selected via --dataset) :text, utt2spk, images.scp.
   Eg. local/process_data.py data/local /export/corpora/LDC/LDC2012T15 /export/corpora/LDC/LDC2013T09
@@ -19,34 +18,44 @@ import sys
 import xml.dom.minidom as minidom
 import unicodedata
 
-parser = argparse.ArgumentParser(description="Creates text, utt2spk and images.scp files",
-                                 epilog="E.g.  " +
-                                 sys.argv[0] + "  data/LDC2012T15"
-                                 " data/LDC2013T09 data/LDC2013T15 data/madcat.train.raw.lineid "
-                                 " data/train data/local/lines ",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser = argparse.ArgumentParser(
+    description="Creates text, utt2spk and images.scp files",
+    epilog="E.g.  " + sys.argv[0] + "  data/LDC2012T15"
+    " data/LDC2013T09 data/LDC2013T15 data/madcat.train.raw.lineid "
+    " data/train data/local/lines ",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('database_path1',
                     help='Path to the downloaded (and extracted) madcat data')
 parser.add_argument('database_path2',
                     help='Path to the downloaded (and extracted) madcat data')
 parser.add_argument('database_path3',
                     help='Path to the downloaded (and extracted) madcat data')
-parser.add_argument('data_splits',
-                    help='Path to file that contains the train/test/dev split information')
+parser.add_argument(
+    'data_splits',
+    help='Path to file that contains the train/test/dev split information')
 parser.add_argument('out_dir',
                     help='directory location to write output files.')
-parser.add_argument('images_scp_path',
-                    help='Path of input images.scp file(maps line image and location)')
-parser.add_argument('writing_condition1',
-                    help='Path to the downloaded (and extracted) writing conditions file 1')
-parser.add_argument('writing_condition2',
-                    help='Path to the downloaded (and extracted) writing conditions file 2')
-parser.add_argument('writing_condition3',
-                    help='Path to the downloaded (and extracted) writing conditions file 3')
-parser.add_argument("--augment", type=lambda x: (str(x).lower() == 'true'), default=False,
+parser.add_argument(
+    'images_scp_path',
+    help='Path of input images.scp file(maps line image and location)')
+parser.add_argument(
+    'writing_condition1',
+    help='Path to the downloaded (and extracted) writing conditions file 1')
+parser.add_argument(
+    'writing_condition2',
+    help='Path to the downloaded (and extracted) writing conditions file 2')
+parser.add_argument(
+    'writing_condition3',
+    help='Path to the downloaded (and extracted) writing conditions file 3')
+parser.add_argument("--augment",
+                    type=lambda x: (str(x).lower() == 'true'),
+                    default=False,
                     help="performs image augmentation")
-parser.add_argument("--subset", type=lambda x: (str(x).lower() == 'true'), default=False,
-                    help="only processes subset of data based on writing condition")
+parser.add_argument(
+    "--subset",
+    type=lambda x: (str(x).lower() == 'true'),
+    default=False,
+    help="only processes subset of data based on writing condition")
 args = parser.parse_args()
 
 
@@ -59,19 +68,19 @@ def check_file_location():
         madcat_file_path (string): complete path and name of the madcat xml file
                                   corresponding to the page image.
     """
-    madcat_file_path1 = os.path.join(
-        args.database_path1, 'madcat', base_name + '.madcat.xml')
-    madcat_file_path2 = os.path.join(
-        args.database_path2, 'madcat', base_name + '.madcat.xml')
-    madcat_file_path3 = os.path.join(
-        args.database_path3, 'madcat', base_name + '.madcat.xml')
+    madcat_file_path1 = os.path.join(args.database_path1, 'madcat',
+                                     base_name + '.madcat.xml')
+    madcat_file_path2 = os.path.join(args.database_path2, 'madcat',
+                                     base_name + '.madcat.xml')
+    madcat_file_path3 = os.path.join(args.database_path3, 'madcat',
+                                     base_name + '.madcat.xml')
 
-    image_file_path1 = os.path.join(
-        args.database_path1, 'images', base_name + '.tif')
-    image_file_path2 = os.path.join(
-        args.database_path2, 'images', base_name + '.tif')
-    image_file_path3 = os.path.join(
-        args.database_path3, 'images', base_name + '.tif')
+    image_file_path1 = os.path.join(args.database_path1, 'images',
+                                    base_name + '.tif')
+    image_file_path2 = os.path.join(args.database_path2, 'images',
+                                    base_name + '.tif')
+    image_file_path3 = os.path.join(args.database_path3, 'images',
+                                    base_name + '.tif')
 
     if os.path.exists(madcat_file_path1):
         return madcat_file_path1, image_file_path1, wc_dict1
@@ -184,8 +193,8 @@ image_num = 0
 with open(args.data_splits) as f:
     prev_base_name = ''
     for line in f:
-        base_name = os.path.splitext(
-            os.path.splitext(line.split(' ')[0])[0])[0]
+        base_name = os.path.splitext(os.path.splitext(
+            line.split(' ')[0])[0])[0]
         if prev_base_name != base_name:
             prev_base_name = base_name
             madcat_xml_path, image_file_path, wc_dict = check_file_location()
@@ -203,27 +212,31 @@ with open(args.data_splits) as f:
                         location_id = "_{}_scale{}".format(line_id, i)
                         line_image_file_name = base_name + location_id + '.png'
                         location = image_loc_dict[line_image_file_name]
-                        image_file_path = os.path.join(
-                            location, line_image_file_name)
+                        image_file_path = os.path.join(location,
+                                                       line_image_file_name)
                         line = text_line_word_dict[key]
                         text = ' '.join(line)
-                        base_line_image_file_name = line_image_file_name.split('.png')[
-                            0]
-                        utt_id = "{}_{}_{}".format(writer_id, str(
-                            image_num).zfill(6), base_line_image_file_name)
+                        base_line_image_file_name = line_image_file_name.split(
+                            '.png')[0]
+                        utt_id = "{}_{}_{}".format(writer_id,
+                                                   str(image_num).zfill(6),
+                                                   base_line_image_file_name)
                         text_fh.write(utt_id + ' ' + text + '\n')
                         utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
                         image_fh.write(utt_id + ' ' + image_file_path + '\n')
                         image_num += 1
                 else:
                     updated_base_name = "{}_{}.png".format(
-                        base_name, str(line_id).zfill(4))
+                        base_name,
+                        str(line_id).zfill(4))
                     location = image_loc_dict[updated_base_name]
                     image_file_path = os.path.join(location, updated_base_name)
                     line = text_line_word_dict[line_id]
                     text = ' '.join(line)
-                    utt_id = "{}_{}_{}_{}".format(writer_id, str(
-                        image_num).zfill(6), base_name, str(line_id).zfill(4))
+                    utt_id = "{}_{}_{}_{}".format(writer_id,
+                                                  str(image_num).zfill(6),
+                                                  base_name,
+                                                  str(line_id).zfill(4))
                     text_fh.write(utt_id + ' ' + text + '\n')
                     utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
                     image_fh.write(utt_id + ' ' + image_file_path + '\n')

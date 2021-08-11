@@ -8,7 +8,9 @@ import os
 parser = argparse.ArgumentParser(
     description="""Creates the list of characters and words in lexicon""")
 parser.add_argument('dir', type=str, help='output path')
-parser.add_argument('--data-dir', type=str, default='data',
+parser.add_argument('--data-dir',
+                    type=str,
+                    default='data',
                     help='Path to text file')
 args = parser.parse_args()
 

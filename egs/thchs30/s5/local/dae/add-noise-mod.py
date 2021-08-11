@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # Copyright 2016  Tsinghua University (Author: Chao Liu, Dong Wang).  Apache 2.0.
 
-
 from __future__ import print_function
 from __future__ import division
 import optparse
@@ -20,7 +19,9 @@ try:
     pyximport.install()
     from thchs30_util import *
 except:
-    print("Cython possibly not installed, using standard python code. The process might be slow", file=sys.stderr)
+    print(
+        "Cython possibly not installed, using standard python code. The process might be slow",
+        file=sys.stderr)
 
     def energy(mat):
         return float(sum([x * x for x in mat])) / len(mat)
@@ -70,19 +71,29 @@ def scp(scp_filename):
 def wave_header(sample_array, sample_rate):
     byte_count = (len(sample_array)) * 2  # short
     # write the header
-    hdr = struct.pack('<ccccIccccccccIHHIIHH',
-                      'R', 'I', 'F', 'F',
-                      byte_count + 0x2c - 8,  # header size
-                      'W', 'A', 'V', 'E', 'f', 'm', 't', ' ',
-                      0x10,  # size of 'fmt ' header
-                      1,  # format 1
-                      1,  # channels
-                      sample_rate,  # samples / second
-                      sample_rate * 2,  # bytes / second
-                      2,  # block alignment
-                      16)  # bits / sample
-    hdr += struct.pack('<ccccI',
-                       'd', 'a', 't', 'a', byte_count)
+    hdr = struct.pack(
+        '<ccccIccccccccIHHIIHH',
+        'R',
+        'I',
+        'F',
+        'F',
+        byte_count + 0x2c - 8,  # header size
+        'W',
+        'A',
+        'V',
+        'E',
+        'f',
+        'm',
+        't',
+        ' ',
+        0x10,  # size of 'fmt ' header
+        1,  # format 1
+        1,  # channels
+        sample_rate,  # samples / second
+        sample_rate * 2,  # bytes / second
+        2,  # block alignment
+        16)  # bits / sample
+    hdr += struct.pack('<ccccI', 'd', 'a', 't', 'a', byte_count)
     return hdr
 
 
@@ -133,7 +144,7 @@ def main():
         mat = wave_mat(wav)
         signal = energy(mat)
         logging.debug('signal energy: %f', signal)
-        noise = signal / (10 ** (noise_level / 10))
+        noise = signal / (10**(noise_level / 10))
         logging.debug('noise energy: %f', noise)
         type = dirichlet(params)
         logging.debug('selected type: %d', type)
@@ -144,10 +155,10 @@ def main():
                 output(fname, mat)
         else:
             p, n = noises[type]
-            if p+len(mat) > len(n):
-                noise_energies[type] = energy(n[p::]+n[0:len(n)-p:])
+            if p + len(mat) > len(n):
+                noise_energies[type] = energy(n[p::] + n[0:len(n) - p:])
             else:
-                noise_energies[type] = energy(n[p:p+len(mat):])
+                noise_energies[type] = energy(n[p:p + len(mat):])
             scale = math.sqrt(noise / noise_energies[type])
             logging.debug('noise scale: %f', scale)
             pos, result = mix(mat, n, p, scale)

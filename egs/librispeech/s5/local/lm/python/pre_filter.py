@@ -10,7 +10,9 @@ import argparse
 import re
 import sys
 
-roman_number = [re.compile('^\s*[_LXVI]+(\.)?\s*$'), ]
+roman_number = [
+    re.compile('^\s*[_LXVI]+(\.)?\s*$'),
+]
 
 sq_brackets = [re.compile('(.*)(\[.+\])(.*)', re.IGNORECASE)]
 
@@ -18,22 +20,30 @@ pipes = [re.compile('^\s*\|.*\|\s*$')]
 
 non_word = [re.compile('^\W+$')]
 
-chapter = [re.compile(
-    '^\s*((Chapter)|(Volume)|(Canto)).*[LXIV0-9]+.*$', re.IGNORECASE), ]
+chapter = [
+    re.compile('^\s*((Chapter)|(Volume)|(Canto)).*[LXIV0-9]+.*$',
+               re.IGNORECASE),
+]
 
-contents = [re.compile('CONTENTS'),
-            re.compile('^.*((\s{2,50})|([\t]+))[0-9]+\s*$'),
-            re.compile('^\s*((I+[:.]+)|(I?[LXV]+I*([\.:])?))\s+.*')]
+contents = [
+    re.compile('CONTENTS'),
+    re.compile('^.*((\s{2,50})|([\t]+))[0-9]+\s*$'),
+    re.compile('^\s*((I+[:.]+)|(I?[LXV]+I*([\.:])?))\s+.*')
+]
 
 debug = None
 
 
 def parse_opts():
     parser = argparse.ArgumentParser(
-        description='Strips unhelpful, from LM viewpoint, strings from PG texts',
+        description=
+        'Strips unhelpful, from LM viewpoint, strings from PG texts',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--debug', default=False, action='store_true',
-                        help='Debug info - e.g. showing the lines that were stripped')
+    parser.add_argument(
+        '--debug',
+        default=False,
+        action='store_true',
+        help='Debug info - e.g. showing the lines that were stripped')
 
     parser.add_argument('in_text', type=str, help='Input text file')
     parser.add_argument('out_text', type=str, help='Filtered output text file')
@@ -47,8 +57,8 @@ def debug_log(lines, idx, context=2):
     if debug:
         start = max(0, idx - context)
         end = min(len(lines), idx + context + 1)
-        sys.stderr.write('\n'.join('> %s' %
-                                   l for l in lines[start:end]) + '\n\n')
+        sys.stderr.write('\n'.join('> %s' % l
+                                   for l in lines[start:end]) + '\n\n')
 
 
 def match(regexes, line):
@@ -63,7 +73,7 @@ def empty_lines(lines, index, extent):
     If the 'extent' is negative, the function checks the preceding lines
     """
     if extent > 0:
-        start = min(index + 1, len(lines)-1)
+        start = min(index + 1, len(lines) - 1)
         end = min(index + extent + 1, len(lines))
     else:
         start = max(0, index + extent)
@@ -86,12 +96,14 @@ if __name__ == '__main__':
             continue
 
         # Roman numeral alone in a line, surrounded by empty lines
-        if match(roman_number, l) and empty_lines(in_lines, i, -1) and empty_lines(in_lines, i, 1):
+        if match(roman_number, l) and empty_lines(
+                in_lines, i, -1) and empty_lines(in_lines, i, 1):
             # print 'matched roman'
             debug_log(in_lines, i)
             continue
 
-        if match(chapter, l) and (empty_lines(in_lines, i, -1) or empty_lines(in_lines, i, 1)):
+        if match(chapter, l) and (empty_lines(in_lines, i, -1)
+                                  or empty_lines(in_lines, i, 1)):
             # print 'matched chapter'
             debug_log(in_lines, i)
             continue

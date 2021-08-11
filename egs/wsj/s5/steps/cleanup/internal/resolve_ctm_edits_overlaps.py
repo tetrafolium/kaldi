@@ -4,7 +4,6 @@
 #           2014  Vijayaditya Peddinti
 #           2016  Vimal Manohar
 # Apache 2.0.
-
 """
 Script to combine ctms edits with overlapping segments obtained from
 smith-waterman alignment. This script is similar to utils/ctm/resolve_ctm_edits.py,
@@ -24,9 +23,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
 handler.setLevel(logging.INFO)
-formatter = logging.Formatter(
-    '%(asctime)s [%(pathname)s:%(lineno)s - '
-    '%(funcName)s - %(levelname)s ] %(message)s')
+formatter = logging.Formatter('%(asctime)s [%(pathname)s:%(lineno)s - '
+                              '%(funcName)s - %(levelname)s ] %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -36,13 +34,18 @@ def get_args():
 
     usage = """ Python script to resolve overlaps in ctms """
     parser = argparse.ArgumentParser(usage)
-    parser.add_argument('segments', type=argparse.FileType('r'),
+    parser.add_argument('segments',
+                        type=argparse.FileType('r'),
                         help='use segments to resolve overlaps')
-    parser.add_argument('ctm_edits_in', type=argparse.FileType('r'),
+    parser.add_argument('ctm_edits_in',
+                        type=argparse.FileType('r'),
                         help='input_ctm_file')
-    parser.add_argument('ctm_edits_out', type=argparse.FileType('w'),
+    parser.add_argument('ctm_edits_out',
+                        type=argparse.FileType('w'),
                         help='output_ctm_file')
-    parser.add_argument('--verbose', type=int, default=0,
+    parser.add_argument('--verbose',
+                        type=int,
+                        default=0,
                         help="Higher value for more verbose logging.")
     args = parser.parse_args()
 
@@ -69,8 +72,8 @@ def read_segments(segments_file):
         segments[parts[0]] = (parts[1], float(parts[2]), float(parts[3]))
         reco2utt[parts[1]].append(parts[0])
 
-    logger.info("Read %d lines from segments file %s",
-                num_lines, segments_file.name)
+    logger.info("Read %d lines from segments file %s", num_lines,
+                segments_file.name)
     segments_file.close()
 
     return segments, reco2utt
@@ -114,9 +117,12 @@ def read_ctm_edits(ctm_edits_file, segments):
         if (reco, utt) not in ctm_edits:
             ctm_edits[(reco, utt)] = []
 
-        ctm_edits[(reco, utt)].append(
-            [parts[0], parts[1], float(parts[2]), float(parts[3]),
-             parts[4], float(parts[5])] + parts[6:])
+        ctm_edits[(reco, utt)].append([
+            parts[0], parts[1],
+            float(parts[2]),
+            float(parts[3]), parts[4],
+            float(parts[5])
+        ] + parts[6:])
 
     logger.info("Read %d lines from CTM %s", num_lines, ctm_edits_file.name)
 
@@ -139,13 +145,12 @@ def wer(ctm_edit_lines):
     return float(num_incorrect_words) / num_words
 
 
-def choose_best_ctm_lines(first_lines, second_lines,
-                          window_length, overlap_length):
+def choose_best_ctm_lines(first_lines, second_lines, window_length,
+                          overlap_length):
     """Returns ctm lines that have lower WER. If the WER is the lines with
     the higher number of words is returned.
     """
-    i, best_lines = min((0, first_lines),
-                        (1, second_lines),
+    i, best_lines = min((0, first_lines), (1, second_lines),
                         key=lambda x: wer(x[1]))
     return i
 
@@ -194,8 +199,7 @@ def resolve_overlaps(ctm_edits, segments):
             logger.error(
                 "Current utterance %s is not the same as the next "
                 "utterance %s in previous iteration.\n"
-                "CTM is not sorted by utterance-id?",
-                cur_utt, next_utt)
+                "CTM is not sorted by utterance-id?", cur_utt, next_utt)
             raise ValueError
 
         # Assumption here is that the segments are written in
@@ -205,8 +209,7 @@ def resolve_overlaps(ctm_edits, segments):
         if segments[next_utt][1] < segments[cur_utt][1]:
             logger.error(
                 "Next utterance %s <= Current utterance %s. "
-                "CTM edits is not sorted by utterance-id.",
-                next_utt, cur_utt)
+                "CTM edits is not sorted by utterance-id.", next_utt, cur_utt)
             raise ValueError
 
         try:
@@ -220,8 +223,7 @@ def resolve_overlaps(ctm_edits, segments):
             try:
                 overlap = segments[cur_utt][2] - segments[next_utt][1]
             except KeyError:
-                logger("Could not find utterance %s in segments",
-                       next_utt)
+                logger("Could not find utterance %s in segments", next_utt)
                 raise
 
             # find the first word that is in the overlap
@@ -247,9 +249,9 @@ def resolve_overlaps(ctm_edits, segments):
             next_utt_start_lines = ctm_edits_for_next_utt[:
                                                           next_utt_start_index]
 
-            choose_index = choose_best_ctm_lines(
-                cur_utt_end_lines, next_utt_start_lines,
-                window_length, overlap)
+            choose_index = choose_best_ctm_lines(cur_utt_end_lines,
+                                                 next_utt_start_lines,
+                                                 window_length, overlap)
 
             # Ignore the hypotheses beyond this midpoint. They will be
             # considered as part of the next segment.
@@ -262,12 +264,13 @@ def resolve_overlaps(ctm_edits, segments):
             if choose_index == 0 and next_utt_start_index > 0:
                 # Update the ctm_edits_for_next_utt to include only the lines
                 # starting from index.
-                ctm_edits[utt_index + 1] = (
-                    ctm_edits_for_next_utt[next_utt_start_index:])
+                ctm_edits[utt_index +
+                          1] = (ctm_edits_for_next_utt[next_utt_start_index:])
             # else leave the ctm_edits as is.
         except:
-            logger.error("Could not resolve overlaps between CTM edits for "
-                         "%s and %s", cur_utt, next_utt)
+            logger.error(
+                "Could not resolve overlaps between CTM edits for "
+                "%s and %s", cur_utt, next_utt)
             logger.error("Current CTM:")
             for line in ctm_edits_for_cur_utt:
                 logger.error(ctm_edit_line_to_string(line))
@@ -307,16 +310,14 @@ def run(args):
                 ctm_edits_for_reco.append(ctm_edits[(reco, utt)])
         try:
             if len(ctm_edits_for_reco) == 0:
-                logger.warn('CTMs for recording %s is empty.',
-                            reco)
-                continue   # Go to the next recording
+                logger.warn('CTMs for recording %s is empty.', reco)
+                continue  # Go to the next recording
 
             # Process CTMs in the recordings
             ctm_edits_for_reco = resolve_overlaps(ctm_edits_for_reco, segments)
             write_ctm_edits(ctm_edits_for_reco, args.ctm_edits_out)
         except Exception:
-            logger.error("Failed to process CTM edits for recording %s",
-                         reco)
+            logger.error("Failed to process CTM edits for recording %s", reco)
             raise
     args.ctm_edits_out.close()
     logger.info("Wrote CTM for %d recordings.", len(ctm_edits))

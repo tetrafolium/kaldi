@@ -5,16 +5,37 @@ import os
 import sys
 
 files = [
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-1/exp/tri5a/decode_test/oracle/oracle.tra'),
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-2/exp/tri5a/decode_test/oracle/oracle.tra'),
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-3/exp/tri5a/decode_test/oracle/oracle.tra'),
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-4/exp/tri5a/decode_test/oracle/oracle.tra'),
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-5/exp/tri5a/decode_test/oracle/oracle.tra'),
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-6/exp/tri5a/decode_test/oracle/oracle.tra'),
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-7/exp/tri5a/decode_test/oracle/oracle.tra'),
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-8/exp/tri5a/decode_test/oracle/oracle.tra'),
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-9/exp/tri5a/decode_test/oracle/oracle.tra'),
-    open('/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-10/exp/tri5a/decode_test/oracle/oracle.tra')]
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-1/exp/tri5a/decode_test/oracle/oracle.tra'
+    ),
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-2/exp/tri5a/decode_test/oracle/oracle.tra'
+    ),
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-3/exp/tri5a/decode_test/oracle/oracle.tra'
+    ),
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-4/exp/tri5a/decode_test/oracle/oracle.tra'
+    ),
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-5/exp/tri5a/decode_test/oracle/oracle.tra'
+    ),
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-6/exp/tri5a/decode_test/oracle/oracle.tra'
+    ),
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-7/exp/tri5a/decode_test/oracle/oracle.tra'
+    ),
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-8/exp/tri5a/decode_test/oracle/oracle.tra'
+    ),
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-9/exp/tri5a/decode_test/oracle/oracle.tra'
+    ),
+    open(
+        '/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-10/exp/tri5a/decode_test/oracle/oracle.tra'
+    )
+]
 
 
 def findTranscription(timeDetail):
@@ -56,10 +77,11 @@ if not os.path.exists('exp/tri5a/one-best/train'):
 
 #provFile = open('/export/a04/gkumar/corpora/fishcall/fisher_provisional_dev.es', 'w+')
 provFile = open(
-    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/asr.train.oracle', 'w+')
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/asr.train.oracle',
+    'w+')
 for item in fileList:
-    timingFile = open(
-        '/export/a04/gkumar/corpora/fishcall/fisher/tim/' + item + '.es')
+    timingFile = open('/export/a04/gkumar/corpora/fishcall/fisher/tim/' +
+                      item + '.es')
     newFile = open('exp/tri5a/one-best/train/' + item + '.es', 'w+')
     for line in timingFile:
         timeInfo = line.split()

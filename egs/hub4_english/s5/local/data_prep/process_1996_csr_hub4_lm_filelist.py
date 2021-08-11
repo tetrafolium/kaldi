@@ -2,7 +2,6 @@
 
 # Copyright 2016    Vimal Manohar
 # Apache 2.0.
-
 """Prepare CSR-IV 1996 Language model text corpus (LDC98T31)."""
 
 from __future__ import print_function
@@ -34,7 +33,10 @@ def get_args():
 
     parser = argparse.ArgumentParser("""Prepare CSR-IV 1996 Language model text
     corpus (LDC98T31).""")
-    parser.add_argument("--verbose", choices=[0, 1, 2, 3], type=int, default=0,
+    parser.add_argument("--verbose",
+                        choices=[0, 1, 2, 3],
+                        type=int,
+                        default=0,
                         help="Set higher for more verbose logging.")
     parser.add_argument("file_list",
                         help="""List of compressed source files""")
@@ -90,8 +92,9 @@ def process_file_lines(lines, out_file_handle):
                                 normalized_text.encode('ascii')))
                             num_written += 1
                     except Exception:
-                        logger.error("Failed to process content %s in para "
-                                     "%s", x, para)
+                        logger.error(
+                            "Failed to process content %s in para "
+                            "%s", x, para)
                         raise
 
         except Exception:
@@ -114,37 +117,32 @@ def _run(args):
             base_name = os.path.basename(file_)
             name = os.path.splitext(base_name)[0]
 
-            out_file = gzip.open("{0}/{1}.txt.gz".format(args.dir, name),
-                                 'w')
+            out_file = gzip.open("{0}/{1}.txt.gz".format(args.dir, name), 'w')
 
             logger.info("Running LM pipefile for |%s|...", base_name)
 
-            command = (
-                "gunzip -c {0} | "
-                "tools/csr4_utils/pare-sgml.perl | "
-                "perl tools/csr4_utils/bugproc.perl | "
-                "perl tools/csr4_utils/numhack.perl | "
-                "perl tools/csr4_utils/numproc.perl "
-                "  -xtools/csr4_utils/num_excp | "
-                "perl tools/csr4_utils/abbrproc.perl "
-                "  tools/csr4_utils/abbrlist | "
-                "perl tools/csr4_utils/puncproc.perl -np"
-                "".format(file_))
+            command = ("gunzip -c {0} | "
+                       "tools/csr4_utils/pare-sgml.perl | "
+                       "perl tools/csr4_utils/bugproc.perl | "
+                       "perl tools/csr4_utils/numhack.perl | "
+                       "perl tools/csr4_utils/numproc.perl "
+                       "  -xtools/csr4_utils/num_excp | "
+                       "perl tools/csr4_utils/abbrproc.perl "
+                       "  tools/csr4_utils/abbrlist | "
+                       "perl tools/csr4_utils/puncproc.perl -np"
+                       "".format(file_))
             logger.debug("Running command '%s'", command)
 
-            p = subprocess.Popen(command,
-                                 stdout=subprocess.PIPE, shell=True)
+            p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
 
             stdout = p.communicate()[0]
             if p.returncode is not 0:
-                logger.error(
-                    "Command '%s' failed with return status %d",
-                    command, p.returncode)
+                logger.error("Command '%s' failed with return status %d",
+                             command, p.returncode)
                 raise RuntimeError
 
             if not process_file_lines(stdout, out_file):
-                logger.warn("File %s empty or could not be processed.",
-                            file_)
+                logger.warn("File %s empty or could not be processed.", file_)
         except Exception:
             logger.error("Failed processing file %s", file_)
             raise

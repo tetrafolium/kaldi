@@ -4,7 +4,6 @@
 #                2017  Ashish Arora
 #                2017  Yiwen Shao
 #                2018  Hossein Hadian
-
 """ This script converts images to Kaldi-format feature matrices. The input to
     this script is the path to a data directory, e.g. "data/train". This script
     reads the images listed in images.scp and writes them to standard output
@@ -29,23 +28,40 @@ import math
 from signal import signal, SIGPIPE, SIG_DFL
 signal(SIGPIPE, SIG_DFL)
 
-parser = argparse.ArgumentParser(description="""Converts images (in 'dir'/images.scp) to features and
-                                                writes them to standard output in text format.""")
-parser.add_argument('images_scp_path', type=str,
+parser = argparse.ArgumentParser(
+    description="""Converts images (in 'dir'/images.scp) to features and
+                                                writes them to standard output in text format."""
+)
+parser.add_argument('images_scp_path',
+                    type=str,
                     help='Path of images.scp file')
-parser.add_argument('--allowed_len_file_path', type=str, default=None,
-                    help='If supplied, each images will be padded to reach the '
-                    'target length (this overrides --padding).')
-parser.add_argument('--out-ark', type=str, default='-',
+parser.add_argument(
+    '--allowed_len_file_path',
+    type=str,
+    default=None,
+    help='If supplied, each images will be padded to reach the '
+    'target length (this overrides --padding).')
+parser.add_argument('--out-ark',
+                    type=str,
+                    default='-',
                     help='Where to write the output feature file')
-parser.add_argument('--feat-dim', type=int, default=40,
+parser.add_argument('--feat-dim',
+                    type=int,
+                    default=40,
                     help='Size to scale the height of all images')
-parser.add_argument('--padding', type=int, default=5,
+parser.add_argument('--padding',
+                    type=int,
+                    default=5,
                     help='Number of white pixels to pad on the left'
                     'and right side of the image.')
-parser.add_argument('--fliplr', type=lambda x: (str(x).lower() == 'true'), default=False,
-                    help="Flip the image left-right for right to left languages")
-parser.add_argument("--augment", type=lambda x: (str(x).lower() == 'true'), default=False,
+parser.add_argument(
+    '--fliplr',
+    type=lambda x: (str(x).lower() == 'true'),
+    default=False,
+    help="Flip the image left-right for right to left languages")
+parser.add_argument("--augment",
+                    type=lambda x: (str(x).lower() == 'true'),
+                    default=False,
                     help="performs image augmentation")
 args = parser.parse_args()
 
@@ -84,10 +100,12 @@ def horizontal_pad(im, allowed_lengths=None):
         left_padding = int(padding // 2)
         right_padding = padding - left_padding
     dim_y = im.shape[0]  # height
-    im_pad = np.concatenate((255 * np.ones((dim_y, left_padding),
-                                           dtype=int), im), axis=1)
-    im_pad1 = np.concatenate((im_pad, 255 * np.ones((dim_y, right_padding),
-                                                    dtype=int)), axis=1)
+    im_pad = np.concatenate((255 * np.ones(
+        (dim_y, left_padding), dtype=int), im),
+                            axis=1)
+    im_pad1 = np.concatenate((im_pad, 255 * np.ones(
+        (dim_y, right_padding), dtype=int)),
+                             axis=1)
     return im_pad1
 
 
@@ -139,7 +157,7 @@ def geometric_moment(frame, p, q):
     m = 0
     for i in range(frame.shape[1]):
         for j in range(frame.shape[0]):
-            m += (i ** p) * (j ** q) * frame[i][i]
+            m += (i**p) * (j**q) * frame[i][i]
     return m
 
 
@@ -162,10 +180,14 @@ def height_normalization(frame, w, h):
         geometric_moment(frame, 0, 0)  # m10/m00
     y_bar = geometric_moment(frame, 0, 1) / \
         geometric_moment(frame, 0, 0)  # m01/m00
-    sigma_x = (alpha * ((central_moment(frame, 2, 0) /
-                         geometric_moment(frame, 0, 0)) ** .5))  # alpha * sqrt(u20/m00)
-    sigma_y = (alpha * ((central_moment(frame, 0, 2) /
-                         geometric_moment(frame, 0, 0)) ** .5))  # alpha * sqrt(u02/m00)
+    sigma_x = (
+        alpha *
+        ((central_moment(frame, 2, 0) / geometric_moment(frame, 0, 0))**.5)
+    )  # alpha * sqrt(u20/m00)
+    sigma_y = (
+        alpha *
+        ((central_moment(frame, 0, 2) / geometric_moment(frame, 0, 0))**.5)
+    )  # alpha * sqrt(u02/m00)
     for x in range(w):
         for y in range(h):
             i = int((x / w - 0.5) * sigma_x + x_bar)
@@ -203,15 +225,16 @@ def horizontal_shear(im, degree):
     padding_x = int(abs(np.tan(rad)) * im.shape[0])
     padding_y = im.shape[0]
     if rad > 0:
-        im_pad = np.concatenate(
-            (255 * np.ones((padding_y, padding_x), dtype=int), im), axis=1)
+        im_pad = np.concatenate((255 * np.ones(
+            (padding_y, padding_x), dtype=int), im),
+                                axis=1)
     elif rad < 0:
-        im_pad = np.concatenate(
-            (im, 255 * np.ones((padding_y, padding_x), dtype=int)), axis=1)
+        im_pad = np.concatenate((im, 255 * np.ones(
+            (padding_y, padding_x), dtype=int)),
+                                axis=1)
     else:
         im_pad = im
-    shear_matrix = np.array([[1, 0],
-                             [np.tan(rad), 1]])
+    shear_matrix = np.array([[1, 0], [np.tan(rad), 1]])
     sheared_im = affine_transform(im_pad, shear_matrix, cval=255.0)
     return sheared_im
 
@@ -233,7 +256,8 @@ if os.path.isfile(allowed_len_handle):
         for line in f:
             allowed_lengths.append(int(line.strip()))
     print("Read {} allowed lengths and will apply them to the "
-          "features.".format(len(allowed_lengths)), file=sys.stderr)
+          "features.".format(len(allowed_lengths)),
+          file=sys.stderr)
 
 num_fail = 0
 num_ok = 0
@@ -265,4 +289,5 @@ with open(data_list_path) as f:
         write_kaldi_matrix(out_fh, data, image_id)
 
 print('Generated features for {} images. Failed for {} (image too '
-      'long).'.format(num_ok, num_fail), file=sys.stderr)
+      'long).'.format(num_ok, num_fail),
+      file=sys.stderr)

@@ -2,7 +2,6 @@
 
 # Copyright 2016    Vimal Manohar
 # Apache 2.0.
-
 """This script process a 1995 CSR-IV annotation file and writes to
 utt2spk, segments and text files.
 """
@@ -14,7 +13,6 @@ import logging
 import re
 from bs4 import BeautifulSoup
 import hub4_utils
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -31,18 +29,23 @@ def get_args():
 
     parser = argparse.ArgumentParser("Process 1995 CSR-IV HUB4 transcripts")
 
-    parser.add_argument("--noise-word", default="<NOISE>",
+    parser.add_argument("--noise-word",
+                        default="<NOISE>",
                         help="Word to add in-place of noise words")
     parser.add_argument("--spoken-noise-word",
                         default="<SPOKEN_NOISE>",
                         help="Word to add in-place of speaker noise words")
-    parser.add_argument("in_file", type=argparse.FileType('r'),
+    parser.add_argument("in_file",
+                        type=argparse.FileType('r'),
                         help="Input transcript file")
-    parser.add_argument("segments_file", type=argparse.FileType('a'),
+    parser.add_argument("segments_file",
+                        type=argparse.FileType('a'),
                         help="Output segments file")
-    parser.add_argument("utt2spk_file", type=argparse.FileType('a'),
+    parser.add_argument("utt2spk_file",
+                        type=argparse.FileType('a'),
                         help="Output utt2spk file")
-    parser.add_argument("text_file", type=argparse.FileType('a'),
+    parser.add_argument("text_file",
+                        type=argparse.FileType('a'),
                         help="Output text file")
 
     args = parser.parse_args()
@@ -51,9 +54,7 @@ def get_args():
 
 class Segment(object):
     """Class to store an utterance (segment)"""
-
-    def __init__(self, reco_id, spk=None, start_time=-1,
-                 end_time=-2, text=""):
+    def __init__(self, reco_id, spk=None, start_time=-1, end_time=-2, text=""):
         """The arguments are straight-forward.
         spk can be None if speaker is not known, in which case the utterance-id
         and speaker-id are made the same.
@@ -72,21 +73,23 @@ class Segment(object):
         above.
         """
         if self.spk is None:
-            return "{reco}-{0:06d}-{1:06d}".format(
-                int(self.start_time * 100), int(self.end_time * 100),
-                reco=self.reco_id)
-        return "{reco}-{spk}-{0:06d}-{1:06d}".format(
-            int(self.start_time * 100), int(self.end_time * 100),
-            reco=self.reco_id, spk=self.spk)
+            return "{reco}-{0:06d}-{1:06d}".format(int(self.start_time * 100),
+                                                   int(self.end_time * 100),
+                                                   reco=self.reco_id)
+        return "{reco}-{spk}-{0:06d}-{1:06d}".format(int(self.start_time *
+                                                         100),
+                                                     int(self.end_time * 100),
+                                                     reco=self.reco_id,
+                                                     spk=self.spk)
 
     def get_spk_id(self):
         """Returns the speaker-id appended to the recording-id, if speaker is
         known. Otherwise returns the utterance-id as speaker-id.
         """
         if self.spk is None:
-            return "{reco}-{0:06d}-{1:06d}".format(
-                int(self.start_time * 100), int(self.end_time * 100),
-                reco=self.reco_id)
+            return "{reco}-{0:06d}-{1:06d}".format(int(self.start_time * 100),
+                                                   int(self.end_time * 100),
+                                                   reco=self.reco_id)
         return "{reco}-{spk}".format(reco=self.reco_id, spk=self.spk)
 
     def write_utt2spk(self, out_file):
@@ -96,15 +99,13 @@ class Segment(object):
 
     def write_segment(self, out_file):
         """Writes this segment's entry into segments file."""
-        print("{0} {1} {2:.3f} {3:.3f}".format(
-            self.get_utt_id(), self.reco_id,
-            self.start_time, self.end_time),
-            file=out_file)
+        print("{0} {1} {2:.3f} {3:.3f}".format(self.get_utt_id(), self.reco_id,
+                                               self.start_time, self.end_time),
+              file=out_file)
 
     def write_text(self, out_file):
         """Writes this segment's entry into kaldi text file."""
-        print("{0} {1}".format(self.get_utt_id(), self.text),
-              file=out_file)
+        print("{0} {1}".format(self.get_utt_id(), self.text), file=out_file)
 
 
 def write_segments(segments, args):
@@ -129,8 +130,7 @@ test_spk_matcher = re.compile(r"(\S+)\(bt=(\S+)\set=(\S+)\):\s(.+)$")
 train_spk_matcher = re.compile(r"(\S+):\s(.+)$")
 
 
-def process_story_content(args, reco_id, content,
-                          start_time, end_time):
+def process_story_content(args, reco_id, content, start_time, end_time):
     """Process the contents in a story and converts into a set of segments.
 
     Arguments:
@@ -144,8 +144,11 @@ def process_story_content(args, reco_id, content,
     """
 
     segments = []
-    segment_tmp = Segment(reco_id=reco_id, spk=None,
-                          start_time=start_time, end_time=-2, text="")
+    segment_tmp = Segment(reco_id=reco_id,
+                          spk=None,
+                          start_time=start_time,
+                          end_time=-2,
+                          text="")
 
     for line in content.split('\n\n'):
         line = re.sub('\n', ' ', line)
@@ -172,9 +175,12 @@ def process_story_content(args, reco_id, content,
                                 args.spoken_noise_word)
             if len(text) == 0 or re.match(r"\[[^]]+\]$|\s*$", text):
                 continue
-            segments.append(Segment(reco_id=reco_id, spk=spk,
-                                    start_time=bt, end_time=et,
-                                    text=text))
+            segments.append(
+                Segment(reco_id=reco_id,
+                        spk=spk,
+                        start_time=bt,
+                        end_time=et,
+                        text=text))
             continue
 
         m = train_spk_matcher.match(line)
@@ -223,15 +229,20 @@ def run(args):
                     if len(non_story_contents):
                         end_time = story_begin_time
                         segments = process_story_content(
-                            args, reco_id, ' '.join(non_story_contents),
-                            start_time=start_time, end_time=end_time)
+                            args,
+                            reco_id,
+                            ' '.join(non_story_contents),
+                            start_time=start_time,
+                            end_time=end_time)
                         write_segments(segments, args)
                         non_story_contents = []
                         start_time = story_end_time
                     segments = process_story_content(
-                        args, reco_id,
+                        args,
+                        reco_id,
                         ' '.join([str(x) for x in s.children]),
-                        start_time=story_begin_time, end_time=story_end_time)
+                        start_time=story_begin_time,
+                        end_time=story_end_time)
                     write_segments(segments, args)
                 elif (s.name is not None and s.name != "language"
                       and s.name != 'sung'):
@@ -239,8 +250,8 @@ def run(args):
                         "Expected a NavigableString or <story> "
                         "or <language> or <sung>; got {0}".format(s))
                 elif s.name == "language" or s.name == "sung":
-                    non_story_contents.append(
-                        ' '.join([str(x) for x in s.children]))
+                    non_story_contents.append(' '.join(
+                        [str(x) for x in s.children]))
                 else:
                     non_story_contents.append(str(s))
             except RuntimeError:
@@ -250,9 +261,11 @@ def run(args):
                 raise
         # End for loop over broadcast children
         if len(non_story_contents) > 0:
-            segments = process_story_content(
-                args, reco_id, ' '.join(non_story_contents),
-                start_time=start_time, end_time=-1)
+            segments = process_story_content(args,
+                                             reco_id,
+                                             ' '.join(non_story_contents),
+                                             start_time=start_time,
+                                             end_time=-1)
             write_segments(segments, args)
 
 
@@ -263,8 +276,10 @@ def main():
     except Exception:
         raise
     finally:
-        for f in [args.in_file, args.segments_file,
-                  args.utt2spk_file, args.text_file]:
+        for f in [
+                args.in_file, args.segments_file, args.utt2spk_file,
+                args.text_file
+        ]:
             if f is not None:
                 f.close()
 

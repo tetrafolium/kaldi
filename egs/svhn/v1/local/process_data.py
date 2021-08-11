@@ -2,8 +2,6 @@
 
 # Copyright 2017 Johns Hopkins University (author: Hossein Hadian)
 # Apache 2.0
-
-
 """ This script prepares the training and test data for SVHN.
 """
 from __future__ import division
@@ -16,13 +14,14 @@ import numpy as np
 
 parser = argparse.ArgumentParser(description="""Converts train/test data of
                                                 SVHN (Street View House Numbers)
-                                                dataset to Kaldi feature format""")
+                                                dataset to Kaldi feature format"""
+                                 )
 parser.add_argument('matlab_file',
                     help='path to SVHN matlab data file (cropped version)')
-parser.add_argument('dir',
-                    help='output dir')
+parser.add_argument('dir', help='output dir')
 parser.add_argument('--out-ark',
-                    default='-', help='where to write output feature data')
+                    default='-',
+                    help='where to write output feature data')
 
 args = parser.parse_args()
 

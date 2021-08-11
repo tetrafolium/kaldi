@@ -27,25 +27,59 @@ from optparse import OptionParser
 usage = "%prog [options] <feat-dim> <num-leaves> >nnet-proto-file"
 parser = OptionParser(usage)
 # Required,
-parser.add_option('--cell-dim', dest='cell_dim', type='int', default=320,
-                  help='Number of cells for one direction in LSTM [default: %default]')
-parser.add_option('--proj-dim', dest='proj_dim', type='int', default=400,
+parser.add_option(
+    '--cell-dim',
+    dest='cell_dim',
+    type='int',
+    default=320,
+    help='Number of cells for one direction in LSTM [default: %default]')
+parser.add_option('--proj-dim',
+                  dest='proj_dim',
+                  type='int',
+                  default=400,
                   help='Number of LSTM recurrent units [default: %default]')
-parser.add_option('--num-layers', dest='num_layers', type='int', default=2,
+parser.add_option('--num-layers',
+                  dest='num_layers',
+                  type='int',
+                  default=2,
                   help='Number of LSTM layers [default: %default]')
 # Optional (default == 'None'),
-parser.add_option('--lstm-param-range', dest='lstm_param_range', type='float',
+parser.add_option('--lstm-param-range',
+                  dest='lstm_param_range',
+                  type='float',
                   help='Range of initial LSTM parameters [default: %default]')
-parser.add_option('--param-stddev', dest='param_stddev', type='float',
-                  help='Standard deviation for initial weights of Softmax layer [default: %default]')
-parser.add_option('--cell-clip', dest='cell_clip', type='float',
-                  help='Clipping cell values during propagation (per-frame) [default: %default]')
-parser.add_option('--diff-clip', dest='diff_clip', type='float',
-                  help='Clipping partial-derivatives during BPTT (per-frame) [default: %default]')
-parser.add_option('--cell-diff-clip', dest='cell_diff_clip', type='float',
-                  help='Clipping partial-derivatives of "cells" during BPTT (per-frame, those accumulated by CEC) [default: %default]')
-parser.add_option('--grad-clip', dest='grad_clip', type='float',
-                  help='Clipping the accumulated gradients (per-updates) [default: %default]')
+parser.add_option(
+    '--param-stddev',
+    dest='param_stddev',
+    type='float',
+    help=
+    'Standard deviation for initial weights of Softmax layer [default: %default]'
+)
+parser.add_option(
+    '--cell-clip',
+    dest='cell_clip',
+    type='float',
+    help=
+    'Clipping cell values during propagation (per-frame) [default: %default]')
+parser.add_option(
+    '--diff-clip',
+    dest='diff_clip',
+    type='float',
+    help=
+    'Clipping partial-derivatives during BPTT (per-frame) [default: %default]')
+parser.add_option(
+    '--cell-diff-clip',
+    dest='cell_diff_clip',
+    type='float',
+    help=
+    'Clipping partial-derivatives of "cells" during BPTT (per-frame, those accumulated by CEC) [default: %default]'
+)
+parser.add_option(
+    '--grad-clip',
+    dest='grad_clip',
+    type='float',
+    help='Clipping the accumulated gradients (per-updates) [default: %default]'
+)
 #
 
 (o, args) = parser.parse_args()
@@ -90,6 +124,7 @@ for l in range(o.num_layers - 1):
 print("<Tanh> <InputDim> %d <OutputDim> %d" % (o.proj_dim, o.proj_dim))
 
 # Softmax layer,
-print("<AffineTransform> <InputDim> %d <OutputDim> %d <BiasMean> 0.0 <BiasRange> 0.0" %
-      (o.proj_dim, num_leaves) + softmax_affine_opts)
+print(
+    "<AffineTransform> <InputDim> %d <OutputDim> %d <BiasMean> 0.0 <BiasRange> 0.0"
+    % (o.proj_dim, num_leaves) + softmax_affine_opts)
 print("<Softmax> <InputDim> %d <OutputDim> %d" % (num_leaves, num_leaves))

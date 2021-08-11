@@ -12,7 +12,8 @@ conversationList = open(
     '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/train')
 oracleTmp = 'exp/tri5a/one-best/oracle-ch-train'
 provFile = open(
-    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/oracle.train', 'w+')
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-callhome/oracle.train',
+    'w+')
 timLocation = '/export/a04/gkumar/corpora/fishcall/callhome/tim'
 
 

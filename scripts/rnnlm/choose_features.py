@@ -11,53 +11,77 @@ import math
 from collections import defaultdict
 sys.stdout = open(1, 'w', encoding='utf-8', closefd=False)
 
+parser = argparse.ArgumentParser(
+    description=
+    "This script chooses the sparse feature representation of words. "
+    "To be more specific, it chooses the set of features-- you compute "
+    "them for the specific words by calling rnnlm/get_word_features.py.",
+    epilog="E.g. " + sys.argv[0] +
+    " --unigram-probs=exp/rnnlm/unigram_probs.txt "
+    "--unigram-scale=0.1 "
+    "data/rnnlm/vocab/words.txt > exp/rnnlm/features.txt",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-parser = argparse.ArgumentParser(description="This script chooses the sparse feature representation of words. "
-                                             "To be more specific, it chooses the set of features-- you compute "
-                                             "them for the specific words by calling rnnlm/get_word_features.py.",
-                                 epilog="E.g. " +
-                                 sys.argv[0] +
-                                 " --unigram-probs=exp/rnnlm/unigram_probs.txt "
-                                        "--unigram-scale=0.1 "
-                                        "data/rnnlm/vocab/words.txt > exp/rnnlm/features.txt",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-parser.add_argument("--unigram-probs", type=str, default='', required=True,
+parser.add_argument("--unigram-probs",
+                    type=str,
+                    default='',
+                    required=True,
                     help="Specify the file containing unigram probs.")
-parser.add_argument("--min-ngram-order", type=int, default=2,
+parser.add_argument("--min-ngram-order",
+                    type=int,
+                    default=2,
                     help="minimum length of n-grams of characters to"
-                         "make potential features.")
-parser.add_argument("--max-ngram-order", type=int, default=3,
+                    "make potential features.")
+parser.add_argument("--max-ngram-order",
+                    type=int,
+                    default=3,
                     help="maximum length of n-grams of characters to"
-                         "make potential features.")
-parser.add_argument("--min-frequency", type=float, default=1.0e-05,
-                    help="minimum frequency with which an n-gram character "
-                         "feature is encountered (counted as binary presence in a word times unigram "
-                         "probs of words), for it to be used as a feature. e.g. "
-                         "if less than 1.0e-06 of tokens contain the n-gram 'xyz', "
-                         "then it wouldn't be used as a feature.")
-parser.add_argument("--include-unigram-feature", type=str, default='true',
+                    "make potential features.")
+parser.add_argument(
+    "--min-frequency",
+    type=float,
+    default=1.0e-05,
+    help="minimum frequency with which an n-gram character "
+    "feature is encountered (counted as binary presence in a word times unigram "
+    "probs of words), for it to be used as a feature. e.g. "
+    "if less than 1.0e-06 of tokens contain the n-gram 'xyz', "
+    "then it wouldn't be used as a feature.")
+parser.add_argument("--include-unigram-feature",
+                    type=str,
+                    default='true',
                     choices=['true', 'false'],
                     help="If true, the unigram frequency of a word is "
-                         "one of the features.  [note: one reason we "
-                         "want to include this, is to make it easier to "
-                         "port models to new vocabularies and domains].")
-parser.add_argument("--include-length-feature", type=str, default='true',
-                    choices=['true', 'false'],
-                    help="If true, the length in characters of a word is one of the features.")
-parser.add_argument("--top-word-features", type=int, default=2000,
+                    "one of the features.  [note: one reason we "
+                    "want to include this, is to make it easier to "
+                    "port models to new vocabularies and domains].")
+parser.add_argument(
+    "--include-length-feature",
+    type=str,
+    default='true',
+    choices=['true', 'false'],
+    help="If true, the length in characters of a word is one of the features.")
+parser.add_argument("--top-word-features",
+                    type=int,
+                    default=2000,
                     help="The most frequent n words each get their own "
-                         "special feature, in addition to any other features "
-                         "that the word may naturally get.")
-parser.add_argument("--special-words", type=str, default='<s>,</s>,<brk>',
+                    "special feature, in addition to any other features "
+                    "that the word may naturally get.")
+parser.add_argument("--special-words",
+                    type=str,
+                    default='<s>,</s>,<brk>',
                     help="List of special words that get their own special "
-                         "features and do not get any other features.")
-parser.add_argument("--use-constant-feature", type=str, default="false",
+                    "features and do not get any other features.")
+parser.add_argument("--use-constant-feature",
+                    type=str,
+                    default="false",
                     help="If set to true, we give a constant feature to all "
                     "words (to help model offsets).  The value will equal "
                     "the --max-feature-rms option.")
-parser.add_argument("--max-feature-rms", type=float, default=0.01,
-                    help="maximum allowed root-mean-square value for any feature.")
+parser.add_argument(
+    "--max-feature-rms",
+    type=float,
+    default=0.01,
+    help="maximum allowed root-mean-square value for any feature.")
 
 # dir=exp/rnnlm_tdnn_d
 # paste <(awk '{print $2}' $dir/config/unigram_probs.txt) <(awk '{$1="";print;}' $dir/word_feats.txt ) | awk '{freq=$1; num_feats=(NF-1)/2; for (n=1;n<=num_feats;n++) { a=n*2; b=n*2+1; rms[$a] += freq * $b*$b; }} END{for(k in rms) { print k, rms[k];}}' | sort -k2 -nr | head
@@ -65,19 +89,21 @@ parser.add_argument("--max-feature-rms", type=float, default=0.01,
 # 7019 9.99947e-05
 # ..
 
-parser.add_argument("vocab_file",
-                    help="Path for vocab file")
+parser.add_argument("vocab_file", help="Path for vocab file")
 
 args = parser.parse_args()
 
 if args.use_constant_feature != "false" and args.use_constant_feature != "true":
-    sys.exit(sys.argv[0] + ": --use-constant-feature must be true or false: {0}".format(
-        args.use_constant_feature))
+    sys.exit(sys.argv[0] +
+             ": --use-constant-feature must be true or false: {0}".format(
+                 args.use_constant_feature))
 if args.min_ngram_order < 1:
     sys.exit(sys.argv[0] + ": --min-ngram-order must be at least 1.")
 if args.max_ngram_order < args.min_ngram_order:
     sys.exit(
-        sys.argv[0] + ": --max-ngram-order must be larger than or equal to --min-ngram-order.")
+        sys.argv[0] +
+        ": --max-ngram-order must be larger than or equal to --min-ngram-order."
+    )
 
 SPECIAL_SYMBOLS = ["<eps>", "<s>", "<brk>"]
 
@@ -93,8 +119,9 @@ def read_vocab(vocab_file):
             fields = line.split()
             assert len(fields) == 2
             if fields[0] in vocab:
-                sys.exit(sys.argv[0] + ": duplicated word({0}) in vocab: {1}"
-                                       .format(fields[0], vocab_file))
+                sys.exit(sys.argv[0] +
+                         ": duplicated word({0}) in vocab: {1}".format(
+                             fields[0], vocab_file))
             vocab[fields[0]] = int(fields[1])
 
     # check there is no duplication and no gap among word ids
@@ -155,10 +182,8 @@ num_features = 0
 # handle offsets of the words' log-likelihoods, so we don't have
 # to include an offset term in the math.
 if args.use_constant_feature == "true":
-    print("{0}\tconstant\t{1}".format(num_features,
-                                      args.max_feature_rms))
+    print("{0}\tconstant\t{1}".format(num_features, args.max_feature_rms))
     num_features += 1
-
 
 # 'word_indexes_to_exclude' will contain the integer indexes of words that are
 # in 'args.special_words' plus the zero word (epsilon) and which don't take part
@@ -175,15 +200,16 @@ word_indexes_to_exclude = {0}  # a set including only zero.
 if args.special_words != '':
     for word in args.special_words.split(','):
         if not word in vocab:
-            sys.exit(sys.argv[0] + ": error: element {0} of --special-words option "
-                     "is not in the vocabulary file {1}".format(word, args.vocab_file))
+            sys.exit(sys.argv[0] +
+                     ": error: element {0} of --special-words option "
+                     "is not in the vocabulary file {1}".format(
+                         word, args.vocab_file))
         word_indexes_to_exclude.add(vocab[word])
         this_word_prob = unigram_probs[vocab[word]]
         rms = math.sqrt(this_word_prob)
         print("{0}\tspecial\t{1}\t{2}".format(num_features, word,
                                               get_feature_scale(rms)))
         num_features += 1
-
 
 # Print a line for the unigram feature (this is a feature that's a scaled,
 # offset version of the log-unigram-prob of the word).  The line is of the form:
@@ -265,15 +291,16 @@ if args.top_word_features > 0:
     # sorted_word_indexes is a sorted list of pairs (word_index, unigram_prob),
     # sorted from greatest to least unigram_prob.
     sorted_word_indexes = sorted(enumerate(unigram_probs),
-                                 key=lambda x: x[1], reverse=True)
+                                 key=lambda x: x[1],
+                                 reverse=True)
     num_top_words_printed = 0
     for word_index, unigram_prob in sorted_word_indexes:
         if word_index in word_indexes_to_exclude:
             continue
         word = wordlist[word_index]
         rms = math.sqrt(unigram_prob)
-        print("{0}\tword\t{1}\t{2}".format(
-            num_features, word, get_feature_scale(rms)))
+        print("{0}\tword\t{1}\t{2}".format(num_features, word,
+                                           get_feature_scale(rms)))
         num_features += 1
         top_words.add(word)
         num_top_words_printed += 1
@@ -349,19 +376,19 @@ for (word_index, unigram_prob) in enumerate(unigram_probs):
         for (match_type, match), count in this_word_feats.items():
             (feat_freq, expected_feat_sumsq) = ngram_feats[(match_type, match)]
             ngram_feats[(match_type, match)] = (feat_freq + unigram_prob,
-                                                expected_feat_sumsq + unigram_prob * count * count)
+                                                expected_feat_sumsq +
+                                                unigram_prob * count * count)
 
-
-for (match_type, match), (expected_feat_sum, expected_feat_sumsq) in sorted(ngram_feats.items()):
+for (match_type, match), (expected_feat_sum,
+                          expected_feat_sumsq) in sorted(ngram_feats.items()):
     if match_type == 'word' and match in top_words:
         continue  # avoid duplicate
     if expected_feat_sum < args.min_frequency:
         continue  # very infrequent features are excluded via this mechanism.
     rms = math.sqrt(expected_feat_sumsq)
-    print("{0}\t{1}\t{2}\t{3}".format(
-        num_features, match_type, match, get_feature_scale(rms)))
+    print("{0}\t{1}\t{2}\t{3}".format(num_features, match_type, match,
+                                      get_feature_scale(rms)))
     num_features += 1
 
-
-print(sys.argv[0] +
-      ": chose {0} features.".format(num_features), file=sys.stderr)
+print(sys.argv[0] + ": chose {0} features.".format(num_features),
+      file=sys.stderr)

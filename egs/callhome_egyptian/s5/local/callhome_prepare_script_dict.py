@@ -10,7 +10,8 @@ wordLexiconLoc = sys.argv[2]
 outLexiconLoc = sys.argv[3]
 
 # First create a map from the romanized to the script version
-lexicon = codecs.open(lexiconLocation + "callhome_arabic_lexicon_991012/ar_lex.v07",
+lexicon = codecs.open(lexiconLocation +
+                      "callhome_arabic_lexicon_991012/ar_lex.v07",
                       encoding="iso-8859-6")
 for line in lexicon:
     lineComp = line.strip().split('\t')

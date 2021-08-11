@@ -9,17 +9,18 @@ import xml.dom.minidom as minidom
 
 parser = argparse.ArgumentParser(description="""Creates text utt2spk 
                                                 and image file """)
-parser.add_argument('database_path', type=str,
+parser.add_argument('database_path',
+                    type=str,
                     help='path to downloaded iam data')
-parser.add_argument('out_dir', type=str,
-                    help='where to write output files')
-parser.add_argument('--train_sets', type=str,
-                    help='sets for training')
-parser.add_argument('--test_sets', type=str,
-                    help='sets for testing')
-parser.add_argument('--dataset', type=str, default='train',
-                    choices=['train', 'test'],
-                    help='choose trainset, testset, validationset1, or validationset2')
+parser.add_argument('out_dir', type=str, help='where to write output files')
+parser.add_argument('--train_sets', type=str, help='sets for training')
+parser.add_argument('--test_sets', type=str, help='sets for testing')
+parser.add_argument(
+    '--dataset',
+    type=str,
+    default='train',
+    choices=['train', 'test'],
+    help='choose trainset, testset, validationset1, or validationset2')
 args = parser.parse_args()
 
 ### main ###
@@ -43,7 +44,7 @@ if args.dataset == 'train':
 else:
     sets = args.test_sets.split(" ")
 for dir_name in sorted(sets):
-    if(dir_name == "set_e" or dir_name == "set_f" or dir_name == "set_s"):
+    if (dir_name == "set_e" or dir_name == "set_f" or dir_name == "set_s"):
         png_path = args.database_path + '/' + dir_name + '/png'
         tru_path = args.database_path + '/' + dir_name + '/tru'
         for i in range(0, len(os.listdir(png_path))):

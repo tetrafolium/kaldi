@@ -12,10 +12,13 @@ def get_args():
     parser = argparse.ArgumentParser(
         description="""This script splits a kaldi text file
         into per_speaker per_session text files""")
-    parser.add_argument("wer_dir_path", type=str,
+    parser.add_argument("wer_dir_path",
+                        type=str,
                         help="path of directory containing wer files")
-    parser.add_argument("output_dir_path", type=str,
-                        help="path of the directory containing per speaker output files")
+    parser.add_argument(
+        "output_dir_path",
+        type=str,
+        help="path of the directory containing per speaker output files")
     args = parser.parse_args()
     return args
 
@@ -43,11 +46,11 @@ def main():
         total_ins = toks[-3][:-1]
         total_del = toks[-2][:-1]
         total_sub = toks[-1]
-        recodingid_error_dict[recordingid] = (
-            total_words, total_errors, total_ins, total_del, total_sub)
+        recodingid_error_dict[recordingid] = (total_words, total_errors,
+                                              total_ins, total_del, total_sub)
 
-    recording_spkorder_file = os.path.join(
-        args.output_dir_path, 'recordinid_spkorder')
+    recording_spkorder_file = os.path.join(args.output_dir_path,
+                                           'recordinid_spkorder')
     for line in open(recording_spkorder_file, 'r', encoding='utf8'):
         parts = line.strip().split(':')
         recordingid = parts[0]
@@ -55,7 +58,7 @@ def main():
         spkorder_list = spkorder.split('_')
         num_speakers = len(spkorder_list)
         total_errors = total_words = total_ins = total_del = total_sub = 0
-        for i in range(1, num_speakers+1):
+        for i in range(1, num_speakers + 1):
             filename = 'wer_' + recordingid + '_' + 'r' + \
                 str(i) + 'h' + str(spkorder_list[i-1])
             wer_filename = os.path.join(args.wer_dir_path, filename)
@@ -73,8 +76,8 @@ def main():
             recodingid_error_dict[recordingid][2]), "Total insertions mismatch"
         assert int(total_del) == int(
             recodingid_error_dict[recordingid][3]), "Total deletions mismatch"
-        assert int(total_sub) == int(
-            recodingid_error_dict[recordingid][4]), "Total substitutions mismatch"
+        assert int(total_sub) == int(recodingid_error_dict[recordingid]
+                                     [4]), "Total substitutions mismatch"
 
 
 if __name__ == '__main__':

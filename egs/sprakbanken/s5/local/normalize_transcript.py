@@ -8,27 +8,18 @@ from string import maketrans
 
 # Global vars
 
-normdict = {".": "",
-            ",": "",
-            ":": "",
-            ";": "",
-            "?": "",
-            "\\": " ",
-            "\t": " "
-            }
+normdict = {".": "", ",": "", ":": "", ";": "", "?": "", "\\": " ", "\t": " "}
 
 from_chars = ''.join(list(normdict.keys()))
 to_chars = ''.join(list(normdict.values()))
 
 #t_table = maketrans(from_chars, to_chars)
 
-
 # Main
 
 numtable = writenumbers.loadNumTable(sys.argv[1])
 transcript = codecs.open(sys.argv[2], "r", "utf8")
 outtext = codecs.open(sys.argv[3], "w", "utf8")
-
 
 for line in transcript:
     normtext1 = re.sub(r'[\.,:;\?]', '', line)

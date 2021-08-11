@@ -18,7 +18,6 @@
 '''
 from __future__ import print_function
 
-
 import sys
 import codecs
 import os
@@ -58,7 +57,8 @@ def create_parallel_file_list(session, sndlist, txtlist):
 
         # Append counter to create new directory. Use global counter to prevent resetting every time
         # the function is called.
-        if len(os.listdir(session.sessiondir)) != 0:  # Check if there are files in the directory
+        if len(os.listdir(session.sessiondir)
+               ) != 0:  # Check if there are files in the directory
             global n
             n += 1
             session.sessiondir = "{}_{}".format(session.sessiondir, n)
@@ -70,7 +70,7 @@ def create_parallel_file_list(session, sndlist, txtlist):
 
     for recnum, recording in enumerate(session.record_states):
         # print(session.record_states)
-        if recnum == 0:     # skip the first recording of silence
+        if recnum == 0:  # skip the first recording of silence
             continue
         oldsound = os.path.join(session.wavdir, recording[1])
 
@@ -79,7 +79,7 @@ def create_parallel_file_list(session, sndlist, txtlist):
             continue
 
         # create file and write the transcription
-        txtout = session.create_filename(recnum+1, "txt")
+        txtout = session.create_filename(recnum + 1, "txt")
         txtline = os.path.join(session.sessiondir, txtout)
         fout = codecs.open(txtline, "w", "utf8")
         fout.write(recording[0] + "\n")
@@ -89,7 +89,7 @@ def create_parallel_file_list(session, sndlist, txtlist):
         txtline = txtline.replace('791213 8232', '791213_8232')
         oldsound = oldsound.replace('791213 8232', '791213_8232')
         txtlist.write(txtline + "\n")  # write lists of txt files
-        sndlist.write(oldsound + "\n")   # write lists of recordings
+        sndlist.write(oldsound + "\n")  # write lists of recordings
 
     if recnum == 10:
         sys.exit('Are there files?')
@@ -135,8 +135,12 @@ if __name__ == '__main__':
         topfolder = sys.argv[1]
         dest = sys.argv[2]
     except:
-        print('Usage: python3 sprak2kaldi.py <corpus project dir> <processed corpus project subdir>')
-        print('E.g. python3 sprak2kaldi.py /path/to/data/local/data/0565-1  /path/to/data/local/data/corpus_processed/0565-1')
+        print(
+            'Usage: python3 sprak2kaldi.py <corpus project dir> <processed corpus project subdir>'
+        )
+        print(
+            'E.g. python3 sprak2kaldi.py /path/to/data/local/data/0565-1  /path/to/data/local/data/corpus_processed/0565-1'
+        )
         sys.exit('exit 1')
 
     if os.path.exists(dest):

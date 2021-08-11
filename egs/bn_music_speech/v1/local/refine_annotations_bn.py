@@ -45,7 +45,7 @@ def resegment(music, speech, other, frame_length, min_seg):
 
     annotate_frames(frame2classes, music, "music", frame_length, num_frames)
     annotate_frames(frame2classes, speech, "speech", frame_length, num_frames)
-    annotate_frames(frame2classes, other,  "other", frame_length, num_frames)
+    annotate_frames(frame2classes, other, "other", frame_length, num_frames)
 
     curr_class = None
     for i in range(0, len(frame2classes)):
@@ -65,8 +65,8 @@ def resegment(music, speech, other, frame_length, min_seg):
     start_frame = 0
     for i in range(1, len(frame2classes)):
         if curr_class != frame2classes[i]:
-            start = float(start_frame)/frame_length
-            end = float(i)/frame_length
+            start = float(start_frame) / frame_length
+            end = float(i) / frame_length
             if end - start > min_seg:
                 if curr_class == "music":
                     new_music.append((start, end))
@@ -78,7 +78,8 @@ def resegment(music, speech, other, frame_length, min_seg):
     return new_music, new_speech
 
 
-def annotate_frames(frame2classes, segs, annotation, frame_length, max_duration):
+def annotate_frames(frame2classes, segs, annotation, frame_length,
+                    max_duration):
     for (start, end) in segs:
         frame_start = min(int(start * frame_length), max_duration)
         frame_end = min(int(end * frame_length), max_duration)
@@ -102,8 +103,9 @@ def main():
         speech_segs = process_segs(raw_speech_segs)
         music_segs = process_segs(raw_music_segs)
         other_segs = process_segs(raw_other_segs)
-        music_segs, speech_segs = resegment(
-            music_segs, speech_segs, other_segs, frames_per_sec, min_seg_length)
+        music_segs, speech_segs = resegment(music_segs, speech_segs,
+                                            other_segs, frames_per_sec,
+                                            min_seg_length)
 
         speech_output = ""
         music_output = ""

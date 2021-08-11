@@ -52,15 +52,15 @@ def create_parallel_files(session):
         oldsound = os.path.join(session.wavdir, recording[1])
         if not os.path.exists(oldsound):
             continue
-        txtout = session.create_filename(recnum+1, "txt")
-        sndout = session.create_filename(recnum+1, "wav")
+        txtout = session.create_filename(recnum + 1, "txt")
+        sndout = session.create_filename(recnum + 1, "wav")
 
-        fout = codecs.open(os.path.join(
-            session.sessiondir, txtout), "w", "utf8")
+        fout = codecs.open(os.path.join(session.sessiondir, txtout), "w",
+                           "utf8")
         fout.write(recording[0] + "\n")
         fout.close()
-        dst = shutil.copyfile(
-            oldsound, os.path.join(session.sessiondir, sndout))
+        dst = shutil.copyfile(oldsound, os.path.join(session.sessiondir,
+                                                     sndout))
 
 
 def make_speech_corpus(top, dest, srcfolder):
@@ -97,6 +97,6 @@ if __name__ == '__main__':
     topfolder = sys.argv[1]
     find_ext_folders(topfolder, spldirs, ".spl")
 
-#    print(len(spldirs))
+    #    print(len(spldirs))
     for num, folder in enumerate(spldirs):
         make_speech_corpus(topfolder, dest, folder)

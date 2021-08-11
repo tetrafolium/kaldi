@@ -31,7 +31,8 @@ def load_dubm(dubm_text):
                 state = 1
                 data_array = []
             # Single line vector like <WEIGHTS>
-            elif len(line_split) >= 3 and line_split[1] == "[" and line_split[-1] == "]":
+            elif len(line_split
+                     ) >= 3 and line_split[1] == "[" and line_split[-1] == "]":
                 para_name = line_split[0]
                 data_list = []
                 for i in range(2, len(line_split) - 1):
@@ -90,7 +91,7 @@ def load_ivector_extractor(ie_text):
                 continue
             elif line_split[-1] == "]":
                 data_array = []
-                for i in range(len(line_split)-1):
+                for i in range(len(line_split) - 1):
                     data_array.append(float(line_split[i]))
                 data_matrix.append(data_array)
                 data_3dmatrix.append(data_matrix)

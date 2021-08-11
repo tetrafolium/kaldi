@@ -42,13 +42,16 @@ def loadXml(xmlFileName, opts):
     segments = trans.getElementsByTagName('segments')[0]
     elements = []
     for segment in segments.getElementsByTagName('segment'):
-        sid = segment.attributes['id'].value.split(
-            '_utt_')[0].replace("_", "-")
+        sid = segment.attributes['id'].value.split('_utt_')[0].replace(
+            "_", "-")
         startTime = float(segment.attributes['starttime'].value)
         endTime = float(segment.attributes['endtime'].value)
 
-        tokens = [e.childNodes[0].data for e in segment.getElementsByTagName(
-            'element') if len(e.childNodes)]
+        tokens = [
+            e.childNodes[0].data
+            for e in segment.getElementsByTagName('element')
+            if len(e.childNodes)
+        ]
         # skip any word starts with '#'
         tokens = filter(lambda i: not i.startswith('#'), tokens)
         # convert to buckwalter if required
@@ -80,8 +83,8 @@ def ctm(data):
         interval = duration / len(tokens)
         startTime = e.startTime
         for token in tokens:
-            out.write("{} 1 {:.02f} {:.02f} ".format(
-                data['id'], startTime, interval))
+            out.write("{} 1 {:.02f} {:.02f} ".format(data['id'], startTime,
+                                                     interval))
             out.write(token)
             out.write("\n")
 
@@ -99,14 +102,25 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description='convert Arabic MGB xml file to MGB xml')
-    parser.add_argument("--id", dest="uid",
-                        help="utterance id")
-    parser.add_argument("--buck", dest="buck", default=False, action='store_true',
+    parser.add_argument("--id", dest="uid", help="utterance id")
+    parser.add_argument("--buck",
+                        dest="buck",
+                        default=False,
+                        action='store_true',
                         help="output buckwalter text")
-    parser.add_argument("--ctm", dest="ctm", default=False, action='store_true',
+    parser.add_argument("--ctm",
+                        dest="ctm",
+                        default=False,
+                        action='store_true',
                         help="output ctm file for testing")
-    parser.add_argument("--skip-bad-segments", dest="skip_bs", default=False, action='store_true',
-                        help="skip segments with ###, these are either overlapped speech or unintelligible speech")
+    parser.add_argument(
+        "--skip-bad-segments",
+        dest="skip_bs",
+        default=False,
+        action='store_true',
+        help=
+        "skip segments with ###, these are either overlapped speech or unintelligible speech"
+    )
     parser.add_argument(dest="xmlFileName", metavar="xml", type=str)
     args = parser.parse_args()
 

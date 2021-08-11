@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script normalizes a text file. It performs following normalizations:
     multiple continuous spaces to single space, removes spaces at the begining
     and end of the word.
@@ -18,7 +17,10 @@ output_file = sys.argv[2]
 
 def main():
 
-    with open(input_file, 'r', encoding='utf-8') as fh, open(output_file, 'w', encoding='utf-8') as fh_out:
+    with open(input_file,
+              'r', encoding='utf-8') as fh, open(output_file,
+                                                 'w',
+                                                 encoding='utf-8') as fh_out:
         for utt, uttid in SnorIter(fh):
             # Only output one space at a time
             space_chars = set([" ", "\t", "\u00a0"])

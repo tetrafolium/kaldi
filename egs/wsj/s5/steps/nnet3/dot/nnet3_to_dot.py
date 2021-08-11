@@ -5,7 +5,6 @@
 
 # script to convert nnet3-am-info output to a dot graph
 
-
 # we're using python 3.x style print but want it to work in python 2.x,
 from __future__ import print_function
 import re
@@ -102,7 +101,10 @@ def GetDotNodeName(name_string, is_component=False):
     return {"label": name_string, "node": node_name_string}
 
 
-def ProcessAppendDescriptor(segment, parent_node_name, affix, edge_attributes=None):
+def ProcessAppendDescriptor(segment,
+                            parent_node_name,
+                            affix,
+                            edge_attributes=None):
     dot_graph = []
     names = []
     desc_name = 'Append_{0}'.format(affix)
@@ -111,20 +113,22 @@ def ProcessAppendDescriptor(segment, parent_node_name, affix, edge_attributes=No
         part_name = "{0}{1}{2}".format(desc_name, sub_segment['name'], i)
         names.append("<{0}> part {1}".format(
             GetDotNodeName(part_name)['node'], i))
-        dot_graph += DescriptorSegmentToDot(sub_segment,
-                                            "{0}:{1}".format(desc_name, part_name), desc_name)
+        dot_graph += DescriptorSegmentToDot(
+            sub_segment, "{0}:{1}".format(desc_name, part_name), desc_name)
 
     part_index = len(segment['sub_segments'])
     for i in range(len(segment['arguments'])):
-        part_name = "{0}{1}{2}".format(
-            desc_name, segment['arguments'][i], part_index + i)
+        part_name = "{0}{1}{2}".format(desc_name, segment['arguments'][i],
+                                       part_index + i)
         names.append("<{0}> part {1}".format(
             GetDotNodeName(part_name)['node'], part_index + i))
-        dot_graph.append("{0} -> {1}:{2}".format(GetDotNodeName(segment['arguments'][i])[
-                         'node'], GetDotNodeName(desc_name)['node'], GetDotNodeName(part_name)['node']))
+        dot_graph.append("{0} -> {1}:{2}".format(
+            GetDotNodeName(segment['arguments'][i])['node'],
+            GetDotNodeName(desc_name)['node'],
+            GetDotNodeName(part_name)['node']))
 
     label = "|".join(names)
-    label = "{{"+label+"}|Append}"
+    label = "{{" + label + "}|Append}"
     dot_graph.append('{0} [shape=Mrecord, label="{1}"];'.format(
         GetDotNodeName(desc_name)['node'], label))
 
@@ -135,8 +139,9 @@ def ProcessAppendDescriptor(segment, parent_node_name, affix, edge_attributes=No
         if 'style' in edge_attributes:
             attr_string += ' style={0} '.format(edge_attributes['style'])
 
-    dot_string = '{0} -> {1} [tailport=s]'.format(GetDotNodeName(
-        desc_name)['node'], GetDotNodeName(parent_node_name)['node'])
+    dot_string = '{0} -> {1} [tailport=s]'.format(
+        GetDotNodeName(desc_name)['node'],
+        GetDotNodeName(parent_node_name)['node'])
 
     if attr_string != '':
         dot_string += ' [{0}] '.format(attr_string)
@@ -145,7 +150,10 @@ def ProcessAppendDescriptor(segment, parent_node_name, affix, edge_attributes=No
     return dot_graph
 
 
-def ProcessRoundDescriptor(segment, parent_node_name, affix, edge_attributes=None):
+def ProcessRoundDescriptor(segment,
+                           parent_node_name,
+                           affix,
+                           edge_attributes=None):
     dot_graph = []
 
     label = 'Round ({0})'.format(segment['arguments'][1])
@@ -159,17 +167,20 @@ def ProcessRoundDescriptor(segment, parent_node_name, affix, edge_attributes=Non
     attr_string = 'label="{0}"'.format(label)
     if style is not None:
         attr_string += ' {0}'.format(style)
-    dot_graph.append('{0}->{1} [ {2} ]'.format(GetDotNodeName(segment['arguments'][0])['node'],
-                                               GetDotNodeName(parent_node_name)[
-        'node'],
-        attr_string))
+    dot_graph.append('{0}->{1} [ {2} ]'.format(
+        GetDotNodeName(segment['arguments'][0])['node'],
+        GetDotNodeName(parent_node_name)['node'], attr_string))
     if segment['sub_segments']:
         raise Exception(
-            "Round can just deal with forwarding descriptor, no sub-segments allowed")
+            "Round can just deal with forwarding descriptor, no sub-segments allowed"
+        )
     return dot_graph
 
 
-def ProcessOffsetDescriptor(segment, parent_node_name, affix, edge_attributes=None):
+def ProcessOffsetDescriptor(segment,
+                            parent_node_name,
+                            affix,
+                            edge_attributes=None):
     dot_graph = []
 
     label = 'Offset ({0})'.format(segment['arguments'][1])
@@ -184,17 +195,20 @@ def ProcessOffsetDescriptor(segment, parent_node_name, affix, edge_attributes=No
     if style is not None:
         attr_string += ' {0}'.format(style)
 
-    dot_graph.append('{0}->{1} [ {2} ]'.format(GetDotNodeName(segment['arguments'][0])['node'],
-                                               GetDotNodeName(parent_node_name)[
-        'node'],
-        attr_string))
+    dot_graph.append('{0}->{1} [ {2} ]'.format(
+        GetDotNodeName(segment['arguments'][0])['node'],
+        GetDotNodeName(parent_node_name)['node'], attr_string))
     if segment['sub_segments']:
         raise Exception(
-            "Offset can just deal with forwarding descriptor, no sub-segments allowed")
+            "Offset can just deal with forwarding descriptor, no sub-segments allowed"
+        )
     return dot_graph
 
 
-def ProcessSumDescriptor(segment, parent_node_name, affix, edge_attributes=None):
+def ProcessSumDescriptor(segment,
+                         parent_node_name,
+                         affix,
+                         edge_attributes=None):
     dot_graph = []
     names = []
     desc_name = 'Sum_{0}'.format(affix)
@@ -204,21 +218,24 @@ def ProcessSumDescriptor(segment, parent_node_name, affix, edge_attributes=None)
         part_name = "{0}{1}{2}".format(desc_name, sub_segment['name'], i)
         names.append("<{0}> part {1}".format(
             GetDotNodeName(part_name)['node'], i))
-        dot_graph += DescriptorSegmentToDot(sub_segment, "{0}:{1}".format(
-            desc_name, part_name), "{0}_{1}".format(desc_name, i))
+        dot_graph += DescriptorSegmentToDot(
+            sub_segment, "{0}:{1}".format(desc_name, part_name),
+            "{0}_{1}".format(desc_name, i))
 
     # link the sum node parts to corresponding segments
     part_index = len(segment['sub_segments'])
     for i in range(len(segment['arguments'])):
-        part_name = "{0}{1}{2}".format(
-            desc_name, segment['arguments'][i], part_index + i)
+        part_name = "{0}{1}{2}".format(desc_name, segment['arguments'][i],
+                                       part_index + i)
         names.append("<{0}> part {1}".format(
             GetDotNodeName(part_name)['node'], part_index + i))
-        dot_graph.append("{0} -> {1}:{2}".format(GetDotNodeName(segment['arguments'][i])[
-                         'node'], GetDotNodeName(desc_name)['node'], GetDotNodeName(part_name)['node']))
+        dot_graph.append("{0} -> {1}:{2}".format(
+            GetDotNodeName(segment['arguments'][i])['node'],
+            GetDotNodeName(desc_name)['node'],
+            GetDotNodeName(part_name)['node']))
 
     label = "|".join(names)
-    label = '{{'+label+'}|Sum}'
+    label = '{{' + label + '}|Sum}'
     dot_graph.append('{0} [shape=Mrecord, label="{1}", color=red];'.format(
         GetDotNodeName(desc_name)['node'], label))
 
@@ -229,19 +246,23 @@ def ProcessSumDescriptor(segment, parent_node_name, affix, edge_attributes=None)
         if 'style' in edge_attributes:
             attr_string += ' style={0} '.format(edge_attributes['style'])
 
-    dot_string = '{0} -> {1}'.format(GetDotNodeName(desc_name)
-                                     ['node'], GetDotNodeName(parent_node_name)['node'])
+    dot_string = '{0} -> {1}'.format(
+        GetDotNodeName(desc_name)['node'],
+        GetDotNodeName(parent_node_name)['node'])
 
     dot_string += ' [{0} tailport=s ] '.format(attr_string)
     dot_graph.append(dot_string)
     return dot_graph
 
 
-def ProcessReplaceIndexDescriptor(segment, parent_node_name, affix, edge_attributes=None):
+def ProcessReplaceIndexDescriptor(segment,
+                                  parent_node_name,
+                                  affix,
+                                  edge_attributes=None):
     dot_graph = []
 
-    label = 'ReplaceIndex({0}, {1})'.format(
-        segment['arguments'][1], segment['arguments'][2])
+    label = 'ReplaceIndex({0}, {1})'.format(segment['arguments'][1],
+                                            segment['arguments'][2])
     style = None
     if edge_attributes is not None:
         if 'label' in edge_attributes:
@@ -253,83 +274,100 @@ def ProcessReplaceIndexDescriptor(segment, parent_node_name, affix, edge_attribu
     if style is not None:
         attr_string += ' {0}'.format(style)
 
-    dot_graph.append('{0}->{1} [{2}]'.format(GetDotNodeName(segment['arguments'][0])['node'],
-                                             GetDotNodeName(parent_node_name)[
-        'node'],
-        attr_string))
+    dot_graph.append('{0}->{1} [{2}]'.format(
+        GetDotNodeName(segment['arguments'][0])['node'],
+        GetDotNodeName(parent_node_name)['node'], attr_string))
     if segment['sub_segments']:
         raise Exception(
-            "ReplaceIndex can just deal with forwarding descriptor, no sub-segments allowed")
+            "ReplaceIndex can just deal with forwarding descriptor, no sub-segments allowed"
+        )
     return dot_graph
 
 
-def ProcessIfDefinedDescriptor(segment, parent_node_name, affix, edge_attributes=None):
+def ProcessIfDefinedDescriptor(segment,
+                               parent_node_name,
+                               affix,
+                               edge_attributes=None):
     # IfDefined adds attributes to the edges
     if edge_attributes is not None:
         raise Exception(
-            "edge_attributes was not None, this means an IfDefined descriptor was calling the current IfDefined descriptor. This is not allowed")
+            "edge_attributes was not None, this means an IfDefined descriptor was calling the current IfDefined descriptor. This is not allowed"
+        )
     dot_graph = []
     dot_graph.append('#ProcessIfDefinedDescriptor')
     names = []
 
     if segment['sub_segments']:
         sub_segment = segment['sub_segments'][0]
-        dot_graph += DescriptorSegmentToDot(sub_segment, parent_node_name, parent_node_name,
-                                            edge_attributes={'style': 'dotted', 'label': 'IfDefined'})
+        dot_graph += DescriptorSegmentToDot(sub_segment,
+                                            parent_node_name,
+                                            parent_node_name,
+                                            edge_attributes={
+                                                'style': 'dotted',
+                                                'label': 'IfDefined'
+                                            })
 
     if segment['arguments']:
-        dot_graph.append('{0} -> {1} [style=dotted, label="IfDefined"]'.format(GetDotNodeName(
-            segment['arguments'][0])['node'], GetDotNodeName(parent_node_name)['node']))
+        dot_graph.append('{0} -> {1} [style=dotted, label="IfDefined"]'.format(
+            GetDotNodeName(segment['arguments'][0])['node'],
+            GetDotNodeName(parent_node_name)['node']))
 
     return dot_graph
 
 
-def DescriptorSegmentToDot(segment, parent_node_name, affix, edge_attributes=None):
+def DescriptorSegmentToDot(segment,
+                           parent_node_name,
+                           affix,
+                           edge_attributes=None):
     # segment is a dicionary which corresponds to a descriptor
     dot_graph = []
     if segment['name'] == "Append":
-        dot_graph += ProcessAppendDescriptor(segment,
-                                             parent_node_name, affix, edge_attributes)
+        dot_graph += ProcessAppendDescriptor(segment, parent_node_name, affix,
+                                             edge_attributes)
     elif segment['name'] == "Offset":
-        dot_graph += ProcessOffsetDescriptor(segment,
-                                             parent_node_name, affix, edge_attributes)
+        dot_graph += ProcessOffsetDescriptor(segment, parent_node_name, affix,
+                                             edge_attributes)
     elif segment['name'] == "Sum":
-        dot_graph += ProcessSumDescriptor(segment,
-                                          parent_node_name, affix, edge_attributes)
+        dot_graph += ProcessSumDescriptor(segment, parent_node_name, affix,
+                                          edge_attributes)
     elif segment['name'] == "IfDefined":
-        dot_graph += ProcessIfDefinedDescriptor(
-            segment, parent_node_name, affix, edge_attributes)
+        dot_graph += ProcessIfDefinedDescriptor(segment, parent_node_name,
+                                                affix, edge_attributes)
     elif segment['name'] == "ReplaceIndex":
-        dot_graph += ProcessReplaceIndexDescriptor(
-            segment, parent_node_name, affix, edge_attributes)
+        dot_graph += ProcessReplaceIndexDescriptor(segment, parent_node_name,
+                                                   affix, edge_attributes)
     elif segment['name'] == "Round":
-        dot_graph += ProcessRoundDescriptor(segment,
-                                            parent_node_name, affix, edge_attributes)
+        dot_graph += ProcessRoundDescriptor(segment, parent_node_name, affix,
+                                            edge_attributes)
     elif segment['name'] == "Scale":
         pass
     else:
         raise Exception(
-            'Descriptor {0}, is not recognized by this script. Please add Process{0}Descriptor method'.format(segment['name']))
+            'Descriptor {0}, is not recognized by this script. Please add Process{0}Descriptor method'
+            .format(segment['name']))
     return dot_graph
 
 
 def Nnet3DescriptorToDot(descriptor, parent_node_name):
     dot_lines = []
-    [segments, arguments] = descriptor_parser.IdentifyNestedSegments(
-        descriptor)
+    [segments,
+     arguments] = descriptor_parser.IdentifyNestedSegments(descriptor)
     if segments:
         for segment in segments:
-            dot_lines += DescriptorSegmentToDot(segment,
-                                                parent_node_name, parent_node_name)
+            dot_lines += DescriptorSegmentToDot(segment, parent_node_name,
+                                                parent_node_name)
     elif arguments:
-        assert(len(arguments) == 1)
-        dot_lines.append("{0} -> {1}".format(GetDotNodeName(arguments[0])[
-                         'node'], GetDotNodeName(parent_node_name)['node']))
+        assert (len(arguments) == 1)
+        dot_lines.append("{0} -> {1}".format(
+            GetDotNodeName(arguments[0])['node'],
+            GetDotNodeName(parent_node_name)['node']))
     return dot_lines
 
 
 def ParseNnet3String(string):
-    if re.search('^input-node|^component|^output-node|^component-node|^dim-range-node', string.strip()) is None:
+    if re.search(
+            '^input-node|^component|^output-node|^component-node|^dim-range-node',
+            string.strip()) is None:
         return [None, None]
 
     parts = string.split()
@@ -338,7 +376,7 @@ def ParseNnet3String(string):
     prev_field = ''
     for i in range(1, len(parts)):
         if re.search('=', parts[i]) is None:
-            prev_field += ' '+parts[i]
+            prev_field += ' ' + parts[i]
         else:
             if not (prev_field.strip() == ''):
                 fields.append(prev_field)
@@ -358,6 +396,7 @@ def ParseNnet3String(string):
     except IndexError:
         raise Exception('Malformed config line {0}'.format(string))
     return [config_type, parsed_string]
+
 
 # sample component config line
 # component name=L0_lda type=FixedAffineComponent, input-dim=300, output-dim=300, linear-params-stddev=0.00992724, bias-params-stddev=0.573973
@@ -382,12 +421,21 @@ def Nnet3ComponentToDot(component_config, component_attributes=None):
     except KeyError:
         pass
 
-    return ['{0} [label="{1}" {2}]'.format(GetDotNodeName(component_config['name'], is_component=True)['node'], label, attr_string)]
+    return [
+        '{0} [label="{1}" {2}]'.format(
+            GetDotNodeName(component_config['name'],
+                           is_component=True)['node'], label, attr_string)
+    ]
 
 
 # input-node name=input dim=40
 def Nnet3InputToDot(parsed_config):
-    return ['{0} [ label="{1}\\ndim={2}"]'.format(GetDotNodeName(parsed_config['name'])['node'], parsed_config['name'], parsed_config['dim'])]
+    return [
+        '{0} [ label="{1}\\ndim={2}"]'.format(
+            GetDotNodeName(parsed_config['name'])['node'],
+            parsed_config['name'], parsed_config['dim'])
+    ]
+
 
 # output-node name=output input=Final_log_softmax dim=3940 objective=linear
 # output-node name=output input=Offset(Final_log_softmax, 5) dim=3940 objective=linear
@@ -395,11 +443,13 @@ def Nnet3InputToDot(parsed_config):
 
 def Nnet3OutputToDot(parsed_config):
     dot_graph = []
-    dot_graph += Nnet3DescriptorToDot(
-        parsed_config['input'], parsed_config['name'])
-    dot_graph.append('{0} [ label="{1}\\nobjective={2}"]'.format(GetDotNodeName(
-        parsed_config['name'])['node'], parsed_config['name'], parsed_config['objective']))
+    dot_graph += Nnet3DescriptorToDot(parsed_config['input'],
+                                      parsed_config['name'])
+    dot_graph.append('{0} [ label="{1}\\nobjective={2}"]'.format(
+        GetDotNodeName(parsed_config['name'])['node'], parsed_config['name'],
+        parsed_config['objective']))
     return dot_graph
+
 
 # dim-range-node name=Lstm1_r_t input-node=Lstm1_rp_t dim-offset=0 dim=256
 
@@ -409,23 +459,23 @@ def Nnet3DimrangeToDot(parsed_config):
     dot_node = GetDotNodeName(parsed_config['name'])
     dot_graph.append('{0} [shape=rectangle, label="{1}"]'.format(
         dot_node['node'], dot_node['label']))
-    dot_graph.append('{0} -> {1} [taillabel="dimrange({2}, {3})"]'.format(GetDotNodeName(parsed_config['input-node'])['node'],
-                                                                          GetDotNodeName(parsed_config['name'])[
-        'node'],
-        parsed_config['dim-offset'],
-        parsed_config['dim']))
+    dot_graph.append('{0} -> {1} [taillabel="dimrange({2}, {3})"]'.format(
+        GetDotNodeName(parsed_config['input-node'])['node'],
+        GetDotNodeName(parsed_config['name'])['node'],
+        parsed_config['dim-offset'], parsed_config['dim']))
     return dot_graph
 
 
 def Nnet3ComponentNodeToDot(parsed_config):
     dot_graph = []
-    dot_graph += Nnet3DescriptorToDot(
-        parsed_config['input'], parsed_config['name'])
+    dot_graph += Nnet3DescriptorToDot(parsed_config['input'],
+                                      parsed_config['name'])
     dot_node = GetDotNodeName(parsed_config['name'])
     dot_graph.append('{0} [ label="{1}", shape=box ]'.format(
         dot_node['node'], dot_node['label']))
-    dot_graph.append('{0} -> {1} [ weight=10 ]'.format(GetDotNodeName(parsed_config['component'], is_component=True)['node'],
-                                                       GetDotNodeName(parsed_config['name'])['node']))
+    dot_graph.append('{0} -> {1} [ weight=10 ]'.format(
+        GetDotNodeName(parsed_config['component'], is_component=True)['node'],
+        GetDotNodeName(parsed_config['name'])['node']))
     return dot_graph
 
 
@@ -439,7 +489,8 @@ def GroupConfigs(configs, node_prefixes=None):
         group = []
         rest = []
         for config in configs:
-            if re.search('^{0}'.format(node_prefix), config[1]['name']) is not None:
+            if re.search('^{0}'.format(node_prefix),
+                         config[1]['name']) is not None:
                 group.append(config)
             else:
                 rest.append(config)
@@ -501,17 +552,26 @@ def ParseConfigLines(lines, node_prefixes=None, component_attributes=None):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Converts the output of nnet3-am-info "
-                                                 "to dot graph. The output has to be compiled"
-                                                 " with dot to generate a displayable graph",
-                                     epilog="See steps/nnet3/nnet3_to_dot.sh for example.")
-    parser.add_argument("--component-attributes", type=str,
-                        help="Attributes of the components which should be displayed in the dot-graph "
-                             "e.g. --component-attributes name,type,input-dim,output-dim", default=None)
-    parser.add_argument("--node-prefixes", type=str,
-                        help="list of prefixes. Nnet3 components/component-nodes with the same prefix"
-                        " will be clustered together in the dot-graph"
-                        " --node-prefixes Lstm1,Lstm2,Layer1", default=None)
+    parser = argparse.ArgumentParser(
+        description="Converts the output of nnet3-am-info "
+        "to dot graph. The output has to be compiled"
+        " with dot to generate a displayable graph",
+        epilog="See steps/nnet3/nnet3_to_dot.sh for example.")
+    parser.add_argument(
+        "--component-attributes",
+        type=str,
+        help=
+        "Attributes of the components which should be displayed in the dot-graph "
+        "e.g. --component-attributes name,type,input-dim,output-dim",
+        default=None)
+    parser.add_argument(
+        "--node-prefixes",
+        type=str,
+        help=
+        "list of prefixes. Nnet3 components/component-nodes with the same prefix"
+        " will be clustered together in the dot-graph"
+        " --node-prefixes Lstm1,Lstm2,Layer1",
+        default=None)
 
     parser.add_argument("dotfile", help="name of the dot output file")
 
@@ -526,8 +586,9 @@ if __name__ == "__main__":
         node_prefixes = args.node_prefixes.split(',')
 
     lines = sys.stdin.readlines()
-    dot_graph = ParseConfigLines(
-        lines, component_attributes=component_attributes, node_prefixes=node_prefixes)
+    dot_graph = ParseConfigLines(lines,
+                                 component_attributes=component_attributes,
+                                 node_prefixes=node_prefixes)
 
     dotfile_handle = open(args.dotfile, "w")
     dotfile_handle.write("\n".join(dot_graph))

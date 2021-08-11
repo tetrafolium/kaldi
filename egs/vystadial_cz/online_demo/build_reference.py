@@ -51,7 +51,9 @@ if __name__ == '__main__':
         print(usage % {'exec': sys.argv[0]}, file=sys.stderr)
         sys.exit(1)
 
-    refers = [os.path.join(target_dir, os.path.basename(scp) + '.tra')
-              for scp in scps]
+    refers = [
+        os.path.join(target_dir,
+                     os.path.basename(scp) + '.tra') for scp in scps
+    ]
     for scp, refer in zip(scps, refers):
         build_reference(scp, refer)

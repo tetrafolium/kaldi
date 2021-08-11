@@ -1,7 +1,6 @@
 # Copyright 2016    Johns Hopkins University (Dan Povey)
 #           2016    Vijayaditya Peddinti
 # Apache 2.0.
-
 """ This module contains the top level xconfig parsing functions.
 """
 
@@ -13,7 +12,6 @@ import libs.nnet3.xconfig.layers as xlayers
 import libs.nnet3.xconfig.utils as xutils
 
 import libs.common as common_lib
-
 
 # We have to modify this dictionary when adding new layers
 config_to_layer = {
@@ -82,9 +80,9 @@ config_to_layer = {
     'no-op-component': xlayers.XconfigNoOpComponent,
     'linear-component': xlayers.XconfigLinearComponent,
     'affine-component': xlayers.XconfigAffineComponent,
-    'scale-component':  xlayers.XconfigPerElementScaleComponent,
+    'scale-component': xlayers.XconfigPerElementScaleComponent,
     'dim-range-component': xlayers.XconfigDimRangeComponent,
-    'offset-component':  xlayers.XconfigPerElementOffsetComponent,
+    'offset-component': xlayers.XconfigPerElementOffsetComponent,
     'combine-feature-maps-layer': xlayers.XconfigCombineFeatureMapsLayer,
     'delta-layer': xlayers.XconfigDeltaLayer
 }
@@ -104,7 +102,8 @@ def xconfig_line_to_object(config_line, prev_layers=None):
         (first_token, key_to_value) = x
         if not first_token in config_to_layer:
             raise RuntimeError("No such layer type '{0}'".format(first_token))
-        return config_to_layer[first_token](first_token, key_to_value, prev_layers)
+        return config_to_layer[first_token](first_token, key_to_value,
+                                            prev_layers)
     except Exception:
         logging.error(
             "***Exception caught while parsing the following xconfig line:\n"
@@ -131,9 +130,8 @@ def get_model_component_info(model_filename):
     try:
         f = open(model_filename, 'r')
     except Exception as e:
-        sys.exit("{0}: error reading model file '{1}'".format(sys.argv[0],
-                                                              model_filename,
-                                                              repr(e)))
+        sys.exit("{0}: error reading model file '{1}'".format(
+            sys.argv[0], model_filename, repr(e)))
 
     # use nnet3-info to get component names in the model.
     out = common_lib.get_command_stdout("""nnet3-info {0} | grep '\-node' """
@@ -154,20 +152,21 @@ def get_model_component_info(model_filename):
             if len(key_value) == 2:
                 key = key_value[0]
                 value = key_value[1]
-                if key == "name":           # name=**
+                if key == "name":  # name=**
                     layer_name = value
-                elif key == "dim":          # for input-node
+                elif key == "dim":  # for input-node
                     dim = int(value)
-                elif key == "output-dim":   # for component-node
+                elif key == "output-dim":  # for component-node
                     dim = int(value)
 
         if layer_name is not None and layer_name not in layer_names:
             layer_names.append(layer_name)
             key_to_value['name'] = layer_name
-            assert(dim != -1)
+            assert (dim != -1)
             key_to_value['dim'] = dim
-            all_layers.append(xlayers.XconfigExistingLayer(
-                'existing', key_to_value, all_layers))
+            all_layers.append(
+                xlayers.XconfigExistingLayer('existing', key_to_value,
+                                             all_layers))
     if len(all_layers) == 0:
         raise RuntimeError("{0}: model filename '{1}' is empty.".format(
             sys.argv[0], model_filename))

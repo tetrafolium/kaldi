@@ -30,7 +30,7 @@ for line in fin:
     if items[4].find(".") != -1:
         letters = items[4].split("._")
         acronym_period = round(float(items[3]), 2)
-        letter_slot = round(acronym_period/len(letters), 2)
+        letter_slot = round(acronym_period / len(letters), 2)
         time_start = round(float(items[2]), 2)
         for l in letters[:-1]:
             time = " %.2f %.2f " % (time_start, letter_slot)
@@ -40,7 +40,7 @@ for line in fin:
         time = " %.2f %.2f " % (time_start, last_slot)
         letters[-1] = re.sub(r"\.'s", "'s", letters[-1])
         letters[-1] = re.sub(r"\.s", "'s", letters[-1])
-        fout.write(' '.join(items[:2]) + time +
-                   letters[-1].replace('.', '') + "\n")
+        fout.write(' '.join(items[:2]) + time + letters[-1].replace('.', '') +
+                   "\n")
     else:
         fout.write(line)

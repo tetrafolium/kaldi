@@ -100,8 +100,8 @@ for line in in_stream:
         if char == '=':
             connected = True
             continue
-        out_stream.write((" " if lastChar else "") + lastChar +
-                         lastType + (" conn" if connected else " sil"))
+        out_stream.write((" " if lastChar else "") + lastChar + lastType +
+                         (" conn" if connected else " sil"))
         if char in map:
             lastChar = map[char]
             if connected:
@@ -132,5 +132,5 @@ for line in in_stream:
         lastType = "E"
     elif lastType == "B":
         lastType = "A"
-    out_stream.write(" "+lastChar+lastType)
+    out_stream.write(" " + lastChar + lastType)
     out_stream.write("\n")

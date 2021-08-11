@@ -36,8 +36,8 @@ with gzip.open(arpa_gz, 'r') as f:
             wrd_log10[wrd] = float(log10_p_unigram)
 
 # Create list, 'wrd id log_p_unigram',
-words_unigram = [
-    [wrd, id, (wrd_log10[wrd] if wrd in wrd_log10 else -99)] for wrd, id in words]
+words_unigram = [[wrd, id, (wrd_log10[wrd] if wrd in wrd_log10 else -99)]
+                 for wrd, id in words]
 
 print(words_unigram[0], file=sys.stderr)
 # Store,

@@ -2,7 +2,6 @@
 
 # Copyright      2017  Chun Chieh Chang
 #                2017  Ashish Arora
-
 """ This script reads the extracted IAM database files and creates
     the following files (for the data subset selected via --dataset):
     text, utt2spk, images.scp.
@@ -20,13 +19,18 @@ import xml.dom.minidom as minidom
 
 parser = argparse.ArgumentParser(description="""Creates text, utt2spk
                                                 and images.scp files.""")
-parser.add_argument('database_path', type=str,
+parser.add_argument('database_path',
+                    type=str,
                     help='Path to the downloaded (and extracted) IAM data')
-parser.add_argument('split_path', type=str,
+parser.add_argument('split_path',
+                    type=str,
                     help='location of the train/test/val set')
-parser.add_argument('out_dir', type=str,
+parser.add_argument('out_dir',
+                    type=str,
                     help='location to write output files.')
-parser.add_argument('--dataset', type=str, default='train',
+parser.add_argument('--dataset',
+                    type=str,
+                    default='train',
                     choices=['train', 'test', 'validation'],
                     help='Subset of data to process.')
 args = parser.parse_args()
@@ -40,11 +44,9 @@ utt2spk_fh = open(utt2spk_file, 'w')
 image_file = os.path.join(args.out_dir + '/', 'images.scp')
 image_fh = open(image_file, 'w')
 
-dataset_path = os.path.join(args.split_path,
-                            args.dataset + '.uttlist')
+dataset_path = os.path.join(args.split_path, args.dataset + '.uttlist')
 
-text_file_path = os.path.join(args.database_path,
-                              'ascii', 'lines.txt')
+text_file_path = os.path.join(args.database_path, 'ascii', 'lines.txt')
 text_dict = {}
 
 
@@ -77,8 +79,8 @@ with open(dataset_path) as f:
         writer_id = form_elements.getAttribute('writer-id')
         outerfolder = form_elements.getAttribute('id')[0:3]
         innerfolder = form_elements.getAttribute('id')
-        lines_path = os.path.join(args.database_path, 'lines',
-                                  outerfolder, innerfolder)
+        lines_path = os.path.join(args.database_path, 'lines', outerfolder,
+                                  innerfolder)
         for file in os.listdir(lines_path):
             if file.endswith(".png"):
                 image_file_path = os.path.join(lines_path, file)

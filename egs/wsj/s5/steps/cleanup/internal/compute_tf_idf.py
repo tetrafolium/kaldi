@@ -25,7 +25,9 @@ def _get_args():
         load IDF stats from a different file instead of computing them from the
         input set of documents.""")
 
-    parser.add_argument("--tf-weighting-scheme", type=str, default="raw",
+    parser.add_argument("--tf-weighting-scheme",
+                        type=str,
+                        default="raw",
                         choices=["binary", "raw", "log", "normalized"],
                         help="""The function applied on the raw
                         term-frequencies f(t,d) when computing tf(t,d).
@@ -35,12 +37,16 @@ def _get_args():
                         log    : tf(t,d) = 1 + log(f(t,d))
                         normalized : tf(t,d) = K + (1-K) * """
                         """f(t,d) / max{f(t',d): t' in d}""")
-    parser.add_argument("--tf-normalization-factor", type=float, default=0.5,
+    parser.add_argument("--tf-normalization-factor",
+                        type=float,
+                        default=0.5,
                         help="K value for normalized TF weighting scheme")
-    parser.add_argument("--idf-weighting-scheme", type=str, default="log",
-                        choices=["unary", "log", "log-smoothed",
-                                 "probabilistic"],
-                        help="""The function applied on the raw
+    parser.add_argument(
+        "--idf-weighting-scheme",
+        type=str,
+        default="log",
+        choices=["unary", "log", "log-smoothed", "probabilistic"],
+        help="""The function applied on the raw
                         inverse-document frequencies n(t) = |d in D: t in d|
                         when computing idf(t,d).
                         IDF weighting schemes:-
@@ -48,23 +54,31 @@ def _get_args():
                         log    : idf(t,D) = log (N / 1 + n(t))
                         log-smoothed : idf(t,D) = log(1 + N / n(t))
                         probabilistic: idf(t,D) = log((N - n(t)) / n(t))""")
-    parser.add_argument("--ngram-order", type=int, default=2,
+    parser.add_argument("--ngram-order",
+                        type=int,
+                        default=2,
                         help="Accumulate for terms upto this n-grams order")
 
-    parser.add_argument("--input-idf-stats", type=argparse.FileType('r'),
+    parser.add_argument("--input-idf-stats",
+                        type=argparse.FileType('r'),
                         help="If provided, IDF stats are loaded from this "
                         "file")
-    parser.add_argument("--output-idf-stats", type=argparse.FileType('w'),
+    parser.add_argument("--output-idf-stats",
+                        type=argparse.FileType('w'),
                         help="If providied, IDF stats are written to this "
                         "file")
-    parser.add_argument("--accumulate-over-docs", type=str, default="true",
+    parser.add_argument("--accumulate-over-docs",
+                        type=str,
+                        default="true",
                         choices=["true", "false"],
                         help="If true, the stats are accumulated over all the "
                         "documents and a single tf-idf-file is written out.")
-    parser.add_argument("docs", type=argparse.FileType('r'),
+    parser.add_argument("docs",
+                        type=argparse.FileType('r'),
                         help="Input documents in kaldi text format i.e. "
                         "<document-id> <text>")
-    parser.add_argument("tf_idf_file", type=argparse.FileType('w'),
+    parser.add_argument("tf_idf_file",
+                        type=argparse.FileType('w'),
                         help="Output tf-idf for each (t,d) pair in the "
                         "input documents written in the format "
                         "<terms> <document-id> <tf-idf>")
@@ -77,9 +91,8 @@ def _get_args():
     args.accumulate_over_docs = bool(args.accumulate_over_docs == "true")
 
     if not args.accumulate_over_docs and args.input_idf_stats is None:
-        raise TypeError(
-            "If --accumulate-over-docs=false is provided, "
-            "then --input-idf-stats must be provided.")
+        raise TypeError("If --accumulate-over-docs=false is provided, "
+                        "then --input-idf-stats must be provided.")
 
     return args
 
@@ -101,7 +114,9 @@ def _run(args):
             # Write the document-id and the corresponding tf-idf values.
             print(doc, file=args.tf_idf_file, end=' ')
             tf_idf.write_tfidf_from_stats(
-                tf_stats, idf_stats, args.tf_idf_file,
+                tf_stats,
+                idf_stats,
+                args.tf_idf_file,
                 tf_weighting_scheme=args.tf_weighting_scheme,
                 idf_weighting_scheme=args.idf_weighting_scheme,
                 tf_normalization_factor=args.tf_normalization_factor,
@@ -110,16 +125,17 @@ def _run(args):
         num_done += 1
 
     if args.accumulate_over_docs:
-        tf_stats.compute_term_stats(idf_stats=idf_stats
-                                    if args.input_idf_stats is None
-                                    else None)
+        tf_stats.compute_term_stats(
+            idf_stats=idf_stats if args.input_idf_stats is None else None)
 
         if args.output_idf_stats is not None:
             idf_stats.write(args.output_idf_stats)
             args.output_idf_stats.close()
 
         tf_idf.write_tfidf_from_stats(
-            tf_stats, idf_stats, args.tf_idf_file,
+            tf_stats,
+            idf_stats,
+            args.tf_idf_file,
             tf_weighting_scheme=args.tf_weighting_scheme,
             idf_weighting_scheme=args.idf_weighting_scheme,
             tf_normalization_factor=args.tf_normalization_factor)

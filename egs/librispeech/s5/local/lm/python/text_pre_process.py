@@ -22,9 +22,11 @@ import nltk
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Pre-process a book's text")
-    parser.add_argument("--in-encoding", default="utf-8",
+    parser.add_argument("--in-encoding",
+                        default="utf-8",
                         help="Encoding to use when reading the input text")
-    parser.add_argument("--out-encoding", default="ascii",
+    parser.add_argument("--out-encoding",
+                        default="ascii",
                         help="Encoding to use when writing the output text")
     parser.add_argument('--sent-end-marker', default="DOTDOTDOT")
     parser.add_argument("in_text", help="Input text")
@@ -97,11 +99,12 @@ def pre_segment(text):
 
 if __name__ == '__main__':
     opts = parse_args()
-    with codecs.open(opts.in_text, 'r', opts.in_encoding, errors='ignore') as src:
+    with codecs.open(opts.in_text, 'r', opts.in_encoding,
+                     errors='ignore') as src:
         text_in = src.read()
 
-    text = unicodedata.normalize(
-        'NFKD', text_in).encode(opts.out_encoding, 'ignore')
+    text = unicodedata.normalize('NFKD',
+                                 text_in).encode(opts.out_encoding, 'ignore')
     text = convert_roman(text)
     text = pre_segment(text)
     text = segment_sentences(text, opts.sent_end_marker)

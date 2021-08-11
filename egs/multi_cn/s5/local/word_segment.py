@@ -2,7 +2,6 @@
 # coding:utf-8
 # this script is copied from hkust/s5/local/hkust_segment.py
 
-
 from __future__ import print_function
 import sys
 from mmseg import seg_txt

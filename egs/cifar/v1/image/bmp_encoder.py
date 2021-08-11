@@ -4,7 +4,6 @@
 # Apache 2.0
 import sys
 import struct
-
 """ Provide an function to write bmp image to stdout with the input two dimensional
     list.
     usage: bmp_encoder(data, width, height)

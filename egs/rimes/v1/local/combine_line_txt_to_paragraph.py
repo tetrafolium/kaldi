@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script creates paragraph level text file. It reads 
     the line level text file and combines them to get
     paragraph level file.
@@ -28,7 +27,6 @@ for line in infile:
     if paragraph_id not in paragraph_txt_dict.keys():
         paragraph_txt_dict[paragraph_id] = dict()
     paragraph_txt_dict[paragraph_id][line_id] = line_text
-
 
 para_txt_dict = dict()
 for para_id in sorted(paragraph_txt_dict.keys()):

@@ -56,7 +56,7 @@ while (text and text[:5] == "ngram"):
     counts = int(ind[1].strip())
     r = ind[0].split()
     read_n = int(r[1].strip())
-    if read_n != n+1:
+    if read_n != n + 1:
         print("invalid ARPA file: {}".format(text))
         sys.exit()
     n = read_n
@@ -68,7 +68,7 @@ while (text and text[:5] == "ngram"):
 sentprob = 0.0  # sentence begin unigram
 ngrams = []
 inf = float("inf")
-for n in range(1, len(cngrams)+1):  # unigrams, bigrams, trigrams
+for n in range(1, len(cngrams) + 1):  # unigrams, bigrams, trigrams
     while (text and "-grams:" not in text):
         text = file.readline()
     if n != int(text[1]):
@@ -76,18 +76,21 @@ for n in range(1, len(cngrams)+1):  # unigrams, bigrams, trigrams
         sys.exit()
     # print text,cngrams[n-1]
     this_ngrams = {}  # stores all read ngrams
-    for ng in range(cngrams[n-1]):
+    for ng in range(cngrams[n - 1]):
         while (text and len(text.split()) < 2):
             text = file.readline()
-            if (not text) or ((len(text.split()) == 1) and (("-grams:" in text) or (text[:5] == "\\end\\"))):
+            if (not text) or ((len(text.split()) == 1) and
+                              (("-grams:" in text) or
+                               (text[:5] == "\\end\\"))):
                 break
-        if (not text) or ((len(text.split()) == 1) and (("-grams:" in text) or (text[:5] == "\\end\\"))):
+        if (not text) or ((len(text.split()) == 1) and
+                          (("-grams:" in text) or (text[:5] == "\\end\\"))):
             break  # to deal with incorrect ARPA files
         entry = text.split()
         prob = float(entry[0])
-        if len(entry) > n+1:
+        if len(entry) > n + 1:
             back = float(entry[-1])
-            words = entry[1:n+1]
+            words = entry[1:n + 1]
         else:
             back = 0.0
             words = entry[1:]
@@ -98,24 +101,26 @@ for n in range(1, len(cngrams)+1):  # unigrams, bigrams, trigrams
         this_ngrams[ngram] = (prob, back)
         # print prob,ngram.encode("utf-8"),back
 
-        for x in range(n-1, 0, -1):
+        for x in range(n - 1, 0, -1):
             # add all missing backoff ngrams for reversed lm
             l_ngram = " ".join(words[:x])  # shortened ngram
-            r_ngram = " ".join(words[1:1+x])  # shortened ngram with offset one
-            if l_ngram not in ngrams[x-1]:  # create missing ngram
-                ngrams[x-1][l_ngram] = (0.0, inf)
+            r_ngram = " ".join(words[1:1 +
+                                     x])  # shortened ngram with offset one
+            if l_ngram not in ngrams[x - 1]:  # create missing ngram
+                ngrams[x - 1][l_ngram] = (0.0, inf)
                 # print ngram, "create 0.0", l_ngram, "inf"
-            if r_ngram not in ngrams[x-1]:  # create missing ngram
-                ngrams[x-1][r_ngram] = (0.0, inf)
+            if r_ngram not in ngrams[x - 1]:  # create missing ngram
+                ngrams[x - 1][r_ngram] = (0.0, inf)
                 # print ngram, "create 0.0", r_ngram, "inf",x,n,h_ngram
 
             # add all missing backoff ngrams for forward lm
-            h_ngram = " ".join(words[n-x:])  # shortened history
-            if h_ngram not in ngrams[x-1]:  # create missing ngram
-                ngrams[x-1][h_ngram] = (0.0, inf)
+            h_ngram = " ".join(words[n - x:])  # shortened history
+            if h_ngram not in ngrams[x - 1]:  # create missing ngram
+                ngrams[x - 1][h_ngram] = (0.0, inf)
                 # print "create inf", h_ngram, "0.0"
         text = file.readline()
-        if (not text) or ((len(text.split()) == 1) and (("-grams:" in text) or (text[:5] == "\\end\\"))):
+        if (not text) or ((len(text.split()) == 1) and
+                          (("-grams:" in text) or (text[:5] == "\\end\\"))):
             break
     ngrams.append(this_ngrams)
 
@@ -141,51 +146,56 @@ file.close()
 
 # compute new reversed ARPA model
 print("\\data\\")
-for n in range(1, len(cngrams)+1):  # unigrams, bigrams, trigrams
-    print("ngram {0} = {1}".format(n, len(ngrams[n-1].keys())))
+for n in range(1, len(cngrams) + 1):  # unigrams, bigrams, trigrams
+    print("ngram {0} = {1}".format(n, len(ngrams[n - 1].keys())))
 offset = 0.0
-for n in range(1, len(cngrams)+1):  # unigrams, bigrams, trigrams
+for n in range(1, len(cngrams) + 1):  # unigrams, bigrams, trigrams
     print("\\{}-grams:".format(n))
-    keys = sorted(ngrams[n-1].keys())
+    keys = sorted(ngrams[n - 1].keys())
     for ngram in keys:
-        prob = ngrams[n-1][ngram]
+        prob = ngrams[n - 1][ngram]
         # reverse word order
         words = ngram.split()
         rstr = " ".join(reversed(words))
         # swap <s> and </s>
-        rev_ngram = rstr.replace("<s>", "<temp>").replace(
-            "</s>", "<s>").replace("<temp>", "</s>")
+        rev_ngram = rstr.replace("<s>", "<temp>").replace("</s>",
+                                                          "<s>").replace(
+                                                              "<temp>", "</s>")
 
         revprob = prob[0]
-        if (prob[1] != inf):  # only backoff weights from not newly created ngrams
+        if (prob[1] !=
+                inf):  # only backoff weights from not newly created ngrams
             revprob = revprob + prob[1]
         # print prob[0],prob[1]
         # sum all missing terms in decreasing ngram order
-        for x in range(n-1, 0, -1):
+        for x in range(n - 1, 0, -1):
             l_ngram = " ".join(words[:x])  # shortened ngram
-            if l_ngram not in ngrams[x-1]:
-                sys.stderr.write(rev_ngram+": not found "+l_ngram+"\n")
-            p_l = ngrams[x-1][l_ngram][0]
+            if l_ngram not in ngrams[x - 1]:
+                sys.stderr.write(rev_ngram + ": not found " + l_ngram + "\n")
+            p_l = ngrams[x - 1][l_ngram][0]
             # print p_l,l_ngram
             revprob = revprob + p_l
 
-            r_ngram = " ".join(words[1:1+x])  # shortened ngram with offset one
-            if r_ngram not in ngrams[x-1]:
-                sys.stderr.write(rev_ngram+": not found "+r_ngram+"\n")
-            p_r = ngrams[x-1][r_ngram][0]
+            r_ngram = " ".join(words[1:1 +
+                                     x])  # shortened ngram with offset one
+            if r_ngram not in ngrams[x - 1]:
+                sys.stderr.write(rev_ngram + ": not found " + r_ngram + "\n")
+            p_r = ngrams[x - 1][r_ngram][0]
             #print -p_r,r_ngram
             revprob = revprob - p_r
 
         if n != len(cngrams):  # not highest order
             back = 0.0
-            if rev_ngram[:3] == "<s>":  # special handling since arpa2fst ignores <s> weight
+            if rev_ngram[:
+                         3] == "<s>":  # special handling since arpa2fst ignores <s> weight
                 if n == 1:
                     offset = revprob  # remember <s> weight
                     revprob = sentprob  # apply <s> weight from forward model
                     back = offset
                 elif n == 2:
                     revprob = revprob + offset  # add <s> weight to bigrams starting with <s>
-            if (prob[1] != inf):  # only backoff weights from not newly created ngrams
+            if (prob[1] !=
+                    inf):  # only backoff weights from not newly created ngrams
                 print(revprob, rev_ngram.encode("utf-8"), back)
             else:
                 print(revprob, rev_ngram.encode("utf-8"), "-100000.0")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """ This script converts characters from utf-8 format to hexadecimal format.
     Eg. word_trans_utf8_to_uxxxx.py <input-file> <output-file>
 """
@@ -16,7 +15,10 @@ output_file = sys.argv[2]
 
 
 def main():
-    with open(input_file, 'r', encoding='utf-8') as fh, open(output_file, 'w', encoding='utf-8') as fh_out:
+    with open(input_file,
+              'r', encoding='utf-8') as fh, open(output_file,
+                                                 'w',
+                                                 encoding='utf-8') as fh_out:
         for utt, uttid in SnorIter(fh):
             for word in utt.split():
                 fh_out.write(utf8_char_to_uxxxx(word[0]))

@@ -30,48 +30,90 @@ from optparse import OptionParser
 usage = "%prog [options] <feat-dim> <num-leaves> <num-hidden-layers> <num-hidden-neurons>  >nnet-proto-file"
 parser = OptionParser(usage)
 
-parser.add_option('--activation-type', dest='activation_type',
-                  help='Select type of activation function : (<Sigmoid>|<Tanh>) [default: %default]',
-                  default='<Sigmoid>', type='string')
-parser.add_option('--num-filters1', dest='num_filters1',
-                  help='Number of filters in first convolutional layer [default: %default]',
-                  default=128, type='int')
-parser.add_option('--num-filters2', dest='num_filters2',
-                  help='Number of filters in second convolutional layer [default: %default]',
-                  default=256, type='int')
-parser.add_option('--pool-size', dest='pool_size',
+parser.add_option(
+    '--activation-type',
+    dest='activation_type',
+    help=
+    'Select type of activation function : (<Sigmoid>|<Tanh>) [default: %default]',
+    default='<Sigmoid>',
+    type='string')
+parser.add_option(
+    '--num-filters1',
+    dest='num_filters1',
+    help='Number of filters in first convolutional layer [default: %default]',
+    default=128,
+    type='int')
+parser.add_option(
+    '--num-filters2',
+    dest='num_filters2',
+    help='Number of filters in second convolutional layer [default: %default]',
+    default=256,
+    type='int')
+parser.add_option('--pool-size',
+                  dest='pool_size',
                   help='Size of pooling [default: %default]',
-                  default=3, type='int')
-parser.add_option('--pool-step', dest='pool_step',
+                  default=3,
+                  type='int')
+parser.add_option('--pool-step',
+                  dest='pool_step',
                   help='Step of pooling [default: %default]',
-                  default=3, type='int')
-parser.add_option('--pool-type', dest='pool_type',
+                  default=3,
+                  type='int')
+parser.add_option('--pool-type',
+                  dest='pool_type',
                   help='Type of pooling (Max || Average) [default: %default]',
-                  default='Max', type='string')
-parser.add_option('--pitch-dim', dest='pitch_dim',
-                  help='Number of features representing pitch [default: %default]',
-                  default=0, type='int')
-parser.add_option('--delta-order', dest='delta_order',
+                  default='Max',
+                  type='string')
+parser.add_option(
+    '--pitch-dim',
+    dest='pitch_dim',
+    help='Number of features representing pitch [default: %default]',
+    default=0,
+    type='int')
+parser.add_option('--delta-order',
+                  dest='delta_order',
                   help='Order of delta features [default: %default]',
-                  default=2, type='int')
-parser.add_option('--splice', dest='splice',
+                  default=2,
+                  type='int')
+parser.add_option('--splice',
+                  dest='splice',
                   help='Length of splice [default: %default]',
-                  default=5, type='int')
-parser.add_option('--patch-step1', dest='patch_step1',
-                  help='Patch step of first convolutional layer [default: %default]',
-                  default=1, type='int')
-parser.add_option('--patch-dim1', dest='patch_dim1',
-                  help='Dim of convolutional kernel in 1st layer (freq. axis) [default: %default]',
-                  default=8, type='int')
-parser.add_option('--patch-dim2', dest='patch_dim2',
-                  help='Dim of convolutional kernel in 2nd layer (freq. axis) [default: %default]',
-                  default=4, type='int')
-parser.add_option('--dir', dest='protodir',
-                  help='Directory, where network prototypes will be saved [default: %default]',
-                  default='.', type='string')
-parser.add_option('--num-pitch-neurons', dest='num_pitch_neurons',
-                  help='Number of neurons in layers processing pitch features [default: %default]',
-                  default='200', type='int')
+                  default=5,
+                  type='int')
+parser.add_option(
+    '--patch-step1',
+    dest='patch_step1',
+    help='Patch step of first convolutional layer [default: %default]',
+    default=1,
+    type='int')
+parser.add_option(
+    '--patch-dim1',
+    dest='patch_dim1',
+    help=
+    'Dim of convolutional kernel in 1st layer (freq. axis) [default: %default]',
+    default=8,
+    type='int')
+parser.add_option(
+    '--patch-dim2',
+    dest='patch_dim2',
+    help=
+    'Dim of convolutional kernel in 2nd layer (freq. axis) [default: %default]',
+    default=4,
+    type='int')
+parser.add_option(
+    '--dir',
+    dest='protodir',
+    help=
+    'Directory, where network prototypes will be saved [default: %default]',
+    default='.',
+    type='string')
+parser.add_option(
+    '--num-pitch-neurons',
+    dest='num_pitch_neurons',
+    help=
+    'Number of neurons in layers processing pitch features [default: %default]',
+    default='200',
+    type='int')
 
 (o, args) = parser.parse_args()
 if len(args) != 1:
@@ -82,11 +124,12 @@ feat_dim = int(args[0])
 # End parse options
 
 # we need number of feats without deltas and splice and pitch
-feat_raw_dim = feat_dim / (o.delta_order+1) / (o.splice*2+1) - o.pitch_dim
+feat_raw_dim = feat_dim / (o.delta_order + 1) / (o.splice * 2 +
+                                                 1) - o.pitch_dim
 
 # Check
-assert(feat_dim > 0)
-assert(o.pool_type == 'Max' or o.pool_type == 'Average')
+assert (feat_dim > 0)
+assert (o.pool_type == 'Max' or o.pool_type == 'Average')
 
 ###
 # Print prototype of the network
@@ -104,7 +147,7 @@ patch_stride2 = num_pool  # same as layer1 outputs
 num_patch2 = 1 + (num_pool - patch_dim2) / patch_step2
 
 inputdim_of_cnn = feat_dim
-outputdim_of_cnn = o.num_filters2*num_patch2
+outputdim_of_cnn = o.num_filters2 * num_patch2
 
 convolution_proto = ''
 
@@ -141,14 +184,19 @@ if (o.pitch_dim > 0):
     # pitch part
     f_pitch = open('%s/nnet.proto.pitch' % o.protodir, 'w')
     f_pitch.write('<NnetProto>\n')
-    f_pitch.write('<AffineTransform> <InputDim> %d <OutputDim> %d <BiasMean> %f <BiasRange> %f <ParamStddev> %f\n' %
-                  ((o.pitch_dim * (o.delta_order+1) * (o.splice*2+1)), o.num_pitch_neurons, -2, 4, 0.02))
-    f_pitch.write('%s <InputDim> %d <OutputDim> %d\n' %
-                  (o.activation_type, o.num_pitch_neurons, o.num_pitch_neurons))
-    f_pitch.write('<AffineTransform> <InputDim> %d <OutputDim> %d <BiasMean> %f <BiasRange> %f <ParamStddev> %f\n' %
-                  (o.num_pitch_neurons, o.num_pitch_neurons, -2, 4, 0.1))
-    f_pitch.write('%s <InputDim> %d <OutputDim> %d\n' %
-                  (o.activation_type, o.num_pitch_neurons, o.num_pitch_neurons))
+    f_pitch.write(
+        '<AffineTransform> <InputDim> %d <OutputDim> %d <BiasMean> %f <BiasRange> %f <ParamStddev> %f\n'
+        % ((o.pitch_dim * (o.delta_order + 1) *
+            (o.splice * 2 + 1)), o.num_pitch_neurons, -2, 4, 0.02))
+    f_pitch.write(
+        '%s <InputDim> %d <OutputDim> %d\n' %
+        (o.activation_type, o.num_pitch_neurons, o.num_pitch_neurons))
+    f_pitch.write(
+        '<AffineTransform> <InputDim> %d <OutputDim> %d <BiasMean> %f <BiasRange> %f <ParamStddev> %f\n'
+        % (o.num_pitch_neurons, o.num_pitch_neurons, -2, 4, 0.1))
+    f_pitch.write(
+        '%s <InputDim> %d <OutputDim> %d\n' %
+        (o.activation_type, o.num_pitch_neurons, o.num_pitch_neurons))
     f_pitch.write('</NnetProto>\n')
     f_pitch.close()
 
@@ -156,12 +204,17 @@ if (o.pitch_dim > 0):
     vector = ''
     for i in range(1, inputdim_of_cnn, feat_raw_dim + o.pitch_dim):
         vector += '%d:1:%d ' % (i, i + feat_raw_dim - 1)
-    for i in range(feat_raw_dim+1, inputdim_of_cnn + 1, feat_raw_dim + o.pitch_dim):
+    for i in range(feat_raw_dim + 1, inputdim_of_cnn + 1,
+                   feat_raw_dim + o.pitch_dim):
         vector += '%d:1:%d ' % (i, i + o.pitch_dim - 1)
-    print('<Copy> <InputDim> %d <OutputDim> %d <BuildVector> %s </BuildVector>' %
-          (inputdim_of_cnn, inputdim_of_cnn, vector))
-    print('<ParallelComponent> <InputDim> %d <OutputDim> %d <NestedNnetProto> %s %s </NestedNnetProto>' %
-          (inputdim_of_cnn, o.num_pitch_neurons + outputdim_of_cnn, '%s/nnet.proto.convolution' % o.protodir, '%s/nnet.proto.pitch' % o.protodir))
+    print(
+        '<Copy> <InputDim> %d <OutputDim> %d <BuildVector> %s </BuildVector>' %
+        (inputdim_of_cnn, inputdim_of_cnn, vector))
+    print(
+        '<ParallelComponent> <InputDim> %d <OutputDim> %d <NestedNnetProto> %s %s </NestedNnetProto>'
+        % (inputdim_of_cnn, o.num_pitch_neurons + outputdim_of_cnn,
+           '%s/nnet.proto.convolution' % o.protodir,
+           '%s/nnet.proto.pitch' % o.protodir))
 
 else:  # no pitch
     print(convolution_proto)

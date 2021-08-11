@@ -11,10 +11,11 @@ def get_args():
     parser = argparse.ArgumentParser(
         description="""This script splits a kaldi text file
         into per_speaker per_session text files""")
-    parser.add_argument("input_text_path", type=str,
-                        help="path of text file")
-    parser.add_argument("output_dir_path", type=str,
-                        help="Output path for per_session per_speaker reference files")
+    parser.add_argument("input_text_path", type=str, help="path of text file")
+    parser.add_argument(
+        "output_dir_path",
+        type=str,
+        help="Output path for per_session per_speaker reference files")
     args = parser.parse_args()
     return args
 
@@ -46,14 +47,17 @@ def main():
             spkr_num += 1
 
     for sessionid_speakerid in sorted(sessionid_speakerid_dict):
-        ref_file = args.output_dir_path + '/ref_' + sessionid_speakerid.split('_')[0] + '_' + str(
-            spkrid_mapping[sessionid_speakerid.split('_')[1]])
+        ref_file = args.output_dir_path + '/ref_' + sessionid_speakerid.split(
+            '_')[0] + '_' + str(
+                spkrid_mapping[sessionid_speakerid.split('_')[1]])
         ref_writer = open(ref_file, 'w')
-        wc_file = args.output_dir_path + '/ref_wc_' + sessionid_speakerid.split('_')[0] + '_' + str(
-            spkrid_mapping[sessionid_speakerid.split('_')[1]])
+        wc_file = args.output_dir_path + '/ref_wc_' + sessionid_speakerid.split(
+            '_')[0] + '_' + str(
+                spkrid_mapping[sessionid_speakerid.split('_')[1]])
         wc_writer = open(wc_file, 'w')
-        combined_ref_file = args.output_dir_path + '/ref_' + sessionid_speakerid.split('_')[0] + '_' + str(
-            spkrid_mapping[sessionid_speakerid.split('_')[1]]) + '_comb'
+        combined_ref_file = args.output_dir_path + '/ref_' + sessionid_speakerid.split(
+            '_')[0] + '_' + str(
+                spkrid_mapping[sessionid_speakerid.split('_')[1]]) + '_comb'
         combined_ref_writer = open(combined_ref_file, 'w')
         utterances = sessionid_speakerid_dict[sessionid_speakerid]
         text = ''

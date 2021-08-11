@@ -2,7 +2,6 @@
 
 # Copyright 2017  Vimal Manohar
 # Apache 2.0
-
 """This script finds the OOV phone by reading the OOV word from
 oov.int in the input <lang> directory and the lexicon
 <lang>/phones/align_lexicon.int.
@@ -46,8 +45,9 @@ def main():
         raise SystemExit(0)
 
     if oov_mapped_to_multiple_phones:
-        raise RuntimeError("OOV word found, but is mapped to multiples phones. "
-                           "This is an unusual case.")
+        raise RuntimeError(
+            "OOV word found, but is mapped to multiples phones. "
+            "This is an unusual case.")
 
     raise RuntimeError("Could not find OOV word in "
                        "{0}/phones/align_lexicon.int".format(lang))

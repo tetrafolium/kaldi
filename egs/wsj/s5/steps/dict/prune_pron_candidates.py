@@ -12,26 +12,40 @@ import math
 
 
 def GetArgs():
-    parser = argparse.ArgumentParser(description="Prune pronunciation candidates based on soft-counts from lattice-alignment"
-                                     "outputs, and a reference lexicon. Basically, for each word we sort all pronunciation"
-                                     "cadidates according to their soft-counts, and then select the top r * N candidates"
-                                     "(For words in the reference lexicon, N = # pron variants given by the reference"
-                                     "lexicon; For oov words, N = avg. # pron variants per word in the reference lexicon)."
-                                     "r is a user-specified constant, like 2.",
-                                     epilog="See steps/dict/learn_lexicon_greedy.sh for example")
+    parser = argparse.ArgumentParser(
+        description=
+        "Prune pronunciation candidates based on soft-counts from lattice-alignment"
+        "outputs, and a reference lexicon. Basically, for each word we sort all pronunciation"
+        "cadidates according to their soft-counts, and then select the top r * N candidates"
+        "(For words in the reference lexicon, N = # pron variants given by the reference"
+        "lexicon; For oov words, N = avg. # pron variants per word in the reference lexicon)."
+        "r is a user-specified constant, like 2.",
+        epilog="See steps/dict/learn_lexicon_greedy.sh for example")
 
-    parser.add_argument("--r", type=float, default="2.0",
-                        help="a user-specified ratio parameter which determines how many"
-                        "pronunciation candidates we want to keep for each word.")
-    parser.add_argument("pron_stats", metavar="<pron-stats>", type=str,
-                        help="File containing soft-counts of all pronounciation candidates; "
-                        "each line must be <soft-counts> <word> <phones>")
-    parser.add_argument("ref_lexicon", metavar="<ref-lexicon>", type=str,
-                        help="Reference lexicon file, where we obtain # pron variants for"
-                        "each word, based on which we prune the pron candidates.")
-    parser.add_argument("pruned_prons", metavar="<pruned-prons>", type=str,
-                        help="A file in lexicon format, which contains prons we want to"
-                        "prune away from the pron_stats file.")
+    parser.add_argument(
+        "--r",
+        type=float,
+        default="2.0",
+        help="a user-specified ratio parameter which determines how many"
+        "pronunciation candidates we want to keep for each word.")
+    parser.add_argument(
+        "pron_stats",
+        metavar="<pron-stats>",
+        type=str,
+        help="File containing soft-counts of all pronounciation candidates; "
+        "each line must be <soft-counts> <word> <phones>")
+    parser.add_argument(
+        "ref_lexicon",
+        metavar="<ref-lexicon>",
+        type=str,
+        help="Reference lexicon file, where we obtain # pron variants for"
+        "each word, based on which we prune the pron candidates.")
+    parser.add_argument(
+        "pruned_prons",
+        metavar="<pruned-prons>",
+        type=str,
+        help="A file in lexicon format, which contains prons we want to"
+        "prune away from the pron_stats file.")
 
     print(' '.join(sys.argv), file=sys.stderr)
 
@@ -58,8 +72,8 @@ def ReadStats(pron_stats_handle):
         if len(splits) == 0:
             continue
         if len(splits) < 2:
-            raise Exception('Invalid format of line ' + line
-                            + ' in stats file.')
+            raise Exception('Invalid format of line ' + line +
+                            ' in stats file.')
         count = float(splits[0])
         word = splits[1]
         phones = ' '.join(splits[2:])
@@ -77,8 +91,8 @@ def ReadLexicon(ref_lexicon_handle):
         if len(splits) == 0:
             continue
         if len(splits) < 2:
-            raise Exception('Invalid format of line ' + line
-                            + ' in lexicon file.')
+            raise Exception('Invalid format of line ' + line +
+                            ' in lexicon file.')
         word = splits[0]
         try:
             phones = ' '.join(splits[2:])

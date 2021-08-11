@@ -2,7 +2,6 @@
 
 # Copyright 2017  Vimal Manohar
 # Apache 2.0
-
 """This script verifies the list of phones read from stdin are valid
 phones present in lang/phones.txt."""
 
@@ -15,7 +14,8 @@ def get_args():
     This script verifies the list of phones read from stdin are valid
     phones present in lang/phones.txt.""")
 
-    parser.add_argument("phones", type=str,
+    parser.add_argument("phones",
+                        type=str,
                         help="File containing the list of all phones as the "
                         "first column")
 
