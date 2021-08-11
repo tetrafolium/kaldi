@@ -123,7 +123,7 @@ void CuArray<T>::CopyFromVec(const std::vector<T> &src) {
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
     CuTimer tim;
-    CU_SAFE_CALL(cudaMemcpyAsync(this->data_, &src.front(), 
+    CU_SAFE_CALL(cudaMemcpyAsync(this->data_, &src.front(),
           src.size()*sizeof(T), cudaMemcpyHostToDevice, cudaStreamPerThread));
     CU_SAFE_CALL(cudaStreamSynchronize(cudaStreamPerThread));
     CuDevice::Instantiate().AccuProfile(__func__, tim);
@@ -313,8 +313,8 @@ void CuArray<T>::Write(std::ostream& out, bool binary) const {
 
 template<typename T>
 CuSubArray<T>::CuSubArray(const CuArrayBase<T> &src,
-                          MatrixIndexT offset,
-                          MatrixIndexT dim) {
+    MatrixIndexT offset,
+    MatrixIndexT dim) {
   KALDI_ASSERT(offset >= 0 && dim >= 0 &&
                offset + dim <= src.Dim());
   this->data_ = src.data_ + offset;

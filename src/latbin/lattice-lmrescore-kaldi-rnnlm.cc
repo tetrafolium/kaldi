@@ -73,9 +73,9 @@ int main(int argc, char *argv[]) {
     }
 
     std::string word_embedding_rxfilename = po.GetArg(1),
-                rnnlm_rxfilename = po.GetArg(2),
-                lats_rspecifier = po.GetArg(3),
-                lats_wspecifier = po.GetArg(4);
+        rnnlm_rxfilename = po.GetArg(2),
+        lats_rspecifier = po.GetArg(3),
+        lats_wspecifier = po.GetArg(4);
 
     kaldi::nnet3::Nnet rnnlm;
     ReadKaldiObject(rnnlm_rxfilename, &rnnlm);
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
         fst::ScaleLattice(fst::GraphLatticeScale(lm_scale), &determinized_clat);
         if (determinized_clat.Start() == fst::kNoStateId) {
           KALDI_WARN << "Empty lattice for utterance " << key
-              << " (incompatible LM?)";
+                     << " (incompatible LM?)";
           n_fail++;
         } else {
           compact_lattice_writer.Write(key, determinized_clat);

@@ -31,10 +31,10 @@ struct PitchInterpolatorOptions {
   BaseFloat max_voicing_prob; // p(voicing) we use at the end of the range when it was observed
   // at one. (probably 0.9 is suitable; allows to not follow observed pitch even if p(voicing)=1.
   BaseFloat max_pitch_change_per_frame;
-  PitchInterpolatorOptions(): pitch_interval(4.0),
-                              interpolator_factor(1.0e-05),
-                              max_voicing_prob(0.9),
-                              max_pitch_change_per_frame(10.0) { }
+  PitchInterpolatorOptions() : pitch_interval(4.0),
+    interpolator_factor(1.0e-05),
+    max_voicing_prob(0.9),
+    max_pitch_change_per_frame(10.0) { }
   void Register(OptionsItf *opts) {
     opts->Register("pitch-interval", &pitch_interval, "Frequency interval in Hz, used "
                    "for the pitch interpolation and smoothing algorithm.");
@@ -45,15 +45,15 @@ struct PitchInterpolatorOptions {
     opts->Register("max-voicing-prob", &max_voicing_prob, "Probability of voicing the "
                    "algorithm uses as the observed p(voicing) approaches 1; having "
                    "value <1 allows it to interpolate even if p(voicing) = 1");
-    opts->Register("max-pitch-change-per-frame", &max_pitch_change_per_frame, 
+    opts->Register("max-pitch-change-per-frame", &max_pitch_change_per_frame,
                    "This value should be set large enough to no longer affect the "
                    "results, but the larger it is the slower the algorithm will be.");
   }
   void Check() const {
     KALDI_ASSERT(pitch_interval > 0.0 && pitch_interval < 20.0 &&
-                 interpolator_factor > 0.0 && interpolator_factor < 1.0 &&
-                 max_voicing_prob <= 1.0 && max_voicing_prob >= 0.5 &&
-                 max_pitch_change_per_frame > 2.0 * pitch_interval);
+        interpolator_factor > 0.0 && interpolator_factor < 1.0 &&
+        max_voicing_prob <= 1.0 && max_voicing_prob >= 0.5 &&
+        max_pitch_change_per_frame > 2.0 * pitch_interval);
   }
 };
 
@@ -62,30 +62,30 @@ struct PitchInterpolatorStats {
   int64 num_frames_zero; // #frames that were zero in original pitch.
   int64 num_frames_changed; // #frames that were not zero originally, but
   // which the algorithm changed.
-  
-  PitchInterpolatorStats(): num_frames_tot(0), num_frames_zero(0),
-                            num_frames_changed(0) { }
+
+  PitchInterpolatorStats() : num_frames_tot(0), num_frames_zero(0),
+    num_frames_changed(0) { }
   void Print() {
     BaseFloat zero_percent = num_frames_zero * 100.0 / num_frames_tot,
         changed_percent = num_frames_changed * 100.0 / num_frames_tot;
-        KALDI_LOG << "Over " << num_frames_tot << " frames, "
-                  << zero_percent << "% were zero at input, and "
-                  << changed_percent << "% were not zero but were changed.";
+    KALDI_LOG << "Over " << num_frames_tot << " frames, "
+              << zero_percent << "% were zero at input, and "
+              << changed_percent << "% were not zero but were changed.";
   }
 };
 
 class PitchInterpolator {
- public:
+public:
   PitchInterpolator(const PitchInterpolatorOptions &opts,
-                    Matrix<BaseFloat> *mat,
-                    PitchInterpolatorStats *stats):
-      opts_(opts) {
+      Matrix<BaseFloat> *mat,
+      PitchInterpolatorStats *stats) :
+    opts_(opts) {
     opts.Check();
     InitValues(*mat);
     Forward();
     Backtrace(mat, stats);
   }
- private:
+private:
   void InitValues(const Matrix<BaseFloat> &mat) {
     BaseFloat pitch_interval = opts_.pitch_interval;
     num_frames_ = mat.NumRows();
@@ -119,7 +119,7 @@ class PitchInterpolator {
     for (int32 f = 0; f < num_frames_; f++) {
       min_pitch_[f] = min_pitch - pitch_interval * RandUniform(); // bottom of
       // discretization range for each frame is randomly different.
-      
+
       BaseFloat pitch = mat(f, 1);
       if (pitch == 0.0) {
         pitch_[f] = 0; // This will actually be a don't-care value; we just put in
@@ -142,11 +142,11 @@ class PitchInterpolator {
     BaseFloat log_constant_prob = Log(constant_prob),
         log_ratio = Log(specified_prob / constant_prob);
     log_alpha_.Add(log_constant_prob); // add log_constant_prob to all pitches at this time.
-    
+
     log_alpha_(pitch_[t]) += log_ratio; // corrects this to be like adding
     // log(specified_prob) to the observed pitch at this time.  Note: if pitch_[t] == 0,
     // this won't have any effect because log_ratio will be zero too.
-    
+
     Vector<BaseFloat> temp_rand(num_pitches_);
     temp_rand.SetRandn(); // Set to Gaussian noise.  Type of noise doesn't really matter.
     log_alpha_.AddVec(0.01, temp_rand); // We add a small amount of noise to the
@@ -161,7 +161,7 @@ class PitchInterpolator {
     KALDI_ASSERT(t > 0);
     BaseFloat pitch_interval = opts_.pitch_interval;
     back_pointers_[t].resize(num_pitches_);
-    
+
     // Transition probability between pitch p and p' on times t-1 and t
     // is (p - p')^2, with the pitch measured in Hz.  We're doing Viterbi,
     // so always pick the max over the previous frame's t.
@@ -177,7 +177,7 @@ class PitchInterpolator {
       for (int32 prev_p = min_prev_p; prev_p <= max_prev_p; prev_p++) {
         BaseFloat delta_pitch = (min_pitch_[t-1] + prev_p * pitch_interval) -
             (min_pitch_[t] + p * pitch_interval);
-        BaseFloat this_logprob = prev_log_alpha_(prev_p) 
+        BaseFloat this_logprob = prev_log_alpha_(prev_p)
             - 0.5 * delta_pitch * delta_pitch;
         if (this_logprob > best_logprob) {
           best_logprob = this_logprob;
@@ -186,9 +186,9 @@ class PitchInterpolator {
       }
       back_pointers_[t][p] = best_prev_p;
       log_alpha_(p) = best_logprob;
-    }    
+    }
   }
-  
+
   void Forward() {
     // Viterbi in a discrete model of the pitch, in which the observation
     // probability of a pitch is p(voicing) at the observed pitch, and
@@ -248,7 +248,7 @@ class PitchInterpolator {
 
 
 
-// Linear Interpolation for places where the pitch value is zero 
+// Linear Interpolation for places where the pitch value is zero
 void LinearlyInterpolatePitch(Matrix<BaseFloat> *mat) {
   int32 num_frames = mat->NumRows();
   int i = 0;
@@ -276,7 +276,7 @@ void LinearlyInterpolatePitch(Matrix<BaseFloat> *mat) {
       // took time derivatives we would have an artificial spike at zero.
       if (start_value < 0.0) start_value = 0.9 * end_value;
       if (end_value < 0.0) end_value = 0.9 * start_value;
-      
+
       for(int k = start + 1; k < end; k++)
         features(k, 1) = start_value +
             (end_value - start_value) / (end - start) * (k - start);
@@ -299,18 +299,18 @@ int main(int argc, char *argv[]) {
         "just linear interpolation across gaps where pitch == 0 (not predicted).\n"
         "Usage:  interpolate-pitch [options...] <feats-rspecifier> <feats-wspecifier>\n";
 
-    
+
     // construct all the global objects
     ParseOptions opts(usage);
 
     bool linear_interpolation = false;
     PitchInterpolatorOptions interpolate_opts;
-    
+
     opts.Register("linear-interpolation",
                 &linear_interpolation, "If true, just do simple linear "
                 "interpolation across gaps (else, model-based)");
     interpolate_opts.Register(&opts);
-    
+
     // parse options (+filling the registered variables)
     opts.Read(argc, argv);
 
@@ -318,7 +318,7 @@ int main(int argc, char *argv[]) {
       opts.PrintUsage();
       exit(1);
     }
-    
+
     std::string input_rspecifier = opts.GetArg(1);
     std::string output_wspecifier = opts.GetArg(2);
 
@@ -326,14 +326,14 @@ int main(int argc, char *argv[]) {
     BaseFloatMatrixWriter kaldi_writer;  // typedef to TableWriter<something>.
 
     if (!kaldi_writer.Open(output_wspecifier))
-       KALDI_ERR << "Could not initialize output with wspecifier "
+      KALDI_ERR << "Could not initialize output with wspecifier "
                 << output_wspecifier;
 
     int32 num_done = 0, num_err = 0;
     PitchInterpolatorStats stats;
-    
+
     for (; !reader.Done(); reader.Next()) {
-      std::string utt = reader.Key();   
+      std::string utt = reader.Key();
       Matrix<BaseFloat> features = reader.Value();
       int num_frames = features.NumRows();
 
@@ -343,7 +343,7 @@ int main(int argc, char *argv[]) {
         num_err++;
         continue;
       }
-      
+
       if (linear_interpolation) LinearlyInterpolatePitch(&features);
       else {
         // work happens in constructor of this class.
@@ -351,7 +351,7 @@ int main(int argc, char *argv[]) {
       }
       kaldi_writer.Write(utt, features);
       num_done++;
-        
+
       if (num_done % 10 == 0)
         KALDI_LOG << "Processed " << num_done << " utterances";
       KALDI_VLOG(2) << "Processed features for key " << utt;

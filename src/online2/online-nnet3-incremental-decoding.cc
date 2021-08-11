@@ -26,17 +26,17 @@ namespace kaldi {
 
 template <typename FST>
 SingleUtteranceNnet3IncrementalDecoderTpl<FST>::SingleUtteranceNnet3IncrementalDecoderTpl(
-    const LatticeIncrementalDecoderConfig &decoder_opts,
-    const TransitionModel &trans_model,
-    const nnet3::DecodableNnetSimpleLoopedInfo &info,
-    const FST &fst,
-    OnlineNnet2FeaturePipeline *features):
-    decoder_opts_(decoder_opts),
-    input_feature_frame_shift_in_seconds_(features->FrameShiftInSeconds()),
-    trans_model_(trans_model),
-    decodable_(trans_model_, info,
-               features->InputFeature(), features->IvectorFeature()),
-    decoder_(fst, trans_model, decoder_opts_) {
+  const LatticeIncrementalDecoderConfig &decoder_opts,
+  const TransitionModel &trans_model,
+  const nnet3::DecodableNnetSimpleLoopedInfo &info,
+  const FST &fst,
+  OnlineNnet2FeaturePipeline *features) :
+  decoder_opts_(decoder_opts),
+  input_feature_frame_shift_in_seconds_(features->FrameShiftInSeconds()),
+  trans_model_(trans_model),
+  decodable_(trans_model_, info,
+      features->InputFeature(), features->IvectorFeature()),
+  decoder_(fst, trans_model, decoder_opts_) {
   decoder_.InitDecoding();
 }
 
@@ -53,13 +53,13 @@ void SingleUtteranceNnet3IncrementalDecoderTpl<FST>::AdvanceDecoding() {
 
 template <typename FST>
 void SingleUtteranceNnet3IncrementalDecoderTpl<FST>::GetBestPath(bool end_of_utterance,
-                                              Lattice *best_path) const {
+    Lattice *best_path) const {
   decoder_.GetBestPath(best_path, end_of_utterance);
 }
 
 template <typename FST>
 bool SingleUtteranceNnet3IncrementalDecoderTpl<FST>::EndpointDetected(
-    const OnlineEndpointConfig &config) {
+  const OnlineEndpointConfig &config) {
   BaseFloat output_frame_shift =
       input_feature_frame_shift_in_seconds_ *
       decodable_.FrameSubsamplingFactor();

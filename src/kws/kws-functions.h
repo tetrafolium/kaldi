@@ -33,7 +33,7 @@ namespace kaldi {
 // another interval and returns the overlap of that interval and the current
 // interval.
 class Interval {
- public:
+public:
   Interval() {}
   Interval(int32 start, int32 end) : start_(start), end_(end) {}
   Interval(const Interval &interval) : start_(interval.Start()), end_(interval.End()) {}
@@ -45,7 +45,7 @@ class Interval {
   int32 End() const {return end_;}
   ~Interval() {}
 
- private:
+private:
   int32 start_;
   int32 end_;
 };
@@ -54,7 +54,7 @@ class Interval {
 // &i2) to compare the Interval defined above. If interval i1 is in front of
 // interval i2, then return true; otherwise return false.
 bool CompareInterval(const Interval &i1,
-                     const Interval &i2);
+    const Interval &i2);
 
 // This function clusters the arcs with same word id and overlapping time-spans.
 // Examples of clusters:
@@ -64,7 +64,7 @@ bool CompareInterval(const Interval &i1,
 // It puts disambiguating symbols in the olabels, leaving the words on the
 // ilabels.
 bool ClusterLattice(CompactLattice *clat,
-                    const std::vector<int32> &state_times);
+    const std::vector<int32> &state_times);
 
 // This function contains two steps: weight pushing and factor generation. The
 // original ShortestDistance() is not very efficient, so we do the weight
@@ -72,9 +72,9 @@ bool ClusterLattice(CompactLattice *clat,
 // factor generation step expand the lattice to the LXTXT' semiring, with
 // additional start state and end state (and corresponding arcs) added.
 bool CreateFactorTransducer(const CompactLattice &clat,
-                            const std::vector<int32> &state_times,
-                            int32 utterance_id,
-                            KwsProductFst *factor_transducer);
+    const std::vector<int32> &state_times,
+    int32 utterance_id,
+    KwsProductFst *factor_transducer);
 
 // This function removes the arcs with long silence. By "long" we mean arcs with
 // #frames exceeding the given max_silence_frames. We do this filtering because
@@ -83,13 +83,13 @@ bool CreateFactorTransducer(const CompactLattice &clat,
 // step, so the "search area" is limited to the original arcs before factor
 // generation.
 void RemoveLongSilences(int32 max_silence_frames,
-                        const std::vector<int32> &state_times,
-                        KwsProductFst *factor_transducer);
+    const std::vector<int32> &state_times,
+    KwsProductFst *factor_transducer);
 
 // Do the factor merging part: encode input and output, and apply weighted
 // epsilon removal, determinization and minimization.  Modifies factor_transducer.
 void DoFactorMerging(KwsProductFst *factor_transducer,
-                     KwsLexicographicFst *index_transducer);
+    KwsLexicographicFst *index_transducer);
 
 // Do the factor disambiguation step: remove the cluster id's for the non-final
 // arcs and insert disambiguation symbols for the final arcs
@@ -97,8 +97,8 @@ void DoFactorDisambiguation(KwsLexicographicFst *index_transducer);
 
 // Do the optimization: do encoded determinization, minimization
 void OptimizeFactorTransducer(KwsLexicographicFst *index_transducer,
-                              int32 max_states,
-                              bool allow_partial);
+    int32 max_states,
+    bool allow_partial);
 
 // the following two functions will, if GetVerboseLevel() >= 2, check that the
 // cost of the second-best path in the transducers is not negative, and print
@@ -115,7 +115,7 @@ void MaybeDoSanityCheck(const KwsLexicographicFst &index_transducer);
 // in the header because, for the sake of compilation time, we split up the
 // implementation into two .cc files.
 class KwsProductFstToKwsLexicographicFstMapper {
- public:
+public:
   typedef KwsProductArc FromArc;
   typedef KwsProductWeight FromWeight;
   typedef KwsLexicographicArc ToArc;
@@ -126,9 +126,9 @@ class KwsProductFstToKwsLexicographicFstMapper {
   inline ToArc operator()(const FromArc &arc) const {
     return ToArc(arc.ilabel,
                  arc.olabel,
-                 (arc.weight == FromWeight::Zero() ?
-                  ToWeight::Zero() :
-                  ToWeight(arc.weight.Value1().Value(),
+               (arc.weight == FromWeight::Zero() ?
+               ToWeight::Zero() :
+               ToWeight(arc.weight.Value1().Value(),
                            StdLStdWeight(arc.weight.Value2().Value1().Value(),
                                          arc.weight.Value2().Value2().Value()))),
                  arc.nextstate);

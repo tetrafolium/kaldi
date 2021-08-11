@@ -35,7 +35,7 @@ namespace rnnlm {
     and similar purposes.
  */
 class RnnlmCoreComputer {
- public:
+public:
   /** Constructor.
        @param [in] nnet   The neural network that is to be used to evaluate
                           likelihoods (and possibly derivatives).
@@ -63,47 +63,47 @@ class RnnlmCoreComputer {
                            of minibatch.output_weights).
        @param [out] word_embedding_deriv  If supplied, the derivative of the
                             objective function w.r.t. the word embedding will be
-                            *added* to this location; it must have the same
+   * added* to this location; it must have the same
                             dimension as 'word_embedding'.
        @return objf      The total objective function for this minibatch; divide
                          this by '*weight' to normalize it (i.e. get the average
                          log-prob per word).
    */
   BaseFloat Compute(const RnnlmExample &minibatch,
-                    const RnnlmExampleDerived &derived,
-                    const CuMatrixBase<BaseFloat> &word_embedding,
-                    BaseFloat *weight = NULL,
-                    CuMatrixBase<BaseFloat> *word_embedding_deriv = NULL);
+      const RnnlmExampleDerived &derived,
+      const CuMatrixBase<BaseFloat> &word_embedding,
+      BaseFloat *weight = NULL,
+      CuMatrixBase<BaseFloat> *word_embedding_deriv = NULL);
 
- private:
+private:
 
   void ProvideInput(const RnnlmExample &minibatch,
-                    const RnnlmExampleDerived &derived,
-                    const CuMatrixBase<BaseFloat> &word_embedding,
-                    nnet3::NnetComputer *computer);
+      const RnnlmExampleDerived &derived,
+      const CuMatrixBase<BaseFloat> &word_embedding,
+      nnet3::NnetComputer *computer);
 
   /** Process the output of the neural net and compute the objective function;
       store stats from the objective function in objf_info_.
-   @param [in] minibatch  The minibatch for which we're proessing the output.
-   @param [in] derived  Derived quantities from the minibatch.
-   @param [in] word_embedding  The word embedding, with the same numbering as
+     @param [in] minibatch  The minibatch for which we're proessing the output.
+     @param [in] derived  Derived quantities from the minibatch.
+     @param [in] word_embedding  The word embedding, with the same numbering as
                       used in the minibatch (may be subsampled at this point).
-   @param [out] word_embedding_deriv  If non-NULL, the part of the derivative
+     @param [out] word_embedding_deriv  If non-NULL, the part of the derivative
                       w.r.t. the word-embedding that arises from the output
                       computation will be *added* to here.
-   @param [out] weight  If non-NULL, this function will output to this location
+     @param [out] weight  If non-NULL, this function will output to this location
                the total weight of the output words, which can be used as
                the normalizer for the (returned) objective function.
-   @return  Returns the total objective function (of the form:
+     @return  Returns the total objective function (of the form:
             \sum_i weight(i) * ( num_term(i) + den_term(i) ), see rnnlm-example-utils.h
             for more information about this.
-  */
+   */
   BaseFloat ProcessOutput(const RnnlmExample &minibatch,
-                          const RnnlmExampleDerived &derived,
-                          const CuMatrixBase<BaseFloat> &word_embedding,
-                          nnet3::NnetComputer *computer,
-                          CuMatrixBase<BaseFloat> *word_embedding_deriv,
-                          BaseFloat *weight);
+      const RnnlmExampleDerived &derived,
+      const CuMatrixBase<BaseFloat> &word_embedding,
+      nnet3::NnetComputer *computer,
+      CuMatrixBase<BaseFloat> *word_embedding_deriv,
+      BaseFloat *weight);
 
   const nnet3::Nnet &nnet_;
 

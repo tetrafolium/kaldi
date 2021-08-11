@@ -37,15 +37,15 @@ namespace kaldi {
 // means we're keeping all dimensions that have any variation at all.
 
 void Sgmm2Project::ComputeProjection(const AmSgmm2 &sgmm,
-                                     const Matrix<BaseFloat> &inv_lda_mllt,
-                                     int32 start_dim,
-                                     int32 end_dim, // last dim plus one
-                                     Matrix<BaseFloat> *projection) {
+    const Matrix<BaseFloat> &inv_lda_mllt,
+    int32 start_dim,
+    int32 end_dim,                                  // last dim plus one
+    Matrix<BaseFloat> *projection) {
   Matrix<double> inv_lda_mllt_dbl(inv_lda_mllt);
   KALDI_ASSERT(inv_lda_mllt.NumRows() == inv_lda_mllt.NumCols());
-  
+
   // First, to compute the projection that we're going to use:
-  
+
   SpMatrix<double> B; // between-class covar.
   SpMatrix<double> W; // within-class covar.
 
@@ -76,7 +76,7 @@ void Sgmm2Project::ComputeProjection(const AmSgmm2 &sgmm,
   // for the rejected dimensions].
   for (int32 i = model_dim; i < full_dim; i++)
     W(i, i) = 1.0;
-  
+
   // Next, we'll project these "extended" stats with the "inv_lda_mllt"
   // matrix, which takes us into the space where we were before LDA+MLLT.
   SpMatrix<double> B_orig(full_dim), W_orig(full_dim);
@@ -88,30 +88,30 @@ void Sgmm2Project::ComputeProjection(const AmSgmm2 &sgmm,
   Matrix<double> B_orig_mat(B_orig), W_orig_mat(W_orig); // Get them as full matrices...
   SpMatrix<double> B_orig_limit(B_orig_mat.Range(start_dim, end_dim-start_dim,
                                                  start_dim, end_dim-start_dim)),
-      W_orig_limit(W_orig_mat.Range(start_dim, end_dim-start_dim,
+  W_orig_limit(W_orig_mat.Range(start_dim, end_dim-start_dim,
                                     start_dim, end_dim-start_dim));
-  
+
   Matrix<double> proj;
   int32 retained_dim = model_dim;
   if (end_dim - start_dim < retained_dim) retained_dim = end_dim - start_dim;
   ComputeLdaTransform(B_orig_limit, W_orig_limit, retained_dim, &proj);
-  
+
   // Now proj has the projection from the "limited-dimension" space.
   // We want a projection from the entire space.
-  
+
   projection->Resize(retained_dim, full_dim); // This projection (which we output) will project from
   // full_dim to retained_dim; it goes from the pre-LDA+MLLT space to "retained_dim" which
   // is <= model_dim.
-  
+
   // Copy the relevant dimensions of "projection" from the "proj" matrix that
   // we just computed.  The rest remain zero (corresponding to discarded dimensions).
   projection->Range(0, retained_dim, start_dim, end_dim-start_dim).CopyFromMat(proj);
 }
 
 void Sgmm2Project::ComputeLdaTransform(const SpMatrix<double> &B,
-                                       const SpMatrix<double> &W,
-                                       int32 dim_to_retain, 
-                                       Matrix<double> *Projection) {
+    const SpMatrix<double> &W,
+    int32 dim_to_retain,
+    Matrix<double> *Projection) {
   int32 dim = B.NumRows();
   KALDI_ASSERT(dim_to_retain <= dim);
 
@@ -121,12 +121,12 @@ void Sgmm2Project::ComputeLdaTransform(const SpMatrix<double> &B,
   // T^{-1} is the projection that makes W unit.
   TpMatrix<double> Tinv(T); // get inverse of T.
   Tinv.Invert();
-  
+
   // Now project B_orig with Tinv, to get between-class scatter in space where
   // W_orig is unit.
   SpMatrix<double> B_proj(dim);
   B_proj.AddTp2Sp(1.0, Tinv, kNoTrans, B, 0.0);
-  
+
   // Now, in this space, do SVD.
 
   Matrix<double> P(dim, dim);
@@ -161,8 +161,8 @@ void Sgmm2Project::ComputeLdaTransform(const SpMatrix<double> &B,
 
 
 void Sgmm2Project::ComputeLdaStats(const FullGmm &full_ubm,
-                                   SpMatrix<double> *between_covar,
-                                   SpMatrix<double> *within_covar) {
+    SpMatrix<double> *between_covar,
+    SpMatrix<double> *within_covar) {
   int32 dim = full_ubm.Dim(); // Feature dimension.
   between_covar->Resize(dim); // zeroes it.
   within_covar->Resize(dim); // zeroes it.
@@ -178,18 +178,18 @@ void Sgmm2Project::ComputeLdaStats(const FullGmm &full_ubm,
 }
 
 void Sgmm2Project::ApplyProjection(const Matrix<BaseFloat> &total_projection,
-                                   AmSgmm2 *sgmm) {
+    AmSgmm2 *sgmm) {
   int32 dim = sgmm->FeatureDim();
   int32 retained_dim = total_projection.NumRows();
   KALDI_ASSERT(retained_dim <= dim);
-  
+
   // Note: small_projection is as total_projection but ignoring the
   // higher dimensions of the input... this is valid as far as the means
   // are concerned, because we extend with zeros.
   SubMatrix<BaseFloat> small_projection(total_projection, 0, retained_dim, 0, dim);
   Matrix<double> small_projection_dbl(small_projection);
   Matrix<double> total_projection_dbl(total_projection);
-  
+
   int32 I = sgmm->NumGauss();
   for (int32 i = 0; i < I; i++) {
     {
@@ -206,7 +206,7 @@ void Sgmm2Project::ApplyProjection(const Matrix<BaseFloat> &total_projection,
     }
     ProjectVariance(total_projection_dbl, true, // inverted,
                     &(sgmm->SigmaInv_[i]));
-  }    
+  }
 
   { // Project full_ubm.
     FullGmmNormal full_ubm_normal(sgmm->full_ubm_);
@@ -228,8 +228,8 @@ void Sgmm2Project::ApplyProjection(const Matrix<BaseFloat> &total_projection,
 }
 
 void Sgmm2Project::ProjectVariance(const Matrix<double> &total_projection,
-                                   bool inverse,
-                                   SpMatrix<double> *variance) {
+    bool inverse,
+    SpMatrix<double> *variance) {
   if (inverse) {
     SpMatrix<double> inv_var(*variance);
     inv_var.Invert();
@@ -252,8 +252,8 @@ void Sgmm2Project::ProjectVariance(const Matrix<double> &total_projection,
 }
 
 void Sgmm2Project::ProjectVariance (const Matrix<double> &total_projection,
-                                    bool inverse,
-                                    SpMatrix<float> *variance) {
+    bool inverse,
+    SpMatrix<float> *variance) {
   SpMatrix<double> variance_dbl(*variance);
   ProjectVariance(total_projection, inverse, &variance_dbl);
   if (variance->NumRows() != variance_dbl.NumRows())

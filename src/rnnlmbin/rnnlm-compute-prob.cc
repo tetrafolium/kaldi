@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
     if (!IsSimpleNnet(rnnlm))
       KALDI_ERR << "Input RNNLM in " << rnnlm_rxfilename
                 << " is not the type of neural net we were looking for; "
-          "failed IsSimpleNnet().";
+        "failed IsSimpleNnet().";
     if (batchnorm_test_mode)
       SetBatchnormTestMode(true, &rnnlm);
     if (dropout_test_mode)

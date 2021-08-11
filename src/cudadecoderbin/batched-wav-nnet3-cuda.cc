@@ -37,10 +37,10 @@ using namespace cuda_decoder;
 #define KALDI_CUDA_DECODER_BIN_PIPELINE_FULL_SLEEP ((double)1 / 1e5)
 
 void GetDiagnosticsAndPrintOutput(const std::string &utt,
-                                  const fst::SymbolTable *word_syms,
-                                  const CompactLattice &clat,
-                                  std::mutex *stdout_mutex,
-                                  int64 *tot_num_frames, double *tot_like) {
+    const fst::SymbolTable *word_syms,
+    const CompactLattice &clat,
+    std::mutex *stdout_mutex,
+    int64 *tot_num_frames, double *tot_like) {
   if (clat.NumStates() == 0) {
     KALDI_WARN << "Empty lattice.";
     return;
@@ -85,12 +85,12 @@ void GetDiagnosticsAndPrintOutput(const std::string &utt,
 // concurrently,
 // so it must be threadsafe
 void FinishOneDecode(const std::string &utt, const std::string &key,
-                     const fst::SymbolTable *word_syms,
-                     BatchedThreadedNnet3CudaPipeline *cuda_pipeline,
-                     int64 *num_frames, double *tot_like,
-                     CompactLatticeWriter *clat_writer,
-                     std::mutex *clat_writer_mutex, std::mutex *stdout_mutex,
-                     const bool write_lattice, CompactLattice &clat) {
+    const fst::SymbolTable *word_syms,
+    BatchedThreadedNnet3CudaPipeline *cuda_pipeline,
+    int64 *num_frames, double *tot_like,
+    CompactLatticeWriter *clat_writer,
+    std::mutex *clat_writer_mutex, std::mutex *stdout_mutex,
+    const bool write_lattice, CompactLattice &clat) {
   nvtxRangePushA("FinishOneDecode");
   GetDiagnosticsAndPrintOutput(utt, word_syms, clat, stdout_mutex, num_frames,
                                tot_like);
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
     BatchedThreadedNnet3CudaPipeline cuda_pipeline(batched_decoder_config);
 
     std::string nnet3_rxfilename = po.GetArg(1), fst_rxfilename = po.GetArg(2),
-                wav_rspecifier = po.GetArg(3), clat_wspecifier = po.GetArg(4);
+        wav_rspecifier = po.GetArg(3), clat_wspecifier = po.GetArg(4);
 
     TransitionModel trans_model;
     nnet3::AmNnetSimple am_nnet;
@@ -242,27 +242,27 @@ int main(int argc, char *argv[]) {
         // Creating a function alias for the callback function of that utterance
         auto finish_one_decode_lamba =
             [
-                // Capturing the arguments that will change by copy
-                utt, key, 
-                // Capturing the const/global args by reference
-                &word_syms, &cuda_pipeline, &stdout_mutex, &num_frames,
-                &clat_write_mutex, &clat_writer, &write_lattice,
-                &tot_like]
+          // Capturing the arguments that will change by copy
+          utt, key,
+          // Capturing the const/global args by reference
+          &word_syms, &cuda_pipeline, &stdout_mutex, &num_frames,
+          &clat_write_mutex, &clat_writer, &write_lattice,
+          &tot_like]
             // The callback function receive the compact lattice as argument
             // if determinize_lattice is true, it is a determinized lattice
             // otherwise, it is a raw lattice converted to compact format
             // through ConvertLattice
-            (CompactLattice & clat_in) {
+              (CompactLattice & clat_in) {
               // Content of our callback function. Calling the general
               // FinishOneDecode function with the proper arguments
               FinishOneDecode(
-                  // Captured arguments used to specialize FinishOneDecode for
-                  // this task
+                // Captured arguments used to specialize FinishOneDecode for
+                // this task
                   utt, key, word_syms, &cuda_pipeline, &num_frames, &tot_like,
-                  &clat_writer, &clat_write_mutex, &stdout_mutex, 
+                  &clat_writer, &clat_write_mutex, &stdout_mutex,
                   write_lattice,
-                  // Generated lattice that will be passed once the task is
-                  // complete
+                // Generated lattice that will be passed once the task is
+                // complete
                   clat_in);
             };
         // Adding a new task. Once the output lattice is ready, it will call
@@ -277,7 +277,7 @@ int main(int argc, char *argv[]) {
         nvtxRangePop();
         if (num_todo != -1 && num_task_submitted >= num_todo) break;
       }  // end utterance loop
-      
+
       std::string group_done;
       // Non-blocking way to check if a group is done
       // returns false if zero groups are ready
@@ -324,7 +324,7 @@ int main(int argc, char *argv[]) {
 
     cuda_pipeline.Finalize();
     cudaDeviceSynchronize();
-      
+
     delete word_syms;  // will delete if non-NULL.
 
     return 0;

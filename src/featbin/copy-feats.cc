@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     int32 num_done = 0;
 
     CompressionMethod compression_method = static_cast<CompressionMethod>(
-        compression_method_in);
+      compression_method_in);
 
     if (ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier) {
       // Copying tables of features.

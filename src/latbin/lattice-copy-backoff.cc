@@ -38,9 +38,9 @@ int main(int argc, char *argv[]) {
         "<lat-rspecifier2> <lat-wspecifier>\n"
         " e.g.: lattice-copy-backoff ark:bad_but_complete.lat "
         "ark:good_but_incomplete.lat ark:out.lat\n";
-      
+
     ParseOptions po(usage);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 3) {
@@ -51,9 +51,9 @@ int main(int argc, char *argv[]) {
     std::string lats_rspecifier1 = po.GetArg(1),
         lats_rspecifier2 = po.GetArg(2),
         lats_wspecifier = po.GetArg(3);
-    
+
     int32 n_done = 0, n_backed_off = 0;
-    
+
     SequentialCompactLatticeReader lattice_reader1(lats_rspecifier1);
     RandomAccessCompactLatticeReader lattice_reader2(lats_rspecifier2);
     CompactLatticeWriter lattice_writer(lats_wspecifier);

@@ -41,12 +41,12 @@ int main(int argc, char *argv[]) {
 
     NnetMixupConfig config;
     bool binary_write = true;
-    
+
     ParseOptions po(usage);
     config.Register(&po);
 
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 2) {
       po.PrintUsage();
       exit(1);
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     std::string nnet_rxfilename = po.GetArg(1),
         nnet_wxfilename = po.GetArg(2);
-    
+
     TransitionModel trans_model;
     AmNnet am_nnet;
     {

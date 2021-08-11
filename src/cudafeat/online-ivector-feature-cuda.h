@@ -28,16 +28,16 @@
 namespace kaldi {
 
 class IvectorExtractorFastCuda {
- public:
+public:
   IvectorExtractorFastCuda(const OnlineIvectorExtractionConfig &config)
-      : b_(0), tot_post_(2) {
+    : b_(0), tot_post_(2) {
     if (config.use_most_recent_ivector == false) {
       KALDI_WARN
-          << "IvectorExractorFastCuda: Ignoring use_most_recent_ivector=false.";
+        << "IvectorExractorFastCuda: Ignoring use_most_recent_ivector=false.";
     }
     if (config.greedy_ivector_extractor == false) {
       KALDI_WARN << "IvectorExractorFastCuda: Ignoring "
-                    "greedy_ivector_extractor=false.";
+        "greedy_ivector_extractor=false.";
     }
 
     info_.Init(config);
@@ -83,7 +83,7 @@ class IvectorExtractorFastCuda {
   int32 IvectorDim() const { return ivector_dim_; }
   int32 NumGauss() const { return num_gauss_; }
 
- private:
+private:
   OnlineIvectorExtractionInfo info_;
 
   IvectorExtractorFastCuda(IvectorExtractorFastCuda const &);
@@ -92,18 +92,18 @@ class IvectorExtractorFastCuda {
   void Read(const kaldi::OnlineIvectorExtractionConfig &config);
 
   void SpliceFeats(const CuMatrixBase<BaseFloat> &feats,
-                   CuMatrix<BaseFloat> *spliced_feats);
+      CuMatrix<BaseFloat> *spliced_feats);
 
   void ComputePosteriors(const CuMatrixBase<float> &feats,
-                         CuMatrix<float> *posteriors);
+      CuMatrix<float> *posteriors);
 
   void ComputeIvectorStats(const CuMatrixBase<float> &feats,
-                           const CuMatrixBase<float> &posteriors,
-                           CuVector<float> *gamma, CuMatrix<float> *X);
+      const CuMatrixBase<float> &posteriors,
+      CuVector<float> *gamma, CuMatrix<float> *X);
 
   void ComputeIvectorFromStats(const CuVector<float> &gamma,
-                               const CuMatrix<float> &X,
-                               CuVector<float> *ivector);
+      const CuMatrix<float> &X,
+      CuVector<float> *ivector);
 
   CudaOnlineCmvnState naive_cmvn_state_;
 

@@ -29,14 +29,14 @@ namespace nnet3 {
 
 
 NnetBatchComputer::NnetBatchComputer(
-    const NnetBatchComputerOptions &opts,
-    const Nnet &nnet,
-    const VectorBase<BaseFloat> &priors):
-    opts_(opts),
-    nnet_(nnet),
-    compiler_(nnet_, opts.optimize_config),
-    log_priors_(priors),
-    num_full_minibatches_(0) {
+  const NnetBatchComputerOptions &opts,
+  const Nnet &nnet,
+  const VectorBase<BaseFloat> &priors) :
+  opts_(opts),
+  nnet_(nnet),
+  compiler_(nnet_, opts.optimize_config),
+  log_priors_(priors),
+  num_full_minibatches_(0) {
   log_priors_.ApplyLog();
   opts_.CheckAndFixConfigs(nnet_.Modulus());
   KALDI_ASSERT(opts_.minibatch_size >= 1 && opts_.edge_minibatch_size >= 1 &&
@@ -71,10 +71,10 @@ void NnetBatchComputer::PrintMinibatchStats() {
   os << "Minibatch stats: seconds-taken,frames-in:frames-out*minibatch-size=num-done(percent-full%)  ";
 
   for (MapType::const_iterator iter = tasks_.begin();
-       iter != tasks_.end(); ++iter) {
+      iter != tasks_.end(); ++iter) {
     for (std::map<int32, MinibatchSizeInfo>::const_iterator
-             miter = iter->second.minibatch_info.begin();
-         miter != iter->second.minibatch_info.end(); ++miter) {
+        miter = iter->second.minibatch_info.begin();
+        miter != iter->second.minibatch_info.end(); ++miter) {
       const ComputationGroupKey &key = iter->first;
       const MinibatchSizeInfo &minfo = miter->second;
       MinibatchStats stats;
@@ -88,7 +88,7 @@ void NnetBatchComputer::PrintMinibatchStats() {
       tot_minibatches += minfo.num_done;
       tot_time += minfo.seconds_taken;
       stats.percent_full = int32(minfo.tot_num_tasks * 100.0 /
-                                 (stats.minibatch_size * stats.num_done));
+              (stats.minibatch_size * stats.num_done));
       all_stats.push_back(stats);
     }
   }
@@ -121,7 +121,7 @@ NnetBatchComputer::~NnetBatchComputer() {
   if (num_pending_tasks > 0)
     KALDI_ERR << "Tasks are pending but object is being destroyed";
   for (auto iter = no_more_than_n_minibatches_full_.begin();
-       iter != no_more_than_n_minibatches_full_.end(); ++iter) {
+      iter != no_more_than_n_minibatches_full_.end(); ++iter) {
     std::condition_variable *cond = iter->second;
     // the next call will notify any threads that were waiting on this condition
     // variable-- there shouldn't be any, though, as it would be a programming
@@ -134,9 +134,9 @@ NnetBatchComputer::~NnetBatchComputer() {
 
 NnetBatchComputer::MinibatchSizeInfo*
 NnetBatchComputer::GetHighestPriorityComputation(
-    bool allow_partial_minibatch,
-    int32 *minibatch_size_out,
-    std::vector<NnetInferenceTask*> *tasks) {
+  bool allow_partial_minibatch,
+  int32 *minibatch_size_out,
+  std::vector<NnetInferenceTask*> *tasks) {
   tasks->clear();
   std::unique_lock<std::mutex> lock(mutex_);
   MapType::iterator iter = tasks_.begin(), end = tasks_.end(),
@@ -168,9 +168,9 @@ NnetBatchComputer::GetHighestPriorityComputation(
 
 
 void NnetBatchComputer::GetHighestPriorityTasks(
-    int32 num_tasks_needed,
-    ComputationGroupInfo *info,
-    std::vector<NnetInferenceTask*> *tasks) {
+  int32 num_tasks_needed,
+  ComputationGroupInfo *info,
+  std::vector<NnetInferenceTask*> *tasks) {
   int32 num_tasks_present = info->tasks.size(),
       minibatch_size = GetMinibatchSize(*info);
   KALDI_ASSERT(tasks->empty());
@@ -225,7 +225,7 @@ void NnetBatchComputer::GetHighestPriorityTasks(
 
 
 int32 NnetBatchComputer::GetMinibatchSize(
-    const ComputationGroupInfo &info) const {
+  const ComputationGroupInfo &info) const {
   if (info.tasks.empty()) {
     return opts_.minibatch_size; // actually it shouldn't matter what we return
                                  // in this case.
@@ -240,21 +240,21 @@ int32 NnetBatchComputer::GetMinibatchSize(
 }
 
 int32 NnetBatchComputer::GetActualMinibatchSize(
-    const ComputationGroupInfo &info) const {
+  const ComputationGroupInfo &info) const {
   KALDI_ASSERT(!info.tasks.empty());
   int32 num_tasks = info.tasks.size(),
       this_minibatch_size = GetMinibatchSize(info);
   KALDI_ASSERT(num_tasks > 0);
   while (num_tasks <
-         int32(opts_.partial_minibatch_factor * this_minibatch_size))
+      int32(opts_.partial_minibatch_factor * this_minibatch_size))
     this_minibatch_size *= opts_.partial_minibatch_factor;
   return int32(this_minibatch_size);
 }
 
 
 std::shared_ptr<const NnetComputation> NnetBatchComputer::GetComputation(
-    const ComputationGroupInfo &info,
-    int32 minibatch_size) {
+  const ComputationGroupInfo &info,
+  int32 minibatch_size) {
   KALDI_ASSERT(!info.tasks.empty());
   // note: all the tasks will have the same structure, in the respects that
   // would affect the computation.
@@ -266,7 +266,7 @@ std::shared_ptr<const NnetComputation> NnetBatchComputer::GetComputation(
 
 
 double NnetBatchComputer::GetPriority(bool allow_partial_minibatch,
-                                      const ComputationGroupInfo &info) const {
+    const ComputationGroupInfo &info) const {
   if (info.tasks.empty())
     return -std::numeric_limits<double>::infinity();
   int32 this_minibatch_size = GetMinibatchSize(info);
@@ -310,9 +310,9 @@ double NnetBatchComputer::GetPriority(bool allow_partial_minibatch,
 
 // static
 void NnetBatchComputer::GetComputationRequest(
-    const NnetInferenceTask &task,
-    int32 minibatch_size,
-    ComputationRequest *request) {
+  const NnetInferenceTask &task,
+  int32 minibatch_size,
+  ComputationRequest *request) {
   request->need_model_derivative = false;
   request->store_component_stats = false;
   request->inputs.reserve(2);
@@ -344,20 +344,20 @@ void NnetBatchComputer::GetComputationRequest(
 }
 
 void NnetBatchComputer::FormatInputs(
-    int32 minibatch_size,
-    const std::vector<NnetInferenceTask*> &tasks,
-    CuMatrix<BaseFloat> *input,
-    CuMatrix<BaseFloat> *ivector) {
+  int32 minibatch_size,
+  const std::vector<NnetInferenceTask*> &tasks,
+  CuMatrix<BaseFloat> *input,
+  CuMatrix<BaseFloat> *ivector) {
   int32 num_input_frames = tasks[0]->input.NumRows(),
       input_dim = tasks[0]->input.NumCols(),
       ivector_dim = tasks[0]->ivector.Dim(),
       num_tasks = tasks.size();
   KALDI_ASSERT(num_tasks > 0 && num_tasks <= minibatch_size);
-  
+
   // destination matrix
   input->Resize(minibatch_size * num_input_frames, input_dim,
                 kUndefined);
- 
+
 #if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
 
@@ -382,16 +382,16 @@ void NnetBatchComputer::FormatInputs(
     }
 
     // execute batched copy
-    cuda_batched_copy_mats(num_tasks, &num_rows[0], &num_cols[0], &inputs[0], 
+    cuda_batched_copy_mats(num_tasks, &num_rows[0], &num_cols[0], &inputs[0],
         &ldi[0], &outputs[0], &ldo[0]);
 
-  } else 
+  } else
 #endif
   {
     for (int32 n = 0; n < num_tasks; n++) {
       CuSubMatrix<BaseFloat> input_part(*input,
-                                    n * num_input_frames, num_input_frames,
-                                    0, input_dim);
+          n * num_input_frames, num_input_frames,
+          0, input_dim);
       input_part.CopyFromMat(tasks[n]->input);
     }
   }
@@ -402,7 +402,7 @@ void NnetBatchComputer::FormatInputs(
       // shouldn't be strictly necessary.
       // the -1 means 'take all remaining rows'.
       input->RowRange(num_tasks * num_input_frames,
-                      (minibatch_size - num_tasks) * num_input_frames).SetZero();
+          (minibatch_size - num_tasks) * num_input_frames).SetZero();
     }
   }
 
@@ -411,9 +411,9 @@ void NnetBatchComputer::FormatInputs(
 
 #if HAVE_CUDA == 1
     if (CuDevice::Instantiate().Enabled()) {
-     
+
       // using the batched matrix copy routine for this.  This isn't
-      // extremely efficient but the kernel takes a minimal amount of 
+      // extremely efficient but the kernel takes a minimal amount of
       // time so making a batched vector copy is not worth the effort.
       std::vector<const BaseFloat*> inputs(num_tasks);
       std::vector<BaseFloat*> outputs(num_tasks);
@@ -434,10 +434,10 @@ void NnetBatchComputer::FormatInputs(
       }
 
       // execute batched copy
-      cuda_batched_copy_mats(num_tasks, &num_rows[0], &num_cols[0], &inputs[0], &ldi[0], 
+      cuda_batched_copy_mats(num_tasks, &num_rows[0], &num_cols[0], &inputs[0], &ldi[0],
           &outputs[0], &ldo[0]);
 
-    } else 
+    } else
 #endif
     {
       for (int32 n = 0; n < num_tasks; n++) {
@@ -457,8 +457,8 @@ void NnetBatchComputer::FormatInputs(
 }
 
 void NnetBatchComputer::FormatOutputs(
-    const CuMatrix<BaseFloat> &output,
-    const std::vector<NnetInferenceTask*> &tasks) {
+  const CuMatrix<BaseFloat> &output,
+  const std::vector<NnetInferenceTask*> &tasks) {
   KALDI_ASSERT(!tasks.empty());
   int32 num_output_frames = tasks[0]->num_output_frames,
       output_dim = output.NumCols(),
@@ -469,7 +469,7 @@ void NnetBatchComputer::FormatOutputs(
   // un-comment the commented lines of code below to do so and add equivalent
   // calls to the cuda version.
 
-#if HAVE_CUDA == 1 
+#if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
 
     std::vector<const BaseFloat*> inputs(num_tasks);
@@ -482,11 +482,11 @@ void NnetBatchComputer::FormatOutputs(
       NnetInferenceTask *task = tasks[n];
 
       int32 left_unused = task->num_initial_unused_output_frames,
-            used = task->num_used_output_frames;
+          used = task->num_used_output_frames;
       // int32 right_unused = num_output_frames - used - left_unused;
-      
-      // TODO do we really expect different tasks to output CPU or GPU? 
-      // This adds a bit of code complexity.  Perhaps output_to_cpu should 
+
+      // TODO do we really expect different tasks to output CPU or GPU?
+      // This adds a bit of code complexity.  Perhaps output_to_cpu should
       // be a property of the batch computer and not the tasks
       if (task->output_to_cpu) {
         task->output_cpu.Resize(num_output_frames, output_dim,
@@ -508,7 +508,7 @@ void NnetBatchComputer::FormatOutputs(
             left_unused, used);
         const CuSubMatrix<BaseFloat> input_mat = output.RowRange(
             n * num_output_frames + left_unused, used);
-       
+
         // create matrix batch description arrays
         num_rows[b] = output_mat.NumRows();
         num_cols[b] = output_mat.NumCols();
@@ -519,21 +519,21 @@ void NnetBatchComputer::FormatOutputs(
         b++; // increase batch count
       }
     }
-    
+
     // execute batched copy
-    cuda_batched_copy_mats(b, &num_rows[0], &num_cols[0], &inputs[0], &ldi[0], 
+    cuda_batched_copy_mats(b, &num_rows[0], &num_cols[0], &inputs[0], &ldi[0],
         &outputs[0], &ldo[0]);
-  
+
   } else
 #endif
   {
-    //TODO i don't think all of these paths are actually possible.  We should simplify this.  
+    //TODO i don't think all of these paths are actually possible.  We should simplify this.
     //Is it possible to output_to_gpu with HAVE_CUDA == 0 or when the device is disabled?
     for (int32 n = 0; n < num_tasks; n++) {
       NnetInferenceTask *task = tasks[n];
 
       int32 left_unused = task->num_initial_unused_output_frames,
-            used = task->num_used_output_frames;
+          used = task->num_used_output_frames;
       // int32 right_unused = num_output_frames - used - left_unused;
 
       if (task->output_to_cpu) {
@@ -566,7 +566,7 @@ void NnetBatchComputer::FormatOutputs(
 }
 
 void NnetBatchComputer::AcceptTask(NnetInferenceTask *task,
-                                   int32 max_minibatches_full) {
+    int32 max_minibatches_full) {
   std::unique_lock<std::mutex> lock(mutex_);
 
   if (max_minibatches_full > 0 && num_full_minibatches_ > max_minibatches_full) {
@@ -603,7 +603,7 @@ bool NnetBatchComputer::Compute(bool allow_partial_minibatch) {
   Timer tim;
   Nnet *nnet_to_update = NULL;  // we're not doing any update
   NnetComputer computer(opts_.compute_config, *(minfo->computation),
-                        nnet_, nnet_to_update);
+      nnet_, nnet_to_update);
 
 
   CuMatrix<BaseFloat> input;
@@ -657,12 +657,12 @@ namespace utterance_splitting {
    task per chunk, with only the members 'output_t_stride',
     'num_output_frames', 'num_initial_unused_output_frames',
     'num_used_output_frames' and 'is_irregular' set up.
-*/
+ */
 void GetOutputFrameInfoForTasks(
-    const NnetBatchComputerOptions &opts,
-    int32 num_subsampled_frames,
-    int32 num_subsampled_frames_per_chunk,
-    std::vector<NnetInferenceTask> *tasks) {
+  const NnetBatchComputerOptions &opts,
+  int32 num_subsampled_frames,
+  int32 num_subsampled_frames_per_chunk,
+  std::vector<NnetInferenceTask> *tasks) {
   KALDI_ASSERT(num_subsampled_frames > 0);
   int32 fpc = num_subsampled_frames_per_chunk;
   int32 num_tasks = (num_subsampled_frames + fpc - 1) / fpc;
@@ -711,11 +711,11 @@ void GetOutputFrameInfoForTasks(
     KALDI_ASSERT((*tasks)[0].first_used_output_frame_index == 0);
     for (int32 i = 1; i < num_tasks; i++) {
       KALDI_ASSERT((*tasks)[i].first_used_output_frame_index ==
-                   (*tasks)[i-1].first_used_output_frame_index +
-                   (*tasks)[i-1].num_used_output_frames);
+          (*tasks)[i-1].first_used_output_frame_index +
+          (*tasks)[i-1].num_used_output_frames);
     }
     KALDI_ASSERT((*tasks)[num_tasks-1].first_used_output_frame_index +
-                 (*tasks)[num_tasks-1].num_used_output_frames ==
+        (*tasks)[num_tasks-1].num_used_output_frames ==
                  num_subsampled_frames);
     for (int32 i = 0; i < num_tasks; i++) {
       const NnetInferenceTask &task = (*tasks)[i];
@@ -727,10 +727,10 @@ void GetOutputFrameInfoForTasks(
 }
 
 void AddOnlineIvectorsToTasks(
-    const NnetBatchComputerOptions &opts,
-    const CuMatrix<BaseFloat> &online_ivectors,
-    int32 online_ivector_period,
-    std::vector<NnetInferenceTask> *tasks) {
+  const NnetBatchComputerOptions &opts,
+  const CuMatrix<BaseFloat> &online_ivectors,
+  int32 online_ivector_period,
+  std::vector<NnetInferenceTask> *tasks) {
   int32 f = opts.frame_subsampling_factor,
       num_tasks = tasks->size();
   for (int32 i = 0; i < num_tasks; i++) {
@@ -775,21 +775,21 @@ void AddOnlineIvectorsToTasks(
    and right context of the network (num-frames required on left and right
    to compute an output frame), and may be computed by doing:
     ComputeSimpleNnetContext(nnet, &nnet_left_context_, &nnet_right_context_)
-*/
+ */
 static void SplitInputToTasks(const NnetBatchComputerOptions &opts,
-                              int32 nnet_left_context,
-                              int32 nnet_right_context,
-                              const CuMatrix<BaseFloat> &input,
-                              std::vector<NnetInferenceTask> *tasks) {
+    int32 nnet_left_context,
+    int32 nnet_right_context,
+    const CuMatrix<BaseFloat> &input,
+    std::vector<NnetInferenceTask> *tasks) {
   int32 num_input_frames = input.NumRows(),
       f = opts.frame_subsampling_factor,
       num_subsampled_frames = (num_input_frames + f - 1) / f,
       extra_left_context_initial = (opts.extra_left_context_initial < 0 ?
-                                    opts.extra_left_context :
-                                    opts.extra_left_context_initial),
+      opts.extra_left_context :
+      opts.extra_left_context_initial),
       extra_right_context_final = (opts.extra_right_context_final < 0 ?
-                                   opts.extra_right_context :
-                                   opts.extra_right_context_final),
+      opts.extra_right_context :
+      opts.extra_right_context_final),
       num_tasks = tasks->size();
 
   for (int32 i = 0; i < num_tasks; i++) {
@@ -819,7 +819,7 @@ static void SplitInputToTasks(const NnetBatchComputerOptions &opts,
     // edge actually made a difference to the structure of the example.
     task.is_edge =
         (tot_left_context != nnet_left_context + opts.extra_left_context ||
-         tot_right_context !=  nnet_right_context + opts.extra_right_context);
+        tot_right_context !=  nnet_right_context + opts.extra_right_context);
 
     int32 begin_input_t_padded = begin_input_t - tot_left_context,
         end_input_t_padded = end_input_t + tot_right_context;
@@ -833,7 +833,7 @@ static void SplitInputToTasks(const NnetBatchComputerOptions &opts,
                       input.NumCols(), kUndefined);
 
     // Copy from intput into task input with clamping
-    task.input.CopyRangeFromMatClamped(input, begin_input_t_padded, 
+    task.input.CopyRangeFromMatClamped(input, begin_input_t_padded,
         end_input_t_padded, 0, num_input_frames-1);
   }
 }
@@ -841,14 +841,14 @@ static void SplitInputToTasks(const NnetBatchComputerOptions &opts,
 } // namespace utterance_splitting
 
 void NnetBatchComputer::SplitUtteranceIntoTasks(
-    bool output_to_cpu,
-    const Matrix<BaseFloat> &input,
-    const Vector<BaseFloat> *h_ivector,
-    const Matrix<BaseFloat> *h_online_ivectors,
-    int32 online_ivector_period,
-    std::vector<NnetInferenceTask> *tasks) {
+  bool output_to_cpu,
+  const Matrix<BaseFloat> &input,
+  const Vector<BaseFloat> *h_ivector,
+  const Matrix<BaseFloat> *h_online_ivectors,
+  int32 online_ivector_period,
+  std::vector<NnetInferenceTask> *tasks) {
 
-  // Inputs are expected to be in device memory. 
+  // Inputs are expected to be in device memory.
   // create temporary device arrays and copy
   // inputs into them
   CuMatrix<BaseFloat> cu_input(input);
@@ -871,23 +871,23 @@ void NnetBatchComputer::SplitUtteranceIntoTasks(
 }
 
 void NnetBatchComputer::SplitUtteranceIntoTasks(
-    bool output_to_cpu,
-    const CuMatrix<BaseFloat> &input,
-    const CuVector<BaseFloat> *ivector,
-    const CuMatrix<BaseFloat> *online_ivectors,
-    int32 online_ivector_period,
-    std::vector<NnetInferenceTask> *tasks) {
+  bool output_to_cpu,
+  const CuMatrix<BaseFloat> &input,
+  const CuVector<BaseFloat> *ivector,
+  const CuMatrix<BaseFloat> *online_ivectors,
+  int32 online_ivector_period,
+  std::vector<NnetInferenceTask> *tasks) {
   using namespace utterance_splitting;
 
 
   { // This block does some checking.
     if (input.NumCols() != input_dim_) {
       KALDI_ERR << "Input features did not have expected dimension: expected "
-          << input_dim_ << ", got " << input.NumCols();
+                << input_dim_ << ", got " << input.NumCols();
     }
     int32 ivector_dim = (ivector != NULL ? ivector->Dim() :
-                         (online_ivectors != NULL ?
-                          online_ivectors->NumCols() : 0));
+        (online_ivectors != NULL ?
+        online_ivectors->NumCols() : 0));
     if (ivector_dim_ != 0 && ivector_dim == 0)
       KALDI_ERR << "Model expects i-vectors but none were supplied";
     else if (ivector_dim_ == 0 && ivector_dim != 0)
@@ -914,7 +914,7 @@ void NnetBatchComputer::SplitUtteranceIntoTasks(
   if (ivector != NULL) {
     KALDI_ASSERT(online_ivectors == NULL);
 
-#if HAVE_CUDA == 1 
+#if HAVE_CUDA == 1
     if (CuDevice::Instantiate().Enabled()) {
       int32_t num_tasks = tasks->size();
 
@@ -924,7 +924,7 @@ void NnetBatchComputer::SplitUtteranceIntoTasks(
       std::vector<int32_t> num_rows(num_tasks), num_cols(num_tasks);
 
       int b=0;  // batch counter
-        
+
       for (size_t i = 0; i < tasks->size(); i++) {
         CuVector<BaseFloat> &output_vec = (*tasks)[i].ivector;
         const CuVector<BaseFloat> &input_vec =  *ivector;
@@ -940,9 +940,9 @@ void NnetBatchComputer::SplitUtteranceIntoTasks(
         ldi[b] = 0;
         b++; // increase batch count
       }
-    
+
       // execute batched copy
-      cuda_batched_copy_mats(b, &num_rows[0], &num_cols[0], &inputs[0], &ldi[0], 
+      cuda_batched_copy_mats(b, &num_rows[0], &num_cols[0], &inputs[0], &ldi[0],
           &outputs[0], &ldo[0]);
     } else
 #endif
@@ -966,8 +966,8 @@ void NnetBatchComputer::SplitUtteranceIntoTasks(
 
 
 void MergeTaskOutput(
-    const std::vector<NnetInferenceTask> &tasks,
-    Matrix<BaseFloat> *output) {
+  const std::vector<NnetInferenceTask> &tasks,
+  Matrix<BaseFloat> *output) {
   int32 num_tasks = tasks.size(),
       num_output_frames = 0,
       output_dim = -1;
@@ -976,8 +976,8 @@ void MergeTaskOutput(
     num_output_frames += task.num_used_output_frames;
     if (i == 0) {
       output_dim = (task.output_to_cpu ?
-                    task.output_cpu.NumCols() :
-                    task.output.NumCols());
+          task.output_cpu.NumCols() :
+          task.output.NumCols());
     }
   }
   KALDI_ASSERT(num_output_frames != 0 && output_dim != 0);
@@ -1000,8 +1000,8 @@ void MergeTaskOutput(
   KALDI_ASSERT(cur_output_frame == num_output_frames);
 }
 void MergeTaskOutput(
-    const std::vector<NnetInferenceTask> &tasks,
-    CuMatrix<BaseFloat> *output) {
+  const std::vector<NnetInferenceTask> &tasks,
+  CuMatrix<BaseFloat> *output) {
   int32 num_tasks = tasks.size(),
       num_output_frames = 0,
       output_dim = -1;
@@ -1010,15 +1010,15 @@ void MergeTaskOutput(
     num_output_frames += task.num_used_output_frames;
     if (i == 0) {
       output_dim = (task.output_to_cpu ?
-                    task.output_cpu.NumCols() :
-                    task.output.NumCols());
+          task.output_cpu.NumCols() :
+          task.output.NumCols());
     }
   }
   KALDI_ASSERT(num_output_frames != 0 && output_dim != 0);
   int32 cur_output_frame = 0;
   output->Resize(num_output_frames, output_dim, kUndefined);
-  
-#if HAVE_CUDA == 1 
+
+#if HAVE_CUDA == 1
   if (CuDevice::Instantiate().Enabled()) {
 
     std::vector<const BaseFloat*> inputs(num_tasks);
@@ -1030,16 +1030,16 @@ void MergeTaskOutput(
     for (int32 i = 0; i < num_tasks; i++) {
       const NnetInferenceTask &task = tasks[i];
       int32 skip = task.num_initial_unused_output_frames,
-            num_used = task.num_used_output_frames;
+          num_used = task.num_used_output_frames;
       KALDI_ASSERT(cur_output_frame == task.first_used_output_frame_index);
       if (task.output_to_cpu) {
         output->RowRange(cur_output_frame, num_used).CopyFromMat(
             task.output_cpu.RowRange(skip, num_used));
       } else {
-        CuSubMatrix<BaseFloat> output_mat = 
-          output->RowRange(cur_output_frame, num_used);
-        const CuSubMatrix<BaseFloat> input_mat =  
-          task.output.RowRange(skip, num_used);
+        CuSubMatrix<BaseFloat> output_mat =
+            output->RowRange(cur_output_frame, num_used);
+        const CuSubMatrix<BaseFloat> input_mat =
+            task.output.RowRange(skip, num_used);
 
         // create matrix batch description arrays
         num_rows[b] = output_mat.NumRows();
@@ -1054,50 +1054,50 @@ void MergeTaskOutput(
     }
 
     // execute batched copy
-    cuda_batched_copy_mats(b, &num_rows[0], &num_cols[0], &inputs[0], &ldi[0], 
+    cuda_batched_copy_mats(b, &num_rows[0], &num_cols[0], &inputs[0], &ldi[0],
         &outputs[0], &ldo[0]);
 
   } else
 #endif
- {
-  for (int32 i = 0; i < num_tasks; i++) {
-    const NnetInferenceTask &task = tasks[i];
-    int32 skip = task.num_initial_unused_output_frames,
-        num_used = task.num_used_output_frames;
-    KALDI_ASSERT(cur_output_frame == task.first_used_output_frame_index);
-    if (task.output_to_cpu) {
-      output->RowRange(cur_output_frame, num_used).CopyFromMat(
+  {
+    for (int32 i = 0; i < num_tasks; i++) {
+      const NnetInferenceTask &task = tasks[i];
+      int32 skip = task.num_initial_unused_output_frames,
+          num_used = task.num_used_output_frames;
+      KALDI_ASSERT(cur_output_frame == task.first_used_output_frame_index);
+      if (task.output_to_cpu) {
+        output->RowRange(cur_output_frame, num_used).CopyFromMat(
           task.output_cpu.RowRange(skip, num_used));
-    } else {
-      output->RowRange(cur_output_frame, num_used).CopyFromMat(
+      } else {
+        output->RowRange(cur_output_frame, num_used).CopyFromMat(
           task.output.RowRange(skip, num_used));
+      }
+      cur_output_frame += num_used;
     }
-    cur_output_frame += num_used;
   }
- }
- 
+
   KALDI_ASSERT(cur_output_frame == num_output_frames);
 }
 
 
 NnetBatchInference::NnetBatchInference(
-    const NnetBatchComputerOptions &opts,
-    const Nnet &nnet,
-    const VectorBase<BaseFloat> &priors):
-    computer_(opts, nnet, priors),
-    is_finished_(false),
-    utterance_counter_(0) {
+  const NnetBatchComputerOptions &opts,
+  const Nnet &nnet,
+  const VectorBase<BaseFloat> &priors) :
+  computer_(opts, nnet, priors),
+  is_finished_(false),
+  utterance_counter_(0) {
   // 'thread_' will run the Compute() function in the background.
   compute_thread_ = std::thread(ComputeFunc, this);
 }
 
 
 void NnetBatchInference::AcceptInput(
-    const std::string &utterance_id,
-    const Matrix<BaseFloat> &input,
-    const Vector<BaseFloat> *ivector,
-    const Matrix<BaseFloat> *online_ivectors,
-    int32 online_ivector_period) {
+  const std::string &utterance_id,
+  const Matrix<BaseFloat> &input,
+  const Vector<BaseFloat> *ivector,
+  const Matrix<BaseFloat> *online_ivectors,
+  int32 online_ivector_period) {
 
   UtteranceInfo *info = new UtteranceInfo();
   info->utterance_id = utterance_id;
@@ -1128,7 +1128,7 @@ void NnetBatchInference::AcceptInput(
 }
 
 bool NnetBatchInference::GetOutput(std::string *utterance_id,
-                                   Matrix<BaseFloat> *output) {
+    Matrix<BaseFloat> *output) {
   if (utts_.empty())
     return false;
 
@@ -1186,13 +1186,13 @@ void NnetBatchInference::Compute() {
 
 
 NnetBatchDecoder::NnetBatchDecoder(
-    const fst::Fst<fst::StdArc> &fst,
-    const LatticeFasterDecoderConfig &decoder_opts,
-    const TransitionModel &trans_model,
-    const fst::SymbolTable *word_syms,
-    bool allow_partial,
-    int32 num_threads,
-    NnetBatchComputer *computer):
+  const fst::Fst<fst::StdArc> &fst,
+  const LatticeFasterDecoderConfig &decoder_opts,
+  const TransitionModel &trans_model,
+  const fst::SymbolTable *word_syms,
+  bool allow_partial,
+  int32 num_threads,
+  NnetBatchComputer *computer) :
   fst_(fst), decoder_opts_(decoder_opts),
   trans_model_(trans_model), word_syms_(word_syms),
   allow_partial_(allow_partial),  computer_(computer),
@@ -1222,11 +1222,11 @@ void NnetBatchDecoder::UpdatePriorityOffset(double priority) {
 }
 
 void NnetBatchDecoder::AcceptInput(
-    const std::string &utterance_id,
-    const Matrix<BaseFloat> &input,
-    const Vector<BaseFloat> *ivector,
-    const Matrix<BaseFloat> *online_ivectors,
-    int32 online_ivector_period){
+  const std::string &utterance_id,
+  const Matrix<BaseFloat> &input,
+  const Vector<BaseFloat> *ivector,
+  const Matrix<BaseFloat> *online_ivectors,
+  int32 online_ivector_period){
   // This function basically does a handshake with one of the decoder threads.
   // It may have to wait till one of the decoder threads becomes ready.
   input_utterance_.utterance_id = utterance_id;
@@ -1264,12 +1264,12 @@ int32 NnetBatchDecoder::Finished() {
 
 
 bool NnetBatchDecoder::GetOutput(
-    std::string *utterance_id,
-    CompactLattice *clat,
-    std::string *sentence) {
+  std::string *utterance_id,
+  CompactLattice *clat,
+  std::string *sentence) {
   if (!decoder_opts_.determinize_lattice)
     KALDI_ERR << "Don't call this version of GetOutput if you are "
-        "not determinizing.";
+      "not determinizing.";
   while (true) {
     if (pending_utts_.empty())
       return false;
@@ -1296,12 +1296,12 @@ bool NnetBatchDecoder::GetOutput(
 
 
 bool NnetBatchDecoder::GetOutput(
-    std::string *utterance_id,
-    Lattice *lat,
-    std::string *sentence) {
+  std::string *utterance_id,
+  Lattice *lat,
+  std::string *sentence) {
   if (decoder_opts_.determinize_lattice)
     KALDI_ERR << "Don't call this version of GetOutput if you are "
-        "determinizing.";
+      "determinizing.";
   while (true) {
     if (pending_utts_.empty())
       return false;
@@ -1379,9 +1379,9 @@ void NnetBatchDecoder::Decode() {
         UpdatePriorityOffset(task.priority);
 
         SubMatrix<BaseFloat> post(task.output_cpu,
-                                  task.num_initial_unused_output_frames,
-                                  task.num_used_output_frames,
-                                  0, task.output_cpu.NumCols());
+            task.num_initial_unused_output_frames,
+            task.num_used_output_frames,
+            0, task.output_cpu.NumCols());
         DecodableMatrixMapped decodable(trans_model_, post, frame_offset);
         frame_offset += post.NumRows();
         decoder.AdvanceDecoding(&decodable);
@@ -1499,7 +1499,7 @@ NnetBatchDecoder::~NnetBatchDecoder() {
     // At this point the application is bound to fail so raising another
     // exception is not a big problem.
     KALDI_ERR << "Destroying NnetBatchDecoder object without calling "
-        "Finished() and consuming the remaining output";
+      "Finished() and consuming the remaining output";
   }
   // Print diagnostics.
 
@@ -1516,7 +1516,7 @@ NnetBatchDecoder::~NnetBatchDecoder() {
   KALDI_LOG << "Time taken "<< elapsed
             << "s: real-time factor assuming 100 frames/sec is "
             << (num_threads * elapsed * 100.0 /
-                std::max<int64>(input_frame_count, 1))
+  std::max<int64>(input_frame_count, 1))
             << " (per thread; with " << num_threads << " threads).";
   KALDI_LOG << "Done " << num_success_ << " utterances ("
             << num_partial_ << " forced out); failed for "

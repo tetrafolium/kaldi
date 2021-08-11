@@ -32,9 +32,9 @@ struct LdaEstimateOptions {
   bool allow_large_dim;
   BaseFloat within_class_factor; // TODO: remove this eventually, it
   // is deprecated (that code is now in ../nnet2/get-feature-transform.{h,cc})
-  LdaEstimateOptions(): remove_offset(false), dim(40), allow_large_dim(false),
-                        within_class_factor(1.0) { }
-  
+  LdaEstimateOptions() : remove_offset(false), dim(40), allow_large_dim(false),
+    within_class_factor(1.0) { }
+
   void Register(OptionsItf *opts) {
     opts->Register("remove-offset", &remove_offset, "If true, output an affine "
                    "transform that makes the projected data mean equal to zero.");
@@ -48,14 +48,14 @@ struct LdaEstimateOptions {
                    "for dimensions where between-class variance is small; "
                    "this is a feature being experimented with for neural-net "
                    "input.");
-  }    
+  }
 };
 
 /** Class for computing linear discriminant analysis (LDA) transform.
     C.f. \ref transform_lda.
  */
 class LdaEstimate {
- public:
+public:
   LdaEstimate() {}
 
   /// Allocates memory for accumulators
@@ -82,14 +82,14 @@ class LdaEstimate {
   /// result, as with other Kaldi transforms.)
   /// The "remove_offset" argument is new and should be set to false for back
   /// compatibility.
-  void Estimate(const LdaEstimateOptions &opts, 
-                Matrix<BaseFloat> *M,
-                Matrix<BaseFloat> *Mfull = NULL) const;
+  void Estimate(const LdaEstimateOptions &opts,
+      Matrix<BaseFloat> *M,
+      Matrix<BaseFloat> *Mfull = NULL) const;
 
   void Read(std::istream &in_stream, bool binary, bool add);
   void Write(std::ostream &out_stream, bool binary) const;
 
- protected:
+protected:
   Vector<double> zero_acc_;
   Matrix<double> first_acc_;
   SpMatrix<double> total_second_acc_;
@@ -97,14 +97,14 @@ class LdaEstimate {
   /// This function modifies the LDA matrix so that it
   /// also subtracts the mean feature value.
   static void AddMeanOffset(const VectorBase<double> &total_mean,
-                            Matrix<BaseFloat> *projection);
+      Matrix<BaseFloat> *projection);
 
   /// Extract a more processed form of the stats.
   void GetStats(SpMatrix<double> *total_covar,
-                SpMatrix<double> *between_covar,
-                Vector<double> *total_mean,
-                double *sum) const;
-  
+      SpMatrix<double> *between_covar,
+      Vector<double> *total_mean,
+      double *sum) const;
+
   // Disallow assignment operator.
   LdaEstimate &operator = (const LdaEstimate &other);
 };

@@ -47,18 +47,18 @@ int32 IndexOfSoftmaxLayer(const Nnet &nnet);
    Inserts the components of one neural network into a particular place in the
    other one.  This is useful for adding hidden layers to a neural net.  Inserts
    the components of "src_nnet" before component index c of "dest_nnet".
-*/
+ */
 void InsertComponents(const Nnet &src_nnet,
-                      int32 c,
-                      Nnet *dest_nnet);
+    int32 c,
+    Nnet *dest_nnet);
 
 /**
    Removes the last "num_to_remove" components and
    adds the components from "src_nnet".
  */
 void ReplaceLastComponents(const Nnet &src_nnet,
-                           int32 num_to_remove,
-                           Nnet *dest_nnet);
+    int32 num_to_remove,
+    Nnet *dest_nnet);
 
 
 

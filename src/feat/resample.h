@@ -65,7 +65,7 @@ namespace kaldi {
    rectangular filter with cutoff C is the sinc function,
    \f[         f(t) = 2C sinc(2Ct),                   \f]
    where sinc is the normalized sinc function \f$ sinc(t) = sin(pi t) / (pi t) \f$, with
-  \f$  sinc(0) = 1 \f$.  This is not a practical filter, though, because it has
+   \f$  sinc(0) = 1 \f$.  This is not a practical filter, though, because it has
    infinite support.  At the cost of less-than-perfect rolloff, we can choose
    a suitable windowing function g(t), and use f(t) g(t) as the filter.  For
    a windowing function we choose raised-cosine (Hanning) window with support
@@ -81,7 +81,7 @@ namespace kaldi {
    and window are symmetric).
    This is true for arbitrary values of t.  What the class ArbitraryResample does
    is to allow you to evaluate the signal for specified values of t.
-*/
+ */
 
 
 /**
@@ -91,14 +91,14 @@ namespace kaldi {
    "filter_cutoff_hz" should be less than half the sample rate;
    "num_zeros" should probably be at least two preferably more; higher numbers give
    sharper filters but will be less efficient.
-*/
+ */
 class ArbitraryResample {
- public:
+public:
   ArbitraryResample(int32 num_samples_in,
-                    BaseFloat samp_rate_hz,
-                    BaseFloat filter_cutoff_hz,
-                    const Vector<BaseFloat> &sample_points_secs,
-                    int32 num_zeros);
+      BaseFloat samp_rate_hz,
+      BaseFloat filter_cutoff_hz,
+      const Vector<BaseFloat> &sample_points_secs,
+      int32 num_zeros);
 
   int32 NumSamplesIn() const { return num_samples_in_; }
 
@@ -110,13 +110,13 @@ class ArbitraryResample {
   /// input.NumCols() should equal NumSamplesIn()
   /// and output.NumCols() should equal NumSamplesOut().
   void Resample(const MatrixBase<BaseFloat> &input,
-                MatrixBase<BaseFloat> *output) const;
+      MatrixBase<BaseFloat> *output) const;
 
   /// This version of the Resample function processes just
   /// one vector.
   void Resample(const VectorBase<BaseFloat> &input,
-                VectorBase<BaseFloat> *output) const;
- private:
+      VectorBase<BaseFloat> *output) const;
+private:
   void SetIndexes(const Vector<BaseFloat> &sample_points);
 
   void SetWeights(const Vector<BaseFloat> &sample_points);
@@ -142,10 +142,10 @@ class ArbitraryResample {
 
    We require that the input and output sampling rate be specified as
    integers, as this is an easy way to specify that their ratio be rational.
-*/
+ */
 
 class LinearResample {
- public:
+public:
   /// Constructor.  We make the input and output sample rates integers, because
   /// we are going to need to find a common divisor.  This should just remind
   /// you that they need to be integers.  The filter cutoff needs to be less
@@ -153,9 +153,9 @@ class LinearResample {
   /// controls the sharpness of the filter, more == sharper but less efficient.
   /// We suggest around 4 to 10 for normal use.
   LinearResample(int32 samp_rate_in_hz,
-                 int32 samp_rate_out_hz,
-                 BaseFloat filter_cutoff_hz,
-                 int32 num_zeros);
+      int32 samp_rate_out_hz,
+      BaseFloat filter_cutoff_hz,
+      int32 num_zeros);
 
   /// This function does the resampling.  If you call it with flush == true and
   /// you have never called it with flush == false, it just resamples the input
@@ -175,8 +175,8 @@ class LinearResample {
   /// have internal state; you can remove this by calling Reset().
   /// Empty input is acceptable.
   void Resample(const VectorBase<BaseFloat> &input,
-                bool flush,
-                Vector<BaseFloat> *output);
+      bool flush,
+      Vector<BaseFloat> *output);
 
   /// Calling the function Reset() resets the state of the object prior to
   /// processing a new signal; it is only necessary if you have called
@@ -189,7 +189,7 @@ class LinearResample {
   //// Return the input and output sampling rates (for checks, for example)
   inline int32 GetInputSamplingRate() { return samp_rate_in_; }
   inline int32 GetOutputSamplingRate() { return samp_rate_out_; }
- private:
+private:
   /// This function outputs the number of output samples we will output
   /// for a signal with "input_num_samp" input samples.  If flush == true,
   /// we return the largest n such that
@@ -206,8 +206,8 @@ class LinearResample {
   /// and to *samp_out_wrapped the index into weights_ where we can get the
   /// corresponding weights on the input.
   inline void GetIndexes(int64 samp_out,
-                         int64 *first_samp_in,
-                         int32 *samp_out_wrapped) const;
+      int64 *first_samp_in,
+      int32 *samp_out_wrapped) const;
 
   void SetRemainder(const VectorBase<BaseFloat> &input);
 
@@ -269,15 +269,15 @@ class LinearResample {
    are actually required to have exact integer values (like 16000 or 8000) with
    a ratio between them that can be expressed as a rational number with
    reasonably small integer factors.
-*/
+ */
 void ResampleWaveform(BaseFloat orig_freq, const VectorBase<BaseFloat> &wave,
-                      BaseFloat new_freq, Vector<BaseFloat> *new_wave);
+    BaseFloat new_freq, Vector<BaseFloat> *new_wave);
 
 
 /// This function is deprecated.  It is provided for backward compatibility, to avoid
 /// breaking older code.
 inline void DownsampleWaveForm(BaseFloat orig_freq, const VectorBase<BaseFloat> &wave,
-                               BaseFloat new_freq, Vector<BaseFloat> *new_wave) {
+    BaseFloat new_freq, Vector<BaseFloat> *new_wave) {
   ResampleWaveform(orig_freq, wave, new_freq, new_wave);
 }
 

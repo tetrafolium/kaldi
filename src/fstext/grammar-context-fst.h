@@ -38,7 +38,7 @@
 
    See \ref grammar (../doc/grammar.dox) for high-level
    documentation on how this framework works.
-*/
+ */
 
 
 #include <algorithm>
@@ -90,7 +90,7 @@ enum NonterminalValues {
 inline int32 GetEncodingMultiple(int32 nonterm_phones_offset) {
   int32 medium_number = static_cast<int32>(kNontermMediumNumber);
   return medium_number *
-      ((nonterm_phones_offset + medium_number) / medium_number);
+         ((nonterm_phones_offset + medium_number) / medium_number);
 }
 
 /**
@@ -104,7 +104,7 @@ inline int32 GetEncodingMultiple(int32 nonterm_phones_offset) {
    to make "ofst".
 
     @param [in] nonterm_phones_offset  The integer id of the symbol
-                  #nonterm_bos in the phones.txt file.  You can just set this
+ #nonterm_bos in the phones.txt file.  You can just set this
                   to a large value (like 1 million) if you are not actually using
                   nonterminals (e.g. for testing purposes).
     @param [in] disambig_syms  List of disambiguation symbols, e.g. the integer
@@ -116,13 +116,13 @@ inline int32 GetEncodingMultiple(int32 nonterm_phones_offset) {
                   (http://kaldi-asr.org/doc/tree_externals.html#tree_ilabel)
                   and also \ref grammar_special_clg
                   (http://kaldi-asr.org/doc/grammar#grammar_special_clg).
-  */
+ */
 void ComposeContextLeftBiphone(
-    int32 nonterm_phones_offset,
-    const std::vector<int32> &disambig_syms,
-    const VectorFst<StdArc> &ifst,
-    VectorFst<StdArc> *ofst,
-    std::vector<std::vector<int32> > *ilabels);
+  int32 nonterm_phones_offset,
+  const std::vector<int32> &disambig_syms,
+  const VectorFst<StdArc> &ifst,
+  VectorFst<StdArc> *ofst,
+  std::vector<std::vector<int32> > *ilabels);
 
 
 
@@ -141,7 +141,7 @@ void ComposeContextLeftBiphone(
 
    Search for "hbka.pdf" ("Speech Recognition with Weighted Finite State
    Transducers") by M. Mohri, for more context.
-*/
+ */
 
 class InverseLeftBiphoneContextFst: public DeterministicOnDemandFst<StdArc> {
 public:
@@ -157,7 +157,7 @@ public:
      symbol because it is not needed in systems without right context.
 
         @param [in] nonterm_phones_offset  The integer id of the symbol
-                  #nonterm_bos in the phones.txt file. You can just set this to
+   #nonterm_bos in the phones.txt file. You can just set this to
                   a large value (like 1 million) if you are not actually using
                   nonterminals (e.g. for testing purposes).
         @param [in] phones      List of integer ids of phones, as you would see in phones.txt
@@ -165,10 +165,10 @@ public:
                                    e.g. the ids of #0, #1, #2 in phones.txt
 
      See \ref graph_context for more details.
-  */
+   */
   InverseLeftBiphoneContextFst(Label nonterm_phones_offset,
-                               const std::vector<int32>& phones,
-                               const std::vector<int32>& disambig_syms);
+      const std::vector<int32>& phones,
+      const std::vector<int32>& disambig_syms);
 
   /**
      Here is a note on the state space of InverseLeftBiphoneContextFst;
@@ -245,7 +245,7 @@ private:
   // see http://kaldi-asr.org/doc/tree_externals.html#tree_ilabel) to
   // Label (the output label in this FST).
   typedef unordered_map<std::vector<int32>, Label,
-                        kaldi::VectorHasher<int32> > VectorToLabelMap;
+          kaldi::VectorHasher<int32> > VectorToLabelMap;
 
 
   // The following three variables were also passed in by the caller:

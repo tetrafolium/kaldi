@@ -33,10 +33,10 @@ using std::vector;
 
 namespace kaldi {
 void AccumulateForUtterance(const Matrix<BaseFloat> &feats,
-                            const Posterior &post,
-                            const TransitionModel &trans_model,
-                            const AmDiagGmm &am_gmm,
-                            FmllrDiagGmmAccs *spk_stats) {
+    const Posterior &post,
+    const TransitionModel &trans_model,
+    const AmDiagGmm &am_gmm,
+    FmllrDiagGmmAccs *spk_stats) {
   Posterior pdf_post;
   ConvertPosteriorToPdfs(trans_model, post, &pdf_post);
   for (size_t i = 0; i < post.size(); i++) {
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 
     BasisFmllrEstimate basis_est;
     ReadKaldiObject(basis_rspecifier, &basis_est);
-    
+
     RandomAccessPosteriorReader post_reader(post_rspecifier);
 
     double tot_impr = 0.0, tot_t = 0.0;
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
           transform_writer.Write(spk, transform);
           // Optionally write out the base weights
           if (!weights_out_filename.empty() && weights.Dim() > 0)
-              weights_writer.Write(spk, weights);
+            weights_writer.Write(spk, weights);
         }
         KALDI_LOG << "For speaker " << spk << ", auxf-impr from Basis fMLLR is "
                   << (impr / spk_tot_t) << ", over " << spk_tot_t << " frames, "

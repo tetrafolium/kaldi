@@ -52,26 +52,26 @@ static void ProcessRangeFile(const std::string &range_rxfilename,
                   << fields.size() << " instead.";
 
       std::string utt = fields[0],
-                  start_frame_str = fields[3],
-                  num_frames_str = fields[4],
-                  label_str = fields[5];
+          start_frame_str = fields[3],
+          num_frames_str = fields[4],
+          label_str = fields[5];
 
       if (!ConvertStringToInteger(fields[1], &(chunk_info->output_archive_id))
-        || !ConvertStringToInteger(start_frame_str, &(chunk_info->start_frame))
-        || !ConvertStringToInteger(num_frames_str, &(chunk_info->num_frames))
-        || !ConvertStringToInteger(label_str, &(chunk_info->label)))
+          || !ConvertStringToInteger(start_frame_str, &(chunk_info->start_frame))
+          || !ConvertStringToInteger(num_frames_str, &(chunk_info->num_frames))
+          || !ConvertStringToInteger(label_str, &(chunk_info->label)))
         KALDI_ERR << "Expected integer for output archive in range file.";
 
       chunk_info->name = utt + "-" + start_frame_str + "-" + num_frames_str
-        + "-" + label_str;
+          + "-" + label_str;
       unordered_map<std::string, std::vector<ChunkInfo*> >::iterator
-        got = utt_to_chunks->find(utt);
+          got = utt_to_chunks->find(utt);
 
       if (got == utt_to_chunks->end()) {
         std::vector<ChunkInfo* > chunk_infos;
         chunk_infos.push_back(chunk_info);
         utt_to_chunks->insert(std::pair<std::string,
-          std::vector<ChunkInfo* > > (utt, chunk_infos));
+            std::vector<ChunkInfo* > > (utt, chunk_infos));
       } else {
         got->second.push_back(chunk_info);
       }
@@ -88,7 +88,7 @@ static void WriteExamples(const MatrixBase<BaseFloat> &feats,
     ChunkInfo *chunk = *it;
     NnetExample eg;
     int32 num_rows = feats.NumRows(),
-          feat_dim = feats.NumCols();
+        feat_dim = feats.NumCols();
     if (num_rows < chunk->num_frames) {
       KALDI_WARN << "Unable to create examples for utterance " << utt
                  << ". Requested chunk size of "
@@ -101,7 +101,7 @@ static void WriteExamples(const MatrixBase<BaseFloat> &feats,
       int32 shift = std::min(0, num_rows - chunk->start_frame
                                  - chunk->num_frames);
       SubMatrix<BaseFloat> chunk_mat(feats, chunk->start_frame + shift,
-                                  chunk->num_frames, 0, feat_dim);
+          chunk->num_frames, 0, feat_dim);
       NnetIo nnet_input = NnetIo("input", 0, chunk_mat);
       for (std::vector<Index>::iterator indx_it = nnet_input.indexes.begin();
           indx_it != nnet_input.indexes.end(); ++indx_it)
@@ -188,18 +188,18 @@ int main(int argc, char *argv[]) {
     SequentialBaseFloatMatrixReader feat_reader(feature_rspecifier);
 
     int32 num_done = 0,
-          num_err = 0,
-          num_egs_written = 0;
+        num_err = 0,
+        num_egs_written = 0;
 
     for (; !feat_reader.Done(); feat_reader.Next()) {
       std::string key = feat_reader.Key();
       const Matrix<BaseFloat> &feats = feat_reader.Value();
       unordered_map<std::string, std::vector<ChunkInfo*> >::iterator
-        got = utt_to_chunks.find(key);
+          got = utt_to_chunks.find(key);
       if (got == utt_to_chunks.end()) {
         KALDI_WARN << "Could not create examples from utterance "
                    << key << " because it has no entry in the ranges "
-                  <<  "input file.";
+                   <<  "input file.";
         num_err++;
       } else {
         std::vector<ChunkInfo *> chunks = got->second;

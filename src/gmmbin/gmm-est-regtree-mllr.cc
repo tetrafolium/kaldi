@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
           }
           if (!posteriors_reader.HasKey(*utt_itr)) {
             KALDI_WARN << "Did not find posteriors for utterance "
-                << *utt_itr;
+                       << *utt_itr;
             num_no_posterior++;
             continue;
           }
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
           const Posterior &posterior = posteriors_reader.Value(*utt_itr);
           if (posterior.size() != feats.NumRows()) {
             KALDI_WARN << "Posteriors has wrong size " << (posterior.size())
-                << " vs. " << (feats.NumRows());
+                       << " vs. " << (feats.NumRows());
             num_other_error++;
             continue;
           }
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
         string key = feature_reader.Key();
         if (!posteriors_reader.HasKey(key)) {
           KALDI_WARN << "Did not find aligned transcription for utterance "
-              << key;
+                     << key;
           num_no_posterior++;
           continue;
         }
@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
 
         if (posterior.size() != feats.NumRows()) {
           KALDI_WARN << "Posteriors has wrong size " << (posterior.size())
-              << " vs. " << (feats.NumRows());
+                     << " vs. " << (feats.NumRows());
           num_other_error++;
           continue;
         }

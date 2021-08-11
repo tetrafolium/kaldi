@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
         egs_config.vocab_size = lm.VocabSize();
       RnnlmExampleSampler sampler(egs_config, lm);
       RnnlmExampleCreator creator(egs_config, sequencer_config,
-                                  sampler, &writer);
+          sampler, &writer);
       Input ki(sentences_rxfilename);
       creator.Process(ki.Stream());
       delete symtab;
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
         egs_config.vocab_size = lm.VocabSize();
       RnnlmExampleSampler sampler(egs_config, lm);
       RnnlmExampleCreator creator(egs_config, sequencer_config,
-                                  sampler, &writer);
+          sampler, &writer);
       Input ki(sentences_rxfilename);
       creator.Process(ki.Stream());
     } else {

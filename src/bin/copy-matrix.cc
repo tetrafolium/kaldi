@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     }
 
     if ( (apply_log && apply_exp) || (apply_softmax_per_row && apply_exp) ||
-          (apply_softmax_per_row && apply_log) )
+        (apply_softmax_per_row && apply_log) )
       KALDI_ERR << "Only one of apply-log, apply-exp and "
                 << "apply-softmax-per-row can be given";
 
@@ -88,10 +88,10 @@ int main(int argc, char *argv[]) {
 
     bool in_is_rspecifier =
         (ClassifyRspecifier(matrix_in_fn, NULL, NULL)
-         != kNoRspecifier),
+        != kNoRspecifier),
         out_is_wspecifier =
         (ClassifyWspecifier(matrix_out_fn, NULL, NULL, NULL)
-         != kNoWspecifier);
+        != kNoWspecifier);
 
     if (in_is_rspecifier != out_is_wspecifier)
       KALDI_ERR << "Cannot mix archives with regular files (copying matrices)";
@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
       SequentialBaseFloatMatrixReader reader(matrix_in_fn);
       for (; !reader.Done(); reader.Next(), num_done++) {
         if (scale != 1.0 || apply_log || apply_exp ||
-              apply_power != 1.0 || apply_softmax_per_row) {
+            apply_power != 1.0 || apply_softmax_per_row) {
           Matrix<BaseFloat> mat(reader.Value());
           if (scale != 1.0) mat.Scale(scale);
           if (apply_log) {

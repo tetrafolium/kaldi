@@ -45,17 +45,17 @@ namespace kaldi {
 
  */
 class PrunedCompactLatticeComposer {
- public:
+public:
   PrunedCompactLatticeComposer(
-      const ComposeLatticePrunedOptions &opts,
-      const CompactLattice &clat,
-      fst::DeterministicOnDemandFst<fst::StdArc> *det_fst,
-      CompactLattice* composed_clat);
+    const ComposeLatticePrunedOptions &opts,
+    const CompactLattice &clat,
+    fst::DeterministicOnDemandFst<fst::StdArc> *det_fst,
+    CompactLattice* composed_clat);
 
   // Does the composition.  You must call this just once per object.
   void Compose();
 
- private:
+private:
 
   // Gets the num-arcs limit for this iteration of the algorithm, which will be
   // opts_.initial_num_arcs if there are currently no arcs; or otherwise
@@ -80,7 +80,7 @@ class PrunedCompactLatticeComposer {
   // This is a part of ProcessQueueElements() that has been broken out
   // for clarity. it process the arc_index'th arc out of this source state.
   void ProcessTransition(int32 composed_src_state,
-                         int32 arc_index);
+      int32 arc_index);
 
   // This function recomputes certain members of the ComposedStateInfo relating
   // to the output states: namely, 'forward_cost', 'backward_cost' and
@@ -343,8 +343,8 @@ class PrunedCompactLatticeComposer {
   BaseFloat current_cutoff_;
 
   typedef std::priority_queue<std::pair<BaseFloat, int32>,
-                      std::vector<std::pair<BaseFloat, int32> >,
-                      std::greater<std::pair<BaseFloat, int32> > > QueueType;
+          std::vector<std::pair<BaseFloat, int32> >,
+          std::greater<std::pair<BaseFloat, int32> > > QueueType;
 
   // composed_state_queue_ is a priority queue of the composed states
   // that we are intending to expand.  It contains pairs
@@ -365,7 +365,7 @@ class PrunedCompactLatticeComposer {
   // state in the composed FST.  That would correspond to a state-id in
   // clat_out_, and also to an index into 'composed_state_info_'.
   unordered_map<std::pair<int32,int32>,
-                int32, PairHasher<int32> > pair_to_state_;
+      int32, PairHasher<int32> > pair_to_state_;
 
   // This contains the set of state-indexes of the input lattice that already
   // have states in the composed output (i.e. is in accessed_lat_states_ if and
@@ -379,7 +379,7 @@ class PrunedCompactLatticeComposer {
 
 
 void PrunedCompactLatticeComposer::GetTopsortedStateList(
-    std::vector<int32> *composed_states) const {
+  std::vector<int32> *composed_states) const {
   composed_states->clear();
   composed_states->reserve(clat_out_->NumStates());
   std::set<int32>::const_iterator iter = accessed_lat_states_.begin(),
@@ -403,7 +403,7 @@ int32 PrunedCompactLatticeComposer::GetCurrentArcLimit() const {
   } else {
     KALDI_ASSERT(opts_.growth_ratio > 1.0);
     int32 ans = static_cast<int32>(current_num_arcs *
-                                   opts_.growth_ratio);
+        opts_.growth_ratio);
     if (ans == current_num_arcs)  // make sure the target increases.
       ans = current_num_arcs + 1;
     // if we have already reached a final state, then
@@ -426,7 +426,7 @@ void PrunedCompactLatticeComposer::RecomputePruningInfo() {
 }
 
 void PrunedCompactLatticeComposer::ComputeForwardCosts(
-    const std::vector<int32> &composed_states) {
+  const std::vector<int32> &composed_states) {
   KALDI_ASSERT(composed_states[0] == 0);
 
   // Note: when we initialized composed_state_info_[0]
@@ -450,14 +450,14 @@ void PrunedCompactLatticeComposer::ComputeForwardCosts(
   for (; state_index_iter != state_index_end; ++state_index_iter) {
     int32 composed_state_index = *state_index_iter;
     const ComposedStateInfo &info = composed_state_info_[
-        composed_state_index];
+      composed_state_index];
     double forward_cost = info.forward_cost;
     // The next line is a check for infinity.  If infinities have appeared, it
     // either means there is a bug in the algorithm or there were infinities or
     // NaN's in the lattice.
     KALDI_ASSERT(forward_cost - forward_cost == 0.0);
     fst::ArcIterator<CompactLattice> aiter(*clat_out_,
-                                           composed_state_index);
+        composed_state_index);
     for (; !aiter.Done(); aiter.Next()) {
       const CompactLatticeArc &arc = aiter.Value();
       double arc_cost = ConvertToCost(arc.weight),
@@ -473,7 +473,7 @@ void PrunedCompactLatticeComposer::ComputeForwardCosts(
 }
 
 void PrunedCompactLatticeComposer::ComputeBackwardCosts(
-    const std::vector<int32> &composed_states) {
+  const std::vector<int32> &composed_states) {
   // Access the composed states in reverse topological order from latest to
   // earliest.
   std::vector<int32>::const_reverse_iterator iter = composed_states.rbegin(),
@@ -484,12 +484,12 @@ void PrunedCompactLatticeComposer::ComputeBackwardCosts(
     double backward_cost =
         ConvertToCost(clat_out_->Final(composed_state_index));
     fst::ArcIterator<CompactLattice> aiter(*clat_out_,
-                                           composed_state_index);
+        composed_state_index);
     for (; !aiter.Done(); aiter.Next()) {
       const CompactLatticeArc &arc = aiter.Value();
       double arc_cost = ConvertToCost(arc.weight),
-         next_backward_cost = composed_state_info_[arc.nextstate].backward_cost,
-         this_backward_cost = arc_cost + next_backward_cost;
+          next_backward_cost = composed_state_info_[arc.nextstate].backward_cost,
+          this_backward_cost = arc_cost + next_backward_cost;
       if (this_backward_cost < backward_cost)
         backward_cost = this_backward_cost;
     }
@@ -508,11 +508,11 @@ void PrunedCompactLatticeComposer::ComputeBackwardCosts(
 }
 
 void PrunedCompactLatticeComposer::ComputeDeltaBackwardCosts(
-    const std::vector<int32> &composed_states) {
+  const std::vector<int32> &composed_states) {
 
   int32 num_states = clat_out_->NumStates();
   for (int32 composed_state_index = 0; composed_state_index < num_states;
-       ++composed_state_index) {
+      ++composed_state_index) {
     ComposedStateInfo &info = composed_state_info_[composed_state_index];
     int32 lat_state = info.lat_state;
     // Note: delta_backward_cost will be +infinity at this stage if the
@@ -619,15 +619,15 @@ void PrunedCompactLatticeComposer::ComputeLatticeStateInfo() {
 }
 
 PrunedCompactLatticeComposer::PrunedCompactLatticeComposer(
-      const ComposeLatticePrunedOptions &opts,
-      const CompactLattice &clat_in,
-      fst::DeterministicOnDemandFst<fst::StdArc> *det_fst,
-      CompactLattice* composed_clat): output_reached_final_(false),
-    opts_(opts), clat_in_(clat_in), det_fst_(det_fst),
-    clat_out_(composed_clat),
-    num_arcs_out_(0),
-    output_best_cost_(std::numeric_limits<double>::infinity()),
-    current_cutoff_(std::numeric_limits<double>::infinity()) {
+  const ComposeLatticePrunedOptions &opts,
+  const CompactLattice &clat_in,
+  fst::DeterministicOnDemandFst<fst::StdArc> *det_fst,
+  CompactLattice* composed_clat) : output_reached_final_(false),
+  opts_(opts), clat_in_(clat_in), det_fst_(det_fst),
+  clat_out_(composed_clat),
+  num_arcs_out_(0),
+  output_best_cost_(std::numeric_limits<double>::infinity()),
+  current_cutoff_(std::numeric_limits<double>::infinity()) {
   clat_out_->DeleteStates();
   depth_penalty_ = -1000;
 }
@@ -663,12 +663,12 @@ void PrunedCompactLatticeComposer::AddFirstState() {
 
 
 void PrunedCompactLatticeComposer::ProcessQueueElement(
-    int32 src_composed_state) {
+  int32 src_composed_state) {
   KALDI_ASSERT(static_cast<size_t>(src_composed_state) <
                composed_state_info_.size());
 
   ComposedStateInfo &src_composed_state_info = composed_state_info_[
-      src_composed_state];
+    src_composed_state];
   int32 lat_state = src_composed_state_info.lat_state;
   const LatticeStateInfo &lat_state_info =
       lat_state_info_[lat_state];
@@ -696,9 +696,9 @@ void PrunedCompactLatticeComposer::ProcessQueueElement(
           lat_state_info.arc_delta_costs[sorted_arc_index+1].first;
       expected_cost_offset =
           (src_composed_state_info.forward_cost +
-           lat_state_info.backward_cost +
-           src_composed_state_info.delta_backward_cost +
-           src_composed_state_info.arc_delta_cost - lat_best_cost_);
+          lat_state_info.backward_cost +
+          src_composed_state_info.delta_backward_cost +
+          src_composed_state_info.arc_delta_cost - lat_best_cost_);
     }
     // We do '<' here rather than '<=', so that if current_cutoff_ is infinity
     // and expected_cost_offset is infinity (because we've exhausted all the
@@ -752,11 +752,11 @@ void PrunedCompactLatticeComposer::ProcessQueueElement(
 }
 
 void PrunedCompactLatticeComposer::ProcessTransition(int32 src_composed_state,
-                                                     int32 arc_index) {
+    int32 arc_index) {
   // Make src_composed_state a const pointer not a reference, as we may have to
   // modify the pointer if composed_state_info_ is resized.
   const ComposedStateInfo *src_info = &(composed_state_info_[
-      src_composed_state]);
+        src_composed_state]);
   int32 src_lat_state = src_info->lat_state;
   // Get the arc we are going to expand.
   fst::ArcIterator<CompactLattice> aiter(clat_in_, src_lat_state);
@@ -801,10 +801,10 @@ void PrunedCompactLatticeComposer::ProcessTransition(int32 src_composed_state,
     // 'dest_info', and if the destination state did not already
     // exist, creates a new composed state.
     typedef std::unordered_map<std::pair<int32,int32>, int32,
-        PairHasher<int32> > MapType;
+            PairHasher<int32> > MapType;
     int32 new_composed_state = clat_out_->NumStates();
     std::pair<const std::pair<int32,int32>, int32> value(
-        std::pair<int32,int32>(dest_lat_state, dest_lm_state), new_composed_state);
+      std::pair<int32,int32>(dest_lat_state, dest_lm_state), new_composed_state);
     std::pair<MapType::iterator, bool> ret =
         pair_to_state_.insert(value);
     if (ret.second) {
@@ -843,9 +843,9 @@ void PrunedCompactLatticeComposer::ProcessTransition(int32 src_composed_state,
       // has been removed.
       BaseFloat expected_cost_offset =
           (dest_info->forward_cost +
-           dest_lat_state_info.backward_cost +
-           dest_info->delta_backward_cost -
-           lat_best_cost_);
+          dest_lat_state_info.backward_cost +
+          dest_info->delta_backward_cost -
+          lat_best_cost_);
       if (expected_cost_offset < current_cutoff_) {
         // the following call should be equivalent to
         // composed_state_queue_.push(std::pair<BaseFloat,int32>(...)) with
@@ -894,11 +894,11 @@ void PrunedCompactLatticeComposer::Compose() {
   // while (we have not reached final state  ||
   //        num-arcs produced < target num-arcs) { ...
   while (output_best_cost_ == std::numeric_limits<double>::infinity() ||
-         num_arcs_out_ < opts_.max_arcs) {
+      num_arcs_out_ < opts_.max_arcs) {
     RecomputePruningInfo();
     int32 this_iter_arc_limit = GetCurrentArcLimit();
     while (num_arcs_out_ < this_iter_arc_limit &&
-           !composed_state_queue_.empty()) {
+        !composed_state_queue_.empty()) {
       int32 src_composed_state = composed_state_queue_.top().second;
       composed_state_queue_.pop();
       ProcessQueueElement(src_composed_state);
@@ -944,10 +944,10 @@ void PrunedCompactLatticeComposer::Compose() {
 }
 
 void ComposeCompactLatticePruned(
-    const ComposeLatticePrunedOptions &opts,
-    const CompactLattice &clat,
-    fst::DeterministicOnDemandFst<fst::StdArc> *det_fst,
-    CompactLattice* composed_clat) {
+  const ComposeLatticePrunedOptions &opts,
+  const CompactLattice &clat,
+  fst::DeterministicOnDemandFst<fst::StdArc> *det_fst,
+  CompactLattice* composed_clat) {
   PrunedCompactLatticeComposer composer(opts, clat, det_fst, composed_clat);
   composer.Compose();
 }

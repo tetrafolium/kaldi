@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
       trans_model.Read(is.Stream(), binary_read);
     }
     RandomAccessMapAmDiagGmmReaderMapped gmms_reader(gmms_rspecifier,
-                                                     utt2spk_rspecifier);
+        utt2spk_rspecifier);
 
     Int32VectorWriter words_writer(words_wspecifier);
     Int32VectorWriter alignment_writer(alignment_wspecifier);
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
     LatticeWriter lattice_writer;
 
     if (lattice_wspecifier != "") {
-      if (! (determinize ? compact_lattice_writer.Open(lattice_wspecifier)
+      if (!(determinize ? compact_lattice_writer.Open(lattice_wspecifier)
              : lattice_writer.Open(lattice_wspecifier)))
         KALDI_ERR << "Could not open table for writing lattices: "
                   << lattice_wspecifier;
@@ -152,8 +152,8 @@ int main(int argc, char *argv[]) {
 
         LatticeFasterDecoder decoder(*decode_fst, decoder_opts);
         kaldi::DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model,
-                                                      features,
-                                                      acoustic_scale);
+            features,
+            acoustic_scale);
         double like;
         if (DecodeUtteranceLatticeFaster(
                 decoder, gmm_decodable, trans_model, word_syms, utt,
@@ -197,8 +197,8 @@ int main(int argc, char *argv[]) {
 
         LatticeFasterDecoder decoder(fst_reader.Value(utt), decoder_opts);
         kaldi::DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model,
-                                                      features,
-                                                      acoustic_scale);
+            features,
+            acoustic_scale);
         double like;
         if (DecodeUtteranceLatticeFaster(
                 decoder, gmm_decodable, trans_model, word_syms, utt,

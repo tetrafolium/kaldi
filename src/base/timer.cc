@@ -27,7 +27,7 @@
 namespace kaldi {
 
 class ProfileStats {
- public:
+public:
   void AccStats(const char *function_name, double elapsed) {
     std::unordered_map<const char*, ProfileStatsEntry>::iterator
         iter = map_.find(function_name);
@@ -47,25 +47,25 @@ class ProfileStats {
 
     ReverseSecondComparator comp;
     std::vector<std::pair<std::string, double> > pairs(total_time.begin(),
-                                                       total_time.end());
+        total_time.end());
     std::sort(pairs.begin(), pairs.end(), comp);
     for (size_t i = 0; i < pairs.size(); i++) {
       KALDI_LOG << "Time taken in " << pairs[i].first << " is "
                 << std::fixed << std::setprecision(2) << pairs[i].second << "s.";
     }
   }
- private:
+private:
 
   struct ProfileStatsEntry {
     std::string name;
     double total_time;
     ProfileStatsEntry() { }
-    ProfileStatsEntry(const char *name): name(name) { }
+    ProfileStatsEntry(const char *name) : name(name) { }
   };
 
   struct ReverseSecondComparator {
     bool operator () (const std::pair<std::string, double> &a,
-                      const std::pair<std::string, double> &b) {
+        const std::pair<std::string, double> &b) {
       return a.second > b.second;
     }
   };

@@ -43,7 +43,7 @@ void LdaEstimate::Scale(BaseFloat f) {
 }
 
 void LdaEstimate::Accumulate(const VectorBase<BaseFloat> &data,
-                             int32 class_id, BaseFloat weight) {
+    int32 class_id, BaseFloat weight) {
   KALDI_ASSERT(class_id >= 0);
   KALDI_ASSERT(class_id < NumClasses() && data.Dim() == Dim());
 
@@ -55,9 +55,9 @@ void LdaEstimate::Accumulate(const VectorBase<BaseFloat> &data,
 }
 
 void LdaEstimate::GetStats(SpMatrix<double> *total_covar,
-                           SpMatrix<double> *between_covar,
-                           Vector<double> *total_mean,
-                           double *tot_count) const {
+    SpMatrix<double> *between_covar,
+    Vector<double> *total_mean,
+    double *tot_count) const {
   int32 num_class = NumClasses(), dim = Dim();
   double sum = zero_acc_.Sum();
   *tot_count = sum;
@@ -68,7 +68,7 @@ void LdaEstimate::GetStats(SpMatrix<double> *total_covar,
   total_mean->Scale(1.0 / sum);
   total_covar->Scale(1.0 / sum);
   total_covar->AddVec2(-1.0, *total_mean);
-  
+
   between_covar->Resize(dim);
   Vector<double> class_mean(dim);
   for (int32 c = 0; c < num_class; c++) {
@@ -83,19 +83,19 @@ void LdaEstimate::GetStats(SpMatrix<double> *total_covar,
 
 
 void LdaEstimate::Estimate(const LdaEstimateOptions &opts,
-                           Matrix<BaseFloat> *m,
-                           Matrix<BaseFloat> *mfull) const {
+    Matrix<BaseFloat> *m,
+    Matrix<BaseFloat> *mfull) const {
   int32 target_dim = opts.dim;
   KALDI_ASSERT(target_dim > 0);
   // between-class covar is of most rank C-1
   KALDI_ASSERT(target_dim <= Dim() && (target_dim < NumClasses() || opts.allow_large_dim));
   int32 dim = Dim();
-  
+
   double count;
   SpMatrix<double> total_covar, bc_covar;
   Vector<double> total_mean;
   GetStats(&total_covar, &bc_covar, &total_mean, &count);
-  
+
   // within-class covariance
   SpMatrix<double> wc_covar(total_covar);
   wc_covar.AddSp(-1.0, bc_covar);
@@ -108,7 +108,7 @@ void LdaEstimate::Estimate(const LdaEstimateOptions &opts,
               << " to diagonal and trying again.\n";
     for (int32 i = 0; i < wc_covar.NumRows(); i++)
       wc_covar(i, i) += smooth;
-    wc_covar_sqrt.Cholesky(wc_covar);    
+    wc_covar_sqrt.Cholesky(wc_covar);
   }
   Matrix<double> wc_covar_sqrt_mat(wc_covar_sqrt);
   // copy wc_covar_sqrt to Matrix, because it facilitates further use
@@ -128,15 +128,15 @@ void LdaEstimate::Estimate(const LdaEstimateOptions &opts,
 
   KALDI_LOG << "Sum of all singular values is " << svd_d.Sum();
   KALDI_LOG << "Sum of selected singular values is " <<
-      SubVector<double>(svd_d, 0, target_dim).Sum();
-  
+    SubVector<double>(svd_d, 0, target_dim).Sum();
+
   Matrix<double> lda_mat(dim, dim);
   lda_mat.AddMatMat(1.0, svd_u, kTrans, wc_covar_sqrt_mat, kNoTrans, 0.0);
 
   // finally, copy first target_dim rows to m
   m->Resize(target_dim, dim);
   m->CopyFromMat(lda_mat.Range(0, target_dim, 0, dim));
-  
+
   if (mfull != NULL) {
     mfull->Resize(dim, dim);
     mfull->CopyFromMat(lda_mat);
@@ -159,12 +159,12 @@ void LdaEstimate::Estimate(const LdaEstimateOptions &opts,
     AddMeanOffset(total_mean, m);
     if (mfull != NULL)
       AddMeanOffset(total_mean, mfull);
-  }  
+  }
 }
 
 // static
 void LdaEstimate::AddMeanOffset(const VectorBase<double> &mean_dbl,
-                                Matrix<BaseFloat> *projection) {
+    Matrix<BaseFloat> *projection) {
   Vector<BaseFloat> mean(mean_dbl);
   Vector<BaseFloat> neg_projected_mean(projection->NumRows());
   // the negative

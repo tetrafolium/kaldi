@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     bool binary_write = true,
         copy_am = true,
         copy_tm = true;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("copy-am", &copy_am, "Copy the acoustic model (AmDiagGmm object)");

@@ -32,9 +32,9 @@ namespace kaldi {
 
 /// Top-down clustering of the Gaussians in a model based on their means.
 void RegressionTree::BuildTree(const Vector<BaseFloat> &state_occs,
-                               const std::vector<int32> &sil_indices,
-                               const AmDiagGmm &am,
-                               int32 max_clusters) {
+    const std::vector<int32> &sil_indices,
+    const AmDiagGmm &am,
+    int32 max_clusters) {
   KALDI_ASSERT(IsSortedAndUniq(sil_indices));
   int32 dim = am.Dim(),
       num_pdfs = static_cast<int32>(am.NumPdfs());
@@ -61,7 +61,7 @@ void RegressionTree::BuildTree(const Vector<BaseFloat> &state_occs,
       am.GetGaussianVariance(pdf_index, gauss_index, &tmp_var);
       tmp_var.AddVec2(1.0, tmp_mean);  // make it x^2 stats.
       BaseFloat this_weight =  state_occs(pdf_index) *
-                               (am.GetPdf(pdf_index).weights())(gauss_index);
+          (am.GetPdf(pdf_index).weights())(gauss_index);
       tmp_mean.Scale(this_weight);
       tmp_var.Scale(this_weight);
       gauss_indices.push_back(std::make_pair(pdf_index, gauss_index));
@@ -75,7 +75,7 @@ void RegressionTree::BuildTree(const Vector<BaseFloat> &state_occs,
   int32 num_leaves;
   TreeClusterOptions opts;  // Use default options or get from somewhere else
   TreeCluster(gauss_means,
-              (sil_indices.empty() ? max_clusters : max_clusters-1),
+      (sil_indices.empty() ? max_clusters : max_clusters-1),
               NULL /* clusters not needed */,
               &leaves, &clust_parents, &num_leaves, opts);
 
@@ -127,8 +127,8 @@ void RegressionTree::BuildTree(const Vector<BaseFloat> &state_occs,
 
 
 static bool GetActiveParents(int32 node, const vector<int32> &parents,
-                             const vector<bool> &is_active,
-                             vector<int32> *active_parents_out) {
+    const vector<bool> &is_active,
+    vector<int32> *active_parents_out) {
   KALDI_ASSERT(parents.size() == is_active.size());
   KALDI_ASSERT(static_cast<size_t>(node) < parents.size());
   active_parents_out->clear();
@@ -160,9 +160,9 @@ static bool GetActiveParents(int32 node, const vector<int32> &parents,
 /// of regression classes. Return value is true if at least one regression
 /// class passed the count cutoff, false otherwise.
 bool RegressionTree::GatherStats(const vector<AffineXformStats*> &stats_in,
-                                 double min_count,
-                                 vector<int32> *regclasses_out,
-                                 vector<AffineXformStats*> *stats_out) const {
+    double min_count,
+    vector<int32> *regclasses_out,
+    vector<AffineXformStats*> *stats_out) const {
   KALDI_ASSERT(static_cast<int32>(stats_in.size()) == num_baseclasses_);
   if (static_cast<int32>(regclasses_out->size()) != num_baseclasses_)
     regclasses_out->resize(static_cast<size_t>(num_baseclasses_), -1);
@@ -288,7 +288,7 @@ void RegressionTree::Write(std::ostream &out, bool binary) const {
     WriteToken(out, binary, "<CLASS>");
     WriteBasicType(out, binary, bclass);
     WriteBasicType(out, binary, static_cast<int32>(
-        baseclasses_[bclass].size()));
+          baseclasses_[bclass].size()));
     if (!binary) out << '\n';
     for (vector< pair<int32, int32> >::const_iterator
         it = baseclasses_[bclass].begin(), end = baseclasses_[bclass].end();
@@ -306,7 +306,7 @@ void RegressionTree::Write(std::ostream &out, bool binary) const {
 }
 
 void RegressionTree::Read(std::istream &in, bool binary,
-                          const AmDiagGmm &am) {
+    const AmDiagGmm &am) {
   int32 total_gauss = 0;
   ExpectToken(in, binary, "<REGTREE>");
   ExpectToken(in, binary, "<NUMNODES>");
@@ -344,7 +344,7 @@ void RegressionTree::Read(std::istream &in, bool binary,
 
   if (total_gauss != am.NumGauss())
     KALDI_ERR << "Expecting " << am.NumGauss() << " Gaussians in "
-        "regression tree, found " << total_gauss;
+      "regression tree, found " << total_gauss;
   MakeGauss2Bclass(am);
 }
 
@@ -360,7 +360,7 @@ void RegressionTree::MakeGauss2Bclass(const AmDiagGmm &am) {
       ++bclass_index) {
     vector< pair<int32, int32> >::const_iterator itr =
         baseclasses_[bclass_index].begin(), end =
-            baseclasses_[bclass_index].end();
+        baseclasses_[bclass_index].end();
     for (; itr != end; ++itr) {
       KALDI_ASSERT(itr->first < am.NumPdfs() &&
           itr->second < am.NumGaussInPdf(itr->first));
@@ -371,7 +371,7 @@ void RegressionTree::MakeGauss2Bclass(const AmDiagGmm &am) {
 
   if (total_gauss != am.NumGauss())
     KALDI_ERR << "Expecting " << am.NumGauss() << " Gaussians in "
-        "regression tree, found " << total_gauss;
+      "regression tree, found " << total_gauss;
 }
 
 }  // namespace kaldi

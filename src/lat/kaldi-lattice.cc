@@ -60,7 +60,7 @@ Lattice* ConvertToLattice(Lattice *ifst) {
 
 
 bool WriteCompactLattice(std::ostream &os, bool binary,
-                         const CompactLattice &t) {
+    const CompactLattice &t) {
   if (binary) {
     fst::FstWriteOptions opts;
     // Leave all the options default.  Normally these lattices wouldn't have any
@@ -76,8 +76,8 @@ bool WriteCompactLattice(std::ostream &os, bool binary,
     os << '\n';
     bool acceptor = true, write_one = false;
     fst::FstPrinter<CompactLatticeArc> printer(t, t.InputSymbols(),
-                                               t.OutputSymbols(),
-                                               NULL, acceptor, write_one, "\t");
+        t.OutputSymbols(),
+        NULL, acceptor, write_one, "\t");
     printer.Print(&os, "<unknown>");
     if (os.fail())
       KALDI_WARN << "Stream failure detected.";
@@ -98,15 +98,15 @@ class LatticeReader {
   typedef CompactLatticeWeight CWeight;
   typedef Arc::Label Label;
   typedef Arc::StateId StateId;
- public:
+public:
   // everything is static in this class.
 
   /** This function reads from the FST text format; it does not know in advance
       whether it's a Lattice or CompactLattice in the stream so it tries to
       read both formats until it becomes clear which is the correct one.
-  */
+   */
   static std::pair<Lattice*, CompactLattice*> ReadText(
-      std::istream &is) {
+    std::istream &is) {
     typedef std::pair<Lattice*, CompactLattice*> PairT;
     using std::string;
     using std::vector;
@@ -154,38 +154,38 @@ class LatticeReader {
         Weight w;
         StateId d = s;
         switch (col.size()) {
-          case 1 :
-            fst->SetFinal(s, Weight::One());
-            break;
-          case 2:
-            if (!StrToWeight(col[1], true, &w)) ok = false;
-            else fst->SetFinal(s, w);
-            break;
-          case 3: // 3 columns not ok for Lattice format; it's not an acceptor.
-            ok = false;
-            break;
-          case 4:
-            ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
-                ConvertStringToInteger(col[2], &arc.ilabel) &&
-                ConvertStringToInteger(col[3], &arc.olabel);
-            if (ok) {
-              d = arc.nextstate;
-              arc.weight = Weight::One();
-              fst->AddArc(s, arc);
-            }
-            break;
-          case 5:
-            ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
-                ConvertStringToInteger(col[2], &arc.ilabel) &&
-                ConvertStringToInteger(col[3], &arc.olabel) &&
-                StrToWeight(col[4], false, &arc.weight);
-            if (ok) {
-              d = arc.nextstate;
-              fst->AddArc(s, arc);
-            }
-            break;
-          default:
-            ok = false;
+        case 1:
+          fst->SetFinal(s, Weight::One());
+          break;
+        case 2:
+          if (!StrToWeight(col[1], true, &w)) ok = false;
+          else fst->SetFinal(s, w);
+          break;
+        case 3:   // 3 columns not ok for Lattice format; it's not an acceptor.
+          ok = false;
+          break;
+        case 4:
+          ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
+              ConvertStringToInteger(col[2], &arc.ilabel) &&
+              ConvertStringToInteger(col[3], &arc.olabel);
+          if (ok) {
+            d = arc.nextstate;
+            arc.weight = Weight::One();
+            fst->AddArc(s, arc);
+          }
+          break;
+        case 5:
+          ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
+              ConvertStringToInteger(col[2], &arc.ilabel) &&
+              ConvertStringToInteger(col[3], &arc.olabel) &&
+              StrToWeight(col[4], false, &arc.weight);
+          if (ok) {
+            d = arc.nextstate;
+            fst->AddArc(s, arc);
+          }
+          break;
+        default:
+          ok = false;
         }
         while (d >= fst->NumStates())
           fst->AddState();
@@ -200,35 +200,35 @@ class LatticeReader {
         CWeight w;
         StateId d = s;
         switch (col.size()) {
-          case 1 :
-            cfst->SetFinal(s, CWeight::One());
-            break;
-          case 2:
-            if (!StrToCWeight(col[1], true, &w)) ok = false;
-            else cfst->SetFinal(s, w);
-            break;
-          case 3: // compact-lattice is acceptor format: state, next-state, label.
-            ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
-                ConvertStringToInteger(col[2], &arc.ilabel);
-            if (ok) {
-              d = arc.nextstate;
-              arc.olabel = arc.ilabel;
-              arc.weight = CWeight::One();
-              cfst->AddArc(s, arc);
-            }
-            break;
-          case 4:
-            ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
-                ConvertStringToInteger(col[2], &arc.ilabel) &&
-                StrToCWeight(col[3], false, &arc.weight);
-            if (ok) {
-              d = arc.nextstate;
-              arc.olabel = arc.ilabel;
-              cfst->AddArc(s, arc);
-            }
-            break;
-          case 5: default:
-            ok = false;
+        case 1:
+          cfst->SetFinal(s, CWeight::One());
+          break;
+        case 2:
+          if (!StrToCWeight(col[1], true, &w)) ok = false;
+          else cfst->SetFinal(s, w);
+          break;
+        case 3:   // compact-lattice is acceptor format: state, next-state, label.
+          ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
+              ConvertStringToInteger(col[2], &arc.ilabel);
+          if (ok) {
+            d = arc.nextstate;
+            arc.olabel = arc.ilabel;
+            arc.weight = CWeight::One();
+            cfst->AddArc(s, arc);
+          }
+          break;
+        case 4:
+          ok = ConvertStringToInteger(col[1], &arc.nextstate) &&
+              ConvertStringToInteger(col[2], &arc.ilabel) &&
+              StrToCWeight(col[3], false, &arc.weight);
+          if (ok) {
+            d = arc.nextstate;
+            arc.olabel = arc.ilabel;
+            cfst->AddArc(s, arc);
+          }
+          break;
+        case 5: default:
+          ok = false;
         }
         while (d >= cfst->NumStates())
           cfst->AddState();
@@ -302,7 +302,7 @@ Lattice *ReadLatticeText(std::istream &is) {
 }
 
 bool ReadCompactLattice(std::istream &is, bool binary,
-                        CompactLattice **clat) {
+    CompactLattice **clat) {
   KALDI_ASSERT(*clat == NULL);
   if (binary) {
     fst::FstHeader hdr;
@@ -316,7 +316,7 @@ bool ReadCompactLattice(std::istream &is, bool binary,
       return false;
     }
     fst::FstReadOptions ropts("<unspecified>",
-                              &hdr);
+        &hdr);
 
     typedef fst::CompactLatticeWeightTpl<fst::LatticeWeightTpl<float>, int32> T1;
     typedef fst::CompactLatticeWeightTpl<fst::LatticeWeightTpl<double>, int32> T2;
@@ -401,8 +401,8 @@ bool WriteLattice(std::ostream &os, bool binary, const Lattice &t) {
     os << '\n';
     bool acceptor = false, write_one = false;
     fst::FstPrinter<LatticeArc> printer(t, t.InputSymbols(),
-                                        t.OutputSymbols(),
-                                        NULL, acceptor, write_one, "\t");
+        t.OutputSymbols(),
+        NULL, acceptor, write_one, "\t");
     printer.Print(&os, "<unknown>");
     if (os.fail())
       KALDI_WARN << "Stream failure detected.";
@@ -415,7 +415,7 @@ bool WriteLattice(std::ostream &os, bool binary, const Lattice &t) {
 }
 
 bool ReadLattice(std::istream &is, bool binary,
-                 Lattice **lat) {
+    Lattice **lat) {
   KALDI_ASSERT(*lat == NULL);
   if (binary) {
     fst::FstHeader hdr;
@@ -429,7 +429,7 @@ bool ReadLattice(std::istream &is, bool binary,
       return false;
     }
     fst::FstReadOptions ropts("<unspecified>",
-                              &hdr);
+        &hdr);
 
     typedef fst::CompactLatticeWeightTpl<fst::LatticeWeightTpl<float>, int32> T1;
     typedef fst::CompactLatticeWeightTpl<fst::LatticeWeightTpl<double>, int32> T2;

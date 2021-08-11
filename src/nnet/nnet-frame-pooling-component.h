@@ -41,8 +41,8 @@ namespace nnet1 {
  * by weight-vector size.
  */
 class FramePoolingComponent : public UpdatableComponent {
- public:
-  FramePoolingComponent(int32 dim_in, int32 dim_out):
+public:
+  FramePoolingComponent(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out),
     feature_dim_(0),
     normalize_(false)
@@ -214,7 +214,7 @@ class FramePoolingComponent : public UpdatableComponent {
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // check dims
     KALDI_ASSERT(in.NumCols() % feature_dim_ == 0);
     KALDI_ASSERT(out->NumCols() % feature_dim_ == 0);
@@ -231,15 +231,15 @@ class FramePoolingComponent : public UpdatableComponent {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     KALDI_ERR << "Unimplemented.";
   }
 
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     // useful dims
     int32 num_pools = offset_.size();
     // lazy init
@@ -251,10 +251,10 @@ class FramePoolingComponent : public UpdatableComponent {
         // multiply matrices element-wise, and sum to get the derivative
         CuSubMatrix<BaseFloat> in_frame(
           input.ColRange((offset_[p]+i) * feature_dim_, feature_dim_)
-        );
+          );
         CuSubMatrix<BaseFloat> diff_frame(
           diff.ColRange(p * feature_dim_, feature_dim_)
-        );
+          );
         CuMatrix<BaseFloat> mul_elems(in_frame);
         mul_elems.MulElements(diff_frame);
         weight_diff_[p](i) = mul_elems.Sum();
@@ -262,7 +262,7 @@ class FramePoolingComponent : public UpdatableComponent {
     }
     // update
     for (int32 p = 0; p < num_pools; p++) {
-      weight_[p].AddVec(- learn_rate_coef_ * opts_.learn_rate, weight_diff_[p]);
+      weight_[p].AddVec(-learn_rate_coef_ * opts_.learn_rate, weight_diff_[p]);
     }
     // force to be positive, re-normalize the sum
     if (normalize_) {
@@ -273,7 +273,7 @@ class FramePoolingComponent : public UpdatableComponent {
     }
   }
 
- private:
+private:
   int32 feature_dim_;  // feature dimension before splicing
   std::vector<int32> offset_;  // vector of pooling offsets
   /// Vector of pooling weight vectors,

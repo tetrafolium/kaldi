@@ -23,19 +23,19 @@ namespace kaldi {
 namespace nnet2 {
 
 /*
-  This function gets the "update direction".  The vector "nnets" is
-  interpreted as (old-nnet new-nnet1 net-nnet2 ... new-nnetN), and
-  the "update direction" is the average of the new nnets, minus the
-  old nnet.
-*/
+   This function gets the "update direction".  The vector "nnets" is
+   interpreted as (old-nnet new-nnet1 net-nnet2 ... new-nnetN), and
+   the "update direction" is the average of the new nnets, minus the
+   old nnet.
+ */
 static void GetUpdateDirection(const std::vector<Nnet> &nnets,
-                               Nnet *direction) {
+    Nnet *direction) {
   KALDI_ASSERT(nnets.size() > 1);
   int32 num_new_nnets = nnets.size() - 1;
   Vector<BaseFloat> scales(nnets[0].NumUpdatableComponents());
 
   scales.Set(1.0 / num_new_nnets);
-  
+
   *direction = nnets[1];
   direction->ScaleComponents(scales); // first of the new nnets.
   for (int32 n = 2; n < 1 + num_new_nnets; n++)
@@ -50,30 +50,30 @@ static void GetUpdateDirection(const std::vector<Nnet> &nnets,
 /// each updatable component of "direction" first scaled by
 /// the appropriate scale.
 static void AddDirection(const Nnet &orig_nnet,
-                         const Nnet &direction,
-                         const VectorBase<BaseFloat> &scales,
-                         Nnet *dest) {
+    const Nnet &direction,
+    const VectorBase<BaseFloat> &scales,
+    Nnet *dest) {
   *dest = orig_nnet;
   dest->AddNnet(scales, direction);
 }
 
 
 static BaseFloat ComputeObjfAndGradient(
-    const std::vector<NnetExample> &validation_set,
-    const Vector<double> &scale_params,
-    const Nnet &orig_nnet,
-    const Nnet &direction,
-    Vector<double> *gradient) {
-  
+  const std::vector<NnetExample> &validation_set,
+  const Vector<double> &scale_params,
+  const Nnet &orig_nnet,
+  const Nnet &direction,
+  Vector<double> *gradient) {
+
   Vector<BaseFloat> scale_params_float(scale_params);
 
   Nnet nnet_combined;
   AddDirection(orig_nnet, direction, scale_params_float, &nnet_combined);
-  
+
   Nnet nnet_gradient(nnet_combined);
   bool is_gradient = true;
   nnet_gradient.SetZero(is_gradient);
-  
+
   // note: "ans" is normalized by the total weight of validation frames.
   int32 batch_size = 1024;
   BaseFloat ans = ComputeNnetGradient(nnet_combined,
@@ -90,30 +90,30 @@ static BaseFloat ComputeObjfAndGradient(
         dynamic_cast<const UpdatableComponent*>(&(nnet_gradient.GetComponent(j)));
     if (uc_direction != NULL) {
       BaseFloat dotprod = uc_direction->DotProduct(*uc_gradient) / tot_count;
-      (*gradient)(i) = dotprod; 
+      (*gradient)(i) = dotprod;
       i++;
     }
   }
   KALDI_ASSERT(i == scale_params.Dim());
   return ans;
 }
-                                   
+
 
 void CombineNnetsA(const NnetCombineAconfig &config,
-                   const std::vector<NnetExample> &validation_set,
-                   const std::vector<Nnet> &nnets,
-                   Nnet *nnet_out) {
+    const std::vector<NnetExample> &validation_set,
+    const std::vector<Nnet> &nnets,
+    Nnet *nnet_out) {
 
   Nnet direction; // the update direction = avg(nnets[1 ... N]) - nnets[0].
   GetUpdateDirection(nnets, &direction);
-  
+
   Vector<double> scale_params(nnets[0].NumUpdatableComponents()); // initial
   // scale on "direction".
 
   int32 dim = scale_params.Dim();
   KALDI_ASSERT(dim > 0);
   Vector<double> gradient(dim);
-  
+
   double objf, initial_objf, zero_objf;
 
   // Compute objf at zero; we don't actually need this gradient.
@@ -124,7 +124,7 @@ void CombineNnetsA(const NnetCombineAconfig &config,
                                      &gradient);
   KALDI_LOG << "Objective function at old parameters is "
             << zero_objf;
-  
+
   scale_params.Set(1.0); // start optimization from the average of the parameters.
 
   LbfgsOptions lbfgs_options;
@@ -132,11 +132,11 @@ void CombineNnetsA(const NnetCombineAconfig &config,
   lbfgs_options.m = dim; // Store the same number of vectors as the dimension
   // itself, so this is BFGS.
   lbfgs_options.first_step_length = config.initial_step;
-  
+
   OptimizeLbfgs<double> lbfgs(scale_params,
-                              lbfgs_options);
-  
-  for (int32 i = 0; i < config.num_bfgs_iters; i++) {    
+      lbfgs_options);
+
+  for (int32 i = 0; i < config.num_bfgs_iters; i++) {
     scale_params.CopyFromVec(lbfgs.GetProposedValue());
     objf = ComputeObjfAndGradient(validation_set,
                                   scale_params,
@@ -146,8 +146,8 @@ void CombineNnetsA(const NnetCombineAconfig &config,
 
     KALDI_VLOG(2) << "Iteration " << i << " scale-params = " << scale_params
                   << ", objf = " << objf << ", gradient = " << gradient;
-    
-    if (i == 0) initial_objf = objf;    
+
+    if (i == 0) initial_objf = objf;
     lbfgs.DoStep(objf, gradient);
   }
 
@@ -191,10 +191,10 @@ void CombineNnetsA(const NnetCombineAconfig &config,
       // expect this branch to be taken only rarely if at all.
       KALDI_WARN << "After overshooting, objf was worse than not updating; not doing the "
                  << "overshoot. ";
-     scale_params.Scale(1.0 / overshoot);
+      scale_params.Scale(1.0 / overshoot);
     }
   } // Else don't do the "overshoot" stuff.
-  
+
   Vector<BaseFloat> scale_params_float(scale_params);
   // Output to "nnet_out":
   AddDirection(nnets[0], direction, scale_params_float, nnet_out);
@@ -224,7 +224,7 @@ void CombineNnetsA(const NnetCombineAconfig &config,
     }
   }
 }
- 
-  
+
+
 } // namespace nnet2
 } // namespace kaldi

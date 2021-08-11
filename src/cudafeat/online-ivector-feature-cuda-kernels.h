@@ -19,23 +19,23 @@
 
 namespace kaldi {
 void batched_gemv_reduce(int batch_size, int rows, int cols, int A_stride,
-                         const float *AT, int B_stride, const float *B,
-                         float *C);
+    const float *AT, int B_stride, const float *B,
+    float *C);
 
 void splice_features(int32_t num_frames, int32_t feat_dim, int32_t left,
-                     int32_t size, const float *feats, int32_t ldf,
-                     float *sfeats, int32_t lds);
+    int32_t size, const float *feats, int32_t ldf,
+    float *sfeats, int32_t lds);
 
 void update_linear_and_quadratic_terms(int32_t n, float old_num_frames,
-                                       float prior_offset_,
-                                       float *cur_tot_weight, int32_t max_count,
-                                       float *quadratic, float *linear);
+    float prior_offset_,
+    float *cur_tot_weight, int32_t max_count,
+    float *quadratic, float *linear);
 
 void get_matrix_sum_double_buffer(int32_t b, int32_t num_rows, int32_t num_cols,
-                                  float *A, int32_t lda, float scale,
-                                  float *sum);
+    float *A, int32_t lda, float scale,
+    float *sum);
 
 void square_matrix(int32_t num_rows, int32_t num_cols, const float *feats,
-                   int32_t ldf, float *feats_sq, int32_t lds);
+    int32_t ldf, float *feats_sq, int32_t lds);
 }
 #endif

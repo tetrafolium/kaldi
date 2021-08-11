@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
     if ( (disambig_wxfilename != "") && (disambig_rxfilename == "") )
       KALDI_ERR << "fstmakecontextfst: cannot specify --write-disambig-syms if "
-          "not specifying --read-disambig-syms\n";
+        "not specifying --read-disambig-syms\n";
 
     std::vector<int32> disambig_in;
     if (disambig_rxfilename != "") {
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (std::binary_search(phone_syms.begin(), phone_syms.end(), subseq_sym)
-       || std::binary_search(disambig_in.begin(), disambig_in.end(), subseq_sym))
+        || std::binary_search(disambig_in.begin(), disambig_in.end(), subseq_sym))
       KALDI_ERR << "Invalid subsequential symbol " << subseq_sym
                 << ", already a phone or disambiguation symbol.";
 

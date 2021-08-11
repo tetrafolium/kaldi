@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     SequentialBaseFloatMatrixReader feat_reader(feat_rspecifier);
     BaseFloatMatrixWriter feat_writer(feat_wspecifier);
 
-    for (;!feat_reader.Done(); feat_reader.Next()) {
+    for (; !feat_reader.Done(); feat_reader.Next()) {
       std::string utt = feat_reader.Key();
       Matrix<BaseFloat> feat(feat_reader.Value());
       if (feat.NumRows() == 0) {
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
         continue;
       }
       Matrix<BaseFloat> cmvn_feat(feat.NumRows(),
-                                  feat.NumCols(), kUndefined);
+          feat.NumCols(), kUndefined);
 
       SlidingWindowCmn(opts, feat, &cmvn_feat);
 

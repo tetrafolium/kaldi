@@ -21,7 +21,7 @@
 #include "tree/context-dep.h"
 
 void MakeEvent(std::string &qry, fst::SymbolTable *phone_syms,
-               kaldi::EventType **query)
+    kaldi::EventType **query)
 {
   using namespace kaldi;
 
@@ -91,10 +91,10 @@ int main(int argc, char **argv) {
 
     fst::SymbolTable *phones_symtab = NULL;
     {
-        std::ifstream is(phnfile.c_str());
-        phones_symtab = ::fst::SymbolTable::ReadText(is, phnfile);
-        if (!phones_symtab)
-            KALDI_ERR << "Could not read phones symbol table file "<< phnfile;
+      std::ifstream is(phnfile.c_str());
+      phones_symtab = ::fst::SymbolTable::ReadText(is, phnfile);
+      if (!phones_symtab)
+        KALDI_ERR << "Could not read phones symbol table file "<< phnfile;
     }
 
     EventType *query = NULL;

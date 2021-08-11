@@ -33,25 +33,25 @@
 #endif
 
 /* some test  examples:
- ( echo "0 0 0 0"; echo "0 0" ) | fstcompile | fstdeterminizestar | fstprint
- ( echo "0 0 1 0"; echo "0 0" ) | fstcompile | fstdeterminizestar | fstprint
- ( echo "0 0 1 0"; echo "0 1 1 0"; echo "0 0" ) | fstcompile | fstdeterminizestar | fstprint
+   ( echo "0 0 0 0"; echo "0 0" ) | fstcompile | fstdeterminizestar | fstprint
+   ( echo "0 0 1 0"; echo "0 0" ) | fstcompile | fstdeterminizestar | fstprint
+   ( echo "0 0 1 0"; echo "0 1 1 0"; echo "0 0" ) | fstcompile | fstdeterminizestar | fstprint
  # this last one fails [correctly]:
- ( echo "0 0 0 1"; echo "0 0" ) | fstcompile | fstdeterminizestar | fstprint
+   ( echo "0 0 0 1"; echo "0 0" ) | fstcompile | fstdeterminizestar | fstprint
 
-  cd ~/tmpdir
-  while true; do
+   cd ~/tmpdir
+   while true; do
     fstrand > 1.fst
     fstpredeterminize out.lst 1.fst | fstdeterminizestar | fstrmsymbols out.lst > 2.fst
     fstequivalent --random=true 1.fst 2.fst || echo "Test failed"
     echo -n "."
-  done
+   done
 
- Test of debugging [with non-determinizable input]:
- ( echo " 0 0 1 0 1.0"; echo "0 1 1 0"; echo "1 1 1 0 0"; echo "0 2 2 0"; echo "2"; echo "1" ) | fstcompile | fstdeterminizestar
-  kill -SIGUSR1 [the process-id of fstdeterminizestar]
-  # prints out a bunch of debugging output showing the mess it got itself into.
-*/
+   Test of debugging [with non-determinizable input]:
+   ( echo " 0 0 1 0 1.0"; echo "0 1 1 0"; echo "1 1 1 0 0"; echo "0 2 2 0"; echo "2"; echo "1" ) | fstcompile | fstdeterminizestar
+   kill -SIGUSR1 [the process-id of fstdeterminizestar]
+ # prints out a bunch of debugging output showing the mess it got itself into.
+ */
 
 
 bool debug_location = false;

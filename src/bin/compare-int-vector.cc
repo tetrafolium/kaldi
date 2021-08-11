@@ -26,23 +26,23 @@
 
 namespace kaldi {
 void AddToCount(int32 location_to_add,
-                double value_to_add,
-                std::vector<double> *counts) {
+    double value_to_add,
+    std::vector<double> *counts) {
   if (location_to_add < 0)
     KALDI_ERR << "Contents of vectors cannot be "
-        "negative if --write-tot-counts or --write-diff-counts "
-        "options are provided.";
+      "negative if --write-tot-counts or --write-diff-counts "
+      "options are provided.";
   if (counts->size() <= static_cast<size_t>(location_to_add))
     counts->resize(location_to_add + 1, 0.0);
   (*counts)[location_to_add] += value_to_add;
 }
 
 void AddToConfusionMatrix(int32 phone1, int32 phone2,
-                          Matrix<double> *counts) {
+    Matrix<double> *counts) {
   if (phone1 < 0 || phone2 < 0)
     KALDI_ERR << "Contents of vectors cannot be "
-        "negative if --write-confusion-matrix option is "
-        "provided.";
+      "negative if --write-confusion-matrix option is "
+      "provided.";
   int32 max_size = std::max<int32>(phone1, phone2) + 1;
   if (counts->NumRows() < max_size)
     counts->Resize(max_size, max_size, kCopyData);
@@ -51,8 +51,8 @@ void AddToConfusionMatrix(int32 phone1, int32 phone2,
 
 
 void WriteAsKaldiVector(const std::vector<double> &counts,
-                        std::string &wxfilename,
-                        bool binary) {
+    std::string &wxfilename,
+    bool binary) {
   Vector<BaseFloat> counts_vec(counts.size());
   for (size_t i = 0; i < counts.size(); i++)
     counts_vec(i) = counts[i];
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
         continue;
       }
       const std::vector<int32> &value1 = reader1.Value(),
-          &value2 = reader2.Value(key);
+      &value2 = reader2.Value(key);
       size_t len1 = value1.size(), len2 = value2.size();
       if (len1 != len2) {
         KALDI_WARN << "For utterance " << key << ", lengths differ "
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
     BaseFloat difference_percent = tot_difference * 100.0 / tot_frames;
     KALDI_LOG << "Computed difference for " << num_done << " utterances, of which "
               << num_mismatched_lengths << " had mismatched lengths; corresponding "
-        "utterance not found for " << num_not_found;
+      "utterance not found for " << num_not_found;
     KALDI_LOG << "Average p(different) is " << std::setprecision(4) << difference_percent
               << "%, over " << tot_frames << " frames.";
 

@@ -80,7 +80,7 @@ void MinimumBayesRisk::MbrDecode() {
           BaseFloat second_dur =
               one_best_times_[i-1].second - one_best_times_[i-1].first;
           BaseFloat mid = first_dur > 0 ? left + (right - left) * first_dur /
-                                     (first_dur + second_dur) : left;
+              (first_dur + second_dur) : left;
           one_best_times_[i-2].first = left;
           one_best_times_[i-2].second = one_best_times_[i-1].first = mid;
           one_best_times_[i-1].second = right;
@@ -128,9 +128,9 @@ void MinimumBayesRisk::NormalizeEps(std::vector<int32> *vec) {
 }
 
 double MinimumBayesRisk::EditDistance(int32 N, int32 Q,
-                                      Vector<double> &alpha,
-                                      Matrix<double> &alpha_dash,
-                                      Vector<double> &alpha_dash_arc) {
+    Vector<double> &alpha,
+    Matrix<double> &alpha_dash,
+    Vector<double> &alpha_dash_arc) {
   alpha(1) = 0.0; // = log(1).  Line 5.
   alpha_dash(1, 0) = 0.0; // Line 5.
   for (int32 q = 1; q <= Q; q++)
@@ -221,30 +221,30 @@ void MinimumBayesRisk::AccStats() {
         // line 21:
         beta_dash_arc(q) += Exp(alpha(s_a) + p_a - alpha(n)) * beta_dash(n, q);
         switch (static_cast<int>(b_arc[q])) { // lines 22 and 23:
-          case 1:
-            beta_dash(s_a, q-1) += beta_dash_arc(q);
-            // next: gamma(q, w(a)) += beta_dash_arc(q)
-            AddToMap(w_a, beta_dash_arc(q), &(gamma[q]));
-            // next: accumulating times, see decl for tau_b,tau_e
-            AddToMap(w_a, state_times_[s_a] * beta_dash_arc(q), &(tau_b[q]));
-            AddToMap(w_a, state_times_[n] * beta_dash_arc(q), &(tau_e[q]));
-            break;
-          case 2:
-            beta_dash(s_a, q) += beta_dash_arc(q);
-            break;
-          case 3:
-            beta_dash_arc(q-1) += beta_dash_arc(q);
-            // next: gamma(q, epsilon) += beta_dash_arc(q)
-            AddToMap(0, beta_dash_arc(q), &(gamma[q]));
-            // next: accumulating times, see decl for tau_b,tau_e
-            // WARNING: there was an error in Appendix C.  If we followed
-            // the instructions there the next line would say state_times_[sa], but
-            // it would be wrong.  I will try to publish an erratum.
-            AddToMap(0, state_times_[n] * beta_dash_arc(q), &(tau_b[q]));
-            AddToMap(0, state_times_[n] * beta_dash_arc(q), &(tau_e[q]));
-            break;
-          default:
-            KALDI_ERR << "Invalid b_arc value"; // error in code.
+        case 1:
+          beta_dash(s_a, q-1) += beta_dash_arc(q);
+          // next: gamma(q, w(a)) += beta_dash_arc(q)
+          AddToMap(w_a, beta_dash_arc(q), &(gamma[q]));
+          // next: accumulating times, see decl for tau_b,tau_e
+          AddToMap(w_a, state_times_[s_a] * beta_dash_arc(q), &(tau_b[q]));
+          AddToMap(w_a, state_times_[n] * beta_dash_arc(q), &(tau_e[q]));
+          break;
+        case 2:
+          beta_dash(s_a, q) += beta_dash_arc(q);
+          break;
+        case 3:
+          beta_dash_arc(q-1) += beta_dash_arc(q);
+          // next: gamma(q, epsilon) += beta_dash_arc(q)
+          AddToMap(0, beta_dash_arc(q), &(gamma[q]));
+          // next: accumulating times, see decl for tau_b,tau_e
+          // WARNING: there was an error in Appendix C.  If we followed
+          // the instructions there the next line would say state_times_[sa], but
+          // it would be wrong.  I will try to publish an erratum.
+          AddToMap(0, state_times_[n] * beta_dash_arc(q), &(tau_b[q]));
+          AddToMap(0, state_times_[n] * beta_dash_arc(q), &(tau_e[q]));
+          break;
+        default:
+          KALDI_ERR << "Invalid b_arc value";   // error in code.
         }
       }
       beta_dash_arc(0) += Exp(alpha(s_a) + p_a - alpha(n)) * beta_dash(n, 0);
@@ -264,7 +264,7 @@ void MinimumBayesRisk::AccStats() {
   for (int32 q = 1; q <= Q; q++) { // a check (line 35)
     double sum = 0.0;
     for (map<int32, double>::iterator iter = gamma[q].begin();
-         iter != gamma[q].end(); ++iter) sum += iter->second;
+        iter != gamma[q].end(); ++iter) sum += iter->second;
     if (fabs(sum - 1.0) > 0.1)
       KALDI_WARN << "sum of gamma[" << q << ",s] is " << sum;
   }
@@ -275,7 +275,7 @@ void MinimumBayesRisk::AccStats() {
   gamma_.resize(Q);
   for (int32 q = 1; q <= Q; q++) {
     for (map<int32, double>::iterator iter = gamma[q].begin();
-         iter != gamma[q].end(); ++iter)
+        iter != gamma[q].end(); ++iter)
       gamma_[q-1].push_back(
           std::make_pair(iter->first, static_cast<BaseFloat>(iter->second)));
     // sort gamma_[q-1] from largest to smallest posterior.
@@ -291,8 +291,8 @@ void MinimumBayesRisk::AccStats() {
   sausage_times_.resize(Q);
   for (int32 q = 1; q <= Q; q++) {
     double t_b = 0.0, t_e = 0.0;
-    for (std::vector<std::pair<int32, BaseFloat>>::iterator iter = gamma_[q-1].begin();
-         iter != gamma_[q-1].end(); ++iter) {
+    for (std::vector<std::pair<int32, BaseFloat> >::iterator iter = gamma_[q-1].begin();
+        iter != gamma_[q-1].end(); ++iter) {
       double w_b = tau_b[q][iter->first], w_e = tau_e[q][iter->first];
       if (w_b > w_e)
         KALDI_WARN << "Times out of order";  // this is quite bad.
@@ -348,15 +348,15 @@ void MinimumBayesRisk::PrepareLatticeAndInitStats(CompactLattice *clat) {
   // would normally assume.
   for (int32 n = 1; n <= N; n++) {
     for (fst::ArcIterator<CompactLattice> aiter(*clat, n-1);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       const CompactLatticeArc &carc = aiter.Value();
       Arc arc; // in our local format.
       arc.word = carc.ilabel; // == carc.olabel
       arc.start_node = n;
       arc.end_node = carc.nextstate + 1; // convert to 1-based.
-      arc.loglike = - (carc.weight.Weight().Value1() +
-                       carc.weight.Weight().Value2());
+      arc.loglike = -(carc.weight.Weight().Value1() +
+          carc.weight.Weight().Value2());
       // loglike: sum graph/LM and acoustic cost, and negate to
       // convert to loglikes.  We assume acoustic scaling is already done.
 
@@ -367,7 +367,7 @@ void MinimumBayesRisk::PrepareLatticeAndInitStats(CompactLattice *clat) {
 }
 
 MinimumBayesRisk::MinimumBayesRisk(const CompactLattice &clat_in,
-                                   MinimumBayesRiskOptions opts) : opts_(opts) {
+    MinimumBayesRiskOptions opts) : opts_(opts) {
   CompactLattice clat(clat_in); // copy.
 
   PrepareLatticeAndInitStats(&clat);
@@ -401,8 +401,8 @@ MinimumBayesRisk::MinimumBayesRisk(const CompactLattice &clat_in,
 }
 
 MinimumBayesRisk::MinimumBayesRisk(const CompactLattice &clat_in,
-                                   const std::vector<int32> &words,
-                                   MinimumBayesRiskOptions opts) : opts_(opts) {
+    const std::vector<int32> &words,
+    MinimumBayesRiskOptions opts) : opts_(opts) {
   CompactLattice clat(clat_in); // copy.
 
   PrepareLatticeAndInitStats(&clat);
@@ -414,9 +414,9 @@ MinimumBayesRisk::MinimumBayesRisk(const CompactLattice &clat_in,
 }
 
 MinimumBayesRisk::MinimumBayesRisk(const CompactLattice &clat_in,
-                                   const std::vector<int32> &words,
-                                   const std::vector<std::pair<BaseFloat,BaseFloat> > &times,
-                                   MinimumBayesRiskOptions opts) : opts_(opts) {
+    const std::vector<int32> &words,
+    const std::vector<std::pair<BaseFloat,BaseFloat> > &times,
+    MinimumBayesRiskOptions opts) : opts_(opts) {
   CompactLattice clat(clat_in); // copy.
 
   PrepareLatticeAndInitStats(&clat);

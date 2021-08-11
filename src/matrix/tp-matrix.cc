@@ -108,14 +108,14 @@ void TpMatrix<Real>::Cholesky(const SpMatrix<Real> &orig) {
       jdata[j] = std::sqrt(d);
     } else {
       KALDI_ERR << "Cholesky decomposition failed. Maybe matrix "
-          "is not positive definite.";
+        "is not positive definite.";
     }
   }
 }
 
 template<typename Real>
 void TpMatrix<Real>::CopyFromMat(const MatrixBase<Real> &M,
-                                 MatrixTransposeType Trans) {
+    MatrixTransposeType Trans) {
   if (Trans == kNoTrans) {
     KALDI_ASSERT(this->NumRows() == M.NumRows() && M.NumRows() == M.NumCols());
     MatrixIndexT D = this->NumRows();

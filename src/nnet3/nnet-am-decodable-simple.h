@@ -53,15 +53,15 @@ struct NnetSimpleComputationOptions {
   NnetComputeOptions compute_config;
   CachingOptimizingCompilerOptions compiler_config;
 
-  NnetSimpleComputationOptions():
-      extra_left_context(0),
-      extra_right_context(0),
-      extra_left_context_initial(-1),
-      extra_right_context_final(-1),
-      frame_subsampling_factor(1),
-      frames_per_chunk(50),
-      acoustic_scale(0.1),
-      debug_computation(false) {
+  NnetSimpleComputationOptions() :
+    extra_left_context(0),
+    extra_right_context(0),
+    extra_left_context_initial(-1),
+    extra_right_context_final(-1),
+    frame_subsampling_factor(1),
+    frames_per_chunk(50),
+    acoustic_scale(0.1),
+    debug_computation(false) {
     compiler_config.cache_capacity += frames_per_chunk;
   }
 
@@ -139,14 +139,14 @@ struct NnetSimpleComputationOptions {
 };
 
 /*
-  This class handles the neural net computation; it's mostly accessed
-  via other wrapper classes.
+   This class handles the neural net computation; it's mostly accessed
+   via other wrapper classes.
 
-  Note: this class used to be called NnetDecodableBase.
+   Note: this class used to be called NnetDecodableBase.
 
-  It can accept just input features, or input features plus iVectors.  */
+   It can accept just input features, or input features plus iVectors.  */
 class DecodableNnetSimple {
- public:
+public:
   /**
      This constructor takes features as input, and you can either supply a
      single iVector input, estimated in batch-mode ('ivector'), or 'online'
@@ -177,15 +177,15 @@ class DecodableNnetSimple {
      @param [in] online_ivector_period If you are using iVectors estimated 'online'
                         (i.e. if online_ivectors != NULL) gives the periodicity
                         (in frames) with which the iVectors are estimated.
-  */
+   */
   DecodableNnetSimple(const NnetSimpleComputationOptions &opts,
-                      const Nnet &nnet,
-                      const VectorBase<BaseFloat> &priors,
-                      const MatrixBase<BaseFloat> &feats,
-                      CachingOptimizingCompiler *compiler,
-                      const VectorBase<BaseFloat> *ivector = NULL,
-                      const MatrixBase<BaseFloat> *online_ivectors = NULL,
-                      int32 online_ivector_period = 1);
+      const Nnet &nnet,
+      const VectorBase<BaseFloat> &priors,
+      const MatrixBase<BaseFloat> &feats,
+      CachingOptimizingCompiler *compiler,
+      const VectorBase<BaseFloat> *ivector = NULL,
+      const MatrixBase<BaseFloat> *online_ivectors = NULL,
+      int32 online_ivector_period = 1);
 
 
   // returns the number of frames of likelihoods.  The same as feats_.NumRows()
@@ -205,13 +205,13 @@ class DecodableNnetSimple {
   inline BaseFloat GetOutput(int32 subsampled_frame, int32 pdf_id) {
     if (subsampled_frame < current_log_post_subsampled_offset_ ||
         subsampled_frame >= current_log_post_subsampled_offset_ +
-                            current_log_post_.NumRows())
+        current_log_post_.NumRows())
       EnsureFrameIsComputed(subsampled_frame);
     return current_log_post_(subsampled_frame -
                              current_log_post_subsampled_offset_,
                              pdf_id);
   }
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableNnetSimple);
 
   // This call is made to ensure that we have the log-probs for this frame
@@ -223,10 +223,10 @@ class DecodableNnetSimple {
   // the caller of this function (so the input should exceed the output
   // by a suitable amount of context).  It puts its output in current_log_post_.
   void DoNnetComputation(int32 input_t_start,
-                         const MatrixBase<BaseFloat> &input_feats,
-                         const VectorBase<BaseFloat> &ivector,
-                         int32 output_t_start,
-                         int32 num_subsampled_frames);
+      const MatrixBase<BaseFloat> &input_feats,
+      const VectorBase<BaseFloat> &ivector,
+      int32 output_t_start,
+      int32 num_subsampled_frames);
 
   // Gets the iVector that will be used for this chunk of frames, if we are
   // using iVectors (else does nothing).  note: the num_output_frames is
@@ -234,8 +234,8 @@ class DecodableNnetSimple {
   // the same as the number of subsampled frames (it would be larger by
   // opts_.frame_subsampling_factor).
   void GetCurrentIvector(int32 output_t_start,
-                         int32 num_output_frames,
-                         Vector<BaseFloat> *ivector);
+      int32 num_output_frames,
+      Vector<BaseFloat> *ivector);
 
   // called from constructor
   void CheckAndFixConfigs();
@@ -280,7 +280,7 @@ class DecodableNnetSimple {
 };
 
 class DecodableAmNnetSimple: public DecodableInterface {
- public:
+public:
   /**
      This constructor takes features as input, and you can either supply a
      single iVector input, estimated in batch-mode ('ivector'), or 'online'
@@ -314,15 +314,15 @@ class DecodableAmNnetSimple: public DecodableInterface {
                         across consecutive decodes.  You'd want to have initialized
                         the compiler object with as
                         compiler(am_nnet.GetNnet(), opts.optimize_config).
-  */
+   */
   DecodableAmNnetSimple(const NnetSimpleComputationOptions &opts,
-                        const TransitionModel &trans_model,
-                        const AmNnetSimple &am_nnet,
-                        const MatrixBase<BaseFloat> &feats,
-                        const VectorBase<BaseFloat> *ivector = NULL,
-                        const MatrixBase<BaseFloat> *online_ivectors = NULL,
-                        int32 online_ivector_period = 1,
-                        CachingOptimizingCompiler *compiler = NULL);
+      const TransitionModel &trans_model,
+      const AmNnetSimple &am_nnet,
+      const MatrixBase<BaseFloat> &feats,
+      const VectorBase<BaseFloat> *ivector = NULL,
+      const MatrixBase<BaseFloat> *online_ivectors = NULL,
+      int32 online_ivector_period = 1,
+      CachingOptimizingCompiler *compiler = NULL);
 
 
   virtual BaseFloat LogLikelihood(int32 frame, int32 transition_id);
@@ -338,7 +338,7 @@ class DecodableAmNnetSimple: public DecodableInterface {
     return (frame == NumFramesReady() - 1);
   }
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableAmNnetSimple);
   // This compiler object is only used if the 'compiler'
   // argument to the constructor is NULL.
@@ -349,7 +349,7 @@ class DecodableAmNnetSimple: public DecodableInterface {
 
 
 class DecodableAmNnetSimpleParallel: public DecodableInterface {
- public:
+public:
   /**
      This decodable object is for use in multi-threaded decoding.
      It differs from DecodableAmNnetSimple in two respects:
@@ -385,15 +385,15 @@ class DecodableAmNnetSimpleParallel: public DecodableInterface {
      @param [in] online_ivector_period If you are using iVectors estimated 'online'
                         (i.e. if online_ivectors != NULL) gives the periodicity
                         (in frames) with which the iVectors are estimated.
-  */
+   */
   DecodableAmNnetSimpleParallel(
-      const NnetSimpleComputationOptions &opts,
-      const TransitionModel &trans_model,
-      const AmNnetSimple &am_nnet,
-      const MatrixBase<BaseFloat> &feats,
-      const VectorBase<BaseFloat> *ivector = NULL,
-      const MatrixBase<BaseFloat> *online_ivectors = NULL,
-      int32 online_ivector_period = 1);
+    const NnetSimpleComputationOptions &opts,
+    const TransitionModel &trans_model,
+    const AmNnetSimple &am_nnet,
+    const MatrixBase<BaseFloat> &feats,
+    const VectorBase<BaseFloat> *ivector = NULL,
+    const MatrixBase<BaseFloat> *online_ivectors = NULL,
+    int32 online_ivector_period = 1);
 
 
   virtual BaseFloat LogLikelihood(int32 frame, int32 transition_id);
@@ -410,7 +410,7 @@ class DecodableAmNnetSimpleParallel: public DecodableInterface {
   }
 
   ~DecodableAmNnetSimpleParallel() { DeletePointers(); }
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(DecodableAmNnetSimpleParallel);
   void DeletePointers();
 

@@ -28,11 +28,11 @@ namespace kaldi {
 
 
 void GenRandStats(int32 dim, int32 num_stats, int32 N, int32 P,
-                  const std::vector<int32> &phone_ids,
-                  const std::vector<int32> &phone2hmm_length,
-                  const std::vector<bool> &is_ctx_dep,
-                  bool ensure_all_phones_covered,
-                  BuildTreeStatsType *stats_out) {
+    const std::vector<int32> &phone_ids,
+    const std::vector<int32> &phone2hmm_length,
+    const std::vector<bool> &is_ctx_dep,
+    bool ensure_all_phones_covered,
+    BuildTreeStatsType *stats_out) {
 
   KALDI_ASSERT(dim > 0);
   KALDI_ASSERT(num_stats > 0);
@@ -54,8 +54,8 @@ void GenRandStats(int32 dim, int32 num_stats, int32 N, int32 P,
 
   // Decide on an underlying "mean" for phones...
   Matrix<BaseFloat> phone_vecs(max_phone+1, dim);
-  for (int32 i = 0;i < max_phone+1;i++)
-    for (int32 j = 0;j < dim;j++) phone_vecs(i, j) = RandGauss() * (2.0 / (j+1));
+  for (int32 i = 0; i < max_phone+1; i++)
+    for (int32 j = 0; j < dim; j++) phone_vecs(i, j) = RandGauss() * (2.0 / (j+1));
 
 
   std::map<EventType, Clusterable*> stats_tmp;
@@ -63,10 +63,10 @@ void GenRandStats(int32 dim, int32 num_stats, int32 N, int32 P,
   std::vector<bool> covered(1 + max_phone, false);
 
   bool all_covered = false;
-  for (int32 i = 0;i < num_stats || (ensure_all_phones_covered && !all_covered);i++) {
+  for (int32 i = 0; i < num_stats || (ensure_all_phones_covered && !all_covered); i++) {
     // decide randomly on a phone-in-context.
     std::vector<int32> phone_vec(N);
-    for (size_t i = 0;i < (size_t)N;i++) phone_vec[i] = phone_ids[(Rand() % num_phones)];
+    for (size_t i = 0; i < (size_t)N; i++) phone_vec[i] = phone_ids[(Rand() % num_phones)];
 
     int32 hmm_length = phone2hmm_length[phone_vec[P]];
     KALDI_ASSERT(hmm_length > 0);
@@ -110,9 +110,9 @@ void GenRandStats(int32 dim, int32 num_stats, int32 N, int32 P,
         else count = 100.0 * RandUniform();
 
         int32 num_samples = 10;
-        for (size_t p = 0;p < (size_t)num_samples; p++) {
+        for (size_t p = 0; p < (size_t)num_samples; p++) {
           Vector<BaseFloat> sample(mean);  // copy mean.
-          for (size_t d = 0; d < (size_t)dim; d++)  sample(d) += RandGauss();  // unit var.
+          for (size_t d = 0; d < (size_t)dim; d++) sample(d) += RandGauss();   // unit var.
           this_stats->AddStats(sample, count / num_samples);
         }
       }
@@ -134,21 +134,21 @@ void GenRandStats(int32 dim, int32 num_stats, int32 N, int32 P,
 
 
 EventMap *BuildTree(Questions &qopts,
-                    const std::vector<std::vector<int32> > &phone_sets,
-                    const std::vector<int32> &phone2num_pdf_classes,
-                    const std::vector<bool> &share_roots,
-                    const std::vector<bool> &do_split,
-                    const BuildTreeStatsType &stats,
-                    BaseFloat thresh,
-                    int32 max_leaves,
-                    BaseFloat cluster_thresh,  // typically == thresh.  If negative, use smallest split.
-                    int32 P,
-                    bool round_num_leaves) {
+    const std::vector<std::vector<int32> > &phone_sets,
+    const std::vector<int32> &phone2num_pdf_classes,
+    const std::vector<bool> &share_roots,
+    const std::vector<bool> &do_split,
+    const BuildTreeStatsType &stats,
+    BaseFloat thresh,
+    int32 max_leaves,
+    BaseFloat cluster_thresh,                  // typically == thresh.  If negative, use smallest split.
+    int32 P,
+    bool round_num_leaves) {
   KALDI_ASSERT(thresh > 0 || max_leaves > 0);
   KALDI_ASSERT(stats.size() != 0);
   KALDI_ASSERT(!phone_sets.empty()
-         && phone_sets.size() == share_roots.size()
-         && do_split.size() == phone_sets.size());
+      && phone_sets.size() == share_roots.size()
+      && do_split.size() == phone_sets.size());
 
   // the inputs will be further checked in GetStubMap.
   int32 num_leaves = 0;  // allocator for leaves.
@@ -175,7 +175,7 @@ EventMap *BuildTree(Questions &qopts,
   KALDI_ASSERT(IsSortedAndUniq(nonsplit_phones));
   BuildTreeStatsType filtered_stats;
   FilterStatsByKey(stats, P, nonsplit_phones, false,  // retain only those not
-                   // in "nonsplit_phones"
+      // in "nonsplit_phones"
                    &filtered_stats);
 
   EventMap *tree_split = SplitDecisionTree(*tree_stub,
@@ -318,9 +318,9 @@ EventMap *BuildTree(Questions &qopts,
 // stats, or there would have been an error in tree building.
 
 static void ComputeTreeMapping(const EventMap &small_tree,
-                               const EventMap &big_tree,
-                               const BuildTreeStatsType &stats,
-                               std::vector<int32> *leaf_map) {
+    const EventMap &big_tree,
+    const BuildTreeStatsType &stats,
+    std::vector<int32> *leaf_map) {
   std::vector<BuildTreeStatsType> split_stats_small; // stats split by small tree
   int32 num_leaves_big = big_tree.MaxResult() + 1,
       num_leaves_small = small_tree.MaxResult() + 1;
@@ -385,16 +385,16 @@ static void ComputeTreeMapping(const EventMap &small_tree,
 
 
 EventMap *BuildTreeTwoLevel(Questions &qopts,
-                            const std::vector<std::vector<int32> > &phone_sets,
-                            const std::vector<int32> &phone2num_pdf_classes,
-                            const std::vector<bool> &share_roots,
-                            const std::vector<bool> &do_split,
-                            const BuildTreeStatsType &stats,
-                            int32 max_leaves_first,
-                            int32 max_leaves_second,
-                            bool cluster_leaves,
-                            int32 P,
-                            std::vector<int32> *leaf_map) {
+    const std::vector<std::vector<int32> > &phone_sets,
+    const std::vector<int32> &phone2num_pdf_classes,
+    const std::vector<bool> &share_roots,
+    const std::vector<bool> &do_split,
+    const BuildTreeStatsType &stats,
+    int32 max_leaves_first,
+    int32 max_leaves_second,
+    bool cluster_leaves,
+    int32 P,
+    std::vector<int32> *leaf_map) {
 
   KALDI_LOG << "****BuildTreeTwoLevel: building first level tree";
   EventMap *first_level_tree = BuildTree(qopts, phone_sets,
@@ -414,7 +414,7 @@ EventMap *BuildTreeTwoLevel(Questions &qopts,
   KALDI_ASSERT(IsSortedAndUniq(nonsplit_phones));
   BuildTreeStatsType filtered_stats;
   FilterStatsByKey(stats, P, nonsplit_phones, false,  // retain only those not
-                   // in "nonsplit_phones"
+      // in "nonsplit_phones"
                    &filtered_stats);
 
   int32 num_leaves = first_level_tree->MaxResult() + 1,
@@ -479,7 +479,7 @@ EventMap *BuildTreeTwoLevel(Questions &qopts,
     // pair of (small-tree-number, big-tree-number).
     std::sort(leaf_pairs.begin(), leaf_pairs.end());
     std::vector<int32> old2new_map(leaf_map->size()),
-        new_leaf_map(leaf_map->size());
+    new_leaf_map(leaf_map->size());
     // Note: old2new_map maps from old indices to new indices, in the
     // renumbering; new_leaf_map maps from 2nd-level tree indices to
     // 1st-level tree indices.
@@ -500,8 +500,8 @@ EventMap *BuildTreeTwoLevel(Questions &qopts,
 
 
 void ReadSymbolTableAsIntegers(std::string filename,
-                               bool include_eps,
-                               std::vector<int32> *syms) {
+    bool include_eps,
+    std::vector<int32> *syms) {
   std::ifstream is(filename.c_str());
   if (!is.good())
     KALDI_ERR << "ReadSymbolTableAsIntegers: could not open symbol table "<<filename;
@@ -536,7 +536,7 @@ static void RemoveDuplicates(std::vector<std::vector<int32 > > *vecs) {
   new_vecs.reserve(vecs->size());
   int32 num_not_inserted = 0;
   for (std::vector<std::vector<int32 > >::const_iterator iter = vecs->begin(),
-           end = vecs->end(); iter != end; iter++) {
+      end = vecs->end(); iter != end; iter++) {
     if (vec_set.insert(*iter).second) {  // if this vector was not already in
                                          // the set...
       new_vecs.push_back(*iter);
@@ -555,11 +555,11 @@ static void RemoveDuplicates(std::vector<std::vector<int32 > > *vecs) {
 /// of phones corresponding to both the leaf-level clusters
 /// and all the non-leaf-level clusters.
 static void ObtainSetsOfPhones(const std::vector<std::vector<int32> > &phone_sets,  // the original phone sets, may
-                               // just be individual phones.
-                               const std::vector<int32> &assignments,  // phone-sets->clusters
-                               const std::vector<int32> &clust_assignments,  // clust->parent
-                               int32 num_leaves,  // number of clusters present..
-                               std::vector<std::vector<int32> > *sets_out) {
+    // just be individual phones.
+    const std::vector<int32> &assignments,                             // phone-sets->clusters
+    const std::vector<int32> &clust_assignments,                             // clust->parent
+    int32 num_leaves,                             // number of clusters present..
+    std::vector<std::vector<int32> > *sets_out) {
   KALDI_ASSERT(sets_out != NULL);
   sets_out->clear();
   std::vector<std::vector<int32> > raw_sets(clust_assignments.size());
@@ -607,19 +607,19 @@ static void ObtainSetsOfPhones(const std::vector<std::vector<int32> > &phone_set
   RemoveDuplicates(&raw_sets);
   sets_out->reserve(raw_sets.size());
   for (size_t i = 0; i < raw_sets.size(); i++)
-    if (! raw_sets[i].empty())  // if the empty set is present, remove it...
+    if (!raw_sets[i].empty())   // if the empty set is present, remove it...
       sets_out->push_back(raw_sets[i]);
 }
 
 
 void AutomaticallyObtainQuestions(BuildTreeStatsType &stats,
-                                  const std::vector<std::vector<int32> > &phone_sets_in,
-                                  const std::vector<int32> &all_pdf_classes_in,
-                                  int32 P,
-                                  std::vector<std::vector<int32> > *questions_out) {
+    const std::vector<std::vector<int32> > &phone_sets_in,
+    const std::vector<int32> &all_pdf_classes_in,
+    int32 P,
+    std::vector<std::vector<int32> > *questions_out) {
   std::vector<std::vector<int32> > phone_sets(phone_sets_in);
   std::vector<int32> phones;
-  for (size_t i = 0; i < phone_sets.size() ;i++) {
+  for (size_t i = 0; i < phone_sets.size(); i++) {
     std::sort(phone_sets[i].begin(), phone_sets[i].end());
     if (phone_sets[i].empty())
       KALDI_ERR << "Empty phone set in AutomaticallyObtainQuestions";
@@ -698,8 +698,8 @@ void AutomaticallyObtainQuestions(BuildTreeStatsType &stats,
       std::ostringstream ss;
       ss << "AutomaticallyObtainQuestions: no stats available for phone set: ";
       for (size_t j = 0; j < phone_sets[i].size(); j++)
-        ss << phone_sets[i][j] << ' ' ;
-      KALDI_WARN  << ss.str();
+        ss << phone_sets[i][j] << ' ';
+      KALDI_WARN << ss.str();
     }
   }
   if (num_no_data + 1 >= summed_stats_per_set.size()) {
@@ -746,14 +746,14 @@ void AutomaticallyObtainQuestions(BuildTreeStatsType &stats,
 
 
 void KMeansClusterPhones(BuildTreeStatsType &stats,
-                         const std::vector<std::vector<int32> > &phone_sets_in,
-                         const std::vector<int32> &all_pdf_classes_in,
-                         int32 P,
-                         int32 num_classes,
-                         std::vector<std::vector<int32> > *sets_out) {
+    const std::vector<std::vector<int32> > &phone_sets_in,
+    const std::vector<int32> &all_pdf_classes_in,
+    int32 P,
+    int32 num_classes,
+    std::vector<std::vector<int32> > *sets_out) {
   std::vector<std::vector<int32> > phone_sets(phone_sets_in);
   std::vector<int32> phones;
-  for (size_t i = 0; i < phone_sets.size() ;i++) {
+  for (size_t i = 0; i < phone_sets.size(); i++) {
     std::sort(phone_sets[i].begin(), phone_sets[i].end());
     if (phone_sets[i].empty())
       KALDI_ERR << "Empty phone set in AutomaticallyObtainQuestions";
@@ -816,8 +816,8 @@ void KMeansClusterPhones(BuildTreeStatsType &stats,
       std::ostringstream ss;
       ss << "AutomaticallyObtainQuestions: no stats available for phone set: ";
       for (size_t j = 0; j < phone_sets[i].size(); j++)
-        ss << phone_sets[i][j] << ' ' ;
-      KALDI_WARN  << ss.str();
+        ss << phone_sets[i][j] << ' ';
+      KALDI_WARN << ss.str();
     }
   }
 
@@ -855,16 +855,16 @@ void KMeansClusterPhones(BuildTreeStatsType &stats,
 }
 
 void ReadRootsFile(std::istream &is,
-                   std::vector<std::vector<int32> > *phone_sets,
-                   std::vector<bool> *is_shared_root,
-                   std::vector<bool> *is_split_root) {
+    std::vector<std::vector<int32> > *phone_sets,
+    std::vector<bool> *is_shared_root,
+    std::vector<bool> *is_split_root) {
   KALDI_ASSERT(phone_sets != NULL && is_shared_root != NULL &&
                is_split_root != NULL && phone_sets->empty()
-               && is_shared_root->empty() && is_split_root->empty());
+      && is_shared_root->empty() && is_split_root->empty());
 
   std::string line;
   int line_number = 0;
-  while ( ! getline(is, line).fail() ) {
+  while ( !getline(is, line).fail() ) {
     line_number++;
     std::istringstream ss(line);
     std::string shared;

@@ -34,9 +34,9 @@ namespace kaldi {
 // to index into the base decodable object.
 
 class DecodableMapped: public DecodableInterface {
- public:
-  DecodableMapped(const std::vector<int32> &index_map, DecodableInterface *d):
-      index_map_(index_map), decodable_(d) { }
+public:
+  DecodableMapped(const std::vector<int32> &index_map, DecodableInterface *d) :
+    index_map_(index_map), decodable_(d) { }
 
   // Note, frames are numbered from zero.  But state_index is numbered
   // from one (this routine is called by FSTs).
@@ -54,7 +54,7 @@ class DecodableMapped: public DecodableInterface {
     return decodable_->IsLastFrame(frame);
   }
 
- private:
+private:
   std::vector<int32> index_map_;
   DecodableInterface *decodable_;
 

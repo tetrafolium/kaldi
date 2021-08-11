@@ -30,7 +30,7 @@ void GetForbiddenSymbols(std::set<std::string> *forbidden_symbols) {
 ///  Reads all the lines from a text file and appends
 ///  them to the "sentences" vector.
 void ReadAllLines(const std::string &filename,
-                  std::vector<std::vector<std::string> > *sentences) {
+    std::vector<std::vector<std::string> > *sentences) {
   std::ifstream is(filename.c_str());
   std::string line;
   while (std::getline(is, line)) {
@@ -43,7 +43,7 @@ void ReadAllLines(const std::string &filename,
 }
 
 void GetTestSentences(const std::set<std::string> &forbidden_symbols,
-                      std::vector<std::vector<std::string> > *sentences) {
+    std::vector<std::vector<std::string> > *sentences) {
   sentences->clear();
   ReadAllLines("sampling-lm-test.cc", sentences);
   ReadAllLines("rnnlm-example-test.cc", sentences);
@@ -58,7 +58,7 @@ void GetTestSentences(const std::set<std::string> &forbidden_symbols,
 }
 
 fst::SymbolTable *GetSymbolTable(
-    const std::vector<std::vector<std::string> > &sentences) {
+  const std::vector<std::vector<std::string> > &sentences) {
   fst::SymbolTable* table = new fst::SymbolTable();
   table->AddSymbol("<eps>", 0);
   table->AddSymbol("<s>", 1);
@@ -71,9 +71,9 @@ fst::SymbolTable *GetSymbolTable(
 }
 
 void ConvertToInteger(
-    const std::vector<std::vector<std::string> > &string_sentences,
-    const fst::SymbolTable &symbol_table,
-    std::vector<std::vector<int32> > *int_sentences) {
+  const std::vector<std::vector<std::string> > &string_sentences,
+  const fst::SymbolTable &symbol_table,
+  std::vector<std::vector<int32> > *int_sentences) {
   int_sentences->resize(string_sentences.size());
   for (int i = 0; i < string_sentences.size(); i++) {
     (*int_sentences)[i].resize(string_sentences[i].size());
@@ -95,9 +95,9 @@ void ConvertToInteger(
     the paper and extend it to arbitrary ngram order. Also, as in SRILM,
     we use the original(unmodified) count for the ngrams starting with <s>.
     We don't do any min-count prune for ngrams;
-*/
+ */
 class InterpolatedKneserNeyLM {
- public:
+public:
   struct LMState {
     int32 numerator;
     int32 denominator;
@@ -106,7 +106,7 @@ class InterpolatedKneserNeyLM {
     BaseFloat bow;
 
     LMState() : numerator(0), denominator(0), non_zero_count(0),
-                prob(0.0), bow(0.0) {};
+      prob(0.0), bow(0.0) {};
   };
   typedef unordered_map<std::vector<int32>, LMState, VectorHasher<int32> > Ngrams;
 
@@ -120,8 +120,8 @@ class InterpolatedKneserNeyLM {
                               symbol
    */
   InterpolatedKneserNeyLM(int32 ngram_order, int32 bos_symbol,
-                          int32 eos_symbol, double discount) :
-      unigram_denominator_(0) {
+      int32 eos_symbol, double discount) :
+    unigram_denominator_(0) {
     ngram_order_ = ngram_order;
     discount_ = discount;
     bos_symbol_ = bos_symbol;
@@ -130,8 +130,8 @@ class InterpolatedKneserNeyLM {
   }
 
   void FillWords(const std::vector<int32> &sentence,
-                 int32 pos, int32 order,
-                 std::vector<int32> *words) {
+      int32 pos, int32 order,
+      std::vector<int32> *words) {
     KALDI_ASSERT(pos >= -1 && pos <= static_cast<int32>(sentence.size()));
 
     words->resize(order);
@@ -210,7 +210,7 @@ class InterpolatedKneserNeyLM {
           context = ngrams_[order - 1].find(subwords);
           KALDI_ASSERT(context != ngrams_[order - 1].end());
           state.prob = (state.numerator - discount_)
-                       / context->second.denominator;
+              / context->second.denominator;
 
           // interpolate lower order
           subwords.assign(it->first.begin(), it->first.end() - 1);
@@ -250,8 +250,8 @@ class InterpolatedKneserNeyLM {
   }
 
   static void WriteNgram(const std::vector<int32> &words,
-                  BaseFloat prob, BaseFloat bow,
-                  const fst::SymbolTable &symbol_table, std::ostream &os) {
+      BaseFloat prob, BaseFloat bow,
+      const fst::SymbolTable &symbol_table, std::ostream &os) {
     os << ProbToLogProb(prob) << "\t";
     for (int32 i = 0; i < words.size() - 1; i++) {
       os << symbol_table.Find(words[i]) << " ";
@@ -271,7 +271,7 @@ class InterpolatedKneserNeyLM {
                              the language model in ARPA format.
    */
   void WriteToARPA(const fst::SymbolTable &symbol_table,
-                   std::ostream &os) const {
+      std::ostream &os) const {
     // we write out only the words appeared in training text, instead of all
     // words in symbol_table, since there would be some special symbols in
     // symbol_table and our unigram distribution are calculated without
@@ -399,7 +399,7 @@ class InterpolatedKneserNeyLM {
     return true;
   }
 
- private:
+private:
 
   // Ngram order
   int32 ngram_order_;
@@ -421,11 +421,11 @@ class InterpolatedKneserNeyLM {
 };
 
 void EstimateAndWriteLanguageModel(
-    int32 ngram_order,
-    const fst::SymbolTable &symbol_table,
-    const std::vector<std::vector<int32> > &sentences,
-    int32 bos_symbol, int32 eos_symbol,
-    std::ostream &os) {
+  int32 ngram_order,
+  const fst::SymbolTable &symbol_table,
+  const std::vector<std::vector<int32> > &sentences,
+  int32 bos_symbol, int32 eos_symbol,
+  std::ostream &os) {
   InterpolatedKneserNeyLM lm(ngram_order, bos_symbol, eos_symbol, 0.6);
   lm.Estimate(sentences);
 #ifdef _KALDI_RNNLM_TEST_CHECK_LM_

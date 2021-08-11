@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
           *test_ivector = test_ivectors[key2];
 
       Vector<double> train_ivector_dbl(*train_ivector),
-          test_ivector_dbl(*test_ivector);
+      test_ivector_dbl(*test_ivector);
 
       int32 num_train_examples;
       if (!num_utts_rspecifier.empty()) {
@@ -201,10 +201,10 @@ int main(int argc, char *argv[]) {
     }
 
     for (HashType::iterator iter = train_ivectors.begin();
-         iter != train_ivectors.end(); ++iter)
+        iter != train_ivectors.end(); ++iter)
       delete iter->second;
     for (HashType::iterator iter = test_ivectors.begin();
-         iter != test_ivectors.end(); ++iter)
+        iter != test_ivectors.end(); ++iter)
       delete iter->second;
 
 

@@ -82,7 +82,7 @@ void SparseVector<double>::CopyElementsToVec(VectorBase<double> *vec) const;
 template <typename Real>
 template <typename OtherReal>
 void SparseVector<Real>::AddToVec(Real alpha,
-                                  VectorBase<OtherReal> *vec) const {
+    VectorBase<OtherReal> *vec) const {
   KALDI_ASSERT(vec->Dim() == dim_);
   OtherReal *other_data = vec->Data();
   typename std::vector<std::pair<MatrixIndexT, Real> >::const_iterator
@@ -104,7 +104,7 @@ template
 void SparseVector<double>::AddToVec(double alpha, VectorBase<float> *vec) const;
 template
 void SparseVector<double>::AddToVec(double alpha,
-                                    VectorBase<double> *vec) const;
+    VectorBase<double> *vec) const;
 
 template <typename Real>
 template <typename OtherReal>
@@ -130,7 +130,7 @@ void SparseVector<double>::CopyFromSvec(const SparseVector<double> &svec);
 
 template <typename Real>
 SparseVector<Real>& SparseVector<Real>::operator = (
-    const SparseVector<Real> &other) {
+  const SparseVector<Real> &other) {
   this->CopyFromSvec(other);
   dim_ = other.dim_;
   pairs_ = other.pairs_;
@@ -216,7 +216,7 @@ void SparseVector<Real>::Read(std::istream &is, bool binary) {
       if (is.fail())
         KALDI_ERR << "Error reading sparse vector, expecting numbers.";
       KALDI_ASSERT(i >= 0 && i < dim
-                   && (pairs_.empty() || i > pairs_.back().first));
+          && (pairs_.empty() || i > pairs_.back().first));
       pairs_.push_back(std::pair<MatrixIndexT, BaseFloat>(i, p));
     }
   }
@@ -227,7 +227,7 @@ namespace sparse_vector_utils {
 template <typename Real>
 struct CompareFirst {
   inline bool operator() (const std::pair<MatrixIndexT, Real> &p1,
-                           const std::pair<MatrixIndexT, Real> &p2) const {
+      const std::pair<MatrixIndexT, Real> &p2) const {
     return p1.first < p2.first;
   }
 };
@@ -235,9 +235,9 @@ struct CompareFirst {
 
 template <typename Real>
 SparseVector<Real>::SparseVector(
-    MatrixIndexT dim, const std::vector<std::pair<MatrixIndexT, Real> > &pairs):
-    dim_(dim),
-    pairs_(pairs) {
+  MatrixIndexT dim, const std::vector<std::pair<MatrixIndexT, Real> > &pairs) :
+  dim_(dim),
+  pairs_(pairs) {
   std::sort(pairs_.begin(), pairs_.end(),
             sparse_vector_utils::CompareFirst<Real>());
   typename std::vector<std::pair<MatrixIndexT, Real> >::iterator
@@ -278,7 +278,7 @@ void SparseVector<Real>::SetRandn(BaseFloat zero_prob) {
 
 template <typename Real>
 void SparseVector<Real>::Resize(MatrixIndexT dim,
-                                MatrixResizeType resize_type) {
+    MatrixResizeType resize_type) {
   if (resize_type != kCopyData || dim == 0)
     pairs_.clear();
   KALDI_ASSERT(dim >= 0);
@@ -350,7 +350,7 @@ Real SparseMatrix<Real>::FrobeniusNorm() const {
 template <typename Real>
 template <typename OtherReal>
 void SparseMatrix<Real>::CopyToMat(MatrixBase<OtherReal> *other,
-                                   MatrixTransposeType trans) const {
+    MatrixTransposeType trans) const {
   if (trans == kNoTrans) {
     MatrixIndexT num_rows = rows_.size();
     KALDI_ASSERT(other->NumRows() == num_rows);
@@ -376,16 +376,16 @@ void SparseMatrix<Real>::CopyToMat(MatrixBase<OtherReal> *other,
 
 template
 void SparseMatrix<float>::CopyToMat(MatrixBase<float> *other,
-                                    MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 template
 void SparseMatrix<float>::CopyToMat(MatrixBase<double> *other,
-                                    MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 template
 void SparseMatrix<double>::CopyToMat(MatrixBase<float> *other,
-                                    MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 template
 void SparseMatrix<double>::CopyToMat(MatrixBase<double> *other,
-                                    MatrixTransposeType trans) const;
+    MatrixTransposeType trans) const;
 
 template <typename Real>
 void SparseMatrix<Real>::CopyElementsToVec(VectorBase<Real> *other) const {
@@ -404,7 +404,7 @@ void SparseMatrix<Real>::CopyElementsToVec(VectorBase<Real> *other) const {
 template<typename Real>
 template<typename OtherReal>
 void SparseMatrix<Real>::CopyFromSmat(const SparseMatrix<OtherReal> &other,
-                                      MatrixTransposeType trans) {
+    MatrixTransposeType trans) {
   if (trans == kNoTrans) {
     rows_.resize(other.NumRows());
     if (rows_.size() == 0)
@@ -414,7 +414,7 @@ void SparseMatrix<Real>::CopyFromSmat(const SparseMatrix<OtherReal> &other,
     }
   } else {
     std::vector<std::vector<std::pair<MatrixIndexT, Real> > > pairs(
-        other.NumCols());
+      other.NumCols());
     for (MatrixIndexT i = 0; i < other.NumRows(); ++i) {
       for (int id = 0; id < other.Row(i).NumElements(); ++id) {
         MatrixIndexT j = other.Row(i).GetElement(id).first;
@@ -428,16 +428,16 @@ void SparseMatrix<Real>::CopyFromSmat(const SparseMatrix<OtherReal> &other,
 }
 template
 void SparseMatrix<float>::CopyFromSmat(const SparseMatrix<float> &other,
-                                       MatrixTransposeType trans);
+    MatrixTransposeType trans);
 template
 void SparseMatrix<float>::CopyFromSmat(const SparseMatrix<double> &other,
-                                       MatrixTransposeType trans);
+    MatrixTransposeType trans);
 template
 void SparseMatrix<double>::CopyFromSmat(const SparseMatrix<float> &other,
-                                        MatrixTransposeType trans);
+    MatrixTransposeType trans);
 template
 void SparseMatrix<double>::CopyFromSmat(const SparseMatrix<double> &other,
-                                        MatrixTransposeType trans);
+    MatrixTransposeType trans);
 
 template <typename Real>
 void SparseMatrix<Real>::Write(std::ostream &os, bool binary) const {
@@ -494,8 +494,8 @@ void SparseMatrix<Real>::Read(std::istream &is, bool binary) {
 
 template <typename Real>
 void SparseMatrix<Real>::AddToMat(BaseFloat alpha,
-                                  MatrixBase<Real> *other,
-                                  MatrixTransposeType trans) const {
+    MatrixBase<Real> *other,
+    MatrixTransposeType trans) const {
   if (trans == kNoTrans) {
     MatrixIndexT num_rows = rows_.size();
     KALDI_ASSERT(other->NumRows() == num_rows);
@@ -521,7 +521,7 @@ void SparseMatrix<Real>::AddToMat(BaseFloat alpha,
 
 template <typename Real>
 Real VecSvec(const VectorBase<Real> &vec,
-             const SparseVector<Real> &svec) {
+    const SparseVector<Real> &svec) {
   KALDI_ASSERT(vec.Dim() == svec.Dim());
   MatrixIndexT n = svec.NumElements();
   const std::pair<MatrixIndexT, Real> *sdata = svec.Data();
@@ -534,10 +534,10 @@ Real VecSvec(const VectorBase<Real> &vec,
 
 template
 float VecSvec(const VectorBase<float> &vec,
-              const SparseVector<float> &svec);
+    const SparseVector<float> &svec);
 template
 double VecSvec(const VectorBase<double> &vec,
-              const SparseVector<double> &svec);
+    const SparseVector<double> &svec);
 
 template <typename Real>
 const SparseVector<Real> &SparseMatrix<Real>::Row(MatrixIndexT r) const {
@@ -555,7 +555,7 @@ void SparseMatrix<Real>::SetRow(int32 r, const SparseVector<Real> &vec) {
 
 template<typename Real>
 void SparseMatrix<Real>::SelectRows(const std::vector<int32> &row_indexes,
-                                    const SparseMatrix<Real> &smat_other) {
+    const SparseMatrix<Real> &smat_other) {
   Resize(row_indexes.size(), smat_other.NumCols());
   for (int i = 0; i < row_indexes.size(); ++i) {
     SetRow(i, smat_other.Row(row_indexes[i]));
@@ -564,7 +564,7 @@ void SparseMatrix<Real>::SelectRows(const std::vector<int32> &row_indexes,
 
 template<typename Real>
 SparseMatrix<Real>::SparseMatrix(const std::vector<int32> &indexes, int32 dim,
-                                 MatrixTransposeType trans) {
+    MatrixTransposeType trans) {
   const std::vector<int32>& idx = indexes;
   std::vector<std::vector<std::pair<MatrixIndexT, Real> > > pair(idx.size());
   for (int i = 0; i < idx.size(); ++i) {
@@ -583,8 +583,8 @@ SparseMatrix<Real>::SparseMatrix(const std::vector<int32> &indexes, int32 dim,
 
 template<typename Real>
 SparseMatrix<Real>::SparseMatrix(const std::vector<int32> &indexes,
-                                 const VectorBase<Real> &weights, int32 dim,
-                                 MatrixTransposeType trans) {
+    const VectorBase<Real> &weights, int32 dim,
+    MatrixTransposeType trans) {
   const std::vector<int32>& idx = indexes;
   const VectorBase<Real>& w = weights;
   std::vector<std::vector<std::pair<MatrixIndexT, Real> > > pair(idx.size());
@@ -604,7 +604,7 @@ SparseMatrix<Real>::SparseMatrix(const std::vector<int32> &indexes,
 
 template <typename Real>
 SparseMatrix<Real>& SparseMatrix<Real>::operator = (
-    const SparseMatrix<Real> &other) {
+  const SparseMatrix<Real> &other) {
   rows_ = other.rows_;
   return *this;
 }
@@ -616,9 +616,9 @@ void SparseMatrix<Real>::Swap(SparseMatrix<Real> *other) {
 
 template<typename Real>
 SparseMatrix<Real>::SparseMatrix(
-    MatrixIndexT dim,
-    const std::vector<std::vector<std::pair<MatrixIndexT, Real> > > &pairs):
-    rows_(pairs.size()) {
+  MatrixIndexT dim,
+  const std::vector<std::vector<std::pair<MatrixIndexT, Real> > > &pairs) :
+  rows_(pairs.size()) {
   MatrixIndexT num_rows = pairs.size();
   for (MatrixIndexT row = 0; row < num_rows; row++) {
     SparseVector<Real> svec(dim, pairs[row]);
@@ -635,8 +635,8 @@ void SparseMatrix<Real>::SetRandn(BaseFloat zero_prob) {
 
 template <typename Real>
 void SparseMatrix<Real>::Resize(MatrixIndexT num_rows,
-                                MatrixIndexT num_cols,
-                                MatrixResizeType resize_type) {
+    MatrixIndexT num_cols,
+    MatrixResizeType resize_type) {
   KALDI_ASSERT(num_rows >= 0 && num_cols >= 0);
   if (resize_type == kSetZero || resize_type == kUndefined) {
     rows_.clear();
@@ -654,7 +654,7 @@ void SparseMatrix<Real>::Resize(MatrixIndexT num_rows,
 
 template <typename Real>
 void SparseMatrix<Real>::AppendSparseMatrixRows(
-    std::vector<SparseMatrix<Real> > *inputs) {
+  std::vector<SparseMatrix<Real> > *inputs) {
   rows_.clear();
   size_t num_rows = 0;
   typename std::vector<SparseMatrix<Real> >::iterator
@@ -702,8 +702,8 @@ SparseMatrix<Real>::SparseMatrix(const MatrixBase<Real> &mat) {
 
 template<typename Real>
 Real TraceMatSmat(const MatrixBase<Real> &A,
-                  const SparseMatrix<Real> &B,
-                  MatrixTransposeType trans) {
+    const SparseMatrix<Real> &B,
+    MatrixTransposeType trans) {
   Real sum = 0.0;
   if (trans == kTrans) {
     MatrixIndexT num_rows = A.NumRows();
@@ -730,12 +730,12 @@ Real TraceMatSmat(const MatrixBase<Real> &A,
 
 template
 float TraceMatSmat(const MatrixBase<float> &A,
-                   const SparseMatrix<float> &B,
-                   MatrixTransposeType trans);
+    const SparseMatrix<float> &B,
+    MatrixTransposeType trans);
 template
 double TraceMatSmat(const MatrixBase<double> &A,
-                   const SparseMatrix<double> &B,
-                   MatrixTransposeType trans);
+    const SparseMatrix<double> &B,
+    MatrixTransposeType trans);
 
 void GeneralMatrix::Clear() {
   mat_.Resize(0, 0);
@@ -829,7 +829,7 @@ void GeneralMatrix::GetMatrix(Matrix<BaseFloat> *mat) const {
 }
 
 void GeneralMatrix::CopyToMat(MatrixBase<BaseFloat> *mat,
-                              MatrixTransposeType trans) const {
+    MatrixTransposeType trans) const {
   if (mat_.NumRows() !=0) {
     mat->CopyFromMat(mat_, trans);
   } else if (cmat_.NumRows() != 0) {
@@ -927,7 +927,7 @@ void GeneralMatrix::Read(std::istream &is, bool binary) {
 
 
 void AppendGeneralMatrixRows(const std::vector<const GeneralMatrix *> &src,
-                             GeneralMatrix *mat) {
+    GeneralMatrix *mat) {
   mat->Clear();
   int32 size = src.size();
   if (size == 0)
@@ -966,7 +966,7 @@ void AppendGeneralMatrixRows(const std::vector<const GeneralMatrix *> &src,
       int32 src_rows = src_mat.NumRows();
       if (src_rows != 0) {
         SubMatrix<BaseFloat> dest_submat(appended_mat, row_offset, src_rows,
-                                         0, num_cols);
+            0, num_cols);
         src_mat.CopyToMat(&dest_submat);
         row_offset += src_rows;
       }
@@ -977,12 +977,12 @@ void AppendGeneralMatrixRows(const std::vector<const GeneralMatrix *> &src,
 }
 
 void FilterCompressedMatrixRows(const CompressedMatrix &in,
-                                const std::vector<bool> &keep_rows,
-                                Matrix<BaseFloat> *out) {
+    const std::vector<bool> &keep_rows,
+    Matrix<BaseFloat> *out) {
   KALDI_ASSERT(keep_rows.size() == static_cast<size_t>(in.NumRows()));
   int32 num_kept_rows = 0;
   std::vector<bool>::const_iterator iter = keep_rows.begin(),
-                                     end = keep_rows.end();
+      end = keep_rows.end();
   for (; iter != end; ++iter)
     if (*iter)
       num_kept_rows++;
@@ -1021,12 +1021,12 @@ void FilterCompressedMatrixRows(const CompressedMatrix &in,
 
 template <typename Real>
 void FilterMatrixRows(const Matrix<Real> &in,
-                      const std::vector<bool> &keep_rows,
-                      Matrix<Real> *out) {
+    const std::vector<bool> &keep_rows,
+    Matrix<Real> *out) {
   KALDI_ASSERT(keep_rows.size() == static_cast<size_t>(in.NumRows()));
   int32 num_kept_rows = 0;
   std::vector<bool>::const_iterator iter = keep_rows.begin(),
-                                     end = keep_rows.end();
+      end = keep_rows.end();
   for (; iter != end; ++iter)
     if (*iter)
       num_kept_rows++;
@@ -1052,21 +1052,21 @@ void FilterMatrixRows(const Matrix<Real> &in,
 
 template
 void FilterMatrixRows(const Matrix<float> &in,
-                      const std::vector<bool> &keep_rows,
-                      Matrix<float> *out);
+    const std::vector<bool> &keep_rows,
+    Matrix<float> *out);
 template
 void FilterMatrixRows(const Matrix<double> &in,
-                      const std::vector<bool> &keep_rows,
-                      Matrix<double> *out);
+    const std::vector<bool> &keep_rows,
+    Matrix<double> *out);
 
 template <typename Real>
 void FilterSparseMatrixRows(const SparseMatrix<Real> &in,
-                            const std::vector<bool> &keep_rows,
-                            SparseMatrix<Real> *out) {
+    const std::vector<bool> &keep_rows,
+    SparseMatrix<Real> *out) {
   KALDI_ASSERT(keep_rows.size() == static_cast<size_t>(in.NumRows()));
   int32 num_kept_rows = 0;
   std::vector<bool>::const_iterator iter = keep_rows.begin(),
-                                     end = keep_rows.end();
+      end = keep_rows.end();
   for (; iter != end; ++iter)
     if (*iter)
       num_kept_rows++;
@@ -1090,22 +1090,22 @@ void FilterSparseMatrixRows(const SparseMatrix<Real> &in,
 
 template
 void FilterSparseMatrixRows(const SparseMatrix<float> &in,
-                            const std::vector<bool> &keep_rows,
-                            SparseMatrix<float> *out);
+    const std::vector<bool> &keep_rows,
+    SparseMatrix<float> *out);
 template
 void FilterSparseMatrixRows(const SparseMatrix<double> &in,
-                            const std::vector<bool> &keep_rows,
-                            SparseMatrix<double> *out);
+    const std::vector<bool> &keep_rows,
+    SparseMatrix<double> *out);
 
 
 void FilterGeneralMatrixRows(const GeneralMatrix &in,
-                             const std::vector<bool> &keep_rows,
-                             GeneralMatrix *out) {
+    const std::vector<bool> &keep_rows,
+    GeneralMatrix *out) {
   out->Clear();
   KALDI_ASSERT(keep_rows.size() == static_cast<size_t>(in.NumRows()));
   int32 num_kept_rows = 0;
   std::vector<bool>::const_iterator iter = keep_rows.begin(),
-                                     end = keep_rows.end();
+      end = keep_rows.end();
   for (; iter != end; ++iter)
     if (*iter)
       num_kept_rows++;
@@ -1116,50 +1116,50 @@ void FilterGeneralMatrixRows(const GeneralMatrix &in,
     return;
   }
   switch (in.Type()) {
-    case kCompressedMatrix: {
-      const CompressedMatrix &cmat = in.GetCompressedMatrix();
-      Matrix<BaseFloat> full_mat;
-      FilterCompressedMatrixRows(cmat, keep_rows, &full_mat);
-      out->SwapFullMatrix(&full_mat);
-      return;
-    }
-    case kSparseMatrix: {
-      const SparseMatrix<BaseFloat> &smat = in.GetSparseMatrix();
-      SparseMatrix<BaseFloat> smat_out;
-      FilterSparseMatrixRows(smat, keep_rows, &smat_out);
-      out->SwapSparseMatrix(&smat_out);
-      return;
-    }
-    case kFullMatrix: {
-      const Matrix<BaseFloat> &full_mat = in.GetFullMatrix();
-      Matrix<BaseFloat> full_mat_out;
-      FilterMatrixRows(full_mat, keep_rows, &full_mat_out);
-      out->SwapFullMatrix(&full_mat_out);
-      return;
-    }
-    default:
-      KALDI_ERR << "Invalid general-matrix type.";
+  case kCompressedMatrix: {
+    const CompressedMatrix &cmat = in.GetCompressedMatrix();
+    Matrix<BaseFloat> full_mat;
+    FilterCompressedMatrixRows(cmat, keep_rows, &full_mat);
+    out->SwapFullMatrix(&full_mat);
+    return;
+  }
+  case kSparseMatrix: {
+    const SparseMatrix<BaseFloat> &smat = in.GetSparseMatrix();
+    SparseMatrix<BaseFloat> smat_out;
+    FilterSparseMatrixRows(smat, keep_rows, &smat_out);
+    out->SwapSparseMatrix(&smat_out);
+    return;
+  }
+  case kFullMatrix: {
+    const Matrix<BaseFloat> &full_mat = in.GetFullMatrix();
+    Matrix<BaseFloat> full_mat_out;
+    FilterMatrixRows(full_mat, keep_rows, &full_mat_out);
+    out->SwapFullMatrix(&full_mat_out);
+    return;
+  }
+  default:
+    KALDI_ERR << "Invalid general-matrix type.";
   }
 }
 
 void GeneralMatrix::AddToMat(BaseFloat alpha, MatrixBase<BaseFloat> *mat,
-                             MatrixTransposeType trans) const {
+    MatrixTransposeType trans) const {
   switch (this->Type()) {
-    case kFullMatrix: {
-      mat->AddMat(alpha, mat_, trans);
-      break;
-    }
-    case kSparseMatrix: {
-      smat_.AddToMat(alpha, mat, trans);
-      break;
-    }
-    case kCompressedMatrix: {
-      Matrix<BaseFloat> temp_mat(cmat_);
-      mat->AddMat(alpha, temp_mat, trans);
-      break;
-    }
-    default:
-      KALDI_ERR << "Invalid general-matrix type.";
+  case kFullMatrix: {
+    mat->AddMat(alpha, mat_, trans);
+    break;
+  }
+  case kSparseMatrix: {
+    smat_.AddToMat(alpha, mat, trans);
+    break;
+  }
+  case kCompressedMatrix: {
+    Matrix<BaseFloat> temp_mat(cmat_);
+    mat->AddMat(alpha, temp_mat, trans);
+    break;
+  }
+  default:
+    KALDI_ERR << "Invalid general-matrix type.";
   }
 }
 
@@ -1231,58 +1231,58 @@ void GeneralMatrix::Swap(GeneralMatrix *other) {
 
 
 void ExtractRowRangeWithPadding(
-    const GeneralMatrix &in,
-    int32 row_offset,
-    int32 num_rows,
-    GeneralMatrix *out) {
+  const GeneralMatrix &in,
+  int32 row_offset,
+  int32 num_rows,
+  GeneralMatrix *out) {
   // make sure 'out' is empty to start with.
   Matrix<BaseFloat> empty_mat;
   *out = empty_mat;
   if (num_rows == 0) return;
   switch (in.Type()) {
-    case kFullMatrix: {
-      const Matrix<BaseFloat> &mat_in = in.GetFullMatrix();
-      int32 num_rows_in = mat_in.NumRows(), num_cols = mat_in.NumCols();
-      KALDI_ASSERT(num_rows_in > 0);  // we can't extract >0 rows from an empty
+  case kFullMatrix: {
+    const Matrix<BaseFloat> &mat_in = in.GetFullMatrix();
+    int32 num_rows_in = mat_in.NumRows(), num_cols = mat_in.NumCols();
+    KALDI_ASSERT(num_rows_in > 0);    // we can't extract >0 rows from an empty
                                       // matrix.
-      Matrix<BaseFloat> mat_out(num_rows, num_cols, kUndefined);
-      for (int32 row = 0; row < num_rows; row++) {
-        int32 row_in = row + row_offset;
-        if (row_in < 0) row_in = 0;
-        else if (row_in >= num_rows_in) row_in = num_rows_in - 1;
-        SubVector<BaseFloat> vec_in(mat_in, row_in),
-            vec_out(mat_out, row);
-        vec_out.CopyFromVec(vec_in);
-      }
-      out->SwapFullMatrix(&mat_out);
-      break;
+    Matrix<BaseFloat> mat_out(num_rows, num_cols, kUndefined);
+    for (int32 row = 0; row < num_rows; row++) {
+      int32 row_in = row + row_offset;
+      if (row_in < 0) row_in = 0;
+      else if (row_in >= num_rows_in) row_in = num_rows_in - 1;
+      SubVector<BaseFloat> vec_in(mat_in, row_in),
+      vec_out(mat_out, row);
+      vec_out.CopyFromVec(vec_in);
     }
-    case kSparseMatrix: {
-      const SparseMatrix<BaseFloat> &smat_in = in.GetSparseMatrix();
-      int32 num_rows_in = smat_in.NumRows(),
-          num_cols = smat_in.NumCols();
-      KALDI_ASSERT(num_rows_in > 0);  // we can't extract >0 rows from an empty
+    out->SwapFullMatrix(&mat_out);
+    break;
+  }
+  case kSparseMatrix: {
+    const SparseMatrix<BaseFloat> &smat_in = in.GetSparseMatrix();
+    int32 num_rows_in = smat_in.NumRows(),
+        num_cols = smat_in.NumCols();
+    KALDI_ASSERT(num_rows_in > 0);    // we can't extract >0 rows from an empty
                                       // matrix.
-      SparseMatrix<BaseFloat> smat_out(num_rows, num_cols);
-      for (int32 row = 0; row < num_rows; row++) {
-        int32 row_in = row + row_offset;
-        if (row_in < 0) row_in = 0;
-        else if (row_in >= num_rows_in) row_in = num_rows_in - 1;
-        smat_out.SetRow(row, smat_in.Row(row_in));
-      }
-      out->SwapSparseMatrix(&smat_out);
-      break;
+    SparseMatrix<BaseFloat> smat_out(num_rows, num_cols);
+    for (int32 row = 0; row < num_rows; row++) {
+      int32 row_in = row + row_offset;
+      if (row_in < 0) row_in = 0;
+      else if (row_in >= num_rows_in) row_in = num_rows_in - 1;
+      smat_out.SetRow(row, smat_in.Row(row_in));
     }
-    case kCompressedMatrix: {
-      const CompressedMatrix &cmat_in = in.GetCompressedMatrix();
-      bool allow_padding = true;
-      CompressedMatrix cmat_out(cmat_in, row_offset, num_rows,
-                                0, cmat_in.NumCols(), allow_padding);
-      out->SwapCompressedMatrix(&cmat_out);
-      break;
-    }
-    default:
-      KALDI_ERR << "Bad matrix type.";
+    out->SwapSparseMatrix(&smat_out);
+    break;
+  }
+  case kCompressedMatrix: {
+    const CompressedMatrix &cmat_in = in.GetCompressedMatrix();
+    bool allow_padding = true;
+    CompressedMatrix cmat_out(cmat_in, row_offset, num_rows,
+        0, cmat_in.NumCols(), allow_padding);
+    out->SwapCompressedMatrix(&cmat_out);
+    break;
+  }
+  default:
+    KALDI_ERR << "Bad matrix type.";
   }
 }
 

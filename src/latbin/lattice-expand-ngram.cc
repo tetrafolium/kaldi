@@ -31,11 +31,11 @@ int main(int argc, char *argv[]) {
     using kaldi::CompactLatticeArc;
 
     const char *usage =
-      "Expand lattices so that each arc has a unique n-label history, for\n"
-      "a specified n (defaults to 3).\n"
-      "Usage: lattice-expand-ngram [options] lattice-rspecifier "
-      "lattice-wspecifier\n"
-      "e.g.: lattice-expand-ngram --n=3 ark:lat ark:expanded_lat\n";
+        "Expand lattices so that each arc has a unique n-label history, for\n"
+        "a specified n (defaults to 3).\n"
+        "Usage: lattice-expand-ngram [options] lattice-rspecifier "
+        "lattice-wspecifier\n"
+        "e.g.: lattice-expand-ngram --n=3 ark:lat ark:expanded_lat\n";
 
     ParseOptions po(usage);
     int32 n = 3;
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     KALDI_ASSERT(n > 0);
 
     std::string lats_rspecifier = po.GetArg(1),
-      lats_wspecifier = po.GetOptArg(2);
+        lats_wspecifier = po.GetOptArg(2);
 
     fst::UnweightedNgramFst<CompactLatticeArc> expand_fst(n);
 
@@ -70,14 +70,14 @@ int main(int argc, char *argv[]) {
       ComposeDeterministicOnDemand(lat, &expand_fst, &expanded_lat);
       if (expanded_lat.Start() == fst::kNoStateId) {
         KALDI_WARN << "Empty lattice for utterance " << key;
-       n_fail++;
+        n_fail++;
       } else {
         if (lat.NumStates() == expanded_lat.NumStates()) {
           KALDI_LOG << "Lattice for key " << key
-            << " did not need to be expanded for order " << n << ".";
+                    << " did not need to be expanded for order " << n << ".";
         } else {
           KALDI_LOG << "Lattice expanded from " << lat.NumStates() << " to "
-            << expanded_lat.NumStates() << " states for order " << n << ".";
+                    << expanded_lat.NumStates() << " states for order " << n << ".";
         }
         lat_writer.Write(key, expanded_lat);
         n_done++;
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
       lat_reader.FreeCurrent();
     }
     KALDI_LOG << "Processed " << n_done << " lattices with " << n_fail
-      << " failures.";
+              << " failures.";
     return 0;
   } catch(const std::exception &e) {
     std::cerr << e.what();

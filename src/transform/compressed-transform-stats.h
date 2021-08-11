@@ -42,20 +42,20 @@ namespace kaldi {
 // compression of G.]
 
 class CompressedAffineXformStats {
- public:
-  CompressedAffineXformStats(): beta_(0.0) { }
+public:
+  CompressedAffineXformStats() : beta_(0.0) { }
   CompressedAffineXformStats(const AffineXformStats &input) {
     CopyFromAffineXformStats(input);
   }
   void CopyFromAffineXformStats(const AffineXformStats &input);
-  
+
   void CopyToAffineXformStats(AffineXformStats *output) const;
 
   void Write(std::ostream &os, bool binary) const;
 
   void Read(std::istream &is, bool binary);
 
-  private:
+private:
   // Note: normally we don't use float, only BaseFloat.  In this case
   // it seems more appropriate to use float (since the stuff in G_ is
   // already a lot more approximate than float.)
@@ -68,11 +68,11 @@ class CompressedAffineXformStats {
   // Convert one G matrix into linearized, normalized form ready
   // for compression.
   static void PrepareOneG(const SpMatrix<double> &Gi, double beta,
-                          SubVector<double> *linearized);
+      SubVector<double> *linearized);
   // Reverse the process of PrepareOneG.
   static void ExtractOneG(const SubVector<double> &linearized, double beta,
-                          SpMatrix<double> *Gi);
-  
+      SpMatrix<double> *Gi);
+
 };
 
 

@@ -59,19 +59,19 @@ struct RnnlmEmbeddingTrainerOptions {
   int32 natural_gradient_update_period;
   int32 natural_gradient_num_minibatches_history;
 
-  RnnlmEmbeddingTrainerOptions():
-      print_interval(100),
-      momentum(0.0),
-      max_param_change(1.0),
-      l2_regularize(0.0),
-      learning_rate(0.01),
-      backstitch_training_scale(0.0),
-      backstitch_training_interval(1),
-      use_natural_gradient(true),
-      natural_gradient_alpha(4.0),
-      natural_gradient_rank(80),
-      natural_gradient_update_period(4),
-      natural_gradient_num_minibatches_history(10) { }
+  RnnlmEmbeddingTrainerOptions() :
+    print_interval(100),
+    momentum(0.0),
+    max_param_change(1.0),
+    l2_regularize(0.0),
+    learning_rate(0.01),
+    backstitch_training_scale(0.0),
+    backstitch_training_interval(1),
+    use_natural_gradient(true),
+    natural_gradient_alpha(4.0),
+    natural_gradient_rank(80),
+    natural_gradient_update_period(4),
+    natural_gradient_num_minibatches_history(10) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("momentum", &momentum, "Momentum constant to apply during "
@@ -126,7 +126,7 @@ struct RnnlmEmbeddingTrainerOptions {
     feature embedding matrix.
  */
 class RnnlmEmbeddingTrainer {
- public:
+public:
   /** Constructor.
        @param [in] config  Structure that holds configuration options;
                           this class will keep a reference to it.
@@ -137,7 +137,7 @@ class RnnlmEmbeddingTrainer {
                           keeps the pointer and will modify that variable.
    */
   RnnlmEmbeddingTrainer(const RnnlmEmbeddingTrainerOptions &config,
-                        CuMatrix<BaseFloat> *embedding_mat);
+      CuMatrix<BaseFloat> *embedding_mat);
 
   /* Train on one minibatch-- this version is used either when there is no
      subsampling, or when there is subsampling but we are using a feature
@@ -147,14 +147,14 @@ class RnnlmEmbeddingTrainer {
                      embedding matrix; it's provided as a non-const pointer for
                      convenience so that we can modify it in-place if needed
                      for the natural gradient update.
-  */
+   */
   void Train(CuMatrixBase<BaseFloat> *embedding_deriv);
 
   // The backstitch version of the above function. Depending
   // on whether is_backstitch_step1 is true, It could be either the first
   // (backward) step, or the second (forward) step of backstitch.
   void TrainBackstitch(bool is_backstitch_step1,
-                       CuMatrixBase<BaseFloat> *embedding_deriv);
+      CuMatrixBase<BaseFloat> *embedding_deriv);
 
 
   /* Train on one minibatch-- this version is for when there is subsampling, and
@@ -172,19 +172,19 @@ class RnnlmEmbeddingTrainer {
                       pointer for convenience so that we can modify
                       it in-place if needed for the natural gradient
                       update.
-  */
+   */
   void Train(const CuArrayBase<int32> &active_words,
-             CuMatrixBase<BaseFloat> *word_embedding_deriv);
+      CuMatrixBase<BaseFloat> *word_embedding_deriv);
 
   // The backstitch version of the above function.
   void TrainBackstitch(bool is_backstitch_step1,
-                       const CuArrayBase<int32> &active_words,
-                       CuMatrixBase<BaseFloat> *word_embedding_deriv);
+      const CuArrayBase<int32> &active_words,
+      CuMatrixBase<BaseFloat> *word_embedding_deriv);
 
   ~RnnlmEmbeddingTrainer();
 
 
- private:
+private:
 
   // Sets options in the object 'preconditioner_', based on the config
   // (but not SetNumSamplesHistory(), we do that in the Train() functions because

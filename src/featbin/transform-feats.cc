@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
         "Global if transform-rxfilename provided.\n"
         "Usage: transform-feats [options] (<transform-rspecifier>|<transform-rxfilename>) <feats-rspecifier> <feats-wspecifier>\n"
         "See also: transform-vec, copy-feats, compose-transforms\n";
-        
+
     ParseOptions po(usage);
     std::string utt2spk_rspecifier;
     po.Register("utt2spk", &utt2spk_rspecifier, "rspecifier for utterance to speaker map");
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     bool use_global_transform;
     Matrix<BaseFloat> global_transform;
     if (ClassifyRspecifier(transform_rspecifier_or_rxfilename, NULL, NULL)
-       == kNoRspecifier) {
+        == kNoRspecifier) {
       // not an rspecifier -> interpret as rxfilename....
       use_global_transform = true;
       ReadKaldiObject(transform_rspecifier_or_rxfilename, &global_transform);
@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
     double tot_t = 0.0, tot_logdet = 0.0;  // to compute average logdet weighted by time...
     int32 num_done = 0, num_error = 0;
     BaseFloat cached_logdet = -1;
-    
-    for (;!feat_reader.Done(); feat_reader.Next()) {
+
+    for (; !feat_reader.Done(); feat_reader.Next()) {
       std::string utt = feat_reader.Key();
       const Matrix<BaseFloat> &feat(feat_reader.Value());
 
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
                    << feat_dim;
         if (transform_cols == feat_dim+2)
           KALDI_WARN << "[perhaps the transform was created by compose-transforms, "
-              "and you forgot the --b-is-affine option?]";
+            "and you forgot the --b-is-affine option?]";
         num_error++;
         continue;
       }
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
       feat_writer.Write(utt, feat_out);
     }
     if (logdet_type != Unknown && logdet_type != DimIncrease)
-      KALDI_LOG << "Overall average " << (logdet_type == PseudoLogdet ? "[pseudo-]":"")
+      KALDI_LOG << "Overall average " << (logdet_type == PseudoLogdet ? "[pseudo-]" : "")
                 << "logdet is " << (tot_logdet/tot_t) << " over " << tot_t
                 << " frames.";
     KALDI_LOG << "Applied transform to " << num_done << " utterances; " << num_error

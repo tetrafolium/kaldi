@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     const int32 num_fst_readers = fst_readers.size();
 
     int32 n_done = 0,
-          n_skipped = 0;
+        n_skipped = 0;
 
     for (; !fst_reader.Done(); fst_reader.Next()) {
       std::string key = fst_reader.Key();
@@ -72,8 +72,8 @@ int main(int argc, char *argv[]) {
       for (int32 i = 0; i < num_fst_readers; i++) {
         if (!fst_readers[i]->HasKey(key)) {
           KALDI_WARN << "Skipping '" << key << "'"
-            << " due to missing the fst in " << (i+2) << "th <rspecifier> : "
-            << "'" << po.GetArg(i+2) << "'";
+                     << " due to missing the fst in " << (i+2) << "th <rspecifier> : "
+                     << "'" << po.GetArg(i+2) << "'";
           skip_key = true;
         }
       }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     fst_readers.clear();
 
     KALDI_LOG << "Produced " << n_done << " FSTs by concatenating " << po.NumArgs()-1
-      << " streams " << "(" << n_skipped << " keys skipped).";
+              << " streams " << "(" << n_skipped << " keys skipped).";
     return (n_done != 0 ? 0 : 1);
   } catch(const std::exception &e) {
     std::cerr << e.what();

@@ -76,11 +76,11 @@ struct KaldiTfRnnlmWrapperOpts {
 };
 
 /**
-This class wraps the TensorFlow based RNNLM, and provides a set of interfaces
-to be used for class TfRnnlmDeterministicFst, implemented later in this file
-*/
+   This class wraps the TensorFlow based RNNLM, and provides a set of interfaces
+   to be used for class TfRnnlmDeterministicFst, implemented later in this file
+ */
 class KaldiTfRnnlmWrapper {
- public:
+public:
 
   /// constructor
   /// opts specify symbol for <unk> and num-threads for computation
@@ -93,10 +93,10 @@ class KaldiTfRnnlmWrapper {
   ///        [word]  [prob or count]  (it auto-normalizes the probabilities)
   /// tf_model_path is the location of the TensorFlow model
   KaldiTfRnnlmWrapper(const KaldiTfRnnlmWrapperOpts &opts,
-                      const std::string &rnn_wordlist,
-                      const std::string &word_symbol_table_rxfilename,
-                      const std::string &unk_prob_file,
-                      const std::string &tf_model_path);
+      const std::string &rnn_wordlist,
+      const std::string &word_symbol_table_rxfilename,
+      const std::string &unk_prob_file,
+      const std::string &tf_model_path);
   ~KaldiTfRnnlmWrapper();
 
   int32 GetEos() const { return eos_; }
@@ -121,17 +121,17 @@ class KaldiTfRnnlmWrapper {
   /// if the last 2 pointers are NULL we don't query them in TF session
   /// e.g. in the case of computing p(</s>|some history)
   BaseFloat GetLogProb(int32 word,      // word id in RNN wordlist
-                       int32 fst_word,  // FST word label, only for computing OOS cost
-                       const Tensor &context_in,
-                       const Tensor &cell_in,
-                       Tensor *context_out,
-                       Tensor *cell_out);
+      int32 fst_word,                   // FST word label, only for computing OOS cost
+      const Tensor &context_in,
+      const Tensor &cell_in,
+      Tensor *context_out,
+      Tensor *cell_out);
 
   /// takes in a word-id for FST and return the word-id for RNNLM
   /// return the word-id for <oos> if not found
   int FstLabelToRnnLabel(int i) const;
 
- private:
+private:
   /// read the TensorFlow model and create the session for computation
   /// num-threads need to be specified in creating the session
   void ReadTfModel(const std::string &tf_model_path, int32 num_threads);
@@ -171,8 +171,8 @@ class KaldiTfRnnlmWrapper {
 };
 
 class TfRnnlmDeterministicFst:
-         public fst::DeterministicOnDemandFst<fst::StdArc> {
- public:
+  public fst::DeterministicOnDemandFst<fst::StdArc> {
+public:
   typedef fst::StdArc::Weight Weight;
   typedef fst::StdArc::StateId StateId;
   typedef fst::StdArc::Label Label;
@@ -192,9 +192,9 @@ class TfRnnlmDeterministicFst:
 
   virtual bool GetArc(StateId s, Label ilabel, fst::StdArc* oarc);
 
- private:
+private:
   typedef unordered_map<std::vector<Label>,
-                        StateId, VectorHasher<Label> > MapType;
+          StateId, VectorHasher<Label> > MapType;
   StateId start_state_;
   MapType wseq_to_state_;
   std::vector<std::vector<Label> > state_to_wseq_;

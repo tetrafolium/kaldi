@@ -79,8 +79,8 @@ __device__ __forceinline__ float orderedIntToFloat(int32 intVal) {
 // the array vec must be sorted
 // Finds that value using a binary search
 __device__ __forceinline__ int32 binsearch_maxle(const int32 *vec,
-                                                 const int32 val, int32 low,
-                                                 int32 high) {
+    const int32 val, int32 low,
+    int32 high) {
   while (true) {
     if (low == high) return low;  // we know it exists
     if ((low + 1) == high) return (vec[high] <= val) ? high : low;
@@ -105,7 +105,7 @@ union UInt64UnionInt2 {
 
 #if __CUDA_ARCH__ < 350
 __device__ __inline__ void atomicMinULL(unsigned long long *ptr,
-                                        unsigned long long val) {
+    unsigned long long val) {
   unsigned long long old = *ptr, assumed;
   do {
     assumed = old;
@@ -114,7 +114,7 @@ __device__ __inline__ void atomicMinULL(unsigned long long *ptr,
 }
 #else
 __device__ __forceinline__ void atomicMinULL(unsigned long long *ptr,
-                                             unsigned long long val) {
+    unsigned long long val) {
   atomicMin(ptr, val);
 }
 #endif
@@ -168,18 +168,18 @@ __device__ __forceinline__ int hash_func(int key) {
 // (for instance, in int2, y is stored before x)
 
 __device__ __inline__ void PackArgminInUInt64(const uint32_t min, const uint32_t arg, unsigned long long *argmin) {
-	unsigned long long p = min;
-	p <<= 32;
-	p |= arg;
-	*argmin = p;
+  unsigned long long p = min;
+  p <<= 32;
+  p |= arg;
+  *argmin = p;
 }
 
 __device__ __inline__ void GetMinFromPackedArgminUInt64(const unsigned long long argmin, uint32_t *min) {
-	*min = (uint32_t)((argmin & 0xFFFFFFFF00000000LL) >> 32);
+  *min = (uint32_t)((argmin & 0xFFFFFFFF00000000LL) >> 32);
 }
 
 __device__ __inline__ void GetArgFromPackedArgminUInt64(const unsigned long long argmin, uint32_t *arg) {
-	*arg = (uint32_t)(argmin & 0xFFFFFFFFLL);
+  *arg = (uint32_t)(argmin & 0xFFFFFFFFLL);
 }
 
 // hashmap_insert_or_aggregate
@@ -212,8 +212,8 @@ __device__ __inline__ void GetArgFromPackedArgminUInt64(const unsigned long long
 // keys must be >= 0 (to avoid collisions with
 // KALDI_CUDA_DECODER_HASHMAP_NO_KEY)
 __device__ __inline__ void hashmap_insert_or_aggregate(
-    HashmapValueT *d_map_values, int key, int int_cost, int arg_int_cost,
-    int capacity, int *local_idx, int *out_hash_idx) {
+  HashmapValueT *d_map_values, int key, int int_cost, int arg_int_cost,
+  int capacity, int *local_idx, int *out_hash_idx) {
   int hash_idx = hash_func(key) % capacity;
   int c = 0;
   HashmapValueT *d_val = NULL;
@@ -245,15 +245,15 @@ __device__ __inline__ void hashmap_insert_or_aggregate(
 // We use the bit sign for that
 // Setter and getter
 __device__ __inline__ void SetFSTStateHashIndex(int32 raw_hash_idx,
-                                                bool is_representative,
-                                                FSTStateHashIndex *hash_idx) {
+    bool is_representative,
+    FSTStateHashIndex *hash_idx) {
   *hash_idx = is_representative ? (-raw_hash_idx - 1)  // -1 to force it < 0
                                 : raw_hash_idx;
 }
 
 __device__ __inline__ void GetFSTStateHashIndex(FSTStateHashIndex &hash_idx,
-                                                int32 *raw_hash_idx,
-                                                bool *is_representative) {
+    int32 *raw_hash_idx,
+    bool *is_representative) {
   *is_representative = (hash_idx < 0);
   *raw_hash_idx = *is_representative ? (-(hash_idx + 1)) : hash_idx;
 }

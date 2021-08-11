@@ -43,13 +43,13 @@ int main(int argc, char *argv[]) {
         "\n"
         "e.g.:\n"
         " nnet-train-ensemble 1.1.nnet 2.1.nnet ark:egs.ark 2.1.nnet 2.2.nnet \n";
-    
+
     bool binary_write = true;
     bool zero_stats = true;
     int32 srand_seed = 0;
     std::string use_gpu = "yes";
     NnetEnsembleTrainerConfig train_config;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("zero-stats", &zero_stats, "If true, zero occupation "
@@ -59,27 +59,27 @@ int main(int argc, char *argv[]) {
                 "with l2-penalty != 0.0");
     po.Register("use-gpu", &use_gpu,
                 "yes|no|optional|wait, only has effect if compiled with CUDA");
- 
+
     train_config.Register(&po);
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() <= 3) {
       po.PrintUsage();
       exit(1);
     }
     srand(srand_seed);
-    
+
 #if HAVE_CUDA==1
     CuDevice::Instantiate().SelectGpuId(use_gpu);
 #endif
-    
+
     int32 num_nnets = (po.NumArgs() - 1) / 2;
     std::string nnet_rxfilename = po.GetArg(1);
     std::string examples_rspecifier = po.GetArg(num_nnets + 1);
 
     std::string nnet1_rxfilename = po.GetArg(1);
-    
+
     TransitionModel trans_model;
     std::vector<AmNnet> am_nnets(num_nnets);
     {
@@ -100,27 +100,27 @@ int main(int argc, char *argv[]) {
       trans_model.Read(ki.Stream(), binary_read);
       am_nnets[n].Read(ki.Stream(), binary_read);
       nnets[n] = &am_nnets[n].GetNnet();
-    }      
-    
+    }
+
 
     int64 num_examples = 0;
 
     {
       if (zero_stats) {
-        for (int32 n = 1; n < num_nnets; n++) 
+        for (int32 n = 1; n < num_nnets; n++)
           nnets[n]->ZeroStats();
       }
       { // want to make sure this object deinitializes before
         // we write the model, as it does something in the destructor.
         NnetEnsembleTrainer trainer(train_config,
-                                    nnets);
-      
+            nnets);
+
         SequentialNnetExampleReader example_reader(examples_rspecifier);
 
         for (; !example_reader.Done(); example_reader.Next(), num_examples++)
           trainer.TrainOnExample(example_reader.Value());  // It all happens here!
       }
-    
+
       {
         for (int32 n = 0; n < num_nnets; n++) {
           Output ko(po.GetArg(po.NumArgs() - num_nnets + n + 1), binary_write);
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
 #if HAVE_CUDA==1
     CuDevice::Instantiate().PrintProfile();
 #endif
-    
+
     KALDI_LOG << "Finished training, processed " << num_examples
               << " training examples.";
     return (num_examples == 0 ? 1 : 0);

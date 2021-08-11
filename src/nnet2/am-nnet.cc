@@ -43,7 +43,7 @@ void AmNnet::Read(std::istream &is, bool binary) {
 
 void AmNnet::SetPriors(const VectorBase<BaseFloat> &priors) {
   priors_ = priors;
-  if (priors_.Dim() > NumPdfs())    
+  if (priors_.Dim() > NumPdfs())
     KALDI_ERR << "Dimension of priors cannot exceed number of pdfs.";
 
   if (priors_.Dim() > 0 && priors_.Dim() < NumPdfs()) {

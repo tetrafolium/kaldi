@@ -37,20 +37,20 @@ struct NnetShrinkConfig {
   // num-iters is in reality the number of function evaluations.
 
   BaseFloat initial_step;
-  
-  NnetShrinkConfig(): num_bfgs_iters(10), initial_step(0.1) { }
+
+  NnetShrinkConfig() : num_bfgs_iters(10), initial_step(0.1) { }
   void Register(OptionsItf *opts) {
     opts->Register("num-bfgs-iters", &num_bfgs_iters, "Number of iterations of "
                    "BFGS to use when optimizing shrinkage parameters");
     opts->Register("initial-step", &initial_step, "Parameter in the optimization, "
                    "used to set the initial step length");
-  }  
+  }
 };
 
 void ShrinkNnet(const NnetShrinkConfig &shrink_config,
-                const std::vector<NnetExample> &validation_set,
-                Nnet *nnet);
-  
+    const std::vector<NnetExample> &validation_set,
+    Nnet *nnet);
+
 
 
 } // namespace nnet2

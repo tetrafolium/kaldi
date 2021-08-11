@@ -37,11 +37,11 @@ int main(int argc, char *argv[]) {
     using fst::StdArc;
 
     const char *usage =
-      "Minimize lattices, in CompactLattice format.  Should be applied to\n"
-      "determinized lattices (e.g. produced with --determinize-lattice=true)\n"
-      "Note: by default this program\n"
-      "pushes the strings and weights prior to minimization."
-      "Usage: lattice-minimize [options] lattice-rspecifier lattice-wspecifier\n"
+        "Minimize lattices, in CompactLattice format.  Should be applied to\n"
+        "determinized lattices (e.g. produced with --determinize-lattice=true)\n"
+        "Note: by default this program\n"
+        "pushes the strings and weights prior to minimization."
+        "Usage: lattice-minimize [options] lattice-rspecifier lattice-wspecifier\n"
         " e.g.: lattice-minimize ark:1.lats ark:2.lats\n";
 
     ParseOptions po(usage);
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
                 "lattice to the start.");
     po.Register("push-weights", &push_weights, "If true, push the weights in the "
                 "lattice to the start.");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -66,11 +66,11 @@ int main(int argc, char *argv[]) {
 
 
     SequentialCompactLatticeReader clat_reader(lats_rspecifier);
-    CompactLatticeWriter clat_writer(lats_wspecifier); 
+    CompactLatticeWriter clat_writer(lats_wspecifier);
 
     int32 n_done = 0, n_err = 0;
 
-    
+
     for (; !clat_reader.Done(); clat_reader.Next()) {
       std::string key = clat_reader.Key();
       CompactLattice clat = clat_reader.Value();
@@ -83,13 +83,13 @@ int main(int argc, char *argv[]) {
       }
       if (push_weights && !PushCompactLatticeWeights(&clat)) {
         KALDI_WARN << "Failure in pushing lattice weights (bad lattice?),"
-                   << "for key " << key ;           
+                   << "for key " << key;
         n_err++;
         continue;
       }
       if (!MinimizeCompactLattice(&clat)) {
         KALDI_WARN << "Failure in minimizing lattice (bad lattice?),"
-                   << "for key " << key ;           
+                   << "for key " << key;
         n_err++;
         continue;
       }

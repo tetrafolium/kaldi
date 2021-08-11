@@ -29,14 +29,14 @@ namespace kaldi {
 
 
 void AccStatsForUtterance(const TransitionModel &trans_model,
-                          const AmDiagGmm &am_gmm,
-                          const GaussPost &gpost,
-                          const Matrix<BaseFloat> &feats,
-                          FmllrRawAccs *accs) {
+    const AmDiagGmm &am_gmm,
+    const GaussPost &gpost,
+    const Matrix<BaseFloat> &feats,
+    FmllrRawAccs *accs) {
   for (size_t t = 0; t < gpost.size(); t++) {
     for (size_t i = 0; i < gpost[t].size(); i++) {
       int32 pdf = gpost[t][i].first;
-      const Vector<BaseFloat> &posterior(gpost[t][i].second);      
+      const Vector<BaseFloat> &posterior(gpost[t][i].second);
       accs->AccumulateFromPosteriors(am_gmm.GetPdf(pdf),
                                      feats.Row(t), posterior);
     }
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     std::string model_rxfilename = po.GetArg(1),
         full_lda_mat_rxfilename = po.GetArg(2),
         feature_rspecifier = po.GetArg(3),
@@ -94,17 +94,17 @@ int main(int argc, char *argv[]) {
 
     Matrix<BaseFloat> full_lda_mat;
     ReadKaldiObject(full_lda_mat_rxfilename, &full_lda_mat);
-    
+
     RandomAccessGaussPostReader gpost_reader(gpost_rspecifier);
     BaseFloatMatrixWriter transform_writer(transform_wspecifier);
-    
+
     double tot_auxf_impr = 0.0, tot_count = 0.0;
-    
+
     int32 num_done = 0, num_err = 0;
     if (!spk2utt_rspecifier.empty()) { // Adapting per speaker
       SequentialTokenVectorReader spk2utt_reader(spk2utt_rspecifier);
       RandomAccessBaseFloatMatrixReader feature_reader(feature_rspecifier);
-      
+
       for (; !spk2utt_reader.Done(); spk2utt_reader.Next()) {
         FmllrRawAccs accs(raw_feat_dim, am_gmm.Dim(), full_lda_mat);
         std::string spk = spk2utt_reader.Key();
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
           AccStatsForUtterance(trans_model, am_gmm, gpost, feats, &accs);
           num_done++;
         }
-        
+
         BaseFloat auxf_impr, count;
         {
           Matrix<BaseFloat> transform(raw_feat_dim, raw_feat_dim + 1);
@@ -168,8 +168,8 @@ int main(int argc, char *argv[]) {
         FmllrRawAccs accs(raw_feat_dim, am_gmm.Dim(), full_lda_mat);
 
         AccStatsForUtterance(trans_model, am_gmm, gpost, feats, &accs);
-        
-        BaseFloat auxf_impr, count;        
+
+        BaseFloat auxf_impr, count;
         {
           Matrix<BaseFloat> transform(raw_feat_dim, raw_feat_dim + 1);
           transform.SetUnit();

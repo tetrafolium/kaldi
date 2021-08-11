@@ -44,7 +44,7 @@ namespace fst {
 /// This function used to be called just PushCompactLattice.
 template<class Weight, class IntType>
 bool PushCompactLatticeStrings(
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *clat);
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *clat);
 
 /// This function pushes the weights in the CompactLattice so that all states
 /// except possibly the start state, have Weight components (of type
@@ -54,7 +54,7 @@ bool PushCompactLatticeStrings(
 /// gracefully by just leaving the lattice the same.
 template<class Weight, class IntType>
 bool PushCompactLatticeWeights(
-    MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *clat);
+  MutableFst<ArcTpl<CompactLatticeWeightTpl<Weight, IntType> > > *clat);
 
 }  // namespace fst
 

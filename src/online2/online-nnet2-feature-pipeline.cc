@@ -23,8 +23,8 @@
 namespace kaldi {
 
 OnlineNnet2FeaturePipelineInfo::OnlineNnet2FeaturePipelineInfo(
-    const OnlineNnet2FeaturePipelineConfig &config):
-    silence_weighting_config(config.silence_weighting_config) {
+  const OnlineNnet2FeaturePipelineConfig &config) :
+  silence_weighting_config(config.silence_weighting_config) {
   if (config.feature_type == "mfcc" || config.feature_type == "plp" ||
       config.feature_type == "fbank") {
     feature_type = config.feature_type;
@@ -88,15 +88,15 @@ OnlineNnet2FeaturePipelineInfo::OnlineNnet2FeaturePipelineInfo(
 
 /// The main feature extraction pipeline is constructed in this constructor.
 OnlineNnet2FeaturePipeline::OnlineNnet2FeaturePipeline(
-    const OnlineNnet2FeaturePipelineInfo &info):
-    info_(info), base_feature_(NULL),
-    pitch_(NULL), pitch_feature_(NULL),
-    cmvn_feature_(NULL),
-    feature_plus_optional_pitch_(NULL),
-    feature_plus_optional_cmvn_(NULL),
-    ivector_feature_(NULL),
-    nnet3_feature_(NULL),
-    final_feature_(NULL) {
+  const OnlineNnet2FeaturePipelineInfo &info) :
+  info_(info), base_feature_(NULL),
+  pitch_(NULL), pitch_feature_(NULL),
+  cmvn_feature_(NULL),
+  feature_plus_optional_pitch_(NULL),
+  feature_plus_optional_cmvn_(NULL),
+  ivector_feature_(NULL),
+  nnet3_feature_(NULL),
+  final_feature_(NULL) {
 
   if (info_.feature_type == "mfcc") {
     base_feature_ = new OnlineMfcc(info_.mfcc_opts);
@@ -157,17 +157,17 @@ int32 OnlineNnet2FeaturePipeline::NumFramesReady() const {
 }
 
 void OnlineNnet2FeaturePipeline::GetFrame(int32 frame,
-                                          VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   return final_feature_->GetFrame(frame, feat);
 }
 
 void OnlineNnet2FeaturePipeline::UpdateFrameWeights(
-    const std::vector<std::pair<int32, BaseFloat> > &delta_weights) {
-    IvectorFeature()->UpdateFrameWeights(delta_weights);
+  const std::vector<std::pair<int32, BaseFloat> > &delta_weights) {
+  IvectorFeature()->UpdateFrameWeights(delta_weights);
 }
 
 void OnlineNnet2FeaturePipeline::SetAdaptationState(
-    const OnlineIvectorExtractorAdaptationState &adaptation_state) {
+  const OnlineIvectorExtractorAdaptationState &adaptation_state) {
   if (info_.use_ivectors) {
     ivector_feature_->SetAdaptationState(adaptation_state);
   }
@@ -175,7 +175,7 @@ void OnlineNnet2FeaturePipeline::SetAdaptationState(
 }
 
 void OnlineNnet2FeaturePipeline::GetAdaptationState(
-    OnlineIvectorExtractorAdaptationState *adaptation_state) const {
+  OnlineIvectorExtractorAdaptationState *adaptation_state) const {
   if (info_.use_ivectors) {
     ivector_feature_->GetAdaptationState(adaptation_state);
   }
@@ -183,13 +183,13 @@ void OnlineNnet2FeaturePipeline::GetAdaptationState(
 }
 
 void OnlineNnet2FeaturePipeline::SetCmvnState(
-    const OnlineCmvnState &cmvn_state) {
+  const OnlineCmvnState &cmvn_state) {
   if (NULL != cmvn_feature_)
     cmvn_feature_->SetState(cmvn_state);
 }
 
 void OnlineNnet2FeaturePipeline::GetCmvnState(
-    OnlineCmvnState *cmvn_state) {
+  OnlineCmvnState *cmvn_state) {
   if (NULL != cmvn_feature_) {
     int32 frame = cmvn_feature_->NumFramesReady() - 1;
     // the following call will crash if no frames are ready.
@@ -215,8 +215,8 @@ OnlineNnet2FeaturePipeline::~OnlineNnet2FeaturePipeline() {
 }
 
 void OnlineNnet2FeaturePipeline::AcceptWaveform(
-    BaseFloat sampling_rate,
-    const VectorBase<BaseFloat> &waveform) {
+  BaseFloat sampling_rate,
+  const VectorBase<BaseFloat> &waveform) {
   base_feature_->AcceptWaveform(sampling_rate, waveform);
   if (pitch_)
     pitch_->AcceptWaveform(sampling_rate, waveform);

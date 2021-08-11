@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
 
     Matrix<BaseFloat> word_embedding_mat(word_feature_mat.NumRows(),
-                                         feature_embedding_mat.NumCols());
+        feature_embedding_mat.NumCols());
 
     word_embedding_mat.AddSmatMat(1.0, word_feature_mat, kNoTrans,
                                   feature_embedding_mat, 0.0);

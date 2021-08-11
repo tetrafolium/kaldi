@@ -68,27 +68,29 @@ namespace nnet2 {
       feat_dim = 1024, num_chunks = 512, first_offset = 7, last_offset = 7
    (the decoding setup would still look pretty normal, so we don't give an example).
 
-*/
+ */
 class ChunkInfo {
- public:
+public:
   ChunkInfo()  // default constructor we assume this object will not be used
-      : feat_dim_(0), num_chunks_(0),
-        first_offset_(0), last_offset_(0),
-        offsets_() { }
+    : feat_dim_(0), num_chunks_(0),
+    first_offset_(0), last_offset_(0),
+    offsets_() { }
 
   ChunkInfo(int32 feat_dim, int32 num_chunks,
-            int32 first_offset, int32 last_offset )
-      : feat_dim_(feat_dim), num_chunks_(num_chunks),
-        first_offset_(first_offset), last_offset_(last_offset),
-        offsets_() { Check(); }
+      int32 first_offset, int32 last_offset )
+    : feat_dim_(feat_dim), num_chunks_(num_chunks),
+    first_offset_(first_offset), last_offset_(last_offset),
+    offsets_() { Check(); }
 
   ChunkInfo(int32 feat_dim, int32 num_chunks,
-            const std::vector<int32> offsets)
-      : feat_dim_(feat_dim), num_chunks_(num_chunks),
-        first_offset_(offsets.front()), last_offset_(offsets.back()),
-        offsets_(offsets) { if (last_offset_ - first_offset_ + 1 == offsets_.size())
-                              offsets_.clear();
-          Check(); }
+      const std::vector<int32> offsets)
+    : feat_dim_(feat_dim), num_chunks_(num_chunks),
+    first_offset_(offsets.front()), last_offset_(offsets.back()),
+    offsets_(offsets) {
+    if (last_offset_ - first_offset_ + 1 == offsets_.size())
+      offsets_.clear();
+    Check();
+  }
 
   // index : actual row index in the current chunk
   // offset : the time offset of feature frame at current row in the chunk
@@ -120,7 +122,8 @@ class ChunkInfo {
   /// Returns the number of rows that we expect the feature matrix to have.
   int32 NumRows() const {
     return num_chunks_ * (!offsets_.empty() ? offsets_.size() :
-                                         last_offset_ - first_offset_ + 1); }
+           last_offset_ - first_offset_ + 1);
+  }
 
   /// Returns the number of columns that we expect the feature matrix to have.
   int32 NumCols() const { return feat_dim_; }
@@ -131,17 +134,17 @@ class ChunkInfo {
   /// Checks that the data in the ChunkInfo is valid, and die if not.
   void Check() const;
 
- private:
+private:
   int32 feat_dim_;  // Feature dimension.
   int32 num_chunks_;  // Number of separate equal-sized chunks of features
   int32 first_offset_;  // Start time offset within each chunk, numbered so that at
-                      // the input to the network, the first_offset of the first
-                      // feature would always be zero.
+                        // the input to the network, the first_offset of the first
+                        // feature would always be zero.
   int32 last_offset_;  // End time offset within each chunk.
   std::vector<int32> offsets_; // offsets is only nonempty if the chunk contains
-                             // a non-contiguous sequence.  If nonempty, it must
-                             // be sorted, and offsets.front() == first_offset,
-                             // offsets.back() == last_offset.
+                               // a non-contiguous sequence.  If nonempty, it must
+                               // be sorted, and offsets.front() == first_offset,
+                               // offsets.back() == last_offset.
 
 };
 
@@ -155,8 +158,8 @@ class ChunkInfo {
  *
  */
 class Component {
- public:
-  Component(): index_(-1) { }
+public:
+  Component() : index_(-1) { }
 
   virtual std::string Type() const = 0; // each type should return a string such as
   // "SigmoidComponent".
@@ -195,15 +198,15 @@ class Component {
   /// chunk of data) or will be the same as in.NumFrames(), but
   /// other values are possible if some layers do splicing.
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const = 0;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const = 0;
 
   /// A non-virtual propagate function that first resizes output if necessary.
   void Propagate(const ChunkInfo &in_info,
-                 const ChunkInfo &out_info,
-                 const CuMatrixBase<BaseFloat> &in,
-                 CuMatrix<BaseFloat> *out) const {
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrix<BaseFloat> *out) const {
     if (out->NumRows() != out_info.NumRows() ||
         out->NumCols() != out_info.NumCols()) {
       out->Resize(out_info.NumRows(), out_info.NumCols());
@@ -225,12 +228,12 @@ class Component {
   /// num_chunks lets us treat the input matrix as contiguous-in-time
   /// chunks of equal size; it only matters if splicing is involved.
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const = 0;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const = 0;
 
   virtual bool BackpropNeedsInput() const { return true; } // if this returns false,
   // the "in_value" to Backprop may be a dummy variable.
@@ -263,7 +266,7 @@ class Component {
 
   virtual ~Component() { }
 
- private:
+private:
   int32 index_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(Component);
 };
@@ -277,9 +280,9 @@ class Component {
  * This is a base-class for Components with parameters.
  */
 class UpdatableComponent: public Component {
- public:
-  UpdatableComponent(const UpdatableComponent &other):
-      learning_rate_(other.learning_rate_){ }
+public:
+  UpdatableComponent(const UpdatableComponent &other) :
+    learning_rate_(other.learning_rate_){ }
 
   void Init(BaseFloat learning_rate) {
     learning_rate_ = learning_rate;
@@ -294,7 +297,7 @@ class UpdatableComponent: public Component {
   /// MixtureProbComponent).
   virtual void SetZero(bool treat_as_gradient) = 0;
 
-  UpdatableComponent(): learning_rate_(0.001) { }
+  UpdatableComponent() : learning_rate_(0.001) { }
 
   virtual ~UpdatableComponent() { }
 
@@ -341,19 +344,19 @@ class UpdatableComponent: public Component {
     KALDI_ASSERT(0);
   }
 
- protected:
+protected:
   BaseFloat learning_rate_; ///< learning rate (0.0..0.01)
- private:
+private:
   const UpdatableComponent &operator = (const UpdatableComponent &other); // Disallow.
 };
 
 /// This kind of Component is a base-class for things like
 /// sigmoid and softmax.
 class NonlinearComponent: public Component {
- public:
+public:
   void Init(int32 dim) { dim_ = dim; count_ = 0.0; }
   explicit NonlinearComponent(int32 dim) { Init(dim); }
-  NonlinearComponent(): dim_(0) { } // e.g. prior to Read().
+  NonlinearComponent() : dim_(0) { } // e.g. prior to Read().
   explicit NonlinearComponent(const NonlinearComponent &other);
 
   virtual int32 InputDim() const { return dim_; }
@@ -381,7 +384,7 @@ class NonlinearComponent: public Component {
   // The following function is used when "widening" neural networks.
   void SetDim(int32 dim);
 
- protected:
+protected:
   friend class NormalizationComponent;
   friend class SigmoidComponent;
   friend class TanhComponent;
@@ -395,7 +398,7 @@ class NonlinearComponent: public Component {
   // count_. (If deriv == NULL, it won't update "deriv_sum_").
   // It will be called from the Backprop function of child classes.
   void UpdateStats(const CuMatrixBase<BaseFloat> &out_value,
-                   const CuMatrixBase<BaseFloat> *deriv = NULL);
+      const CuMatrixBase<BaseFloat> *deriv = NULL);
 
 
   const NonlinearComponent &operator = (const NonlinearComponent &other); // Disallow.
@@ -409,32 +412,34 @@ class NonlinearComponent: public Component {
 };
 
 class MaxoutComponent: public Component {
- public:
+public:
   void Init(int32 input_dim, int32 output_dim);
   explicit MaxoutComponent(int32 input_dim, int32 output_dim) {
     Init(input_dim, output_dim);
   }
-  MaxoutComponent(): input_dim_(0), output_dim_(0) { }
+  MaxoutComponent() : input_dim_(0), output_dim_(0) { }
   virtual std::string Type() const { return "MaxoutComponent"; }
   virtual void InitFromString(std::string args);
   virtual int32 InputDim() const { return input_dim_; }
   virtual int32 OutputDim() const { return output_dim_; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &,  //out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &,                    //out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return true; }
   virtual bool BackpropNeedsOutput() const { return true; }
-  virtual Component* Copy() const { return new MaxoutComponent(input_dim_,
-                                                              output_dim_); }
+  virtual Component* Copy() const {
+    return new MaxoutComponent(input_dim_,
+                                                              output_dim_);
+  }
 
   virtual void Read(std::istream &is, bool binary); // This Read function
   // requires that the Component has the correct type.
@@ -443,7 +448,7 @@ class MaxoutComponent: public Component {
   virtual void Write(std::ostream &os, bool binary) const;
 
   virtual std::string Info() const;
- protected:
+protected:
   int32 input_dim_;
   int32 output_dim_;
 };
@@ -466,14 +471,14 @@ class MaxoutComponent: public Component {
  * implementation (and was not helpful for Ossama).
  */
 class MaxpoolingComponent: public Component {
- public:
+public:
   void Init(int32 input_dim, int32 output_dim,
-            int32 pool_size, int32 pool_stride);
+      int32 pool_size, int32 pool_stride);
   explicit MaxpoolingComponent(int32 input_dim, int32 output_dim,
-                               int32 pool_size, int32 pool_stride) {
+      int32 pool_size, int32 pool_stride) {
     Init(input_dim, output_dim, pool_size, pool_stride);
   }
-  MaxpoolingComponent(): input_dim_(0), output_dim_(0),
+  MaxpoolingComponent() : input_dim_(0), output_dim_(0),
     pool_size_(0), pool_stride_(0) { }
   virtual std::string Type() const { return "MaxpoolingComponent"; }
   virtual void InitFromString(std::string args);
@@ -481,21 +486,22 @@ class MaxpoolingComponent: public Component {
   virtual int32 OutputDim() const { return output_dim_; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &,  //out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &,                    //out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return true; }
   virtual bool BackpropNeedsOutput() const { return true; }
   virtual Component* Copy() const {
     return new MaxpoolingComponent(input_dim_, output_dim_,
-                               pool_size_, pool_stride_); }
+                               pool_size_, pool_stride_);
+  }
 
   virtual void Read(std::istream &is, bool binary); // This Read function
   // requires that the Component has the correct type.
@@ -504,7 +510,7 @@ class MaxpoolingComponent: public Component {
   virtual void Write(std::ostream &os, bool binary) const;
 
   virtual std::string Info() const;
- protected:
+protected:
   int32 input_dim_;
   int32 output_dim_;
   int32 pool_size_;
@@ -512,32 +518,34 @@ class MaxpoolingComponent: public Component {
 };
 
 class PnormComponent: public Component {
- public:
+public:
   void Init(int32 input_dim, int32 output_dim, BaseFloat p);
   explicit PnormComponent(int32 input_dim, int32 output_dim, BaseFloat p) {
     Init(input_dim, output_dim, p);
   }
-  PnormComponent(): input_dim_(0), output_dim_(0), p_(0) { }
+  PnormComponent() : input_dim_(0), output_dim_(0), p_(0) { }
   virtual std::string Type() const { return "PnormComponent"; }
   virtual void InitFromString(std::string args);
   virtual int32 InputDim() const { return input_dim_; }
   virtual int32 OutputDim() const { return output_dim_; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &,  //out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &,                    //out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return true; }
   virtual bool BackpropNeedsOutput() const { return true; }
-  virtual Component* Copy() const { return new PnormComponent(input_dim_,
-                                                              output_dim_, p_); }
+  virtual Component* Copy() const {
+    return new PnormComponent(input_dim_,
+                                                              output_dim_, p_);
+  }
 
   virtual void Read(std::istream &is, bool binary); // This Read function
   // requires that the Component has the correct type.
@@ -546,16 +554,16 @@ class PnormComponent: public Component {
   virtual void Write(std::ostream &os, bool binary) const;
 
   virtual std::string Info() const;
- protected:
+protected:
   int32 input_dim_;
   int32 output_dim_;
   BaseFloat p_;
 };
 
 class NormalizeComponent: public NonlinearComponent {
- public:
-  explicit NormalizeComponent(int32 dim): NonlinearComponent(dim) { }
-  explicit NormalizeComponent(const NormalizeComponent &other): NonlinearComponent(other) { }
+public:
+  explicit NormalizeComponent(int32 dim) : NonlinearComponent(dim) { }
+  explicit NormalizeComponent(const NormalizeComponent &other) : NonlinearComponent(other) { }
   NormalizeComponent() { }
   virtual std::string Type() const { return "NormalizeComponent"; }
   virtual Component* Copy() const { return new NormalizeComponent(*this); }
@@ -563,17 +571,17 @@ class NormalizeComponent: public NonlinearComponent {
   virtual bool BackpropNeedsOutput() const { return false; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
- private:
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
+private:
   NormalizeComponent &operator = (const NormalizeComponent &other); // Disallow.
   static const BaseFloat kNormFloor;
   // about 0.7e-20.  We need a value that's exactly representable in
@@ -583,9 +591,9 @@ class NormalizeComponent: public NonlinearComponent {
 
 
 class SigmoidComponent: public NonlinearComponent {
- public:
-  explicit SigmoidComponent(int32 dim): NonlinearComponent(dim) { }
-  explicit SigmoidComponent(const SigmoidComponent &other): NonlinearComponent(other) { }
+public:
+  explicit SigmoidComponent(int32 dim) : NonlinearComponent(dim) { }
+  explicit SigmoidComponent(const SigmoidComponent &other) : NonlinearComponent(other) { }
   SigmoidComponent() { }
   virtual std::string Type() const { return "SigmoidComponent"; }
   virtual bool BackpropNeedsInput() const { return false; }
@@ -593,24 +601,24 @@ class SigmoidComponent: public NonlinearComponent {
   virtual Component* Copy() const { return new SigmoidComponent(*this); }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
- private:
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
+private:
   SigmoidComponent &operator = (const SigmoidComponent &other); // Disallow.
 };
 
 class TanhComponent: public NonlinearComponent {
- public:
-  explicit TanhComponent(int32 dim): NonlinearComponent(dim) { }
-  explicit TanhComponent(const TanhComponent &other): NonlinearComponent(other) { }
+public:
+  explicit TanhComponent(int32 dim) : NonlinearComponent(dim) { }
+  explicit TanhComponent(const TanhComponent &other) : NonlinearComponent(other) { }
   TanhComponent() { }
   virtual std::string Type() const { return "TanhComponent"; }
   virtual Component* Copy() const { return new TanhComponent(*this); }
@@ -618,45 +626,45 @@ class TanhComponent: public NonlinearComponent {
   virtual bool BackpropNeedsOutput() const { return true; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
- private:
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
+private:
   TanhComponent &operator = (const TanhComponent &other); // Disallow.
 };
 
 /// Take the absoute values of an input vector to a power.
 /// The derivative for zero input will be treated as zero.
 class PowerComponent: public NonlinearComponent {
- public:
+public:
   void Init(int32 dim, BaseFloat power = 2);
   explicit PowerComponent(int32 dim, BaseFloat power = 2) {
     Init(dim, power);
   }
-  PowerComponent(): dim_(0), power_(2) { }
+  PowerComponent() : dim_(0), power_(2) { }
   virtual std::string Type() const { return "PowerComponent"; }
   virtual void InitFromString(std::string args);
   virtual int32 InputDim() const { return dim_; }
   virtual int32 OutputDim() const { return dim_; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return true; }
   virtual bool BackpropNeedsOutput() const { return true; }
   virtual Component* Copy() const { return new PowerComponent(dim_, power_); }
@@ -668,15 +676,15 @@ class PowerComponent: public NonlinearComponent {
 
   virtual std::string Info() const;
 
- private:
+private:
   int32 dim_;
   BaseFloat power_;
 };
 
 class RectifiedLinearComponent: public NonlinearComponent {
- public:
-  explicit RectifiedLinearComponent(int32 dim): NonlinearComponent(dim) { }
-  explicit RectifiedLinearComponent(const RectifiedLinearComponent &other): NonlinearComponent(other) { }
+public:
+  explicit RectifiedLinearComponent(int32 dim) : NonlinearComponent(dim) { }
+  explicit RectifiedLinearComponent(const RectifiedLinearComponent &other) : NonlinearComponent(other) { }
   RectifiedLinearComponent() { }
   virtual std::string Type() const { return "RectifiedLinearComponent"; }
   virtual Component* Copy() const { return new RectifiedLinearComponent(*this); }
@@ -684,24 +692,24 @@ class RectifiedLinearComponent: public NonlinearComponent {
   virtual bool BackpropNeedsOutput() const { return true; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
- private:
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
+private:
   RectifiedLinearComponent &operator = (const RectifiedLinearComponent &other); // Disallow.
 };
 
 class SoftHingeComponent: public NonlinearComponent {
- public:
-  explicit SoftHingeComponent(int32 dim): NonlinearComponent(dim) { }
-  explicit SoftHingeComponent(const SoftHingeComponent &other): NonlinearComponent(other) { }
+public:
+  explicit SoftHingeComponent(int32 dim) : NonlinearComponent(dim) { }
+  explicit SoftHingeComponent(const SoftHingeComponent &other) : NonlinearComponent(other) { }
   SoftHingeComponent() { }
   virtual std::string Type() const { return "SoftHingeComponent"; }
   virtual Component* Copy() const { return new SoftHingeComponent(*this); }
@@ -709,17 +717,17 @@ class SoftHingeComponent: public NonlinearComponent {
   virtual bool BackpropNeedsOutput() const { return true; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
- private:
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
+private:
   SoftHingeComponent &operator = (const SoftHingeComponent &other); // Disallow.
 };
 
@@ -728,27 +736,27 @@ class SoftHingeComponent: public NonlinearComponent {
 // useless, but we use it when we want to change how fast the next layer learns.
 // (e.g. a smaller scale will make the next layer learn slower.)
 class ScaleComponent: public Component {
- public:
-  explicit ScaleComponent(int32 dim, BaseFloat scale): dim_(dim), scale_(scale) { }
-  explicit ScaleComponent(const ScaleComponent &other):
-      dim_(other.dim_), scale_(other.scale_) { }
-  ScaleComponent(): dim_(0), scale_(0.0) { }
+public:
+  explicit ScaleComponent(int32 dim, BaseFloat scale) : dim_(dim), scale_(scale) { }
+  explicit ScaleComponent(const ScaleComponent &other) :
+    dim_(other.dim_), scale_(other.scale_) { }
+  ScaleComponent() : dim_(0), scale_(0.0) { }
   virtual std::string Type() const { return "ScaleComponent"; }
   virtual Component* Copy() const { return new ScaleComponent(*this); }
   virtual bool BackpropNeedsInput() const { return false; }
   virtual bool BackpropNeedsOutput() const { return false; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
 
   virtual int32 InputDim() const { return dim_; }
   virtual int32 OutputDim() const { return dim_; }
@@ -762,7 +770,7 @@ class ScaleComponent: public Component {
 
   virtual std::string Info() const;
 
- private:
+private:
   int32 dim_;
   BaseFloat scale_;
   ScaleComponent &operator = (const ScaleComponent &other); // Disallow.
@@ -775,61 +783,61 @@ class AffineComponent;  // Forward declaration.
 class FixedScaleComponent;  // Forward declaration.
 
 class SoftmaxComponent: public NonlinearComponent {
- public:
-  explicit SoftmaxComponent(int32 dim): NonlinearComponent(dim) { }
-  explicit SoftmaxComponent(const SoftmaxComponent &other): NonlinearComponent(other) { }
+public:
+  explicit SoftmaxComponent(int32 dim) : NonlinearComponent(dim) { }
+  explicit SoftmaxComponent(const SoftmaxComponent &other) : NonlinearComponent(other) { }
   SoftmaxComponent() { }
   virtual std::string Type() const { return "SoftmaxComponent"; }
   virtual bool BackpropNeedsInput() const { return false; }
   virtual bool BackpropNeedsOutput() const { return true; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
 
   void MixUp(int32 num_mixtures,
-             BaseFloat power,
-             BaseFloat min_count,
-             BaseFloat perturb_stddev,
-             AffineComponent *ac,
-             SumGroupComponent *sc);
+      BaseFloat power,
+      BaseFloat min_count,
+      BaseFloat perturb_stddev,
+      AffineComponent *ac,
+      SumGroupComponent *sc);
 
   virtual Component* Copy() const { return new SoftmaxComponent(*this); }
- private:
+private:
   SoftmaxComponent &operator = (const SoftmaxComponent &other); // Disallow.
 };
 
 class LogSoftmaxComponent: public NonlinearComponent {
- public:
-  explicit LogSoftmaxComponent(int32 dim): NonlinearComponent(dim) { }
-  explicit LogSoftmaxComponent(const LogSoftmaxComponent &other): NonlinearComponent(other) { }
+public:
+  explicit LogSoftmaxComponent(int32 dim) : NonlinearComponent(dim) { }
+  explicit LogSoftmaxComponent(const LogSoftmaxComponent &other) : NonlinearComponent(other) { }
   LogSoftmaxComponent() { }
   virtual std::string Type() const { return "LogSoftmaxComponent"; }
   virtual bool BackpropNeedsInput() const { return false; }
   virtual bool BackpropNeedsOutput() const { return true; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
 
   virtual Component* Copy() const { return new LogSoftmaxComponent(*this); }
- private:
+private:
   LogSoftmaxComponent &operator = (const LogSoftmaxComponent &other); // Disallow.
 };
 
@@ -842,20 +850,20 @@ class FixedAffineComponent;
 // AffineComponent.
 class AffineComponent: public UpdatableComponent {
   friend class SoftmaxComponent; // Friend declaration relates to mixing up.
- public:
+public:
   AffineComponent(const AffineComponent &other);
   // The next constructor is used in converting from nnet1.
   AffineComponent(const CuMatrixBase<BaseFloat> &linear_params,
-                  const CuVectorBase<BaseFloat> &bias_params,
-                  BaseFloat learning_rate);
+      const CuVectorBase<BaseFloat> &bias_params,
+      BaseFloat learning_rate);
 
   virtual int32 InputDim() const { return linear_params_.NumCols(); }
   virtual int32 OutputDim() const { return linear_params_.NumRows(); }
   void Init(BaseFloat learning_rate,
-            int32 input_dim, int32 output_dim,
-            BaseFloat param_stddev, BaseFloat bias_stddev);
+      int32 input_dim, int32 output_dim,
+      BaseFloat param_stddev, BaseFloat bias_stddev);
   void Init(BaseFloat learning_rate,
-            std::string matrix_filename);
+      std::string matrix_filename);
 
   // This function resizes the dimensions of the component, setting the
   // parameters to zero, while leaving any other configuration values the same.
@@ -865,7 +873,7 @@ class AffineComponent: public UpdatableComponent {
   // together.  They return a pointer to a new Component equivalent to
   // the sequence of two components.  We haven't implemented this for
   // FixedLinearComponent yet.
-  Component *CollapseWithNext(const AffineComponent &next) const ;
+  Component *CollapseWithNext(const AffineComponent &next) const;
   Component *CollapseWithNext(const FixedAffineComponent &next) const;
   Component *CollapseWithNext(const FixedScaleComponent &next) const;
   Component *CollapseWithPrevious(const FixedAffineComponent &prev) const;
@@ -873,24 +881,24 @@ class AffineComponent: public UpdatableComponent {
   virtual std::string Info() const;
   virtual void InitFromString(std::string args);
 
-  AffineComponent(): is_gradient_(false) { } // use Init to really initialize.
+  AffineComponent() : is_gradient_(false) { } // use Init to really initialize.
   virtual std::string Type() const { return "AffineComponent"; }
   virtual bool BackpropNeedsInput() const { return true; }
   virtual bool BackpropNeedsOutput() const { return false; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Scale(BaseFloat scale);
   virtual void Add(BaseFloat alpha, const UpdatableComponent &other);
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual void SetZero(bool treat_as_gradient);
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -899,7 +907,7 @@ class AffineComponent: public UpdatableComponent {
   virtual void PerturbParams(BaseFloat stddev);
   // This new function is used when mixing up:
   virtual void SetParams(const VectorBase<BaseFloat> &bias,
-                         const MatrixBase<BaseFloat> &linear);
+      const MatrixBase<BaseFloat> &linear);
   const CuVector<BaseFloat> &BiasParams() { return bias_params_; }
   const CuMatrix<BaseFloat> &LinearParams() { return linear_params_; }
 
@@ -910,28 +918,28 @@ class AffineComponent: public UpdatableComponent {
   /// This function is for getting a low-rank approximations of this
   /// AffineComponent by two AffineComponents.
   virtual void LimitRank(int32 dimension,
-                         AffineComponent **a, AffineComponent **b) const;
+      AffineComponent **a, AffineComponent **b) const;
 
   /// This function is implemented in widen-nnet.cc
   void Widen(int32 new_dimension,
-             BaseFloat param_stddev,
-             BaseFloat bias_stddev,
-             std::vector<NonlinearComponent*> c2, // will usually have just one
+      BaseFloat param_stddev,
+      BaseFloat bias_stddev,
+      std::vector<NonlinearComponent*> c2,        // will usually have just one
                                                   // element.
-             AffineComponent *c3);
- protected:
+      AffineComponent *c3);
+protected:
   friend class AffineComponentPreconditionedOnline;
   // This function Update() is for extensibility; child classes may override this.
   virtual void Update(
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &out_deriv) {
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &out_deriv) {
     UpdateSimple(in_value, out_deriv);
   }
   // UpdateSimple is used when *this is a gradient.  Child classes may
   // or may not override this.
   virtual void UpdateSimple(
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &out_deriv);
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &out_deriv);
 
   const AffineComponent &operator = (const AffineComponent &other); // Disallow.
   CuMatrix<BaseFloat> linear_params_;
@@ -946,24 +954,24 @@ class AffineComponent: public UpdatableComponent {
 // Fisher matrix has a special structure.
 // [note: it is currently used in the standard recipe].
 class AffineComponentPreconditioned: public AffineComponent {
- public:
+public:
   virtual std::string Type() const { return "AffineComponentPreconditioned"; }
 
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
   void Init(BaseFloat learning_rate,
-            int32 input_dim, int32 output_dim,
-            BaseFloat param_stddev, BaseFloat bias_stddev,
-            BaseFloat alpha, BaseFloat max_change);
+      int32 input_dim, int32 output_dim,
+      BaseFloat param_stddev, BaseFloat bias_stddev,
+      BaseFloat alpha, BaseFloat max_change);
   void Init(BaseFloat learning_rate, BaseFloat alpha,
-            BaseFloat max_change, std::string matrix_filename);
+      BaseFloat max_change, std::string matrix_filename);
 
   virtual void InitFromString(std::string args);
   virtual std::string Info() const;
   virtual Component* Copy() const;
-  AffineComponentPreconditioned(): alpha_(1.0), max_change_(0.0) { }
+  AffineComponentPreconditioned() : alpha_(1.0), max_change_(0.0) { }
   void SetMaxChange(BaseFloat max_change) { max_change_ = max_change; }
- protected:
+protected:
   KALDI_DISALLOW_COPY_AND_ASSIGN(AffineComponentPreconditioned);
   BaseFloat alpha_;
   BaseFloat max_change_; // If > 0, this is the maximum amount of parameter change (in L2 norm)
@@ -980,11 +988,11 @@ class AffineComponentPreconditioned: public AffineComponent {
   /// times learning_rate_)
   /// is <= max_change.
   BaseFloat GetScalingFactor(const CuMatrix<BaseFloat> &in_value_precon,
-                             const CuMatrix<BaseFloat> &out_deriv_precon);
+      const CuMatrix<BaseFloat> &out_deriv_precon);
 
   virtual void Update(
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &out_deriv);
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &out_deriv);
 };
 
 
@@ -995,7 +1003,7 @@ class AffineComponentPreconditioned: public AffineComponent {
 /// a version of AffineComponent that has a non-(multiple of unit) learning-rate
 /// matrix.  See nnet-precondition-online.h for a description of the technique.
 class AffineComponentPreconditionedOnline: public AffineComponent {
- public:
+public:
   virtual std::string Type() const {
     return "AffineComponentPreconditionedOnline";
   }
@@ -1003,16 +1011,16 @@ class AffineComponentPreconditionedOnline: public AffineComponent {
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
   void Init(BaseFloat learning_rate,
-            int32 input_dim, int32 output_dim,
-            BaseFloat param_stddev, BaseFloat bias_stddev,
-            int32 rank_in, int32 rank_out, int32 update_period,
-            BaseFloat num_samples_history, BaseFloat alpha,
-            BaseFloat max_change_per_sample);
+      int32 input_dim, int32 output_dim,
+      BaseFloat param_stddev, BaseFloat bias_stddev,
+      int32 rank_in, int32 rank_out, int32 update_period,
+      BaseFloat num_samples_history, BaseFloat alpha,
+      BaseFloat max_change_per_sample);
   void Init(BaseFloat learning_rate, int32 rank_in,
-            int32 rank_out, int32 update_period,
-            BaseFloat num_samples_history,
-            BaseFloat alpha, BaseFloat max_change_per_sample,
-            std::string matrix_filename);
+      int32 rank_out, int32 update_period,
+      BaseFloat num_samples_history,
+      BaseFloat alpha, BaseFloat max_change_per_sample,
+      std::string matrix_filename);
 
   virtual void Resize(int32 input_dim, int32 output_dim);
 
@@ -1020,16 +1028,16 @@ class AffineComponentPreconditionedOnline: public AffineComponent {
   // training, from AffineComponent or AffineComponentPreconditioned to
   // AffineComponentPreconditionedOnline.
   AffineComponentPreconditionedOnline(const AffineComponent &orig,
-                                      int32 rank_in, int32 rank_out,
-                                      int32 update_period,
-                                      BaseFloat eta, BaseFloat alpha);
+      int32 rank_in, int32 rank_out,
+      int32 update_period,
+      BaseFloat eta, BaseFloat alpha);
 
   virtual void InitFromString(std::string args);
   virtual std::string Info() const;
   virtual Component* Copy() const;
-  AffineComponentPreconditionedOnline(): max_change_per_sample_(0.0) { }
+  AffineComponentPreconditionedOnline() : max_change_per_sample_(0.0) { }
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(AffineComponentPreconditionedOnline);
 
 
@@ -1065,39 +1073,39 @@ class AffineComponentPreconditionedOnline: public AffineComponent {
   /// output), which we will need to multiply into the learning rate.
   /// out_products is a pointer because we modify it in-place.
   BaseFloat GetScalingFactor(const CuVectorBase<BaseFloat> &in_products,
-                             BaseFloat gamma_prod,
-                             CuVectorBase<BaseFloat> *out_products);
+      BaseFloat gamma_prod,
+      CuVectorBase<BaseFloat> *out_products);
 
   // Sets the configs rank, alpha and eta in the preconditioner objects,
   // from the class variables.
   void SetPreconditionerConfigs();
 
   virtual void Update(
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &out_deriv);
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &out_deriv);
 };
 
 class RandomComponent: public Component {
- public:
+public:
   // This function is required in testing code and in other places we need
   // consistency in the random number generation (e.g. when optimizing
   // validation-set performance), but check where else we call sRand().  You'll
   // need to call srand as well as making this call.
   void ResetGenerator() { random_generator_.SeedGpu(); }
- protected:
+protected:
   CuRand<BaseFloat> random_generator_;
 };
 
 /// Splices a context window of frames together [over time]
 class SpliceComponent: public Component {
- public:
+public:
   SpliceComponent() { }  // called only prior to Read() or Init().
   // Note: it is required that the elements of "context" be in
   // strictly increasing order, that the lowest element of component
   // be nonpositive, and the highest element be nonnegative.
   void Init(int32 input_dim,
-            std::vector<int32> context,
-            int32 const_component_dim=0);
+      std::vector<int32> context,
+      int32 const_component_dim=0);
   virtual std::string Type() const { return "SpliceComponent"; }
   virtual std::string Info() const;
   virtual void InitFromString(std::string args);
@@ -1106,22 +1114,22 @@ class SpliceComponent: public Component {
   virtual std::vector<int32> Context() const { return context_; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return false; }
   virtual bool BackpropNeedsOutput() const { return false; }
   virtual Component* Copy() const;
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(SpliceComponent);
   int32 input_dim_;
   std::vector<int32> context_;
@@ -1131,10 +1139,10 @@ class SpliceComponent: public Component {
 /// This is as SpliceComponent but outputs the max of
 /// any of the inputs (taking the max across time).
 class SpliceMaxComponent: public Component {
- public:
+public:
   SpliceMaxComponent() { }  // called only prior to Read() or Init().
   void Init(int32 dim,
-            std::vector<int32> context);
+      std::vector<int32> context);
   virtual std::string Type() const { return "SpliceMaxComponent"; }
   virtual std::string Info() const;
   virtual void InitFromString(std::string args);
@@ -1143,22 +1151,22 @@ class SpliceMaxComponent: public Component {
   virtual std::vector<int32> Context() const  { return context_; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return true; }
   virtual bool BackpropNeedsOutput() const { return false; }
   virtual Component* Copy() const;
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(SpliceMaxComponent);
   int32 dim_;
   std::vector<int32> context_;
@@ -1169,7 +1177,7 @@ class SpliceMaxComponent: public Component {
 // here that we support a number of equal-sized blocks of parameters,
 // in the linear part, so e.g. 2 x 500 would mean 2 blocks of 500 each.
 class BlockAffineComponent: public UpdatableComponent {
- public:
+public:
   virtual int32 InputDim() const { return linear_params_.NumCols() * num_blocks_; }
   virtual int32 OutputDim() const { return linear_params_.NumRows(); }
   virtual int32 GetParameterDim() const;
@@ -1178,9 +1186,9 @@ class BlockAffineComponent: public UpdatableComponent {
 
   // Note: num_blocks must divide input_dim.
   void Init(BaseFloat learning_rate,
-                    int32 input_dim, int32 output_dim,
-                    BaseFloat param_stddev, BaseFloat bias_stddev,
-                    int32 num_blocks);
+      int32 input_dim, int32 output_dim,
+      BaseFloat param_stddev, BaseFloat bias_stddev,
+      int32 num_blocks);
   virtual void InitFromString(std::string args);
 
   BlockAffineComponent() { } // use Init to really initialize.
@@ -1189,16 +1197,16 @@ class BlockAffineComponent: public UpdatableComponent {
   virtual bool BackpropNeedsOutput() const { return false; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual void SetZero(bool treat_as_gradient);
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -1207,17 +1215,17 @@ class BlockAffineComponent: public UpdatableComponent {
   virtual void PerturbParams(BaseFloat stddev);
   virtual void Scale(BaseFloat scale);
   virtual void Add(BaseFloat alpha, const UpdatableComponent &other);
- protected:
+protected:
   virtual void Update(
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &out_deriv) {
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &out_deriv) {
     UpdateSimple(in_value, out_deriv);
   }
   // UpdateSimple is used when *this is a gradient.  Child classes may
   // override this.
   virtual void UpdateSimple(
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &out_deriv);
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &out_deriv);
 
   // The matrix linear_params_ has a block structure, with num_blocks_ blocks of
   // equal size.  The blocks are stored in linear_params_ as
@@ -1230,7 +1238,7 @@ class BlockAffineComponent: public UpdatableComponent {
   CuMatrix<BaseFloat> linear_params_;
   CuVector<BaseFloat> bias_params_;
   int32 num_blocks_;
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(BlockAffineComponent);
 
 };
@@ -1240,12 +1248,12 @@ class BlockAffineComponent: public UpdatableComponent {
 // here that we support a number of equal-sized blocks of parameters,
 // in the linear part, so e.g. 2 x 500 would mean 2 blocks of 500 each.
 class BlockAffineComponentPreconditioned: public BlockAffineComponent {
- public:
+public:
   // Note: num_blocks must divide input_dim.
   void Init(BaseFloat learning_rate,
-            int32 input_dim, int32 output_dim,
-            BaseFloat param_stddev, BaseFloat bias_stddev,
-            int32 num_blocks, BaseFloat alpha);
+      int32 input_dim, int32 output_dim,
+      BaseFloat param_stddev, BaseFloat bias_stddev,
+      int32 num_blocks, BaseFloat alpha);
 
   virtual void InitFromString(std::string args);
 
@@ -1255,11 +1263,11 @@ class BlockAffineComponentPreconditioned: public BlockAffineComponent {
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
   virtual Component* Copy() const;
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(BlockAffineComponentPreconditioned);
   virtual void Update(
-      const CuMatrixBase<BaseFloat> &in_value,
-      const CuMatrixBase<BaseFloat> &out_deriv);
+    const CuMatrixBase<BaseFloat> &in_value,
+    const CuMatrixBase<BaseFloat> &out_deriv);
 
   bool is_gradient_;
   BaseFloat alpha_;
@@ -1287,17 +1295,17 @@ public:
   virtual bool BackpropNeedsOutput() const { return false; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   // Note: in_value and out_value are both dummy variables.
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual Component* Copy() const;
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
@@ -1318,7 +1326,7 @@ private:
 /// random permutation, but it may be specified).  Useful in conjunction with
 /// block-diagonal transforms.
 class PermuteComponent: public Component {
- public:
+public:
   void Init(int32 dim);
   void Init(const std::vector<int32> &reorder);
   PermuteComponent(int32 dim) { Init(dim); }
@@ -1338,18 +1346,18 @@ class PermuteComponent: public Component {
   virtual bool BackpropNeedsOutput() const { return false; }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
 
- private:
+private:
   KALDI_DISALLOW_COPY_AND_ASSIGN(PermuteComponent);
   std::vector<int32> reorder_; // This class sends input dimension i to
                                // output dimension reorder_[i].
@@ -1359,7 +1367,7 @@ class PermuteComponent: public Component {
 /// Discrete cosine transform.
 /// TODO: modify this Component so that it supports only keeping a subset
 class DctComponent: public Component {
- public:
+public:
   DctComponent() { dim_ = 0; }
   virtual std::string Type() const { return "DctComponent"; }
   virtual std::string Info() const;
@@ -1374,22 +1382,22 @@ class DctComponent: public Component {
   virtual int32 OutputDim() const { return dct_mat_.NumRows() * (dim_ / dct_mat_.NumCols()); }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return false; }
   virtual bool BackpropNeedsOutput() const { return false; }
   virtual Component* Copy() const;
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
- private:
+private:
   void Reorder(CuMatrixBase<BaseFloat> *mat, bool reverse) const;
   int32 dim_; // The input dimension of the (sub)vector.
 
@@ -1411,7 +1419,7 @@ class DctComponent: public Component {
 /// FixedLinearComponent is a linear transform that is supplied
 /// at network initialization time and is not trainable.
 class FixedLinearComponent: public Component {
- public:
+public:
   FixedLinearComponent() { }
   virtual std::string Type() const { return "FixedLinearComponent"; }
   virtual std::string Info() const;
@@ -1426,22 +1434,22 @@ class FixedLinearComponent: public Component {
   virtual int32 OutputDim() const { return mat_.NumRows(); }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return false; }
   virtual bool BackpropNeedsOutput() const { return false; }
   virtual Component* Copy() const;
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
- protected:
+protected:
   friend class AffineComponent;
   CuMatrix<BaseFloat> mat_;
 
@@ -1452,7 +1460,7 @@ class FixedLinearComponent: public Component {
 /// FixedAffineComponent is an affine transform that is supplied
 /// at network initialization time and is not trainable.
 class FixedAffineComponent: public Component {
- public:
+public:
   FixedAffineComponent() { }
   virtual std::string Type() const { return "FixedAffineComponent"; }
   virtual std::string Info() const;
@@ -1468,16 +1476,16 @@ class FixedAffineComponent: public Component {
   virtual int32 OutputDim() const { return linear_params_.NumRows(); }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return false; }
   virtual bool BackpropNeedsOutput() const { return false; }
   virtual Component* Copy() const;
@@ -1486,7 +1494,7 @@ class FixedAffineComponent: public Component {
 
   // Function to provide access to linear_params_.
   const CuMatrix<BaseFloat> &LinearParams() const { return linear_params_; }
- protected:
+protected:
   friend class AffineComponent;
   CuMatrix<BaseFloat> linear_params_;
   CuVector<BaseFloat> bias_params_;
@@ -1499,7 +1507,7 @@ class FixedAffineComponent: public Component {
 /// to the Rescale component in the nnet1 setup (and only needed for nnet1
 /// model conversion).
 class FixedScaleComponent: public Component {
- public:
+public:
   FixedScaleComponent() { }
   virtual std::string Type() const { return "FixedScaleComponent"; }
   virtual std::string Info() const;
@@ -1514,23 +1522,23 @@ class FixedScaleComponent: public Component {
   virtual int32 OutputDim() const { return scales_.Dim(); }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return false; }
   virtual bool BackpropNeedsOutput() const { return false; }
   virtual Component* Copy() const;
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
 
- protected:
+protected:
   friend class AffineComponent;  // necessary for collapse
   CuVector<BaseFloat> scales_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(FixedScaleComponent);
@@ -1540,7 +1548,7 @@ class FixedScaleComponent: public Component {
 /// to the AddShift component in the nnet1 setup (and only needed for nnet1
 /// model conversion.
 class FixedBiasComponent: public Component {
- public:
+public:
   FixedBiasComponent() { }
   virtual std::string Type() const { return "FixedBiasComponent"; }
   virtual std::string Info() const;
@@ -1555,23 +1563,23 @@ class FixedBiasComponent: public Component {
   virtual int32 OutputDim() const { return bias_.Dim(); }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const ;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual bool BackpropNeedsInput() const { return false; }
   virtual bool BackpropNeedsOutput() const { return false; }
   virtual Component* Copy() const;
   virtual void Read(std::istream &is, bool binary);
   virtual void Write(std::ostream &os, bool binary) const;
 
- protected:
+protected:
   CuVector<BaseFloat> bias_;
   KALDI_DISALLOW_COPY_AND_ASSIGN(FixedBiasComponent);
 };
@@ -1582,7 +1590,7 @@ class FixedBiasComponent: public Component {
 /// Typically you would use this in training but not in
 /// test or when computing validation-set objective functions.
 class DropoutComponent: public RandomComponent {
- public:
+public:
   /// dropout-proportion is the proportion that is dropped out,
   /// e.g. if 0.1, we set 10% to a low value.  [note, in
   /// some older code it was interpreted as the value not dropped
@@ -1590,12 +1598,12 @@ class DropoutComponent: public RandomComponent {
   /// is equal to dropout_scale.  The high scale-value is chosen
   /// such that the expected scale-value is one.
   void Init(int32 dim,
-            BaseFloat dropout_proportion = 0.5,
-            BaseFloat dropout_scale = 0.0);
+      BaseFloat dropout_proportion = 0.5,
+      BaseFloat dropout_scale = 0.0);
   DropoutComponent(int32 dim, BaseFloat dp = 0.5, BaseFloat sc = 0.0) {
     Init(dim, dp, sc);
   }
-  DropoutComponent(): dim_(0), dropout_proportion_(0.5) { }
+  DropoutComponent() : dim_(0), dropout_proportion_(0.5) { }
   virtual int32 InputDim() const { return dim_; }
   virtual int32 OutputDim() const { return dim_; }
   virtual void InitFromString(std::string args);
@@ -1612,18 +1620,18 @@ class DropoutComponent: public RandomComponent {
   virtual Component* Copy() const;
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const;
   virtual std::string Info() const;
- private:
+private:
   int32 dim_;
   BaseFloat dropout_proportion_;
   BaseFloat dropout_scale_; // Set the scale that we scale "dropout_proportion_"
@@ -1633,10 +1641,10 @@ class DropoutComponent: public RandomComponent {
 /// This is a bit similar to dropout but adding (not multiplying) Gaussian
 /// noise with a given standard deviation.
 class AdditiveNoiseComponent: public RandomComponent {
- public:
+public:
   void Init(int32 dim, BaseFloat noise_stddev);
   AdditiveNoiseComponent(int32 dim, BaseFloat stddev) { Init(dim, stddev); }
-  AdditiveNoiseComponent(): dim_(0), stddev_(1.0) { }
+  AdditiveNoiseComponent() : dim_(0), stddev_(1.0) { }
   virtual int32 InputDim() const { return dim_; }
   virtual int32 OutputDim() const { return dim_; }
   virtual void InitFromString(std::string args);
@@ -1654,17 +1662,17 @@ class AdditiveNoiseComponent: public RandomComponent {
   }
   using Component::Propagate; // to avoid name hiding
   virtual void Propagate(const ChunkInfo &in_info,
-                         const ChunkInfo &out_info,
-                         const CuMatrixBase<BaseFloat> &in,
-                         CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update, // may be identical to "this".
-                        CuMatrix<BaseFloat> *in_deriv) const { *in_deriv = out_deriv; }
- private:
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update,                   // may be identical to "this".
+      CuMatrix<BaseFloat> *in_deriv) const { *in_deriv = out_deriv; }
+private:
   int32 dim_;
   BaseFloat stddev_;
 };
@@ -1716,23 +1724,23 @@ class AdditiveNoiseComponent: public RandomComponent {
  *
  */
 class Convolutional1dComponent: public UpdatableComponent {
- public:
+public:
   Convolutional1dComponent();
   // constructor using another component
   Convolutional1dComponent(const Convolutional1dComponent &component);
   // constructor using parameters
   Convolutional1dComponent(const CuMatrixBase<BaseFloat> &filter_params,
-                           const CuVectorBase<BaseFloat> &bias_params,
-                           BaseFloat learning_rate);
+      const CuVectorBase<BaseFloat> &bias_params,
+      BaseFloat learning_rate);
 
   int32 InputDim() const;
   int32 OutputDim() const;
   void Init(BaseFloat learning_rate, int32 input_dim, int32 output_dim,
-            int32 patch_dim, int32 patch_step, int32 patch_stride,
-            BaseFloat param_stddev, BaseFloat bias_stddev, bool appended_conv);
+      int32 patch_dim, int32 patch_step, int32 patch_stride,
+      BaseFloat param_stddev, BaseFloat bias_stddev, bool appended_conv);
   void Init(BaseFloat learning_rate,
-            int32 patch_dim, int32 patch_step, int32 patch_stride,
-            std::string matrix_filename, bool appended_conv);
+      int32 patch_dim, int32 patch_step, int32 patch_stride,
+      std::string matrix_filename, bool appended_conv);
 
   // resize the component, setting the parameters to zero, while
   // leaving any other configuration values the same
@@ -1744,18 +1752,18 @@ class Convolutional1dComponent: public UpdatableComponent {
   bool BackpropNeedsOutput() const { return false; }
   using Component::Propagate; // to avoid name hiding
   void Propagate(const ChunkInfo &in_info,
-                 const ChunkInfo &out_info,
-                 const CuMatrixBase<BaseFloat> &in,
-                 CuMatrixBase<BaseFloat> *out) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in,
+      CuMatrixBase<BaseFloat> *out) const;
   void Scale(BaseFloat scale);
   virtual void Add(BaseFloat alpha, const UpdatableComponent &other);
   virtual void Backprop(const ChunkInfo &in_info,
-                        const ChunkInfo &out_info,
-                        const CuMatrixBase<BaseFloat> &in_value,
-                        const CuMatrixBase<BaseFloat> &out_value,
-                        const CuMatrixBase<BaseFloat> &out_deriv,
-                        Component *to_update_in,
-                        CuMatrix<BaseFloat> *in_deriv) const;
+      const ChunkInfo &out_info,
+      const CuMatrixBase<BaseFloat> &in_value,
+      const CuMatrixBase<BaseFloat> &out_value,
+      const CuMatrixBase<BaseFloat> &out_deriv,
+      Component *to_update_in,
+      CuMatrix<BaseFloat> *in_deriv) const;
   void SetZero(bool treat_as_gradient);
   void Read(std::istream &is, bool binary);
   void Write(std::ostream &os, bool binary) const;
@@ -1763,23 +1771,23 @@ class Convolutional1dComponent: public UpdatableComponent {
   Component* Copy() const;
   void PerturbParams(BaseFloat stddev);
   void SetParams(const VectorBase<BaseFloat> &bias,
-                 const MatrixBase<BaseFloat> &filter);
+      const MatrixBase<BaseFloat> &filter);
   const CuVector<BaseFloat> &BiasParams() { return bias_params_; }
   const CuMatrix<BaseFloat> &LinearParams() { return filter_params_; }
   int32 GetParameterDim() const;
   void Update(const CuMatrixBase<BaseFloat> &in_value,
-              const CuMatrixBase<BaseFloat> &out_deriv);
+      const CuMatrixBase<BaseFloat> &out_deriv);
 
- private:
+private:
   int32 patch_dim_;
   int32 patch_step_;
   int32 patch_stride_;
 
   static void ReverseIndexes(const std::vector<int32> &forward_indexes,
-                             int32 input_dim,
-                             std::vector<std::vector<int32> > *backward_indexes);
+      int32 input_dim,
+      std::vector<std::vector<int32> > *backward_indexes);
   static void RearrangeIndexes(const std::vector<std::vector<int32> > &in,
-                               std::vector<std::vector<int32> > *out);
+      std::vector<std::vector<int32> > *out);
 
   const Convolutional1dComponent &operator = (const Convolutional1dComponent &other); // Disallow.
   CuMatrix<BaseFloat> filter_params_;
@@ -1795,18 +1803,18 @@ class Convolutional1dComponent: public UpdatableComponent {
 /// field like foo=12, this function will set "param" to 12 and remove that
 /// element from "string".  It returns true if the parameter was read.
 bool ParseFromString(const std::string &name, std::string *string,
-                     int32 *param);
+    int32 *param);
 /// This version is for parameters of type BaseFloat.
 bool ParseFromString(const std::string &name, std::string *string,
-                     BaseFloat *param);
+    BaseFloat *param);
 /// This version is for parameters of type std::vector<int32>; it expects
 /// them as a colon-separated list, without spaces.
 bool ParseFromString(const std::string &name, std::string *string,
-                     std::vector<int32> *param);
+    std::vector<int32> *param);
 /// This version is for parameters of type bool, which can appear
 /// as any string beginning with f, F, t or T.
 bool ParseFromString(const std::string &name, std::string *string,
-                     bool *param);
+    bool *param);
 
 
 } // namespace nnet2

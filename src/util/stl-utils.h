@@ -110,7 +110,7 @@ void CopySetToVector(const unordered_set<T> &s, std::vector<T> *v) {
 /// Copies the (key, value) pairs in a map to a vector of pairs.
 template<class A, class B>
 void CopyMapToVector(const std::map<A, B> &m,
-                     std::vector<std::pair<A, B> > *v) {
+    std::vector<std::pair<A, B> > *v) {
   KALDI_ASSERT(v != NULL);
   v->resize(m.size());
   typename std::map<A, B>::const_iterator miter = m.begin(), mend = m.end();
@@ -226,7 +226,7 @@ struct VectorHasher {  // hashing function for vector<Int>.
   VectorHasher() {  // Check we're instantiated with an integer type.
     KALDI_ASSERT_IS_INTEGER_TYPE(Int);
   }
- private:
+private:
   static const int kPrime = 7853;
 };
 
@@ -255,7 +255,7 @@ struct StringHasher {  // hashing function for std::string
     }
     return ans;
   }
- private:
+private:
   static const int kPrime = 7853;
 };
 
@@ -273,7 +273,7 @@ inline void ReverseVector(std::vector<T> *vec) {
 template<class A, class B>
 struct CompareFirstMemberOfPair {
   inline bool operator() (const std::pair<A, B> &p1,
-                          const std::pair<A, B> &p2) {
+      const std::pair<A, B> &p2) {
     return p1.first < p2.first;
   }
 };
@@ -290,10 +290,10 @@ inline void MergePairVectorSumming(std::vector<std::pair<I, F> > *vec) {
   CompareFirstMemberOfPair<I, F> c;
   std::sort(vec->begin(), vec->end(), c);  // sort on 1st element.
   typename std::vector<std::pair<I, F> >::iterator out = vec->begin(),
-      in = vec->begin(), end = vec->end();
+  in = vec->begin(), end = vec->end();
   // special case: while there is nothing to be changed, skip over
   // initial input (avoids unnecessary copying).
-  while (in + 1 < end && in[0].first != in[1].first && in[0].second != 0.0) {
+  while (in + 1 < end && in [0].first != in [1].first && in [0].second != 0.0) {
     in++;
     out++;
   }

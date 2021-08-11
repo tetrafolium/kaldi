@@ -56,9 +56,9 @@ bool NnetIo::operator == (const NnetIo &other) const {
 }
 
 NnetIo::NnetIo(const std::string &name,
-               int32 t_begin, const MatrixBase<BaseFloat> &feats,
-               int32 t_stride):
-    name(name), features(feats) {
+    int32 t_begin, const MatrixBase<BaseFloat> &feats,
+    int32 t_stride) :
+  name(name), features(feats) {
   int32 num_rows = feats.NumRows();
   KALDI_ASSERT(num_rows > 0);
   indexes.resize(num_rows);  // sets all n,t,x to zeros.
@@ -67,9 +67,9 @@ NnetIo::NnetIo(const std::string &name,
 }
 
 NnetIo::NnetIo(const std::string &name,
-               int32 t_begin, const GeneralMatrix &feats,
-               int32 t_stride):
-    name(name), features(feats) {
+    int32 t_begin, const GeneralMatrix &feats,
+    int32 t_stride) :
+  name(name), features(feats) {
   int32 num_rows = feats.NumRows();
   KALDI_ASSERT(num_rows > 0);
   indexes.resize(num_rows);  // sets all n,t,x to zeros.
@@ -84,11 +84,11 @@ void NnetIo::Swap(NnetIo *other) {
 }
 
 NnetIo::NnetIo(const std::string &name,
-               int32 dim,
-               int32 t_begin,
-               const Posterior &labels,
-               int32 t_stride):
-    name(name) {
+    int32 dim,
+    int32 t_begin,
+    const Posterior &labels,
+    int32 t_stride) :
+  name(name) {
   int32 num_rows = labels.size();
   KALDI_ASSERT(num_rows > 0);
   SparseMatrix<BaseFloat> sparse_feats(dim, labels);
@@ -137,7 +137,7 @@ void NnetExample::Compress() {
 
 
 size_t NnetIoStructureHasher::operator () (
-    const NnetIo &io) const noexcept {
+  const NnetIo &io) const noexcept {
   StringHasher string_hasher;
   IndexVectorHasher indexes_hasher;
 
@@ -151,16 +151,16 @@ size_t NnetIoStructureHasher::operator () (
 
 
 bool NnetIoStructureCompare::operator () (
-    const NnetIo &a, const NnetIo &b) const {
+  const NnetIo &a, const NnetIo &b) const {
   return a.name == b.name &&
-      a.features.NumRows() == b.features.NumRows() &&
-      a.features.NumCols() == b.features.NumCols() &&
-      a.indexes == b.indexes;
+         a.features.NumRows() == b.features.NumRows() &&
+         a.features.NumCols() == b.features.NumCols() &&
+         a.indexes == b.indexes;
 }
 
 
 size_t NnetExampleStructureHasher::operator () (
-    const NnetExample &eg) const noexcept {
+  const NnetExample &eg) const noexcept {
   // these numbers were chosen at random from a list of primes.
   NnetIoStructureHasher io_hasher;
   size_t size = eg.io.size(), ans = size * 35099;
@@ -170,7 +170,7 @@ size_t NnetExampleStructureHasher::operator () (
 }
 
 bool NnetExampleStructureCompare::operator () (const NnetExample &a,
-                                               const NnetExample &b) const {
+    const NnetExample &b) const {
   NnetIoStructureCompare io_compare;
   if (a.io.size() != b.io.size())
     return false;

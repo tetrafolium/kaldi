@@ -34,7 +34,7 @@
 namespace kaldi {
 
 void IvectorExtractorFastCuda::GetIvector(const CuMatrixBase<BaseFloat> &feats,
-                                          CuVector<BaseFloat> *ivector) {
+    CuVector<BaseFloat> *ivector) {
   nvtxRangePushA("GetIvector");
   CuMatrix<BaseFloat> posteriors, X;
   CuVector<BaseFloat> gamma;
@@ -67,7 +67,7 @@ void IvectorExtractorFastCuda::GetIvector(const CuMatrixBase<BaseFloat> &feats,
 
       // create submatrix which removes last column
       CuSubMatrix<BaseFloat> cu_lda(cu_lda_, 0, lda_rows, 0, lda_cols - 1);
-  
+
       // Add offset
       lda_feats_normalized.CopyRowsFromVec(offset_);
       lda_feats_normalized.AddMatMat(1.0, spliced_feats_normalized, kNoTrans,
@@ -75,7 +75,7 @@ void IvectorExtractorFastCuda::GetIvector(const CuMatrixBase<BaseFloat> &feats,
 
     } else {
       KALDI_ERR << "Dimension mismatch: source features have dimension "
-                << spliced_feats_normalized.NumCols() << " and LDA #cols is " 
+                << spliced_feats_normalized.NumCols() << " and LDA #cols is "
                 << lda_cols;
     }
   }
@@ -97,14 +97,14 @@ void IvectorExtractorFastCuda::GetIvector(const CuMatrixBase<BaseFloat> &feats,
 
       // create submatrix which removes last column
       CuSubMatrix<BaseFloat> cu_lda(cu_lda_, 0, lda_rows, 0, lda_cols - 1);
-      
+
       // Add offset
       lda_feats.CopyRowsFromVec(offset_);
       lda_feats.AddMatMat(1.0, spliced_feats, kNoTrans, cu_lda, kTrans, 1.0);
 
     } else {
       KALDI_ERR << "Dimension mismatch: source features have dimension "
-                << spliced_feats.NumCols() << " and LDA #cols is " 
+                << spliced_feats.NumCols() << " and LDA #cols is "
                 << lda_cols;
     }
   }
@@ -121,7 +121,7 @@ void IvectorExtractorFastCuda::GetIvector(const CuMatrixBase<BaseFloat> &feats,
 }
 
 void IvectorExtractorFastCuda::Read(
-    const kaldi::OnlineIvectorExtractionConfig &config) {
+  const kaldi::OnlineIvectorExtractionConfig &config) {
   // read ubm
   DiagGmm gmm;
   ReadKaldiObject(config.diag_ubm_rxfilename, &gmm);
@@ -177,20 +177,20 @@ void IvectorExtractorFastCuda::Read(
     // compute matrix ie_Sigma_inv_M[i[
     tmp_sub_U.AddMat2Sp(1, ie_M[i], kTrans, ie_Sigma_inv[i], 0);
     SubVector<float> tmp_U_vec(tmp_sub_U.Data(),
-                               ivector_dim_ * (ivector_dim_ + 1) / 2);
+        ivector_dim_ * (ivector_dim_ + 1) / 2);
     ie_U_.Row(i).CopyFromVec(tmp_U_vec);
 
     tmp_Sigma_inv_M.AddSpMat(1, ie_Sigma_inv[i], ie_M[i], kNoTrans, 0);
 
     // copy into global matrix
     CuSubMatrix<float> window(ie_Sigma_inv_M_f_, i * feat_dim_, feat_dim_, 0,
-                              ivector_dim_);
+        ivector_dim_);
     window.CopyFromMat(tmp_Sigma_inv_M);
   }
 }
 
 void IvectorExtractorFastCuda::SpliceFeats(const CuMatrixBase<BaseFloat> &feats,
-                                           CuMatrix<BaseFloat> *spliced_feats) {
+    CuMatrix<BaseFloat> *spliced_feats) {
   int left = -info_.splice_opts.left_context;
   int right = info_.splice_opts.right_context;
   int size = right - left + 1;
@@ -202,7 +202,7 @@ void IvectorExtractorFastCuda::SpliceFeats(const CuMatrixBase<BaseFloat> &feats,
 }
 
 void IvectorExtractorFastCuda::ComputePosteriors(
-    const CuMatrixBase<float> &feats, CuMatrix<float> *posteriors) {
+  const CuMatrixBase<float> &feats, CuMatrix<float> *posteriors) {
   int num_frames = feats.NumRows();
 
   posteriors->Resize(num_frames, num_gauss_, kUndefined);
@@ -232,8 +232,8 @@ void IvectorExtractorFastCuda::ComputePosteriors(
 }
 
 void IvectorExtractorFastCuda::ComputeIvectorStats(
-    const CuMatrixBase<float> &feats, const CuMatrixBase<float> &posteriors,
-    CuVector<float> *gamma, CuMatrix<float> *X) {
+  const CuMatrixBase<float> &feats, const CuMatrixBase<float> &posteriors,
+  CuVector<float> *gamma, CuMatrix<float> *X) {
   gamma->Resize(num_gauss_, kUndefined);
   X->Resize(num_gauss_, feat_dim_, kUndefined);
 
@@ -243,8 +243,8 @@ void IvectorExtractorFastCuda::ComputeIvectorStats(
 }
 
 void IvectorExtractorFastCuda::ComputeIvectorFromStats(
-    const CuVector<float> &gamma, const CuMatrix<float> &X,
-    CuVector<float> *ivector) {
+  const CuVector<float> &gamma, const CuMatrix<float> &X,
+  CuVector<float> *ivector) {
   CuVector<float> &linear = *ivector;
   linear.Resize(ivector_dim_, kUndefined);
   // Initialize to zero as batched kernel is +=
@@ -257,7 +257,7 @@ void IvectorExtractorFastCuda::ComputeIvectorFromStats(
                       X.Stride(), X.Data(), linear.Data());
 
   CuSubVector<float> q_vec(quadratic.Data(),
-                           ivector_dim_ * (ivector_dim_ + 1) / 2);
+      ivector_dim_ * (ivector_dim_ + 1) / 2);
   q_vec.AddMatVec(1.0f, ie_U_, kTrans, gamma, 0.0f);
 
   // TODO for online this needs to be stored and passed forward
@@ -297,7 +297,7 @@ void IvectorExtractorFastCuda::ComputeIvectorFromStats(
 
   // allocate temp buffer
   float *workspace = static_cast<float *>(
-      CuDevice::Instantiate().Malloc(L_work * sizeof(float)));
+    CuDevice::Instantiate().Malloc(L_work * sizeof(float)));
 
   // perform factorization
   CUSOLVER_SAFE_CALL(cusolverDnSpotrf(
@@ -319,7 +319,7 @@ void IvectorExtractorFastCuda::ComputeIvectorFromStats(
 
   // allocate temp buffer
   float *workspace = static_cast<float *>(
-      CuDevice::Instantiate().Malloc(L_work * sizeof(float)));
+    CuDevice::Instantiate().Malloc(L_work * sizeof(float)));
   int *devIpiv =
       static_cast<int *>(CuDevice::Instantiate().Malloc(L_work * sizeof(int)));
 

@@ -56,8 +56,8 @@ int main(int argc, char *argv[]) {
 
     std::string transform_mat_rxfilename;
     std::string ivector_rspecifier,
-                online_ivector_rspecifier,
-                utt2spk_rspecifier;
+        online_ivector_rspecifier,
+        utt2spk_rspecifier;
     int32 online_ivector_period = 0;
     opts.Register(&po);
 
@@ -106,9 +106,9 @@ int main(int argc, char *argv[]) {
     CollapseModel(CollapseModelConfig(), &nnet);
 
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
     RandomAccessBaseFloatVectorReaderMapped ivector_reader(
-        ivector_rspecifier, utt2spk_rspecifier);
+      ivector_rspecifier, utt2spk_rspecifier);
 
     CachingOptimizingCompiler compiler(nnet, opts.optimize_config);
 
@@ -183,13 +183,13 @@ int main(int argc, char *argv[]) {
 
       Vector<BaseFloat> priors;  // empty vector, we don't need priors here.
       DecodableNnetSimple nnet_computer(
-          opts, nnet, priors,
-          features, &compiler,
-          ivector, online_ivectors,
-          online_ivector_period);
+        opts, nnet, priors,
+        features, &compiler,
+        ivector, online_ivectors,
+        online_ivector_period);
 
       Matrix<BaseFloat> matrix(nnet_computer.NumFrames(),
-                               nnet_computer.OutputDim());
+          nnet_computer.OutputDim());
       for (int32 t = 0; t < nnet_computer.NumFrames(); t++) {
         SubVector<BaseFloat> row(matrix, t);
         nnet_computer.GetOutputForFrame(t, &row);
@@ -204,9 +204,9 @@ int main(int argc, char *argv[]) {
 
 
       chain::DenominatorComputation den_computation(
-          chain_opts, den_graph,
-          1, // num_sequences,
-          gpu_nnet_output);
+        chain_opts, den_graph,
+        1,   // num_sequences,
+        gpu_nnet_output);
 
 
       int32 num_frames = gpu_nnet_output.NumRows();

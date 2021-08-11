@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     fst::DeterminizeLatticePhonePrunedOptions opts;
     opts.max_mem = 50000000;
 
-    po.Register("write-compact", &write_compact, 
+    po.Register("write-compact", &write_compact,
                 "If true, write in normal (compact) form. "
                 "--write-compact=false allows you to retain frame-level "
                 "acoustic score information, but this requires the input "
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
     // depth stats (for diagnostics).
     double sum_depth_in = 0.0,
-          sum_depth_out = 0.0, sum_t = 0.0;
+        sum_depth_out = 0.0, sum_t = 0.0;
 
     if (acoustic_scale == 0.0)
       KALDI_ERR << "Do not use a zero acoustic scale (cannot be inverted)";
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 
       // Compute a map from each (t, tid) to (sum_of_acoustic_scores, count)
       unordered_map<std::pair<int32,int32>, std::pair<BaseFloat, int32>,
-                                          PairHasher<int32> > acoustic_scores;
+          PairHasher<int32> > acoustic_scores;
       if (!write_compact)
         ComputeAcousticScoresMap(lat, &acoustic_scores);
 
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
       if (!DeterminizeLatticePhonePrunedWrapper(
               trans_model, &lat, beam, &det_clat, opts)) {
         KALDI_WARN << "For key " << key << ", determinization did not succeed"
-            "(partial output will be pruned tighter than the specified beam.)";
+          "(partial output will be pruned tighter than the specified beam.)";
         n_warn++;
       }
 

@@ -69,7 +69,7 @@ void* CuMemoryAllocator::Malloc(size_t size) {
 
 
 CuMemoryAllocator::MemoryBlock *CuMemoryAllocator::SplitBlock(
-    MemoryBlock *block, size_t size) {
+  MemoryBlock *block, size_t size) {
   SubRegion *subregion = block->subregion;
   // new_block will become the right-most part of 'block', and 'block' will
   // be the left-most part.
@@ -161,7 +161,7 @@ void CuMemoryAllocator::AddToFreeBlocks(MemoryBlock *block) {
   KALDI_PARANOID_ASSERT(block->begin >= subregion->begin &&
                         block->begin < subregion->end);
   size_t block_size = block->end - block->begin,
-       subregion_index = subregion->subregion_index;
+      subregion_index = subregion->subregion_index;
   // Update largest_free_block_, if needed.
   if (block_size > largest_free_block_[subregion_index]) {
     largest_free_block_[subregion_index] = block_size;
@@ -171,7 +171,7 @@ void CuMemoryAllocator::AddToFreeBlocks(MemoryBlock *block) {
 
 
 void* CuMemoryAllocator::MallocFromSubregion(SubRegion *subregion,
-                                             size_t size) {
+    size_t size) {
   // NULL is implementation defined and doesn't have to be zero so we can't
   // guarantee that NULL will be <= a valid pointer-- so we cast to a pointer
   // from zero instead of using NULL.
@@ -189,8 +189,8 @@ void* CuMemoryAllocator::MallocFromSubregion(SubRegion *subregion,
   int max_iters = 20;
   auto search_iter = iter;
   for (int32 i = 0;
-       search_iter != subregion->free_blocks.end() && i < max_iters;
-       ++i, ++search_iter) {
+      search_iter != subregion->free_blocks.end() && i < max_iters;
+      ++i, ++search_iter) {
     if (search_iter->second->thread_id == std::this_thread::get_id() ||
         search_iter->second->t <= synchronize_gpu_t_) {
       iter = search_iter;
@@ -237,7 +237,7 @@ void* CuMemoryAllocator::MallocFromSubregion(SubRegion *subregion,
   block->t = t_;
   allocated_block_map_[block->begin] = block;
   allocated_memory_ += (block->end - block->begin);
-  if (allocated_memory_ > max_allocated_memory_) 
+  if (allocated_memory_ > max_allocated_memory_)
     max_allocated_memory_ = allocated_memory_;
   return block->begin;
 }
@@ -248,7 +248,7 @@ void* CuMemoryAllocator::MallocFromSubregion(SubRegion *subregion,
 void* CuMemoryAllocator::MallocInternal(size_t size) {
 start:
   std::vector<size_t>::const_iterator iter = largest_free_block_.begin(),
-      end = largest_free_block_.end();
+  end = largest_free_block_.end();
   size_t subregion_index = 0;
   for (; iter != end; ++iter, ++subregion_index) {
     if (*iter > size) {
@@ -376,29 +376,29 @@ void CuMemoryAllocator::PrintMemoryUsage() const {
             << ", synchronized the GPU " << num_synchronizations_
             << " times out of " << (t_/2) << " frees; "
             << "device memory info: " << GetFreeGpuMemory(NULL, NULL)
-            << "maximum allocated: " << max_allocated_memory_  
-            << "current allocated: " << allocated_memory_; 
+            << "maximum allocated: " << max_allocated_memory_
+            << "current allocated: " << allocated_memory_;
 }
 
 // Note: we just initialize with the default options, but we can change it later
 // (as long as it's before we first use the class) by calling SetOptions().
-CuMemoryAllocator::CuMemoryAllocator():
-    opts_(CuAllocatorOptions()),
-    t_(0),
-    synchronize_gpu_t_(0),
-    num_synchronizations_(0),
-    tot_time_taken_(0.0),
-    malloc_time_taken_(0.0),
-    max_allocated_memory_(0),
-    allocated_memory_(0) {
+CuMemoryAllocator::CuMemoryAllocator() :
+  opts_(CuAllocatorOptions()),
+  t_(0),
+  synchronize_gpu_t_(0),
+  num_synchronizations_(0),
+  tot_time_taken_(0.0),
+  malloc_time_taken_(0.0),
+  max_allocated_memory_(0),
+  allocated_memory_(0) {
   // Note: we don't allocate any memory regions at the start; we wait for the user
   // to call Malloc() or MallocPitch(), and then allocate one when needed.
 }
 
 
 void* CuMemoryAllocator::MallocPitch(size_t row_bytes,
-                                     size_t num_rows,
-                                     size_t *pitch) {
+    size_t num_rows,
+    size_t *pitch) {
   Timer tim;
   if (!opts_.cache_memory) {
     void *ans;
@@ -619,7 +619,7 @@ CuMemoryAllocator::~CuMemoryAllocator() {
   for (size_t i = 0; i < subregions_.size(); i++) {
     SubRegion *subregion = subregions_[i];
     for (auto iter = subregion->free_blocks.begin();
-         iter != subregion->free_blocks.end(); ++iter)
+        iter != subregion->free_blocks.end(); ++iter)
       delete iter->second;
     delete subregion;
   }

@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-    
+
     g_cuda_allocator.SetOptions(g_allocator_options);
     CuDevice::Instantiate().SelectGpuId("yes");
     CuDevice::Instantiate().AllowMultithreading();
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 
     std::string output_wspecifier = po.GetArg(2);
 
-    // Fbank is implemented via the MFCC code path 
+    // Fbank is implemented via the MFCC code path
     CudaSpectralFeatures fbank(fbank_opts);
 
     SequentialTableReader<WaveHolder> reader(wav_rspecifier);
@@ -87,8 +87,8 @@ int main(int argc, char *argv[]) {
       KALDI_ASSERT(vtln_map_rspecifier != "" && "the utt2spk option is only "
                    "needed if the vtln-map option is used.");
     RandomAccessBaseFloatReaderMapped vtln_map_reader(vtln_map_rspecifier,
-                                                      utt2spk_rspecifier);
-    
+        utt2spk_rspecifier);
+
     if (output_format == "kaldi") {
       if (!kaldi_writer.Open(output_wspecifier))
         KALDI_ERR << "Could not initialize output with wspecifier "

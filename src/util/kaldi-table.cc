@@ -24,34 +24,34 @@ namespace kaldi {
 
 
 bool ReadScriptFile(const std::string &rxfilename,
-                    bool warn,
-                    std::vector<std::pair<std::string, std::string> >
-                    *script_out) {
+    bool warn,
+    std::vector<std::pair<std::string, std::string> >
+    *script_out) {
   bool is_binary;
   Input input;
 
   if (!input.Open(rxfilename, &is_binary)) {
     if (warn) KALDI_WARN << "Error opening script file: " <<
-                 PrintableRxfilename(rxfilename);
+        PrintableRxfilename(rxfilename);
     return false;
   }
   if (is_binary) {
     if (warn) KALDI_WARN << "Error: script file appears to be binary: " <<
-                 PrintableRxfilename(rxfilename);
+        PrintableRxfilename(rxfilename);
     return false;
   }
 
   bool ans = ReadScriptFile(input.Stream(), warn, script_out);
   if (warn && !ans)
     KALDI_WARN << "[script file was: " << PrintableRxfilename(rxfilename) <<
-                  "]";
+      "]";
   return ans;
 }
 
 bool ReadScriptFile(std::istream &is,
-                    bool warn,
-                    std::vector<std::pair<std::string, std::string> >
-                    *script_out) {
+    bool warn,
+    std::vector<std::pair<std::string, std::string> >
+    *script_out) {
   KALDI_ASSERT(script_out != NULL);
   std::string line;
   int line_number = 0;
@@ -70,7 +70,7 @@ bool ReadScriptFile(std::istream &is,
     if (key.empty() || rest.empty()) {
       if (warn)
         KALDI_WARN << "Invalid " << line_number << "'th line in script file"
-                          <<":\"" << line << '"';
+                   <<":\"" << line << '"';
       return false;
     }
     script_out->resize(script_out->size()+1);
@@ -81,8 +81,8 @@ bool ReadScriptFile(std::istream &is,
 }
 
 bool WriteScriptFile(std::ostream &os,
-                     const std::vector<std::pair<std::string, std::string> >
-                     &script) {
+    const std::vector<std::pair<std::string, std::string> >
+    &script) {
   if (!os.good()) {
     KALDI_WARN << "WriteScriptFile: attempting to write to invalid stream.";
     return false;
@@ -91,16 +91,16 @@ bool WriteScriptFile(std::ostream &os,
   for (iter = script.begin(); iter != script.end(); ++iter) {
     if (!IsToken(iter->first)) {
       KALDI_WARN << "WriteScriptFile: using invalid token \"" << iter->first <<
-                    '"';
+        '"';
       return false;
     }
     if (iter->second.find('\n') != std::string::npos ||
-       (iter->second.length() != 0 &&
+        (iter->second.length() != 0 &&
         (isspace(iter->second[0]) ||
-         isspace(iter->second[iter->second.length()-1])))) {
+        isspace(iter->second[iter->second.length()-1])))) {
       // second part contains newline or leading or trailing space.
       KALDI_WARN << "WriteScriptFile: attempting to write invalid line \"" <<
-                    iter->second << '"';
+        iter->second << '"';
       return false;
     }
     os << iter->first << ' ' << iter->second << '\n';
@@ -113,8 +113,8 @@ bool WriteScriptFile(std::ostream &os,
 }
 
 bool WriteScriptFile(const std::string &wxfilename,
-                     const std::vector<std::pair<std::string, std::string> >
-                     &script) {
+    const std::vector<std::pair<std::string, std::string> >
+    &script) {
   Output output;
   if (!output.Open(wxfilename, false, false)) {  // false, false means not
     // binary, no binary-mode header.
@@ -133,9 +133,9 @@ bool WriteScriptFile(const std::string &wxfilename,
 
 
 WspecifierType ClassifyWspecifier(const std::string &wspecifier,
-                                  std::string *archive_wxfilename,
-                                  std::string *script_wxfilename,
-                                  WspecifierOptions *opts) {
+    std::string *archive_wxfilename,
+    std::string *script_wxfilename,
+    WspecifierOptions *opts) {
   //  Examples:
   //  ark,t:wxfilename -> kArchiveWspecifier
   //  ark,b:wxfilename -> kArchiveWspecifier
@@ -199,23 +199,23 @@ WspecifierType ClassifyWspecifier(const std::string &wspecifier,
   }
 
   switch (ws) {
-    case kArchiveWspecifier:
-      if (archive_wxfilename)
-        *archive_wxfilename = after_colon;
-      break;
-    case kScriptWspecifier:
-      if (script_wxfilename)
-        *script_wxfilename = after_colon;
-      break;
-    case kBothWspecifier:
-      pos = after_colon.find(',');  // first comma.
-      if (pos == std::string::npos) return kNoWspecifier;
-      if (archive_wxfilename)
-        *archive_wxfilename = std::string(after_colon, 0, pos);
-      if (script_wxfilename)
-        *script_wxfilename = std::string(after_colon, pos+1);
-      break;
-    case kNoWspecifier: default: break;
+  case kArchiveWspecifier:
+    if (archive_wxfilename)
+      *archive_wxfilename = after_colon;
+    break;
+  case kScriptWspecifier:
+    if (script_wxfilename)
+      *script_wxfilename = after_colon;
+    break;
+  case kBothWspecifier:
+    pos = after_colon.find(',');    // first comma.
+    if (pos == std::string::npos) return kNoWspecifier;
+    if (archive_wxfilename)
+      *archive_wxfilename = std::string(after_colon, 0, pos);
+    if (script_wxfilename)
+      *script_wxfilename = std::string(after_colon, pos+1);
+    break;
+  case kNoWspecifier: default: break;
   }
   return ws;
 }
@@ -223,8 +223,8 @@ WspecifierType ClassifyWspecifier(const std::string &wspecifier,
 
 
 RspecifierType ClassifyRspecifier(const std::string &rspecifier,
-                                  std::string *rxfilename,
-                                  RspecifierOptions *opts) {
+    std::string *rxfilename,
+    RspecifierOptions *opts) {
   // Examples
   // ark:rxfilename  ->  kArchiveRspecifier
   // scp:rxfilename  -> kScriptRspecifier
@@ -260,7 +260,7 @@ RspecifierType ClassifyRspecifier(const std::string &rspecifier,
   // disallowed.
 
   std::string before_colon(rspecifier, 0, pos),
-      after_colon(rspecifier, pos+1);
+  after_colon(rspecifier, pos+1);
 
   std::vector<std::string> split_first_part;  // Split part before ':' on ', '.
   SplitStringToVector(before_colon, ", ", false, &split_first_part);  // false==
@@ -308,7 +308,7 @@ RspecifierType ClassifyRspecifier(const std::string &rspecifier,
     }
   }
   if ((rs == kArchiveRspecifier || rs == kScriptRspecifier)
-     && rxfilename != NULL)
+      && rxfilename != NULL)
     *rxfilename = after_colon;
   return rs;
 }

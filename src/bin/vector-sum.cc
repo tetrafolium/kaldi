@@ -44,7 +44,7 @@ int32 TypeOneUsage(const ParseOptions &po) {
   // Input vectors
   SequentialBaseFloatVectorReader vector_reader1(vector_in_fn1);
   std::vector<RandomAccessBaseFloatVectorReader*> vector_readers(num_args-2,
-                                                                 static_cast<RandomAccessBaseFloatVectorReader*>(NULL));
+      static_cast<RandomAccessBaseFloatVectorReader*>(NULL));
   std::vector<std::string> vector_in_fns(num_args-2);
   for (int32 i = 2; i < num_args; ++i) {
     vector_readers[i-2] = new RandomAccessBaseFloatVectorReader(po.GetArg(i));
@@ -101,8 +101,8 @@ int32 TypeOneUsage(const ParseOptions &po) {
 }
 
 int32 TypeTwoUsage(const ParseOptions &po,
-                   bool binary,
-                   bool average = false) {
+    bool binary,
+    bool average = false) {
   KALDI_ASSERT(po.NumArgs() == 2);
   KALDI_ASSERT(ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier &&
                "vector-sum: first argument must be an rspecifier");
@@ -149,7 +149,7 @@ int32 TypeTwoUsage(const ParseOptions &po,
 // sum a bunch of single files to produce a single file [including
 // extended filenames, of course]
 int32 TypeThreeUsage(const ParseOptions &po,
-                     bool binary) {
+    bool binary) {
   KALDI_ASSERT(po.NumArgs() >= 2);
   for (int32 i = 1; i < po.NumArgs(); i++) {
     if (ClassifyRspecifier(po.GetArg(i), NULL, NULL) != kNoRspecifier) {
@@ -168,7 +168,7 @@ int32 TypeThreeUsage(const ParseOptions &po,
     Vector<BaseFloat> this_vec;
     ReadKaldiObject(po.GetArg(i), &this_vec);
     if (sum.Dim() < this_vec.Dim())
-      sum.Resize(this_vec.Dim(), kCopyData);;
+      sum.Resize(this_vec.Dim(), kCopyData); ;
     sum.AddVec(1.0, this_vec);
   }
   WriteKaldiObject(sum, po.GetArg(po.NumArgs()), binary);
@@ -219,15 +219,15 @@ int main(int argc, char *argv[]) {
       // output to table.
       exit_status = TypeOneUsage(po);
     } else if (po.NumArgs() == 2 &&
-               ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier &&
-               ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) ==
-               kNoWspecifier) {
+        ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier &&
+        ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) ==
+        kNoWspecifier) {
       // input from a single table, output not to table.
       exit_status = TypeTwoUsage(po, binary, average);
     } else if (po.NumArgs() >= 2 &&
-               ClassifyRspecifier(po.GetArg(1), NULL, NULL) == kNoRspecifier &&
-               ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) ==
-               kNoWspecifier) {
+        ClassifyRspecifier(po.GetArg(1), NULL, NULL) == kNoRspecifier &&
+        ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) ==
+        kNoWspecifier) {
       // summing flat files.
       exit_status = TypeThreeUsage(po, binary);
     } else {

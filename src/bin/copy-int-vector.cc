@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         "Usage: copy-int-vector [options] (vector-in-rspecifier|vector-in-rxfilename) (vector-out-wspecifier|vector-out-wxfilename)\n"
         " e.g.: copy-int-vector --binary=false foo -\n"
         "   copy-int-vector ark:1.ali ark,t:-\n";
-    
+
     bool binary = true;
     ParseOptions po(usage);
 
@@ -55,14 +55,14 @@ int main(int argc, char *argv[]) {
 
     bool in_is_rspecifier =
         (ClassifyRspecifier(vector_in_fn, NULL, NULL)
-         != kNoRspecifier),
+        != kNoRspecifier),
         out_is_wspecifier =
         (ClassifyWspecifier(vector_out_fn, NULL, NULL, NULL)
-         != kNoWspecifier);
+        != kNoWspecifier);
 
     if (in_is_rspecifier != out_is_wspecifier)
       KALDI_ERR << "Cannot mix archives with regular files (copying vectors)";
-    
+
     if (!in_is_rspecifier) {
       std::vector<int32> vec;
       {

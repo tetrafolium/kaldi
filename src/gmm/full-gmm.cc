@@ -91,7 +91,7 @@ void FullGmm::CopyFromDiagGmm(const DiagGmm &diaggmm) {
 
 int32 FullGmm::ComputeGconsts() {
   int32 num_mix = NumGauss(),
-         dim = Dim();
+      dim = Dim();
   KALDI_ASSERT(num_mix > 0 && dim > 0);
   BaseFloat offset = -0.5 * M_LOG_2PI * dim;  // constant term in gconst.
   int32 num_bad = 0;
@@ -130,7 +130,7 @@ int32 FullGmm::ComputeGconsts() {
 }
 
 void FullGmm::Split(int32 target_components, float perturb_factor,
-                    vector<int32> *history) {
+    vector<int32> *history) {
   if (target_components <= NumGauss() || NumGauss() == 0) {
     KALDI_WARN << "Cannot split from " << NumGauss() <<  " to "
                << target_components << " components";
@@ -206,7 +206,7 @@ void FullGmm::Perturb(float perturb_factor) {
 void FullGmm::Merge(int32 target_components, vector<int32> *history) {
   if (target_components <= 0 || NumGauss() < target_components) {
     KALDI_ERR << "Invalid argument for target number of Gaussians (="
-        << target_components << ")";
+              << target_components << ")";
   }
   if (NumGauss() == target_components) {
     KALDI_WARN << "No components merged, as target = total.";
@@ -289,7 +289,7 @@ void FullGmm::Merge(int32 target_components, vector<int32> *history) {
       BaseFloat merged_logdet = MergedComponentsLogdet(w1, w2,
         means.Row(i), means.Row(j), vars[i], vars[j]);
       delta_like(i, j) = w_sum * merged_logdet
-        - w1 * logdet(i) - w2 * logdet(j);
+          - w1 * logdet(i) - w2 * logdet(j);
     }
   }
 
@@ -358,7 +358,7 @@ void FullGmm::Merge(int32 target_components, vector<int32> *history) {
       BaseFloat merged_logdet = MergedComponentsLogdet(w1, w2,
         means.Row(max_i), means.Row(j), vars[max_i], vars[j]);
       delta_like(max_i, j) = w_sum * merged_logdet
-        - w1 * logdet(max_i) - w2 * logdet(j);
+          - w1 * logdet(max_i) - w2 * logdet(j);
       // doesn't respect lower triangular indeces,
       // relies on implicitly performed swap of coordinates if necessary
     }
@@ -380,7 +380,7 @@ void FullGmm::Merge(int32 target_components, vector<int32> *history) {
 }
 
 BaseFloat FullGmm::MergePreselect(int32 target_components,
-                                  const vector<pair<int32, int32> > &preselect) {
+    const vector<pair<int32, int32> > &preselect) {
   KALDI_ASSERT(!preselect.empty());
   double ans = 0.0;
   if (target_components <= 0 || NumGauss() < target_components) {
@@ -446,7 +446,7 @@ BaseFloat FullGmm::MergePreselect(int32 target_components,
   // Merge components with smallest impact on the loglike
   int32 removed;
   for (removed = 0;
-       removed < num_comp - target_components && !queue.empty(); ) {
+      removed < num_comp - target_components && !queue.empty(); ) {
     QueueElem qelem = queue.top();
     queue.pop();
     BaseFloat delta_log_like_old = qelem.first;
@@ -535,11 +535,11 @@ BaseFloat FullGmm::MergePreselect(int32 target_components,
 
 
 BaseFloat FullGmm::MergedComponentsLogdet(BaseFloat w1, BaseFloat w2,
-                                          const VectorBase<BaseFloat> &f1,
-                                          const VectorBase<BaseFloat> &f2,
-                                          const SpMatrix<BaseFloat> &s1,
-                                          const SpMatrix<BaseFloat> &s2)
-    const {
+    const VectorBase<BaseFloat> &f1,
+    const VectorBase<BaseFloat> &f2,
+    const SpMatrix<BaseFloat> &s1,
+    const SpMatrix<BaseFloat> &s2)
+const {
   int32 dim = f1.Dim();
   Vector<BaseFloat> tmp_mean(dim);
   SpMatrix<BaseFloat> tmp_var(dim);
@@ -560,12 +560,12 @@ BaseFloat FullGmm::MergedComponentsLogdet(BaseFloat w1, BaseFloat w2,
 
 // returns the component of the log-likelihood due to this mixture
 BaseFloat FullGmm::ComponentLogLikelihood(const VectorBase<BaseFloat> &data,
-                                          int32 comp_id) const {
+    int32 comp_id) const {
   if (!valid_gconsts_)
     KALDI_ERR << "Must call ComputeGconsts() before computing likelihood";
   if (data.Dim() != Dim()) {
     KALDI_ERR << "DiagGmm::ComponentLogLikelihood, dimension "
-        << "mismatch " << (data.Dim()) << "vs. "<< (Dim());
+              << "mismatch " << (data.Dim()) << "vs. "<< (Dim());
   }
   BaseFloat loglike;
 
@@ -589,7 +589,7 @@ BaseFloat FullGmm::LogLikelihood(const VectorBase<BaseFloat> &data) const {
 }
 
 void FullGmm::LogLikelihoods(const VectorBase<BaseFloat> &data,
-                             Vector<BaseFloat> *loglikes) const {
+    Vector<BaseFloat> *loglikes) const {
   loglikes->Resize(gconsts_.Dim(), kUndefined);
   loglikes->CopyFromVec(gconsts_);
   int32 dim = Dim();
@@ -611,8 +611,8 @@ void FullGmm::LogLikelihoods(const VectorBase<BaseFloat> &data,
 }
 
 void FullGmm::LogLikelihoodsPreselect(const VectorBase<BaseFloat> &data,
-                                      const vector<int32> &indices,
-                                      Vector<BaseFloat> *loglikes) const {
+    const vector<int32> &indices,
+    Vector<BaseFloat> *loglikes) const {
   int32 dim = Dim();
   KALDI_ASSERT(dim == data.Dim());
   int32 num_indices = static_cast<int32>(indices.size());
@@ -635,8 +635,8 @@ void FullGmm::LogLikelihoodsPreselect(const VectorBase<BaseFloat> &data,
 
 /// Get gaussian selection information for one frame.
 BaseFloat FullGmm::GaussianSelection(const VectorBase<BaseFloat> &data,
-                                     int32 num_gselect,
-                                     std::vector<int32> *output) const {
+    int32 num_gselect,
+    std::vector<int32> *output) const {
   int32 num_gauss = NumGauss();
   Vector<BaseFloat> loglikes(num_gauss, kUndefined);
   output->clear();
@@ -661,8 +661,8 @@ BaseFloat FullGmm::GaussianSelection(const VectorBase<BaseFloat> &data,
   std::sort(pairs.begin(), pairs.end(),
             std::greater<std::pair<BaseFloat, int32> >());
   for (int32 j = 0;
-       j < num_gselect && j < static_cast<int32>(pairs.size());
-       j++) {
+      j < num_gselect && j < static_cast<int32>(pairs.size());
+      j++) {
     output->push_back(pairs[j].second);
     tot_loglike = LogAdd(tot_loglike, pairs[j].first);
   }
@@ -672,10 +672,10 @@ BaseFloat FullGmm::GaussianSelection(const VectorBase<BaseFloat> &data,
 
 
 BaseFloat FullGmm::GaussianSelectionPreselect(
-    const VectorBase<BaseFloat> &data,
-    const std::vector<int32> &preselect,
-    int32 num_gselect,
-    std::vector<int32> *output) const {
+  const VectorBase<BaseFloat> &data,
+  const std::vector<int32> &preselect,
+  int32 num_gselect,
+  std::vector<int32> *output) const {
   static bool warned_size = false;
   int32 preselect_sz = preselect.size();
   int32 this_num_gselect = std::min(num_gselect, preselect_sz);
@@ -705,8 +705,8 @@ BaseFloat FullGmm::GaussianSelectionPreselect(
             std::greater<std::pair<BaseFloat, int32> >());
   output->clear();
   for (int32 j = 0;
-       j < this_num_gselect && j < static_cast<int32>(pairs.size());
-       j++) {
+      j < this_num_gselect && j < static_cast<int32>(pairs.size());
+      j++) {
     output->push_back(pairs[j].second);
     tot_loglike = LogAdd(tot_loglike, pairs[j].first);
   }
@@ -717,7 +717,7 @@ BaseFloat FullGmm::GaussianSelectionPreselect(
 
 // Gets likelihood of data given this. Also provides per-Gaussian posteriors.
 BaseFloat FullGmm::ComponentPosteriors(const VectorBase<BaseFloat> &data,
-                                       VectorBase<BaseFloat> *posterior) const {
+    VectorBase<BaseFloat> *posterior) const {
   if (posterior == NULL) KALDI_ERR << "NULL pointer passed as return argument.";
   Vector<BaseFloat> loglikes;
   LogLikelihoods(data, &loglikes);
@@ -775,14 +775,14 @@ void FullGmm::Write(std::ostream &out_stream, bool binary) const {
 }
 
 std::ostream & operator <<(std::ostream & out_stream,
-                           const kaldi::FullGmm &gmm) {
+    const kaldi::FullGmm &gmm) {
   gmm.Write(out_stream, false);
   return out_stream;
 }
 
 /// this = rho x source + (1-rho) x this
 void FullGmm::Interpolate(BaseFloat rho, const FullGmm &source,
-                          GmmFlagsType flags) {
+    GmmFlagsType flags) {
   KALDI_ASSERT(NumGauss() == source.NumGauss());
   KALDI_ASSERT(Dim() == source.Dim());
   FullGmmNormal us(*this);

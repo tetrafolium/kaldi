@@ -29,7 +29,7 @@ namespace rnnlm {
 
 
 void SampleWithoutReplacement(const std::vector<double> &probs,
-                              std::vector<int32> *sample) {
+    std::vector<int32> *sample) {
 
   // This outer loop over 't' will *almost always* just run for t == 0.  The
   // loop is necessary only to handle a pathological case.
@@ -99,7 +99,7 @@ void SampleWithoutReplacement(const std::vector<double> &probs,
 
       // give it a bit of extra space in the assertion.
       KALDI_ASSERT((r < 0.00011 && c < -0.99985) ||
-                   (r > 0.99985 && c > -0.00011));
+          (r > 0.99985 && c > -0.00011));
 
       // .. and continue around the loop.
       // Having 'r' take these values is extremely improbable, so
@@ -123,7 +123,7 @@ void CheckDistribution(const Distribution &d) {
 }
 
 void WeightDistribution(BaseFloat weight,
-                        Distribution *d) {
+    Distribution *d) {
   Distribution::iterator iter = d->begin(),
       end = d->end();
   for (; iter != end; ++iter)
@@ -142,7 +142,7 @@ BaseFloat TotalOfDistribution(const Distribution &d) {
 
 
 const double* SampleFromCdf(const double *cdf_start,
-                            const double *cdf_end) {
+    const double *cdf_end) {
   double tot_prob = *cdf_end - *cdf_start;
   KALDI_ASSERT(cdf_end > cdf_start && tot_prob > 0.0);
   double cutoff = *cdf_start + tot_prob * RandUniform();
@@ -175,8 +175,8 @@ const double* SampleFromCdf(const double *cdf_start,
 // Merges two distributions, summing the probabilities of any elements that
 // occur in both.
 void MergeDistributions(const Distribution &d1,
-                        const Distribution &d2,
-                        Distribution *d) {
+    const Distribution &d2,
+    Distribution *d) {
   if (GetVerboseLevel() >= 2) {
     CheckDistribution(d1);
     CheckDistribution(d2);
@@ -195,11 +195,11 @@ void MergeDistributions(const Distribution &d1,
 
 
 void Sampler::SampleWords(
-    int32 num_words_to_sample,
-    BaseFloat unigram_weight,
-    const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
-    const std::vector<int32> &words_we_must_sample,
-    std::vector<std::pair<int32, BaseFloat> > *sample) const {
+  int32 num_words_to_sample,
+  BaseFloat unigram_weight,
+  const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
+  const std::vector<int32> &words_we_must_sample,
+  std::vector<std::pair<int32, BaseFloat> > *sample) const {
   CheckDistribution(higher_order_probs);  // TODO: delete this.
   int32 vocab_size = unigram_cdf_.size();
   KALDI_ASSERT(IsSortedAndUniq(words_we_must_sample) &&
@@ -238,8 +238,8 @@ void Sampler::SampleWords(
       (num_words_to_sample - num_words_we_must_sample);
 
   std::vector<std::pair<int32, BaseFloat> > words_we_must_sample_distribution(
-      num_words_we_must_sample);
-  for (int32 i = 0 ; i < num_words_we_must_sample; i++) {
+    num_words_we_must_sample);
+  for (int32 i = 0; i < num_words_we_must_sample; i++) {
     words_we_must_sample_distribution[i].first = words_we_must_sample[i];
     words_we_must_sample_distribution[i].second = p;
   }
@@ -286,10 +286,10 @@ Sampler::Sampler(const std::vector<BaseFloat> &unigram_probs) {
 
 
 void Sampler::SampleWords(
-    int32 num_words_to_sample,
-    BaseFloat unigram_weight,
-    const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
-    std::vector<std::pair<int32, BaseFloat> > *sample) const {
+  int32 num_words_to_sample,
+  BaseFloat unigram_weight,
+  const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
+  std::vector<std::pair<int32, BaseFloat> > *sample) const {
   int32 vocab_size = unigram_cdf_.size() - 1;
   KALDI_ASSERT(num_words_to_sample > 0 &&
                num_words_to_sample + 1 < unigram_cdf_.size() &&
@@ -326,20 +326,20 @@ void Sampler::SampleWords(
 // application.
 template <typename T>
 class hacked_priority_queue: public std::priority_queue<T> {
- public:
+public:
   void append_all_elements(std::vector<T> *output) const {
     output->insert(output->end(), this->c.begin(), this->c.end());
   }
   // we have to redeclare the constructor.
   template <typename InputIter> hacked_priority_queue(
-      InputIter begin, const InputIter end): std::priority_queue<T>(begin, end) { }
+    InputIter begin, const InputIter end) : std::priority_queue<T>(begin, end) { }
 };
 
 
 // static
 void Sampler::NormalizeIntervals(int32 num_words_to_sample,
-                                 double total_p,
-                                 std::vector<Interval> *intervals) {
+    double total_p,
+    std::vector<Interval> *intervals) {
   // as mentioned in the header, if the input probabilities of the words
   // (here represented as Intervals)/ are p(i), we define
   //  q(i) = min(alpha p(i), 1.0)
@@ -366,7 +366,7 @@ void Sampler::NormalizeIntervals(int32 num_words_to_sample,
   // have a prob of exactly 1.0, and eventually we'll add the rest.
   intervals->clear();
   while (!queue.empty()) {  // note: we normally won't reach the condition where
-                          // queue.empty() here; we'll normally break.
+                            // queue.empty() here; we'll normally break.
     Interval top = queue.top();
     if (current_alpha * top.prob < 1.0) {
       break;  // we're done.
@@ -383,7 +383,7 @@ void Sampler::NormalizeIntervals(int32 num_words_to_sample,
             total_unigram_prob = end_cdf - start_cdf,
             first_half_unigram_prob = mid_cdf - start_cdf,
             second_half_unigram_prob = (total_unigram_prob -
-                                        first_half_unigram_prob),
+            first_half_unigram_prob),
             top_prob = top.prob;
         KALDI_ASSERT(total_unigram_prob > 0.0 && top_prob > 0.0);
         if (first_half_unigram_prob > 0.0) {
@@ -407,7 +407,7 @@ void Sampler::NormalizeIntervals(int32 num_words_to_sample,
         top.prob = 1.0;
         intervals->push_back(top);
         KALDI_ASSERT(queue.empty() ||
-                     (total_remaining_p > 0 && new_alpha > current_alpha));
+            (total_remaining_p > 0 && new_alpha > current_alpha));
         current_alpha = new_alpha;
       }
     }
@@ -446,7 +446,7 @@ void Sampler::NormalizeIntervals(int32 num_words_to_sample,
 }
 
 void Sampler::SampleFromIntervals(const std::vector<Interval> &intervals,
-                                  std::vector<std::pair<int32, BaseFloat> > *samples)  const {
+    std::vector<std::pair<int32, BaseFloat> > *samples)  const {
   size_t num_intervals = intervals.size();
   std::vector<double> probs(num_intervals);
   for (size_t i = 0; i < num_intervals; i++)
@@ -490,9 +490,9 @@ void Sampler::SampleFromIntervals(const std::vector<Interval> &intervals,
 
 
 double Sampler::GetInitialIntervals(
-    BaseFloat unigram_weight,
-    const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
-    std::vector<Interval> *intervals) const {
+  BaseFloat unigram_weight,
+  const std::vector<std::pair<int32, BaseFloat> > &higher_order_probs,
+  std::vector<Interval> *intervals) const {
   double ans = 0.0;
   intervals->clear();
   intervals->reserve(higher_order_probs.size() * 2 + 1);

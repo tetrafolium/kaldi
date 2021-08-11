@@ -109,11 +109,11 @@ int main(int argc, char *argv[]) {
       VectorFst<LatticeArc> decoded;  // linear FST.
 
       if ( (allow_partial || decoder.ReachedFinal())
-           && decoder.GetBestPath(&decoded) ) {
+          && decoder.GetBestPath(&decoded) ) {
         num_success++;
         if (!decoder.ReachedFinal())
           KALDI_WARN << "Decoder did not reach end-state, outputting partial traceback.";
-          
+
         std::vector<int32> alignment;
         std::vector<int32> words;
         LatticeWeight weight;

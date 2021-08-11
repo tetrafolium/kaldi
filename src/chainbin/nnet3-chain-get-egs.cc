@@ -84,20 +84,20 @@ namespace nnet3 {
                                       chunks. This also stores some stats.
      @param [out]  example_writer     Pointer to egs writer.
 
-**/
+ **/
 
 static bool ProcessFile(const TransitionModel *trans_mdl,
-                        const fst::StdVectorFst &normalization_fst,
-                        const GeneralMatrix &feats,
-                        const MatrixBase<BaseFloat> *ivector_feats,
-                        int32 ivector_period,
-                        const chain::Supervision &supervision,
-                        const VectorBase<BaseFloat> *deriv_weights,
-                        int32 supervision_length_tolerance,
-                        const std::string &utt_id,
-                        bool compress,
-                        UtteranceSplitter *utt_splitter,
-                        NnetChainExampleWriter *example_writer) {
+    const fst::StdVectorFst &normalization_fst,
+    const GeneralMatrix &feats,
+    const MatrixBase<BaseFloat> *ivector_feats,
+    int32 ivector_period,
+    const chain::Supervision &supervision,
+    const VectorBase<BaseFloat> *deriv_weights,
+    int32 supervision_length_tolerance,
+    const std::string &utt_id,
+    bool compress,
+    UtteranceSplitter *utt_splitter,
+    NnetChainExampleWriter *example_writer) {
   KALDI_ASSERT(supervision.num_sequences == 1);
   int32 num_input_frames = feats.NumRows(),
       num_output_frames = supervision.frames_per_sequence;
@@ -105,7 +105,7 @@ static bool ProcessFile(const TransitionModel *trans_mdl,
   int32 frame_subsampling_factor = utt_splitter->Config().frame_subsampling_factor;
 
   if (deriv_weights && (std::abs(deriv_weights->Dim() - num_output_frames)
-                        > supervision_length_tolerance)) {
+      > supervision_length_tolerance)) {
     KALDI_WARN << "For utterance " << utt_id
                << ", mismatch between deriv-weights dim and num-output-frames"
                << "; " << deriv_weights->Dim() << " vs " << num_output_frames;
@@ -170,14 +170,14 @@ static bool ProcessFile(const TransitionModel *trans_mdl,
     nnet_chain_eg.outputs.resize(1);
 
     SubVector<BaseFloat> output_weights(
-        &(chunk.output_weights[0]),
-        static_cast<int32>(chunk.output_weights.size()));
+      &(chunk.output_weights[0]),
+      static_cast<int32>(chunk.output_weights.size()));
 
     if (!deriv_weights) {
       NnetChainSupervision nnet_supervision("output", supervision_part,
-                                            output_weights,
-                                            first_frame,
-                                            frame_subsampling_factor);
+          output_weights,
+          first_frame,
+          frame_subsampling_factor);
       nnet_chain_eg.outputs[0].Swap(&nnet_supervision);
     } else {
       Vector<BaseFloat> this_deriv_weights(num_frames_subsampled);
@@ -189,9 +189,9 @@ static bool ProcessFile(const TransitionModel *trans_mdl,
       KALDI_ASSERT(output_weights.Dim() == num_frames_subsampled);
       this_deriv_weights.MulElements(output_weights);
       NnetChainSupervision nnet_supervision("output", supervision_part,
-                                            this_deriv_weights,
-                                            first_frame,
-                                            frame_subsampling_factor);
+          this_deriv_weights,
+          first_frame,
+          frame_subsampling_factor);
       nnet_chain_eg.outputs[0].Swap(&nnet_supervision);
     }
 
@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
 
     bool compress = true;
     int32 length_tolerance = 100, online_ivector_period = 1,
-          supervision_length_tolerance = 1;
+        supervision_length_tolerance = 1;
 
     ExampleGenerationConfig eg_config;  // controls num-frames,
                                         // left/right-context, etc.
@@ -370,12 +370,12 @@ int main(int argc, char *argv[]) {
     // when selecting parts of matrices.
     SequentialGeneralMatrixReader feat_reader(feature_rspecifier);
     chain::RandomAccessSupervisionReader supervision_reader(
-        supervision_rspecifier);
+      supervision_rspecifier);
     NnetChainExampleWriter example_writer(examples_wspecifier);
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
     RandomAccessBaseFloatVectorReader deriv_weights_reader(
-        deriv_weights_rspecifier);
+      deriv_weights_rspecifier);
 
     int32 num_err = 0;
 
@@ -401,8 +401,8 @@ int main(int argc, char *argv[]) {
         }
         if (online_ivector_feats != NULL &&
             (abs(feats.NumRows() - (online_ivector_feats->NumRows() *
-                                    online_ivector_period)) > length_tolerance
-             || online_ivector_feats->NumRows() == 0)) {
+            online_ivector_period)) > length_tolerance
+            || online_ivector_feats->NumRows() == 0)) {
           KALDI_WARN << "Length difference between feats " << feats.NumRows()
                      << " and iVectors " << online_ivector_feats->NumRows()
                      << "exceeds tolerance " << length_tolerance;
@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
     }
     if (num_err > 0)
       KALDI_WARN << num_err << " utterances had errors and could "
-          "not be processed.";
+        "not be processed.";
     // utt_splitter prints stats in its destructor.
     return utt_splitter.ExitStatus();
   } catch(const std::exception &e) {

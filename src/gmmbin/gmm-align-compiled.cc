@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
         }
 
         DecodableAmDiagGmmScaled gmm_decodable(am_gmm, trans_model, features,
-                                               acoustic_scale);
+            acoustic_scale);
 
         KALDI_LOG << utt;
         AlignUtteranceWrapper(align_config, utt,

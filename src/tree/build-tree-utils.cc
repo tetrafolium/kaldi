@@ -61,8 +61,8 @@ void ReadBuildTreeStats(std::istream &is, bool binary, const Clusterable &exampl
 
 
 bool PossibleValues(EventKeyType key,
-                    const BuildTreeStatsType &stats,
-                    std::vector<EventValueType> *ans) {
+    const BuildTreeStatsType &stats,
+    std::vector<EventValueType> *ans) {
   bool all_present = true;
   std::set<EventValueType> values;
   BuildTreeStatsType::const_iterator iter = stats.begin(), end = stats.end();
@@ -124,7 +124,7 @@ void FindAllKeys(const BuildTreeStatsType &stats, AllKeysType keys_type, std::ve
 
 
 EventMap *DoTableSplit(const EventMap &orig, EventKeyType key,  const BuildTreeStatsType &stats,
-                       int32 *num_leaves) {
+    int32 *num_leaves) {
   // First-- map the stats to each leaf in the EventMap.
   std::vector<BuildTreeStatsType> split_stats;
   SplitStatsByMap(stats, orig, &split_stats);
@@ -139,7 +139,7 @@ EventMap *DoTableSplit(const EventMap &orig, EventKeyType key,  const BuildTreeS
       KALDI_ASSERT(!vals.empty() && vals.front() >= 0);  // don't support mapping negative values
       // at present time-- would need different EventMap type, not TableEventMap.
       std::vector<EventMap*> table(vals.back()+1, (EventMap*)NULL);
-      for (size_t idx = 0;idx < vals.size();idx++) {
+      for (size_t idx = 0; idx < vals.size(); idx++) {
         EventValueType val = vals[idx];
         if (idx == 0) table[val] = new ConstantEventMap(leaf);  // reuse current leaf.
         else table[val] = new ConstantEventMap( (*num_leaves)++ );  // else take new leaf id.
@@ -204,7 +204,7 @@ void SplitStatsByKey(const BuildTreeStatsType &stats_in, EventKeyType key, std::
   for (iter = stats_in.begin(); iter != end; ++iter) {
     const EventType &evec = iter->first;
     EventValueType val;
-    if (! EventMap::Lookup(evec, key, &val)) // no such key.
+    if (!EventMap::Lookup(evec, key, &val))  // no such key.
       KALDI_ERR << "SplitStats: key "<< key << " is not present in event vector " << EventTypeToString(evec);
     size = std::max(size, (size_t)(val+1));
   }
@@ -220,11 +220,11 @@ void SplitStatsByKey(const BuildTreeStatsType &stats_in, EventKeyType key, std::
 
 
 void FilterStatsByKey(const BuildTreeStatsType &stats_in,
-                      EventKeyType key,
-                      std::vector<EventValueType> &values,
-                      bool include_if_present,  // true-> retain only in "values",
-                      // false-> retain only not in "values".
-                      BuildTreeStatsType *stats_out) {
+    EventKeyType key,
+    std::vector<EventValueType> &values,
+    bool include_if_present,                    // true-> retain only in "values",
+    // false-> retain only not in "values".
+    BuildTreeStatsType *stats_out) {
   KALDI_ASSERT(IsSortedAndUniq(values));
   BuildTreeStatsType::const_iterator iter, end = stats_in.end();
   KALDI_ASSERT(stats_out != NULL);
@@ -233,7 +233,7 @@ void FilterStatsByKey(const BuildTreeStatsType &stats_in,
   for (iter = stats_in.begin(); iter != end; ++iter) {
     const EventType &evec = iter->first;
     EventValueType val;
-    if (! EventMap::Lookup(evec, key, &val)) // no such key. // HERE.
+    if (!EventMap::Lookup(evec, key, &val))  // no such key. // HERE.
       KALDI_ERR << "SplitStats: key "<< key << " is not present in event vector " << EventTypeToString(evec);
     bool in_values = std::binary_search(values.begin(), values.end(), val);
     if (in_values == include_if_present)
@@ -248,7 +248,7 @@ Clusterable *SumStats(const BuildTreeStatsType &stats_in) {
   for (; iter != end; ++iter) {
     Clusterable *cl = iter->second;
     if (cl != NULL) {
-      if (!ans)  ans = cl->Copy();
+      if (!ans) ans = cl->Copy();
       else ans->Add(*cl);
     }
   }
@@ -279,7 +279,7 @@ BaseFloat SumObjf(const BuildTreeStatsType &stats_in) {
 void SumStatsVec(const std::vector<BuildTreeStatsType> &stats_in, std::vector<Clusterable*> *stats_out) {
   KALDI_ASSERT(stats_out != NULL && stats_out->empty());
   stats_out->resize(stats_in.size(), NULL);
-  for (size_t i = 0;i < stats_in.size();i++) (*stats_out)[i] = SumStats(stats_in[i]);
+  for (size_t i = 0; i < stats_in.size(); i++) (*stats_out)[i] = SumStats(stats_in[i]);
 }
 
 BaseFloat ObjfGivenMap(const BuildTreeStatsType &stats_in, const EventMap &e) {
@@ -295,8 +295,8 @@ BaseFloat ObjfGivenMap(const BuildTreeStatsType &stats_in, const EventMap &e) {
 // This function computes the best initial split of these stats [with this key].
 // Returns best objf change (>=0).
 BaseFloat ComputeInitialSplit(const std::vector<Clusterable*> &summed_stats,
-                              const Questions &q_opts, EventKeyType key,
-                              std::vector<EventValueType> *yes_set) {
+    const Questions &q_opts, EventKeyType key,
+    std::vector<EventValueType> *yes_set) {
   KALDI_ASSERT(yes_set != NULL);
   yes_set->clear();
   const QuestionsForKey &key_opts = q_opts.GetQuestionsOf(key);
@@ -346,9 +346,9 @@ BaseFloat ComputeInitialSplit(const std::vector<Clusterable*> &summed_stats,
 // returns best delta-objf.
 // If key does not exist, returns 0 and sets yes_set_out to empty.
 BaseFloat FindBestSplitForKey(const BuildTreeStatsType &stats,
-                              const Questions &q_opts,
-                              EventKeyType key,
-                              std::vector<EventValueType> *yes_set_out) {
+    const Questions &q_opts,
+    EventKeyType key,
+    std::vector<EventValueType> *yes_set_out) {
   if (stats.size()<=1) return 0.0;  // cannot split if only zero or one instance of stats.
   if (!PossibleValues(key, stats, NULL)) {
     yes_set_out->clear();
@@ -397,7 +397,7 @@ BaseFloat FindBestSplitForKey(const BuildTreeStatsType &stats,
     // refine_impr should always be positive
     improvement += refine_impr;
     yes_set.clear();
-    for (size_t i = 0;i < assignments.size();i++) if (assignments[i] == 1) yes_set.push_back(i);
+    for (size_t i = 0; i < assignments.size(); i++) if (assignments[i] == 1) yes_set.push_back(i);
   }
   *yes_set_out = yes_set;
 
@@ -423,11 +423,11 @@ BaseFloat FindBestSplitForKey(const BuildTreeStatsType &stats,
 
 
 /*
-  DecisionTreeBuilder is a class used in SplitDecisionTree
-*/
+   DecisionTreeBuilder is a class used in SplitDecisionTree
+ */
 
 class DecisionTreeSplitter {
- public:
+public:
   EventMap *GetMap() {
     if (!yes_) {  // leaf.
       return new ConstantEventMap(leaf_);
@@ -445,7 +445,7 @@ class DecisionTreeSplitter {
     }
   }
   DecisionTreeSplitter(EventAnswerType leaf, const BuildTreeStatsType &stats,
-                      const Questions &q_opts): q_opts_(q_opts), yes_(NULL), no_(NULL), leaf_(leaf), stats_(stats) {
+      const Questions &q_opts) : q_opts_(q_opts), yes_(NULL), no_(NULL), leaf_(leaf), stats_(stats) {
     // not, this must work when stats is empty too. [just gives zero improvement, non-splittable].
     FindBestSplit();
   }
@@ -453,7 +453,7 @@ class DecisionTreeSplitter {
     delete yes_;
     delete no_;
   }
- private:
+private:
   void DoSplitInternal(int32 *next_leaf) {
     // Does the split; applicable only to leaf nodes.
     KALDI_ASSERT(!yes_);  // make sure children not already set up.
@@ -530,13 +530,13 @@ class DecisionTreeSplitter {
 };
 
 EventMap *SplitDecisionTree(const EventMap &input_map,
-                            const BuildTreeStatsType &stats,
-                            Questions &q_opts,
-                            BaseFloat thresh,
-                            int32 max_leaves,  // max_leaves<=0 -> no maximum.
-                            int32 *num_leaves,
-                            BaseFloat *obj_impr_out,
-                            BaseFloat *smallest_split_change_out) {
+    const BuildTreeStatsType &stats,
+    Questions &q_opts,
+    BaseFloat thresh,
+    int32 max_leaves,                          // max_leaves<=0 -> no maximum.
+    int32 *num_leaves,
+    BaseFloat *obj_impr_out,
+    BaseFloat *smallest_split_change_out) {
   KALDI_ASSERT(num_leaves != NULL && *num_leaves > 0);  // can't be 0 or input_map would be empty.
   int32 num_empty_leaves = 0;
   BaseFloat like_impr = 0.0;
@@ -548,7 +548,7 @@ EventMap *SplitDecisionTree(const EventMap &input_map,
     SplitStatsByMap(stats, input_map, &split_stats);
     KALDI_ASSERT(split_stats.size() != 0);
     builders.resize(split_stats.size());  // size == #leaves.
-    for (size_t i = 0;i < split_stats.size();i++) {
+    for (size_t i = 0; i < split_stats.size(); i++) {
       EventAnswerType leaf = static_cast<EventAnswerType>(i);
       if (split_stats[i].size() == 0) num_empty_leaves++;
       builders[i] = new DecisionTreeSplitter(leaf, split_stats[i], q_opts);
@@ -565,7 +565,7 @@ EventMap *SplitDecisionTree(const EventMap &input_map,
     // Note-- queue's size never changes from now.  All the alternatives leaves to split are
     // inside the "DecisionTreeSplitter*" objects, in a tree structure.
     while (queue.top().first > thresh
-          && (max_leaves<=0 || *num_leaves < max_leaves)) {
+        && (max_leaves<=0 || *num_leaves < max_leaves)) {
       smallest_split_change = std::min(smallest_split_change, queue.top().first);
       size_t i = queue.top().second;
       like_impr += queue.top().first;
@@ -584,12 +584,12 @@ EventMap *SplitDecisionTree(const EventMap &input_map,
 
   {  // Create the output EventMap.
     std::vector<EventMap*> sub_trees(builders.size());
-    for (size_t i = 0; i < sub_trees.size();i++) sub_trees[i] = builders[i]->GetMap();
+    for (size_t i = 0; i < sub_trees.size(); i++) sub_trees[i] = builders[i]->GetMap();
     answer = input_map.Copy(sub_trees);
-    for (size_t i = 0; i < sub_trees.size();i++) delete sub_trees[i];
+    for (size_t i = 0; i < sub_trees.size(); i++) delete sub_trees[i];
   }
   // Free up memory.
-  for (size_t i = 0;i < builders.size();i++) delete builders[i];
+  for (size_t i = 0; i < builders.size(); i++) delete builders[i];
 
   if (obj_impr_out != NULL) *obj_impr_out = like_impr;
   return answer;
@@ -597,9 +597,9 @@ EventMap *SplitDecisionTree(const EventMap &input_map,
 
 
 int ClusterEventMapGetMapping(const EventMap &e_in,
-                              const BuildTreeStatsType &stats,
-                              BaseFloat thresh,
-                              std::vector<EventMap*> *mapping) {
+    const BuildTreeStatsType &stats,
+    BaseFloat thresh,
+    std::vector<EventMap*> *mapping) {
   // First map stats
   KALDI_ASSERT(stats.size() != 0);
   std::vector<BuildTreeStatsType> split_stats;
@@ -610,7 +610,7 @@ int ClusterEventMapGetMapping(const EventMap &e_in,
   std::vector<int32> indexes;
   std::vector<Clusterable*> summed_stats_contiguous;
   size_t max_index = 0;
-  for (size_t i = 0;i < summed_stats.size();i++) {
+  for (size_t i = 0; i < summed_stats.size(); i++) {
     if (summed_stats[i] != NULL) {
       indexes.push_back(i);
       summed_stats_contiguous.push_back(summed_stats[i]);
@@ -633,7 +633,7 @@ int ClusterEventMapGetMapping(const EventMap &e_in,
 
 
   KALDI_ASSERT(assignments.size() == summed_stats_contiguous.size() && !assignments.empty());
-  size_t num_clust = * std::max_element(assignments.begin(), assignments.end()) + 1;
+  size_t num_clust = *std::max_element(assignments.begin(), assignments.end()) + 1;
   int32 num_combined = summed_stats_contiguous.size() - num_clust;
   KALDI_ASSERT(num_combined >= 0);
 
@@ -646,7 +646,7 @@ int ClusterEventMapGetMapping(const EventMap &e_in,
   KALDI_ASSERT(mapping != NULL);
   if (max_index >= mapping->size()) mapping->resize(max_index+1, NULL);
 
-  for (size_t i = 0;i < summed_stats_contiguous.size();i++) {
+  for (size_t i = 0; i < summed_stats_contiguous.size(); i++) {
     size_t index = indexes[i];
     size_t new_index = indexes[assignments[i]];  // index assigned by clusterig-- map to existing indices in the map,
     // that we clustered from, so we don't conflict with indices in other parts
@@ -687,7 +687,7 @@ EventMap *RenumberEventMap(const EventMap &e_in, int32 *num_leaves) {
 }
 
 EventMap *MapEventMapLeaves(const EventMap &e_in,
-                            const std::vector<int32> &mapping_in) {
+    const std::vector<int32> &mapping_in) {
   std::vector<EventMap*> mapping(mapping_in.size());
   for (size_t i = 0; i < mapping_in.size(); i++)
     mapping[i] = new ConstantEventMap(mapping_in[i]);
@@ -697,7 +697,7 @@ EventMap *MapEventMapLeaves(const EventMap &e_in,
 }
 
 EventMap *ClusterEventMap(const EventMap &e_in, const BuildTreeStatsType &stats,
-                          BaseFloat thresh, int32 *num_removed_ptr) {
+    BaseFloat thresh, int32 *num_removed_ptr) {
   std::vector<EventMap*> mapping;
   int32 num_removed = ClusterEventMapGetMapping(e_in, stats, thresh, &mapping);
   EventMap *ans = e_in.Copy(mapping);
@@ -708,8 +708,8 @@ EventMap *ClusterEventMap(const EventMap &e_in, const BuildTreeStatsType &stats,
 }
 
 EventMap *ShareEventMapLeaves(const EventMap &e_in, EventKeyType key,
-                              std::vector<std::vector<EventValueType> > &values,
-                              int32 *num_leaves) {
+    std::vector<std::vector<EventValueType> > &values,
+    int32 *num_leaves) {
   // the use of "pdfs" as the name of the next variable reflects the anticipated
   // use of this function.
   std::vector<std::vector<EventAnswerType> > pdfs(values.size());
@@ -758,24 +758,24 @@ void DeleteBuildTreeStats(BuildTreeStatsType *stats) {
 }
 
 EventMap *GetToLengthMap(const BuildTreeStatsType &stats, int32 P,
-                         const std::vector<EventValueType> *phones,
-                         int32 default_length) {
+    const std::vector<EventValueType> *phones,
+    int32 default_length) {
   std::vector<BuildTreeStatsType> stats_by_phone;
   try {
     SplitStatsByKey(stats, P, &stats_by_phone);
   } catch(const KaldiFatalError &) {
     KALDI_ERR <<
-        "You seem to have provided invalid stats [no central-phone key].";
+      "You seem to have provided invalid stats [no central-phone key].";
   }
   std::map<EventValueType, EventAnswerType> phone_to_length;
   for (size_t p = 0; p < stats_by_phone.size(); p++) {
-    if (! stats_by_phone[p].empty()) {
+    if (!stats_by_phone[p].empty()) {
       std::vector<BuildTreeStatsType> stats_by_length;
       try {
         SplitStatsByKey(stats_by_phone[p], kPdfClass, &stats_by_length);
       } catch(const KaldiFatalError &) {
         KALDI_ERR <<
-            "You seem to have provided invalid stats [no position key].";
+          "You seem to have provided invalid stats [no position key].";
       }
       size_t length = stats_by_length.size();
       for (size_t i = 0; i < length; i++) {
@@ -801,10 +801,10 @@ EventMap *GetToLengthMap(const BuildTreeStatsType &stats, int32 P,
 // Recursive routine that is a helper to ClusterEventMapRestricted.
 // returns number removed.
 static int32 ClusterEventMapRestrictedHelper(const EventMap &e_in,
-                                             const BuildTreeStatsType &stats,
-                                             BaseFloat thresh,
-                                             std::vector<EventKeyType> keys,
-                                             std::vector<EventMap*> *leaf_mapping) {
+    const BuildTreeStatsType &stats,
+    BaseFloat thresh,
+    std::vector<EventKeyType> keys,
+    std::vector<EventMap*> *leaf_mapping) {
   if (keys.size() == 0) {
     return ClusterEventMapGetMapping(e_in, stats, thresh, leaf_mapping);
   } else {  // split on the key.
@@ -820,10 +820,10 @@ static int32 ClusterEventMapRestrictedHelper(const EventMap &e_in,
 }
 
 EventMap *ClusterEventMapRestrictedByKeys(const EventMap &e_in,
-                                          const BuildTreeStatsType &stats,
-                                          BaseFloat thresh,
-                                          const std::vector<EventKeyType> &keys,
-                                          int32 *num_removed) {
+    const BuildTreeStatsType &stats,
+    BaseFloat thresh,
+    const std::vector<EventKeyType> &keys,
+    int32 *num_removed) {
   std::vector<EventMap*> leaf_mapping;  // For output of ClusterEventMapGetMapping.
 
   int32 nr = ClusterEventMapRestrictedHelper(e_in, stats, thresh, keys, &leaf_mapping);
@@ -836,10 +836,10 @@ EventMap *ClusterEventMapRestrictedByKeys(const EventMap &e_in,
 
 
 EventMap *ClusterEventMapRestrictedByMap(const EventMap &e_in,
-                                         const BuildTreeStatsType &stats,
-                                         BaseFloat thresh,
-                                         const EventMap &e_restrict,
-                                         int32 *num_removed_ptr) {
+    const BuildTreeStatsType &stats,
+    BaseFloat thresh,
+    const EventMap &e_restrict,
+    int32 *num_removed_ptr) {
   std::vector<EventMap*> leaf_mapping;
 
   std::vector<BuildTreeStatsType> split_stats;
@@ -859,11 +859,11 @@ EventMap *ClusterEventMapRestrictedByMap(const EventMap &e_in,
 }
 
 EventMap *ClusterEventMapToNClustersRestrictedByMap(
-    const EventMap &e_in,
-    const BuildTreeStatsType &stats,
-    int32 num_clusters_required,
-    const EventMap &e_restrict,
-    int32 *num_removed_ptr) {
+  const EventMap &e_in,
+  const BuildTreeStatsType &stats,
+  int32 num_clusters_required,
+  const EventMap &e_restrict,
+  int32 *num_removed_ptr) {
   std::vector<BuildTreeStatsType> split_stats;
   SplitStatsByMap(stats, e_restrict, &split_stats);
 
@@ -973,10 +973,10 @@ EventMap *ClusterEventMapToNClustersRestrictedByMap(
 }
 
 EventMap *GetStubMap(int32 P,
-                     const std::vector<std::vector<int32> > &phone_sets,
-                     const std::vector<int32> &phone2num_pdf_classes,
-                     const std::vector<bool> &share_roots,
-                     int32 *num_leaves_out) {
+    const std::vector<std::vector<int32> > &phone_sets,
+    const std::vector<int32> &phone2num_pdf_classes,
+    const std::vector<bool> &share_roots,
+    int32 *num_leaves_out) {
 
   {  // Checking inputs.
     KALDI_ASSERT(!phone_sets.empty() && share_roots.size() == phone_sets.size());
@@ -999,14 +999,14 @@ EventMap *GetStubMap(int32 P,
     max_set_size = std::max(max_set_size, phone_sets[i].size());
     highest_numbered_phone =
         std::max(highest_numbered_phone,
-                 * std::max_element(phone_sets[i].begin(), phone_sets[i].end()));
+                 *std::max_element(phone_sets[i].begin(), phone_sets[i].end()));
   }
 
   if (phone_sets.size() == 1) {  // there is only one set so the recursion finishes.
     if (share_roots[0]) {  // if "shared roots" return a single leaf.
       return new ConstantEventMap( (*num_leaves_out)++ );
     } else {  // not sharing roots -> work out the length and return a
-             // TableEventMap splitting on length.
+              // TableEventMap splitting on length.
       EventAnswerType max_len = 0;
       for (size_t i = 0; i < phone_sets[0].size(); i++) {
         EventAnswerType len;
@@ -1030,7 +1030,7 @@ EventMap *GetStubMap(int32 P,
                                m);
     }
   } else if (max_set_size == 1
-            && static_cast<int32>(phone_sets.size()) <= 2*highest_numbered_phone) {
+      && static_cast<int32>(phone_sets.size()) <= 2*highest_numbered_phone) {
     // create table map splitting on phone-- more efficient.
     // the part after the && checks that this would not contain a very sparse vector.
     std::map<EventValueType, EventMap*> m;
@@ -1075,10 +1075,10 @@ EventMap *GetStubMap(int32 P,
 
 // convert stats to different (possibly smaller) context-window size.
 bool ConvertStats(int32 oldN, int32 oldP, int32 newN, int32 newP,
-                  BuildTreeStatsType *stats) {
+    BuildTreeStatsType *stats) {
   bool warned = false;
   KALDI_ASSERT(stats != NULL && oldN > 0 && newN > 0 && oldP >= 0
-               && newP >= 0 && newP < newN && oldP < oldN);
+      && newP >= 0 && newP < newN && oldP < oldN);
   if (newN > oldN) {  // can't add unseen context.
     KALDI_WARN << "Cannot convert stats to larger context: " << newN
                << " > " << oldN;

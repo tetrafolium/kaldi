@@ -26,14 +26,14 @@ namespace nnet2 {
 /* See the header for what we're doing.
    The pattern we're looking for is AffineComponent followed by
    a NonlinearComponent of type SigmoidComponent or TanhComponent.
-*/
+ */
 
 void FixNnet(const NnetFixConfig &config, Nnet *nnet) {
   for (int32 c = 0; c + 1 < nnet->NumComponents(); c++) {
     AffineComponent *ac = dynamic_cast<AffineComponent*>(
-        &(nnet->GetComponent(c)));
+      &(nnet->GetComponent(c)));
     NonlinearComponent *nc = dynamic_cast<NonlinearComponent*>(
-        &(nnet->GetComponent(c + 1)));
+      &(nnet->GetComponent(c + 1)));
     if (ac == NULL || nc == NULL) continue;
     // We only want to process this if it's of type SigmoidComponent
     // or TanhComponent.
@@ -105,7 +105,7 @@ void FixNnet(const NnetFixConfig &config, Nnet *nnet) {
     ac->SetParams(bias_params, linear_params);
   }
 }
-  
-  
+
+
 } // namespace nnet2
 } // namespace kaldi

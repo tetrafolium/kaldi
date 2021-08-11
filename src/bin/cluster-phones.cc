@@ -85,15 +85,15 @@ int main(int argc, char *argv[]) {
 
     std::vector<int32> pdf_class_list;
     if (!SplitStringToIntegers(pdf_class_list_str, ":", false, &pdf_class_list)
-       || pdf_class_list.empty()) {
-      KALDI_ERR << "Invalid pdf-class-list string [expecting colon-separated list of integers]: " 
-                 << pdf_class_list_str;
+        || pdf_class_list.empty()) {
+      KALDI_ERR << "Invalid pdf-class-list string [expecting colon-separated list of integers]: "
+                << pdf_class_list_str;
     }
 
     std::vector<std::vector< int32> > phone_sets;
     if (!ReadIntegerVectorVectorSimple(phone_sets_rxfilename, &phone_sets))
       KALDI_ERR << "Could not read phone sets from "
-                 << PrintableRxfilename(phone_sets_rxfilename);
+                << PrintableRxfilename(phone_sets_rxfilename);
 
     if (phone_sets.size() == 0)
       KALDI_ERR << "No phone sets in phone sets file ";
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     if (mode == "questions") {
       if (num_classes != -1)
         KALDI_ERR << "num-classes option is not (currently) compatible "
-            "with \"questions\" mode.";
+          "with \"questions\" mode.";
       AutomaticallyObtainQuestions(stats,
                                    phone_sets,
                                    pdf_class_list,
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
                                    &phone_sets_out);
     } else if (mode == "k-means") {
       if (num_classes <= 1 ||
-         static_cast<size_t>(num_classes) > phone_sets.size())
+          static_cast<size_t>(num_classes) > phone_sets.size())
         KALDI_ERR << "num-classes invalid: num_classes is " << num_classes
                   << ", number of phone sets is " << phone_sets.size();
       KMeansClusterPhones(stats,
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 
     if (!WriteIntegerVectorVectorSimple(phone_sets_wxfilename, phone_sets_out))
       KALDI_ERR << "Error writing questions to "
-                 << PrintableWxfilename(phone_sets_wxfilename);
+                << PrintableWxfilename(phone_sets_wxfilename);
     else
       KALDI_LOG << "Wrote questions to "<<phone_sets_wxfilename;
 

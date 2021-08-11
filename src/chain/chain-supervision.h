@@ -35,15 +35,15 @@ namespace kaldi {
 namespace chain {
 
 /*
-  This file contains some declarations relating to the object we use to
-  encode the supervision information for the 'chain' model.
+   This file contains some declarations relating to the object we use to
+   encode the supervision information for the 'chain' model.
 
-  If we were training the model on whole utterances we could just use the
-  reference phone sequence, but to make it easier to train on parts of
-  utterances (and also for efficiency) we use the time-alignment information,
-  extended by a user-specified margin, to limit the range of frames
-  that the phones can appear at.
-*/
+   If we were training the model on whole utterances we could just use the
+   reference phone sequence, but to make it easier to train on parts of
+   utterances (and also for efficiency) we use the time-alignment information,
+   extended by a user-specified margin, to limit the range of frames
+   that the phones can appear at.
+ */
 
 
 struct SupervisionOptions {
@@ -54,12 +54,12 @@ struct SupervisionOptions {
   BaseFloat lm_scale;
   bool convert_to_pdfs;
 
-  SupervisionOptions(): left_tolerance(5),
-                        right_tolerance(5),
-                        frame_subsampling_factor(1),
-                        weight(1.0),
-                        lm_scale(0.0),
-                        convert_to_pdfs(true) { }
+  SupervisionOptions() : left_tolerance(5),
+    right_tolerance(5),
+    frame_subsampling_factor(1),
+    weight(1.0),
+    lm_scale(0.0),
+    convert_to_pdfs(true) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("left-tolerance", &left_tolerance, "Left tolerance for "
@@ -115,18 +115,18 @@ struct ProtoSupervision {
      Returns true on success (the only possible failure is that total duration <
      opts.subsampling_factor). */
 bool AlignmentToProtoSupervision(const SupervisionOptions &opts,
-                                 const std::vector<int32> &phones,
-                                 const std::vector<int32> &durations,
-                                 ProtoSupervision *proto_supervision);
+    const std::vector<int32> &phones,
+    const std::vector<int32> &durations,
+    ProtoSupervision *proto_supervision);
 
 /**   Creates a ProtoSupervision object from a vector of (phone, duration) pairs
       (see the function SplitToPhones()).  This does the same jobs as the other
       AlignmentToProtoSupervision, from different input.
  */
 bool AlignmentToProtoSupervision(
-    const SupervisionOptions &opts,
-    const std::vector<std::pair<int32, int32> > &phones_durs,
-    ProtoSupervision *proto_supervision);
+  const SupervisionOptions &opts,
+  const std::vector<std::pair<int32, int32> > &phones_durs,
+  ProtoSupervision *proto_supervision);
 
 
 /** Creates a proto-supervision from a phone-aligned phone lattice (i.e. a
@@ -140,10 +140,10 @@ bool AlignmentToProtoSupervision(
     the number of frames in the lattice is less than opts.frame_subsampling_factor,
     or there are epsilon phones in the lattice, or the final-probs have alignments
     on them.
-*/
+ */
 bool PhoneLatticeToProtoSupervision(const SupervisionOptions &opts,
-                                    const CompactLattice &clat,
-                                    ProtoSupervision *proto_supervision);
+    const CompactLattice &clat,
+    ProtoSupervision *proto_supervision);
 
 
 /** Modifies the duration information (start_time and end_time) of each phone
@@ -153,9 +153,9 @@ bool PhoneLatticeToProtoSupervision(const SupervisionOptions &opts,
     frame_subsampling_factor.  Requires that proto_supervision->num_frames >=
     options.frame_subsampling_factor.
 
-*/
+ */
 void ModifyProtoSupervisionTimes(const SupervisionOptions &options,
-                                 ProtoSupervision *proto_supervision);
+    ProtoSupervision *proto_supervision);
 
 
 
@@ -175,18 +175,18 @@ void ModifyProtoSupervisionTimes(const SupervisionOptions &options,
    are pdf-ids plus one.
  */
 class TimeEnforcerFst:
-      public fst::DeterministicOnDemandFst<fst::StdArc> {
- public:
+  public fst::DeterministicOnDemandFst<fst::StdArc> {
+public:
   typedef fst::StdArc::Weight Weight;
   typedef fst::StdArc::StateId StateId;
   typedef fst::StdArc::Label Label;
 
   TimeEnforcerFst(const TransitionModel &trans_model,
-                  bool convert_to_pdfs,
-                  const std::vector<std::vector<int32> > &allowed_phones):
-      trans_model_(trans_model),
-      convert_to_pdfs_(convert_to_pdfs),
-      allowed_phones_(allowed_phones) { }
+      bool convert_to_pdfs,
+      const std::vector<std::vector<int32> > &allowed_phones) :
+    trans_model_(trans_model),
+    convert_to_pdfs_(convert_to_pdfs),
+    allowed_phones_(allowed_phones) { }
 
   // We cannot use "const" because the pure virtual function in the interface is
   // not const.
@@ -203,7 +203,7 @@ class TimeEnforcerFst:
   // epsilon).
   virtual bool GetArc(StateId s, Label ilabel, fst::StdArc* oarc);
 
- private:
+private:
   const TransitionModel &trans_model_;
   // if convert_to_pdfs_ is true, this FST will map from transition-id (on the
   // input side) to pdf-id plus one (on the output side); if false, both sides'
@@ -286,8 +286,8 @@ struct Supervision {
   // it will only be present for un-merged egs.
   std::vector<int32> alignment_pdfs;
 
-  Supervision(): weight(1.0), num_sequences(1), frames_per_sequence(-1),
-                 label_dim(-1) { }
+  Supervision() : weight(1.0), num_sequences(1), frames_per_sequence(-1),
+    label_dim(-1) { }
 
   Supervision(const Supervision &other);
 
@@ -314,13 +314,13 @@ struct Supervision {
     It returns true on success, and false on failure; the only failure mode for
     which it might return false that would not be a bug, is when the FST is
     empty because there were too many phones for the number of frames.
-*/
+ */
 bool ProtoSupervisionToSupervision(
-    const ContextDependencyInterface &ctx_dep,
-    const TransitionModel &trans_model,
-    const ProtoSupervision &proto_supervision,
-    bool convert_to_pdfs,
-    Supervision *supervision);
+  const ContextDependencyInterface &ctx_dep,
+  const TransitionModel &trans_model,
+  const ProtoSupervision &proto_supervision,
+  bool convert_to_pdfs,
+  Supervision *supervision);
 
 /** This function creates and initializes an end-to-end supervision object
     from a training FST (e.g. created using compile-train-graphs). It simply
@@ -332,10 +332,10 @@ bool ProtoSupervisionToSupervision(
     To find out more about end-to-end training, see chain-generic-numerator.h
  */
 bool TrainingGraphToSupervisionE2e(
-    const fst::StdVectorFst& training_graph,
-    const TransitionModel& trans_model,
-    int32 num_frames,
-    Supervision *supervision);
+  const fst::StdVectorFst& training_graph,
+  const TransitionModel& trans_model,
+  int32 num_frames,
+  Supervision *supervision);
 
 /**
    This function sorts the states of the fst argument in an ordering
@@ -346,13 +346,13 @@ bool TrainingGraphToSupervisionE2e(
    This function requires that the input FST be connected (i.e. all states
    reachable from the start state).
    This function is called from ProtoSupervisionToSupervision().
-*/
+ */
 void SortBreadthFirstSearch(fst::StdVectorFst *fst);
 
 // This class is used for splitting something of type Supervision into
 // multiple pieces corresponding to different frame-ranges.
 class SupervisionSplitter {
- public:
+public:
   SupervisionSplitter(const Supervision &supervision);
 
   // Extracts a frame range of the supervision into 'supervision'.  Note: the
@@ -361,8 +361,8 @@ class SupervisionSplitter {
   // normalization graph (derived from the normalization FST), but also removes
   // epsilons and ensures the states are sorted on time.
   void GetFrameRange(int32 begin_frame, int32 frames_per_sequence,
-                     Supervision *supervision) const;
- private:
+      Supervision *supervision) const;
+private:
   // Creates an output FST covering frames begin_frame <= t < end_frame,
   // assuming that the corresponding state-range that we need to
   // include, begin_state <= s < end_state has been included.
@@ -370,8 +370,8 @@ class SupervisionSplitter {
   // states).  Does not do the post-processing (RmEpsilon, Determinize,
   // TopSort on the result).  See code for details.
   void CreateRangeFst(int32 begin_frame, int32 end_frame,
-                      int32 begin_state, int32 end_state,
-                      fst::StdVectorFst *fst) const;
+      int32 begin_state, int32 end_state,
+      fst::StdVectorFst *fst) const;
 
   const Supervision &supervision_;
   // Indexed by the state-index of 'supervision_.fst', this is the frame-index,
@@ -401,7 +401,7 @@ class SupervisionSplitter {
 /// required sorting of states.  Think of it as the final stage in preparation
 /// of the supervision FST.
 bool AddWeightToSupervisionFst(const fst::StdVectorFst &normalization_fst,
-                               Supervision *supervision);
+    Supervision *supervision);
 
 /// Assuming the 'fst' is epsilon-free, connected, and has the property that all
 /// paths from the start-state are of the same length, output a vector
@@ -427,14 +427,14 @@ bool AddWeightToSupervisionFst(const fst::StdVectorFst &normalization_fst,
 ///
 /// @return  Returns the path length
 int32 ComputeFstStateTimes(const fst::StdVectorFst &fst,
-                           std::vector<int32> *state_times);
+    std::vector<int32> *state_times);
 
 
 
 /// This function merges a list of supervision objects, which must have the
 /// same num-frames and label-dim.
 void MergeSupervision(const std::vector<const Supervision*> &input,
-                      Supervision *output_supervision);
+    Supervision *output_supervision);
 
 
 /// This function helps you to pseudo-randomly split a sequence of length 'num_frames',
@@ -446,8 +446,8 @@ void MergeSupervision(const std::vector<const Supervision*> &input,
 /// output ranges are of the form
 /// [ (*range_starts)[i] ... (*range_starts)[i] + frames_per_range - 1 ].
 void SplitIntoRanges(int32 num_frames,
-                     int32 frames_per_range,
-                     std::vector<int32> *range_starts);
+    int32 frames_per_range,
+    std::vector<int32> *range_starts);
 
 
 /// This utility function is not used directly in the 'chain' code.  It is used
@@ -471,8 +471,8 @@ void SplitIntoRanges(int32 num_frames,
 /// to the left range; the right part to the right range; and
 /// in between, interpolating linearly.
 void GetWeightsForRanges(int32 range_length,
-                         const std::vector<int32> &range_starts,
-                         std::vector<Vector<BaseFloat> > *weights);
+    const std::vector<int32> &range_starts,
+    std::vector<Vector<BaseFloat> > *weights);
 
 
 /// This function converts a 'Supervision' object that has a non-cyclic FST
@@ -484,8 +484,8 @@ void GetWeightsForRanges(int32 range_length,
 /// It returns true on success, and false if some kind of error happened
 /// (this is not expected).
 bool ConvertSupervisionToUnconstrained(
-    const TransitionModel &trans_mdl,
-    Supervision *supervision);
+  const TransitionModel &trans_mdl,
+  Supervision *supervision);
 
 
 typedef TableWriter<KaldiObjectHolder<Supervision> > SupervisionWriter;

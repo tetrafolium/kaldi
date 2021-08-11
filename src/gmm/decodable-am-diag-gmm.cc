@@ -26,7 +26,7 @@ using std::vector;
 namespace kaldi {
 
 BaseFloat DecodableAmDiagGmmUnmapped::LogLikelihoodZeroBased(
-    int32 frame, int32 state) {
+  int32 frame, int32 state) {
   KALDI_ASSERT(static_cast<size_t>(frame) <
                static_cast<size_t>(NumFramesReady()));
   KALDI_ASSERT(static_cast<size_t>(state) < static_cast<size_t>(NumIndices()) &&
@@ -48,11 +48,11 @@ BaseFloat DecodableAmDiagGmmUnmapped::LogLikelihoodZeroBased(
   // check if everything is in order
   if (pdf.Dim() != data.Dim()) {
     KALDI_ERR << "Dim mismatch: data dim = "  << data.Dim()
-        << " vs. model dim = " << pdf.Dim();
+              << " vs. model dim = " << pdf.Dim();
   }
   if (!pdf.valid_gconsts()) {
     KALDI_ERR << "State "  << (state)  << ": Must call ComputeGconsts() "
-        "before computing likelihood.";
+      "before computing likelihood.";
   }
 
   Vector<BaseFloat> loglikes(pdf.gconsts());  // need to recreate for each pdf

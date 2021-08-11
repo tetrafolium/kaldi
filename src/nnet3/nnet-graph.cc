@@ -28,7 +28,7 @@ namespace nnet3 {
 
 
 void NnetToDirectedGraph(const Nnet &nnet,
-                         std::vector<std::vector<int32> > *graph) {
+    std::vector<std::vector<int32> > *graph) {
   graph->clear();
   int32 num_nodes = nnet.NumNodes();
   graph->resize(num_nodes);
@@ -37,19 +37,19 @@ void NnetToDirectedGraph(const Nnet &nnet,
     // handle dependencies of this node.
     std::vector<int32> node_dependencies;
     switch (node.node_type) {
-      case kInput:
-        break;  // no node dependencies.
-      case kDescriptor:
-        node.descriptor.GetNodeDependencies(&node_dependencies);
-        break;
-      case kComponent:
-        node_dependencies.push_back(n - 1);
-        break;
-      case kDimRange:
-        node_dependencies.push_back(node.u.node_index);
-        break;
-      default:
-        KALDI_ERR << "Invalid node type";
+    case kInput:
+      break;    // no node dependencies.
+    case kDescriptor:
+      node.descriptor.GetNodeDependencies(&node_dependencies);
+      break;
+    case kComponent:
+      node_dependencies.push_back(n - 1);
+      break;
+    case kDimRange:
+      node_dependencies.push_back(node.u.node_index);
+      break;
+    default:
+      KALDI_ERR << "Invalid node type";
     }
     SortAndUniq(&node_dependencies);
     for (size_t i = 0; i < node_dependencies.size(); i++) {
@@ -61,7 +61,7 @@ void NnetToDirectedGraph(const Nnet &nnet,
 }
 
 void ComputeGraphTranspose(const std::vector<std::vector<int32> > &graph,
-                           std::vector<std::vector<int32> > *graph_transpose) {
+    std::vector<std::vector<int32> > *graph_transpose) {
   int32 size = graph.size();
   graph_transpose->clear();
   graph_transpose->resize(size);
@@ -83,11 +83,11 @@ struct TarjanNode {
 };
 
 void TarjanSccRecursive(int32 node,
-                        const std::vector<std::vector<int32> > &graph,
-                        int32 *global_index,
-                        std::vector<TarjanNode> *tarjan_nodes,
-                        std::vector<int32> *tarjan_stack,
-                        std::vector<std::vector<int32> > *sccs) {
+    const std::vector<std::vector<int32> > &graph,
+    int32 *global_index,
+    std::vector<TarjanNode> *tarjan_nodes,
+    std::vector<int32> *tarjan_stack,
+    std::vector<std::vector<int32> > *sccs) {
   KALDI_ASSERT(sccs != NULL);
   KALDI_ASSERT(tarjan_nodes != NULL);
   KALDI_ASSERT(tarjan_stack != NULL);
@@ -110,13 +110,13 @@ void TarjanSccRecursive(int32 node,
       TarjanSccRecursive(next, graph,
                          global_index, tarjan_nodes, tarjan_stack, sccs);
       (*tarjan_nodes)[node].lowlink = std::min((*tarjan_nodes)[node].lowlink,
-                                               (*tarjan_nodes)[next].lowlink);
+              (*tarjan_nodes)[next].lowlink);
     } else if ((*tarjan_nodes)[next].on_stack) {
       // Next node is on the stack -- back edge. We can't use the lowlink of
       // next node, because that may point to the index of the root, while the
       // current node can't be the root.
       (*tarjan_nodes)[node].lowlink = std::min((*tarjan_nodes)[node].lowlink,
-                                               (*tarjan_nodes)[next].index);
+              (*tarjan_nodes)[next].index);
     }
   }
 
@@ -136,7 +136,7 @@ void TarjanSccRecursive(int32 node,
 }
 
 void FindSccsTarjan(const std::vector<std::vector<int32> > &graph,
-                    std::vector<std::vector<int32> > *sccs) {
+    std::vector<std::vector<int32> > *sccs) {
   KALDI_ASSERT(sccs != NULL);
 
   // Initialization.
@@ -154,7 +154,7 @@ void FindSccsTarjan(const std::vector<std::vector<int32> > &graph,
 }
 
 void FindSccs(const std::vector<std::vector<int32> > &graph,
-              std::vector<std::vector<int32> > *sccs) {
+    std::vector<std::vector<int32> > *sccs) {
   // Internally we call Tarjan's SCC algorithm, as it only requires one DFS. We
   // can change this to other methods later on if necessary.
   KALDI_ASSERT(sccs != NULL);
@@ -162,8 +162,8 @@ void FindSccs(const std::vector<std::vector<int32> > &graph,
 }
 
 void MakeSccGraph(const std::vector<std::vector<int32> > &graph,
-                  const std::vector<std::vector<int32> > &sccs,
-                  std::vector<std::vector<int32> > *scc_graph) {
+    const std::vector<std::vector<int32> > &sccs,
+    std::vector<std::vector<int32> > *scc_graph) {
   KALDI_ASSERT(scc_graph != NULL);
   scc_graph->clear();
   scc_graph->resize(sccs.size());
@@ -194,10 +194,10 @@ void MakeSccGraph(const std::vector<std::vector<int32> > &graph,
 }
 
 void ComputeTopSortOrderRecursive(int32 node,
-                                  const std::vector<std::vector<int32> > &graph,
-                                  std::vector<bool> *cycle_detector,
-                                  std::vector<bool> *is_visited,
-                                  std::vector<int32> *reversed_orders) {
+    const std::vector<std::vector<int32> > &graph,
+    std::vector<bool> *cycle_detector,
+    std::vector<bool> *is_visited,
+    std::vector<int32> *reversed_orders) {
   KALDI_ASSERT(node >= 0 && node < graph.size());
   KALDI_ASSERT(cycle_detector != NULL);
   KALDI_ASSERT(is_visited != NULL);
@@ -221,7 +221,7 @@ void ComputeTopSortOrderRecursive(int32 node,
 }
 
 void ComputeTopSortOrder(const std::vector<std::vector<int32> > &graph,
-                         std::vector<int32> *node_to_order) {
+    std::vector<int32> *node_to_order) {
   // Internally we use DFS, but we only put the node to <node_to_order> when all
   // its parents have been visited.
   KALDI_ASSERT(node_to_order != NULL);
@@ -263,7 +263,7 @@ std::string PrintGraphToString(const std::vector<std::vector<int32> > &graph) {
 }
 
 void ComputeNnetComputationEpochs(const Nnet &nnet,
-                                  std::vector<int32> *node_to_epoch) {
+    std::vector<int32> *node_to_epoch) {
   KALDI_ASSERT(node_to_epoch != NULL);
 
   std::vector<std::vector<int32> > graph;
@@ -308,7 +308,7 @@ bool GraphHasCycles(const std::vector<std::vector<int32> > &graph) {
   int32 num_nodes = graph.size();
   for (size_t i = 0; i < num_nodes; i++)
     for (std::vector<int32>::const_iterator iter = graph[i].begin(),
-             end = graph[i].end(); iter != end; ++iter)
+        end = graph[i].end(); iter != end; ++iter)
       if (*iter == i) return true;
   return false;
 }

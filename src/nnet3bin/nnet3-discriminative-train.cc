@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     bool binary_write = true;
     std::string use_gpu = "yes";
     bool dropout_test_mode = true;
-    
+
     NnetDiscriminativeOptions opts;
 
     ParseOptions po(usage);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-    
+
 #if HAVE_CUDA==1
     CuDevice::Instantiate().SelectGpuId(use_gpu);
 #endif
@@ -76,15 +76,15 @@ int main(int argc, char *argv[]) {
 
     bool binary;
     Input ki(model_rxfilename, &binary);
-    
+
     tmodel.Read(ki.Stream(), binary);
     am_nnet.Read(ki.Stream(), binary);
-    
+
     Nnet nnet = am_nnet.GetNnet();
 
     if (dropout_test_mode)
       SetDropoutTestMode(true, &nnet);
-    
+
     const VectorBase<BaseFloat> &priors = am_nnet.Priors();
 
     NnetDiscriminativeTrainer trainer(opts, tmodel, priors, &nnet);
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 #endif
     Output ko(model_wxfilename, binary_write);
     nnet.Write(ko.Stream(), binary_write);
-    
+
     KALDI_LOG << "Wrote raw nnet model to " << model_wxfilename;
     return (ok ? 0 : 1);
   } catch(const std::exception &e) {

@@ -30,11 +30,11 @@ using std::vector;
 
 namespace kaldi {
 bool AccumulateForUtterance(const Matrix<BaseFloat> &feats,
-                            const DiagGmm &gmm,
-                            const std::string &key,
-                            RandomAccessBaseFloatVectorReader *weights_reader,
-                            RandomAccessInt32VectorVectorReader *gselect_reader,
-                            AccumFullGmm *fullcov_stats) {
+    const DiagGmm &gmm,
+    const std::string &key,
+    RandomAccessBaseFloatVectorReader *weights_reader,
+    RandomAccessInt32VectorVectorReader *gselect_reader,
+    AccumFullGmm *fullcov_stats) {
   Vector<BaseFloat> weights;
   if (weights_reader->IsOpen()) {
     if (!weights_reader->HasKey(key)) {
@@ -76,7 +76,7 @@ bool AccumulateForUtterance(const Matrix<BaseFloat> &feats,
   }
   return true;
 }
-      
+
 
 }
 
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     FmllrOptions fmllr_opts;
     string spk2utt_rspecifier, gselect_rspecifier, weights_rspecifier,
         alignment_model;
-        
+
 
     po.Register("spk2utt", &spk2utt_rspecifier, "rspecifier for speaker to "
                 "utterance-list map");
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
                 "for each utterance, that's a per-frame weight.");
     po.Register("align-model", &alignment_model, "rxfilename for a model in the "
                 "speaker-independent space, to get Gaussian alignments from");
-    
+
     fmllr_opts.Register(&po);
 
     po.Read(argc, argv);
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
       ali_gmm_read.Read(ki.Stream(), binary);
     }
     DiagGmm &ali_gmm = (alignment_model != "" ? ali_gmm_read : gmm);
-    
+
     RandomAccessBaseFloatVectorReader weights_reader(weights_rspecifier);
     RandomAccessInt32VectorVectorReader gselect_reader(gselect_rspecifier);
 
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
                                      &gselect_reader, &fullcov_stats)) num_done++;
           else num_err++;
         }  // end looping over all utterances of the current speaker
-        
+
         BaseFloat impr, spk_tot_t;
         {  // Compute the transform and write it out.
           Matrix<BaseFloat> transform(gmm.Dim(), gmm.Dim()+1);
@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
           tot_t += utt_tot_t;
           num_done++;
         } else num_err++;
-        
+
       }
     }
 

@@ -39,7 +39,7 @@ void ConvolveSignals(const Vector<BaseFloat> &filter, Vector<BaseFloat> *signal)
   signal_padded.SetZero();
   for (int32 i = 0; i < signal_length; i++) {
     for (int32 j = 0; j < filter_length; j++) {
-        signal_padded(i + j) += (*signal)(i) * filter(j);
+      signal_padded(i + j) += (*signal)(i) * filter(j);
     }
   }
   signal->Resize(output_length);

@@ -39,15 +39,15 @@ struct MatrixElement {
 };
 
 extern "C" {
-  /**
-   * Structure containing size of the matrix plus stride.
-   * This structure is an argument of most of the CUDA kernels.
-   */
-  typedef struct MatrixDim_ {
-    int32_cuda rows;
-    int32_cuda cols;
-    int32_cuda stride;
-  } MatrixDim;
+/**
+ * Structure containing size of the matrix plus stride.
+ * This structure is an argument of most of the CUDA kernels.
+ */
+typedef struct MatrixDim_ {
+  int32_cuda rows;
+  int32_cuda cols;
+  int32_cuda stride;
+} MatrixDim;
 
 // we define the following constants here because this file is included
 // both by the C++ code and also CUDA code.
@@ -61,32 +61,32 @@ extern "C" {
 #define CU2DBLOCK 16
 
 
-  /** This structure is used in cu-block-matrix.h to store information
-      about a block-diagonal matrix.  We declare it here so that it
-      will be accessible
-   */
-  typedef struct CuBlockMatrixData_ {
-    int32_cuda row_offset; // sum of #rows of previous M_i
-    int32_cuda col_offset; // sum of #cols of previous M_i
-    MatrixDim matrix_dim; // dimension of this M_i
-    void *matrix_data; // data for M_i.  This is a pointer to either float* or
+/** This structure is used in cu-block-matrix.h to store information
+    about a block-diagonal matrix.  We declare it here so that it
+    will be accessible
+ */
+typedef struct CuBlockMatrixData_ {
+  int32_cuda row_offset;   // sum of #rows of previous M_i
+  int32_cuda col_offset;   // sum of #cols of previous M_i
+  MatrixDim matrix_dim;   // dimension of this M_i
+  void *matrix_data;   // data for M_i.  This is a pointer to either float* or
                        // double*.  Because C doesn't support templates and to
                        // avoid extra coding to support the two cases, we
                        // decided to make this a void* pointer.
-  } CuBlockMatrixData;
+} CuBlockMatrixData;
 
-  typedef struct Int32Pair {
-    int32_cuda first;
-    int32_cuda second;
-  } Int32Pair;
+typedef struct Int32Pair {
+  int32_cuda first;
+  int32_cuda second;
+} Int32Pair;
 
-  inline bool operator<(const Int32Pair &a, const Int32Pair &b) {
-    if (a.first < b.first)
-      return true;
-    if (a.first > b.first)
-      return false;
-    return a.second < b.second;
-  }
+inline bool operator<(const Int32Pair &a, const Int32Pair &b) {
+  if (a.first < b.first)
+    return true;
+  if (a.first > b.first)
+    return false;
+  return a.second < b.second;
+}
 }
 
 #endif

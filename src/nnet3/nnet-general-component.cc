@@ -29,12 +29,12 @@ namespace nnet3 {
 
 // used in I/O
 static void CopyPairVector(const CuArray<Int32Pair> &in,
-                        std::vector<std::pair<int32, int32> > *out) {
+    std::vector<std::pair<int32, int32> > *out) {
   in.CopyToVec(reinterpret_cast<std::vector<Int32Pair>*>(out));
 }
 // used in I/O
 static void CopyPairVector(const std::vector<std::pair<int32, int32> > &in,
-                        CuArray<Int32Pair> *out) {
+    CuArray<Int32Pair> *out) {
   const std::vector<Int32Pair> *in_cast =
       reinterpret_cast<const std::vector<Int32Pair>*>(&in);
   out->CopyFromVec(*in_cast);
@@ -44,8 +44,8 @@ static void CopyPairVector(const std::vector<std::pair<int32, int32> > &in,
 
 //inline
 void DistributeComponent::ComputeInputIndexAndBlock(const Index &output_index,
-                                                    Index *input_index,
-                                                    int32 *block) const {
+    Index *input_index,
+    int32 *block) const {
   int32 num_blocks = input_dim_ / output_dim_;
   *input_index = output_index;
   int32 output_x = output_index.x, input_x;
@@ -61,19 +61,19 @@ void DistributeComponent::ComputeInputIndexAndBlock(const Index &output_index,
 
 //virtual
 void DistributeComponent::GetInputIndexes(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    std::vector<Index> *desired_indexes) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  std::vector<Index> *desired_indexes) const {
   desired_indexes->resize(1);
   ComputeInputIndexAndBlock(output_index, &((*desired_indexes)[0]), NULL);
 }
 
 //virtual
 bool DistributeComponent::IsComputable(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    const IndexSet &input_index_set,
-    std::vector<Index> *used_inputs) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  const IndexSet &input_index_set,
+  std::vector<Index> *used_inputs) const {
   Index input_index;
   ComputeInputIndexAndBlock(output_index, &input_index, NULL);
   if (!input_index_set(input_index))
@@ -100,10 +100,10 @@ void DistributeComponentPrecomputedIndexes::Read(std::istream &istream, bool bin
 
 // virtual
 ComponentPrecomputedIndexes* DistributeComponent::PrecomputeIndexes(
-    const MiscComputationInfo &, // misc_info
-    const std::vector<Index> &input_indexes,
-    const std::vector<Index> &output_indexes,
-    bool) const {  // the bool is 'need_backprop'- unused.
+  const MiscComputationInfo &,   // misc_info
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  bool) const {    // the bool is 'need_backprop'- unused.
   unordered_map<Index, int32, IndexHasher> index_to_input_dim;
   int32 num_input_indexes = input_indexes.size(),
       num_output_indexes = output_indexes.size();
@@ -132,10 +132,10 @@ ComponentPrecomputedIndexes* DistributeComponent::PrecomputeIndexes(
 
 
 void DistributeComponent::ComputeInputPointers(
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in,
-    int32 num_output_rows,
-    std::vector<const BaseFloat*> *input_pointers) const {
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in,
+  int32 num_output_rows,
+  std::vector<const BaseFloat*> *input_pointers) const {
   const DistributeComponentPrecomputedIndexes *indexes =
       dynamic_cast<const DistributeComponentPrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL && "Invalid pointer type");
@@ -154,10 +154,10 @@ void DistributeComponent::ComputeInputPointers(
 }
 
 void DistributeComponent::ComputeInputPointers(
-    const ComponentPrecomputedIndexes *indexes_in,
-    int32 num_output_rows,
-    CuMatrixBase<BaseFloat> *in,
-    std::vector<BaseFloat*> *input_pointers) const {
+  const ComponentPrecomputedIndexes *indexes_in,
+  int32 num_output_rows,
+  CuMatrixBase<BaseFloat> *in,
+  std::vector<BaseFloat*> *input_pointers) const {
   const DistributeComponentPrecomputedIndexes *indexes =
       dynamic_cast<const DistributeComponentPrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL && "Invalid pointer type");
@@ -178,8 +178,8 @@ void DistributeComponent::ComputeInputPointers(
 
 // virtual
 void* DistributeComponent::Propagate(const ComponentPrecomputedIndexes *indexes,
-                                    const CuMatrixBase<BaseFloat> &in,
-                                    CuMatrixBase<BaseFloat> *out) const {
+    const CuMatrixBase<BaseFloat> &in,
+    CuMatrixBase<BaseFloat> *out) const {
   KALDI_ASSERT(indexes != NULL &&
                in.NumCols() == input_dim_ && out->NumCols() == output_dim_);
   int32 num_output_rows = out->NumRows();
@@ -192,13 +192,13 @@ void* DistributeComponent::Propagate(const ComponentPrecomputedIndexes *indexes,
 
 // virtual
 void DistributeComponent::Backprop(const std::string &debug_info,
-                                   const ComponentPrecomputedIndexes *indexes,
-                                   const CuMatrixBase<BaseFloat> &, // in_value,
-                                   const CuMatrixBase<BaseFloat> &, // out_value
-                                   const CuMatrixBase<BaseFloat> &out_deriv,
-                                   void *memo,
-                                   Component *, // to_update,
-                                   CuMatrixBase<BaseFloat> *in_deriv) const {
+    const ComponentPrecomputedIndexes *indexes,
+    const CuMatrixBase<BaseFloat> &,                                // in_value,
+    const CuMatrixBase<BaseFloat> &,                                // out_value
+    const CuMatrixBase<BaseFloat> &out_deriv,
+    void *memo,
+    Component *,                                // to_update,
+    CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("DistributeComponent::Backprop");
   if (in_deriv == NULL) return;
 
@@ -287,10 +287,10 @@ void StatisticsExtractionComponentPrecomputedIndexes::Read(std::istream &is, boo
 
 ComponentPrecomputedIndexes*
 StatisticsExtractionComponent::PrecomputeIndexes(
-    const MiscComputationInfo &misc_info,
-    const std::vector<Index> &input_indexes,
-    const std::vector<Index> &output_indexes,
-    bool need_backprop) const {
+  const MiscComputationInfo &misc_info,
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  bool need_backprop) const {
   int32 num_input_indexes = input_indexes.size(),
       num_output_indexes = output_indexes.size();
   StatisticsExtractionComponentPrecomputedIndexes *ans = new
@@ -301,7 +301,7 @@ StatisticsExtractionComponent::PrecomputeIndexes(
   invalid_pair.first = -1;
   invalid_pair.second = -1;
   std::vector<Int32Pair> forward_indexes_cpu(output_indexes.size(),
-                                             invalid_pair);
+      invalid_pair);
   std::vector<int32> backward_indexes_cpu(input_indexes.size(), -1);
   Vector<BaseFloat> counts_cpu(output_indexes.size());
 
@@ -351,16 +351,16 @@ StatisticsExtractionComponent::PrecomputeIndexes(
   return ans;
 }
 
-StatisticsExtractionComponent::StatisticsExtractionComponent():
-    input_dim_(-1), input_period_(1), output_period_(1),
-    include_variance_(true) { }
+StatisticsExtractionComponent::StatisticsExtractionComponent() :
+  input_dim_(-1), input_period_(1), output_period_(1),
+  include_variance_(true) { }
 
 StatisticsExtractionComponent::StatisticsExtractionComponent(
-    const StatisticsExtractionComponent &other):
-    input_dim_(other.input_dim_),
-    input_period_(other.input_period_),
-    output_period_(other.output_period_),
-    include_variance_(other.include_variance_) {
+  const StatisticsExtractionComponent &other) :
+  input_dim_(other.input_dim_),
+  input_period_(other.input_period_),
+  output_period_(other.output_period_),
+  include_variance_(other.include_variance_) {
   Check();
 }
 
@@ -382,24 +382,24 @@ void StatisticsExtractionComponent::InitFromConfig(ConfigLine *cfl) {
 
 void StatisticsExtractionComponent::Check() const {
   if (!(input_dim_ > 0 && input_period_ > 0 && output_period_ > 0 &&
-        (output_period_ % input_period_) == 0))
+      (output_period_ % input_period_) == 0))
     KALDI_ERR << "Invalid configuration of StatisticsExtractionComponent";
 }
 
 void StatisticsExtractionComponent::ReorderIndexes(
-    std::vector<Index> *input_indexes,
-    std::vector<Index> *output_indexes) const {
-    std::sort(input_indexes->begin(), input_indexes->end(),
+  std::vector<Index> *input_indexes,
+  std::vector<Index> *output_indexes) const {
+  std::sort(input_indexes->begin(), input_indexes->end(),
               IndexLessNxt());
-    std::sort(output_indexes->begin(), output_indexes->end(),
+  std::sort(output_indexes->begin(), output_indexes->end(),
               IndexLessNxt());
 }
 
 bool StatisticsExtractionComponent::IsComputable(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    const IndexSet &input_index_set,
-    std::vector<Index> *used_inputs) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  const IndexSet &input_index_set,
+  std::vector<Index> *used_inputs) const {
   Index input_index(output_index);
   int32 t = output_index.t,
       t_start = output_period_ * (t / output_period_);
@@ -428,9 +428,9 @@ bool StatisticsExtractionComponent::IsComputable(
 }
 
 void StatisticsExtractionComponent::GetInputIndexes(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    std::vector<Index> *desired_indexes) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  std::vector<Index> *desired_indexes) const {
   desired_indexes->clear();
   Index input_index(output_index);
   int32 t = output_index.t,
@@ -446,13 +446,13 @@ void StatisticsExtractionComponent::GetInputIndexes(
 
 
 void* StatisticsExtractionComponent::Propagate(
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in,
-    CuMatrixBase<BaseFloat> *out) const {
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *out) const {
   KALDI_ASSERT(indexes_in != NULL);
   const StatisticsExtractionComponentPrecomputedIndexes *indexes =
-     dynamic_cast<const StatisticsExtractionComponentPrecomputedIndexes*>(
-         indexes_in);
+      dynamic_cast<const StatisticsExtractionComponentPrecomputedIndexes*>(
+    indexes_in);
   int32 num_rows_out = out->NumRows();
   KALDI_ASSERT(indexes != NULL &&
                indexes->forward_indexes.Dim() == num_rows_out &&
@@ -475,14 +475,14 @@ void* StatisticsExtractionComponent::Propagate(
 }
 
 void StatisticsExtractionComponent::Backprop(
-    const std::string &debug_info,
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &, // out_value,
-    const CuMatrixBase<BaseFloat> &out_deriv,
-    void *memo,
-    Component *, // to_update,
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const std::string &debug_info,
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &,   // out_value,
+  const CuMatrixBase<BaseFloat> &out_deriv,
+  void *memo,
+  Component *,   // to_update,
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("StatisticsExtractionComponent::Backprop");
   KALDI_ASSERT(indexes_in != NULL);
   const StatisticsExtractionComponentPrecomputedIndexes *indexes =
@@ -492,8 +492,8 @@ void StatisticsExtractionComponent::Backprop(
                     indexes->backward_indexes);
   if (include_variance_) {
     CuMatrix<BaseFloat> variance_deriv(in_value.NumRows(),
-                                       in_value.NumCols(),
-                                       kUndefined);
+        in_value.NumCols(),
+        kUndefined);
     variance_deriv.CopyRows(out_deriv.ColRange(1 + input_dim_, input_dim_),
                             indexes->backward_indexes);
     in_deriv->AddMatMatElements(2.0, variance_deriv, in_value, 1.0);
@@ -572,20 +572,20 @@ void StatisticsPoolingComponent::InitFromConfig(ConfigLine *cfl) {
   Check();
 }
 
-StatisticsPoolingComponent::StatisticsPoolingComponent():
-    input_dim_(-1), input_period_(1), left_context_(-1), right_context_(-1),
-    num_log_count_features_(0), output_stddevs_(false),
-    variance_floor_(1.0e-10), require_direct_input_(false) { }
+StatisticsPoolingComponent::StatisticsPoolingComponent() :
+  input_dim_(-1), input_period_(1), left_context_(-1), right_context_(-1),
+  num_log_count_features_(0), output_stddevs_(false),
+  variance_floor_(1.0e-10), require_direct_input_(false) { }
 
 
 StatisticsPoolingComponent::StatisticsPoolingComponent(
-    const StatisticsPoolingComponent &other):
-    input_dim_(other.input_dim_), input_period_(other.input_period_),
-    left_context_(other.left_context_), right_context_(other.right_context_),
-    num_log_count_features_(other.num_log_count_features_),
-    output_stddevs_(other.output_stddevs_),
-    variance_floor_(other.variance_floor_),
-    require_direct_input_(other.require_direct_input_) {
+  const StatisticsPoolingComponent &other) :
+  input_dim_(other.input_dim_), input_period_(other.input_period_),
+  left_context_(other.left_context_), right_context_(other.right_context_),
+  num_log_count_features_(other.num_log_count_features_),
+  output_stddevs_(other.output_stddevs_),
+  variance_floor_(other.variance_floor_),
+  require_direct_input_(other.require_direct_input_) {
   Check();
 }
 
@@ -643,18 +643,18 @@ void StatisticsPoolingComponent::Write(std::ostream &os, bool binary) const {
 }
 
 void StatisticsPoolingComponent::ReorderIndexes(
-    std::vector<Index> *input_indexes,
-    std::vector<Index> *output_indexes) const {
-    std::sort(input_indexes->begin(), input_indexes->end(),
+  std::vector<Index> *input_indexes,
+  std::vector<Index> *output_indexes) const {
+  std::sort(input_indexes->begin(), input_indexes->end(),
               IndexLessNxt());
-    std::sort(output_indexes->begin(), output_indexes->end(),
+  std::sort(output_indexes->begin(), output_indexes->end(),
               IndexLessNxt());
 }
 
 void StatisticsPoolingComponent::GetInputIndexes(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    std::vector<Index> *desired_indexes) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  std::vector<Index> *desired_indexes) const {
   desired_indexes->clear();
   Index input_index(output_index);
   int32 middle_t = output_index.t,
@@ -668,10 +668,10 @@ void StatisticsPoolingComponent::GetInputIndexes(
 }
 
 bool StatisticsPoolingComponent::IsComputable(
-    const MiscComputationInfo &misc_info,
-    const Index &output_index,
-    const IndexSet &input_index_set,
-    std::vector<Index> *used_inputs) const {
+  const MiscComputationInfo &misc_info,
+  const Index &output_index,
+  const IndexSet &input_index_set,
+  std::vector<Index> *used_inputs) const {
   if (used_inputs)
     used_inputs->clear();
   // you are not supposed to access the output of this component other than at
@@ -706,10 +706,10 @@ bool StatisticsPoolingComponent::IsComputable(
 
 ComponentPrecomputedIndexes*
 StatisticsPoolingComponent::PrecomputeIndexes(
-    const MiscComputationInfo &misc_info,
-    const std::vector<Index> &input_indexes,
-    const std::vector<Index> &output_indexes,
-    bool need_backprop) const {
+  const MiscComputationInfo &misc_info,
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  bool need_backprop) const {
   int32 num_input_indexes = input_indexes.size(),
       num_output_indexes = output_indexes.size();
   StatisticsPoolingComponentPrecomputedIndexes *ans = new
@@ -721,14 +721,14 @@ StatisticsPoolingComponent::PrecomputeIndexes(
   // forward_indexes_cpu[i] will be the (begin, end) of input indexes
   // included in the sum for the i'th output index.
   std::vector<Int32Pair> forward_indexes_cpu(num_output_indexes,
-                                             invalid_pair);
+      invalid_pair);
   // backward_indexes_cpu[i] will be the (begin, end) of output indexes
   // for which the i'th input index participates in the sum.
   // because of the way the indexes are sorted (and the fact that only
   // required indexes are present at the input), it naturally has this
   // structure [i.e. no gaps in the sets of indexes].
   std::vector<Int32Pair> backward_indexes_cpu(num_input_indexes,
-                                              invalid_pair);
+      invalid_pair);
 
   // this map maps from Index to the position in 'input_indexes'.
   unordered_map<Index, int32, IndexHasher> index_to_input_pos;
@@ -775,9 +775,9 @@ StatisticsPoolingComponent::PrecomputeIndexes(
 }
 
 void* StatisticsPoolingComponent::Propagate(
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in,
-    CuMatrixBase<BaseFloat> *out) const {
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *out) const {
   out->SetZero();
   KALDI_ASSERT(indexes_in != NULL);
   const StatisticsPoolingComponentPrecomputedIndexes *indexes =
@@ -793,7 +793,7 @@ void* StatisticsPoolingComponent::Propagate(
   counts_mat.AddRowRanges(in.ColRange(0, 1), indexes->forward_indexes);
 
   CuSubMatrix<BaseFloat> out_non_count(*out, 0, num_rows_out,
-                                       num_log_count_features_, input_dim_ - 1);
+      num_log_count_features_, input_dim_ - 1);
   out_non_count.AddRowRanges(in.ColRange(1, input_dim_ - 1),
                              indexes->forward_indexes);
   out_non_count.DivRowsVec(counts);
@@ -811,8 +811,8 @@ void* StatisticsPoolingComponent::Propagate(
     KALDI_ASSERT((input_dim_ - 1) % 2 == 0);
     int32 feature_dim = (input_dim_ - 1) / 2;
     CuSubMatrix<BaseFloat> mean(*out, 0, num_rows_out,
-                                num_log_count_features_, feature_dim),
-        variance(*out, 0, num_rows_out,
+        num_log_count_features_, feature_dim),
+    variance(*out, 0, num_rows_out,
                  num_log_count_features_ + feature_dim, feature_dim);
     // subtract mean-squared from average of x^2 to get the variance.
     variance.AddMatMatElements(-1.0, mean, mean, 1.0);
@@ -824,19 +824,19 @@ void* StatisticsPoolingComponent::Propagate(
 }
 
 void StatisticsPoolingComponent::Backprop(
-    const std::string &debug_info,
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in_value,
-    const CuMatrixBase<BaseFloat> &out_value,
-    const CuMatrixBase<BaseFloat> &out_deriv_in,
-    void *memo,
-    Component *, // to_update,
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const std::string &debug_info,
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in_value,
+  const CuMatrixBase<BaseFloat> &out_value,
+  const CuMatrixBase<BaseFloat> &out_deriv_in,
+  void *memo,
+  Component *,   // to_update,
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("StatisticsPoolingComponent::Backprop");
   KALDI_ASSERT(indexes_in != NULL);
   const StatisticsPoolingComponentPrecomputedIndexes *indexes =
       dynamic_cast<const StatisticsPoolingComponentPrecomputedIndexes*>(
-          indexes_in);
+    indexes_in);
   int32 num_rows_out = out_deriv_in.NumRows();
   CuMatrix<BaseFloat> out_deriv(out_deriv_in);
   if (output_stddevs_) {
@@ -846,12 +846,12 @@ void StatisticsPoolingComponent::Backprop(
     // derivatives much.
     int32 feature_dim = (input_dim_ - 1) / 2;
     CuSubMatrix<BaseFloat> mean_deriv(out_deriv, 0, num_rows_out,
-                                      num_log_count_features_, feature_dim),
-        variance_deriv(out_deriv, 0, num_rows_out,
+        num_log_count_features_, feature_dim),
+    variance_deriv(out_deriv, 0, num_rows_out,
                        num_log_count_features_ + feature_dim, feature_dim),
-        mean_value(out_value, 0, num_rows_out,
+    mean_value(out_value, 0, num_rows_out,
                    num_log_count_features_, feature_dim),
-        stddev_value(out_value, 0, num_rows_out,
+    stddev_value(out_value, 0, num_rows_out,
                      num_log_count_features_ + feature_dim, feature_dim);
     // we currently have the deriv w.r.t. the stddev.  step 1 is to get it
     // w.r.t. the centered variance.  If the centered variance is s,
@@ -890,7 +890,7 @@ void StatisticsPoolingComponent::Backprop(
   // Now propagate the derivative back to the input.  we don't propagate it
   // back for the count's row since it's non-differentiable.
   in_deriv->ColRange(1, input_dim_ - 1).
-      AddRowRanges(out_deriv.ColRange(num_log_count_features_, input_dim_ - 1),
+  AddRowRanges(out_deriv.ColRange(num_log_count_features_, input_dim_ - 1),
                    indexes->backward_indexes);
 }
 
@@ -991,16 +991,16 @@ std::string BackpropTruncationComponent::Info() const {
          << ", zeroing-interval=" << zeroing_interval_
          << ", zeroed-proportion="
          << (count_zeroing_boundaries_ > 0.0 ?
-             num_zeroed_ / count_zeroing_boundaries_ : 0)
+  num_zeroed_ / count_zeroing_boundaries_ : 0)
          << ", count-zeroing-boundaries="
          << static_cast<int32>(count_zeroing_boundaries_);
   return stream.str();
 }
 
 void BackpropTruncationComponent::Init(
-    int32 dim, BaseFloat scale, BaseFloat clipping_threshold,
-    BaseFloat zeroing_threshold, int32 zeroing_interval,
-    int32 recurrence_interval) {
+  int32 dim, BaseFloat scale, BaseFloat clipping_threshold,
+  BaseFloat zeroing_threshold, int32 zeroing_interval,
+  int32 recurrence_interval) {
   KALDI_ASSERT(clipping_threshold >= 0 && zeroing_threshold >= 0 &&
                scale > 0.0 && zeroing_interval > 0 &&
                recurrence_interval > 0 && dim > 0);
@@ -1057,10 +1057,10 @@ Component* BackpropTruncationComponent::Copy() const {
 // virtual
 ComponentPrecomputedIndexes*
 BackpropTruncationComponent::PrecomputeIndexes(
-    const MiscComputationInfo &misc_info,
-    const std::vector<Index> &input_indexes,
-    const std::vector<Index> &output_indexes,
-    bool need_backprop) const {
+  const MiscComputationInfo &misc_info,
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  bool need_backprop) const {
   int32 num_input_indexes = input_indexes.size(),
       num_output_indexes = output_indexes.size();
   KALDI_ASSERT(num_input_indexes == num_output_indexes);
@@ -1092,9 +1092,9 @@ BackpropTruncationComponent::PrecomputeIndexes(
 
 // virtual
 void* BackpropTruncationComponent::Propagate(
-                                 const ComponentPrecomputedIndexes *indexes,
-                                 const CuMatrixBase<BaseFloat> &in,
-                                 CuMatrixBase<BaseFloat> *out) const {
+  const ComponentPrecomputedIndexes *indexes,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *out) const {
   out->CopyFromMat(in);
   if (scale_ != 1.0)
     out->Scale(scale_);
@@ -1103,18 +1103,18 @@ void* BackpropTruncationComponent::Propagate(
 
 // virtual
 void BackpropTruncationComponent::Backprop(const std::string &debug_info,
-                             const ComponentPrecomputedIndexes *indexes_in,
-                             const CuMatrixBase<BaseFloat> &, //in_value
-                             const CuMatrixBase<BaseFloat> &,
-                             const CuMatrixBase<BaseFloat> &out_deriv,
-                             void *memo,
-                             Component *to_update_in, // may be NULL; may be
-                             // identical to "this" or different.
-                             CuMatrixBase<BaseFloat> *in_deriv) const {
+    const ComponentPrecomputedIndexes *indexes_in,
+    const CuMatrixBase<BaseFloat> &,                          //in_value
+    const CuMatrixBase<BaseFloat> &,
+    const CuMatrixBase<BaseFloat> &out_deriv,
+    void *memo,
+    Component *to_update_in,                          // may be NULL; may be
+    // identical to "this" or different.
+    CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("BackpropTruncationComponent::Backprop");
   const BackpropTruncationComponentPrecomputedIndexes *indexes =
       dynamic_cast<const BackpropTruncationComponentPrecomputedIndexes*>(
-          indexes_in);
+    indexes_in);
   KALDI_ASSERT(indexes->zeroing.Dim() == out_deriv.NumRows());
   // the following statement will do nothing if in_deriv and out_deriv have same
   // memory.
@@ -1196,7 +1196,7 @@ void BackpropTruncationComponent::Scale(BaseFloat scale) {
 
 // virtual
 void BackpropTruncationComponent::Add(BaseFloat alpha,
-                                      const Component &other_in) {
+    const Component &other_in) {
   const BackpropTruncationComponent *other =
       dynamic_cast<const BackpropTruncationComponent*>(&other_in);
   KALDI_ASSERT(other != NULL);
@@ -1219,41 +1219,41 @@ std::string ConstantComponent::Info() const {
   return stream.str();
 }
 
-ConstantComponent::ConstantComponent():
-    UpdatableComponent(), is_updatable_(true),
-    use_natural_gradient_(true) { }
+ConstantComponent::ConstantComponent() :
+  UpdatableComponent(), is_updatable_(true),
+  use_natural_gradient_(true) { }
 
 ConstantComponent::ConstantComponent(
-    const ConstantComponent &other):
-    UpdatableComponent(other), output_(other.output_),
-    is_updatable_(other.is_updatable_),
-    use_natural_gradient_(other.use_natural_gradient_),
-    preconditioner_(other.preconditioner_) { }
+  const ConstantComponent &other) :
+  UpdatableComponent(other), output_(other.output_),
+  is_updatable_(other.is_updatable_),
+  use_natural_gradient_(other.use_natural_gradient_),
+  preconditioner_(other.preconditioner_) { }
 
 void* ConstantComponent::Propagate(
-    const ComponentPrecomputedIndexes *indexes,
-    const CuMatrixBase<BaseFloat> &in,
-    CuMatrixBase<BaseFloat> *out) const {
+  const ComponentPrecomputedIndexes *indexes,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *out) const {
   out->CopyRowsFromVec(output_);
   return NULL;
 }
 
 void ConstantComponent::Backprop(
-    const std::string &debug_info,
-    const ComponentPrecomputedIndexes *indexes,
-    const CuMatrixBase<BaseFloat> &, // in_value
-    const CuMatrixBase<BaseFloat> &, // out_value
-    const CuMatrixBase<BaseFloat> &out_deriv,
-    void *memo,
-    Component *to_update_in,
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const std::string &debug_info,
+  const ComponentPrecomputedIndexes *indexes,
+  const CuMatrixBase<BaseFloat> &,   // in_value
+  const CuMatrixBase<BaseFloat> &,   // out_value
+  const CuMatrixBase<BaseFloat> &out_deriv,
+  void *memo,
+  Component *to_update_in,
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("ConstantComponent::Backprop");
   // we don't update in_deriv, since we set the flag
   // kBackpropAdds, and the output doesn't depend on the
   // input, so the input-derivative is zero.
   if (to_update_in) {
     ConstantComponent *to_update =
-      dynamic_cast<ConstantComponent*>(to_update_in);
+        dynamic_cast<ConstantComponent*>(to_update_in);
     if (to_update->is_updatable_) {
       // only do the update if the is_updatable_ flag is set.
       KALDI_ASSERT(to_update && to_update->is_updatable_);
@@ -1354,7 +1354,7 @@ void ConstantComponent::PerturbParams(BaseFloat stddev) {
 }
 
 BaseFloat ConstantComponent::DotProduct(
-    const UpdatableComponent &other_in) const {
+  const UpdatableComponent &other_in) const {
   KALDI_ASSERT(is_updatable_);
   const ConstantComponent *other =
       dynamic_cast<const ConstantComponent*>(&other_in);
@@ -1409,19 +1409,19 @@ std::string DropoutMaskComponent::Info() const {
   return stream.str();
 }
 
-DropoutMaskComponent::DropoutMaskComponent():
-    output_dim_(-1), dropout_proportion_(0.5), continuous_(false) { }
+DropoutMaskComponent::DropoutMaskComponent() :
+  output_dim_(-1), dropout_proportion_(0.5), continuous_(false) { }
 
 DropoutMaskComponent::DropoutMaskComponent(
-    const DropoutMaskComponent &other):
-    output_dim_(other.output_dim_),
-    dropout_proportion_(other.dropout_proportion_),
-    continuous_(other.continuous_) { }
+  const DropoutMaskComponent &other) :
+  output_dim_(other.output_dim_),
+  dropout_proportion_(other.dropout_proportion_),
+  continuous_(other.continuous_) { }
 
 void* DropoutMaskComponent::Propagate(
-    const ComponentPrecomputedIndexes *indexes,
-    const CuMatrixBase<BaseFloat> &in,
-    CuMatrixBase<BaseFloat> *out) const {
+  const ComponentPrecomputedIndexes *indexes,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *out) const {
   KALDI_ASSERT(in.NumRows() == 0 && out->NumCols() == output_dim_);
   BaseFloat dropout_proportion = dropout_proportion_;
   KALDI_ASSERT(dropout_proportion >= 0.0 && dropout_proportion <= 1.0);
@@ -1542,27 +1542,27 @@ std::string GeneralDropoutComponent::Info() const {
   return stream.str();
 }
 
-GeneralDropoutComponent::GeneralDropoutComponent():
-    dim_(-1), block_dim_(-1), time_period_(0),
-    dropout_proportion_(0.5),
-    specaugment_max_proportion_(0.0),
-    specaugment_max_regions_(1),
-    continuous_(false) { }
+GeneralDropoutComponent::GeneralDropoutComponent() :
+  dim_(-1), block_dim_(-1), time_period_(0),
+  dropout_proportion_(0.5),
+  specaugment_max_proportion_(0.0),
+  specaugment_max_regions_(1),
+  continuous_(false) { }
 
 GeneralDropoutComponent::GeneralDropoutComponent(
-    const GeneralDropoutComponent &other):
-    dim_(other.dim_),
-    block_dim_(other.block_dim_),
-    time_period_(other.time_period_),
-    dropout_proportion_(other.dropout_proportion_),
-    specaugment_max_proportion_(other.specaugment_max_proportion_),
-    specaugment_max_regions_(other.specaugment_max_regions_),
-    continuous_(other.continuous_) { }
+  const GeneralDropoutComponent &other) :
+  dim_(other.dim_),
+  block_dim_(other.block_dim_),
+  time_period_(other.time_period_),
+  dropout_proportion_(other.dropout_proportion_),
+  specaugment_max_proportion_(other.specaugment_max_proportion_),
+  specaugment_max_regions_(other.specaugment_max_regions_),
+  continuous_(other.continuous_) { }
 
 void* GeneralDropoutComponent::Propagate(
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in,
-    CuMatrixBase<BaseFloat> *out) const {
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *out) const {
 
   KALDI_ASSERT(SameDim(in, *out));
 
@@ -1574,7 +1574,7 @@ void* GeneralDropoutComponent::Propagate(
     return NULL;
 
   const GeneralDropoutComponentPrecomputedIndexes *indexes =
-    dynamic_cast<const GeneralDropoutComponentPrecomputedIndexes*>(indexes_in);
+      dynamic_cast<const GeneralDropoutComponentPrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL);
 
   CuMatrix<BaseFloat> *mask = GetMemo(indexes->num_mask_rows);
@@ -1585,7 +1585,7 @@ void* GeneralDropoutComponent::Propagate(
         dim_multiple = dim_  / block_dim_,
         num_rows_reshaped = num_rows * dim_multiple;
     CuSubMatrix<BaseFloat> out_reshaped(out->Data(), num_rows_reshaped,
-                                        block_dim_, block_dim_);
+        block_dim_, block_dim_);
     out_reshaped.MulRows(*mask, indexes->indexes);
   } else {
     out->MulRows(*mask, indexes->indexes);
@@ -1594,14 +1594,14 @@ void* GeneralDropoutComponent::Propagate(
 }
 
 void GeneralDropoutComponent::Backprop(
-    const std::string &debug_info,
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &, // in_value
-    const CuMatrixBase<BaseFloat> &, // out_value
-    const CuMatrixBase<BaseFloat> &out_deriv,
-    void *memo,
-    Component *to_update,
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const std::string &debug_info,
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &,   // in_value
+  const CuMatrixBase<BaseFloat> &,   // out_value
+  const CuMatrixBase<BaseFloat> &out_deriv,
+  void *memo,
+  Component *to_update,
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("GeneralDropoutComponent::Backprop");
   KALDI_ASSERT(in_deriv != NULL && SameDim(*in_deriv, out_deriv));
 
@@ -1615,7 +1615,7 @@ void GeneralDropoutComponent::Backprop(
   }
 
   const GeneralDropoutComponentPrecomputedIndexes *indexes =
-     dynamic_cast<const GeneralDropoutComponentPrecomputedIndexes*>(indexes_in);
+      dynamic_cast<const GeneralDropoutComponentPrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL && memo != NULL);
   CuMatrix<BaseFloat> *mask = reinterpret_cast<CuMatrix<BaseFloat>*>(memo);
 
@@ -1625,8 +1625,8 @@ void GeneralDropoutComponent::Backprop(
         dim_multiple = dim_  / block_dim_,
         num_rows_reshaped = num_rows * dim_multiple;
     CuSubMatrix<BaseFloat> in_deriv_reshaped(in_deriv->Data(),
-                                             num_rows_reshaped,
-                                             block_dim_, block_dim_);
+        num_rows_reshaped,
+        block_dim_, block_dim_);
     in_deriv_reshaped.MulRows(*mask, indexes->indexes);
   } else {
     in_deriv->MulRows(*mask, indexes->indexes);
@@ -1737,10 +1737,10 @@ void GeneralDropoutComponent::InitFromConfig(ConfigLine *cfl) {
 
 
 CuMatrix<BaseFloat>* GeneralDropoutComponent::GetMemo(
-    int32 num_mask_rows) const {
+  int32 num_mask_rows) const {
   KALDI_ASSERT(num_mask_rows > 0 && !test_mode_ &&
-               (dropout_proportion_ > 0.0 ||
-                specaugment_max_proportion_ != 0.0));
+      (dropout_proportion_ > 0.0 ||
+      specaugment_max_proportion_ != 0.0));
   CuMatrix<BaseFloat> *ans = new CuMatrix<BaseFloat>(num_mask_rows, block_dim_,
                                                      kUndefined);
 
@@ -1750,7 +1750,7 @@ CuMatrix<BaseFloat>* GeneralDropoutComponent::GetMemo(
     Matrix<BaseFloat> mask(num_mask_rows, block_dim_);
     mask.Set(1.0);
     int32 specaugment_max_zeroed = static_cast<int32>(
-        num_freq_bins * specaugment_max_proportion_  +  0.5);
+      num_freq_bins * specaugment_max_proportion_  +  0.5);
     for (int32 seq = 0; seq < num_mask_rows; seq++) {
       // actually seq is more like a sub-part of a sequence, in the case where
       // time_period_ is not zero.
@@ -1776,7 +1776,7 @@ CuMatrix<BaseFloat>* GeneralDropoutComponent::GetMemo(
               end_bin = start_bin + half_bin_size;
           for (int32 i = 0; i < quarter_bin_size; i++) {
             BaseFloat &a = this_mask((start_bin + i) % num_freq_bins),
-                &b = this_mask((end_bin - i) % num_freq_bins);
+            &b = this_mask((end_bin - i) % num_freq_bins);
             std::swap(a, b);
           }
         }
@@ -1808,10 +1808,10 @@ CuMatrix<BaseFloat>* GeneralDropoutComponent::GetMemo(
 }
 
 ComponentPrecomputedIndexes* GeneralDropoutComponent::PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const {
+  const MiscComputationInfo &misc_info,
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  bool need_backprop) const {
   KALDI_ASSERT(input_indexes == output_indexes);
 
   GeneralDropoutComponentPrecomputedIndexes *ans = new
@@ -1834,7 +1834,7 @@ ComponentPrecomputedIndexes* GeneralDropoutComponent::PrecomputeIndexes(
     std::pair<int32, int32> p(n, t);
 
     std::unordered_map<std::pair<int32,int32>, int32,
-                       PairHasher<int32> >::const_iterator
+        PairHasher<int32> >::const_iterator
         iter = m.find(p);
     if (iter != m.end()) {
       indexes[i] = iter->second;
@@ -1895,20 +1895,20 @@ std::string SpecAugmentTimeMaskComponent::Info() const {
   return stream.str();
 }
 
-SpecAugmentTimeMaskComponent::SpecAugmentTimeMaskComponent():
-    dim_(-1), zeroed_proportion_(0.25),
-    time_mask_max_frames_(10) { }
+SpecAugmentTimeMaskComponent::SpecAugmentTimeMaskComponent() :
+  dim_(-1), zeroed_proportion_(0.25),
+  time_mask_max_frames_(10) { }
 
 SpecAugmentTimeMaskComponent::SpecAugmentTimeMaskComponent(
-    const SpecAugmentTimeMaskComponent &other):
-    dim_(other.dim_),
-    zeroed_proportion_(other.zeroed_proportion_),
-    time_mask_max_frames_(other.time_mask_max_frames_) { }
+  const SpecAugmentTimeMaskComponent &other) :
+  dim_(other.dim_),
+  zeroed_proportion_(other.zeroed_proportion_),
+  time_mask_max_frames_(other.time_mask_max_frames_) { }
 
 void* SpecAugmentTimeMaskComponent::Propagate(
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &in,
-    CuMatrixBase<BaseFloat> *out) const {
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &in,
+  CuMatrixBase<BaseFloat> *out) const {
 
   KALDI_ASSERT(SameDim(in, *out));
 
@@ -1920,7 +1920,7 @@ void* SpecAugmentTimeMaskComponent::Propagate(
     return NULL;
 
   const SpecAugmentTimeMaskComponentPrecomputedIndexes *indexes =
-    dynamic_cast<const SpecAugmentTimeMaskComponentPrecomputedIndexes*>(indexes_in);
+      dynamic_cast<const SpecAugmentTimeMaskComponentPrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL);
 
   CuVector<BaseFloat> *mask = GetMemo(*indexes);
@@ -1929,14 +1929,14 @@ void* SpecAugmentTimeMaskComponent::Propagate(
 }
 
 void SpecAugmentTimeMaskComponent::Backprop(
-    const std::string &debug_info,
-    const ComponentPrecomputedIndexes *indexes_in,
-    const CuMatrixBase<BaseFloat> &, // in_value
-    const CuMatrixBase<BaseFloat> &, // out_value
-    const CuMatrixBase<BaseFloat> &out_deriv,
-    void *memo,
-    Component *to_update,
-    CuMatrixBase<BaseFloat> *in_deriv) const {
+  const std::string &debug_info,
+  const ComponentPrecomputedIndexes *indexes_in,
+  const CuMatrixBase<BaseFloat> &,   // in_value
+  const CuMatrixBase<BaseFloat> &,   // out_value
+  const CuMatrixBase<BaseFloat> &out_deriv,
+  void *memo,
+  Component *to_update,
+  CuMatrixBase<BaseFloat> *in_deriv) const {
   NVTX_RANGE("SpecAugmentTimeMaskComponent::Backprop");
   KALDI_ASSERT(in_deriv != NULL && SameDim(*in_deriv, out_deriv));
 
@@ -1949,7 +1949,7 @@ void SpecAugmentTimeMaskComponent::Backprop(
   }
 
   const SpecAugmentTimeMaskComponentPrecomputedIndexes *indexes =
-    dynamic_cast<const SpecAugmentTimeMaskComponentPrecomputedIndexes*>(indexes_in);
+      dynamic_cast<const SpecAugmentTimeMaskComponentPrecomputedIndexes*>(indexes_in);
   KALDI_ASSERT(indexes != NULL && memo != NULL);
   CuVector<BaseFloat> *mask = reinterpret_cast<CuVector<BaseFloat>*>(memo);
 
@@ -2003,7 +2003,7 @@ void SpecAugmentTimeMaskComponent::InitFromConfig(ConfigLine *cfl) {
 
 
 CuVector<BaseFloat>* SpecAugmentTimeMaskComponent::GetMemo(
-    const SpecAugmentTimeMaskComponentPrecomputedIndexes &indexes_in) const {
+  const SpecAugmentTimeMaskComponentPrecomputedIndexes &indexes_in) const {
 
   const std::vector<std::vector<int32> > &indexes = indexes_in.indexes;
   int32 num_sequences = indexes.size();
@@ -2040,10 +2040,10 @@ CuVector<BaseFloat>* SpecAugmentTimeMaskComponent::GetMemo(
 }
 
 ComponentPrecomputedIndexes* SpecAugmentTimeMaskComponent::PrecomputeIndexes(
-      const MiscComputationInfo &misc_info,
-      const std::vector<Index> &input_indexes,
-      const std::vector<Index> &output_indexes,
-      bool need_backprop) const {
+  const MiscComputationInfo &misc_info,
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  bool need_backprop) const {
   KALDI_ASSERT(input_indexes == output_indexes);
 
   SpecAugmentTimeMaskComponentPrecomputedIndexes *ans = new

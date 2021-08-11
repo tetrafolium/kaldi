@@ -55,7 +55,7 @@ bool OnlineCmnInput::Compute(Matrix<BaseFloat> *output) {
 
 
 int32 OnlineCmnInput::NumOutputFrames(int32 num_new_frames,
-                                      bool more_data) const {
+    bool more_data) const {
   // Tells the caller, assuming we get given "num_new_frames" of input (and
   // given knowledge of whether there is more data coming), how many frames
   // would we be able to output?
@@ -149,8 +149,8 @@ void OnlineCmnInput::OutputFrame(VectorBase<BaseFloat> *output) {
 
 #if !defined(_MSC_VER)
 
-OnlineUdpInput::OnlineUdpInput(int32 port, int32 feature_dim):
-    feature_dim_(feature_dim) {
+OnlineUdpInput::OnlineUdpInput(int32 port, int32 feature_dim) :
+  feature_dim_(feature_dim) {
   server_addr_.sin_family = AF_INET; // IPv4
   server_addr_.sin_addr.s_addr = INADDR_ANY; // listen on all interfaces
   server_addr_.sin_port = htons(port);
@@ -160,7 +160,7 @@ OnlineUdpInput::OnlineUdpInput(int32 port, int32 feature_dim):
   int32 rcvbuf_size = 30000;
   if (setsockopt(sock_desc_, SOL_SOCKET, SO_RCVBUF,
                  &rcvbuf_size, sizeof(rcvbuf_size)) == -1)
-      KALDI_ERR << "setsockopt() failed to set receive buffer size!";
+    KALDI_ERR << "setsockopt() failed to set receive buffer size!";
   if (bind(sock_desc_,
            reinterpret_cast<sockaddr*>(&server_addr_),
            sizeof(server_addr_)) == -1)
@@ -189,11 +189,11 @@ bool OnlineUdpInput::Compute(Matrix<BaseFloat> *output) {
 
 
 OnlineLdaInput::OnlineLdaInput(OnlineFeatInputItf *input,
-                               const Matrix<BaseFloat> &transform,
-                               int32 left_context,
-                               int32 right_context):
-    input_(input), input_dim_(input->Dim()),
-    left_context_(left_context), right_context_(right_context) {
+    const Matrix<BaseFloat> &transform,
+    int32 left_context,
+    int32 right_context) :
+  input_(input), input_dim_(input->Dim()),
+  left_context_(left_context), right_context_(right_context) {
 
   int32 tot_context = left_context + 1 + right_context;
   if (transform.NumCols() == input_dim_ * tot_context) {
@@ -212,10 +212,10 @@ OnlineLdaInput::OnlineLdaInput(OnlineFeatInputItf *input,
 
 // static
 void OnlineLdaInput::SpliceFrames(const MatrixBase<BaseFloat> &input1,
-                                  const MatrixBase<BaseFloat> &input2,
-                                  const MatrixBase<BaseFloat> &input3,
-                                  int32 context_window,
-                                  Matrix<BaseFloat> *output) {
+    const MatrixBase<BaseFloat> &input2,
+    const MatrixBase<BaseFloat> &input3,
+    int32 context_window,
+    Matrix<BaseFloat> *output) {
   KALDI_ASSERT(context_window > 0);
   const int32 size1 = input1.NumRows(), size2 = input2.NumRows(),
       size3 = input3.NumRows();
@@ -244,7 +244,7 @@ void OnlineLdaInput::SpliceFrames(const MatrixBase<BaseFloat> &input1,
 }
 
 void OnlineLdaInput::TransformToOutput(const MatrixBase<BaseFloat> &spliced_feats,
-                                       Matrix<BaseFloat> *output) {
+    Matrix<BaseFloat> *output) {
   if (spliced_feats.NumRows() == 0) {
     output->Resize(0, 0);
   } else {
@@ -363,15 +363,15 @@ void OnlineCacheInput::Deallocate() {
 
 
 OnlineDeltaInput::OnlineDeltaInput(const DeltaFeaturesOptions &delta_opts,
-                                   OnlineFeatInputItf *input):
-    input_(input), opts_(delta_opts), input_dim_(input_->Dim()) { }
+    OnlineFeatInputItf *input) :
+  input_(input), opts_(delta_opts), input_dim_(input_->Dim()) { }
 
 
 // static
 void OnlineDeltaInput::AppendFrames(const MatrixBase<BaseFloat> &input1,
-                                    const MatrixBase<BaseFloat> &input2,
-                                    const MatrixBase<BaseFloat> &input3,
-                                    Matrix<BaseFloat> *output) {
+    const MatrixBase<BaseFloat> &input2,
+    const MatrixBase<BaseFloat> &input3,
+    Matrix<BaseFloat> *output) {
   const int32 size1 = input1.NumRows(), size2 = input2.NumRows(),
       size3 = input3.NumRows(), size_out = size1 + size2 + size3;
   if (size_out == 0) {
@@ -392,8 +392,8 @@ void OnlineDeltaInput::AppendFrames(const MatrixBase<BaseFloat> &input1,
 }
 
 void OnlineDeltaInput::DeltaComputation(const MatrixBase<BaseFloat> &input,
-                                        Matrix<BaseFloat> *output,
-                                        Matrix<BaseFloat> *remainder) const {
+    Matrix<BaseFloat> *output,
+    Matrix<BaseFloat> *remainder) const {
   int32 input_rows = input.NumRows(),
       output_rows = std::max(0, input_rows - Context() * 2),
       remainder_rows = std::min(input_rows, Context() * 2),
@@ -486,8 +486,8 @@ void OnlineFeatureMatrix::GetNextFeatures() {
   int32 iter;
   for (iter = 0; iter < opts_.num_tries; iter++) {
     Matrix<BaseFloat> next_features(opts_.batch_size, feat_dim_);
-    finished_ = ! input_->Compute(&next_features);
-    if (next_features.NumRows() == 0 && ! finished_) {
+    finished_ = !input_->Compute(&next_features);
+    if (next_features.NumRows() == 0 && !finished_) {
       // It timed out.  Try again.
       continue;
     }
@@ -501,7 +501,7 @@ void OnlineFeatureMatrix::GetNextFeatures() {
       if (have_last_frame) {
         feat_matrix_.Row(0).CopyFromVec(last_frame);
         feat_matrix_.Range(1, next_features.NumRows(), 0, feat_dim_).
-            CopyFromMat(next_features);
+        CopyFromMat(next_features);
       } else {
         feat_matrix_.CopyFromMat(next_features);
       }
@@ -517,7 +517,7 @@ void OnlineFeatureMatrix::GetNextFeatures() {
 
 
 bool OnlineFeatureMatrix::IsValidFrame (int32 frame) {
-   KALDI_ASSERT(frame >= feat_offset_ &&
+  KALDI_ASSERT(frame >= feat_offset_ &&
                "You are attempting to get expired frames.");
   if (frame < feat_offset_ + feat_matrix_.NumRows())
     return true;

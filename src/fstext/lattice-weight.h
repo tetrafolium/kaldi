@@ -45,7 +45,7 @@ inline std::istream &operator >>(std::istream &strm, LatticeWeightTpl<FloatType>
 
 template<class FloatType>
 class LatticeWeightTpl {
- public:
+public:
   typedef FloatType T; // normally float.
   typedef LatticeWeightTpl ReverseWeight;
 
@@ -57,11 +57,11 @@ class LatticeWeightTpl {
 
   inline void SetValue2(T f) { value2_ = f; }
 
-  LatticeWeightTpl(): value1_{}, value2_{} { }
+  LatticeWeightTpl() : value1_{}, value2_{} { }
 
-  LatticeWeightTpl(T a, T b): value1_(a), value2_(b) {}
+  LatticeWeightTpl(T a, T b) : value1_(a), value2_(b) {}
 
-  LatticeWeightTpl(const LatticeWeightTpl &other): value1_(other.value1_), value2_(other.value2_) { }
+  LatticeWeightTpl(const LatticeWeightTpl &other) : value1_(other.value1_), value2_(other.value2_) { }
 
   LatticeWeightTpl &operator=(const LatticeWeightTpl &w) {
     value1_ = w.value1_;
@@ -83,7 +83,7 @@ class LatticeWeightTpl {
   }
 
   static const std::string &Type() {
-    static const std::string type = (sizeof(T) == 4 ? "lattice4" : "lattice8") ;
+    static const std::string type = (sizeof(T) == 4 ? "lattice4" : "lattice8");
     return type;
   }
 
@@ -98,7 +98,7 @@ class LatticeWeightTpl {
     // must be +inf, and
     if (value1_ != value1_ || value2_ != value2_) return false; // NaN
     if (value1_ == -std::numeric_limits<T>::infinity()  ||
-       value2_ == -std::numeric_limits<T>::infinity()) return false; // -infty not allowed
+        value2_ == -std::numeric_limits<T>::infinity()) return false; // -infty not allowed
     if (value1_ == std::numeric_limits<T>::infinity() ||
         value2_ == std::numeric_limits<T>::infinity()) {
       if (value1_ != std::numeric_limits<T>::infinity() ||
@@ -121,7 +121,7 @@ class LatticeWeightTpl {
   }
   static constexpr uint64 Properties() {
     return kLeftSemiring | kRightSemiring | kCommutative |
-        kPath | kIdempotent;
+           kPath | kIdempotent;
   }
 
   // This is used in OpenFst for binary I/O.  This is OpenFst-style,
@@ -158,7 +158,7 @@ class LatticeWeightTpl {
     return ans;
   }
 
- protected:
+protected:
   inline static void WriteFloatType(std::ostream &strm, const T &f) {
     if (f == std::numeric_limits<T>::infinity())
       strm << "Infinity";
@@ -191,7 +191,7 @@ class LatticeWeightTpl {
   // Reads LatticeWeight when there are no parentheses around pair terms...
   // currently the only form supported.
   inline std::istream &ReadNoParen(
-      std::istream &strm, char separator) {
+    std::istream &strm, char separator) {
     int c;
     do {
       c = strm.get();
@@ -216,7 +216,7 @@ class LatticeWeightTpl {
   friend std::istream &operator>> <FloatType>(std::istream&, LatticeWeightTpl<FloatType>&);
   friend std::ostream &operator<< <FloatType>(std::ostream&, const LatticeWeightTpl<FloatType>&);
 
- private:
+private:
   T value1_;
   T value2_;
 
@@ -230,8 +230,8 @@ class LatticeWeightTpl {
  */
 template<class FloatType, class ScaleFloatType>
 inline LatticeWeightTpl<FloatType> ScaleTupleWeight(
-    const LatticeWeightTpl<FloatType> &w,
-    const std::vector<std::vector<ScaleFloatType> > &scale) {
+  const LatticeWeightTpl<FloatType> &w,
+  const std::vector<std::vector<ScaleFloatType> > &scale) {
   // Without the next special case we'd get NaNs from infinity * 0
   if (w.Value1() == std::numeric_limits<FloatType>::infinity())
     return LatticeWeightTpl<FloatType>::Zero();
@@ -243,13 +243,13 @@ inline LatticeWeightTpl<FloatType> ScaleTupleWeight(
    function to apply to LexicographicWeight and the like, templated on
    TropicalWeight<float> etc.; we use PairWeight which is the base class of
    LexicographicWeight.
-*/
+ */
 template<class FloatType, class ScaleFloatType>
 inline PairWeight<TropicalWeightTpl<FloatType>,
-                  TropicalWeightTpl<FloatType> > ScaleTupleWeight(
-                      const PairWeight<TropicalWeightTpl<FloatType>,
-                                       TropicalWeightTpl<FloatType> > &w,
-                      const std::vector<std::vector<ScaleFloatType> > &scale) {
+    TropicalWeightTpl<FloatType> > ScaleTupleWeight(
+  const PairWeight<TropicalWeightTpl<FloatType>,
+  TropicalWeightTpl<FloatType> > &w,
+  const std::vector<std::vector<ScaleFloatType> > &scale) {
   typedef TropicalWeightTpl<FloatType> BaseType;
   typedef PairWeight<BaseType, BaseType> PairType;
   const BaseType zero = BaseType::Zero();
@@ -265,7 +265,7 @@ inline PairWeight<TropicalWeightTpl<FloatType>,
 
 template<class FloatType>
 inline bool operator==(const LatticeWeightTpl<FloatType> &wa,
-                       const LatticeWeightTpl<FloatType> &wb) {
+    const LatticeWeightTpl<FloatType> &wb) {
   // Volatile qualifier thwarts over-aggressive compiler optimizations
   // that lead to problems esp. with NaturalLess().
   volatile FloatType va1 = wa.Value1(), va2 = wa.Value2(),
@@ -275,7 +275,7 @@ inline bool operator==(const LatticeWeightTpl<FloatType> &wa,
 
 template<class FloatType>
 inline bool operator!=(const LatticeWeightTpl<FloatType> &wa,
-                       const LatticeWeightTpl<FloatType> &wb) {
+    const LatticeWeightTpl<FloatType> &wb) {
   // Volatile qualifier thwarts over-aggressive compiler optimizations
   // that lead to problems esp. with NaturalLess().
   volatile FloatType va1 = wa.Value1(), va2 = wa.Value2(),
@@ -292,7 +292,7 @@ inline bool operator!=(const LatticeWeightTpl<FloatType> &wa,
 
 template<class FloatType>
 inline int Compare (const LatticeWeightTpl<FloatType> &w1,
-                    const LatticeWeightTpl<FloatType> &w2) {
+    const LatticeWeightTpl<FloatType> &w2) {
   FloatType f1 = w1.Value1() + w1.Value2(),
       f2 = w2.Value1() + w2.Value2();
   if (f1 < f2) { return 1; } // having smaller cost means you're larger
@@ -309,7 +309,7 @@ inline int Compare (const LatticeWeightTpl<FloatType> &w1,
 
 template<class FloatType>
 inline LatticeWeightTpl<FloatType> Plus(const LatticeWeightTpl<FloatType> &w1,
-                                        const LatticeWeightTpl<FloatType> &w2) {
+    const LatticeWeightTpl<FloatType> &w2) {
   return (Compare(w1, w2) >= 0 ? w1 : w2);
 }
 
@@ -317,7 +317,7 @@ inline LatticeWeightTpl<FloatType> Plus(const LatticeWeightTpl<FloatType> &w1,
 // For efficiency, override the NaturalLess template class.
 template<class FloatType>
 class NaturalLess<LatticeWeightTpl<FloatType> > {
- public:
+public:
   typedef LatticeWeightTpl<FloatType> Weight;
 
   NaturalLess() {}
@@ -331,7 +331,7 @@ class NaturalLess<LatticeWeightTpl<FloatType> > {
 };
 template<>
 class NaturalLess<LatticeWeightTpl<float> > {
- public:
+public:
   typedef LatticeWeightTpl<float> Weight;
 
   NaturalLess() {}
@@ -345,7 +345,7 @@ class NaturalLess<LatticeWeightTpl<float> > {
 };
 template<>
 class NaturalLess<LatticeWeightTpl<double> > {
- public:
+public:
   typedef LatticeWeightTpl<double> Weight;
 
   NaturalLess() {}
@@ -360,7 +360,7 @@ class NaturalLess<LatticeWeightTpl<double> > {
 
 template<class FloatType>
 inline LatticeWeightTpl<FloatType> Times(const LatticeWeightTpl<FloatType> &w1,
-                                         const LatticeWeightTpl<FloatType> &w2) {
+    const LatticeWeightTpl<FloatType> &w2) {
   return LatticeWeightTpl<FloatType>(w1.Value1()+w2.Value1(), w1.Value2()+w2.Value2());
 }
 
@@ -368,18 +368,18 @@ inline LatticeWeightTpl<FloatType> Times(const LatticeWeightTpl<FloatType> &w1,
 // commutative).
 template<class FloatType>
 inline LatticeWeightTpl<FloatType> Divide(const LatticeWeightTpl<FloatType> &w1,
-                                          const LatticeWeightTpl<FloatType> &w2,
-                                          DivideType typ = DIVIDE_ANY) {
+    const LatticeWeightTpl<FloatType> &w2,
+    DivideType typ = DIVIDE_ANY) {
   typedef FloatType T;
   T a = w1.Value1() - w2.Value1(), b = w1.Value2() - w2.Value2();
   if (a != a || b != b || a == -std::numeric_limits<T>::infinity()
-     || b == -std::numeric_limits<T>::infinity()) {
+      || b == -std::numeric_limits<T>::infinity()) {
     KALDI_WARN << "LatticeWeightTpl::Divide, NaN or invalid number produced. "
                << "[dividing by zero?]  Returning zero";
     return LatticeWeightTpl<T>::Zero();
   }
   if (a == std::numeric_limits<T>::infinity() ||
-     b == std::numeric_limits<T>::infinity())
+      b == std::numeric_limits<T>::infinity())
     return LatticeWeightTpl<T>::Zero(); // not a valid number if only one is infinite.
   return LatticeWeightTpl<T>(a, b);
 }
@@ -387,8 +387,8 @@ inline LatticeWeightTpl<FloatType> Divide(const LatticeWeightTpl<FloatType> &w1,
 
 template<class FloatType>
 inline bool ApproxEqual(const LatticeWeightTpl<FloatType> &w1,
-                        const LatticeWeightTpl<FloatType> &w2,
-                        float delta = kDelta) {
+    const LatticeWeightTpl<FloatType> &w2,
+    float delta = kDelta) {
   if (w1.Value1() == w2.Value1() && w1.Value2() == w2.Value2()) return true;  // handles Zero().
   return (fabs((w1.Value1() + w1.Value2()) - (w2.Value1() + w2.Value2())) <= delta);
 }
@@ -421,7 +421,7 @@ inline std::istream &operator >>(std::istream &strm, LatticeWeightTpl<FloatType>
 
 template<class WeightType, class IntType>
 class CompactLatticeWeightTpl {
- public:
+public:
   typedef WeightType W;
 
   typedef CompactLatticeWeightTpl<WeightType, IntType> ReverseWeight;
@@ -435,8 +435,8 @@ class CompactLatticeWeightTpl {
 
   CompactLatticeWeightTpl() { }
 
-  CompactLatticeWeightTpl(const WeightType &w, const std::vector<IntType> &s):
-      weight_(w), string_(s) { }
+  CompactLatticeWeightTpl(const WeightType &w, const std::vector<IntType> &s) :
+    weight_(w), string_(s) { }
 
   CompactLatticeWeightTpl &operator=(const CompactLatticeWeightTpl<WeightType, IntType> &w) {
     weight_ = w.weight_;
@@ -511,10 +511,10 @@ class CompactLatticeWeightTpl {
   // not Kaldi-style, I/O.
   std::istream &Read(std::istream &strm) {
     weight_.Read(strm);
-    if (strm.fail()){ return strm; }
+    if (strm.fail()) { return strm; }
     int32 sz;
     ReadType(strm, &sz);
-    if (strm.fail()){ return strm; }
+    if (strm.fail()) { return strm; }
     if (sz < 0) {
       KALDI_WARN << "Negative string size!  Read failure";
       strm.clear(std::ios::badbit);
@@ -531,7 +531,7 @@ class CompactLatticeWeightTpl {
   // not Kaldi-style, I/O.
   std::ostream &Write(std::ostream &strm) const {
     weight_.Write(strm);
-    if (strm.fail()){ return strm; }
+    if (strm.fail()) { return strm; }
     int32 sz = static_cast<int32>(string_.size());
     WriteType(strm, sz);
     for(int32 i = 0; i < sz; i++)
@@ -548,7 +548,7 @@ class CompactLatticeWeightTpl {
     }
     return ans;
   }
- private:
+private:
   W weight_;
   std::vector<IntType> string_;
 
@@ -556,20 +556,20 @@ class CompactLatticeWeightTpl {
 
 template<class WeightType, class IntType>
 inline bool operator==(const CompactLatticeWeightTpl<WeightType, IntType> &w1,
-                       const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
+    const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
   return (w1.Weight() == w2.Weight() && w1.String() == w2.String());
 }
 
 template<class WeightType, class IntType>
 inline bool operator!=(const CompactLatticeWeightTpl<WeightType, IntType> &w1,
-                       const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
+    const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
   return (w1.Weight() != w2.Weight() || w1.String() != w2.String());
 }
 
 template<class WeightType, class IntType>
 inline bool ApproxEqual(const CompactLatticeWeightTpl<WeightType, IntType> &w1,
-                        const CompactLatticeWeightTpl<WeightType, IntType> &w2,
-                        float delta = kDelta) {
+    const CompactLatticeWeightTpl<WeightType, IntType> &w2,
+    float delta = kDelta) {
   return (ApproxEqual(w1.Weight(), w2.Weight(), delta) && w1.String() == w2.String());
 }
 
@@ -589,7 +589,7 @@ inline bool ApproxEqual(const CompactLatticeWeightTpl<WeightType, IntType> &w1,
 
 template<class WeightType, class IntType>
 inline int Compare(const CompactLatticeWeightTpl<WeightType, IntType> &w1,
-                   const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
+    const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
   int c1 = Compare(w1.Weight(), w2.Weight());
   if (c1 != 0) return c1;
   int l1 = w1.String().size(), l2 = w2.String().size();
@@ -607,7 +607,7 @@ inline int Compare(const CompactLatticeWeightTpl<WeightType, IntType> &w1,
 // For efficiency, override the NaturalLess template class.
 template<class FloatType, class IntType>
 class NaturalLess<CompactLatticeWeightTpl<LatticeWeightTpl<FloatType>, IntType> > {
- public:
+public:
   typedef CompactLatticeWeightTpl<LatticeWeightTpl<FloatType>, IntType> Weight;
 
   NaturalLess() {}
@@ -621,7 +621,7 @@ class NaturalLess<CompactLatticeWeightTpl<LatticeWeightTpl<FloatType>, IntType> 
 };
 template<>
 class NaturalLess<CompactLatticeWeightTpl<LatticeWeightTpl<float>, int32> > {
- public:
+public:
   typedef CompactLatticeWeightTpl<LatticeWeightTpl<float>, int32> Weight;
 
   NaturalLess() {}
@@ -635,7 +635,7 @@ class NaturalLess<CompactLatticeWeightTpl<LatticeWeightTpl<float>, int32> > {
 };
 template<>
 class NaturalLess<CompactLatticeWeightTpl<LatticeWeightTpl<double>, int32> > {
- public:
+public:
   typedef CompactLatticeWeightTpl<LatticeWeightTpl<double>, int32> Weight;
 
   NaturalLess() {}
@@ -651,7 +651,7 @@ class NaturalLess<CompactLatticeWeightTpl<LatticeWeightTpl<double>, int32> > {
 // Make sure Compare is defined for TropicalWeight, so everything works
 // if we substitute LatticeWeight for TropicalWeight.
 inline int Compare(const TropicalWeight &w1,
-                   const TropicalWeight &w2) {
+    const TropicalWeight &w2) {
   float f1 = w1.Value(), f2 = w2.Value();
   if (f1 == f2) return 0;
   else if (f1 > f2) return -1;
@@ -662,15 +662,15 @@ inline int Compare(const TropicalWeight &w1,
 
 template<class WeightType, class IntType>
 inline CompactLatticeWeightTpl<WeightType, IntType> Plus(
-    const CompactLatticeWeightTpl<WeightType, IntType> &w1,
-    const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
+  const CompactLatticeWeightTpl<WeightType, IntType> &w1,
+  const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
   return (Compare(w1, w2) >= 0 ? w1 : w2);
 }
 
 template<class WeightType, class IntType>
 inline CompactLatticeWeightTpl<WeightType, IntType> Times(
-    const CompactLatticeWeightTpl<WeightType, IntType> &w1,
-    const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
+  const CompactLatticeWeightTpl<WeightType, IntType> &w1,
+  const CompactLatticeWeightTpl<WeightType, IntType> &w2) {
   WeightType w = Times(w1.Weight(), w2.Weight());
   if (w == WeightType::Zero()) {
     return CompactLatticeWeightTpl<WeightType, IntType>::Zero();
@@ -687,8 +687,8 @@ inline CompactLatticeWeightTpl<WeightType, IntType> Times(
 
 template<class WeightType, class IntType>
 inline CompactLatticeWeightTpl<WeightType, IntType> Divide(const CompactLatticeWeightTpl<WeightType, IntType> &w1,
-                                                          const CompactLatticeWeightTpl<WeightType, IntType> &w2,
-                                                          DivideType div = DIVIDE_ANY) {
+    const CompactLatticeWeightTpl<WeightType, IntType> &w2,
+    DivideType div = DIVIDE_ANY) {
   if (w1.Weight() == WeightType::Zero()) {
     if (w2.Weight() != WeightType::Zero()) {
       return CompactLatticeWeightTpl<WeightType, IntType>::Zero();
@@ -782,7 +782,7 @@ inline std::istream &operator >>(std::istream &strm, CompactLatticeWeightTpl<Wei
 
 template<class BaseWeightType, class IntType>
 class CompactLatticeWeightCommonDivisorTpl {
- public:
+public:
   typedef CompactLatticeWeightTpl<BaseWeightType, IntType> Weight;
 
   Weight operator()(const Weight &w1, const Weight &w2) const {
@@ -803,11 +803,11 @@ class CompactLatticeWeightCommonDivisorTpl {
     Assumes there is a ScaleTupleWeight function that applies to "Weight";
     this currently only works if Weight equals LatticeWeightTpl<FloatType>
     for some FloatType.
-*/
+ */
 template<class Weight, class IntType, class ScaleFloatType>
 inline CompactLatticeWeightTpl<Weight, IntType> ScaleTupleWeight(
-    const CompactLatticeWeightTpl<Weight, IntType> &w,
-    const std::vector<std::vector<ScaleFloatType> > &scale) {
+  const CompactLatticeWeightTpl<Weight, IntType> &w,
+  const std::vector<std::vector<ScaleFloatType> > &scale) {
   return CompactLatticeWeightTpl<Weight, IntType>(
       Weight(ScaleTupleWeight(w.Weight(), scale)), w.String());
 }
@@ -817,18 +817,18 @@ inline CompactLatticeWeightTpl<Weight, IntType> ScaleTupleWeight(
     must be templates.*/
 template<class Float1, class Float2>
 inline void ConvertLatticeWeight(
-    const LatticeWeightTpl<Float1> &w_in,
-    LatticeWeightTpl<Float2> *w_out) {
+  const LatticeWeightTpl<Float1> &w_in,
+  LatticeWeightTpl<Float2> *w_out) {
   w_out->SetValue1(w_in.Value1());
   w_out->SetValue2(w_in.Value2());
 }
 
 template<class Float1, class Float2, class Int>
 inline void ConvertLatticeWeight(
-    const CompactLatticeWeightTpl<LatticeWeightTpl<Float1>, Int> &w_in,
-    CompactLatticeWeightTpl<LatticeWeightTpl<Float2>, Int> *w_out) {
+  const CompactLatticeWeightTpl<LatticeWeightTpl<Float1>, Int> &w_in,
+  CompactLatticeWeightTpl<LatticeWeightTpl<Float2>, Int> *w_out) {
   LatticeWeightTpl<Float2> weight2(w_in.Weight().Value1(),
-                                   w_in.Weight().Value2());
+      w_in.Weight().Value2());
   w_out->SetWeight(weight2);
   w_out->SetString(w_in.String());
 }
@@ -836,8 +836,8 @@ inline void ConvertLatticeWeight(
 // to convert from Lattice to standard FST
 template<class Float1, class Float2>
 inline void ConvertLatticeWeight(
-    const LatticeWeightTpl<Float1> &w_in,
-    TropicalWeightTpl<Float2> *w_out) {
+  const LatticeWeightTpl<Float1> &w_in,
+  TropicalWeightTpl<Float2> *w_out) {
   TropicalWeightTpl<Float2> w1(w_in.Value1());
   TropicalWeightTpl<Float2> w2(w_in.Value2());
   *w_out = Times(w1, w2);

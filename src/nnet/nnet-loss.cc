@@ -39,9 +39,9 @@ namespace nnet1 {
  */
 template <typename T>
 inline void CountCorrectFramesWeighted(const CuArray<T> &hyp,
-                                       const CuArray<T> &ref,
-                                       const CuVectorBase<BaseFloat> &weights,
-                                       Vector<double> *correct) {
+    const CuArray<T> &ref,
+    const CuVectorBase<BaseFloat> &weights,
+    Vector<double> *correct) {
   KALDI_ASSERT(hyp.Dim() == ref.Dim());
   KALDI_ASSERT(hyp.Dim() == weights.Dim());
   int32 dim = hyp.Dim();
@@ -60,9 +60,9 @@ inline void CountCorrectFramesWeighted(const CuArray<T> &hyp,
 
 
 void Xent::Eval(const VectorBase<BaseFloat> &frame_weights,
-                const CuMatrixBase<BaseFloat> &net_out,
-                const CuMatrixBase<BaseFloat> &targets,
-                CuMatrix<BaseFloat> *diff) {
+    const CuMatrixBase<BaseFloat> &net_out,
+    const CuMatrixBase<BaseFloat> &targets,
+    CuMatrix<BaseFloat> *diff) {
   // check inputs,
   KALDI_ASSERT(net_out.NumCols() == targets.NumCols());
   KALDI_ASSERT(net_out.NumRows() == targets.NumRows());
@@ -136,7 +136,7 @@ void Xent::Eval(const VectorBase<BaseFloat> &frame_weights,
     if (frames_progress_ > opts_.loss_report_frames) {
       // loss value,
       double progress_value =
-        (xentropy_progress_ - entropy_progress_) / frames_progress_;
+          (xentropy_progress_ - entropy_progress_) / frames_progress_;
 
       // time-related info (fps is weighted),
       double time_now = timer_.Elapsed();
@@ -164,11 +164,11 @@ void Xent::Eval(const VectorBase<BaseFloat> &frame_weights,
 
 
 void Xent::Eval(const VectorBase<BaseFloat> &frame_weights,
-                const CuMatrixBase<BaseFloat> &net_out,
-                const Posterior &post,
-                CuMatrix<BaseFloat> *diff) {
+    const CuMatrixBase<BaseFloat> &net_out,
+    const Posterior &post,
+    CuMatrix<BaseFloat> *diff) {
   int32 num_frames = net_out.NumRows(),
-    num_pdf = net_out.NumCols();
+      num_pdf = net_out.NumCols();
   KALDI_ASSERT(num_frames == post.size());
 
   // convert posterior to matrix,
@@ -181,7 +181,7 @@ void Xent::Eval(const VectorBase<BaseFloat> &frame_weights,
 
 std::string Xent::Report() {
   double loss_value =
-    (xentropy_.Sum() - entropy_.Sum()) / frames_.Sum();
+      (xentropy_.Sum() - entropy_.Sum()) / frames_.Sum();
   std::ostringstream oss;
   oss << "AvgLoss: " << loss_value << " (Xent), "
       << "[AvgXent: " << xentropy_.Sum() / frames_.Sum()
@@ -226,9 +226,9 @@ std::string Xent::ReportPerClass() {
 /* Mse */
 
 void Mse::Eval(const VectorBase<BaseFloat> &frame_weights,
-               const CuMatrixBase<BaseFloat>& net_out,
-               const CuMatrixBase<BaseFloat>& target,
-               CuMatrix<BaseFloat>* diff) {
+    const CuMatrixBase<BaseFloat>& net_out,
+    const CuMatrixBase<BaseFloat>& target,
+    CuMatrix<BaseFloat>* diff) {
   // check inputs,
   KALDI_ASSERT(net_out.NumCols() == target.NumCols());
   KALDI_ASSERT(net_out.NumRows() == target.NumRows());
@@ -281,11 +281,11 @@ void Mse::Eval(const VectorBase<BaseFloat> &frame_weights,
 
 
 void Mse::Eval(const VectorBase<BaseFloat> &frame_weights,
-               const CuMatrixBase<BaseFloat>& net_out,
-               const Posterior& post,
-               CuMatrix<BaseFloat>* diff) {
+    const CuMatrixBase<BaseFloat>& net_out,
+    const Posterior& post,
+    CuMatrix<BaseFloat>* diff) {
   int32 num_frames = net_out.NumRows(),
-    num_nn_outputs = net_out.NumCols();
+      num_nn_outputs = net_out.NumCols();
   KALDI_ASSERT(num_frames == post.size());
 
   // convert posterior to matrix,
@@ -363,11 +363,11 @@ void MultiTaskLoss::InitFromString(const std::string& s) {
 }
 
 void MultiTaskLoss::Eval(const VectorBase<BaseFloat> &frame_weights,
-            const CuMatrixBase<BaseFloat>& net_out,
-            const Posterior& post,
-            CuMatrix<BaseFloat>* diff) {
+    const CuMatrixBase<BaseFloat>& net_out,
+    const Posterior& post,
+    CuMatrix<BaseFloat>* diff) {
   int32 num_frames = net_out.NumRows(),
-    num_output = net_out.NumCols();
+      num_output = net_out.NumCols();
   KALDI_ASSERT(num_frames == post.size());
   KALDI_ASSERT(num_output == loss_dim_offset_.back());  // sum of loss-dims,
 

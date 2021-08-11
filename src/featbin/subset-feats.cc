@@ -25,8 +25,8 @@
 using namespace kaldi;
 
 int32 CopyIncludedFeats(std::string filename,
-                        SequentialBaseFloatMatrixReader *kaldi_reader,
-                        BaseFloatMatrixWriter *kaldi_writer) {
+    SequentialBaseFloatMatrixReader *kaldi_reader,
+    BaseFloatMatrixWriter *kaldi_writer) {
   unordered_set<std::string, StringHasher> include_set;
   bool binary;
   Input ki(filename, &binary);
@@ -55,8 +55,8 @@ int32 CopyIncludedFeats(std::string filename,
 }
 
 int32 CopyExcludedFeats(std::string filename,
-                        SequentialBaseFloatMatrixReader *kaldi_reader,
-                        BaseFloatMatrixWriter *kaldi_writer) {
+    SequentialBaseFloatMatrixReader *kaldi_reader,
+    BaseFloatMatrixWriter *kaldi_writer) {
   unordered_set<std::string, StringHasher> exclude_set;
   bool binary;
   Input ki(filename, &binary);

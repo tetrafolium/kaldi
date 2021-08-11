@@ -42,12 +42,12 @@ int main(int argc, char *argv[]) {
         " nnet-am-reinitialize 1.mdl exp/tri6/final.mdl 2.mdl\n";
 
     bool binary_write = true;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
 
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     std::string nnet_rxfilename = po.GetArg(1),
         transition_model_rxfilename = po.GetArg(2),
         nnet_wxfilename = po.GetArg(3);
-    
+
     TransitionModel orig_trans_model;
     AmNnet am_nnet;
     {
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
     ReadKaldiObject(transition_model_rxfilename, &new_trans_model);
 
     am_nnet.ResizeOutputLayer(new_trans_model.NumPdfs());
-    
+
     {
       Output ko(nnet_wxfilename, binary_write);
       new_trans_model.Write(ko.Stream(), binary_write);

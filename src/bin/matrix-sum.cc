@@ -28,8 +28,8 @@ namespace kaldi {
 // for back-compatibility with an older form, we support scaling
 // of the first two input archives.
 int32 TypeOneUsage(const ParseOptions &po,
-                   BaseFloat scale1,
-                   BaseFloat scale2) {
+    BaseFloat scale1,
+    BaseFloat scale2) {
   int32 num_args = po.NumArgs();
   std::string matrix_in_fn1 = po.GetArg(1),
       matrix_out_fn = po.GetArg(num_args);
@@ -40,8 +40,8 @@ int32 TypeOneUsage(const ParseOptions &po,
   // Input matrices
   SequentialBaseFloatMatrixReader matrix_reader1(matrix_in_fn1);
   std::vector<RandomAccessBaseFloatMatrixReader*>
-      matrix_readers(num_args-2,
-                     static_cast<RandomAccessBaseFloatMatrixReader*>(NULL));
+  matrix_readers(num_args-2,
+      static_cast<RandomAccessBaseFloatMatrixReader*>(NULL));
   std::vector<std::string> matrix_in_fns(num_args-2);
   for (int32 i = 2; i < num_args; ++i) {
     matrix_readers[i-2] = new RandomAccessBaseFloatMatrixReader(po.GetArg(i));
@@ -115,8 +115,8 @@ int32 TypeOneUsageAverage(const ParseOptions &po) {
   // Input matrices
   SequentialBaseFloatMatrixReader matrix_reader1(matrix_in_fn1);
   std::vector<RandomAccessBaseFloatMatrixReader*>
-      matrix_readers(num_args-2,
-                     static_cast<RandomAccessBaseFloatMatrixReader*>(NULL));
+  matrix_readers(num_args-2,
+      static_cast<RandomAccessBaseFloatMatrixReader*>(NULL));
   std::vector<std::string> matrix_in_fns(num_args-2);
   for (int32 i = 2; i < num_args; ++i) {
     matrix_readers[i-2] = new RandomAccessBaseFloatMatrixReader(po.GetArg(i));
@@ -177,7 +177,7 @@ int32 TypeOneUsageAverage(const ParseOptions &po) {
 }
 
 int32 TypeTwoUsage(const ParseOptions &po,
-                   bool binary) {
+    bool binary) {
   KALDI_ASSERT(po.NumArgs() == 2);
   KALDI_ASSERT(ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier &&
                "matrix-sum: first argument must be an rspecifier");
@@ -224,7 +224,7 @@ int32 TypeTwoUsage(const ParseOptions &po,
 // sum a bunch of single files to produce a single file [including
 // extended filenames, of course]
 int32 TypeThreeUsage(const ParseOptions &po,
-                     bool binary, bool average) {
+    bool binary, bool average) {
   KALDI_ASSERT(po.NumArgs() >= 2);
   for (int32 i = 1; i < po.NumArgs(); i++) {
     if (ClassifyRspecifier(po.GetArg(i), NULL, NULL) != kNoRspecifier) {
@@ -309,22 +309,22 @@ int main(int argc, char *argv[]) {
         ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) != kNoWspecifier) {
       if (average)
         // average option with type one usage.";
-	    exit_status = TypeOneUsageAverage(po);
-	  else
+        exit_status = TypeOneUsageAverage(po);
+      else
         // output to table.
         exit_status = TypeOneUsage(po, scale1, scale2);
     } else if (po.NumArgs() == 2 &&
-               ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier &&
-               ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) ==
-               kNoWspecifier) {
+        ClassifyRspecifier(po.GetArg(1), NULL, NULL) != kNoRspecifier &&
+        ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) ==
+        kNoWspecifier) {
       KALDI_ASSERT(scale1 == 1.0 && scale2 == 1.0);
       if (average)
         KALDI_ERR << "--average option not compatible with type two usage.";
       // input from a single table, output not to table.
       exit_status = TypeTwoUsage(po, binary);
     } else if (po.NumArgs() >= 2 &&
-               ClassifyRspecifier(po.GetArg(1), NULL, NULL) == kNoRspecifier &&
-               ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) == kNoWspecifier) {
+        ClassifyRspecifier(po.GetArg(1), NULL, NULL) == kNoRspecifier &&
+        ClassifyWspecifier(po.GetArg(N), NULL, NULL, NULL) == kNoWspecifier) {
       KALDI_ASSERT(scale1 == 1.0 && scale2 == 1.0);
       // summing flat files.
       exit_status = TypeThreeUsage(po, binary, average);

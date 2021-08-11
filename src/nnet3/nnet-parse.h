@@ -43,25 +43,25 @@ namespace nnet3 {
    context if it can't tokenize the input.
  */
 bool DescriptorTokenize(const std::string &input,
-                        std::vector<std::string> *tokens);
+    std::vector<std::string> *tokens);
 
 
 /*
-  Returns true if name 'name' matches pattern 'pattern'.  The pattern
-  format is: everything is literal, except '*' matches zero or more
-  characters.  (Like filename globbing in UNIX).
+   Returns true if name 'name' matches pattern 'pattern'.  The pattern
+   format is: everything is literal, except '*' matches zero or more
+   characters.  (Like filename globbing in UNIX).
  */
 bool NameMatchesPattern(const char *name,
-                        const char *pattern);
+    const char *pattern);
 
 
 /**
-  Return a string used in error messages.  Here, "is" will be from an
-  istringstream derived from a single line or part of a line.
-  If "is" is at EOF or in error state, this should just say "end of line",
-  else if the contents of "is" before EOF is <20 characters it should return
-  it all, else it should return the first 20 characters followed by "...".
-*/
+   Return a string used in error messages.  Here, "is" will be from an
+   istringstream derived from a single line or part of a line.
+   If "is" is at EOF or in error state, this should just say "end of line",
+   else if the contents of "is" before EOF is <20 characters it should return
+   it all, else it should return the first 20 characters followed by "...".
+ */
 std::string ErrorContext(std::istream &is);
 
 std::string ErrorContext(const std::string &str);
@@ -70,7 +70,7 @@ std::string ErrorContext(const std::string &str);
     printing stats in info lines.  For example:
    "[percentiles(0,1,2,5 10,20,50,80,90 95,98,99,100)=(0.001,0.003,0.003,0.004 \
       0.005,0.01,0.07,0.11,0.14 0.18,0.24,0.29,0.39), mean=0.0745, stddev=0.0611]"
-*/
+ */
 std::string SummarizeVector(const VectorBase<float> &vec);
 
 std::string SummarizeVector(const VectorBase<double> &vec);
@@ -87,9 +87,9 @@ std::string SummarizeVector(const CuVectorBase<BaseFloat> &vec);
      ", bias-rms=0.2416", and this represents and uncentered standard deviation.
  */
 void PrintParameterStats(std::ostringstream &os,
-                         const std::string &name,
-                         const CuVectorBase<BaseFloat> &params,
-                         bool include_mean = false);
+    const std::string &name,
+    const CuVectorBase<BaseFloat> &params,
+    bool include_mean = false);
 
 /** Print to 'os' some information about the mean and standard deviation of
     some parameters, used in Info() functions in nnet-simple-component.cc.
@@ -110,12 +110,12 @@ void PrintParameterStats(std::ostringstream &os,
     ", linear-params-singular-values=[percentiles(0,1........, stddev=0.0508]"
  */
 void PrintParameterStats(std::ostringstream &os,
-                         const std::string &name,
-                         const CuMatrix<BaseFloat> &params,
-                         bool include_mean = false,
-                         bool include_row_norms = false,
-                         bool include_column_norms = false,
-                         bool include_singular_values = false);
+    const std::string &name,
+    const CuMatrix<BaseFloat> &params,
+    bool include_mean = false,
+    bool include_row_norms = false,
+    bool include_column_norms = false,
+    bool include_singular_values = false);
 
 
 } // namespace nnet3

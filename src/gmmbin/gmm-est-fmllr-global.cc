@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
         "Usage: gmm-est-fmllr-global [options] <gmm-in> <feature-rspecifier> "
         "<transform-wspecifier>\n"
         "e.g.: gmm-est-fmllr-global 1.ubm scp:feats.scp ark:trans.1\n";
-    
+
     ParseOptions po(usage);
     FmllrOptions fmllr_opts;
     string spk2utt_rspecifier;
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
         tot_t += utt_tot_t;
       }
     }
-    KALDI_LOG << "Done " << num_done << " files, " 
+    KALDI_LOG << "Done " << num_done << " files, "
               << num_err << " with errors.";
     KALDI_LOG << "Overall fMLLR auxf impr per frame is "
               << (tot_impr / tot_t) << " over " << tot_t << " frames.";

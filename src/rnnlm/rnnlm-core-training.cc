@@ -26,26 +26,26 @@ namespace kaldi {
 namespace rnnlm {
 
 
-ObjectiveTracker::ObjectiveTracker(int32 reporting_interval):
-    reporting_interval_(reporting_interval),
-    num_egs_this_interval_(0),
-    tot_weight_this_interval_(0.0),
-    num_objf_this_interval_(0.0),
-    den_objf_this_interval_(0.0),
-    exact_den_objf_this_interval_(0.0),
-    num_egs_(0),
-    tot_weight_(0.0),
-    num_objf_(0.0),
-    den_objf_(0.0),
-    exact_den_objf_(0.0) {
+ObjectiveTracker::ObjectiveTracker(int32 reporting_interval) :
+  reporting_interval_(reporting_interval),
+  num_egs_this_interval_(0),
+  tot_weight_this_interval_(0.0),
+  num_objf_this_interval_(0.0),
+  den_objf_this_interval_(0.0),
+  exact_den_objf_this_interval_(0.0),
+  num_egs_(0),
+  tot_weight_(0.0),
+  num_objf_(0.0),
+  den_objf_(0.0),
+  exact_den_objf_(0.0) {
   KALDI_ASSERT(reporting_interval > 0);
 }
 
 
 void ObjectiveTracker::AddStats(
-    BaseFloat weight, BaseFloat num_objf,
-    BaseFloat den_objf,
-    BaseFloat exact_den_objf) {
+  BaseFloat weight, BaseFloat num_objf,
+  BaseFloat den_objf,
+  BaseFloat exact_den_objf) {
   num_egs_this_interval_++;
   tot_weight_this_interval_ += weight;
   num_objf_this_interval_ += num_objf;
@@ -95,7 +95,7 @@ void ObjectiveTracker::PrintStatsThisInterval() const {
      << weight << " words (weighted)";
 
   os << "; exact = (" << num_objf << " + " << exact_den_objf
-     << ") = " << exact_tot_objf ;
+     << ") = " << exact_tot_objf;
 
   KALDI_LOG << os.str();
 }
@@ -113,21 +113,21 @@ void ObjectiveTracker::PrintStatsOverall() const {
      << ") = " << tot_objf << " over " << weight << " words (weighted) in "
      << num_egs_ << " minibatches";
   os << "; exact = (" << num_objf << " + " << exact_den_objf
-     << ") = " << exact_tot_objf ;
+     << ") = " << exact_tot_objf;
 
   KALDI_LOG << os.str();
 }
 
 
 RnnlmCoreTrainer::RnnlmCoreTrainer(const RnnlmCoreTrainerOptions &config,
-                                   const RnnlmObjectiveOptions &objective_config,
-                                   nnet3::Nnet *nnet):
-    config_(config),
-    objective_config_(objective_config),
-    nnet_(nnet),
-    compiler_(*nnet),  // for now we don't make available other options
-    num_minibatches_processed_(0),
-    objf_info_(10) {
+    const RnnlmObjectiveOptions &objective_config,
+    nnet3::Nnet *nnet) :
+  config_(config),
+  objective_config_(objective_config),
+  nnet_(nnet),
+  compiler_(*nnet),    // for now we don't make available other options
+  num_minibatches_processed_(0),
+  objf_info_(10) {
   ZeroComponentStats(nnet);
   KALDI_ASSERT(config.momentum >= 0.0 &&
                config.max_param_change >= 0.0);
@@ -140,10 +140,10 @@ RnnlmCoreTrainer::RnnlmCoreTrainer(const RnnlmCoreTrainerOptions &config,
 
 
 void RnnlmCoreTrainer::Train(
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv) {
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv) {
   using namespace nnet3;
 
   bool need_model_derivative = true;
@@ -161,7 +161,7 @@ void RnnlmCoreTrainer::Train(
   NnetComputeOptions compute_opts;
 
   NnetComputer computer(compute_opts, *computation,
-                        *nnet_, delta_nnet_);
+      *nnet_, delta_nnet_);
 
   ProvideInput(minibatch, derived, word_embedding, &computer);
   computer.Run();  // This is the forward pass.
@@ -194,11 +194,11 @@ void RnnlmCoreTrainer::Train(
 }
 
 void RnnlmCoreTrainer::TrainBackstitch(
-    bool is_backstitch_step1,
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv) {
+  bool is_backstitch_step1,
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv) {
   using namespace nnet3;
 
   // backstitch training is incompatible with momentum > 0
@@ -223,7 +223,7 @@ void RnnlmCoreTrainer::TrainBackstitch(
   }
   ResetGenerators(nnet_);
   NnetComputer computer(compute_opts, *computation,
-                        *nnet_, delta_nnet_);
+      *nnet_, delta_nnet_);
 
   ProvideInput(minibatch, derived, word_embedding, &computer);
   computer.Run();  // This is the forward pass.
@@ -272,14 +272,14 @@ void RnnlmCoreTrainer::TrainBackstitch(
 }
 
 void RnnlmCoreTrainer::ProvideInput(
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    nnet3::NnetComputer *computer) {
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  nnet3::NnetComputer *computer) {
   int32 embedding_dim = word_embedding.NumCols();
   CuMatrix<BaseFloat> input_embeddings(derived.cu_input_words.Dim(),
-                                       embedding_dim,
-                                       kUndefined);
+      embedding_dim,
+      kUndefined);
   input_embeddings.CopyRows(word_embedding,
                             derived.cu_input_words);
   computer->AcceptInput("input", &input_embeddings);
@@ -301,7 +301,7 @@ void RnnlmCoreTrainer::PrintMaxChangeStats() const {
         KALDI_LOG << "For " << delta_nnet_->GetComponentName(c)
                   << ", per-component max-change was enforced "
                   << ((100.0 * num_max_change_per_component_applied_[i]) /
-                      num_minibatches_processed_)
+        num_minibatches_processed_)
                   << "% of the time.";
       i++;
     }
@@ -309,19 +309,19 @@ void RnnlmCoreTrainer::PrintMaxChangeStats() const {
   if (num_max_change_global_applied_ > 0)
     KALDI_LOG << "The global max-change was enforced "
               << (100.0 * num_max_change_global_applied_) /
-                 (num_minibatches_processed_ *
-                 (config_.backstitch_training_scale == 0.0 ? 1.0 :
-                 1.0 + 1.0 / config_.backstitch_training_interval))
+      (num_minibatches_processed_ *
+    (config_.backstitch_training_scale == 0.0 ? 1.0 :
+    1.0 + 1.0 / config_.backstitch_training_interval))
               << "% of the time.";
 }
 
 void RnnlmCoreTrainer::ProcessOutput(
-    bool is_backstitch_step1,
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    nnet3::NnetComputer *computer,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv) {
+  bool is_backstitch_step1,
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  nnet3::NnetComputer *computer,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv) {
   // 'output' is the output of the neural network.  The row-index
   // combines the time (with higher stride) and the member 'n'
   // of the minibatch (with stride 1); the number of columns is

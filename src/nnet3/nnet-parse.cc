@@ -28,7 +28,7 @@ namespace kaldi {
 namespace nnet3 {
 
 bool DescriptorTokenize(const std::string &input,
-                        std::vector<std::string> *tokens) {
+    std::vector<std::string> *tokens) {
   KALDI_ASSERT(tokens != NULL);
   size_t start = input.find_first_not_of(" \t"), size = input.size();
   tokens->clear();
@@ -93,11 +93,11 @@ std::string ErrorContext(const std::string &str) {
 
 static void PrintFloatSuccinctly(std::ostream &os, BaseFloat f) {
   if (fabs(f) < 10000.0 && fabs(f) >= 10.0) {
-    os  << std::fixed << std::setprecision(0) << f;
+    os << std::fixed << std::setprecision(0) << f;
   } else if (fabs(f) >= 0.995) {
-    os  << std::fixed << std::setprecision(1) << f;
+    os << std::fixed << std::setprecision(1) << f;
   } else if (fabs(f) >= 0.01) {
-    os  << std::fixed << std::setprecision(2) << f;
+    os << std::fixed << std::setprecision(2) << f;
   } else {
     os << std::setprecision(1) << f;
   }
@@ -155,9 +155,9 @@ std::string SummarizeVector(const CuVectorBase<BaseFloat> &cu_vec) {
 }
 
 void PrintParameterStats(std::ostringstream &os,
-                         const std::string &name,
-                         const CuVectorBase<BaseFloat> &params,
-                         bool include_mean) {
+    const std::string &name,
+    const CuVectorBase<BaseFloat> &params,
+    bool include_mean) {
   os << std::setprecision(4);
   os << ", " << name << '-';
   if (include_mean) {
@@ -172,12 +172,12 @@ void PrintParameterStats(std::ostringstream &os,
 }
 
 void PrintParameterStats(std::ostringstream &os,
-                         const std::string &name,
-                         const CuMatrix<BaseFloat> &params,
-                         bool include_mean,
-                         bool include_row_norms,
-                         bool include_column_norms,
-                         bool include_singular_values) {
+    const std::string &name,
+    const CuMatrix<BaseFloat> &params,
+    bool include_mean,
+    bool include_row_norms,
+    bool include_column_norms,
+    bool include_singular_values) {
   os << std::setprecision(4);
   os << ", " << name << '-';
   int32 dim = params.NumRows() * params.NumCols();
@@ -222,7 +222,7 @@ void PrintParameterStats(std::ostringstream &os,
 
 
 void ParseConfigLines(const std::vector<std::string> &lines,
-                      std::vector<ConfigLine> *config_lines) {
+    std::vector<ConfigLine> *config_lines) {
   config_lines->resize(lines.size());
   for (size_t i = 0; i < lines.size(); i++) {
     bool ret = (*config_lines)[i].ParseLine(lines[i]);
@@ -235,7 +235,7 @@ void ParseConfigLines(const std::vector<std::string> &lines,
 bool NameMatchesPattern(const char *name, const char *pattern) {
   if (*pattern == '*') {
     return NameMatchesPattern(name, pattern + 1) ||
-        (*name != '\0' && NameMatchesPattern(name + 1, pattern));
+           (*name != '\0' && NameMatchesPattern(name + 1, pattern));
   } else if (*name == *pattern) {
     return (*name == '\0' || NameMatchesPattern(name + 1, pattern + 1));
   } else {

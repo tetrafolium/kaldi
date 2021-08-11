@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     fst::SymbolTable *syms = fst::SymbolTable::ReadText(phones_symtab_filename);
     if (!syms)
       KALDI_ERR << "Could not read symbol table from file "
-                 << phones_symtab_filename;
+                << phones_symtab_filename;
     std::vector<std::string> names(syms->NumSymbols());
     for (size_t i = 0; i < syms->NumSymbols(); i++)
       names[i] = syms->Find(i);
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 
     trans_model.Print(std::cout,
                       names,
-                      (accumulator_filename != "" ? &occs : NULL));
+        (accumulator_filename != "" ? &occs : NULL));
 
     delete syms;
   } catch(const std::exception &e) {

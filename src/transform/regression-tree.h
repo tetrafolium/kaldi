@@ -39,16 +39,16 @@ namespace kaldi {
  *  class.
  */
 class RegressionTree {
- public:
+public:
   RegressionTree() {}
 
   /// Top-down clustering of the Gaussians in a model based on their means.
   /// If sil_indices is nonempty, will put silence in a special class
   /// using a top-level split.
   void BuildTree(const Vector<BaseFloat> &state_occs,
-                 const std::vector<int32> &sil_indices,
-                 const AmDiagGmm &am,
-                 int32 max_clusters);
+      const std::vector<int32> &sil_indices,
+      const AmDiagGmm &am,
+      int32 max_clusters);
 
   /// Parses the regression tree and finds the nodes whose occupancies (read
   /// from stats_in) are greater than min_count. The regclass_out vector has
@@ -57,9 +57,9 @@ class RegressionTree {
   /// of regression classes. Return value is true if at least one regression
   /// class passed the count cutoff, false otherwise.
   bool GatherStats(const std::vector<AffineXformStats*> &stats_in,
-                   double min_count,
-                   std::vector<int32> *regclasses_out,
-                   std::vector<AffineXformStats*> *stats_out) const;
+      double min_count,
+      std::vector<int32> *regclasses_out,
+      std::vector<AffineXformStats*> *stats_out) const;
 
   void Write(std::ostream &out, bool binary) const;
   void Read(std::istream &in, bool binary, const AmDiagGmm &am);
@@ -67,12 +67,12 @@ class RegressionTree {
   /// Accessors (const)
   int32 NumBaseclasses() const { return num_baseclasses_; }
   const std::vector< std::pair<int32, int32> >& GetBaseclass(int32 bclass)
-      const { return baseclasses_[bclass]; }
+  const { return baseclasses_[bclass]; }
   int32 Gauss2BaseclassId(size_t pdf_id, size_t gauss_id) const {
     return gauss2bclass_[pdf_id][gauss_id];
   }
 
- private:
+private:
   int32 num_nodes_;  ///< Total (non-leaf+leaf) nodes
 
   /// For each node, index of its parent: size = num_nodes_

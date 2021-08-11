@@ -49,15 +49,15 @@ struct MfccOptions {
                     // sqrt(2) on C0 to be the same as HTK.
 
   MfccOptions() : mel_opts(23),
-                  // defaults the #mel-banks to 23 for the MFCC computations.
-                  // this seems to be common for 16khz-sampled data,
-                  // but for 8khz-sampled data, 15 may be better.
-                  num_ceps(13),
-                  use_energy(true),
-                  energy_floor(0.0),
-                  raw_energy(true),
-                  cepstral_lifter(22.0),
-                  htk_compat(false) {}
+    // defaults the #mel-banks to 23 for the MFCC computations.
+    // this seems to be common for 16khz-sampled data,
+    // but for 8khz-sampled data, 15 may be better.
+    num_ceps(13),
+    use_energy(true),
+    energy_floor(0.0),
+    raw_energy(true),
+    cepstral_lifter(22.0),
+    htk_compat(false) {}
 
   void Register(OptionsItf *opts) {
     frame_opts.Register(opts);
@@ -85,7 +85,7 @@ struct MfccOptions {
 
 // This is the new-style interface to the MFCC computation.
 class MfccComputer {
- public:
+public:
   typedef MfccOptions Options;
   explicit MfccComputer(const MfccOptions &opts);
   MfccComputer(const MfccComputer &other);
@@ -118,18 +118,18 @@ class MfccComputer {
        vector as a workspace, which is why it's a non-const pointer.
      @param [out] feature  Pointer to a vector of size this->Dim(), to which
          the computed feature will be written.
-  */
+   */
   void Compute(BaseFloat signal_raw_log_energy,
-               BaseFloat vtln_warp,
-               VectorBase<BaseFloat> *signal_frame,
-               VectorBase<BaseFloat> *feature);
+      BaseFloat vtln_warp,
+      VectorBase<BaseFloat> *signal_frame,
+      VectorBase<BaseFloat> *feature);
 
   ~MfccComputer();
- private:
+private:
   // disallow assignment.
   MfccComputer &operator = (const MfccComputer &in);
 
- protected:
+protected:
   const MelBanks *GetMelBanks(BaseFloat vtln_warp);
 
   MfccOptions opts_;

@@ -29,9 +29,9 @@
 // Create FST that accepts the phone sequence, with any number
 // of word-start and word-end symbol in between each phone.
 void CreatePhonesAltFst(const std::vector<int32> &phones,
-                        int32 word_start_sym,
-                        int32 word_end_sym,
-                        fst::VectorFst<fst::StdArc> *ofst) {
+    int32 word_start_sym,
+    int32 word_end_sym,
+    fst::VectorFst<fst::StdArc> *ofst) {
   using fst::StdArc;
   typedef fst::StdArc::StateId StateId;
   typedef fst::StdArc::Weight Weight;
@@ -104,12 +104,12 @@ int main(int argc, char *argv[]) {
     if (!ConvertStringToInteger(word_start_sym_str, &word_start_sym)
         || word_start_sym <= 0)
       KALDI_ERR << "Invalid word start symbol (expecting integer >= 0): "
-                 << word_start_sym_str;
+                << word_start_sym_str;
     if (!ConvertStringToInteger(word_end_sym_str, &word_end_sym)
         || word_end_sym <= 0 || word_end_sym == word_start_sym)
       KALDI_ERR << "Invalid word end symbol (expecting integer >= 0"
-                 << ", different from word start symbol): "
-                 << word_end_sym_str;
+                << ", different from word start symbol): "
+                << word_end_sym_str;
 
     // L should be lexicon with word start and end symbols marked.
     VectorFst<StdArc> *L = fst::ReadFstKaldi(lex_fst_filename);

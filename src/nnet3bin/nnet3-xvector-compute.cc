@@ -47,7 +47,7 @@ static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
   std::shared_ptr<const NnetComputation> computation(compiler->Compile(request));
   Nnet *nnet_to_update = NULL;  // we're not doing any update.
   NnetComputer computer(NnetComputeOptions(), *computation,
-                  nnet, nnet_to_update);
+      nnet, nnet_to_update);
   CuMatrix<BaseFloat> input_feats_cu(features);
   computer.AcceptInput("input", &input_feats_cu);
   computer.Run();
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     std::string cached_compiler_in;
     std::string cached_compiler_out;
     int32 chunk_size = -1,
-      min_chunk_size = 100;
+        min_chunk_size = 100;
     bool pad_input = true;
 
     opts.Register(&po);
@@ -135,8 +135,8 @@ int main(int argc, char *argv[]) {
 #endif
 
     std::string nnet_rxfilename = po.GetArg(1),
-                feature_rspecifier = po.GetArg(2),
-                vector_wspecifier = po.GetArg(3);
+        feature_rspecifier = po.GetArg(2),
+        vector_wspecifier = po.GetArg(3);
 
     Nnet nnet;
     ReadKaldiObject(nnet_rxfilename, &nnet);
@@ -145,12 +145,12 @@ int main(int argc, char *argv[]) {
     CollapseModel(CollapseModelConfig(), &nnet);
 
     CachingOptimizingCompiler compiler(nnet, opts.optimize_config, compiler_config);
-    
+
     if (!cached_compiler_in.empty()) {
-        KALDI_LOG << "Reading cache from " << cached_compiler_in;
-        bool cache_binary_in;
-        Input ki(cached_compiler_in, &cache_binary_in);
-        compiler.ReadCache(ki.Stream(), cache_binary_in);
+      KALDI_LOG << "Reading cache from " << cached_compiler_in;
+      bool cache_binary_in;
+      Input ki(cached_compiler_in, &cache_binary_in);
+      compiler.ReadCache(ki.Stream(), cache_binary_in);
     }
 
     BaseFloatVectorWriter vector_writer(vector_wspecifier);
@@ -170,8 +170,8 @@ int main(int argc, char *argv[]) {
         continue;
       }
       int32 num_rows = features.NumRows(),
-            feat_dim = features.NumCols(),
-            this_chunk_size = chunk_size;
+          feat_dim = features.NumCols(),
+          this_chunk_size = chunk_size;
       if (!pad_input && num_rows < min_chunk_size) {
         KALDI_WARN << "Minimum chunk size of " << min_chunk_size
                    << " is greater than the number of rows "
@@ -240,12 +240,12 @@ int main(int argc, char *argv[]) {
               << (elapsed*100.0/frame_count);
     KALDI_LOG << "Done " << num_success << " utterances, failed for "
               << num_fail;
-    
+
     if (!cached_compiler_out.empty()) {
-        KALDI_LOG << "Writing cache to " << cached_compiler_out;
-        bool binary_write = true;
-        Output ko(cached_compiler_out, &binary_write);
-        compiler.WriteCache(ko.Stream(), binary_write);
+      KALDI_LOG << "Writing cache to " << cached_compiler_out;
+      bool binary_write = true;
+      Output ko(cached_compiler_out, &binary_write);
+      compiler.WriteCache(ko.Stream(), binary_write);
     }
 
     if (num_success != 0) return 0;

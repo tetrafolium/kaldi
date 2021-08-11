@@ -48,12 +48,12 @@ namespace kaldi {
 // requires other configs that it creates separately, and which are not included
 // here: namely, OnlineNnet2FeaturePipelineConfig and OnlineEndpointConfig.
 struct OnlineNnet2DecodingConfig {
-  
+
   LatticeFasterDecoderConfig decoder_opts;
   nnet2::DecodableNnet2OnlineOptions decodable_opts;
-  
+
   OnlineNnet2DecodingConfig() {  decodable_opts.acoustic_scale = 0.1; }
-  
+
   void Register(OptionsItf *opts) {
     decoder_opts.Register(opts);
     decodable_opts.Register(opts);
@@ -63,17 +63,17 @@ struct OnlineNnet2DecodingConfig {
 /**
    You will instantiate this class when you want to decode a single
    utterance using the online-decoding setup for neural nets.
-*/
+ */
 class SingleUtteranceNnet2Decoder {
- public:
+public:
   // Constructor.  The feature_pipeline_ pointer is not owned in this
   // class, it's owned externally.
   SingleUtteranceNnet2Decoder(const OnlineNnet2DecodingConfig &config,
-                              const TransitionModel &tmodel,
-                              const nnet2::AmNnet &model,
-                              const fst::Fst<fst::StdArc> &fst,
-                              OnlineFeatureInterface *feature_pipeline);
-  
+      const TransitionModel &tmodel,
+      const nnet2::AmNnet &model,
+      const fst::Fst<fst::StdArc> &fst,
+      OnlineFeatureInterface *feature_pipeline);
+
   /// advance the decoding as far as we can.
   void AdvanceDecoding();
 
@@ -83,21 +83,21 @@ class SingleUtteranceNnet2Decoder {
   void FinalizeDecoding();
 
   int32 NumFramesDecoded() const;
-  
+
   /// Gets the lattice.  The output lattice has any acoustic scaling in it
   /// (which will typically be desirable in an online-decoding context); if you
   /// want an un-scaled lattice, scale it using ScaleLattice() with the inverse
   /// of the acoustic weight.  "end_of_utterance" will be true if you want the
   /// final-probs to be included.
   void GetLattice(bool end_of_utterance,
-                  CompactLattice *clat) const;
-  
+      CompactLattice *clat) const;
+
   /// Outputs an FST corresponding to the single best path through the current
   /// lattice. If "use_final_probs" is true AND we reached the final-state of
   /// the graph then it will include those as final-probs, else it will treat
   /// all final-probs as one.
   void GetBestPath(bool end_of_utterance,
-                   Lattice *best_path) const;
+      Lattice *best_path) const;
 
 
   /// This function calls EndpointDetected from online-endpoint.h,
@@ -105,23 +105,23 @@ class SingleUtteranceNnet2Decoder {
   bool EndpointDetected(const OnlineEndpointConfig &config);
 
   const LatticeFasterOnlineDecoder &Decoder() const { return decoder_; }
-  
+
   ~SingleUtteranceNnet2Decoder() { }
- private:
+private:
 
   OnlineNnet2DecodingConfig config_;
 
   OnlineFeatureInterface *feature_pipeline_;
 
   const TransitionModel &tmodel_;
-  
+
   nnet2::DecodableNnet2Online decodable_;
-  
+
   LatticeFasterOnlineDecoder decoder_;
-  
+
 };
 
-  
+
 /// @} End of "addtogroup onlinedecoding"
 
 }  // namespace kaldi

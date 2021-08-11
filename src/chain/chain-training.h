@@ -71,9 +71,9 @@ struct ChainTrainingOptions {
   // should have a softmax as its final nonlinearity.
   BaseFloat xent_regularize;
 
-  ChainTrainingOptions(): l2_regularize(0.0), out_of_range_regularize(0.01),
-                          leaky_hmm_coefficient(1.0e-05),
-                          xent_regularize(0.0) { }
+  ChainTrainingOptions() : l2_regularize(0.0), out_of_range_regularize(0.01),
+    leaky_hmm_coefficient(1.0e-05),
+    xent_regularize(0.0) { }
 
   void Register(OptionsItf *opts) {
     opts->Register("l2-regularize", &l2_regularize, "l2 regularization "
@@ -97,7 +97,7 @@ struct ChainTrainingOptions {
 
     numerator_opts.Register(opts);
   }
-  
+
   // Config for numerator graph object
   GenericNumeratorComputationOptions numerator_opts;
 };
@@ -135,16 +135,16 @@ struct ChainTrainingOptions {
                            peak memory use).  xent_output_deriv will be used in
                            the cross-entropy regularization code; it is also
                            used in computing the cross-entropy objective value.
-*/
+ */
 void ComputeChainObjfAndDeriv(const ChainTrainingOptions &opts,
-                              const DenominatorGraph &den_graph,
-                              const Supervision &supervision,
-                              const CuMatrixBase<BaseFloat> &nnet_output,
-                              BaseFloat *objf,
-                              BaseFloat *l2_term,
-                              BaseFloat *weight,
-                              CuMatrixBase<BaseFloat> *nnet_output_deriv,
-                              CuMatrix<BaseFloat> *xent_output_deriv = NULL);
+    const DenominatorGraph &den_graph,
+    const Supervision &supervision,
+    const CuMatrixBase<BaseFloat> &nnet_output,
+    BaseFloat *objf,
+    BaseFloat *l2_term,
+    BaseFloat *weight,
+    CuMatrixBase<BaseFloat> *nnet_output_deriv,
+    CuMatrix<BaseFloat> *xent_output_deriv = NULL);
 
 
 

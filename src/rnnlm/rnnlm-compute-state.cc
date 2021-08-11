@@ -27,10 +27,10 @@ namespace kaldi {
 namespace rnnlm {
 
 RnnlmComputeStateInfo::RnnlmComputeStateInfo(
-    const RnnlmComputeStateComputationOptions &opts,
-    const kaldi::nnet3::Nnet &rnnlm,
-    const CuMatrix<BaseFloat> &word_embedding_mat):
-    opts(opts), rnnlm(rnnlm), word_embedding_mat(word_embedding_mat) {
+  const RnnlmComputeStateComputationOptions &opts,
+  const kaldi::nnet3::Nnet &rnnlm,
+  const CuMatrix<BaseFloat> &word_embedding_mat) :
+  opts(opts), rnnlm(rnnlm), word_embedding_mat(word_embedding_mat) {
   KALDI_ASSERT(IsSimpleNnet(rnnlm));
   int32 left_context, right_context;
   ComputeSimpleNnetContext(rnnlm, &left_context, &right_context);
@@ -71,16 +71,16 @@ RnnlmComputeStateInfo::RnnlmComputeStateInfo(
 }
 
 RnnlmComputeState::RnnlmComputeState(const RnnlmComputeStateInfo &info,
-                                     int32 bos_index) :
-    info_(info),
-    computer_(info_.opts.compute_config, info_.computation,
-              info_.rnnlm, NULL),  // NULL is 'nnet_to_update'
-    previous_word_(-1),
-    normalization_factor_(0.0) {
+    int32 bos_index) :
+  info_(info),
+  computer_(info_.opts.compute_config, info_.computation,
+      info_.rnnlm, NULL),          // NULL is 'nnet_to_update'
+  previous_word_(-1),
+  normalization_factor_(0.0) {
   AddWord(bos_index);
 }
 
-RnnlmComputeState::RnnlmComputeState(const RnnlmComputeState &other):
+RnnlmComputeState::RnnlmComputeState(const RnnlmComputeState &other) :
   info_(other.info_), computer_(other.computer_),
   previous_word_(other.previous_word_),
   normalization_factor_(other.normalization_factor_)
@@ -128,7 +128,7 @@ void RnnlmComputeState::GetLogProbOfWords(CuMatrixBase<BaseFloat> *output) const
   const CuMatrix<BaseFloat> &word_embedding_mat = info_.word_embedding_mat;
 
   KALDI_ASSERT(output->NumRows() == 1
-                && output->NumCols() == word_embedding_mat.NumCols());
+      && output->NumCols() == word_embedding_mat.NumCols());
   output->Row(0).AddMatVec(1.0, word_embedding_mat, kNoTrans,
                    predicted_word_embedding_->Row(0), 0.0);
 

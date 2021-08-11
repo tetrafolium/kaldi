@@ -59,11 +59,11 @@ int main(int argc, char *argv[]) {
 
     int32 num_transition_ids;
 
-      bool binary_in;
-      Input ki(model_rxfilename, &binary_in);
-      TransitionModel trans_model;
-      trans_model.Read(ki.Stream(), binary_in);
-      num_transition_ids = trans_model.NumTransitionIds();
+    bool binary_in;
+    Input ki(model_rxfilename, &binary_in);
+    TransitionModel trans_model;
+    trans_model.Read(ki.Stream(), binary_in);
+    num_transition_ids = trans_model.NumTransitionIds();
 
     Vector<double> transition_accs(num_transition_ids+1); // +1 because they're
     // 1-based; position zero is empty.  We'll write as float.

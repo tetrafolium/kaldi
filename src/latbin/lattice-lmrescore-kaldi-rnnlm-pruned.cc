@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string lm_to_subtract_rxfilename, lats_rspecifier,
-                word_embedding_rxfilename, rnnlm_rxfilename, lats_wspecifier;
+        word_embedding_rxfilename, rnnlm_rxfilename, lats_wspecifier;
 
     lm_to_subtract_rxfilename = po.GetArg(1),
     word_embedding_rxfilename = po.GetArg(2);
@@ -122,9 +122,9 @@ int main(int argc, char *argv[]) {
       lm_to_subtract_fst = fst::ReadAndPrepareLmFst(
           lm_to_subtract_rxfilename);
       lm_to_subtract_det_backoff =
-        new fst::BackoffDeterministicOnDemandFst<StdArc>(*lm_to_subtract_fst);
+          new fst::BackoffDeterministicOnDemandFst<StdArc>(*lm_to_subtract_fst);
       lm_to_subtract_det_scale =
-           new fst::ScaleDeterministicOnDemandFst(-lm_scale,
+          new fst::ScaleDeterministicOnDemandFst(-lm_scale,
                                                   lm_to_subtract_det_backoff);
     }
 
@@ -144,12 +144,12 @@ int main(int argc, char *argv[]) {
 
     int32 num_done = 0, num_err = 0;
 
-    rnnlm::KaldiRnnlmDeterministicFst* lm_to_add_orig = 
-         new rnnlm::KaldiRnnlmDeterministicFst(max_ngram_order, info);
+    rnnlm::KaldiRnnlmDeterministicFst* lm_to_add_orig =
+        new rnnlm::KaldiRnnlmDeterministicFst(max_ngram_order, info);
 
     for (; !compact_lattice_reader.Done(); compact_lattice_reader.Next()) {
       fst::DeterministicOnDemandFst<StdArc> *lm_to_add =
-         new fst::ScaleDeterministicOnDemandFst(lm_scale, lm_to_add_orig);
+          new fst::ScaleDeterministicOnDemandFst(lm_scale, lm_to_add_orig);
 
       std::string key = compact_lattice_reader.Key();
       CompactLattice clat = compact_lattice_reader.Value();
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
       TopSortCompactLatticeIfNeeded(&clat);
 
       fst::ComposeDeterministicOnDemandFst<StdArc> combined_lms(
-          lm_to_subtract_det_scale, lm_to_add);
+        lm_to_subtract_det_scale, lm_to_add);
 
       // Composes lattice with language model.
       CompactLattice composed_clat;

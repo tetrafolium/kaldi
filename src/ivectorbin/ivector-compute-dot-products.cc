@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
         continue;
       }
       const Vector<BaseFloat> &ivector1 = ivector1_reader.Value(key1),
-          &ivector2 = ivector2_reader.Value(key2);
+      &ivector2 = ivector2_reader.Value(key2);
       // The following will crash if the dimensions differ, but
       // they would likely also differ for all the ivectors so it's probably
       // best to just crash.

@@ -56,18 +56,18 @@ int main(int argc, char *argv[]) {
       po.PrintUsage();
       exit(1);
     }
-      
+
     std::string post_rspecifier1 = po.GetArg(1),
         post_rspecifier2 = po.GetArg(2),
         post_wspecifier = po.GetArg(3);
 
     kaldi::SequentialPosteriorReader posterior_reader1(post_rspecifier1);
     kaldi::RandomAccessPosteriorReader posterior_reader2(post_rspecifier2);
-    kaldi::PosteriorWriter posterior_writer(post_wspecifier); 
+    kaldi::PosteriorWriter posterior_writer(post_wspecifier);
 
     int32 num_done = 0, num_err = 0;
     int64 num_frames_tot = 0, num_frames_disjoint = 0;
-   
+
     for (; !posterior_reader1.Done(); posterior_reader1.Next()) {
       std::string key = posterior_reader1.Key();
       kaldi::Posterior posterior1 = posterior_reader1.Value();

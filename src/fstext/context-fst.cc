@@ -25,24 +25,24 @@ using std::vector;
 
 
 InverseContextFst::InverseContextFst(
-    Label subsequential_symbol,
-    const vector<int32>& phones,
-    const vector<int32>& disambig_syms,
-    int32 context_width,
-    int32 central_position):
-    context_width_(context_width),
-    central_position_(central_position),
-    phone_syms_(phones),
-    disambig_syms_(disambig_syms),
-    subsequential_symbol_(subsequential_symbol) {
+  Label subsequential_symbol,
+  const vector<int32>& phones,
+  const vector<int32>& disambig_syms,
+  int32 context_width,
+  int32 central_position) :
+  context_width_(context_width),
+  central_position_(central_position),
+  phone_syms_(phones),
+  disambig_syms_(disambig_syms),
+  subsequential_symbol_(subsequential_symbol) {
 
   {  // This block checks the inputs.
     KALDI_ASSERT(subsequential_symbol != 0
-                 && disambig_syms_.count(subsequential_symbol) == 0
-                 && phone_syms_.count(subsequential_symbol) == 0);
+        && disambig_syms_.count(subsequential_symbol) == 0
+        && phone_syms_.count(subsequential_symbol) == 0);
     if (phone_syms_.empty())
       KALDI_WARN << "Context FST created but there are no phone symbols: probably "
-          "input FST was empty.";
+        "input FST was empty.";
     KALDI_ASSERT(phone_syms_.count(0) == 0 && disambig_syms_.count(0) == 0 &&
                  central_position_ >= 0 && central_position_ < context_width_);
     for (size_t i = 0; i < phones.size(); i++) {
@@ -83,7 +83,7 @@ InverseContextFst::InverseContextFst(
 
 
 void InverseContextFst::ShiftSequenceLeft(Label label,
-                                          std::vector<int32> *phone_seq) {
+    std::vector<int32> *phone_seq) {
   if (!phone_seq->empty()) {
     phone_seq->erase(phone_seq->begin());
     phone_seq->push_back(label);
@@ -91,8 +91,8 @@ void InverseContextFst::ShiftSequenceLeft(Label label,
 }
 
 void InverseContextFst::GetFullPhoneSequence(
-    const std::vector<int32> &seq, Label label,
-    std::vector<int32> *full_phone_sequence) {
+  const std::vector<int32> &seq, Label label,
+  std::vector<int32> *full_phone_sequence) {
   int32 context_width = context_width_;
   full_phone_sequence->reserve(context_width);
   full_phone_sequence->insert(full_phone_sequence->end(),
@@ -194,9 +194,9 @@ void InverseContextFst::CreateDisambigArc(StateId s, Label ilabel, Arc *arc) {
 }
 
 void InverseContextFst::CreatePhoneOrEpsArc(StateId src, StateId dest,
-                                            Label ilabel,
-                                            const vector<int32> &phone_seq,
-                                            Arc *arc) {
+    Label ilabel,
+    const vector<int32> &phone_seq,
+    Arc *arc) {
   KALDI_PARANOID_ASSERT(phone_seq[central_position_] != subsequential_symbol_);
 
   arc->ilabel = ilabel;
@@ -244,11 +244,11 @@ StdArc::Label InverseContextFst::FindLabel(const vector<int32> &label_vec) {
 
 
 void ComposeContext(const vector<int32> &disambig_syms_in,
-                    int32 context_width, int32 central_position,
-                    VectorFst<StdArc> *ifst,
-                    VectorFst<StdArc> *ofst,
-                    vector<vector<int32> > *ilabels_out,
-                    bool project_ifst) {
+    int32 context_width, int32 central_position,
+    VectorFst<StdArc> *ifst,
+    VectorFst<StdArc> *ofst,
+    vector<vector<int32> > *ilabels_out,
+    bool project_ifst) {
   KALDI_ASSERT(ifst != NULL && ofst != NULL);
   KALDI_ASSERT(context_width > 0);
   KALDI_ASSERT(central_position >= 0);
@@ -258,7 +258,7 @@ void ComposeContext(const vector<int32> &disambig_syms_in,
   std::sort(disambig_syms.begin(), disambig_syms.end());
 
   vector<int32> all_syms;
-  GetInputSymbols(*ifst, false/*no eps*/, &all_syms);
+  GetInputSymbols(*ifst, false /*no eps*/, &all_syms);
   std::sort(all_syms.begin(), all_syms.end());
   vector<int32> phones;
   for (size_t i = 0; i < all_syms.size(); i++)
@@ -284,7 +284,7 @@ void ComposeContext(const vector<int32> &disambig_syms_in,
   }
 
   InverseContextFst inv_c(subseq_sym, phones, disambig_syms,
-                          context_width, central_position);
+      context_width, central_position);
 
   // The following statement is equivalent to the following
   // (if FSTs had the '*' operator for composition):
@@ -295,7 +295,7 @@ void ComposeContext(const vector<int32> &disambig_syms_in,
 }
 
 void AddSubsequentialLoop(StdArc::Label subseq_symbol,
-                          MutableFst<StdArc> *fst) {
+    MutableFst<StdArc> *fst) {
   typedef StdArc Arc;
   typedef typename Arc::StateId StateId;
   typedef typename Arc::Weight Weight;
@@ -303,7 +303,7 @@ void AddSubsequentialLoop(StdArc::Label subseq_symbol,
   vector<StateId> final_states;
   for (StateIterator<MutableFst<Arc> > siter(*fst); !siter.Done(); siter.Next()) {
     StateId s = siter.Value();
-    if (fst->Final(s) != Weight::Zero())  final_states.push_back(s);
+    if (fst->Final(s) != Weight::Zero()) final_states.push_back(s);
   }
 
   StateId superfinal = fst->AddState();
@@ -323,7 +323,7 @@ void AddSubsequentialLoop(StdArc::Label subseq_symbol,
 }
 
 void WriteILabelInfo(std::ostream &os, bool binary,
-                     const vector<vector<int32> > &info) {
+    const vector<vector<int32> > &info) {
   int32 size = info.size();
   kaldi::WriteBasicType(os, binary, size);
   for (int32 i = 0; i < size; i++) {
@@ -333,7 +333,7 @@ void WriteILabelInfo(std::ostream &os, bool binary,
 
 
 void ReadILabelInfo(std::istream &is, bool binary,
-                    vector<vector<int32> > *info) {
+    vector<vector<int32> > *info) {
   int32 size = info->size();
   kaldi::ReadBasicType(is, binary, &size);
   info->resize(size);
@@ -343,9 +343,9 @@ void ReadILabelInfo(std::istream &is, bool binary,
 }
 
 SymbolTable *CreateILabelInfoSymbolTable(const vector<vector<int32> > &info,
-                                         const SymbolTable &phones_symtab,
-                                         std::string separator,
-                                         std::string initial_disambig) {  // e.g. separator = "/", initial-disambig="#-1"
+    const SymbolTable &phones_symtab,
+    std::string separator,
+    std::string initial_disambig) {                                       // e.g. separator = "/", initial-disambig="#-1"
   KALDI_ASSERT(!info.empty() && info[0].empty());
   SymbolTable *ans = new SymbolTable("ilabel-info-symtab");
   int64 s = ans->AddSymbol(phones_symtab.Find(static_cast<int64>(0)));
@@ -355,7 +355,7 @@ SymbolTable *CreateILabelInfoSymbolTable(const vector<vector<int32> > &info,
       KALDI_ERR << "Invalid ilabel-info";
     }
     if (info[i].size() == 1 &&
-       info[i][0] <= 0) {
+        info[i][0] <= 0) {
       if (info[i][0] == 0) {  // special symbol at start that we want to call #-1.
         s = ans->AddSymbol(initial_disambig);
         if (s != i) {

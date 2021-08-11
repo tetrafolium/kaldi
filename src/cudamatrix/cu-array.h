@@ -39,12 +39,12 @@ template <typename T> class CuSubArray;
    store things other than float/double: they are intended to store integers or
    small structs.  Their CPU-based equivalents are std::vector, and we provide
    ways to copy to/from a std::vector of the same type.
-*/
+ */
 template<typename T>
 class CuArrayBase {
   friend class CuArray<T>;
   friend class CuSubArray<T>;
- public:
+public:
   /// Return the vector dimension
   MatrixIndexT Dim() const { return dim_;  }
 
@@ -102,10 +102,10 @@ class CuArrayBase {
   /// Asserts the vector is non-empty, otherwise crashes.
   T Max() const;
 
- protected:
+protected:
   /// Default constructor: make it protected so the user cannot
   /// instantiate this class.
-  CuArrayBase<T>(): data_(NULL), dim_(0) { }
+  CuArrayBase<T>() : data_(NULL), dim_(0) { }
 
 
   T *data_;  ///< GPU data pointer (if GPU not available,
@@ -122,7 +122,7 @@ class CuArrayBase {
  */
 template<typename T>
 class CuArray: public CuArrayBase<T> {
- public:
+public:
 
   /// Default constructor, initialized data_ to NULL and dim_ to 0 via
   /// constructor of CuArrayBase.
@@ -131,7 +131,7 @@ class CuArray: public CuArrayBase<T> {
   /// Constructor with memory initialisation.  resize_type may be kSetZero or
   /// kUndefined.
   explicit CuArray<T>(MatrixIndexT dim, MatrixResizeType resize_type = kSetZero)
-     { Resize(dim, resize_type); }
+  { Resize(dim, resize_type); }
 
   /// Constructor from CPU-based int vector
   explicit CuArray<T>(const std::vector<T> &src) { CopyFromVec(src); }
@@ -178,12 +178,12 @@ class CuArray: public CuArrayBase<T> {
 
 template<typename T>
 class CuSubArray: public CuArrayBase<T> {
- public:
+public:
   /// Constructor as a range of an existing CuArray or CuSubArray.  Note: like
   /// similar constructors in class CuVector and others, it can be used to evade
   /// 'const' constraints; don't do that.
   explicit CuSubArray<T>(const CuArrayBase<T> &src,
-                         MatrixIndexT offset, MatrixIndexT dim);
+      MatrixIndexT offset, MatrixIndexT dim);
 
   /// Construct from raw pointers
   CuSubArray(const T* data, MatrixIndexT length) {

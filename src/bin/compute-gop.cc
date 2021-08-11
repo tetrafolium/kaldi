@@ -74,9 +74,9 @@ namespace kaldi {
 
  */
 void FrameLevelLpp(const SubVector<BaseFloat> &prob_row,
-                   const std::vector<std::set<int32> > &pdf2phones,
-                   const std::vector<int32> *phone_map,
-                   Vector<BaseFloat> *out_frame_level_lpp) {
+    const std::vector<std::set<int32> > &pdf2phones,
+    const std::vector<int32> *phone_map,
+    Vector<BaseFloat> *out_frame_level_lpp) {
   for (int32 i = 0; i < prob_row.Dim(); i++) {
     std::set<int32> dest_idxs;
     for (int32 ph : pdf2phones.at(i)) {
@@ -126,10 +126,10 @@ int main(int argc, char *argv[]) {
     }
 
     std::string model_filename = po.GetArg(1),
-                alignments_rspecifier = po.GetArg(2),
-                prob_rspecifier = po.GetArg(3),
-                gop_wspecifier = po.GetArg(4),
-                feat_wspecifier = po.GetArg(5);
+        alignments_rspecifier = po.GetArg(2),
+        prob_rspecifier = po.GetArg(3),
+        gop_wspecifier = po.GetArg(4),
+        feat_wspecifier = po.GetArg(5);
 
     TransitionModel trans_model;
     {
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
       if (!alignment_reader.HasKey(key)) {
         KALDI_WARN << "No alignment for utterance " << key;
         continue;
-      }       
+      }
       auto alignment = alignment_reader.Value(key);
       Matrix<BaseFloat> &probs = prob_reader.Value();
       if (log_applied) probs.ApplyExp();
@@ -180,14 +180,14 @@ int main(int argc, char *argv[]) {
         // Calculate LPP and LPR for each pure-phone
         Vector<BaseFloat> frame_level_lpp(phone_num);
         FrameLevelLpp(probs.Row(i), pdf2phones,
-                      (phone_map_rxfilename != "") ? &phone_map : NULL,
+            (phone_map_rxfilename != "") ? &phone_map : NULL,
                       &frame_level_lpp);
 
         // LPP(p)=\frac{1}{t_e-t_s+1} \sum_{t=t_s}^{t_e}\log p(p|o_t)
         lpp_part.AddVec(1, frame_level_lpp);
         duration++;
 
-        int32 next_phone_id = (i < frame_num - 1) ? alignment[i + 1] - 1: -1;
+        int32 next_phone_id = (i < frame_num - 1) ? alignment[i + 1] - 1 : -1;
         if (next_phone_id != cur_phone_id) {
           // The current phone's feature have been ready
           lpp_part.Scale(1.0 / duration);

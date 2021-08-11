@@ -43,14 +43,14 @@ namespace kaldi {
    Daniel Povey, Kaisheng Yao. A basis representation of constrained
    MLLR transforms for robust adaptation. Computer Speech and Language,
    volume 26:35–51, 2012.
-*/
+ */
 
 struct BasisFmllrOptions {
   int32 num_iters;
   BaseFloat size_scale; // how many basis elements we add for each new frame.
   BaseFloat min_count;
   int32 step_size_iters;
-  BasisFmllrOptions(): num_iters(10), size_scale(0.2), min_count(50.0), step_size_iters(3) { }
+  BasisFmllrOptions() : num_iters(10), size_scale(0.2), min_count(50.0), step_size_iters(3) { }
   void Register(OptionsItf *opts) {
     opts->Register("num-iters", &num_iters,
                    "Number of iterations in basis fMLLR update during testing");
@@ -72,12 +72,12 @@ struct BasisFmllrOptions {
  */
 class BasisFmllrAccus {
 
- public:
+public:
   BasisFmllrAccus() { }
   explicit BasisFmllrAccus(int32 dim) {
-      dim_ = dim;
-      beta_ = 0;
-      ResizeAccus(dim);
+    dim_ = dim;
+    beta_ = 0;
+    ResizeAccus(dim);
   }
 
   void ResizeAccus(int32 dim);
@@ -106,10 +106,10 @@ class BasisFmllrAccus {
  */
 class BasisFmllrEstimate {
 
- public:
-  BasisFmllrEstimate(): dim_(0), basis_size_(0) { }
+public:
+  BasisFmllrEstimate() : dim_(0), basis_size_(0) { }
   explicit BasisFmllrEstimate(int32 dim) {
-      dim_ = dim; basis_size_ = dim * (dim + 1);
+    dim_ = dim; basis_size_ = dim * (dim + 1);
   }
 
   /// Routines for reading and writing fMLLR basis matrices
@@ -124,7 +124,7 @@ class BasisFmllrEstimate {
   /// Note that SVD is performed in the normalized space. The base matrices
   /// are finally converted back to the unnormalized space.
   void EstimateFmllrBasis(const AmDiagGmm &am_gmm,
-                          const BasisFmllrAccus &basis_accus);
+      const BasisFmllrAccus &basis_accus);
 
   /// This function computes the preconditioner matrix, prior to base matrices
   /// estimation. Since the expected values of G statistics are used, it
@@ -132,7 +132,7 @@ class BasisFmllrEstimate {
   /// accumulations AffineXformStats
   /// See section 5.1 of the paper.
   void ComputeAmDiagPrecond(const AmDiagGmm &am_gmm,
-                            SpMatrix<double> *pre_cond);
+      SpMatrix<double> *pre_cond);
 
   int32 Dim() const { return dim_; }
 
@@ -148,11 +148,11 @@ class BasisFmllrEstimate {
   /// provided.
   /// See section 5.3 of the paper for more details.
   double ComputeTransform(const AffineXformStats &spk_stats,
-                          Matrix<BaseFloat> *out_xform,
-                          Vector<BaseFloat> *coefficients,
-                          BasisFmllrOptions options) const;
+      Matrix<BaseFloat> *out_xform,
+      Vector<BaseFloat> *coefficients,
+      BasisFmllrOptions options) const;
 
- private:
+private:
 
   /// Basis matrices. Dim is [T] [D] [D+1]
   /// T is the number of bases

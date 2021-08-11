@@ -31,11 +31,11 @@ namespace chain {
 // This wrapper function does all the job of processing the features and
 // lattice into ChainSupervision objects, and writing them out.
 static bool ProcessSupervision(const TransitionModel &trans_model,
-                               const ContextDependencyInterface &ctx_dep,
-                               const ProtoSupervision &proto_sup,
-                               const std::string &key,
-                               bool convert_to_pdfs,
-                               SupervisionWriter *supervision_writer) {
+    const ContextDependencyInterface &ctx_dep,
+    const ProtoSupervision &proto_sup,
+    const std::string &key,
+    bool convert_to_pdfs,
+    SupervisionWriter *supervision_writer) {
   Supervision supervision;
   if (!ProtoSupervisionToSupervision(ctx_dep, trans_model,
                                      proto_sup, convert_to_pdfs,
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
       }
     } else {
       SequentialInt32PairVectorReader phone_and_dur_reader(
-          phone_durs_or_lat_rspecifier);
+        phone_durs_or_lat_rspecifier);
       for (; !phone_and_dur_reader.Done(); phone_and_dur_reader.Next()) {
         std::string key = phone_and_dur_reader.Key();
         const std::vector<std::pair<int32,int32> > &ali =

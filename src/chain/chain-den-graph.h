@@ -51,7 +51,7 @@ namespace chain {
      GPU.
  */
 class DenominatorGraph {
- public:
+public:
 
   // the number of states in the HMM.
   int32 NumStates() const;
@@ -65,7 +65,7 @@ class DenominatorGraph {
   // Initialize from epsilon-free acceptor FST with pdf-ids plus one as the
   // labels.  'num_pdfs' is only needeed for checking.
   DenominatorGraph(const fst::StdVectorFst &fst,
-                   int32 num_pdfs);
+      int32 num_pdfs);
 
   // returns the pointer to the forward-transitions array, indexed by hmm-state,
   // which will be on the GPU if we're using a GPU.
@@ -99,13 +99,13 @@ class DenominatorGraph {
   // This function ensures that 'ofst' is ilabel sorted (which will be useful in
   // composition).
   void GetNormalizationFst(const fst::StdVectorFst &ifst,
-                           fst::StdVectorFst *ofst);
+      fst::StdVectorFst *ofst);
 
   // This function is only used in testing code.
   void ScaleInitialProbs(BaseFloat s) { initial_probs_.Scale(s); }
 
   // Use default copy constructor and assignment operator.
- private:
+private:
   // functions called from the constructor
   void SetTransitions(const fst::StdVectorFst &fst, int32 num_pfds);
 
@@ -150,16 +150,16 @@ void MinimizeAcceptorNoPush(fst::StdVectorFst *fst);
 // is an acceptor, but does not check this (only looks at its
 // ilabels).
 void MapFstToPdfIdsPlusOne(const TransitionModel &trans_model,
-                           fst::StdVectorFst *fst);
+    fst::StdVectorFst *fst);
 
 // Starting from an acceptor on phones that represents some kind of compiled
 // language model (with no disambiguation symbols), this funtion creates the
 // denominator-graph.  Note: there is similar code in chain-supervision.cc, when
 // creating the supervision graph.
 void CreateDenominatorFst(const ContextDependency &ctx_dep,
-                          const TransitionModel &trans_model,
-                          const fst::StdVectorFst &phone_lm,
-                          fst::StdVectorFst *den_graph);
+    const TransitionModel &trans_model,
+    const fst::StdVectorFst &phone_lm,
+    fst::StdVectorFst *den_graph);
 
 
 }  // namespace chain

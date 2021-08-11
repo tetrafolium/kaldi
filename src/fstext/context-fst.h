@@ -47,7 +47,7 @@
    from symbols representing phone context windows (e.g. "a, b, c") to
    individual phones, e.g. "a".  Search for "hbka.pdf" ("Speech Recognition
    with Weighted Finite State Transducers") by M. Mohri, for more context.
-*/
+ */
 
 #include <unordered_map>
 using std::unordered_map;
@@ -68,18 +68,18 @@ namespace fst {
 
 /// Utility function for writing ilabel-info vectors to disk.
 void WriteILabelInfo(std::ostream &os, bool binary,
-                     const std::vector<std::vector<int32> > &ilabel_info);
+    const std::vector<std::vector<int32> > &ilabel_info);
 
 /// Utility function for reading ilabel-info vectors from disk.
 void ReadILabelInfo(std::istream &is, bool binary,
-                    std::vector<std::vector<int32> > *ilabel_info);
+    std::vector<std::vector<int32> > *ilabel_info);
 
 
 /// The following function is mainly of use for printing and debugging.
 SymbolTable *CreateILabelInfoSymbolTable(const std::vector<std::vector<int32> > &ilabel_info,
-                                         const SymbolTable &phones_symtab,
-                                         std::string separator,
-                                         std::string disambig_prefix);  // e.g. separator = "/", disambig_prefix = "#"
+    const SymbolTable &phones_symtab,
+    std::string separator,
+    std::string disambig_prefix);                                       // e.g. separator = "/", disambig_prefix = "#"
 
 
 
@@ -107,29 +107,29 @@ SymbolTable *CreateILabelInfoSymbolTable(const std::vector<std::vector<int32> > 
                   fst C.fst.
  */
 void ComposeContext(const std::vector<int32> &disambig_syms,
-                    int32 context_width, int32 central_position,
-                    VectorFst<StdArc> *ifst,
-                    VectorFst<StdArc> *ofst,
-                    std::vector<std::vector<int32> > *ilabels_out,
-                    bool project_ifst = false);
+    int32 context_width, int32 central_position,
+    VectorFst<StdArc> *ifst,
+    VectorFst<StdArc> *ofst,
+    std::vector<std::vector<int32> > *ilabels_out,
+    bool project_ifst = false);
 
 
 /**
-  Modifies an FST so that it transuces the same paths, but the input side of the
-  paths can all have the subsequential symbol '$' appended to them any number of
-  times (we could easily specify the number of times, but accepting any number of
-  repetitions is just more convenient).  The actual way we do this is for each
-  final state, we add a transition with weight equal to the final-weight of that
-  state, with input-symbol '$' and output-symbols \<eps\>, and ending in a new
-  super-final state that has unit final-probability and a unit-weight self-loop
-  with '$' on its input and \<eps\> on its output.  The reason we don't just
-  add a loop to each final-state has to do with preserving stochasticity
-  (see \ref fst_algo_stochastic).  We keep the final-probability in all the
-  original final-states rather than setting them to zero, so the resulting FST
-  can accept zero '$' symbols at the end (in case we had no right context).
-*/
+   Modifies an FST so that it transuces the same paths, but the input side of the
+   paths can all have the subsequential symbol '$' appended to them any number of
+   times (we could easily specify the number of times, but accepting any number of
+   repetitions is just more convenient).  The actual way we do this is for each
+   final state, we add a transition with weight equal to the final-weight of that
+   state, with input-symbol '$' and output-symbols \<eps\>, and ending in a new
+   super-final state that has unit final-probability and a unit-weight self-loop
+   with '$' on its input and \<eps\> on its output.  The reason we don't just
+   add a loop to each final-state has to do with preserving stochasticity
+   (see \ref fst_algo_stochastic).  We keep the final-probability in all the
+   original final-states rather than setting them to zero, so the resulting FST
+   can accept zero '$' symbols at the end (in case we had no right context).
+ */
 void AddSubsequentialLoop(StdArc::Label subseq_symbol,
-                          MutableFst<StdArc> *fst);
+    MutableFst<StdArc> *fst);
 
 
 /*
@@ -147,7 +147,7 @@ void AddSubsequentialLoop(StdArc::Label subseq_symbol,
 
    Search for "hbka.pdf" ("Speech Recognition with Weighted Finite State
    Transducers") by M. Mohri, for more context.
-*/
+ */
 
 class InverseContextFst: public DeterministicOnDemandFst<StdArc> {
 public:
@@ -170,12 +170,12 @@ public:
         @param [in] central_position  Central position in context window (zero-based),
                                    e.g. 1 for triphone.
      See \ref graph_context for more details.
-  */
+   */
   InverseContextFst(Label subsequential_symbol,
-                    const std::vector<int32>& phones,
-                    const std::vector<int32>& disambig_syms,
-                    int32 context_width,
-                    int32 central_position);
+      const std::vector<int32>& phones,
+      const std::vector<int32>& disambig_syms,
+      int32 context_width,
+      int32 central_position);
 
 
   virtual StateId Start() { return 0; }
@@ -223,7 +223,7 @@ private:
   /// epsilon, instead of a phone-in-context, if the system has right context
   /// and we are very near the beginning of the phone sequence.
   inline void CreatePhoneOrEpsArc(StateId src, StateId dst, Label ilabel,
-                                  const std::vector<int32> &phone_seq, Arc *arc);
+      const std::vector<int32> &phone_seq, Arc *arc);
 
 
   /// If phone_seq is nonempty then this function it left by one and appends
@@ -241,19 +241,19 @@ private:
   /// 'subsequential_symbol_' does not appear in positions 0 through
   /// central_position_ of 'seq'.
   inline void GetFullPhoneSequence(const std::vector<int32> &seq, Label label,
-                                   std::vector<int32> *full_phone_sequence);
+      std::vector<int32> *full_phone_sequence);
 
   // Map type to map from vectors of int32 (representing phonetic contexts,
   // which will be of dimension context_width - 1) to StateId (corresponding to
   // the state index in this FST).
   typedef unordered_map<std::vector<int32>, StateId,
-                        kaldi::VectorHasher<int32> > VectorToStateMap;
+          kaldi::VectorHasher<int32> > VectorToStateMap;
 
   // Map type to map from vectors of int32 (representing ilabel-info,
   // see http://kaldi-asr.org/doc/tree_externals.html#tree_ilabel) to
   // Label (the output label in this FST).
   typedef unordered_map<std::vector<int32>, Label,
-                        kaldi::VectorHasher<int32> > VectorToLabelMap;
+          kaldi::VectorHasher<int32> > VectorToLabelMap;
 
 
   // Sometimes called N, context_width_ this is the width of the

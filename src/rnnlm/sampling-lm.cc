@@ -38,7 +38,7 @@ void SamplingLm::ConsumeNGram(const NGram& ngram) {
     unigram_probs_[word] = Exp(ngram.logprob);
     if (ngram.backoff != 0.0)
       higher_order_probs_[cur_order - 1][ngram.words].backoff_prob =
-        Exp(ngram.backoff);
+          Exp(ngram.backoff);
   } else {
     HistType history(ngram.words.begin(), ngram.words.end() - 1);
     // Note: we'll later on change the probability, subtracting the
@@ -66,9 +66,9 @@ void SamplingLm::HeaderAvailable() {
 }
 
 BaseFloat SamplingLm::GetProbWithBackoff(
-    const std::vector<int32> &history,
-    const HistoryState *state,
-    int32 word) const {
+  const std::vector<int32> &history,
+  const HistoryState *state,
+  int32 word) const {
   if (state == NULL) {
     int32 order = history.size() + 1;
     if (order == 1) {
@@ -96,9 +96,9 @@ BaseFloat SamplingLm::GetProbWithBackoff(
     } else {
       // we have to back off.
       std::vector<int32> backoff_history(history.begin() + 1,
-                                         history.end());
+          history.end());
       return state->backoff_prob *
-          GetProbWithBackoff(backoff_history, NULL, word);
+             GetProbWithBackoff(backoff_history, NULL, word);
     }
   }
 }
@@ -119,7 +119,7 @@ void SamplingLm::ReadComplete() {
   int32 max_order = Order();
   for (int32 order = max_order; order >= 2; order--) {
     std::unordered_map<HistType, HistoryState, VectorHasher<int32> >
-        &this_map = higher_order_probs_[order - 2];
+    &this_map = higher_order_probs_[order - 2];
     std::unordered_map<HistType, HistoryState,
         VectorHasher<int32> >::iterator
         hist_iter = this_map.begin(), hist_end = this_map.end();
@@ -164,10 +164,10 @@ void SamplingLm::ReadComplete() {
 }
 
 void SamplingLm::AddBackoffToHistoryStates(
-    const WeightedHistType &histories,
-    WeightedHistType *histories_closure,
-    BaseFloat *total_weight_out,
-    BaseFloat *unigram_weight_out) const {
+  const WeightedHistType &histories,
+  WeightedHistType *histories_closure,
+  BaseFloat *total_weight_out,
+  BaseFloat *unigram_weight_out) const {
   // the implementation of this function is not as efficient as it could be,
   // but it should not dominate.
   std::vector<std::pair<HistType, BaseFloat> >::const_iterator
@@ -185,7 +185,7 @@ void SamplingLm::AddBackoffToHistoryStates(
 
     // back off until the history exists or until we reached the unigram state.
     while (cur_hist_len > 0 &&
-           higher_order_probs_[cur_hist_len - 1].count(history) == 0) {
+        higher_order_probs_[cur_hist_len - 1].count(history) == 0) {
       history.erase(history.begin());
       cur_hist_len--;
     }
@@ -221,8 +221,8 @@ void SamplingLm::AddBackoffToHistoryStates(
 
 
 BaseFloat SamplingLm::GetDistribution(
-    const WeightedHistType &histories,
-    std::vector<std::pair<int32, BaseFloat> > *non_unigram_probs_out) const {
+  const WeightedHistType &histories,
+  std::vector<std::pair<int32, BaseFloat> > *non_unigram_probs_out) const {
   std::unordered_map<int32, BaseFloat> non_unigram_probs_temp;
   // Call the other version of GetDistribution().
   BaseFloat ans = GetDistribution(histories, &non_unigram_probs_temp);
@@ -237,8 +237,8 @@ BaseFloat SamplingLm::GetDistribution(
 }
 
 BaseFloat SamplingLm::GetDistribution(
-    const WeightedHistType &histories,
-    std::unordered_map<int32, BaseFloat> *non_unigram_probs) const {
+  const WeightedHistType &histories,
+  std::unordered_map<int32, BaseFloat> *non_unigram_probs) const {
   WeightedHistType histories_closure;
   BaseFloat total_weight, total_unigram_weight;
   AddBackoffToHistoryStates(histories, &histories_closure,
@@ -254,7 +254,7 @@ BaseFloat SamplingLm::GetDistribution(
     KALDI_ASSERT(order > 1);  // unigram history is not included at this point.
     std::unordered_map<HistType, HistoryState,
         VectorHasher<int32> >::const_iterator it_hist =
-           higher_order_probs_[order - 2].find(history);
+        higher_order_probs_[order - 2].find(history);
     KALDI_ASSERT(it_hist != higher_order_probs_[order - 2].end());
     std::vector<std::pair<int32, BaseFloat> >::const_iterator
         word_iter = it_hist->second.words_and_probs.begin(),
@@ -283,7 +283,7 @@ BaseFloat SamplingLm::GetDistribution(
     static int32 num_times_warned = 0;
     if (num_times_warned < 10) {
       KALDI_WARN << "Total weight does not have expected value (problem in "
-          "your ARPA file, or this code).  Won't warn >10 times.";
+        "your ARPA file, or this code).  Won't warn >10 times.";
       num_times_warned++;
     }
   }
@@ -291,15 +291,15 @@ BaseFloat SamplingLm::GetDistribution(
   return total_unigram_weight;
 }
 
-SamplingLm::SamplingLm(const SamplingLmEstimator &estimator):
-    ArpaFileParser(ArpaParseOptions(), NULL),
-    unigram_probs_(estimator.unigram_probs_),
-    higher_order_probs_(estimator.history_states_.size() - 1) {
+SamplingLm::SamplingLm(const SamplingLmEstimator &estimator) :
+  ArpaFileParser(ArpaParseOptions(), NULL),
+  unigram_probs_(estimator.unigram_probs_),
+  higher_order_probs_(estimator.history_states_.size() - 1) {
   for (int32 o = 2;
-       o <= static_cast<int32>(estimator.history_states_.size()); o++) {
+      o <= static_cast<int32>(estimator.history_states_.size()); o++) {
     higher_order_probs_[o-2].reserve(estimator.history_states_[o-1].size());
     unordered_map<std::vector<int32>, SamplingLmEstimator::HistoryState*,
-                  VectorHasher<int32> >::const_iterator
+        VectorHasher<int32> >::const_iterator
         iter = estimator.history_states_[o-1].begin(),
         end =  estimator.history_states_[o-1].end();
     for (; iter != end; ++iter) {
@@ -334,7 +334,7 @@ void SamplingLm::Write(std::ostream &os, bool binary) const {
   KALDI_ASSERT(!unigram_probs_.empty());
   // we have read and write functions in class Vector, so use that.
   SubVector<BaseFloat> probs(const_cast<BaseFloat*>(&(unigram_probs_[0])),
-                             static_cast<int32>(unigram_probs_.size()));
+      static_cast<int32>(unigram_probs_.size()));
   probs.Write(os, binary);
   for (int32 o = 2; o <= order; o++) {
     WriteToken(os, binary, "<StatesOfOrder>");
@@ -344,10 +344,10 @@ void SamplingLm::Write(std::ostream &os, bool binary) const {
     WriteBasicType(os, binary, num_states);
 
     unordered_map<std::vector<int32>, HistoryState,
-                  VectorHasher<int32> >::const_iterator
+        VectorHasher<int32> >::const_iterator
         iter = higher_order_probs_[o-2].begin(),
         end = higher_order_probs_[o-2].end();
-    for (; iter != end; ++iter ){
+    for (; iter != end; ++iter ) {
       const std::vector<int32> &history = iter->first;
       const HistoryState &state = iter->second;
       WriteIntegerVector(os, binary, history);

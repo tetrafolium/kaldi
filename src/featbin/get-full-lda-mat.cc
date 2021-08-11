@@ -24,7 +24,7 @@
 
 namespace kaldi {
 void IncreaseTransformDimension(int32 new_dimension,
-                       Matrix<BaseFloat> *mat) {
+    Matrix<BaseFloat> *mat) {
   int32 d = mat->NumRows();
   if (new_dimension < d)
     KALDI_ERR << "--new-dimension argument invalid or not specified: "
@@ -41,11 +41,11 @@ void IncreaseTransformDimension(int32 new_dimension,
     for (int32 i = d; i < new_dimension; i++)
       (*mat)(i, i) = 1.0; // set new dims to unit matrix.
     for (int32 i = 0; i < d; i++) // and set offset [last column]
-      (*mat)(d, i) = offset(i);          
+      (*mat)(d, i) = offset(i);
   } else {
     KALDI_ERR << "Input matrix has unexpected dimension " << d
               << " x " << mat->NumCols();
-  }  
+  }
 }
 
 } // end namespace kaldi
@@ -64,12 +64,12 @@ int main(int argc, char *argv[]) {
         "Usage: get-full-lda-mat [options] <lda-mllt-rxfilename> <full-lda-rxfilename> "
         "<full-lda-mllt-wxfilename> [<inv-full-lda-mllt-wxfilename>]\n"
         "E.g.: get-full-lda-mat final.mat full.mat full_lda_mllt.mat full_lda_mllt_inv.mat\n";
-    
+
     bool binary = true;
     ParseOptions po(usage);
 
     po.Register("binary", &binary, "Write in binary mode (only relevant if output is a wxfilename)");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() < 3 || po.NumArgs() > 4) {
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     ReadKaldiObject(lda_mllt_rxfilename, &lda_mllt);
     Matrix<BaseFloat> full_lda;
     ReadKaldiObject(full_lda_rxfilename, &full_lda);
-    
+
     KALDI_ASSERT(full_lda.NumCols() == lda_mllt.NumCols());
     KALDI_ASSERT(full_lda.NumRows() == full_lda.NumCols());
 

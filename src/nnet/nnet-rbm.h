@@ -33,13 +33,13 @@ namespace kaldi {
 namespace nnet1 {
 
 class RbmBase : public Component {
- public:
+public:
   typedef enum {
     Bernoulli,
     Gaussian
   } RbmNodeType;
 
-  RbmBase(int32 dim_in, int32 dim_out):
+  RbmBase(int32 dim_in, int32 dim_out) :
     Component(dim_in, dim_out)
   { }
 
@@ -50,13 +50,13 @@ class RbmBase : public Component {
   virtual void Reconstruct(
     const CuMatrixBase<BaseFloat> &hid_state,
     CuMatrix<BaseFloat> *vis_probs
-  ) = 0;
+    ) = 0;
   virtual void RbmUpdate(
     const CuMatrixBase<BaseFloat> &pos_vis,
     const CuMatrixBase<BaseFloat> &pos_hid,
     const CuMatrixBase<BaseFloat> &neg_vis,
     const CuMatrixBase<BaseFloat> &neg_hid
-  ) = 0;
+    ) = 0;
 
   virtual RbmNodeType VisType() const = 0;
   virtual RbmNodeType HidType() const = 0;
@@ -72,21 +72,21 @@ class RbmBase : public Component {
     return rbm_opts_;
   }
 
- protected:
+protected:
   RbmTrainOptions rbm_opts_;
 
- private:
+private:
   //// Make inherited methods inaccessible,
   //   as for RBMs we use Reconstruct(.)
   void Backpropagate(const CuMatrixBase<BaseFloat> &in,
-                     const CuMatrixBase<BaseFloat> &out,
-                     const CuMatrixBase<BaseFloat> &out_diff,
-                     CuMatrix<BaseFloat> *in_diff)
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrix<BaseFloat> *in_diff)
   { }
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff)
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff)
   { }
   ////
 };
@@ -94,8 +94,8 @@ class RbmBase : public Component {
 
 
 class Rbm : public RbmBase {
- public:
-  Rbm(int32 dim_in, int32 dim_out):
+public:
+  Rbm(int32 dim_in, int32 dim_out) :
     RbmBase(dim_in, dim_out)
   { }
 
@@ -115,8 +115,8 @@ class Rbm : public RbmBase {
     std::string vis_type;
     std::string hid_type;
     float vis_bias_mean = 0.0, vis_bias_range = 0.0,
-          hid_bias_mean = 0.0, hid_bias_range = 0.0,
-          param_stddev = 0.1;
+        hid_bias_mean = 0.0, hid_bias_range = 0.0,
+        param_stddev = 0.1;
     std::string vis_bias_cmvn_file;  // initialize biases to logit(p_active)
     // parse config,
     std::string token;
@@ -207,14 +207,14 @@ class Rbm : public RbmBase {
 
   void WriteData(std::ostream &os, bool binary) const {
     switch (vis_type_) {
-      case Bernoulli : WriteToken(os,binary, "bern"); break;
-      case Gaussian  : WriteToken(os,binary, "gauss"); break;
-      default : KALDI_ERR << "Unknown type " << vis_type_;
+    case Bernoulli: WriteToken(os,binary, "bern"); break;
+    case Gaussian: WriteToken(os,binary, "gauss"); break;
+    default: KALDI_ERR << "Unknown type " << vis_type_;
     }
     switch (hid_type_) {
-      case Bernoulli : WriteToken(os,binary, "bern"); break;
-      case Gaussian  : WriteToken(os,binary, "gauss"); break;
-      default : KALDI_ERR << "Unknown type " << hid_type_;
+    case Bernoulli: WriteToken(os,binary, "bern"); break;
+    case Gaussian: WriteToken(os,binary, "gauss"); break;
+    default: KALDI_ERR << "Unknown type " << hid_type_;
     }
     vis_hid_.Write(os, binary);
     vis_bias_.Write(os, binary);
@@ -224,7 +224,7 @@ class Rbm : public RbmBase {
 
   // Component API
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // pre-fill with bias
     out->AddVecToRows(1.0, hid_bias_, 0.0);
     // multiply by weights^t
@@ -237,7 +237,7 @@ class Rbm : public RbmBase {
 
   // RBM training API
   void Reconstruct(const CuMatrixBase<BaseFloat> &hid_state,
-                   CuMatrix<BaseFloat> *vis_probs) {
+      CuMatrix<BaseFloat> *vis_probs) {
     // check the dim
     if (output_dim_ != hid_state.NumCols()) {
       KALDI_ERR << "Nonmatching dims, component:" << output_dim_
@@ -260,9 +260,9 @@ class Rbm : public RbmBase {
   }
 
   void RbmUpdate(const CuMatrixBase<BaseFloat> &pos_vis,
-                 const CuMatrixBase<BaseFloat> &pos_hid,
-                 const CuMatrixBase<BaseFloat> &neg_vis,
-                 const CuMatrixBase<BaseFloat> &neg_hid) {
+      const CuMatrixBase<BaseFloat> &pos_hid,
+      const CuMatrixBase<BaseFloat> &neg_vis,
+      const CuMatrixBase<BaseFloat> &neg_hid) {
     // dims
     KALDI_ASSERT(pos_vis.NumRows() == pos_hid.NumRows() &&
            pos_vis.NumRows() == neg_vis.NumRows() &&
@@ -274,9 +274,9 @@ class Rbm : public RbmBase {
 
     // lazy initialization of buffers
     if ( vis_hid_corr_.NumRows() != vis_hid_.NumRows() ||
-         vis_hid_corr_.NumCols() != vis_hid_.NumCols() ||
-         vis_bias_corr_.Dim()    != vis_bias_.Dim()    ||
-         hid_bias_corr_.Dim()    != hid_bias_.Dim()     ) {
+        vis_hid_corr_.NumCols() != vis_hid_.NumCols() ||
+        vis_bias_corr_.Dim()    != vis_bias_.Dim()    ||
+        hid_bias_corr_.Dim()    != hid_bias_.Dim()     ) {
       vis_hid_corr_.Resize(vis_hid_.NumRows(), vis_hid_.NumCols(), kSetZero);
       vis_bias_corr_.Resize(vis_bias_.Dim(), kSetZero);
       hid_bias_corr_.Resize(hid_bias_.Dim(), kSetZero);
@@ -412,7 +412,7 @@ class Rbm : public RbmBase {
     if (!binary) os << "\n";
   }
 
- protected:
+protected:
   CuMatrix<BaseFloat> vis_hid_;        ///< Matrix with neuron weights
   CuVector<BaseFloat> vis_bias_;       ///< Vector with biases
   CuVector<BaseFloat> hid_bias_;       ///< Vector with biases

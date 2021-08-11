@@ -38,7 +38,7 @@ namespace rnnlm {
 
    @brief  Declares various functions that operate on examples
            for RNNLM training (specifically, class RnnlmExample).
-*/
+ */
 
 
 
@@ -77,7 +77,7 @@ namespace rnnlm {
                               exit, this list will be sorted and unique.
  */
 void RenumberRnnlmExample(RnnlmExample *minibatch,
-                          std::vector<int32> *active_words);
+    std::vector<int32> *active_words);
 
 
 /**  This function takes a NnetExample (which should already have been
@@ -86,12 +86,12 @@ void RenumberRnnlmExample(RnnlmExample *minibatch,
      inputs; if you do, you can create/modify the ComputationRequest manually.
      Assumes that if need_model_derivative is true, you will be supplying
      derivatives w.r.t. all outputs.
-*/
+ */
 void GetRnnlmComputationRequest(const RnnlmExample &minibatch,
-                                bool need_model_derivative,
-                                bool need_input_derivative,
-                                bool store_component_stats,
-                                nnet3::ComputationRequest *computation_request);
+    bool need_model_derivative,
+    bool need_input_derivative,
+    bool store_component_stats,
+    nnet3::ComputationRequest *computation_request);
 
 
 // This struct contains various quantities/expressions that are derived from the
@@ -143,10 +143,10 @@ struct RnnlmExampleDerived {
                              if this is true, it will compute
                              'input_words_tranpose'.
       @param [out] derived   The output structure that we are computing.
-*/
+ */
 void GetRnnlmExampleDerived(const RnnlmExample &minibatch,
-                            bool need_embedding_deriv,
-                            RnnlmExampleDerived *derived);
+    bool need_embedding_deriv,
+    RnnlmExampleDerived *derived);
 
 /**
    Configuration class relating to the objective function used for RNNLM
@@ -156,8 +156,8 @@ struct RnnlmObjectiveOptions {
   BaseFloat den_term_limit;
   uint32 max_logprob_elements;
 
-  RnnlmObjectiveOptions(): den_term_limit(-10.0),
-                           max_logprob_elements(1000000000) { }
+  RnnlmObjectiveOptions() : den_term_limit(-10.0),
+    max_logprob_elements(1000000000) { }
 
   void Register(OptionsItf *po) {
     po->Register("den-term-limit", &den_term_limit,
@@ -262,17 +262,17 @@ struct RnnlmObjectiveOptions {
                          this pointer.
  */
 void ProcessRnnlmOutput(
-    const RnnlmObjectiveOptions &objective_opts,
-    const RnnlmExample &minibatch,
-    const RnnlmExampleDerived &derived,
-    const CuMatrixBase<BaseFloat> &word_embedding,
-    const CuMatrixBase<BaseFloat> &nnet_output,
-    CuMatrixBase<BaseFloat> *word_embedding_deriv,
-    CuMatrixBase<BaseFloat> *nnet_output_deriv,
-    BaseFloat *weight,
-    BaseFloat *objf_num,
-    BaseFloat *objf_den,
-    BaseFloat *objf_den_exact);
+  const RnnlmObjectiveOptions &objective_opts,
+  const RnnlmExample &minibatch,
+  const RnnlmExampleDerived &derived,
+  const CuMatrixBase<BaseFloat> &word_embedding,
+  const CuMatrixBase<BaseFloat> &nnet_output,
+  CuMatrixBase<BaseFloat> *word_embedding_deriv,
+  CuMatrixBase<BaseFloat> *nnet_output_deriv,
+  BaseFloat *weight,
+  BaseFloat *objf_num,
+  BaseFloat *objf_den,
+  BaseFloat *objf_den_exact);
 
 
 

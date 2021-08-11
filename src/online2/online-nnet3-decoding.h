@@ -46,19 +46,19 @@ namespace kaldi {
    You will instantiate this class when you want to decode a single utterance
    using the online-decoding setup for neural nets.  The template will be
    instantiated only for FST = fst::Fst<fst::StdArc> and FST = fst::GrammarFst.
-*/
+ */
 
 template <typename FST>
 class SingleUtteranceNnet3DecoderTpl {
- public:
+public:
 
   // Constructor. The pointer 'features' is not being given to this class to own
   // and deallocate, it is owned externally.
   SingleUtteranceNnet3DecoderTpl(const LatticeFasterDecoderConfig &decoder_opts,
-                                 const TransitionModel &trans_model,
-                                 const nnet3::DecodableNnetSimpleLoopedInfo &info,
-                                 const FST &fst,
-                                 OnlineNnet2FeaturePipeline *features);
+      const TransitionModel &trans_model,
+      const nnet3::DecodableNnetSimpleLoopedInfo &info,
+      const FST &fst,
+      OnlineNnet2FeaturePipeline *features);
 
   /// Initializes the decoding and sets the frame offset of the underlying
   /// decodable object. This method is called by the constructor. You can also
@@ -82,14 +82,14 @@ class SingleUtteranceNnet3DecoderTpl {
   /// of the acoustic weight.  "end_of_utterance" will be true if you want the
   /// final-probs to be included.
   void GetLattice(bool end_of_utterance,
-                  CompactLattice *clat) const;
+      CompactLattice *clat) const;
 
   /// Outputs an FST corresponding to the single best path through the current
   /// lattice. If "use_final_probs" is true AND we reached the final-state of
   /// the graph then it will include those as final-probs, else it will treat
   /// all final-probs as one.
   void GetBestPath(bool end_of_utterance,
-                   Lattice *best_path) const;
+      Lattice *best_path) const;
 
 
   /// This function calls EndpointDetected from online-endpoint.h,
@@ -99,7 +99,7 @@ class SingleUtteranceNnet3DecoderTpl {
   const LatticeFasterOnlineDecoderTpl<FST> &Decoder() const { return decoder_; }
 
   ~SingleUtteranceNnet3DecoderTpl() { }
- private:
+private:
 
   const LatticeFasterDecoderConfig &decoder_opts_;
 

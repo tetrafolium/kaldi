@@ -26,8 +26,8 @@
 namespace kaldi {
 
 void GetWeights(const std::string &weights_str,
-                int32 num_inputs,
-                std::vector<BaseFloat> *weights) {
+    int32 num_inputs,
+    std::vector<BaseFloat> *weights) {
   KALDI_ASSERT(num_inputs >= 1);
   if (!weights_str.empty()) {
     SplitStringToFloats(weights_str, ":", true, weights);
@@ -55,8 +55,8 @@ void GetWeights(const std::string &weights_str,
 // specified weights.  Sets *success to 1 for success and 0 for failure.  (We
 // don't use bool because of the weird implementation of std::vector<bool>).
 void ReadModels(std::vector<std::pair<std::string, BaseFloat> > models_and_weights,
-                nnet3::Nnet *output_nnet,
-                int32 *success) {
+    nnet3::Nnet *output_nnet,
+    int32 *success) {
   using namespace nnet3;
   try {
     int32 n = models_and_weights.size();

@@ -25,107 +25,107 @@
 #include "lat/kaldi-lattice.h"
 
 namespace kaldi {
-  int32 CopySubsetLattices(std::string filename,
-      SequentialLatticeReader *lattice_reader,
-      LatticeWriter *lattice_writer,
-      bool include = true, bool ignore_missing = false,
-      bool sorted = false) {
-    unordered_set<std::string, StringHasher> subset;
-    std::set<std::string> subset_list;
+int32 CopySubsetLattices(std::string filename,
+    SequentialLatticeReader *lattice_reader,
+    LatticeWriter *lattice_writer,
+    bool include = true, bool ignore_missing = false,
+    bool sorted = false) {
+  unordered_set<std::string, StringHasher> subset;
+  std::set<std::string> subset_list;
 
-    bool binary;
-    Input ki(filename, &binary);
-    KALDI_ASSERT(!binary);
-    std::string line;
-    while (std::getline(ki.Stream(), line)) {
-      std::vector<std::string> split_line;
-      SplitStringToVector(line, " \t\r", true, &split_line);
-      if(split_line.empty()) {
-        KALDI_ERR << "Unable to parse line \"" << line << "\" encountered in input in " << filename;
-      }
-      subset.insert(split_line[0]);
-      subset_list.insert(split_line[0]);
+  bool binary;
+  Input ki(filename, &binary);
+  KALDI_ASSERT(!binary);
+  std::string line;
+  while (std::getline(ki.Stream(), line)) {
+    std::vector<std::string> split_line;
+    SplitStringToVector(line, " \t\r", true, &split_line);
+    if(split_line.empty()) {
+      KALDI_ERR << "Unable to parse line \"" << line << "\" encountered in input in " << filename;
     }
-
-    int32 num_total = 0;
-    size_t num_success = 0;
-    for (; !lattice_reader->Done(); lattice_reader->Next(), num_total++) {
-      if (include && sorted && subset_list.size() > 0
-              && lattice_reader->Key() > *(subset_list.rbegin())) {
-        KALDI_LOG << "The utterance " << lattice_reader->Key()
-                  << " is larger than "
-                  << "the last key in the include list. Not reading further.";
-        KALDI_LOG << "Wrote " << num_success << " utterances";
-        return 0;
-      }
-
-      if (include && subset.count(lattice_reader->Key()) > 0) {
-        lattice_writer->Write(lattice_reader->Key(), lattice_reader->Value());
-        num_success++;
-      } else if (!include && subset.count(lattice_reader->Key()) == 0) {
-        lattice_writer->Write(lattice_reader->Key(), lattice_reader->Value());
-        num_success++;
-      }
-    }
-
-    KALDI_LOG << "Wrote " << num_success << " out of " << num_total
-      << " utterances.";
-
-    if (ignore_missing) return 0;
-
-    return (num_success != 0 ? 0 : 1);
+    subset.insert(split_line[0]);
+    subset_list.insert(split_line[0]);
   }
 
-  int32 CopySubsetLattices(std::string filename,
-      SequentialCompactLatticeReader *lattice_reader,
-      CompactLatticeWriter *lattice_writer,
-      bool include = true, bool ignore_missing = false,
-      bool sorted = false) {
-    unordered_set<std::string, StringHasher> subset;
-    std::set<std::string> subset_list;
-
-    bool binary;
-    Input ki(filename, &binary);
-    KALDI_ASSERT(!binary);
-    std::string line;
-    while (std::getline(ki.Stream(), line)) {
-      std::vector<std::string> split_line;
-      SplitStringToVector(line, " \t\r", true, &split_line);
-      if(split_line.empty()) {
-        KALDI_ERR << "Unable to parse line \"" << line << "\" encountered in input in " << filename;
-      }
-      subset.insert(split_line[0]);
-      subset_list.insert(split_line[0]);
+  int32 num_total = 0;
+  size_t num_success = 0;
+  for (; !lattice_reader->Done(); lattice_reader->Next(), num_total++) {
+    if (include && sorted && subset_list.size() > 0
+        && lattice_reader->Key() > *(subset_list.rbegin())) {
+      KALDI_LOG << "The utterance " << lattice_reader->Key()
+                << " is larger than "
+                << "the last key in the include list. Not reading further.";
+      KALDI_LOG << "Wrote " << num_success << " utterances";
+      return 0;
     }
 
-    int32 num_total = 0;
-    size_t num_success = 0;
-    for (; !lattice_reader->Done(); lattice_reader->Next(), num_total++) {
-      if (include && sorted && subset_list.size() > 0
-              && lattice_reader->Key() > *(subset_list.rbegin())) {
-        KALDI_LOG << "The utterance " << lattice_reader->Key()
-                  << " is larger than "
-                  << "the last key in the include list. Not reading further.";
-        KALDI_LOG << "Wrote " << num_success << " utterances";
-        return 0;
-      }
-
-      if (include && subset.count(lattice_reader->Key()) > 0) {
-        lattice_writer->Write(lattice_reader->Key(), lattice_reader->Value());
-        num_success++;
-      } else if (!include && subset.count(lattice_reader->Key()) == 0) {
-        lattice_writer->Write(lattice_reader->Key(), lattice_reader->Value());
-        num_success++;
-      }
+    if (include && subset.count(lattice_reader->Key()) > 0) {
+      lattice_writer->Write(lattice_reader->Key(), lattice_reader->Value());
+      num_success++;
+    } else if (!include && subset.count(lattice_reader->Key()) == 0) {
+      lattice_writer->Write(lattice_reader->Key(), lattice_reader->Value());
+      num_success++;
     }
-
-    KALDI_LOG << " Wrote " << num_success << " out of " << num_total
-      << " utterances.";
-
-    if (ignore_missing) return 0;
-
-    return (num_success != 0 ? 0 : 1);
   }
+
+  KALDI_LOG << "Wrote " << num_success << " out of " << num_total
+            << " utterances.";
+
+  if (ignore_missing) return 0;
+
+  return (num_success != 0 ? 0 : 1);
+}
+
+int32 CopySubsetLattices(std::string filename,
+    SequentialCompactLatticeReader *lattice_reader,
+    CompactLatticeWriter *lattice_writer,
+    bool include = true, bool ignore_missing = false,
+    bool sorted = false) {
+  unordered_set<std::string, StringHasher> subset;
+  std::set<std::string> subset_list;
+
+  bool binary;
+  Input ki(filename, &binary);
+  KALDI_ASSERT(!binary);
+  std::string line;
+  while (std::getline(ki.Stream(), line)) {
+    std::vector<std::string> split_line;
+    SplitStringToVector(line, " \t\r", true, &split_line);
+    if(split_line.empty()) {
+      KALDI_ERR << "Unable to parse line \"" << line << "\" encountered in input in " << filename;
+    }
+    subset.insert(split_line[0]);
+    subset_list.insert(split_line[0]);
+  }
+
+  int32 num_total = 0;
+  size_t num_success = 0;
+  for (; !lattice_reader->Done(); lattice_reader->Next(), num_total++) {
+    if (include && sorted && subset_list.size() > 0
+        && lattice_reader->Key() > *(subset_list.rbegin())) {
+      KALDI_LOG << "The utterance " << lattice_reader->Key()
+                << " is larger than "
+                << "the last key in the include list. Not reading further.";
+      KALDI_LOG << "Wrote " << num_success << " utterances";
+      return 0;
+    }
+
+    if (include && subset.count(lattice_reader->Key()) > 0) {
+      lattice_writer->Write(lattice_reader->Key(), lattice_reader->Value());
+      num_success++;
+    } else if (!include && subset.count(lattice_reader->Key()) == 0) {
+      lattice_writer->Write(lattice_reader->Key(), lattice_reader->Value());
+      num_success++;
+    }
+  }
+
+  KALDI_LOG << " Wrote " << num_success << " out of " << num_total
+            << " utterances.";
+
+  if (ignore_missing) return 0;
+
+  return (num_success != 0 ? 0 : 1);
+}
 }
 
 int main(int argc, char *argv[]) {

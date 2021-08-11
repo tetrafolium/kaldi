@@ -32,7 +32,7 @@ namespace kaldi {
 namespace nnet1 {
 
 class MultiBasisComponent : public UpdatableComponent {
- public:
+public:
   MultiBasisComponent(int32 dim_in, int32 dim_out) :
     UpdatableComponent(dim_in, dim_out),
     selector_lr_coef_(1.0),
@@ -70,7 +70,7 @@ class MultiBasisComponent : public UpdatableComponent {
           basis_filename_vector.push_back(file_or_end);
         }
       } else KALDI_ERR << "Unknown token " << token << ", typo in config?"
-               << " (SelectorProto|SelectorFilename|BasisProto|BasisFilename|BasisFilenameVector)";
+                       << " (SelectorProto|SelectorFilename|BasisProto|BasisFilename|BasisFilenameVector)";
     }
 
     //// INITIALIZE
@@ -141,29 +141,29 @@ class MultiBasisComponent : public UpdatableComponent {
       std::string token;
       int first_char = PeekToken(is, binary);
       switch (first_char) {
-        case 'S': ReadToken(is, false, &token);
-          /**/ if (token == "<SelectorLearnRateCoef>") ReadBasicType(is, binary, &selector_lr_coef_);
-          else if (token == "<Selector>") selector_.Read(is, binary);
-          else KALDI_ERR << "Unknown token: " << token;
-          break;
-        case 'N': ExpectToken(is, binary, "<NumBasis>");
-          int32 num_basis;
-          ReadBasicType(is, binary, &num_basis);
-          nnet_basis_.resize(num_basis);
-          for (int32 i = 0; i < num_basis; i++) {
-            int32 dummy;
-            ExpectToken(is, binary, "<Basis>");
-            ReadBasicType(is, binary, &dummy);
-            nnet_basis_[i].Read(is, binary);
-          }
-          break;
-        case '!':
-          ExpectToken(is, binary, "<!EndOfComponent>");
-          end_loop=true;
-          break;
-        default:
-          ReadToken(is, false, &token);
-          KALDI_ERR << "Unknown token: " << token;
+      case 'S': ReadToken(is, false, &token);
+        /**/ if (token == "<SelectorLearnRateCoef>") ReadBasicType(is, binary, &selector_lr_coef_);
+        else if (token == "<Selector>") selector_.Read(is, binary);
+        else KALDI_ERR << "Unknown token: " << token;
+        break;
+      case 'N': ExpectToken(is, binary, "<NumBasis>");
+        int32 num_basis;
+        ReadBasicType(is, binary, &num_basis);
+        nnet_basis_.resize(num_basis);
+        for (int32 i = 0; i < num_basis; i++) {
+          int32 dummy;
+          ExpectToken(is, binary, "<Basis>");
+          ReadBasicType(is, binary, &dummy);
+          nnet_basis_[i].Read(is, binary);
+        }
+        break;
+      case '!':
+        ExpectToken(is, binary, "<!EndOfComponent>");
+        end_loop=true;
+        break;
+      default:
+        ReadToken(is, false, &token);
+        KALDI_ERR << "Unknown token: " << token;
       }
     }
 
@@ -296,7 +296,7 @@ class MultiBasisComponent : public UpdatableComponent {
   }
 
   void PropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                    CuMatrixBase<BaseFloat> *out) {
+      CuMatrixBase<BaseFloat> *out) {
     // dimensions,
     int32 num_basis = nnet_basis_.size();
 
@@ -307,11 +307,11 @@ class MultiBasisComponent : public UpdatableComponent {
 
     // split the input,
     const CuSubMatrix<BaseFloat> in_basis(
-        in.ColRange(0, nnet_basis_[0].InputDim())
-    );
+      in.ColRange(0, nnet_basis_[0].InputDim())
+      );
     const CuSubMatrix<BaseFloat> in_selector(
-        in.ColRange(nnet_basis_[0].InputDim(), selector_.InputDim())
-    );
+      in.ColRange(nnet_basis_[0].InputDim(), selector_.InputDim())
+      );
 
     // get the 'selector_' posteriors,
     selector_.Propagate(in_selector, &posterior_);
@@ -336,20 +336,20 @@ class MultiBasisComponent : public UpdatableComponent {
   }
 
   void BackpropagateFnc(const CuMatrixBase<BaseFloat> &in,
-                        const CuMatrixBase<BaseFloat> &out,
-                        const CuMatrixBase<BaseFloat> &out_diff,
-                        CuMatrixBase<BaseFloat> *in_diff) {
+      const CuMatrixBase<BaseFloat> &out,
+      const CuMatrixBase<BaseFloat> &out_diff,
+      CuMatrixBase<BaseFloat> *in_diff) {
     // dimensions,
     int32 num_basis = nnet_basis_.size(),
-          num_frames = in.NumRows();
+        num_frames = in.NumRows();
 
     // split the in_diff,
     CuSubMatrix<BaseFloat> in_diff_basis(
-        in_diff->ColRange(0, nnet_basis_[0].InputDim())
-    );
+      in_diff->ColRange(0, nnet_basis_[0].InputDim())
+      );
     CuSubMatrix<BaseFloat> in_diff_selector(
-        in_diff->ColRange(nnet_basis_[0].InputDim(), selector_.InputDim())
-    );
+      in_diff->ColRange(nnet_basis_[0].InputDim(), selector_.InputDim())
+      );
 
     // backprop through 'selector',
     CuMatrix<BaseFloat> selector_out_diff(num_basis, num_frames);
@@ -366,7 +366,7 @@ class MultiBasisComponent : public UpdatableComponent {
 
     // backprop through 'basis',
     CuMatrix<BaseFloat> out_diff_scaled(num_frames, OutputDim()),
-                        in_diff_basis_tmp;
+    in_diff_basis_tmp;
     for (int32 i = 0; i < num_basis; i++) {
       // use only basis with occupancy >0.1,
       if (posterior_sum_(i) > threshold_) {
@@ -378,7 +378,7 @@ class MultiBasisComponent : public UpdatableComponent {
   }
 
   void Update(const CuMatrixBase<BaseFloat> &input,
-              const CuMatrixBase<BaseFloat> &diff) {
+      const CuMatrixBase<BaseFloat> &diff) {
     { }  // do nothing
   }
 
@@ -404,7 +404,7 @@ class MultiBasisComponent : public UpdatableComponent {
       for (int32 j = 0; j < nnet_basis_[i].NumComponents(); j++) {
         if (nnet_basis_[i].GetComponent(j).IsUpdatable()) {
           UpdatableComponent& comp =
-            dynamic_cast<UpdatableComponent&>(nnet_basis_[i].GetComponent(j));
+              dynamic_cast<UpdatableComponent&>(nnet_basis_[i].GetComponent(j));
           // set the value,
           comp.SetLearnRateCoef(val);
         }
@@ -423,7 +423,7 @@ class MultiBasisComponent : public UpdatableComponent {
       for (int32 j = 0; j < nnet_basis_[i].NumComponents(); j++) {
         if (nnet_basis_[i].GetComponent(j).IsUpdatable()) {
           UpdatableComponent& comp =
-            dynamic_cast<UpdatableComponent&>(nnet_basis_[i].GetComponent(j));
+              dynamic_cast<UpdatableComponent&>(nnet_basis_[i].GetComponent(j));
           // set the value,
           comp.SetBiasLearnRateCoef(val);
         }
@@ -431,7 +431,7 @@ class MultiBasisComponent : public UpdatableComponent {
     }
   }
 
- private:
+private:
   /// The vector of 'basis' networks (output of basis is combined
   /// according to the posterior_ from the selector_)
   std::vector<Nnet> nnet_basis_;

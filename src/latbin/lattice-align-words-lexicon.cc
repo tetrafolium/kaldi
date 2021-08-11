@@ -43,19 +43,19 @@ int main(int argc, char *argv[]) {
         "   data/lang/phones/align_lexicon.int final.mdl ark:1.lats ark:aligned.lats\n"
         "See also: lattice-align-words, which is only applicable if your phones have word-position\n"
         "markers, i.e. each phone comes in 5 versions like AA_B, AA_I, AA_W, AA_S, AA.\n";
-    
+
     ParseOptions po(usage);
     bool output_if_error = true;
     bool output_if_empty = false;
-    
+
     po.Register("output-error-lats", &output_if_error, "Output lattices that aligned "
                 "with errors (e.g. due to force-out");
     po.Register("output-if-empty", &output_if_empty, "If true: if algorithm gives "
                 "error and produces empty output, pass the input through.");
-    
+
     WordAlignLatticeLexiconOpts opts;
     opts.Register(&po);
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 4) {
@@ -82,25 +82,25 @@ int main(int argc, char *argv[]) {
 
     TransitionModel tmodel;
     ReadKaldiObject(model_rxfilename, &tmodel);
-    
+
     SequentialCompactLatticeReader clat_reader(lats_rspecifier);
-    CompactLatticeWriter clat_writer(lats_wspecifier); 
+    CompactLatticeWriter clat_writer(lats_wspecifier);
 
     WordAlignLatticeLexiconInfo lexicon_info(lexicon);
     { std::vector<std::vector<int32> > temp; lexicon.swap(temp); }
     // No longer needed.
-    
+
     int32 num_done = 0, num_err = 0;
-    
+
     for (; !clat_reader.Done(); clat_reader.Next()) {
       std::string key = clat_reader.Key();
       const CompactLattice &clat = clat_reader.Value();
-      
+
       CompactLattice aligned_clat;
-      
+
       bool ok = WordAlignLatticeLexicon(clat, tmodel, lexicon_info, opts,
                                         &aligned_clat);
-      
+
       if (!ok) {
         num_err++;
         if (output_if_empty && aligned_clat.NumStates() == 0 &&

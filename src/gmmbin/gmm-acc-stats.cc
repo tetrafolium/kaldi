@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
         const Posterior &posterior = posteriors_reader.Value(key);
 
         if (static_cast<int32>(posterior.size()) != mat.NumRows()) {
-          KALDI_WARN << "Posterior vector has wrong size " 
+          KALDI_WARN << "Posterior vector has wrong size "
                      << (posterior.size()) << " vs. "
                      << (mat.NumRows());
           num_err++;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
 
     KALDI_LOG << "Done " << num_done << " files, " << num_err
               << " with errors.";
-    
+
     KALDI_LOG << "Overall avg like per frame (Gaussian only) = "
               << (tot_like/tot_t) << " over " << tot_t << " frames.";
 

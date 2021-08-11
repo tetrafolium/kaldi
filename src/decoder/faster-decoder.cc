@@ -24,8 +24,8 @@ namespace kaldi {
 
 
 FasterDecoder::FasterDecoder(const fst::Fst<fst::StdArc> &fst,
-                             const FasterDecoderOptions &opts):
-    fst_(fst), config_(opts), num_frames_decoded_(-1) {
+    const FasterDecoderOptions &opts) :
+  fst_(fst), config_(opts), num_frames_decoded_(-1) {
   KALDI_ASSERT(config_.hash_ratio >= 1.0);  // less doesn't make much sense.
   KALDI_ASSERT(config_.max_active > 1);
   KALDI_ASSERT(config_.min_active >= 0 && config_.min_active < config_.max_active);
@@ -51,7 +51,7 @@ void FasterDecoder::Decode(DecodableInterface *decodable) {
 }
 
 void FasterDecoder::AdvanceDecoding(DecodableInterface *decodable,
-                                      int32 max_num_frames) {
+    int32 max_num_frames) {
   KALDI_ASSERT(num_frames_decoded_ >= 0 &&
                "You must call InitDecoding() before AdvanceDecoding()");
   int32 num_frames_ready = decodable->NumFramesReady();
@@ -82,7 +82,7 @@ bool FasterDecoder::ReachedFinal() const {
 }
 
 bool FasterDecoder::GetBestPath(fst::MutableFst<LatticeArc> *fst_out,
-                                bool use_final_probs) {
+    bool use_final_probs) {
   // GetBestPath gets the decoding output.  If "use_final_probs" is true
   // AND we reached a final state, it limits itself to final states;
   // otherwise it gets the most likely token not taking into
@@ -117,9 +117,9 @@ bool FasterDecoder::GetBestPath(fst::MutableFst<LatticeArc> *fst_out,
         graph_cost = tok->arc_.weight.Value(),
         ac_cost = tot_cost - graph_cost;
     LatticeArc l_arc(tok->arc_.ilabel,
-                     tok->arc_.olabel,
-                     LatticeWeight(graph_cost, ac_cost),
-                     tok->arc_.nextstate);
+        tok->arc_.olabel,
+        LatticeWeight(graph_cost, ac_cost),
+        tok->arc_.nextstate);
     arcs_reverse.push_back(l_arc);
   }
   KALDI_ASSERT(arcs_reverse.back().nextstate == fst_.Start());
@@ -146,7 +146,7 @@ bool FasterDecoder::GetBestPath(fst::MutableFst<LatticeArc> *fst_out,
 
 // Gets the weight cutoff.  Also counts the active tokens.
 double FasterDecoder::GetCutoff(Elem *list_head, size_t *tok_count,
-                                BaseFloat *adaptive_beam, Elem **best_elem) {
+    BaseFloat *adaptive_beam, Elem **best_elem) {
   double best_cost = std::numeric_limits<double>::infinity();
   size_t count = 0;
   if (config_.max_active == std::numeric_limits<int32>::max() &&
@@ -211,7 +211,7 @@ double FasterDecoder::GetCutoff(Elem *list_head, size_t *tok_count,
 
 void FasterDecoder::PossiblyResizeHash(size_t num_toks) {
   size_t new_sz = static_cast<size_t>(static_cast<BaseFloat>(num_toks)
-                                      * config_.hash_ratio);
+      * config_.hash_ratio);
   if (new_sz > toks_.Size()) {
     toks_.SetSize(new_sz);
   }
@@ -240,11 +240,11 @@ double FasterDecoder::ProcessEmitting(DecodableInterface *decodable) {
     StateId state = best_elem->key;
     Token *tok = best_elem->val;
     for (fst::ArcIterator<fst::Fst<Arc> > aiter(fst_, state);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       const Arc &arc = aiter.Value();
       if (arc.ilabel != 0) {  // we'd propagate..
-        BaseFloat ac_cost = - decodable->LogLikelihood(frame, arc.ilabel);
+        BaseFloat ac_cost = -decodable->LogLikelihood(frame, arc.ilabel);
         double new_weight = arc.weight.Value() + tok->cost_ + ac_cost;
         if (new_weight + adaptive_beam < next_weight_cutoff)
           next_weight_cutoff = new_weight + adaptive_beam;
@@ -266,11 +266,11 @@ double FasterDecoder::ProcessEmitting(DecodableInterface *decodable) {
       // np++;
       KALDI_ASSERT(state == tok->arc_.nextstate);
       for (fst::ArcIterator<fst::Fst<Arc> > aiter(fst_, state);
-           !aiter.Done();
-           aiter.Next()) {
+          !aiter.Done();
+          aiter.Next()) {
         Arc arc = aiter.Value();
         if (arc.ilabel != 0) {  // propagate..
-          BaseFloat ac_cost =  - decodable->LogLikelihood(frame, arc.ilabel);
+          BaseFloat ac_cost =  -decodable->LogLikelihood(frame, arc.ilabel);
           double new_weight = arc.weight.Value() + tok->cost_ + ac_cost;
           if (new_weight < next_weight_cutoff) {  // not pruned..
             Token *new_tok = new Token(arc, ac_cost, tok);
@@ -301,7 +301,7 @@ double FasterDecoder::ProcessEmitting(DecodableInterface *decodable) {
 void FasterDecoder::ProcessNonemitting(double cutoff) {
   // Processes nonemitting arcs for one frame.
   KALDI_ASSERT(queue_.empty());
-  for (const Elem *e = toks_.GetList(); e != NULL;  e = e->tail)
+  for (const Elem *e = toks_.GetList(); e != NULL; e = e->tail)
     queue_.push_back(e);
   while (!queue_.empty()) {
     const Elem* e = queue_.back();
@@ -314,8 +314,8 @@ void FasterDecoder::ProcessNonemitting(double cutoff) {
     }
     KALDI_ASSERT(tok != NULL && state == tok->arc_.nextstate);
     for (fst::ArcIterator<fst::Fst<Arc> > aiter(fst_, state);
-         !aiter.Done();
-         aiter.Next()) {
+        !aiter.Done();
+        aiter.Next()) {
       const Arc &arc = aiter.Value();
       if (arc.ilabel == 0) {  // propagate nonemitting only...
         Token *new_tok = new Token(arc, tok);

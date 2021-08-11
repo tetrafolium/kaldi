@@ -33,7 +33,7 @@
 namespace kaldi {
 
 class ArpaLmCompilerImplInterface {
- public:
+public:
   virtual ~ArpaLmCompilerImplInterface() { }
   virtual void ConsumeNGram(const NGram& ngram, bool is_highest) = 0;
 };
@@ -46,7 +46,7 @@ typedef int32 Symbol;
 // GeneralHistKey can represent state history in an arbitrarily large n
 // n-gram model with symbol ids fitting int32.
 class GeneralHistKey {
- public:
+public:
   // Construct key from being and end iterators.
   template<class InputIt>
   GeneralHistKey(InputIt begin, InputIt end) : vector_(begin, end) { }
@@ -69,7 +69,7 @@ class GeneralHistKey {
     }
   };
 
- private:
+private:
   std::vector<Symbol> vector_;
 };
 
@@ -81,7 +81,7 @@ class GeneralHistKey {
 //
 // See GeneralHistKey for interface requirements of a key class.
 class OptimizedHistKey {
- public:
+public:
   enum {
     kShift = 21,  // 21 * 3 = 63 bits for data.
     kMaxData = (1 << kShift) - 1
@@ -103,7 +103,7 @@ class OptimizedHistKey {
     size_t operator()(const OptimizedHistKey& key) const { return key.data_; }
   };
 
- private:
+private:
   explicit OptimizedHistKey(uint64 data) : data_(data) { }
   uint64 data_;
 };
@@ -112,13 +112,13 @@ class OptimizedHistKey {
 
 template <class HistKey>
 class ArpaLmCompilerImpl : public ArpaLmCompilerImplInterface {
- public:
+public:
   ArpaLmCompilerImpl(ArpaLmCompiler* parent, fst::StdVectorFst* fst,
-                     Symbol sub_eps);
+      Symbol sub_eps);
 
   virtual void ConsumeNGram(const NGram &ngram, bool is_highest);
 
- private:
+private:
   StateId AddStateWithBackoff(HistKey key, float backoff);
   void CreateBackoff(HistKey key, StateId state, float weight);
 
@@ -130,15 +130,15 @@ class ArpaLmCompilerImpl : public ArpaLmCompilerImplInterface {
 
   StateId eos_state_;
   typedef unordered_map<HistKey, StateId,
-                        typename HistKey::HashType> HistoryMap;
+          typename HistKey::HashType> HistoryMap;
   HistoryMap history_;
 };
 
 template <class HistKey>
 ArpaLmCompilerImpl<HistKey>::ArpaLmCompilerImpl(
-    ArpaLmCompiler* parent, fst::StdVectorFst* fst, Symbol sub_eps)
-    : parent_(parent), fst_(fst), bos_symbol_(parent->Options().bos_symbol),
-      eos_symbol_(parent->Options().eos_symbol), sub_eps_(sub_eps) {
+  ArpaLmCompiler* parent, fst::StdVectorFst* fst, Symbol sub_eps)
+  : parent_(parent), fst_(fst), bos_symbol_(parent->Options().bos_symbol),
+  eos_symbol_(parent->Options().eos_symbol), sub_eps_(sub_eps) {
   // The algorithm maintains state per history. The 0-gram is a special state
   // for empty history. All unigrams (including BOS) backoff into this state.
   StateId zerogram = fst_->AddState();
@@ -155,7 +155,7 @@ ArpaLmCompilerImpl<HistKey>::ArpaLmCompilerImpl(
 
 template <class HistKey>
 void ArpaLmCompilerImpl<HistKey>::ConsumeNGram(const NGram &ngram,
-                                               bool is_highest) {
+    bool is_highest) {
   // Generally, we do the following. Suppose we are adding an n-gram "A B
   // C". Then find the node for "A B", add a new node for "A B C", and connect
   // them with the arc accepting "C" with the specified weight. Also, add a
@@ -243,7 +243,7 @@ void ArpaLmCompilerImpl<HistKey>::ConsumeNGram(const NGram &ngram,
 // latter arises from the chain-collapsing optimization described above.
 template <class HistKey>
 StateId ArpaLmCompilerImpl<HistKey>::AddStateWithBackoff(HistKey key,
-                                                         float backoff) {
+    float backoff) {
   typename HistoryMap::iterator dest_it = history_.find(key);
   if (dest_it != history_.end()) {
     // Found an existing state in the history map. Invariant: if the state in
@@ -263,7 +263,7 @@ StateId ArpaLmCompilerImpl<HistKey>::AddStateWithBackoff(HistKey key,
 // 0-gram model is always present, the search is guaranteed to terminate).
 template <class HistKey>
 inline void ArpaLmCompilerImpl<HistKey>::CreateBackoff(
-    HistKey key, StateId state, float weight) {
+  HistKey key, StateId state, float weight) {
   typename HistoryMap::iterator dest_it = history_.find(key);
   while (dest_it == history_.end()) {
     key = key.Tails();
@@ -308,7 +308,7 @@ void ArpaLmCompiler::ConsumeNGram(const NGram &ngram) {
   for (int i = 0; i < ngram.words.size(); ++i) {
     if ((i > 0 && ngram.words[i] == Options().bos_symbol) ||
         (i + 1 < ngram.words.size()
-         && ngram.words[i] == Options().eos_symbol)) {
+        && ngram.words[i] == Options().eos_symbol)) {
       if (ShouldWarn())
         KALDI_WARN << LineReference()
                    << " skipped: n-gram has invalid BOS/EOS placement";

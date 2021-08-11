@@ -113,8 +113,8 @@ int main(int argc, char *argv[]) {
 
       if (post.size() != static_cast<size_t>(file_frames)) {
         KALDI_WARN << "posterior information for utterance " << key
-                  << " has wrong size " << post.size() << " vs. "
-                  << file_frames;
+                   << " has wrong size " << post.size() << " vs. "
+                   << file_frames;
         num_err++;
         continue;
       }

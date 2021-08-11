@@ -40,13 +40,13 @@ int main(int argc, char *argv[]) {
         "\n"
         "e.g.:\n"
         "nnet-train-simple 1.nnet ark:1.egs 2.nnet\n";
-    
+
     bool binary_write = true;
     bool zero_stats = true;
     int32 srand_seed = 0;
     std::string use_gpu = "yes";
     NnetSimpleTrainerConfig train_config;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("zero-stats", &zero_stats, "If true, zero occupation "
@@ -56,17 +56,17 @@ int main(int argc, char *argv[]) {
                 "with l2-penalty != 0.0");
     po.Register("use-gpu", &use_gpu,
                 "yes|no|optional|wait, only has effect if compiled with CUDA");
-    
+
     train_config.Register(&po);
-    
+
     po.Read(argc, argv);
-    
+
     if (po.NumArgs() != 3) {
       po.PrintUsage();
       exit(1);
     }
     srand(srand_seed);
-    
+
 #if HAVE_CUDA==1
     CuDevice::Instantiate().SelectGpuId(use_gpu);
 #endif
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
         nnet_wxfilename = po.GetArg(3);
 
     int64 num_examples;
-    
+
     {
       TransitionModel trans_model;
       AmNnet am_nnet;
@@ -90,10 +90,10 @@ int main(int argc, char *argv[]) {
       if (zero_stats) am_nnet.GetNnet().ZeroStats();
 
       SequentialNnetExampleReader example_reader(examples_rspecifier);
-      
+
       num_examples = TrainNnetSimple(train_config, &(am_nnet.GetNnet()),
                                      &example_reader);
-    
+
       {
         Output ko(nnet_wxfilename, binary_write);
         trans_model.Write(ko.Stream(), binary_write);
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 #if HAVE_CUDA==1
     CuDevice::Instantiate().PrintProfile();
 #endif
-    
+
     KALDI_LOG << "Finished training, processed " << num_examples
               << " training examples.  Wrote model to "
               << nnet_wxfilename;

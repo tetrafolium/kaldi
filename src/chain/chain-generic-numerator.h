@@ -106,9 +106,9 @@ namespace chain {
 
 struct GenericNumeratorComputationOptions {
   unsigned int num_threads;
-  GenericNumeratorComputationOptions() : 
+  GenericNumeratorComputationOptions() :
     num_threads(std::min(static_cast<unsigned int>(4),
-                std::thread::hardware_concurrency())) { }
+        std::thread::hardware_concurrency())) { }
   void Register(OptionsItf *opts) {
     opts->Register("numerator-graph-threads", &num_threads, "Number of threads "
                    "to use to parallelize the chain numerator graph computation. "
@@ -126,11 +126,11 @@ struct GenericNumeratorComputationOptions {
 // and the numerator FSTs are stored in 'e2e_fsts' instead of 'fst'
 
 class GenericNumeratorComputation {
- public:
+public:
   /// Initializes the object.
   GenericNumeratorComputation(const GenericNumeratorComputationOptions &opts,
-                              const Supervision &supervision,
-                              const CuMatrixBase<BaseFloat> &nnet_output);
+      const Supervision &supervision,
+      const CuMatrixBase<BaseFloat> &nnet_output);
 
   // Does the forward-backward computation. Returns the total log-prob
   // multiplied by supervision_.weight.
@@ -138,26 +138,26 @@ class GenericNumeratorComputation {
   // nnet output w.r.t. the (log-prob times supervision_.weight times
   // deriv_weight) to 'nnet_output_deriv'.
   bool ForwardBackward(BaseFloat *total_loglike,
-                       CuMatrixBase<BaseFloat> *nnet_output_deriv);
+      CuMatrixBase<BaseFloat> *nnet_output_deriv);
 
   BaseFloat ComputeObjf();
- private:
+private:
   // For the remapped FSTs, copy the appropriate activations to CPU memory.
   // For explanation of what remapped FST is, see the large comment in the
   // beginning of the file
   void CopySpecificPdfsIndirect(
-                             const CuMatrixBase<BaseFloat> &nnet_output,
-                             const std::vector<MatrixIndexT> &indices,
-                             Matrix<BaseFloat> *output);
+    const CuMatrixBase<BaseFloat> &nnet_output,
+    const std::vector<MatrixIndexT> &indices,
+    Matrix<BaseFloat> *output);
 
   // For the remapped FSTs, copy the computed values back to gpu,
   // expand to the original shape and add to the output matrix.
   // For explanation of what remapped FST is, see the large comment in the
   // beginning of the file.
   void AddSpecificPdfsIndirect(
-                             Matrix<BaseFloat> *logprobs,
-                             const std::vector<MatrixIndexT> &indices,
-                             CuMatrixBase<BaseFloat> *output);
+    Matrix<BaseFloat> *logprobs,
+    const std::vector<MatrixIndexT> &indices,
+    CuMatrixBase<BaseFloat> *output);
 
   // sets up the alpha for frame t = 0.
   void AlphaFirstFrame(int seq, Matrix<BaseFloat> *alpha);
@@ -165,21 +165,21 @@ class GenericNumeratorComputation {
   // the alpha computation for 0 < t <= supervision_.frames_per_sequence
   // for some 0 <= seq < supervision_.num_sequences.
   BaseFloat AlphaRemainingFrames(int seq,
-                              const Matrix<BaseFloat> &probs,
-                              Matrix<BaseFloat> *alpha);
+      const Matrix<BaseFloat> &probs,
+      Matrix<BaseFloat> *alpha);
 
   // the beta computation for 0 <= t < supervision_.frames_per_sequence
   // for some 0 <= seq < supervision_.num_sequences.
   void BetaRemainingFrames(int32 seq,
-                        const Matrix<BaseFloat> &probs,
-                        const Matrix<BaseFloat> &alpha,
-                        Matrix<BaseFloat> *beta,
-                        Matrix<BaseFloat> *derivs);
+      const Matrix<BaseFloat> &probs,
+      const Matrix<BaseFloat> &alpha,
+      Matrix<BaseFloat> *beta,
+      Matrix<BaseFloat> *derivs);
 
   // the beta computation for t = supervision_.frames_per_sequence
   void BetaLastFrame(int seq,
-                     const Matrix<BaseFloat> &alpha,
-                     Matrix<BaseFloat> *beta);
+      const Matrix<BaseFloat> &alpha,
+      Matrix<BaseFloat> *beta);
 
   // returns total prob for the given matrix alpha (assumes the alpha
   // matrix was computed using AlphaFirstFrame() and AlphaRemainingFrames()
@@ -189,10 +189,10 @@ class GenericNumeratorComputation {
   // some checking that we can do if debug mode is activated, or on frame zero.
   // Returns false if a bad problem is detected.
   bool CheckValues(int32 seq,
-                   const Matrix<BaseFloat> &probs,
-                   const Matrix<BaseFloat> &alpha,
-                   const Matrix<BaseFloat> &beta,
-                   const Matrix<BaseFloat> &derivs) const;
+      const Matrix<BaseFloat> &probs,
+      const Matrix<BaseFloat> &alpha,
+      const Matrix<BaseFloat> &beta,
+      const Matrix<BaseFloat> &derivs) const;
 
 
   const Supervision &supervision_;

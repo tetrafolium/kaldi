@@ -43,13 +43,13 @@ int main(int argc, char *argv[]) try {
 
   /* only for Doxygen documentation, never shown in command line */
   const char *usage =
-        "Test if there is a GPU available, and if the GPU setup is correct.\n"
-        "A GPU is acquired and a small computation is done\n"
-        "(generating a random matrix and computing softmax for its rows).\n"
-        "\n"
-        "exit-code: 0 = success, 1 = compiled without GPU support, -1 = error\n"
-        "\n"
-        "Usage:  cuda-gpu-available\n";
+      "Test if there is a GPU available, and if the GPU setup is correct.\n"
+      "A GPU is acquired and a small computation is done\n"
+      "(generating a random matrix and computing softmax for its rows).\n"
+      "\n"
+      "exit-code: 0 = success, 1 = compiled without GPU support, -1 = error\n"
+      "\n"
+      "Usage:  cuda-gpu-available\n";
 
   char hostname[100] = "UNKNOWN-HOSTNAME";
 #if !defined(_MSC_VER) && !defined(__CYGWIN__)
@@ -69,17 +69,17 @@ int main(int argc, char *argv[]) try {
   } catch (const std::exception &e) {
     fprintf(stderr, "%s\n", e.what());
     KALDI_LOG << "...\n"
-      << "### The CUDA setup is wrong! "
-      << "(\"invalid device function\" == problem with 'compute capability' "
-      << "in compiled kaldi)\n"
-      << "### Before posting the error to forum, please try following:\n"
-      << "### 1) update kaldi & cuda-toolkit (& GPU driver),\n"
-      << "### 2) re-run 'src/configure',\n"
-      << "### 3) re-compile kaldi by 'make clean; make -j depend; make -j'\n"
-      << "###\n"
-      << "### If the problem persists, please send us your:\n"
-      << "### - GPU model name, cuda-toolkit version, driver version "
-      << "(run nvidia-smi), variable $(CUDA_ARCH) from src/kaldi.mk";
+              << "### The CUDA setup is wrong! "
+              << "(\"invalid device function\" == problem with 'compute capability' "
+              << "in compiled kaldi)\n"
+              << "### Before posting the error to forum, please try following:\n"
+              << "### 1) update kaldi & cuda-toolkit (& GPU driver),\n"
+              << "### 2) re-run 'src/configure',\n"
+              << "### 3) re-compile kaldi by 'make clean; make -j depend; make -j'\n"
+              << "###\n"
+              << "### If the problem persists, please send us your:\n"
+              << "### - GPU model name, cuda-toolkit version, driver version "
+              << "(run nvidia-smi), variable $(CUDA_ARCH) from src/kaldi.mk";
     return -1;
   }
   fprintf(stderr, "### Test OK!\n");
@@ -91,17 +91,18 @@ int main(int argc, char *argv[]) try {
     << "that has the CUDA compiler 'nvcc' available.\n";
   return 1;
 #endif
-} catch (const std::exception &e) {
+}
+catch (const std::exception &e) {
   fprintf(stderr, "%s\n", e.what());
   KALDI_LOG << "...\n"
-    << "### WE DID NOT GET A CUDA GPU!!! ###\n"
-    << "### If your system has a 'free' CUDA GPU, try re-installing "
-    << "latest 'CUDA toolkit' from NVidia (this updates GPU drivers too).\n"
-    << "### Otherwise 'nvidia-smi' shows the status of GPUs:\n"
-    << "### - The versions should match ('NVIDIA-SMI' and 'Driver Version'), "
-    << "otherwise reboot or reload kernel module,\n"
-    << "### - The GPU should be unused "
-    << "(no 'process' in list, low 'memory-usage' (<100MB), low 'gpu-fan' (<30%)),\n"
-    << "### - You should see your GPU (burnt GPUs may disappear from the list until reboot),";
+            << "### WE DID NOT GET A CUDA GPU!!! ###\n"
+            << "### If your system has a 'free' CUDA GPU, try re-installing "
+            << "latest 'CUDA toolkit' from NVidia (this updates GPU drivers too).\n"
+            << "### Otherwise 'nvidia-smi' shows the status of GPUs:\n"
+            << "### - The versions should match ('NVIDIA-SMI' and 'Driver Version'), "
+            << "otherwise reboot or reload kernel module,\n"
+            << "### - The GPU should be unused "
+            << "(no 'process' in list, low 'memory-usage' (<100MB), low 'gpu-fan' (<30%)),\n"
+            << "### - You should see your GPU (burnt GPUs may disappear from the list until reboot),";
   return -1;
 }

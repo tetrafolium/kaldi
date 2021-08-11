@@ -1,6 +1,6 @@
 // rnnlm/rnnlm-lattice-rescoring.cc
 
-// Copyright 2017 Johns Hopkins University (author: Daniel Povey) 
+// Copyright 2017 Johns Hopkins University (author: Daniel Povey)
 //           2017 Yiming Wang
 //           2017 Hainan Xu
 //
@@ -32,7 +32,7 @@ KaldiRnnlmDeterministicFst::~KaldiRnnlmDeterministicFst() {
   int32 size = state_to_rnnlm_state_.size();
   for (int32 i = 0; i < size; i++)
     delete state_to_rnnlm_state_[i];
-  
+
   state_to_rnnlm_state_.resize(0);
   state_to_wseq_.resize(0);
   wseq_to_state_.clear();
@@ -44,7 +44,7 @@ void KaldiRnnlmDeterministicFst::Clear() {
   int32 size = state_to_rnnlm_state_.size();
   for (int32 i = 1; i < size; i++)
     delete state_to_rnnlm_state_[i];
-  
+
   state_to_rnnlm_state_.resize(1);
   state_to_wseq_.resize(1);
   wseq_to_state_.clear();
@@ -76,7 +76,7 @@ fst::StdArc::Weight KaldiRnnlmDeterministicFst::Final(StateId s) {
 }
 
 bool KaldiRnnlmDeterministicFst::GetArc(StateId s, Label ilabel,
-                                        fst::StdArc *oarc) {
+    fst::StdArc *oarc) {
   /// At this point, we have created the state.
   KALDI_ASSERT(static_cast<size_t>(s) < state_to_wseq_.size());
 
@@ -94,7 +94,7 @@ bool KaldiRnnlmDeterministicFst::GetArc(StateId s, Label ilabel,
   }
 
   std::pair<const std::vector<Label>, StateId> wseq_state_pair(
-      word_seq, static_cast<Label>(state_to_wseq_.size()));
+    word_seq, static_cast<Label>(state_to_wseq_.size()));
 
   // Attemps to insert the current <wseq_state_pair>. If the pair already exists
   // then it returns false.

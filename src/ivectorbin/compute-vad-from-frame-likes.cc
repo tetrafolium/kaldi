@@ -38,9 +38,9 @@ namespace kaldi {
        0 0
        1 1
        2 0
-*/
+ */
 void PrepareMap(const std::string &map_rxfilename, int32 num_classes,
-                unordered_map<int32, int32> *map) {
+    unordered_map<int32, int32> *map) {
   Input map_input(map_rxfilename);
   for (int32 i = 0; i < num_classes; i++)
     (*map)[i] = i;
@@ -76,9 +76,9 @@ void PrepareMap(const std::string &map_rxfilename, int32 num_classes,
    nonempty, the comma-separated floats are parsed out.  If present, the
    input of priors_str is of the form:
       0.5,0.25,0.25
-*/
+ */
 void PreparePriors(const std::string &priors_str, int32 num_classes,
-                std::vector<BaseFloat> *priors) {
+    std::vector<BaseFloat> *priors) {
   if (priors_str.empty()) {
     for (int32 i = 0; i < num_classes; i++)
       priors->push_back(log(1.0/num_classes)); // Uniform priors
@@ -100,19 +100,19 @@ int main(int argc, char *argv[]) {
   typedef kaldi::int32 int32;
   try {
     const char *usage =
-      "This program computes frame-level voice activity decisions from a\n"
-      "set of input frame-level log-likelihoods.  Usually, these\n"
-      "log-likelihoods are the output of fgmm-global-get-frame-likes.\n"
-      "Frames are assigned labels according to the class for which the\n"
-      "log-likelihood (optionally weighted by a prior) is maximal.  The\n"
-      "class labels are determined by the order of inputs on the command\n"
-      "line.  See options for more details.\n"
-      "\n"
-      "Usage: compute-vad-from-frame-likes [options] <likes-rspecifier-1>\n"
-      "    ... <likes-rspecifier-n> <vad-wspecifier>\n"
-      "e.g.: compute-vad-from-frame-likes --map=label_map.txt\n"
-      "    scp:likes1.scp scp:likes2.scp ark:vad.ark\n"
-      "See also: fgmm-global-get-frame-likes, compute-vad, merge-vads\n";
+        "This program computes frame-level voice activity decisions from a\n"
+        "set of input frame-level log-likelihoods.  Usually, these\n"
+        "log-likelihoods are the output of fgmm-global-get-frame-likes.\n"
+        "Frames are assigned labels according to the class for which the\n"
+        "log-likelihood (optionally weighted by a prior) is maximal.  The\n"
+        "class labels are determined by the order of inputs on the command\n"
+        "line.  See options for more details.\n"
+        "\n"
+        "Usage: compute-vad-from-frame-likes [options] <likes-rspecifier-1>\n"
+        "    ... <likes-rspecifier-n> <vad-wspecifier>\n"
+        "e.g.: compute-vad-from-frame-likes --map=label_map.txt\n"
+        "    scp:likes1.scp scp:likes2.scp ark:vad.ark\n"
+        "See also: fgmm-global-get-frame-likes, compute-vad, merge-vads\n";
 
     ParseOptions po(usage);
     std::string map_rxfilename;
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
     }
 
     int32 num_done = 0, num_err = 0;
-    for (;!first_reader.Done(); first_reader.Next()) {
+    for (; !first_reader.Done(); first_reader.Next()) {
       std::string utt = first_reader.Key();
       Vector<BaseFloat> like(first_reader.Value());
       int32 like_dim = like.Dim();
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
         Vector<BaseFloat> other_like(readers[i]->Value(utt));
         if (like_dim != other_like.Dim()) {
           KALDI_WARN << "Dimension mismatch in input vectors in " << utt
-                    << ": " << like_dim << " vs. " << other_like.Dim();
+                     << ": " << like_dim << " vs. " << other_like.Dim();
           num_err++;
           continue;
         }

@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     using fst::VectorFst;
     using fst::StdArc;
     typedef StdArc::StateId StateId;
-    
+
     const char *usage =
         "Limit the number of arcs crossing any frame, to a specified maximum.\n"
         "Requires an acoustic scale, because forward-backward Viterbi probs are\n"
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
                 "frame");
     po.Register("acoustic-scale", &acoustic_scale,
                 "Scaling factor for acoustic likelihoods");
-    
+
     po.Read(argc, argv);
 
     if (po.NumArgs() != 2) {
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     }
 
     KALDI_ASSERT(acoustic_scale != 0.0);
-    
+
     std::string lats_rspecifier = po.GetArg(1),
         lats_wspecifier = po.GetArg(2);
     SequentialCompactLatticeReader clat_reader(lats_rspecifier);
@@ -73,9 +73,9 @@ int main(int argc, char *argv[]) {
     for (; !clat_reader.Done(); clat_reader.Next()) {
       CompactLattice clat = clat_reader.Value();
       std::string key = clat_reader.Key();
-      
+
       fst::ScaleLattice(fst::AcousticLatticeScale(acoustic_scale), &clat);
-      
+
       TopSortCompactLatticeIfNeeded(&clat);
 
       int32 t;
@@ -85,9 +85,9 @@ int main(int argc, char *argv[]) {
 
       fst::ScaleLattice(fst::AcousticLatticeScale(1.0 / acoustic_scale),
                         &clat);
-      
+
       BaseFloat depth_out = CompactLatticeDepth(clat);
-      
+
       KALDI_VLOG(2) << "For key " << key << ", depth changed from "
                     << depth_in << " to " << depth_out <<  " over "
                     << t << " frames.";

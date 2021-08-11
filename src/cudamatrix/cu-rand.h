@@ -29,11 +29,11 @@ namespace kaldi {
 
 template<typename Real>
 class CuRand {
- public:
+public:
 
-   void SeedGpu() {
+  void SeedGpu() {
   #if HAVE_CUDA == 1
-		CuDevice::Instantiate().SeedGpu();
+    CuDevice::Instantiate().SeedGpu();
   #endif
   }
 

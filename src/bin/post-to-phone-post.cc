@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
         for (auto p: pdf_to_phones[i])
           denominator += p.second;
         for (auto iter = pdf_to_phones[i].begin(); iter != pdf_to_phones[i].end();
-             ++iter) {
+            ++iter) {
           if (denominator != 0.0)
             iter->second /= denominator;
           else

@@ -51,7 +51,7 @@ void VectorBase<float>::AddVec(const float alpha, const VectorBase<float> &rv);
 template<>
 template<>
 void VectorBase<double>::AddVec<double>(const double alpha,
-                                        const VectorBase<double> &rv);
+    const VectorBase<double> &rv);
 
 }  // namespace kaldi
 

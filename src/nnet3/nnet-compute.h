@@ -38,7 +38,7 @@ namespace nnet3 {
 
 struct NnetComputeOptions {
   bool debug;
-  NnetComputeOptions(): debug(false) { }
+  NnetComputeOptions() : debug(false) { }
   void Register(OptionsItf *opts) {
     opts->Register("debug", &debug, "If true, turn on "
                    "debug for the neural net computation (very verbose!) "
@@ -49,15 +49,15 @@ struct NnetComputeOptions {
 
 
 /**
-  class NnetComputer is responsible for executing the computation described in the
-  "computation" object.
+   class NnetComputer is responsible for executing the computation described in the
+   "computation" object.
 
-  You call in sequence, the constructor, then AcceptInput() [or AcceptInputs()],
-  then Run(), then GetOutput() [and if applicable, AcceptOutputDeriv], then if
-  there is a backward computation, Run() [then, if applicable, GetInputDeriv()].
+   You call in sequence, the constructor, then AcceptInput() [or AcceptInputs()],
+   then Run(), then GetOutput() [and if applicable, AcceptOutputDeriv], then if
+   there is a backward computation, Run() [then, if applicable, GetInputDeriv()].
  */
 class NnetComputer {
- public:
+public:
   /// Constructor.  nnet_to_update will be NULL if you are not doing
   /// model update or model-derivative computation.
   /// You must call computation.ComputeCudaIndexes()  before calling
@@ -66,18 +66,18 @@ class NnetComputer {
   /// Caution: there is another constructor that takes a pointer for
   /// 'nnet', be careful not to mix these up.
   NnetComputer(const NnetComputeOptions &options,
-               const NnetComputation &computation,
-               const Nnet &nnet,
-               Nnet *nnet_to_update);
+      const NnetComputation &computation,
+      const Nnet &nnet,
+      Nnet *nnet_to_update);
 
   /// This version of the constructor accepts a pointer to 'nnet' instead
   /// of a const reference.  The difference is that this version will,
   /// for storing statistics (the StoreStats() function of class Component),
   /// use 'nnet' instead of 'nnet_to_update' (if specified).
   NnetComputer(const NnetComputeOptions &options,
-               const NnetComputation &computation,
-               Nnet *nnet,
-               Nnet *nnet_to_update);
+      const NnetComputation &computation,
+      Nnet *nnet,
+      Nnet *nnet_to_update);
 
 
   /// Copy constructor.  May not be used if memos are stored with this object
@@ -95,13 +95,13 @@ class NnetComputer {
   /// ComputationRequest e.g. the indexes.size() in the corresponding
   /// IoSpecification.
   void AcceptInput(const std::string &node_name,
-                   CuMatrix<BaseFloat> *input);
+      CuMatrix<BaseFloat> *input);
 
   /// This convenience function calls AcceptInput() in turn on all the inputs in
   /// the training example.  It needs "nnet" only in order to distinguish inputs
   /// from outputs.
   void AcceptInputs(const Nnet &nnet,
-                    const std::vector<NnetIo> &io);
+      const std::vector<NnetIo> &io);
 
 
   /// This does either the forward or backward computation, depending
@@ -122,11 +122,11 @@ class NnetComputer {
   // Backward() on the same NnetComputer object, or it's a recurrent
   // computation-- it may lead to a crash.
   void GetOutputDestructive(const std::string &output_name,
-                            CuMatrix<BaseFloat> *output);
+      CuMatrix<BaseFloat> *output);
 
 
   ~NnetComputer();
- private:
+private:
   void Init(); // called from constructors.
 
   const NnetComputeOptions &options_;
@@ -196,11 +196,11 @@ class NnetComputer {
   CuSubMatrix<BaseFloat> GetSubMatrix(int32 submatrix_index);
 
   void GetPointers(int32 indexes_multi_index,
-                   int32 num_cols,
-                   CuArray<BaseFloat*> *pointers);
+      int32 num_cols,
+      CuArray<BaseFloat*> *pointers);
   void GetPointers(int32 indexes_multi_index,
-                   int32 num_cols,
-                   CuArray<const BaseFloat*> *pointers);
+      int32 num_cols,
+      CuArray<const BaseFloat*> *pointers);
 
   struct CommandDebugInfo {
     // Uncentered standard deviations of elements of all matrices that this
@@ -223,11 +223,11 @@ class NnetComputer {
 
   // only non-const because of the way GetSubMatrix works.
   void DebugBeforeExecute(int32 command,
-                          CommandDebugInfo *info);
+      CommandDebugInfo *info);
   // only non-const because of the way GetSubMatrix works.
   void DebugAfterExecute(int32 command,
-                         const CommandDebugInfo &info,
-                         double command_execution_time);
+      const CommandDebugInfo &info,
+      double command_execution_time);
 
   // simple helper function used in executing Propagate().
   // saves 'memo' at memo-index 'memo_index'; if memo

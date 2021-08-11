@@ -33,12 +33,12 @@ int main(int argc, char *argv[]) {
 
   try {
     const char *usage =
-      "Perform one iteration of NN training by SGD with per-utterance updates.\n"
-      "The training targets are represented as pdf-posteriors, usually prepared "
-      "by ali-to-post.\n"
-      "Usage: nnet-train-perutt [options] "
-      "<feature-rspecifier> <targets-rspecifier> <model-in> [<model-out>]\n"
-      "e.g.: nnet-train-perutt scp:feature.scp ark:posterior.ark nnet.init nnet.iter1\n";
+        "Perform one iteration of NN training by SGD with per-utterance updates.\n"
+        "The training targets are represented as pdf-posteriors, usually prepared "
+        "by ali-to-post.\n"
+        "Usage: nnet-train-perutt [options] "
+        "<feature-rspecifier> <targets-rspecifier> <model-in> [<model-out>]\n"
+        "e.g.: nnet-train-perutt scp:feature.scp ark:posterior.ark nnet.init nnet.iter1\n";
 
     ParseOptions po(usage);
 
@@ -91,8 +91,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::string feature_rspecifier = po.GetArg(1),
-      targets_rspecifier = po.GetArg(2),
-      model_filename = po.GetArg(3);
+        targets_rspecifier = po.GetArg(2),
+        model_filename = po.GetArg(3);
 
     std::string target_model_filename;
     if (!crossvalidate) {
@@ -146,11 +146,11 @@ int main(int argc, char *argv[]) {
     CuMatrix<BaseFloat> feats, feats_transf, nnet_out, obj_diff;
 
     Timer time;
-    KALDI_LOG << (crossvalidate?"CROSS-VALIDATION":"TRAINING") << " STARTED";
+    KALDI_LOG << (crossvalidate ? "CROSS-VALIDATION" : "TRAINING") << " STARTED";
 
     int32 num_done = 0,
-          num_no_tgt_mat = 0,
-          num_other_error = 0;
+        num_no_tgt_mat = 0,
+        num_other_error = 0;
 
     // main loop,
     for ( ; !feature_reader.Done(); feature_reader.Next()) {
@@ -175,8 +175,8 @@ int main(int argc, char *argv[]) {
       // skip the sentence if it is too long,
       if (mat.NumRows() > max_frames) {
         KALDI_WARN << "Skipping " << utt
-          << " that has " << mat.NumRows() << " frames,"
-          << " it is longer than '--max-frames'" << max_frames;
+                   << " that has " << mat.NumRows() << " frames,"
+                   << " it is longer than '--max-frames'" << max_frames;
         num_other_error++;
         continue;
       }
@@ -280,12 +280,12 @@ int main(int argc, char *argv[]) {
     }
 
     KALDI_LOG << "Done " << num_done << " files, "
-      << num_no_tgt_mat << " with no tgt_mats, "
-      << num_other_error << " with other errors. "
-      << "[" << (crossvalidate ? "CROSS-VALIDATION" : "TRAINING")
-      << ", " << (randomize ? "RANDOMIZED" : "NOT-RANDOMIZED")
-      << ", " << time.Elapsed() / 60 << " min, processing "
-      << total_frames / time.Elapsed() << " frames per sec.]";
+              << num_no_tgt_mat << " with no tgt_mats, "
+              << num_other_error << " with other errors. "
+              << "[" << (crossvalidate ? "CROSS-VALIDATION" : "TRAINING")
+              << ", " << (randomize ? "RANDOMIZED" : "NOT-RANDOMIZED")
+              << ", " << time.Elapsed() / 60 << " min, processing "
+              << total_frames / time.Elapsed() << " frames per sec.]";
 
     if (objective_function == "xent") {
       KALDI_LOG << xent.ReportPerClass();

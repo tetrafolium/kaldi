@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
                            frame_subsampling_factor,
                            repeat_frames,
                            reorder,
-                           (phone_map_rxfilename != "" ? &phone_map : NULL),
+          (phone_map_rxfilename != "" ? &phone_map : NULL),
                            &new_alignment)) {
         alignment_writer.Write(key, new_alignment);
         num_success++;

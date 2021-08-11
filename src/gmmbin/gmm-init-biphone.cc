@@ -51,12 +51,12 @@ void ReadSharedPhonesList(std::string rxfilename, std::vector<std::vector<int32>
 
 EventMap
 *GetFullBiphoneStubMap(const std::vector<std::vector<int32> > &phone_sets,
-                       const std::vector<int32> &phone2num_pdf_classes,
-                       const std::vector<int32> &ci_phones_list,
-                       const std::vector<std::vector<int32> > &bi_counts,
-                       int32 biphone_min_count,
-                       const std::vector<int32> &mono_counts,
-                       int32 mono_min_count) {
+    const std::vector<int32> &phone2num_pdf_classes,
+    const std::vector<int32> &ci_phones_list,
+    const std::vector<std::vector<int32> > &bi_counts,
+    int32 biphone_min_count,
+    const std::vector<int32> &mono_counts,
+    int32 mono_min_count) {
 
   {  // Check the inputs
     KALDI_ASSERT(!phone_sets.empty());
@@ -111,7 +111,7 @@ EventMap
     } else {
       KALDI_ASSERT(numpdfs_per_phone == 2);
       std::vector<int32> right_phoneset = phone_sets[i];  // All these will have a shared
-                                                // event-map child
+      // event-map child
       // Create an event map for level2:
       std::map<EventValueType, EventMap*> level2_map;  // key is 0
       {  // Handle CI phones
@@ -131,7 +131,7 @@ EventMap
           level3_map[0] = current_pdfid++;
           level3_map[1] = current_pdfid++;
         } else if (mono_counts.empty() ||
-                   mono_counts[right_phoneset[0]] > mono_min_count) {
+            mono_counts[right_phoneset[0]] > mono_min_count) {
           //  Revert to mono.
           KALDI_VLOG(2) << "Reverting to mono for biphone (" << left_phoneset[0]
                         << "," << right_phoneset[0] << ")";
@@ -178,12 +178,12 @@ EventMap
 
 ContextDependency*
 BiphoneContextDependencyFull(std::vector<std::vector<int32> > phone_sets,
-                             const std::vector<int32> phone2num_pdf_classes,
-                             const std::vector<int32> &ci_phones_list,
-                             const std::vector<std::vector<int32> > &bi_counts,
-                             int32 biphone_min_count,
-                             const std::vector<int32> &mono_counts,
-                             int32 mono_min_count) {
+    const std::vector<int32> phone2num_pdf_classes,
+    const std::vector<int32> &ci_phones_list,
+    const std::vector<std::vector<int32> > &bi_counts,
+    int32 biphone_min_count,
+    const std::vector<int32> &mono_counts,
+    int32 mono_min_count) {
   // Remove all the CI phones from the phone sets
   std::set<int32> ci_phones;
   for (size_t i = 0; i < ci_phones_list.size(); i++)
@@ -223,8 +223,8 @@ BiphoneContextDependencyFull(std::vector<std::vector<int32> > phone_sets,
    most entries are zero, but since there are not many biphones, a 2-dim vector
    is OK. */
 static void ReadPhoneCounts(std::string &filename, int32 num_phones,
-                            std::vector<int32> *mono_counts,
-                            std::vector<std::vector<int32> > *bi_counts) {
+    std::vector<int32> *mono_counts,
+    std::vector<std::vector<int32> > *bi_counts) {
   // The actual phones start from id = 1 (so the last phone has id = num_phones).
   mono_counts->resize(num_phones + 1, 0);
   bi_counts->resize(num_phones + 1, std::vector<int>(num_phones + 1, 0));

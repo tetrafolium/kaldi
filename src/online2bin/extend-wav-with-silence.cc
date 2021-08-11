@@ -22,20 +22,20 @@
 #include "util/common-utils.h"
 #include "feat/wave-reader.h"
 
-namespace kaldi{
+namespace kaldi {
 void FindQuietestSegment(const Vector<BaseFloat> &wav_in,
-                         BaseFloat samp_rate,
-                         Vector<BaseFloat> *wav_sil,
-                         BaseFloat search_dur = 0.5,
-                         BaseFloat seg_dur = 0.1,
-                         BaseFloat seg_shift_dur = 0.05);
+    BaseFloat samp_rate,
+    Vector<BaseFloat> *wav_sil,
+    BaseFloat search_dur = 0.5,
+    BaseFloat seg_dur = 0.1,
+    BaseFloat seg_shift_dur = 0.05);
 
 void ExtendWaveWithSilence(const Vector<BaseFloat> &wav_in,
-                           BaseFloat samp_rate,
-                           Vector<BaseFloat> *wav_out,
-                           BaseFloat sil_search_len,
-                           BaseFloat sil_extract_len,
-                           BaseFloat sil_extract_shift);
+    BaseFloat samp_rate,
+    Vector<BaseFloat> *wav_out,
+    BaseFloat sil_search_len,
+    BaseFloat sil_extract_len,
+    BaseFloat sil_extract_shift);
 
 }
 
@@ -55,9 +55,9 @@ int main(int argc, char *argv[]) {
 
     ParseOptions po(usage);
     BaseFloat sil_len = 5.0,
-      sil_search_len = 0.5,
-      sil_extract_len = 0.05,
-      sil_extract_shift = 0.025;
+        sil_search_len = 0.5,
+        sil_extract_len = 0.05,
+        sil_extract_shift = 0.025;
     po.Register("extra-silence-length", &sil_len, "the length of silence that will be "
                 "appended to the end of each waveform, in seconds.");
     po.Register("silence-search-length", &sil_search_len, "the length at the beginning "
@@ -82,16 +82,16 @@ int main(int argc, char *argv[]) {
       TableWriter<WaveHolder> writer(po.GetArg(2));
       int32 num_success = 0;
 
-      for(; !reader.Done(); reader.Next()){
+      for(; !reader.Done(); reader.Next()) {
         std::string wav_key = reader.Key();
         const WaveData &wave = reader.Value();
         BaseFloat samp_freq = wave.SampFreq();  // read sampling fequency
         const Matrix<BaseFloat> &wave_data = wave.Data();
         int32 num_chan = wave_data.NumRows(),       // number of channels in recording
-          num_ext_samp  = (int32)(samp_freq * sil_len); // number of samples that will be extended
+            num_ext_samp  = (int32)(samp_freq * sil_len);// number of samples that will be extended
         KALDI_ASSERT(num_ext_samp > 0);
         Matrix<BaseFloat> new_wave(wave_data.NumRows(), wave_data.NumCols() + num_ext_samp);
-        for(int32 i = 0; i < num_chan; i++){
+        for(int32 i = 0; i < num_chan; i++) {
           Vector<BaseFloat> wav_this_chan(wave_data.Row(i));
           Vector<BaseFloat> wav_extend(wav_this_chan.Dim() + num_ext_samp);
           ExtendWaveWithSilence(wav_this_chan, samp_freq, &wav_extend,
@@ -121,10 +121,10 @@ int main(int argc, char *argv[]) {
       BaseFloat samp_freq = wave.SampFreq();  // read sampling fequency
       const Matrix<BaseFloat> &wave_data = wave.Data();
       int32 num_chan = wave_data.NumRows(),       // number of channels in recording
-        num_ext_samp  = (int32)(samp_freq * sil_len); // number of samples that will be extended
+          num_ext_samp  = (int32)(samp_freq * sil_len);// number of samples that will be extended
       KALDI_ASSERT(num_ext_samp > 0);
       Matrix<BaseFloat> new_wave(wave_data.NumRows(), wave_data.NumCols() + num_ext_samp);
-      for(int32 i = 0; i < num_chan; i++){
+      for(int32 i = 0; i < num_chan; i++) {
         Vector<BaseFloat> wav_this_chan(wave_data.Row(i));
         Vector<BaseFloat> wav_extend(wav_this_chan.Dim() + num_ext_samp);
         ExtendWaveWithSilence(wav_this_chan, samp_freq, &wav_extend,
@@ -147,25 +147,25 @@ int main(int argc, char *argv[]) {
   }
 }
 
-namespace kaldi{
+namespace kaldi {
 
 void ExtendWaveWithSilence(const Vector<BaseFloat> &wav_in,
-                           BaseFloat samp_rate,
-                           Vector<BaseFloat> *wav_out,
-                           BaseFloat sil_search_len,
-                           BaseFloat sil_extract_len,
-                           BaseFloat sil_extract_shift){
+    BaseFloat samp_rate,
+    Vector<BaseFloat> *wav_out,
+    BaseFloat sil_search_len,
+    BaseFloat sil_extract_len,
+    BaseFloat sil_extract_shift){
   Vector<BaseFloat> quietest_seg;
   FindQuietestSegment(wav_in, samp_rate, &quietest_seg,
                       sil_search_len, sil_extract_len, sil_extract_shift);
 
   int32 window_size = quietest_seg.Dim(),
-    window_size_half = window_size / 2;
+      window_size_half = window_size / 2;
   KALDI_ASSERT(window_size > 0);
   Vector<BaseFloat> window(window_size);
   Vector<BaseFloat> windowed_silence(window_size);
   Vector<BaseFloat> half_window(window_size_half);
-  for(int32 i = 0; i < window.Dim(); i++){
+  for(int32 i = 0; i < window.Dim(); i++) {
     BaseFloat i_fl = static_cast<BaseFloat>(i);
     window(i) = 0.54 - 0.46*cos(M_2PI * i_fl / (window_size-1));
   }
@@ -174,7 +174,7 @@ void ExtendWaveWithSilence(const Vector<BaseFloat> &wav_in,
 
   wav_out->Range(0, wav_in.Dim()).CopyFromVec(wav_in);
   SubVector<BaseFloat> wav_ext(*wav_out, wav_in.Dim() - window_size_half,
-                                wav_out->Dim() - wav_in.Dim() + window_size_half);
+      wav_out->Dim() - wav_in.Dim() + window_size_half);
   for(int32 i = 0; i < window_size_half; i++)    // windowing the first half window
     wav_ext(i) *= half_window(i);
 
@@ -193,38 +193,38 @@ void ExtendWaveWithSilence(const Vector<BaseFloat> &wav_in,
 // search_dur(default 0.5) seconds at the beginning and the end
 // of input waveform by simply find a segment with the least energy.
 void FindQuietestSegment(const Vector<BaseFloat> &wav_in,
-                         BaseFloat samp_rate,
-                         Vector<BaseFloat> *wav_sil,
-                         BaseFloat search_dur,
-                         BaseFloat seg_dur,
-                         BaseFloat seg_shift_dur){
+    BaseFloat samp_rate,
+    Vector<BaseFloat> *wav_sil,
+    BaseFloat search_dur,
+    BaseFloat seg_dur,
+    BaseFloat seg_shift_dur){
   KALDI_ASSERT(seg_dur < search_dur);
 
   int32 search_len = (int32) (search_dur * samp_rate),
-    seg_len = (int32) (seg_dur * samp_rate),
-    seg_shift = (int32) (seg_shift_dur *samp_rate),
-    start = 0;
+      seg_len = (int32) (seg_dur * samp_rate),
+      seg_shift = (int32) (seg_shift_dur *samp_rate),
+      start = 0;
   double min_energy;
   Vector<BaseFloat> wav_min_energy;
   Vector<BaseFloat> seg_tmp(wav_in.Range(0, seg_len));
   wav_min_energy = seg_tmp;
   min_energy = VecVec(seg_tmp, seg_tmp);
-  for(start = 0; start + seg_len < search_len; ){
+  for(start = 0; start + seg_len < search_len; ) {
     SubVector<BaseFloat> seg_this(wav_in, start, seg_len);
     seg_tmp = seg_this;
     double energy_this = VecVec(seg_this, seg_this);
-    if(energy_this < min_energy && energy_this > 0.0){
+    if(energy_this < min_energy && energy_this > 0.0) {
       min_energy = energy_this;
       wav_min_energy = seg_tmp;
     }
     start += seg_shift;
   }
 
-  for(start = wav_in.Dim() - search_len; start + seg_len < wav_in.Dim(); ){
+  for(start = wav_in.Dim() - search_len; start + seg_len < wav_in.Dim(); ) {
     SubVector<BaseFloat> seg_this(wav_in, start, seg_len);
     seg_tmp = seg_this;
     double energy_this = VecVec(seg_this, seg_this);
-    if(energy_this < min_energy && energy_this > 0.0){
+    if(energy_this < min_energy && energy_this > 0.0) {
       min_energy = energy_this;
       wav_min_energy = seg_tmp;
     }

@@ -28,10 +28,10 @@ using std::vector;
 namespace kaldi {
 
 void FmllrDiagGmmAccs:: AccumulateFromPosteriors(
-    const DiagGmm &pdf,
-    const VectorBase<BaseFloat> &data,
-    const VectorBase<BaseFloat> &posterior) {
-  
+  const DiagGmm &pdf,
+  const VectorBase<BaseFloat> &data,
+  const VectorBase<BaseFloat> &posterior) {
+
   if (this->DataHasChanged(data)) {
     CommitSingleFrameStats();
     InitSingleFrameStats(data);
@@ -43,20 +43,20 @@ void FmllrDiagGmmAccs:: AccumulateFromPosteriors(
 }
 
 void FmllrDiagGmmAccs:: AccumulateFromPosteriorsPreselect(
-    const DiagGmm &pdf,
-    const std::vector<int32> &gselect,
-    const VectorBase<BaseFloat> &data,
-    const VectorBase<BaseFloat> &posterior) {
-  
+  const DiagGmm &pdf,
+  const std::vector<int32> &gselect,
+  const VectorBase<BaseFloat> &data,
+  const VectorBase<BaseFloat> &posterior) {
+
   if (this->DataHasChanged(data)) {
     CommitSingleFrameStats();
     InitSingleFrameStats(data);
   }
   SingleFrameStats &stats = this->single_frame_stats_;
   stats.count += posterior.Sum();
-  
+
   const Matrix<BaseFloat> &means_invvars = pdf.means_invvars(),
-      &inv_vars = pdf.inv_vars();
+  &inv_vars = pdf.inv_vars();
   KALDI_ASSERT(static_cast<int32>(gselect.size()) == posterior.Dim());
   for (size_t i = 0; i < gselect.size(); i++) {
     stats.a.AddVec(posterior(i), means_invvars.Row(gselect[i]));
@@ -65,10 +65,10 @@ void FmllrDiagGmmAccs:: AccumulateFromPosteriorsPreselect(
 }
 
 FmllrDiagGmmAccs::FmllrDiagGmmAccs(const DiagGmm &gmm,
-                                   const AccumFullGmm &fgmm_accs):
-    single_frame_stats_(gmm.Dim()), opts_(FmllrOptions()) {
+    const AccumFullGmm &fgmm_accs) :
+  single_frame_stats_(gmm.Dim()), opts_(FmllrOptions()) {
   KALDI_ASSERT(gmm.NumGauss() == fgmm_accs.NumGauss()
-               && gmm.Dim() == fgmm_accs.Dim());
+      && gmm.Dim() == fgmm_accs.Dim());
   Init(gmm.Dim());
   int32 dim = gmm.Dim(), num_gauss = gmm.NumGauss();
   for (int32 g = 0; g < num_gauss; g++) {
@@ -99,12 +99,12 @@ FmllrDiagGmmAccs::FmllrDiagGmmAccs(const DiagGmm &gmm,
 
 
 BaseFloat FmllrDiagGmmAccs::AccumulateForGmm(const DiagGmm &pdf,
-                                             const VectorBase<BaseFloat> &data,
-                                             BaseFloat weight) {
+    const VectorBase<BaseFloat> &data,
+    BaseFloat weight) {
   int32 num_comp = pdf.NumGauss();
   Vector<BaseFloat> posterior(num_comp);
   BaseFloat loglike;
-  
+
   loglike = pdf.ComponentPosteriors(data, &posterior);
   posterior.Scale(weight);
   AccumulateFromPosteriors(pdf, data, posterior);
@@ -112,10 +112,10 @@ BaseFloat FmllrDiagGmmAccs::AccumulateForGmm(const DiagGmm &pdf,
 }
 
 BaseFloat FmllrDiagGmmAccs::AccumulateForGmmPreselect(
-    const DiagGmm &pdf,
-    const std::vector<int32> &gselect,
-    const VectorBase<BaseFloat> &data,
-    BaseFloat weight) {
+  const DiagGmm &pdf,
+  const std::vector<int32> &gselect,
+  const VectorBase<BaseFloat> &data,
+  BaseFloat weight) {
   KALDI_ASSERT(!gselect.empty() && "Empty gselect information");
   Vector<BaseFloat> loglikes;
   pdf.LogLikelihoodsPreselect(data, gselect, &loglikes);
@@ -129,14 +129,14 @@ BaseFloat FmllrDiagGmmAccs::AccumulateForGmmPreselect(
 
 
 void FmllrDiagGmmAccs::Update(const FmllrOptions &opts,
-                              MatrixBase<BaseFloat> *fmllr_mat,
-                              BaseFloat *objf_impr,
-                              BaseFloat *count) {
+    MatrixBase<BaseFloat> *fmllr_mat,
+    BaseFloat *objf_impr,
+    BaseFloat *count) {
   KALDI_ASSERT(fmllr_mat != NULL);
   CommitSingleFrameStats();
   if (fmllr_mat->IsZero())
     KALDI_ERR << "You must initialize the fMLLR matrix to a non-singular value "
-        "(so we can report objective function changes); e.g. call SetUnit()";
+      "(so we can report objective function changes); e.g. call SetUnit()";
   if (opts.update_type == "full" && this->opts_.update_type != "full") {
     KALDI_ERR << "You are requesting a full-fMLLR update but you accumulated "
               << "stats for more limited update type.";
@@ -167,10 +167,10 @@ void FmllrDiagGmmAccs::Update(const FmllrOptions &opts,
 
 
 BaseFloat ComputeFmllrMatrixDiagGmm(const MatrixBase<BaseFloat> &in_xform,
-                                    const AffineXformStats &stats,
-                                    std::string fmllr_type,  // "none", "offset", "diag", "full"
-                                    int32 num_iters,
-                                    MatrixBase<BaseFloat> *out_xform) {
+    const AffineXformStats &stats,
+    std::string fmllr_type,                                  // "none", "offset", "diag", "full"
+    int32 num_iters,
+    MatrixBase<BaseFloat> *out_xform) {
   if (fmllr_type == "full") {
     return ComputeFmllrMatrixDiagGmmFull(in_xform, stats, num_iters, out_xform);
   } else if (fmllr_type == "diag") {
@@ -180,7 +180,7 @@ BaseFloat ComputeFmllrMatrixDiagGmm(const MatrixBase<BaseFloat> &in_xform,
   } else if (fmllr_type == "none") {
     if (!in_xform.IsUnit())
       KALDI_WARN << "You set fMLLR type to \"none\" but your starting transform "
-          "is not unit [this is strange, and diagnostics will be wrong].";
+        "is not unit [this is strange, and diagnostics will be wrong].";
     out_xform->SetUnit();
     return 0.0;
   } else
@@ -191,10 +191,10 @@ BaseFloat ComputeFmllrMatrixDiagGmm(const MatrixBase<BaseFloat> &in_xform,
 
 
 void FmllrInnerUpdate(SpMatrix<double> &inv_G,
-                      VectorBase<double> &k,
-                      double beta,
-                      int32 row,
-                      MatrixBase<double> *transform) {
+    VectorBase<double> &k,
+    double beta,
+    int32 row,
+    MatrixBase<double> *transform) {
   int32 dim = transform->NumRows();
   KALDI_ASSERT(transform->NumCols() == dim + 1);
   KALDI_ASSERT(row >= 0 && row < dim);
@@ -207,7 +207,7 @@ void FmllrInnerUpdate(SpMatrix<double> &inv_G,
   // Removed this step because it's not necessary and could lead to
   // under/overflow [Dan]
   // cofact_mat.Scale(exp(logdet));
-  
+
   // The extended cofactor vector for the current row
   Vector<double> cofact_row(dim + 1);
   cofact_row.Range(0, dim).CopyRowFromMat(cofact_mat, row);
@@ -234,9 +234,9 @@ void FmllrInnerUpdate(SpMatrix<double> &inv_G,
 }
 
 BaseFloat ComputeFmllrMatrixDiagGmmFull(const MatrixBase<BaseFloat> &in_xform,
-                                        const AffineXformStats &stats,
-                                        int32 num_iters,
-                                        MatrixBase<BaseFloat> *out_xform) {
+    const AffineXformStats &stats,
+    int32 num_iters,
+    MatrixBase<BaseFloat> *out_xform) {
   int32 dim = static_cast<int32>(stats.G_.size());
 
   // Compute the inverse matrices of second-order statistics
@@ -249,7 +249,7 @@ BaseFloat ComputeFmllrMatrixDiagGmmFull(const MatrixBase<BaseFloat> &in_xform,
 
   Matrix<double> old_xform(in_xform), new_xform(in_xform);
   BaseFloat old_objf = FmllrAuxFuncDiagGmm(old_xform, stats);
-  
+
   for (int32 iter = 0; iter < num_iters; ++iter) {
     for (int32 d = 0; d < dim; d++) {
       SubVector<double> k_d(stats.K_, d);
@@ -273,50 +273,50 @@ BaseFloat ComputeFmllrMatrixDiagGmmFull(const MatrixBase<BaseFloat> &in_xform,
 }
 
 BaseFloat ComputeFmllrMatrixDiagGmmDiagonal(const MatrixBase<BaseFloat> &in_xform,
-                                            const AffineXformStats &stats,
-                                            MatrixBase<BaseFloat> *out_xform) {
+    const AffineXformStats &stats,
+    MatrixBase<BaseFloat> *out_xform) {
   // The "Diagonal" here means a diagonal fMLLR matrix, i.e. like W = [ A;  b] where
   // A is diagonal.
   // We re-derived the math (see exponential transform paper) to get a simpler
   // update rule.
 
   /*
-  Write out_xform as D, which is a d x d+1 matrix (where d is the feature dimension).
-  We are solving for s == d_{i,i}, and o == d_{i,d}  [assuming zero-based indexing];
+     Write out_xform as D, which is a d x d+1 matrix (where d is the feature dimension).
+     We are solving for s == d_{i,i}, and o == d_{i,d}  [assuming zero-based indexing];
       s is a scale, o is an offset.
-  The stats are K (dimension d x d+1) and G_i for i=0..d-1 (dimension: d+1 x d+1),
-    and the count beta.
+     The stats are K (dimension d x d+1) and G_i for i=0..d-1 (dimension: d+1 x d+1),
+     and the count beta.
 
- The auxf for the i'th row of the transform is (assuming zero-based indexing):
+     The auxf for the i'th row of the transform is (assuming zero-based indexing):
 
-  s k_{i,i}  +  o k_{i,d}
-  - \frac{1}{2} s^2 g_{i,i,i} - \frac{1}{2} o^2 g_{i,d,d} - s o g_{i,d,i}
+     s k_{i,i}  +  o k_{i,d}
+     - \frac{1}{2} s^2 g_{i,i,i} - \frac{1}{2} o^2 g_{i,d,d} - s o g_{i,d,i}
    + \beta \log |s|
 
-   Suppose we know s, we can solve for o:
+     Suppose we know s, we can solve for o:
       o = (k_{i,d} - s g_{i,d,i}) / g_{i,d,d}
-   Substituting this expression for o into the auxf (and ignoring
-   terms that don't vary with s), we have the auxf:
+     Substituting this expression for o into the auxf (and ignoring
+     terms that don't vary with s), we have the auxf:
 
- \frac{1}{2} s^2 ( g_{i,d,i}^2 / g_{i,d,d}  -  g_{i,i,i} )
-    +  s ( k_{i,i} - g_{i,d,i} k_{i,d} / g_{i,d,d} )
-    + \beta \log |s|
+     \frac{1}{2} s^2 ( g_{i,d,i}^2 / g_{i,d,d}  -  g_{i,i,i} )
+   +  s ( k_{i,i} - g_{i,d,i} k_{i,d} / g_{i,d,d} )
+   + \beta \log |s|
 
-  Differentiating w.r.t. s and assuming s is positive, we have
-    a s + b + c/s = 0
- where
-   a = (  g_{i,d,i}^2 / g_{i,d,d}  -  g_{i,i,i} ),
-   b = ( k_{i,i} - g_{i,d,i} k_{i,d} / g_{i,d,d} )
-   c = beta
- Multiplying by s, we have the equation
-   a s^2 + b s + c = 0, where we assume s > 0.
- We solve it with:
-  s = (-b - \sqrt{b^2 - 4ac}) / 2a
- [take the negative root because we know a is negative, and this gives
-  the more positive solution for s; the other one would be negative].
- We then solve for o with the equation above, i.e.:
+     Differentiating w.r.t. s and assuming s is positive, we have
+     a s + b + c/s = 0
+     where
+     a = (  g_{i,d,i}^2 / g_{i,d,d}  -  g_{i,i,i} ),
+     b = ( k_{i,i} - g_{i,d,i} k_{i,d} / g_{i,d,d} )
+     c = beta
+     Multiplying by s, we have the equation
+     a s^2 + b s + c = 0, where we assume s > 0.
+     We solve it with:
+     s = (-b - \sqrt{b^2 - 4ac}) / 2a
+     [take the negative root because we know a is negative, and this gives
+     the more positive solution for s; the other one would be negative].
+     We then solve for o with the equation above, i.e.:
      o = (k_{i,d} - s g_{i,d,i}) / g_{i,d,d})
-  */
+   */
 
   int32 dim = stats.G_.size();
   double beta = stats.beta_;
@@ -348,8 +348,8 @@ BaseFloat ComputeFmllrMatrixDiagGmmDiagonal(const MatrixBase<BaseFloat> &in_xfor
 }
 
 BaseFloat ComputeFmllrMatrixDiagGmmOffset(const MatrixBase<BaseFloat> &in_xform,
-                                          const AffineXformStats &stats,
-                                          MatrixBase<BaseFloat> *out_xform) {
+    const AffineXformStats &stats,
+    MatrixBase<BaseFloat> *out_xform) {
   int32 dim = stats.G_.size();
   KALDI_ASSERT(in_xform.NumRows() == dim && in_xform.NumCols() == dim+1);
   SubMatrix<BaseFloat> square_part(in_xform, 0, dim, 0, dim);
@@ -379,14 +379,14 @@ BaseFloat ComputeFmllrMatrixDiagGmmOffset(const MatrixBase<BaseFloat> &in_xform,
 
 
 void ApplyFeatureTransformToStats(const MatrixBase<BaseFloat> &xform,
-                                  AffineXformStats *stats) {
+    AffineXformStats *stats) {
   KALDI_ASSERT(stats != NULL && stats->Dim() != 0);
   int32 dim = stats->Dim();
   // make sure the stats are of the standard diagonal kind.
   KALDI_ASSERT(stats->G_.size() == static_cast<size_t>(dim));
   KALDI_ASSERT( (xform.NumRows() == dim && xform.NumCols() == dim) // linear
-                || (xform.NumRows() == dim && xform.NumCols() == dim+1) // affine
-                || (xform.NumRows() == dim+1 && xform.NumCols() == dim+1));  // affine w/ extra row.
+      || (xform.NumRows() == dim && xform.NumCols() == dim+1)           // affine
+      || (xform.NumRows() == dim+1 && xform.NumCols() == dim+1));            // affine w/ extra row.
   if (xform.NumRows() == dim+1) {  // check last row of input
     // has correct value. 0 0 0 ..  0 1.
     for (int32 i = 0; i < dim; i++)
@@ -419,7 +419,7 @@ void ApplyFeatureTransformToStats(const MatrixBase<BaseFloat> &xform,
 }
 
 void ApplyModelTransformToStats(const MatrixBase<BaseFloat> &xform,
-                                AffineXformStats *stats) {
+    AffineXformStats *stats) {
   KALDI_ASSERT(stats != NULL && stats->Dim() != 0.0);
   int32 dim = stats->Dim();
   KALDI_ASSERT(xform.NumRows() == dim && xform.NumCols() == dim+1);
@@ -479,7 +479,7 @@ void ApplyModelTransformToStats(const MatrixBase<BaseFloat> &xform,
 }
 
 float FmllrAuxFuncDiagGmm(const MatrixBase<float> &xform,
-                              const AffineXformStats &stats) {
+    const AffineXformStats &stats) {
   int32 dim = static_cast<int32>(stats.G_.size());
   Matrix<double> xform_d(xform);
   Vector<double> xform_row_g(dim + 1);
@@ -494,7 +494,7 @@ float FmllrAuxFuncDiagGmm(const MatrixBase<float> &xform,
 }
 
 double FmllrAuxFuncDiagGmm(const MatrixBase<double> &xform,
-                           const AffineXformStats &stats) {
+    const AffineXformStats &stats) {
   int32 dim = static_cast<int32>(stats.G_.size());
   Vector<double> xform_row_g(dim + 1);
   SubMatrix<double> A(xform, 0, dim, 0, dim);
@@ -508,10 +508,10 @@ double FmllrAuxFuncDiagGmm(const MatrixBase<double> &xform,
 }
 
 BaseFloat FmllrAuxfGradient(const MatrixBase<BaseFloat> &xform,
-                            // if this is changed back to Matrix<double>
-                           // un-comment the Resize() below.
-                            const AffineXformStats &stats,
-                            MatrixBase<BaseFloat> *grad_out) {
+    // if this is changed back to Matrix<double>
+    // un-comment the Resize() below.
+    const AffineXformStats &stats,
+    MatrixBase<BaseFloat> *grad_out) {
   int32 dim = static_cast<int32>(stats.G_.size());
   Matrix<double> xform_d(xform);
   Vector<double> xform_row_g(dim + 1);
@@ -549,7 +549,7 @@ void FmllrDiagGmmAccs::SingleFrameStats::Init(int32 dim) {
   a.Resize(dim);
   b.Resize(dim);
   count = 0.0;
-}  
+}
 
 void FmllrDiagGmmAccs::InitSingleFrameStats(const VectorBase<BaseFloat> &data) {
   SingleFrameStats &stats = single_frame_stats_;
@@ -568,7 +568,7 @@ void FmllrDiagGmmAccs::CommitSingleFrameStats() {
   Vector<double> xplus(dim+1);
   xplus.Range(0, dim).CopyFromVec(stats.x);
   xplus(dim) = 1.0;
-  
+
   this->beta_ += stats.count;
   this->K_.AddVecVec(1.0, Vector<double>(stats.a), xplus);
 
@@ -576,7 +576,7 @@ void FmllrDiagGmmAccs::CommitSingleFrameStats() {
   if (opts_.update_type == "full") {
     SpMatrix<double> scatter(dim+1);
     scatter.AddVec2(1.0, xplus);
-    
+
     KALDI_ASSERT(static_cast<size_t>(dim) == this->G_.size());
     for (int32 i = 0; i < dim; i++)
       this->G_[i].AddSp(stats.b(i), scatter);
@@ -594,7 +594,7 @@ void FmllrDiagGmmAccs::CommitSingleFrameStats() {
   stats.a.SetZero();
   stats.b.SetZero();
 }
-    
+
 
 
 

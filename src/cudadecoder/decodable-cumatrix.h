@@ -27,17 +27,17 @@ namespace kaldi {
 namespace cuda_decoder {
 
 /**
-  Cuda Decodable matrix.  Takes transition model and posteriors and provides
-  an interface similar to the Decodable Interface
-  */
+   Cuda Decodable matrix.  Takes transition model and posteriors and provides
+   an interface similar to the Decodable Interface
+ */
 class DecodableCuMatrixMapped : public CudaDecodableInterface {
 public:
   // This constructor creates an object that will not delete "likes" when done.
   // the frame_offset is the frame the row 0 of 'likes' corresponds to, would be
   // greater than one if this is not the first chunk of likelihoods.
   DecodableCuMatrixMapped(const TransitionModel &tm,
-                          const CuMatrixBase<BaseFloat> &likes,
-                          int32 frame_offset = 0);
+      const CuMatrixBase<BaseFloat> &likes,
+      int32 frame_offset = 0);
 
   virtual int32 NumFramesReady() const;
 

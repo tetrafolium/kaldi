@@ -80,9 +80,9 @@ int main(int argc, char *argv[]) {
 
     if (utt2spk_rspecifier != "" && vtln_map_rspecifier != "")
       KALDI_ERR << ("The --utt2spk option is only needed if "
-                    "the --vtln-map option is used.");
+      "the --vtln-map option is used.");
     RandomAccessBaseFloatReaderMapped vtln_map_reader(vtln_map_rspecifier,
-                                                      utt2spk_rspecifier);
+        utt2spk_rspecifier);
 
     SequentialTableReader<WaveHolder> reader(wav_rspecifier);
     BaseFloatMatrixWriter kaldi_writer;  // typedef to TableWriter<something>.

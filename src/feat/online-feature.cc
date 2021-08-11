@@ -24,7 +24,7 @@
 
 namespace kaldi {
 
-RecyclingVector::RecyclingVector(int items_to_hold):
+RecyclingVector::RecyclingVector(int items_to_hold) :
   items_to_hold_(items_to_hold == 0 ? -1 : items_to_hold),
   first_available_index_(0) {
 }
@@ -38,7 +38,7 @@ RecyclingVector::~RecyclingVector() {
 Vector<BaseFloat> *RecyclingVector::At(int index) const {
   if (index < first_available_index_) {
     KALDI_ERR << "Attempted to retrieve feature vector that was "
-                 "already removed by the RecyclingVector (index = "
+      "already removed by the RecyclingVector (index = "
               << index << "; "
               << "first_available_index = " << first_available_index_ << "; "
               << "size = " << Size() << ")";
@@ -62,16 +62,16 @@ int RecyclingVector::Size() const {
 
 template <class C>
 void OnlineGenericBaseFeature<C>::GetFrame(int32 frame,
-                                           VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   feat->CopyFromVec(*(features_.At(frame)));
 };
 
 template <class C>
 OnlineGenericBaseFeature<C>::OnlineGenericBaseFeature(
-    const typename C::Options &opts):
-    computer_(opts), window_function_(computer_.GetFrameOptions()),
-    features_(opts.frame_opts.max_feature_vectors),
-    input_finished_(false), waveform_offset_(0) {
+  const typename C::Options &opts) :
+  computer_(opts), window_function_(computer_.GetFrameOptions()),
+  features_(opts.frame_opts.max_feature_vectors),
+  input_finished_(false), waveform_offset_(0) {
   // RE the following assert: search for ONLINE_IVECTOR_LIMIT in
   // online-ivector-feature.cc.
   // Casting to uint32, an unsigned type, means that -1 would be treated
@@ -82,16 +82,16 @@ OnlineGenericBaseFeature<C>::OnlineGenericBaseFeature(
 
 template <class C>
 void OnlineGenericBaseFeature<C>::MaybeCreateResampler(
-    BaseFloat sampling_rate) {
+  BaseFloat sampling_rate) {
   BaseFloat expected_sampling_rate = computer_.GetFrameOptions().samp_freq;
 
   if (resampler_ != nullptr) {
     KALDI_ASSERT(resampler_->GetInputSamplingRate() == sampling_rate);
     KALDI_ASSERT(resampler_->GetOutputSamplingRate() == expected_sampling_rate);
   } else if (((sampling_rate > expected_sampling_rate) &&
-              computer_.GetFrameOptions().allow_downsample) ||
-             ((sampling_rate < expected_sampling_rate) &&
-              computer_.GetFrameOptions().allow_upsample)) {
+      computer_.GetFrameOptions().allow_downsample) ||
+      ((sampling_rate < expected_sampling_rate) &&
+      computer_.GetFrameOptions().allow_upsample)) {
     resampler_.reset(new LinearResample(
         sampling_rate, expected_sampling_rate,
         std::min(sampling_rate / 2, expected_sampling_rate / 2), 6));
@@ -99,7 +99,7 @@ void OnlineGenericBaseFeature<C>::MaybeCreateResampler(
     KALDI_ERR << "Sampling frequency mismatch, expected "
               << expected_sampling_rate << ", got " << sampling_rate
               << "\nPerhaps you want to use the options "
-                 "--allow_{upsample,downsample}";
+      "--allow_{upsample,downsample}";
   }
 }
 
@@ -117,9 +117,9 @@ void OnlineGenericBaseFeature<C>::InputFinished() {
                            resampled_wave.Dim());
       if (waveform_remainder_.Dim() != 0)
         appended_wave.Range(0, waveform_remainder_.Dim())
-            .CopyFromVec(waveform_remainder_);
+        .CopyFromVec(waveform_remainder_);
       appended_wave.Range(waveform_remainder_.Dim(), resampled_wave.Dim())
-          .CopyFromVec(resampled_wave);
+      .CopyFromVec(resampled_wave);
       waveform_remainder_.Swap(&appended_wave);
     }
   }
@@ -129,7 +129,7 @@ void OnlineGenericBaseFeature<C>::InputFinished() {
 
 template <class C>
 void OnlineGenericBaseFeature<C>::AcceptWaveform(
-    BaseFloat sampling_rate, const VectorBase<BaseFloat> &original_waveform) {
+  BaseFloat sampling_rate, const VectorBase<BaseFloat> &original_waveform) {
   if (original_waveform.Dim() == 0)
     return;  // Nothing to do.
   if (input_finished_)
@@ -151,9 +151,9 @@ void OnlineGenericBaseFeature<C>::AcceptWaveform(
   appended_wave.Resize(waveform_remainder_.Dim() + waveform->Dim());
   if (waveform_remainder_.Dim() != 0)
     appended_wave.Range(0, waveform_remainder_.Dim())
-        .CopyFromVec(waveform_remainder_);
+    .CopyFromVec(waveform_remainder_);
   appended_wave.Range(waveform_remainder_.Dim(), waveform->Dim())
-      .CopyFromVec(*waveform);
+  .CopyFromVec(*waveform);
   waveform_remainder_.Swap(&appended_wave);
   ComputeFeatures();
 }
@@ -208,10 +208,10 @@ template class OnlineGenericBaseFeature<MfccComputer>;
 template class OnlineGenericBaseFeature<PlpComputer>;
 template class OnlineGenericBaseFeature<FbankComputer>;
 
-OnlineCmvnState::OnlineCmvnState(const OnlineCmvnState &other):
-    speaker_cmvn_stats(other.speaker_cmvn_stats),
-    global_cmvn_stats(other.global_cmvn_stats),
-    frozen_state(other.frozen_state) { }
+OnlineCmvnState::OnlineCmvnState(const OnlineCmvnState &other) :
+  speaker_cmvn_stats(other.speaker_cmvn_stats),
+  global_cmvn_stats(other.global_cmvn_stats),
+  frozen_state(other.frozen_state) { }
 
 void OnlineCmvnState::Write(std::ostream &os, bool binary) const {
   WriteToken(os, binary, "<OnlineCmvnState>");  // magic string.
@@ -236,11 +236,11 @@ void OnlineCmvnState::Read(std::istream &is, bool binary) {
 }
 
 OnlineCmvn::OnlineCmvn(const OnlineCmvnOptions &opts,
-                       const OnlineCmvnState &cmvn_state,
-                       OnlineFeatureInterface *src):
-    opts_(opts), temp_stats_(2, src->Dim() + 1),
-    temp_feats_(src->Dim()), temp_feats_dbl_(src->Dim()),
-    src_(src) {
+    const OnlineCmvnState &cmvn_state,
+    OnlineFeatureInterface *src) :
+  opts_(opts), temp_stats_(2, src->Dim() + 1),
+  temp_feats_(src->Dim()), temp_feats_dbl_(src->Dim()),
+  src_(src) {
   SetState(cmvn_state);
   if (!SplitStringToIntegers(opts.skip_dims, ":", false, &skip_dims_))
     KALDI_ERR << "Bad --skip-dims option (should be colon-separated list of "
@@ -248,10 +248,10 @@ OnlineCmvn::OnlineCmvn(const OnlineCmvnOptions &opts,
 }
 
 OnlineCmvn::OnlineCmvn(const OnlineCmvnOptions &opts,
-                       OnlineFeatureInterface *src):
-    opts_(opts), temp_stats_(2, src->Dim() + 1),
-    temp_feats_(src->Dim()), temp_feats_dbl_(src->Dim()),
-    src_(src) {
+    OnlineFeatureInterface *src) :
+  opts_(opts), temp_stats_(2, src->Dim() + 1),
+  temp_feats_(src->Dim()), temp_feats_dbl_(src->Dim()),
+  src_(src) {
   if (!SplitStringToIntegers(opts.skip_dims, ":", false, &skip_dims_))
     KALDI_ERR << "Bad --skip-dims option (should be colon-separated list of "
               <<  "integers)";
@@ -259,8 +259,8 @@ OnlineCmvn::OnlineCmvn(const OnlineCmvnOptions &opts,
 
 
 void OnlineCmvn::GetMostRecentCachedFrame(int32 frame,
-                                          int32 *cached_frame,
-                                          MatrixBase<double> *stats) {
+    int32 *cached_frame,
+    MatrixBase<double> *stats) {
   KALDI_ASSERT(frame >= 0);
   InitRingBufferIfNeeded();
   // look for a cached frame on a previous frame as close as possible in time
@@ -335,7 +335,7 @@ OnlineCmvn::~OnlineCmvn() {
 }
 
 void OnlineCmvn::ComputeStatsForFrame(int32 frame,
-                                      MatrixBase<double> *stats_out) {
+    MatrixBase<double> *stats_out) {
   KALDI_ASSERT(frame >= 0 && frame < src_->NumFramesReady());
 
   int32 dim = this->Dim(), cur_frame;
@@ -370,9 +370,9 @@ void OnlineCmvn::ComputeStatsForFrame(int32 frame,
 
 // static
 void OnlineCmvn::SmoothOnlineCmvnStats(const MatrixBase<double> &speaker_stats,
-                                       const MatrixBase<double> &global_stats,
-                                       const OnlineCmvnOptions &opts,
-                                       MatrixBase<double> *stats) {
+    const MatrixBase<double> &global_stats,
+    const OnlineCmvnOptions &opts,
+    MatrixBase<double> *stats) {
   if (speaker_stats.NumRows() == 2 && !opts.normalize_variance) {
     // this is just for efficiency: don't operate on the variance if it's not
     // needed.
@@ -419,7 +419,7 @@ void OnlineCmvn::SmoothOnlineCmvnStats(const MatrixBase<double> &speaker_stats,
 }
 
 void OnlineCmvn::GetFrame(int32 frame,
-                          VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   src_->GetFrame(frame, feat);
   KALDI_ASSERT(feat->Dim() == this->Dim());
   int32 dim = feat->Dim();
@@ -465,7 +465,7 @@ void OnlineCmvn::Freeze(int32 cur_frame) {
 }
 
 void OnlineCmvn::GetState(int32 cur_frame,
-                          OnlineCmvnState *state_out) {
+    OnlineCmvnState *state_out) {
   *state_out = this->orig_state_;
   { // This block updates state_out->speaker_cmvn_stats
     int32 dim = this->Dim();
@@ -519,8 +519,8 @@ void OnlineSpliceFrames::GetFrame(int32 frame, VectorBase<BaseFloat> *feat) {
 }
 
 OnlineTransform::OnlineTransform(const MatrixBase<BaseFloat> &transform,
-                                 OnlineFeatureInterface *src):
-    src_(src) {
+    OnlineFeatureInterface *src) :
+  src_(src) {
   int32 src_dim = src_->Dim();
   if (transform.NumCols() == src_dim) {  // Linear transform
     linear_term_ = transform;
@@ -543,7 +543,7 @@ void OnlineTransform::GetFrame(int32 frame, VectorBase<BaseFloat> *feat) {
 }
 
 void OnlineTransform::GetFrames(
-    const std::vector<int32> &frames, MatrixBase<BaseFloat> *feats) {
+  const std::vector<int32> &frames, MatrixBase<BaseFloat> *feats) {
   KALDI_ASSERT(static_cast<int32>(frames.size()) == feats->NumRows());
   int32 num_frames = feats->NumRows(),
       input_dim = linear_term_.NumCols();
@@ -571,7 +571,7 @@ int32 OnlineDeltaFeature::NumFramesReady() const {
 }
 
 void OnlineDeltaFeature::GetFrame(int32 frame,
-                                      VectorBase<BaseFloat> *feat) {
+    VectorBase<BaseFloat> *feat) {
   KALDI_ASSERT(frame >= 0 && frame < NumFramesReady());
   KALDI_ASSERT(feat->Dim() == Dim());
   // We'll produce a temporary matrix containing the features we want to
@@ -598,8 +598,8 @@ void OnlineDeltaFeature::GetFrame(int32 frame,
 
 
 OnlineDeltaFeature::OnlineDeltaFeature(const DeltaFeaturesOptions &opts,
-                                       OnlineFeatureInterface *src):
-    src_(src), opts_(opts), delta_features_(opts) { }
+    OnlineFeatureInterface *src) :
+  src_(src), opts_(opts), delta_features_(opts) { }
 
 void OnlineCacheFeature::GetFrame(int32 frame, VectorBase<BaseFloat> *feat) {
   KALDI_ASSERT(frame >= 0);
@@ -617,7 +617,7 @@ void OnlineCacheFeature::GetFrame(int32 frame, VectorBase<BaseFloat> *feat) {
 }
 
 void OnlineCacheFeature::GetFrames(
-    const std::vector<int32> &frames, MatrixBase<BaseFloat> *feats) {
+  const std::vector<int32> &frames, MatrixBase<BaseFloat> *feats) {
   int32 num_frames = frames.size();
   // non_cached_frames will be the subset of 't' values in 'frames' which were
   // not previously cached, which we therefore need to get from src_.
@@ -641,7 +641,7 @@ void OnlineCacheFeature::GetFrames(
   int32 num_non_cached_frames = non_cached_frames.size(),
       dim = this->Dim();
   Matrix<BaseFloat> non_cached_feats(num_non_cached_frames, dim,
-                                     kUndefined);
+      kUndefined);
   src_->GetFrames(non_cached_frames, &non_cached_feats);
   for (int32 i = 0; i < num_non_cached_frames; i++) {
     int32 t = non_cached_frames[i];

@@ -35,13 +35,13 @@ namespace kaldi {
     for more information.
  */
 class SimpleDecoder {
- public:
+public:
   typedef fst::StdArc StdArc;
   typedef StdArc::Weight StdWeight;
   typedef StdArc::Label Label;
   typedef StdArc::StateId StateId;
 
-  SimpleDecoder(const fst::Fst<fst::StdArc> &fst, BaseFloat beam): fst_(fst), beam_(beam) { }
+  SimpleDecoder(const fst::Fst<fst::StdArc> &fst, BaseFloat beam) : fst_(fst), beam_(beam) { }
 
   ~SimpleDecoder();
 
@@ -83,15 +83,15 @@ class SimpleDecoder {
   /// that many frames.  If it returns false, then no tokens are alive,
   /// which is a kind of error state.
   void AdvanceDecoding(DecodableInterface *decodable,
-                         int32 max_num_frames = -1);
+      int32 max_num_frames = -1);
 
   /// Returns the number of frames already decoded.
   int32 NumFramesDecoded() const { return num_frames_decoded_; }
 
- private:
+private:
 
   class Token {
-   public:
+public:
     LatticeArc arc_; // We use LatticeArc so that we can separately
                      // store the acoustic and graph cost, in case
                      // we need to produce lattice-formatted output.
@@ -99,8 +99,8 @@ class SimpleDecoder {
     int32 ref_count_;
     double cost_; // accumulated total cost up to this point.
     Token(const StdArc &arc,
-          BaseFloat acoustic_cost,
-          Token *prev): prev_(prev), ref_count_(1) {
+        BaseFloat acoustic_cost,
+        Token *prev) : prev_(prev), ref_count_(1) {
       arc_.ilabel = arc.ilabel;
       arc_.olabel = arc.olabel;
       arc_.weight = LatticeWeight(arc.weight.Value(), acoustic_cost);

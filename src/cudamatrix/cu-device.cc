@@ -102,8 +102,8 @@ void CuDevice::Initialize() {
     if (!multi_threaded_) {
       multi_threaded_ = true;
       KALDI_WARN << "For multi-threaded code that might use GPU, you should call "
-          "CuDevice::Instantiate().AllowMultithreading() at the start of "
-          "the program.";
+        "CuDevice::Instantiate().AllowMultithreading() at the start of "
+        "the program.";
     }
     device_id_copy_ = device_id_;
     cudaSetDevice(device_id_);
@@ -113,15 +113,15 @@ void CuDevice::Initialize() {
 
 #if CUDA_VERSION >= 9010
     CUSOLVER_SAFE_CALL(cusolverDnCreate(&cusolverdn_handle_));
-    CUSOLVER_SAFE_CALL(cusolverDnSetStream(cusolverdn_handle_, 
+    CUSOLVER_SAFE_CALL(cusolverDnSetStream(cusolverdn_handle_,
             cudaStreamPerThread));
 #endif
-    
-#if CUDA_VERSION >= 9000 
+
+#if CUDA_VERSION >= 9000
     if (device_options_.use_tensor_cores) {
       // Enable tensor cores in CUBLAS
       // Note if the device does not support tensor cores this will fall back to normal math mode
-      CUBLAS_SAFE_CALL(cublasSetMathMode(cublas_handle_, 
+      CUBLAS_SAFE_CALL(cublasSetMathMode(cublas_handle_,
             CUBLAS_TENSOR_OP_MATH));
     }
 #endif
@@ -144,7 +144,7 @@ void CuDevice::Initialize() {
 void CuDevice::SelectGpuId(std::string use_gpu) {
   if (device_id_ != -1) {
     KALDI_ERR << "You cannot call SelectGpuId twice if, on the first time, "
-        "you requested a GPU.";
+      "you requested a GPU.";
   }
   if (use_gpu != "yes" && use_gpu != "no" && use_gpu != "optional" && use_gpu != "wait") {
     KALDI_ERR << "Please choose : --use-gpu=yes|no|optional|wait, passed '" << use_gpu << "'";
@@ -226,7 +226,7 @@ void CuDevice::SelectGpuId(std::string use_gpu) {
   } else {
     // Suggest to use compute exclusive mode
     KALDI_WARN << "Not in compute-exclusive mode.  Suggestion: use "
-        "'nvidia-smi -c 3' to set compute exclusive mode";
+      "'nvidia-smi -c 3' to set compute exclusive mode";
     // We want to choose the device more carefully, so release the CUDA context.
     e = cudaDeviceReset();
     if (e != cudaSuccess) {
@@ -270,27 +270,27 @@ void CuDevice::FinalizeActiveGpu() {
     // Initialize CUBLAS.
     CUBLAS_SAFE_CALL(cublasCreate(&cublas_handle_));
     CUBLAS_SAFE_CALL(cublasSetStream(cublas_handle_, cudaStreamPerThread));
-    
-#if CUDA_VERSION >= 9010 
+
+#if CUDA_VERSION >= 9010
     CUSOLVER_SAFE_CALL(cusolverDnCreate(&cusolverdn_handle_));
     CUSOLVER_SAFE_CALL(cusolverDnSetStream(cusolverdn_handle_,
             cudaStreamPerThread));
 #endif
 
-#if CUDA_VERSION >= 9000 
+#if CUDA_VERSION >= 9000
     if (device_options_.use_tensor_cores) {
       // Enable tensor cores in CUBLAS
       // Note if the device does not support tensor cores this will fall back to normal math mode
-      CUBLAS_SAFE_CALL(cublasSetMathMode(cublas_handle_, 
+      CUBLAS_SAFE_CALL(cublasSetMathMode(cublas_handle_,
             CUBLAS_TENSOR_OP_MATH));
     }
 #endif
 
-    
+
     // Initialize the cuSPARSE library
     CUSPARSE_SAFE_CALL(cusparseCreate(&cusparse_handle_));
     CUSPARSE_SAFE_CALL(cusparseSetStream(cusparse_handle_, cudaStreamPerThread));
-    
+
     // Initialize the generator,
     CURAND_SAFE_CALL(curandCreateGenerator(
           &curand_handle_, CURAND_RNG_PSEUDO_DEFAULT));
@@ -336,15 +336,15 @@ bool CuDevice::IsComputeExclusive() {
   }
   // find out whether compute exclusive mode is used
   switch (gpu_prop.computeMode) {
-    case cudaComputeModeExclusive :
-      return true;
-      break;
-    case cudaComputeModeExclusiveProcess :
-      return true;
-      break;
-    default :
-      // in this case we release the GPU context...
-      return false;
+  case cudaComputeModeExclusive:
+    return true;
+    break;
+  case cudaComputeModeExclusiveProcess:
+    return true;
+    break;
+  default:
+    // in this case we release the GPU context...
+    return false;
   }
 }
 
@@ -409,45 +409,45 @@ bool CuDevice::SelectGpuIdAuto() {
   for(int32 n = 0; n < num_gpus; n++) {
     int32 ret = cudaSetDevice(n);
     switch(ret) {
-      case cudaSuccess : {
-        // create the CUDA context for the thread
-        cudaDeviceSynchronize();
-        // get GPU name
-        char name[128];
-        DeviceGetName(name,128,n);
-        // get GPU memory stats
-        int64 free, total;
-        std::string mem_stats;
-        mem_stats = GetFreeGpuMemory(&free, &total);
-        // log
-        KALDI_LOG << "cudaSetDevice(" << n << "): "
-                  << name << "\t" << mem_stats;
+    case cudaSuccess: {
+      // create the CUDA context for the thread
+      cudaDeviceSynchronize();
+      // get GPU name
+      char name[128];
+      DeviceGetName(name,128,n);
+      // get GPU memory stats
+      int64 free, total;
+      std::string mem_stats;
+      mem_stats = GetFreeGpuMemory(&free, &total);
+      // log
+      KALDI_LOG << "cudaSetDevice(" << n << "): "
+                << name << "\t" << mem_stats;
 
-        // We have seen that in some cases GetFreeGpuMemory returns zero
-        // That will produce nan after division, which might confuse
-        // the sorting routine. Or maybe not, but let's keep it clean
-        if (total <= 0) {
-          KALDI_LOG << "Total memory reported for device " << n
-                    << " is zero (or less).";
-        }
-        float mem_ratio = total > 0 ? free/(float)total : 0;
-        free_mem_ratio[n] = std::make_pair(n, mem_ratio);
+      // We have seen that in some cases GetFreeGpuMemory returns zero
+      // That will produce nan after division, which might confuse
+      // the sorting routine. Or maybe not, but let's keep it clean
+      if (total <= 0) {
+        KALDI_LOG << "Total memory reported for device " << n
+                  << " is zero (or less).";
+      }
+      float mem_ratio = total > 0 ? free/(float)total : 0;
+      free_mem_ratio[n] = std::make_pair(n, mem_ratio);
 
-        // destroy the CUDA context for the thread
-        cudaDeviceReset();
-      } break;
-      case cudaErrorDeviceAlreadyInUse :
-        KALDI_LOG << "cudaSetDevice(" << n << "): "
-                  << "Device cannot be accessed, used EXCLUSIVE-THREAD mode...";
-        break;
-      case cudaErrorInvalidDevice :
-        KALDI_LOG << "cudaSetDevice(" << n << "): "
-                  << "Device cannot be accessed, not a VALID CUDA device!";
-        break;
-      default :
-        KALDI_LOG << "cudaSetDevice(" << n << "): "
-                  << "returned " << ret << ", "
-                  << cudaGetErrorString((cudaError_t)ret);
+      // destroy the CUDA context for the thread
+      cudaDeviceReset();
+    } break;
+    case cudaErrorDeviceAlreadyInUse:
+      KALDI_LOG << "cudaSetDevice(" << n << "): "
+                << "Device cannot be accessed, used EXCLUSIVE-THREAD mode...";
+      break;
+    case cudaErrorInvalidDevice:
+      KALDI_LOG << "cudaSetDevice(" << n << "): "
+                << "Device cannot be accessed, not a VALID CUDA device!";
+      break;
+    default:
+      KALDI_LOG << "cudaSetDevice(" << n << "): "
+                << "returned " << ret << ", "
+                << cudaGetErrorString((cudaError_t)ret);
     }
   }
   // find GPU with max free memory
@@ -484,7 +484,7 @@ bool CuDevice::SelectGpuIdAuto() {
 
 
 void CuDevice::AccuProfile(const char *function_name,
-                           const CuTimer &timer) {
+    const CuTimer &timer) {
   if (GetVerboseLevel() >= 1) {
     std::unique_lock<std::mutex> lock(profile_mutex_, std::defer_lock_t());
     if (multi_threaded_)
@@ -525,7 +525,7 @@ void CuDevice::PrintProfile() {
     // times at the end.
     std::sort(pairs.begin(), pairs.end());
     size_t max_print = 15, start_pos = (pairs.size() <= max_print ?
-                                        0 : pairs.size() - max_print);
+        0 : pairs.size() - max_print);
     for (size_t i = start_pos; i < pairs.size(); i++)
       os << pairs[i].second << "\t" << pairs[i].first << "s\n";
     os << "Total GPU time:\t" << total_time << "s (may involve some double-counting)\n";
@@ -569,7 +569,7 @@ void CuDevice::CheckGpuHealth() {
   CuTimer t;
   // prepare small matrices for a quick test
   Matrix<BaseFloat> a(50, 100);
-  Matrix<BaseFloat> b(100 ,50);
+  Matrix<BaseFloat> b(100,50);
   a.SetRandn();
   b.SetRandUniform();
   // multiply 2 small matrices in CPU:
@@ -584,12 +584,12 @@ void CuDevice::CheckGpuHealth() {
   AccuProfile(__func__, t);
 }
 
-CuDevice::CuDevice():
-    initialized_(false),
-    device_id_copy_(-1),
-    cublas_handle_(NULL),
-    cusparse_handle_(NULL),
-    cusolverdn_handle_(NULL) {
+CuDevice::CuDevice() :
+  initialized_(false),
+  device_id_copy_(-1),
+  cublas_handle_(NULL),
+  cusparse_handle_(NULL),
+  cusolverdn_handle_(NULL) {
 }
 
 CuDevice::~CuDevice() {
@@ -611,7 +611,7 @@ CuDevice::~CuDevice() {
 // Each thread has its own copy of the CuDevice object.
 // Note: this was declared "static".
 thread_local CuDevice CuDevice::this_thread_device_;
-  
+
 CuDevice::CuDeviceOptions CuDevice::device_options_;
 
 // define and initialize the static members of the CuDevice object.

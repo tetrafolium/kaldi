@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     BaseFloat average_learning_rate = 0.0;
     BaseFloat first_layer_factor = 1.0;
     BaseFloat last_layer_factor = 1.0;
-    
+
     ParseOptions po(usage);
     po.Register("binary", &binary_write, "Write output in binary mode");
     po.Register("average-learning-rate", &average_learning_rate,
@@ -150,16 +150,16 @@ int main(int argc, char *argv[]) {
 
     // Gets learning rates for previous neural net.
     Vector<BaseFloat> prev_nnet_learning_rates(num_updatable),
-        cur_nnet_learning_rates(num_updatable);
+    cur_nnet_learning_rates(num_updatable);
     am_prev_nnet.GetNnet().GetLearningRates(&prev_nnet_learning_rates);
     am_cur_nnet.GetNnet().GetLearningRates(&cur_nnet_learning_rates);
     KALDI_LOG << "Learning rates for previous model per layer are "
               << prev_nnet_learning_rates;
     KALDI_LOG << "Learning rates for current model per layer are "
               << cur_nnet_learning_rates;
-    
+
     // Gets target geometric mean.
-    BaseFloat target_geometric_mean = 0.0; 
+    BaseFloat target_geometric_mean = 0.0;
     if (average_learning_rate == 0.0) {
       target_geometric_mean = Exp(cur_nnet_learning_rates.SumLog()
                                   / static_cast<BaseFloat>(num_updatable));
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
     am_cur_nnet.GetNnet().SetLearningRates(nnet_learning_rates);
 
     SetMaxChange(0.0, &(am_cur_nnet.GetNnet()));
-    
+
     Output ko(modified_cur_nnet_rxfilename, binary_write);
     trans_model.Write(ko.Stream(), binary_write);
     am_cur_nnet.Write(ko.Stream(), binary_write);

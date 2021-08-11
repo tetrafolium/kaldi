@@ -27,7 +27,7 @@
 namespace kaldi {
 
 bool EstPca(const Matrix<BaseFloat> &ivector_mat, BaseFloat target_energy,
-  const std::string &reco, Matrix<BaseFloat> *mat) {
+    const std::string &reco, Matrix<BaseFloat> *mat) {
 
   // If the target_energy is 1.0, it's equivalent to not applying the
   // conversation-dependent PCA at all, so it's better to exit this
@@ -36,7 +36,7 @@ bool EstPca(const Matrix<BaseFloat> &ivector_mat, BaseFloat target_energy,
     return false;
 
   int32 num_rows = ivector_mat.NumRows(),
-    num_cols = ivector_mat.NumCols();
+      num_cols = ivector_mat.NumCols();
   Vector<BaseFloat> sum;
   SpMatrix<BaseFloat> sumsq;
   sum.Resize(num_cols);
@@ -58,14 +58,14 @@ bool EstPca(const Matrix<BaseFloat> &ivector_mat, BaseFloat target_energy,
       Matrix<BaseFloat>(sumsq).Svd(&s, &P, NULL);
   } catch (...) {
     KALDI_WARN << "Unable to compute conversation dependent PCA for"
-      << " recording " << reco << ".";
+               << " recording " << reco << ".";
     return false;
   }
 
   SortSvd(&s, &P);
 
   Matrix<BaseFloat> transform(P, kTrans); // Transpose of P.  This is what
-                                       // appears in the transform.
+                                          // appears in the transform.
 
   // We want the PCA transform to retain target_energy amount of the total
   // energy.
@@ -85,8 +85,8 @@ bool EstPca(const Matrix<BaseFloat> &ivector_mat, BaseFloat target_energy,
 
 // Transforms i-vectors using the PLDA model.
 void TransformIvectors(const Matrix<BaseFloat> &ivectors_in,
-  const PldaConfig &plda_config, const Plda &plda,
-  Matrix<BaseFloat> *ivectors_out) {
+    const PldaConfig &plda_config, const Plda &plda,
+    Matrix<BaseFloat> *ivectors_out) {
   int32 dim = plda.Dim();
   ivectors_out->Resize(ivectors_in.NumRows(), dim);
   for (int32 i = 0; i < ivectors_in.NumRows(); i++) {
@@ -99,10 +99,10 @@ void TransformIvectors(const Matrix<BaseFloat> &ivectors_in,
 
 // Transform the i-vectors using the recording-dependent PCA matrix.
 void ApplyPca(const Matrix<BaseFloat> &ivectors_in,
-  const Matrix<BaseFloat> &pca_mat, Matrix<BaseFloat> *ivectors_out) {
+    const Matrix<BaseFloat> &pca_mat, Matrix<BaseFloat> *ivectors_out) {
   int32 transform_cols = pca_mat.NumCols(),
-        transform_rows = pca_mat.NumRows(),
-        feat_dim = ivectors_in.NumCols();
+      transform_rows = pca_mat.NumRows(),
+      feat_dim = ivectors_in.NumCols();
   ivectors_out->Resize(ivectors_in.NumRows(), transform_rows);
   KALDI_ASSERT(transform_cols == feat_dim);
   ivectors_out->AddMatMat(1.0, ivectors_in, kNoTrans,
@@ -116,18 +116,18 @@ int main(int argc, char *argv[]) {
   typedef kaldi::int32 int32;
   try {
     const char *usage =
-      "Perform PLDA scoring for speaker diarization.  The input reco2utt\n"
-      "should be of the form <recording-id> <seg1> <seg2> ... <segN> and\n"
-      "there should be one iVector for each segment.  PLDA scoring is\n"
-      "performed between all pairs of iVectors in a recording and outputs\n"
-      "an archive of score matrices, one for each recording-id.  The rows\n"
-      "and columns of the the matrix correspond the sorted order of the\n"
-      "segments.\n"
-      "Usage: ivector-plda-scoring-dense [options] <plda> <reco2utt>"
-      " <ivectors-rspecifier> <scores-wspecifier>\n"
-      "e.g.: \n"
-      "  ivector-plda-scoring-dense plda reco2utt scp:ivectors.scp"
-      " ark:scores.ark ark,t:ivectors.1.ark\n";
+        "Perform PLDA scoring for speaker diarization.  The input reco2utt\n"
+        "should be of the form <recording-id> <seg1> <seg2> ... <segN> and\n"
+        "there should be one iVector for each segment.  PLDA scoring is\n"
+        "performed between all pairs of iVectors in a recording and outputs\n"
+        "an archive of score matrices, one for each recording-id.  The rows\n"
+        "and columns of the the matrix correspond the sorted order of the\n"
+        "segments.\n"
+        "Usage: ivector-plda-scoring-dense [options] <plda> <reco2utt>"
+        " <ivectors-rspecifier> <scores-wspecifier>\n"
+        "e.g.: \n"
+        "  ivector-plda-scoring-dense plda reco2utt scp:ivectors.scp"
+        " ark:scores.ark ark,t:ivectors.1.ark\n";
 
     ParseOptions po(usage);
     BaseFloat target_energy = 0.5;
@@ -147,9 +147,9 @@ int main(int argc, char *argv[]) {
     }
 
     std::string plda_rxfilename = po.GetArg(1),
-      reco2utt_rspecifier = po.GetArg(2),
-      ivector_rspecifier = po.GetArg(3),
-      scores_wspecifier = po.GetArg(4);
+        reco2utt_rspecifier = po.GetArg(2),
+        ivector_rspecifier = po.GetArg(3),
+        scores_wspecifier = po.GetArg(4);
 
     Plda plda;
     ReadKaldiObject(plda_rxfilename, &plda);
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
     RandomAccessBaseFloatVectorReader ivector_reader(ivector_rspecifier);
     BaseFloatMatrixWriter scores_writer(scores_wspecifier);
     int32 num_reco_err = 0,
-          num_reco_done = 0;
+        num_reco_done = 0;
     for (; !reco2utt_reader.Done(); reco2utt_reader.Next()) {
       Plda this_plda(plda);
       std::string reco = reco2utt_reader.Key();
@@ -182,10 +182,10 @@ int main(int argc, char *argv[]) {
         num_reco_err++;
       } else {
         Matrix<BaseFloat> ivector_mat(ivectors.size(), ivectors[0].Dim()),
-                          ivector_mat_pca,
-                          ivector_mat_plda,
-                          pca_transform,
-                          scores(ivectors.size(), ivectors.size());
+        ivector_mat_pca,
+        ivector_mat_plda,
+        pca_transform,
+        scores(ivectors.size(), ivectors.size());
 
         for (size_t i = 0; i < ivectors.size(); i++) {
           ivector_mat.Row(i).CopyFromVec(ivectors[i]);

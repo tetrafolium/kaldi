@@ -77,7 +77,7 @@ static const char *GetShortFileName(const char *path) {
 
 namespace internal {
 bool LocateSymbolRange(const std::string &trace_name, size_t *begin,
-                       size_t *end) {
+    size_t *end) {
   // Find the first '_' with leading ' ' or '('.
   *begin = std::string::npos;
   for (size_t i = 1; i < trace_name.size(); i++) {
@@ -172,7 +172,7 @@ static std::string KaldiGetStackTrace() {
 /***** KALDI LOGGING *****/
 
 MessageLogger::MessageLogger(LogMessageEnvelope::Severity severity,
-                             const char *func, const char *file, int32 line) {
+    const char *func, const char *file, int32 line) {
   // Obviously, we assume the strings survive the destruction of this object.
   envelope_.severity = severity;
   envelope_.func = func;
@@ -230,7 +230,7 @@ void MessageLogger::LogMessage() const {
 /***** KALDI ASSERTS *****/
 
 void KaldiAssertFailure_(const char *func, const char *file, int32 line,
-                         const char *cond_str) {
+    const char *cond_str) {
   MessageLogger::Log() =
       MessageLogger(LogMessageEnvelope::kAssertFailed, func, file, line)
       << "Assertion failed: (" << cond_str << ")";

@@ -51,8 +51,8 @@ namespace rnnlm {
                                we read.
  */
 void ReadSparseWordFeatures(std::istream &is,
-                            int32 feature_dim,
-                            SparseMatrix<BaseFloat> *word_feature_matrix);
+    int32 feature_dim,
+    SparseMatrix<BaseFloat> *word_feature_matrix);
 
 
 

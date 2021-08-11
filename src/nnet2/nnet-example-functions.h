@@ -23,8 +23,8 @@
 /** @file
     Note on how to parse this filename: it contains functions relatied to
     neural-net training examples, mostly discriminative neural-net training examples,
-   i.e. type DiscriminativeNnetExample    
-*/
+   i.e. type DiscriminativeNnetExample
+ */
 
 #include "nnet2/nnet-nnet.h"
 #include "util/table-types.h"
@@ -47,7 +47,7 @@ namespace nnet2 {
 
 /** Config structure for SplitExample, for splitting discriminative
     training examples.
-*/
+ */
 struct SplitDiscriminativeExampleConfig {
   // This is the maximum length in frames that any example is allowed to have.
   // We will split training examples to ensure that they are no longer than
@@ -70,7 +70,7 @@ struct SplitDiscriminativeExampleConfig {
   bool determinize;
 
   bool minimize; // we'll push and minimize if this is true.
-  
+
   bool test;
 
   bool drop_frames; // For MMI, true if we will eventually drop frames in which
@@ -83,11 +83,11 @@ struct SplitDiscriminativeExampleConfig {
   bool split; // if false, we won't split at all.
 
   bool excise; // if false, we will skip the "excise" step.
-  
-  SplitDiscriminativeExampleConfig():
-      max_length(1024), criterion("smbr"), collapse_transition_ids(true),
-      determinize(true), minimize(true), test(false), drop_frames(false),
-      split(true), excise(true) { }
+
+  SplitDiscriminativeExampleConfig() :
+    max_length(1024), criterion("smbr"), collapse_transition_ids(true),
+    determinize(true), minimize(true), test(false), drop_frames(false),
+    split(true), excise(true) { }
 
   void Register(OptionsItf *opts) {
 
@@ -129,7 +129,7 @@ struct SplitExampleStats {
   int32 longest_segment_after_split;
   int64 num_frames_kept_after_excise;
   int32 longest_segment_after_excise;
-  
+
   SplitExampleStats() { memset(this, 0, sizeof(*this)); }
   void Print();
 };
@@ -138,37 +138,37 @@ struct SplitExampleStats {
     success, false on failure such as mismatched input (will also warn in this
     case). */
 bool LatticeToDiscriminativeExample(
-    const std::vector<int32> &alignment,
-    const Matrix<BaseFloat> &feats,
-    const CompactLattice &clat,
-    BaseFloat weight,
-    int32 left_context,
-    int32 right_context,
-    DiscriminativeNnetExample *eg);
+  const std::vector<int32> &alignment,
+  const Matrix<BaseFloat> &feats,
+  const CompactLattice &clat,
+  BaseFloat weight,
+  int32 left_context,
+  int32 right_context,
+  DiscriminativeNnetExample *eg);
 
 
 /** Split a "discriminative example" into multiple pieces,
     splitting where the lattice has "pinch points".
  */
 void SplitDiscriminativeExample(
-    const SplitDiscriminativeExampleConfig &config,
-    const TransitionModel &tmodel,
-    const DiscriminativeNnetExample &eg,
-    std::vector<DiscriminativeNnetExample> *egs_out,
-    SplitExampleStats *stats_out);
+  const SplitDiscriminativeExampleConfig &config,
+  const TransitionModel &tmodel,
+  const DiscriminativeNnetExample &eg,
+  std::vector<DiscriminativeNnetExample> *egs_out,
+  SplitExampleStats *stats_out);
 
 /** Remove unnecessary frames from discriminative training
     example.  The output egs_out will be of size zero or one
     (usually one) after being called. */
 void ExciseDiscriminativeExample(
-    const SplitDiscriminativeExampleConfig &config,
-    const TransitionModel &tmodel,
-    const DiscriminativeNnetExample &eg,
-    std::vector<DiscriminativeNnetExample> *egs_out,
-    SplitExampleStats *stats_out);
+  const SplitDiscriminativeExampleConfig &config,
+  const TransitionModel &tmodel,
+  const DiscriminativeNnetExample &eg,
+  std::vector<DiscriminativeNnetExample> *egs_out,
+  SplitExampleStats *stats_out);
 
 
-/** Appends the given vector of examples (which must be non-empty) into 
+/** Appends the given vector of examples (which must be non-empty) into
     a single output example (called by CombineExamples, which might be
     a more convenient interface).
 
@@ -181,21 +181,21 @@ void ExciseDiscriminativeExample(
    Will fail if all the input examples don't have the same weight (this will
    normally be 1.0 anyway), or if the feature dimension (i.e. basic feature
    dimension plus spk_info dimension) differs between the examples.
-*/
+ */
 void AppendDiscriminativeExamples(
-    const std::vector<const DiscriminativeNnetExample*> &input,
-    DiscriminativeNnetExample *output);
+  const std::vector<const DiscriminativeNnetExample*> &input,
+  DiscriminativeNnetExample *output);
 
 /**
    This function is used to combine multiple discriminative-training
    examples (each corresponding to a segment of a lattice), into one.
-   
+
    It combines examples into groups such that each group will have a
    total length (number of rows of the feature matrix) less than or
    equal to max_length.  However, if individual examples are longer
    than max_length they will still be processed; they will be given
    their own group.
-   
+
    See also the documentation for AppendDiscriminativeExamples() which
    gives more details on how we append the examples.
 
@@ -207,10 +207,10 @@ void AppendDiscriminativeExamples(
    appropriate speaker vectors will be appended to each row of the features.  */
 
 void CombineDiscriminativeExamples(
-    int32 max_length,
-    const std::vector<DiscriminativeNnetExample> &input,
-    std::vector<DiscriminativeNnetExample> *output);
-                     
+  int32 max_length,
+  const std::vector<DiscriminativeNnetExample> &input,
+  std::vector<DiscriminativeNnetExample> *output);
+
 /**
    This function solves the "packing problem" using the "first fit" algorithm.
    It groups together the indices 0 through sizes.size() - 1, such that the sum
@@ -219,8 +219,8 @@ void CombineDiscriminativeExamples(
    The algorithm is not particularly efficient-- it's more n^2 than n log(n)
    which it should be.  */
 void SolvePackingProblem(BaseFloat max_cost,
-                         const std::vector<BaseFloat> &costs,
-                         std::vector<std::vector<size_t> > *groups);
+    const std::vector<BaseFloat> &costs,
+    std::vector<std::vector<size_t> > *groups);
 
 
 
@@ -243,13 +243,13 @@ void SolvePackingProblem(BaseFloat max_cost,
    or smbr, if we want to treat silence specially).
  */
 void ExampleToPdfPost(
-    const TransitionModel &tmodel,
-    const std::vector<int32> &silence_phones,
-    std::string criterion,
-    bool drop_frames,
-    bool one_silence_class,
-    const DiscriminativeNnetExample &eg,
-    Posterior *post);
+  const TransitionModel &tmodel,
+  const std::vector<int32> &silence_phones,
+  std::string criterion,
+  bool drop_frames,
+  bool one_silence_class,
+  const DiscriminativeNnetExample &eg,
+  Posterior *post);
 
 /**
    This function is used in code that tests the functionality that we provide
@@ -268,7 +268,7 @@ void ExampleToPdfPost(
    function.
 
    'criterion' should be 'mmi', 'mpfe', or 'smbr'.
-   
+
    You should set drop_frames to true if you are doing MMI with drop-frames
    == true.  Then it will not compute the hash for frames where the numerator
    pdf-id is not in the denominator lattice.
@@ -280,17 +280,17 @@ void ExampleToPdfPost(
    The function will also accumulate the total numerator and denominator weights
    used as num_weight and den_weight, for an additional diagnostic, and the total
    number of frames, as tot_t.
-*/
+ */
 void UpdateHash(
-    const TransitionModel &tmodel,
-    const DiscriminativeNnetExample &eg,
-    std::string criterion,
-    bool drop_frames,
-    bool one_silence_class,
-    Matrix<double> *hash,
-    double *num_weight,
-    double *den_weight,
-    double *tot_t);
+  const TransitionModel &tmodel,
+  const DiscriminativeNnetExample &eg,
+  std::string criterion,
+  bool drop_frames,
+  bool one_silence_class,
+  Matrix<double> *hash,
+  double *num_weight,
+  double *den_weight,
+  double *tot_t);
 
 
 

@@ -55,8 +55,8 @@ int main(int argc, char *argv[]) {
 
     std::string word_syms_filename;
     std::string ivector_rspecifier,
-                online_ivector_rspecifier,
-                utt2spk_rspecifier;
+        online_ivector_rspecifier,
+        utt2spk_rspecifier;
     int32 online_ivector_period = 0;
     opts.Register(&po);
 
@@ -97,8 +97,8 @@ int main(int argc, char *argv[]) {
 #endif
 
     std::string nnet_rxfilename = po.GetArg(1),
-                feature_rspecifier = po.GetArg(2),
-                matrix_wspecifier = po.GetArg(3);
+        feature_rspecifier = po.GetArg(2),
+        matrix_wspecifier = po.GetArg(3);
 
     Nnet raw_nnet;
     AmNnetSimple am_nnet;
@@ -121,9 +121,9 @@ int main(int argc, char *argv[]) {
       priors = am_nnet.Priors();
 
     RandomAccessBaseFloatMatrixReader online_ivector_reader(
-        online_ivector_rspecifier);
+      online_ivector_rspecifier);
     RandomAccessBaseFloatVectorReaderMapped ivector_reader(
-        ivector_rspecifier, utt2spk_rspecifier);
+      ivector_rspecifier, utt2spk_rspecifier);
 
     BaseFloatMatrixWriter matrix_writer(matrix_wspecifier);
 

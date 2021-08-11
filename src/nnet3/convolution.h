@@ -103,7 +103,7 @@ namespace time_height_convolution {
    offsets={ (0,0),(0,1),(0,2), (1,0),(1,1),(1,2), (2,0),(2,1),(2,2) }
 
    However-- and you have to be a bit careful here-- the time indexes are on an
-   *absolute* numbering scheme so that if you had downsampled the time axis on a
+ * absolute* numbering scheme so that if you had downsampled the time axis on a
    previous layer, the time-offsets might all be multiples of (e.g.) 2 or 4, but
    the height-offsets would normally always be separated by 1.  [note: we always
    normalize the list of (time-offset, height-offset) pairs with the
@@ -148,7 +148,7 @@ struct ConvolutionModel {
     }
     inline bool operator == (const Offset &other) const {
       return time_offset == other.time_offset &&
-          height_offset == other.height_offset;
+             height_offset == other.height_offset;
     }
   };
   // For a 3x3 patch, the 'offsets' vector would be a list of 9 elements.  It's
@@ -212,19 +212,19 @@ struct ConvolutionModel {
   bool operator == (const ConvolutionModel &other) const;
 
   /*
-    Checks that this model makes sense, and returns true if so; if not, returns
-    false (and if it's for certain less-obvious reasons, prints a warning first
+     Checks that this model makes sense, and returns true if so; if not, returns
+     false (and if it's for certain less-obvious reasons, prints a warning first
      explaining why)..
 
-   @param [in] check_heights_used  If true, part of the check is that all
+     @param [in] check_heights_used  If true, part of the check is that all
          height-values at the input are used at some point (if they
          are not, this model is probably not what you intended).
-   @param [in] allow_height_padding  If true, the checking code assumes that
+     @param [in] allow_height_padding  If true, the checking code assumes that
          zero-padding on the height axis is permitted.
-   @return  Returns true if the check passed, false otherwise.
-  */
+     @return  Returns true if the check passed, false otherwise.
+   */
   bool Check(bool check_heights_used = true,
-             bool allow_height_padding = true) const;
+      bool allow_height_padding = true) const;
 
   // Returns an info-string that describes the model; it looks like
   // "num-filters-in=32, num-filters-out=64, height-in=40, height-out=40, ... ".
@@ -242,13 +242,13 @@ struct ConvolutionModel {
    the TimeHeightConvolutionComponent (it depends on the inputs and
    outputs as well as the layer).
 
-   *CAUTION*: this is after certain transformations of the problem, so the
+ * CAUTION*: this is after certain transformations of the problem, so the
    height_in may not always be the "real" height of the input image (it may be a
    multiple thereof), and the num_t_in may not always be the "real" number
    of distinct time-steps on the input of the computation (it may be a divisor
    thereof).  ConvolutionComputation contains the info needed to actually
    perform the computation.
-*/
+ */
 struct ConvolutionComputation {
   // num_filters_in and num_filters_out will be the same as in the model.
   int32 num_filters_in, num_filters_out;
@@ -364,7 +364,7 @@ struct ConvolutionComputationOptions {
   // for the temporary matrix.  If it would exceed this amount, we do the
   // computation in batches.
   BaseFloat max_memory_mb;
-  ConvolutionComputationOptions(): max_memory_mb(200.0) { }
+  ConvolutionComputationOptions() : max_memory_mb(200.0) { }
 };
 
 
@@ -422,8 +422,8 @@ struct ConvolutionComputationIo {
    used because they are before/after the first/last
    desired time values. */
 void CheckModelAndIo(const ConvolutionModel &model,
-                     const ConvolutionComputationIo &io,
-                     bool allow_extra_input = false);
+    const ConvolutionComputationIo &io,
+    bool allow_extra_input = false);
 
 
 /**
@@ -445,13 +445,13 @@ void CheckModelAndIo(const ConvolutionModel &model,
 
  */
 void CompileConvolutionComputation(
-    const ConvolutionModel &model,
-    const std::vector<Index> &input_indexes,
-    const std::vector<Index> &output_indexes,
-    const ConvolutionComputationOptions &opts,
-    ConvolutionComputation *computation,
-    std::vector<Index> *input_indexes_modified,
-    std::vector<Index> *output_indexes_modified);
+  const ConvolutionModel &model,
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  const ConvolutionComputationOptions &opts,
+  ConvolutionComputation *computation,
+  std::vector<Index> *input_indexes_modified,
+  std::vector<Index> *output_indexes_modified);
 
 
 /**
@@ -469,16 +469,16 @@ void CompileConvolutionComputation(
    @param [in] params   The parameters of the convolution.  This should be of
              dimension conv_comp.ParamRows() by conv_comp.ParamCols().
    @param [out] output   The output of the convolution (this function
-             *adds to* the output).  Should be of dimension
+ * adds to* the output).  Should be of dimension
              conv_comp.num_t_out * conv_comp.num_images
              by conv_comp.height_out * num_filters_out.  It must
              satisfy output.NumCols() == output.Stride().
  */
 void ConvolveForward(
-    const ConvolutionComputation &conv_comp,
-    const CuMatrixBase<BaseFloat> &input,
-    const CuMatrixBase<BaseFloat> &params,
-    CuMatrixBase<BaseFloat> *output);
+  const ConvolutionComputation &conv_comp,
+  const CuMatrixBase<BaseFloat> &input,
+  const CuMatrixBase<BaseFloat> &params,
+  CuMatrixBase<BaseFloat> *output);
 
 
 /**
@@ -495,21 +495,21 @@ void ConvolveForward(
              where X is the total number of pixels in the patches, which equals
              model.offsets.size() in the model for which the computation was
              compiled.  E.g. for a regular 3x3 kernel, X would be 9.
-  @param [in] output_deriv The derivative of the objective function w.r.t. the
+   @param [in] output_deriv The derivative of the objective function w.r.t. the
              output of the convolution.  Should be of dimension
              conv_comp.num_t_out * conv_comp.num_images by conv_comp.height_out
-             * num_filters_out.  It must satisfy output_deriv.NumCols() ==
+ * num_filters_out.  It must satisfy output_deriv.NumCols() ==
              output_deriv.Stride().
    @param [out] input_deriv  If non-NULL, the backpropagated derivative of
              the objective function w.r.t. the input will be *added to* this
              matrix.  Should be the same dimension as the input to the original
              ConvolveForward() call.
-*/
+ */
 void ConvolveBackwardData(
-    const ConvolutionComputation &conv_comp,
-    const CuMatrixBase<BaseFloat> &params,
-    const CuMatrixBase<BaseFloat> &output_deriv,
-    CuMatrixBase<BaseFloat> *input_deriv);
+  const ConvolutionComputation &conv_comp,
+  const CuMatrixBase<BaseFloat> &params,
+  const CuMatrixBase<BaseFloat> &output_deriv,
+  CuMatrixBase<BaseFloat> *input_deriv);
 
 /**
    \brief This does the part of the backward derivative computation
@@ -528,7 +528,7 @@ void ConvolveBackwardData(
    @param [in] output_deriv The derivative of the objective function w.r.t. the
              output of the convolution.  Should be of dimension
              conv_comp.num_t_out * conv_comp.num_images by conv_comp.height_out
-             * num_filters_out.  It must satisfy output_deriv.NumCols() ==
+ * num_filters_out.  It must satisfy output_deriv.NumCols() ==
              output_deriv.Stride().
    @param [in] alpha   This scalar is multiplied into the derivative when
              we add to params_deriv, i.e. *params_deriv += alpha * derivative.
@@ -536,13 +536,13 @@ void ConvolveBackwardData(
              w.r.t the parameters (the 'params' given to the ConvolveForward
              function) is *added* to this location.  This matrix should be
              of dimension conv_comp.NumRows() by conv_comp.NumCols().
-*/
+ */
 void ConvolveBackwardParams(
-    const ConvolutionComputation &conv_comp,
-    const CuMatrixBase<BaseFloat> &input,
-    const CuMatrixBase<BaseFloat> &output_deriv,
-    BaseFloat alpha,
-    CuMatrixBase<BaseFloat> *params_deriv);
+  const ConvolutionComputation &conv_comp,
+  const CuMatrixBase<BaseFloat> &input,
+  const CuMatrixBase<BaseFloat> &output_deriv,
+  BaseFloat alpha,
+  CuMatrixBase<BaseFloat> *params_deriv);
 
 
 /**
@@ -551,11 +551,11 @@ void ConvolveBackwardParams(
    for them (i.e. the smallest grid that will completely cover all the t,n
    pairs).
    This function ignores any 't' values that are kNoTime.
-*/
+ */
 void GetComputationIo(
-    const std::vector<Index> &input_indexes,
-    const std::vector<Index> &output_indexes,
-    ConvolutionComputationIo *io);
+  const std::vector<Index> &input_indexes,
+  const std::vector<Index> &output_indexes,
+  ConvolutionComputationIo *io);
 
 
 /**
@@ -566,13 +566,13 @@ void GetComputationIo(
    needed because they dictate the set of (n, x) pairs; and because they
    determine when to use 'real' indexes and when to use 'blank' padding values
    (i.e. when to replace the t values in the indexes by kNoTime).
-*/
+ */
 void GetIndexesForComputation(
-    const ConvolutionComputationIo &io,
-    const std::vector<Index> &orig_input_indexes,
-    const std::vector<Index> &orig_output_indexes,
-    std::vector<Index> *input_indexes,
-    std::vector<Index> *output_indexes);
+  const ConvolutionComputationIo &io,
+  const std::vector<Index> &orig_input_indexes,
+  const std::vector<Index> &orig_output_indexes,
+  std::vector<Index> *input_indexes,
+  std::vector<Index> *output_indexes);
 
 
 /**
@@ -584,23 +584,23 @@ void GetIndexesForComputation(
    This is stage 1 of compilation.
  */
 void PadComputationInputTime(const ConvolutionModel &model,
-                             ConvolutionComputationIo *io);
+    ConvolutionComputationIo *io);
 
 
 /**
-  This function takes a model that might require zero padding
-  in the height dimension and outputs a model accepting a
-  possibly-larger input dimension which does not require zero
-  padding. *model_padded may differ from 'model' in its height_in and its
-  'offsets' variable (the height-offsets need to be shifted if we pad at the
-  bottom).  We then work out the computation in terms of the model that doesn't
-  need padding (which is easier), and later convert it back to work in the space
-  where there is no padding.
+   This function takes a model that might require zero padding
+   in the height dimension and outputs a model accepting a
+   possibly-larger input dimension which does not require zero
+   padding. *model_padded may differ from 'model' in its height_in and its
+   'offsets' variable (the height-offsets need to be shifted if we pad at the
+   bottom).  We then work out the computation in terms of the model that doesn't
+   need padding (which is easier), and later convert it back to work in the space
+   where there is no padding.
 
    This is stage 2 of compilation.
  */
 void PadModelHeight(const ConvolutionModel &model,
-                    ConvolutionModel *model_padded);
+    ConvolutionModel *model_padded);
 
 
 /** This function modifies, if necessary, a computation that has been built for
@@ -619,9 +619,9 @@ void PadModelHeight(const ConvolutionModel &model,
      of the computation).
  */
 void UnPadModelHeight(const ConvolutionComputationOptions &opts,
-                      const ConvolutionModel &model,
-                      const ConvolutionModel &model_padded,
-                      ConvolutionComputation *computation);
+    const ConvolutionModel &model,
+    const ConvolutionModel &model_padded,
+    ConvolutionComputation *computation);
 
 /**
    This function takes an input model and I/O specification, and it modifies
@@ -640,33 +640,33 @@ void UnPadModelHeight(const ConvolutionComputationOptions &opts,
    in 'model'.
 
    This is stage 3 of compilation.
-*/
+ */
 void AppendInputFrames(const ConvolutionModel &model,
-                       ConvolutionComputationIo *io,
-                       ConvolutionModel *model_appended,
-                       ConvolutionComputationIo *io_appended);
+    ConvolutionComputationIo *io,
+    ConvolutionModel *model_appended,
+    ConvolutionComputationIo *io_appended);
 
 
 /*
-  This function takes a model and a specification of the comptuation's
-  IO, and generates the computation.  This is stage 4 of the compilation.
-  It assumes that stages 1, 2 and 3 have already been done so that:
+   This function takes a model and a specification of the comptuation's
+   IO, and generates the computation.  This is stage 4 of the compilation.
+   It assumes that stages 1, 2 and 3 have already been done so that:
 
     - Any required padding of the time axis (stage 1) and the height axis
       (stage 2) have been done (so any desired input values are available).
     - The t_stride_in and t_stride_out of the io object have the same value
       (stage 3).
 
-  At this point the compilation process is actually quite simple: for each
-  time shift (where the number of time shifts equals num_t_in + 1 - num_t_out
-  of 'io'), we do a computation that copies and maybe duplicates the input
-  columns to a temporary matrix, and then does a matrix multiplication
-  between that temporary matrix
+   At this point the compilation process is actually quite simple: for each
+   time shift (where the number of time shifts equals num_t_in + 1 - num_t_out
+   of 'io'), we do a computation that copies and maybe duplicates the input
+   columns to a temporary matrix, and then does a matrix multiplication
+   between that temporary matrix
  */
 void MakeComputation(const ConvolutionModel &model,
-                     ConvolutionComputationIo &io,
-                     const ConvolutionComputationOptions &opts,
-                     ConvolutionComputation *computation);
+    ConvolutionComputationIo &io,
+    const ConvolutionComputationOptions &opts,
+    ConvolutionComputation *computation);
 
 
 } // namespace time_height_convolution

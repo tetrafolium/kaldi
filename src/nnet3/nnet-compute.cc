@@ -26,22 +26,22 @@ namespace nnet3 {
 
 
 NnetComputer::NnetComputer(const NnetComputeOptions &options,
-                           const NnetComputation &computation,
-                           const Nnet &nnet,
-                           Nnet *nnet_to_update):
-    options_(options), computation_(computation), nnet_(nnet),
-    program_counter_(0), nnet_to_store_stats_(nnet_to_update),
-    nnet_to_update_(nnet_to_update) {
+    const NnetComputation &computation,
+    const Nnet &nnet,
+    Nnet *nnet_to_update) :
+  options_(options), computation_(computation), nnet_(nnet),
+  program_counter_(0), nnet_to_store_stats_(nnet_to_update),
+  nnet_to_update_(nnet_to_update) {
   Init();
 }
 
 NnetComputer::NnetComputer(const NnetComputeOptions &options,
-                           const NnetComputation &computation,
-                           Nnet *nnet,
-                           Nnet *nnet_to_update):
-    options_(options), computation_(computation), nnet_(*nnet),
-    program_counter_(0), nnet_to_store_stats_(nnet),
-    nnet_to_update_(nnet_to_update) {
+    const NnetComputation &computation,
+    Nnet *nnet,
+    Nnet *nnet_to_update) :
+  options_(options), computation_(computation), nnet_(*nnet),
+  program_counter_(0), nnet_to_store_stats_(nnet),
+  nnet_to_update_(nnet_to_update) {
   Init();
 }
 
@@ -80,7 +80,7 @@ BaseFloat NnetComputer::ParameterStddev(const Component &c) {
 }
 
 void NnetComputer::DebugBeforeExecute(int32 command,
-                                      CommandDebugInfo *info) {
+    CommandDebugInfo *info) {
   {
     const std::vector<int32> &matrices_written =
         command_attributes_[command].matrices_written;
@@ -114,8 +114,8 @@ void NnetComputer::DebugBeforeExecute(int32 command,
 
 
 void NnetComputer::DebugAfterExecute(int32 command,
-                                     const CommandDebugInfo &info,
-                                     double command_exec_time) {
+    const CommandDebugInfo &info,
+    double command_exec_time) {
   std::ostringstream os;
   os << command_strings_[command] << "\t|\t";
   {
@@ -161,7 +161,7 @@ void NnetComputer::DebugAfterExecute(int32 command,
 
 
 void NnetComputer::SaveMemo(int32 memo_index,
-                            const Component &c, void *memo) {
+    const Component &c, void *memo) {
   if (memo_index <= 0) {
     if (memo != NULL) {  // memo was returned but is not needed.
       c.DeleteMemo(memo);
@@ -186,24 +186,24 @@ void* NnetComputer::GetMemo(int32 memo_index) {
 }
 
 
-NnetComputer::NnetComputer(const NnetComputer &other):
-    options_(other.options_),
-    computation_(other.computation_),
-    nnet_(other.nnet_),
-    program_counter_(other.program_counter_),
-    pending_commands_(other.pending_commands_),
-    nnet_to_store_stats_(other.nnet_to_store_stats_),
-    nnet_to_update_(other.nnet_to_update_),
-    debug_(other.debug_),
-    command_attributes_(other.command_attributes_),
-    submatrix_strings_(other.submatrix_strings_),
-    command_strings_(other.command_strings_),
-    matrices_(other.matrices_),
-    memos_(other.memos_) {
+NnetComputer::NnetComputer(const NnetComputer &other) :
+  options_(other.options_),
+  computation_(other.computation_),
+  nnet_(other.nnet_),
+  program_counter_(other.program_counter_),
+  pending_commands_(other.pending_commands_),
+  nnet_to_store_stats_(other.nnet_to_store_stats_),
+  nnet_to_update_(other.nnet_to_update_),
+  debug_(other.debug_),
+  command_attributes_(other.command_attributes_),
+  submatrix_strings_(other.submatrix_strings_),
+  command_strings_(other.command_strings_),
+  matrices_(other.matrices_),
+  memos_(other.memos_) {
   // Note: this is the same as the default copy constructor, except for the check below.
   if (!memos_.empty()) {
     KALDI_ERR << "You cannot use the copy constructor of NnetComputer if "
-        "memos are used.";
+      "memos are used.";
   }
 }
 
@@ -212,224 +212,224 @@ void NnetComputer::ExecuteCommand() {
   int32 m1, m2;
   try {
     switch (c.command_type) {
-      case kAllocMatrix:
-        m1 = computation_.submatrices[c.arg1].matrix_index;
-        matrices_[m1].Resize(computation_.matrices[m1].num_rows,
+    case kAllocMatrix:
+      m1 = computation_.submatrices[c.arg1].matrix_index;
+      matrices_[m1].Resize(computation_.matrices[m1].num_rows,
                              computation_.matrices[m1].num_cols,
                              kUndefined,
                              computation_.matrices[m1].stride_type);
-        break;
-      case kDeallocMatrix:
-        m1 = computation_.submatrices[c.arg1].matrix_index;
-        matrices_[m1].Resize(0, 0);
-        break;
-      case kSwapMatrix:
-        m1 = computation_.submatrices[c.arg1].matrix_index;
-        m2 = computation_.submatrices[c.arg2].matrix_index;
-        matrices_[m1].Swap(&(matrices_[m2]));
-        break;
-      case kSetConst: {
-        CuSubMatrix<BaseFloat> s(GetSubMatrix(c.arg1));
-        if (c.alpha == 0.0) s.SetZero();
-        else s.Set(c.alpha);
-        break;
+      break;
+    case kDeallocMatrix:
+      m1 = computation_.submatrices[c.arg1].matrix_index;
+      matrices_[m1].Resize(0, 0);
+      break;
+    case kSwapMatrix:
+      m1 = computation_.submatrices[c.arg1].matrix_index;
+      m2 = computation_.submatrices[c.arg2].matrix_index;
+      matrices_[m1].Swap(&(matrices_[m2]));
+      break;
+    case kSetConst: {
+      CuSubMatrix<BaseFloat> s(GetSubMatrix(c.arg1));
+      if (c.alpha == 0.0) s.SetZero();
+      else s.Set(c.alpha);
+      break;
+    }
+    case kPropagate: {
+      NVTX_RANGE("NnetComputer::ExecuteCommand::kPropagate");
+      const Component *component = nnet_.GetComponent(c.arg1);
+      ComponentPrecomputedIndexes *indexes =
+          computation_.component_precomputed_indexes[c.arg2].data;
+      const CuSubMatrix<BaseFloat> input(GetSubMatrix(c.arg3));
+      CuSubMatrix<BaseFloat> output(GetSubMatrix(c.arg4));
+      void *memo = component->Propagate(indexes, input, &output);
+      if (c.arg6) {    // need to store stats.
+        KALDI_ASSERT(nnet_to_store_stats_ != NULL);
+        Component *stats_component = nnet_to_store_stats_->GetComponent(c.arg1);
+        bool was_in_place = (c.arg3 == c.arg4);
+        // if propagate was in-place, provide empty matrix and not 'input', as
+        // input is no longer valid.
+        const CuSubMatrix<BaseFloat> maybe_input(
+          GetSubMatrix(was_in_place ? 0 : c.arg3));
+        stats_component->StoreStats(maybe_input, output, memo);
       }
-      case kPropagate: {
-        NVTX_RANGE("NnetComputer::ExecuteCommand::kPropagate");
-        const Component *component = nnet_.GetComponent(c.arg1);
-        ComponentPrecomputedIndexes *indexes =
-            computation_.component_precomputed_indexes[c.arg2].data;
-        const CuSubMatrix<BaseFloat> input(GetSubMatrix(c.arg3));
-        CuSubMatrix<BaseFloat> output(GetSubMatrix(c.arg4));
-        void *memo = component->Propagate(indexes, input, &output);
-        if (c.arg6) {  // need to store stats.
-          KALDI_ASSERT(nnet_to_store_stats_ != NULL);
-          Component *stats_component = nnet_to_store_stats_->GetComponent(c.arg1);
-          bool was_in_place = (c.arg3 == c.arg4);
-          // if propagate was in-place, provide empty matrix and not 'input', as
-          // input is no longer valid.
-          const CuSubMatrix<BaseFloat> maybe_input(
-              GetSubMatrix(was_in_place ? 0 : c.arg3));
-          stats_component->StoreStats(maybe_input, output, memo);
+      SaveMemo(c.arg5, *component, memo);
+      break;
+    }
+    case kBackprop:
+    case kBackpropNoModelUpdate:  {
+      NVTX_RANGE("NnetComputer::ExecuteCommand::kBackpropNoModelUpdate");
+      std::ostringstream debug_str;
+      KALDI_ASSERT(nnet_to_update_ != NULL);
+      debug_str << nnet_.GetComponentName(c.arg1);
+      const Component *component = nnet_.GetComponent(c.arg1);
+      KALDI_ASSERT(!(computation_.need_model_derivative && !nnet_to_update_));
+      Component *upd_component = NULL;
+      if (c.command_type == kBackprop) {    // this block sets 'upd_component'
+        Nnet *nnet_to_update;
+        if (component->Properties()&kUpdatableComponent) {
+          nnet_to_update = (computation_.need_model_derivative ?
+              nnet_to_update_ : NULL);
+        } else {
+          // Some non-updatable components, such as CompositeComponent, store
+          // stats in the backprop.  For other types of non-updatable
+          // component, this arg won't matter.
+          nnet_to_update = nnet_to_store_stats_;
         }
-        SaveMemo(c.arg5, *component, memo);
-        break;
+        if (nnet_to_update)
+          upd_component = nnet_to_update->GetComponent(c.arg1);
       }
-      case kBackprop:
-      case kBackpropNoModelUpdate:  {
-        NVTX_RANGE("NnetComputer::ExecuteCommand::kBackpropNoModelUpdate");
-        std::ostringstream debug_str;
-        KALDI_ASSERT(nnet_to_update_ != NULL);
-        debug_str << nnet_.GetComponentName(c.arg1);
-        const Component *component = nnet_.GetComponent(c.arg1);
-        KALDI_ASSERT(!(computation_.need_model_derivative && !nnet_to_update_));
-        Component *upd_component = NULL;
-        if (c.command_type == kBackprop) {  // this block sets 'upd_component'
-          Nnet *nnet_to_update;
-          if (component->Properties()&kUpdatableComponent) {
-            nnet_to_update = (computation_.need_model_derivative ?
-                              nnet_to_update_ : NULL);
-          } else {
-            // Some non-updatable components, such as CompositeComponent, store
-            // stats in the backprop.  For other types of non-updatable
-            // component, this arg won't matter.
-            nnet_to_update = nnet_to_store_stats_;
-          }
-          if (nnet_to_update)
-            upd_component = nnet_to_update->GetComponent(c.arg1);
-        }
-        ComponentPrecomputedIndexes *indexes =
-            computation_.component_precomputed_indexes[c.arg2].data;
-        const CuSubMatrix<BaseFloat> in_value(GetSubMatrix(c.arg3));
-        const CuSubMatrix<BaseFloat> out_value(GetSubMatrix(c.arg4));
-        const CuSubMatrix<BaseFloat> out_deriv(GetSubMatrix(c.arg5));
-        CuSubMatrix<BaseFloat> in_deriv(GetSubMatrix(c.arg6));
-        void *memo = GetMemo(c.arg7);
-        component->Backprop(debug_str.str(), indexes,
+      ComponentPrecomputedIndexes *indexes =
+          computation_.component_precomputed_indexes[c.arg2].data;
+      const CuSubMatrix<BaseFloat> in_value(GetSubMatrix(c.arg3));
+      const CuSubMatrix<BaseFloat> out_value(GetSubMatrix(c.arg4));
+      const CuSubMatrix<BaseFloat> out_deriv(GetSubMatrix(c.arg5));
+      CuSubMatrix<BaseFloat> in_deriv(GetSubMatrix(c.arg6));
+      void *memo = GetMemo(c.arg7);
+      component->Backprop(debug_str.str(), indexes,
                             in_value, out_value, out_deriv,
                             memo, upd_component,
                             c.arg6 == 0 ? NULL : &in_deriv);
-        if (memo != NULL)
-          component->DeleteMemo(memo);
-        break;
-      }
-      case kMatrixCopy: {
-        CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
-        const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
-        dest.CopyFromMat(src);
-        if (c.alpha != 1.0)
-          dest.Scale(c.alpha);  // note: in principle in future we could write a
+      if (memo != NULL)
+        component->DeleteMemo(memo);
+      break;
+    }
+    case kMatrixCopy: {
+      CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
+      const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
+      dest.CopyFromMat(src);
+      if (c.alpha != 1.0)
+        dest.Scale(c.alpha);    // note: in principle in future we could write a
                                 // kernel which would do this in one operation.
-        break;
+      break;
+    }
+    case kMatrixAdd: {
+      CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
+      const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
+      dest.AddMat(c.alpha, src);
+      break;
+    }
+    case kAddRows: {
+      CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
+      const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
+      const CuArray<int32> &indexes = computation_.indexes_cuda[c.arg3];
+      dest.AddRows(c.alpha, src, indexes);
+      break;
+    }
+    case kCopyRows: {
+      CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
+      const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
+      const CuArray<int32> &indexes = computation_.indexes_cuda[c.arg3];
+      BaseFloat alpha = c.alpha;
+      if (alpha != 1.0) {              // for now we're faking the 'alpha' thing because the CopyRows
+        if (alpha == 0.0) break;       // command doesn't take that argument.
+        dest.Scale(1.0 / alpha);
+        dest.CopyRows(src, indexes);
+        dest.Scale(c.alpha);
+      } else {
+        dest.CopyRows(src, indexes);
       }
-      case kMatrixAdd: {
-        CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
-        const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
-        dest.AddMat(c.alpha, src);
-        break;
+      break;
+    }
+    case kCopyRowsMulti: {
+      CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
+      CuArray<const BaseFloat*> pointers;
+      GetPointers(c.arg2, dest.NumCols(), &pointers);
+      BaseFloat alpha = c.alpha;
+      if (alpha != 1.0) {              // for now we're faking the 'alpha' thing because the CopyRows
+        if (alpha == 0.0) break;       // command doesn't take that argument.
+        dest.Scale(1.0 / alpha);
+        dest.CopyRows(pointers);
+        dest.Scale(c.alpha);
+      } else {
+        dest.CopyRows(pointers);
       }
-      case kAddRows: {
-        CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
-        const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
-        const CuArray<int32> &indexes = computation_.indexes_cuda[c.arg3];
-        dest.AddRows(c.alpha, src, indexes);
-        break;
-      }
-      case kCopyRows: {
-        CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
-        const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
-        const CuArray<int32> &indexes = computation_.indexes_cuda[c.arg3];
-        BaseFloat alpha = c.alpha;
-        if (alpha != 1.0) {            // for now we're faking the 'alpha' thing because the CopyRows
-          if (alpha == 0.0) break;     // command doesn't take that argument.
-          dest.Scale(1.0 / alpha);
-          dest.CopyRows(src, indexes);
-          dest.Scale(c.alpha);
-        } else {
-          dest.CopyRows(src, indexes);
-        }
-        break;
-      }
-      case kCopyRowsMulti: {
-        CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
-        CuArray<const BaseFloat*> pointers;
-        GetPointers(c.arg2, dest.NumCols(), &pointers);
-        BaseFloat alpha = c.alpha;
-        if (alpha != 1.0) {            // for now we're faking the 'alpha' thing because the CopyRows
-          if (alpha == 0.0) break;     // command doesn't take that argument.
-          dest.Scale(1.0 / alpha);
-          dest.CopyRows(pointers);
-          dest.Scale(c.alpha);
-        } else {
-          dest.CopyRows(pointers);
-        }
-        break;
-      }
-      case kCopyToRowsMulti: {
-        // If c.alpha is not 1.0, this command is not supported.
-        KALDI_ASSERT(c.alpha == 1.0);
-        CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg1));
-        CuArray<BaseFloat*> pointers;
-        GetPointers(c.arg2, src.NumCols(), &pointers);
-        src.CopyToRows(pointers);
-        break;
-      }
-      case kAddRowsMulti: {
-        CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
-        CuArray<const BaseFloat*> pointers;
-        GetPointers(c.arg2, dest.NumCols(), &pointers);
-        dest.AddRows(c.alpha, pointers);
-        break;
-      }
-      case kAddToRowsMulti: {
-        CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg1));
-        CuArray<BaseFloat*> pointers;
-        GetPointers(c.arg2, src.NumCols(), &pointers);
-        src.AddToRows(c.alpha, pointers);
-        break;
-      }
-      case kAddRowRanges: {
-        CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
-        const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
-        const CuArray<Int32Pair> &pairs = computation_.indexes_ranges_cuda[c.arg3];
-        BaseFloat alpha = c.alpha;
-        if (alpha != 1.0) {            // for now we're faking the 'alpha' thing
+      break;
+    }
+    case kCopyToRowsMulti: {
+      // If c.alpha is not 1.0, this command is not supported.
+      KALDI_ASSERT(c.alpha == 1.0);
+      CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg1));
+      CuArray<BaseFloat*> pointers;
+      GetPointers(c.arg2, src.NumCols(), &pointers);
+      src.CopyToRows(pointers);
+      break;
+    }
+    case kAddRowsMulti: {
+      CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
+      CuArray<const BaseFloat*> pointers;
+      GetPointers(c.arg2, dest.NumCols(), &pointers);
+      dest.AddRows(c.alpha, pointers);
+      break;
+    }
+    case kAddToRowsMulti: {
+      CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg1));
+      CuArray<BaseFloat*> pointers;
+      GetPointers(c.arg2, src.NumCols(), &pointers);
+      src.AddToRows(c.alpha, pointers);
+      break;
+    }
+    case kAddRowRanges: {
+      CuSubMatrix<BaseFloat> dest(GetSubMatrix(c.arg1));
+      const CuSubMatrix<BaseFloat> src(GetSubMatrix(c.arg2));
+      const CuArray<Int32Pair> &pairs = computation_.indexes_ranges_cuda[c.arg3];
+      BaseFloat alpha = c.alpha;
+      if (alpha != 1.0) {              // for now we're faking the 'alpha' thing
                                        // because the AddRowRanges
-          if (alpha == 0.0) break;     // command doesn't take that argument.
-          dest.Scale(1.0 / alpha);
-          dest.AddRowRanges(src, pairs);
-          dest.Scale(c.alpha);
-        } else {
-          dest.AddRowRanges(src, pairs);
-        }
-        break;
+        if (alpha == 0.0) break;       // command doesn't take that argument.
+        dest.Scale(1.0 / alpha);
+        dest.AddRowRanges(src, pairs);
+        dest.Scale(c.alpha);
+      } else {
+        dest.AddRowRanges(src, pairs);
       }
-      case kCompressMatrix:
-        // This does nothing if CUDA is not in use.
+      break;
+    }
+    case kCompressMatrix:
+      // This does nothing if CUDA is not in use.
 #if HAVE_CUDA == 1
-        if (CuDevice::Instantiate().Enabled()) {
-          if (compressed_matrices_.empty())
-            compressed_matrices_.resize(matrices_.size(), NULL);
-          int32 m = computation_.submatrices[c.arg1].matrix_index;
-          KALDI_ASSERT(compressed_matrices_[m] == NULL &&
+      if (CuDevice::Instantiate().Enabled()) {
+        if (compressed_matrices_.empty())
+          compressed_matrices_.resize(matrices_.size(), NULL);
+        int32 m = computation_.submatrices[c.arg1].matrix_index;
+        KALDI_ASSERT(compressed_matrices_[m] == NULL &&
                        matrices_[m].NumRows() != 0);
-          BaseFloat range = c.alpha;
-          bool truncate = (c.arg3 != 0);
-          compressed_matrices_[m] = NewCuCompressedMatrix(
+        BaseFloat range = c.alpha;
+        bool truncate = (c.arg3 != 0);
+        compressed_matrices_[m] = NewCuCompressedMatrix(
               static_cast<CuCompressedMatrixType>(c.arg2),
               range, truncate);
-          compressed_matrices_[m]->CopyFromMat(matrices_[m]);
-          matrices_[m].Resize(0, 0);
-        }
+        compressed_matrices_[m]->CopyFromMat(matrices_[m]);
+        matrices_[m].Resize(0, 0);
+      }
 #endif
-        break;
-      case kDecompressMatrix:
+      break;
+    case kDecompressMatrix:
 #if HAVE_CUDA == 1
-        if (CuDevice::Instantiate().Enabled()) {
-          int32 m = computation_.submatrices[c.arg1].matrix_index;
-          CuCompressedMatrixBase *compressed_matrix =
-              compressed_matrices_[m];
-          KALDI_ASSERT(compressed_matrix != NULL &&
+      if (CuDevice::Instantiate().Enabled()) {
+        int32 m = computation_.submatrices[c.arg1].matrix_index;
+        CuCompressedMatrixBase *compressed_matrix =
+            compressed_matrices_[m];
+        KALDI_ASSERT(compressed_matrix != NULL &&
                        matrices_[m].NumRows() == 0);
-          matrices_[m].Resize(compressed_matrix->NumRows(),
+        matrices_[m].Resize(compressed_matrix->NumRows(),
                               compressed_matrix->NumCols(),
                               kUndefined,
                               computation_.matrices[m].stride_type);
-          compressed_matrix->CopyToMat(&(matrices_[m]));
-          delete compressed_matrix;
-          compressed_matrices_[m] = NULL;
-        }
+        compressed_matrix->CopyToMat(&(matrices_[m]));
+        delete compressed_matrix;
+        compressed_matrices_[m] = NULL;
+      }
 #endif
-        break;
-      case kNoOperation: case kNoOperationPermanent: case kNoOperationMarker:
-      case kNoOperationLabel:
-        break;
-      case kGotoLabel:
-        KALDI_ASSERT(computation_.commands[c.arg1].command_type == kNoOperationLabel);
-        program_counter_ = c.arg1;
-        break;
-      default:
-        KALDI_ERR << "Invalid command in computation";
+      break;
+    case kNoOperation: case kNoOperationPermanent: case kNoOperationMarker:
+    case kNoOperationLabel:
+      break;
+    case kGotoLabel:
+      KALDI_ASSERT(computation_.commands[c.arg1].command_type == kNoOperationLabel);
+      program_counter_ = c.arg1;
+      break;
+    default:
+      KALDI_ERR << "Invalid command in computation";
     }
   } catch (...) {
     if (!debug_) {
@@ -457,8 +457,8 @@ CuSubMatrix<BaseFloat> NnetComputer::GetSubMatrix(int32 submatrix_index) {
 }
 
 void NnetComputer::GetPointers(int32 indexes_multi_index,
-                               int32 num_cols,
-                               CuArray<BaseFloat*> *pointers) {
+    int32 num_cols,
+    CuArray<BaseFloat*> *pointers) {
   KALDI_ASSERT(static_cast<size_t>(indexes_multi_index)
                < computation_.indexes_multi.size());
   const std::vector<std::pair<int32,int32> > &pairs =
@@ -503,8 +503,8 @@ void NnetComputer::GetPointers(int32 indexes_multi_index,
 }
 
 void NnetComputer::GetPointers(int32 indexes_multi_index,
-                               int32 num_cols,
-                               CuArray<const BaseFloat*> *pointers) {
+    int32 num_cols,
+    CuArray<const BaseFloat*> *pointers) {
   GetPointers(indexes_multi_index, num_cols,
               reinterpret_cast<CuArray<BaseFloat*>*>(pointers));
 }
@@ -545,7 +545,7 @@ void NnetComputer::Run() {
 }
 
 void NnetComputer::AcceptInput(const std::string &node_name,
-                               CuMatrix<BaseFloat> *input) {
+    CuMatrix<BaseFloat> *input) {
   bool is_output = false;
   int32 matrix_index = GetIoMatrixIndex(node_name, is_output);
 
@@ -576,7 +576,7 @@ void NnetComputer::AcceptInput(const std::string &node_name,
 }
 
 const CuMatrixBase<BaseFloat> &NnetComputer::GetOutput(
-    const std::string &node_name) {
+  const std::string &node_name) {
   bool is_output = true;
   int32 matrix_index = GetIoMatrixIndex(node_name, is_output);
   KALDI_ASSERT(matrices_[matrix_index].NumRows() != 0);
@@ -585,7 +585,7 @@ const CuMatrixBase<BaseFloat> &NnetComputer::GetOutput(
 
 
 void NnetComputer::GetOutputDestructive(const std::string &node_name,
-                                        CuMatrix<BaseFloat> *output) {
+    CuMatrix<BaseFloat> *output) {
   bool is_output = true;
   int32 matrix_index = GetIoMatrixIndex(node_name, is_output);
   KALDI_ASSERT(matrices_[matrix_index].NumRows() != 0);
@@ -597,8 +597,8 @@ void NnetComputer::GetOutputDestructive(const std::string &node_name,
 void NnetComputer::CheckNoPendingIo() {
   const std::vector<NnetComputation::Command> &c = computation_.commands;
   while (program_counter_ < static_cast<int32>(c.size()) &&
-         (c[program_counter_].command_type == kAcceptInput ||
-          c[program_counter_].command_type == kProvideOutput)) {
+      (c[program_counter_].command_type == kAcceptInput ||
+      c[program_counter_].command_type == kProvideOutput)) {
     pending_commands_.push_back(program_counter_);
     program_counter_++;
   }
@@ -625,9 +625,9 @@ int32 NnetComputer::GetIoMatrixIndex(const std::string &node_name, bool is_outpu
   // first make sure all the I/O commands that we immediately expect, are listed
   // in 'pending_commands_'.
   while (program_counter_ < static_cast<int32>(computation_.commands.size()) &&
-         ((c[program_counter_].command_type == kAcceptInput ||
-           c[program_counter_].command_type == kProvideOutput ||
-           c[program_counter_].command_type == kNoOperationMarker))) {
+      ((c[program_counter_].command_type == kAcceptInput ||
+      c[program_counter_].command_type == kProvideOutput ||
+      c[program_counter_].command_type == kNoOperationMarker))) {
     if (c[program_counter_].command_type != kNoOperationMarker)
       pending_commands_.push_back(program_counter_);
     program_counter_++;
@@ -661,7 +661,7 @@ int32 NnetComputer::GetIoMatrixIndex(const std::string &node_name, bool is_outpu
 
 
 void NnetComputer::AcceptInputs(const Nnet &nnet,
-                                const std::vector<NnetIo> &io_vec) {
+    const std::vector<NnetIo> &io_vec) {
   for (size_t i = 0; i < io_vec.size(); i++) {
     const NnetIo &io = io_vec[i];
     int32 node_index = nnet.GetNodeIndex(io.name);
@@ -669,8 +669,8 @@ void NnetComputer::AcceptInputs(const Nnet &nnet,
       KALDI_ERR << "No node named '" << io.name << "' in nnet.";
     if (nnet.IsInputNode(node_index)) {
       CuMatrix<BaseFloat> cu_input(io.features.NumRows(),
-                                   io.features.NumCols(),
-                                   kUndefined);
+          io.features.NumCols(),
+          kUndefined);
       cu_input.CopyFromGeneralMat(io.features);
       this->AcceptInput(io.name, &cu_input);
     }
