@@ -19,12 +19,12 @@ import io
 import sys
 import unicodedata
 
-sys.stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="utf8");
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf8");
+sys.stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="utf8")
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf8")
 for line in sys.stdin:
-  line = unicodedata.normalize('NFKC', line)
-  words = line.strip().split()
-  uttid = words[0]
-  transcript = ''.join(words[1:])
-  transcript = transcript.replace('|', ' ')
-  print("{} {}".format(uttid, transcript))
+    line = unicodedata.normalize('NFKC', line)
+    words = line.strip().split()
+    uttid = words[0]
+    transcript = ''.join(words[1:])
+    transcript = transcript.replace('|', ' ')
+    print("{} {}".format(uttid, transcript))

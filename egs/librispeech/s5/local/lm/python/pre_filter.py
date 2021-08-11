@@ -18,13 +18,15 @@ pipes = [re.compile('^\s*\|.*\|\s*$')]
 
 non_word = [re.compile('^\W+$')]
 
-chapter = [re.compile('^\s*((Chapter)|(Volume)|(Canto)).*[LXIV0-9]+.*$', re.IGNORECASE),]
+chapter = [re.compile(
+    '^\s*((Chapter)|(Volume)|(Canto)).*[LXIV0-9]+.*$', re.IGNORECASE), ]
 
 contents = [re.compile('CONTENTS'),
             re.compile('^.*((\s{2,50})|([\t]+))[0-9]+\s*$'),
             re.compile('^\s*((I+[:.]+)|(I?[LXV]+I*([\.:])?))\s+.*')]
 
 debug = None
+
 
 def parse_opts():
     parser = argparse.ArgumentParser(
@@ -40,17 +42,21 @@ def parse_opts():
     debug = opts.debug
     return opts
 
+
 def debug_log(lines, idx, context=2):
     if debug:
         start = max(0, idx - context)
         end = min(len(lines), idx + context + 1)
-        sys.stderr.write('\n'.join('> %s' % l for l in lines[start:end]) + '\n\n')
+        sys.stderr.write('\n'.join('> %s' %
+                                   l for l in lines[start:end]) + '\n\n')
+
 
 def match(regexes, line):
     for r in regexes:
         if r.match(line) is not None:
             return True
     return False
+
 
 def empty_lines(lines, index, extent):
     """
@@ -67,6 +73,7 @@ def empty_lines(lines, index, extent):
             return False
     return True
 
+
 if __name__ == '__main__':
     opts = parse_opts()
 
@@ -80,12 +87,12 @@ if __name__ == '__main__':
 
         # Roman numeral alone in a line, surrounded by empty lines
         if match(roman_number, l) and empty_lines(in_lines, i, -1) and empty_lines(in_lines, i, 1):
-            #print 'matched roman'
+            # print 'matched roman'
             debug_log(in_lines, i)
             continue
 
         if match(chapter, l) and (empty_lines(in_lines, i, -1) or empty_lines(in_lines, i, 1)):
-            #print 'matched chapter'
+            # print 'matched chapter'
             debug_log(in_lines, i)
             continue
 
@@ -94,7 +101,7 @@ if __name__ == '__main__':
             continue
 
         if match(contents, l):
-            #print 'matched contents'
+            # print 'matched contents'
             debug_log(in_lines, i)
             continue
 
@@ -110,4 +117,3 @@ if __name__ == '__main__':
 
     with open(opts.out_text, 'w') as out_text:
         out_text.write('\n'.join(out_lines) + '\n')
-        

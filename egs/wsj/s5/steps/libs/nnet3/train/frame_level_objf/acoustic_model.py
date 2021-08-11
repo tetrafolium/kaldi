@@ -25,7 +25,6 @@ def generate_egs(data, alidir, egs_dir,
                  online_ivector_dir=None,
                  samples_per_iter=20000, frames_per_eg_str="20", srand=0,
                  egs_opts=None, cmvn_opts=None):
-
     """ Wrapper for calling steps/nnet3/get_egs.sh
 
     Generates targets from alignment directory 'alidir', which contains

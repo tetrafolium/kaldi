@@ -3,8 +3,8 @@
 # Copyright   2018 Ashish Arora
 # Apache 2.0
 # minimum bounding box part in this script is originally from
-#https://github.com/BebeSparkelSparkel/MinimumBoundingBox
-#https://startupnextdoor.com/computing-convex-hull-in-python/
+# https://github.com/BebeSparkelSparkel/MinimumBoundingBox
+# https://startupnextdoor.com/computing-convex-hull-in-python/
 
 """ This module will be used for extracting line images from page image.
  Given the word segmentation (bounding box around a word) for  every word, it will
@@ -28,10 +28,11 @@ from PIL import Image
 from scipy.misc import toimage
 
 parser = argparse.ArgumentParser(description="Creates line images from page image",
-                                 epilog="E.g.  " + sys.argv[0] + "  data/LDC2012T15"
-                                             " data/madcat.train.raw.lineid "
-                                             " data/local/lines ",
-                                formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                 epilog="E.g.  " +
+                                 sys.argv[0] + "  data/LDC2012T15"
+                                 " data/madcat.train.raw.lineid "
+                                 " data/local/lines ",
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('database_path1', type=str,
                     help='Path to the downloaded madcat data directory 1')
 parser.add_argument('data_splits', type=str,
@@ -57,13 +58,14 @@ bounding_box is a named tuple which contains:
 """
 
 bounding_box_tuple = namedtuple('bounding_box_tuple', 'area '
-                                        'length_parallel '
-                                        'length_orthogonal '
-                                        'rectangle_center '
-                                        'unit_vector '
-                                        'unit_vector_angle '
-                                        'corner_points'
-                         )
+                                'length_parallel '
+                                'length_orthogonal '
+                                'rectangle_center '
+                                'unit_vector '
+                                'unit_vector_angle '
+                                'corner_points'
+                                )
+
 
 def unit_vector(pt0, pt1):
     """ Returns an unit vector that points in the direction of pt0 to pt1.
@@ -76,8 +78,8 @@ def unit_vector(pt0, pt1):
         Eg.  0.31622776601683794, 0.9486832980505138
     """
     dis_0_to_1 = sqrt((pt0[0] - pt1[0])**2 + (pt0[1] - pt1[1])**2)
-    return (pt1[0] - pt0[0])/ dis_0_to_1, \
-           (pt1[1] - pt0[1])/ dis_0_to_1
+    return (pt1[0] - pt0[0]) / dis_0_to_1, \
+           (pt1[1] - pt0[1]) / dis_0_to_1
 
 
 def orthogonal_vector(vector):
@@ -124,7 +126,7 @@ def bounding_area(index, hull):
     return {'area': len_p * len_o,
             'length_parallel': len_p,
             'length_orthogonal': len_o,
-            'rectangle_center': (min_p + float(len_p)/ 2, min_o + float(len_o)/ 2),
+            'rectangle_center': (min_p + float(len_p) / 2, min_o + float(len_o) / 2),
             'unit_vector': unit_vector_p,
             }
 
@@ -140,9 +142,9 @@ def to_xy_coordinates(unit_vector_angle, point):
         (float, float): converted x,y coordinate of the unit vector.
         Eg. 0.680742447866183, 2.1299271629971663
     """
-    angle_orthogonal = unit_vector_angle + pi/ 2
+    angle_orthogonal = unit_vector_angle + pi / 2
     return point[0] * cos(unit_vector_angle) + point[1] * cos(angle_orthogonal), \
-           point[0] * sin(unit_vector_angle) + point[1] * sin(angle_orthogonal)
+        point[0] * sin(unit_vector_angle) + point[1] * sin(angle_orthogonal)
 
 
 def rotate_points(center_of_rotation, angle, points):
@@ -186,7 +188,7 @@ def rectangle_corners(rectangle):
     for i1 in (.5, -.5):
         for i2 in (i1, -1 * i1):
             corner_points.append((rectangle['rectangle_center'][0] + i1 * rectangle['length_parallel'],
-                            rectangle['rectangle_center'][1] + i2 * rectangle['length_orthogonal']))
+                                  rectangle['rectangle_center'][1] + i2 * rectangle['length_orthogonal']))
 
     return rotate_points(rectangle['rectangle_center'], rectangle['unit_vector_angle'], corner_points)
 
@@ -211,7 +213,8 @@ def minimum_bounding_box(points):
              corner_points: set that contains the corners of the rectangle
     """
 
-    if len(points) <= 2: raise ValueError('More than two points required.')
+    if len(points) <= 2:
+        raise ValueError('More than two points required.')
 
     hull_ordered = [points[index] for index in ConvexHull(points).vertices]
     hull_ordered.append(hull_ordered[0])
@@ -223,17 +226,19 @@ def minimum_bounding_box(points):
         if rectangle['area'] < min_rectangle['area']:
             min_rectangle = rectangle
 
-    min_rectangle['unit_vector_angle'] = atan2(min_rectangle['unit_vector'][1], min_rectangle['unit_vector'][0])
-    min_rectangle['rectangle_center'] = to_xy_coordinates(min_rectangle['unit_vector_angle'], min_rectangle['rectangle_center'])
+    min_rectangle['unit_vector_angle'] = atan2(
+        min_rectangle['unit_vector'][1], min_rectangle['unit_vector'][0])
+    min_rectangle['rectangle_center'] = to_xy_coordinates(
+        min_rectangle['unit_vector_angle'], min_rectangle['rectangle_center'])
 
     return bounding_box_tuple(
-        area = min_rectangle['area'],
-        length_parallel = min_rectangle['length_parallel'],
-        length_orthogonal = min_rectangle['length_orthogonal'],
-        rectangle_center = min_rectangle['rectangle_center'],
-        unit_vector = min_rectangle['unit_vector'],
-        unit_vector_angle = min_rectangle['unit_vector_angle'],
-        corner_points = set(rectangle_corners(min_rectangle))
+        area=min_rectangle['area'],
+        length_parallel=min_rectangle['length_parallel'],
+        length_orthogonal=min_rectangle['length_orthogonal'],
+        rectangle_center=min_rectangle['rectangle_center'],
+        unit_vector=min_rectangle['unit_vector'],
+        unit_vector_angle=min_rectangle['unit_vector_angle'],
+        corner_points=set(rectangle_corners(min_rectangle))
     )
 
 
@@ -246,8 +251,8 @@ def get_center(im):
         (int, int): center of the image
         Eg.  2550, 3300
     """
-    center_x = float(im.size[0])/ 2
-    center_y = float(im.size[1])/ 2
+    center_x = float(im.size[0]) / 2
+    center_y = float(im.size[1]) / 2
     return int(center_x), int(center_y)
 
 
@@ -262,9 +267,9 @@ def get_horizontal_angle(unit_vector_angle):
         Eg. 0.01543.
     """
 
-    if unit_vector_angle > pi/ 2 and unit_vector_angle <= pi:
+    if unit_vector_angle > pi / 2 and unit_vector_angle <= pi:
         unit_vector_angle = unit_vector_angle - pi
-    elif unit_vector_angle > -pi and unit_vector_angle < -pi/ 2:
+    elif unit_vector_angle > -pi and unit_vector_angle < -pi / 2:
         unit_vector_angle = unit_vector_angle + pi
 
     return unit_vector_angle
@@ -314,15 +319,23 @@ def rotated_points(bounding_box, center):
     x4, y4 = p4
     center_x, center_y = center
     rotation_angle_in_rad = -get_smaller_angle(bounding_box)
-    x_dash_1 = (x1 - center_x) * cos(rotation_angle_in_rad) - (y1 - center_y) * sin(rotation_angle_in_rad) + center_x
-    x_dash_2 = (x2 - center_x) * cos(rotation_angle_in_rad) - (y2 - center_y) * sin(rotation_angle_in_rad) + center_x
-    x_dash_3 = (x3 - center_x) * cos(rotation_angle_in_rad) - (y3 - center_y) * sin(rotation_angle_in_rad) + center_x
-    x_dash_4 = (x4 - center_x) * cos(rotation_angle_in_rad) - (y4 - center_y) * sin(rotation_angle_in_rad) + center_x
+    x_dash_1 = (x1 - center_x) * cos(rotation_angle_in_rad) - \
+        (y1 - center_y) * sin(rotation_angle_in_rad) + center_x
+    x_dash_2 = (x2 - center_x) * cos(rotation_angle_in_rad) - \
+        (y2 - center_y) * sin(rotation_angle_in_rad) + center_x
+    x_dash_3 = (x3 - center_x) * cos(rotation_angle_in_rad) - \
+        (y3 - center_y) * sin(rotation_angle_in_rad) + center_x
+    x_dash_4 = (x4 - center_x) * cos(rotation_angle_in_rad) - \
+        (y4 - center_y) * sin(rotation_angle_in_rad) + center_x
 
-    y_dash_1 = (y1 - center_y) * cos(rotation_angle_in_rad) + (x1 - center_x) * sin(rotation_angle_in_rad) + center_y
-    y_dash_2 = (y2 - center_y) * cos(rotation_angle_in_rad) + (x2 - center_x) * sin(rotation_angle_in_rad) + center_y
-    y_dash_3 = (y3 - center_y) * cos(rotation_angle_in_rad) + (x3 - center_x) * sin(rotation_angle_in_rad) + center_y
-    y_dash_4 = (y4 - center_y) * cos(rotation_angle_in_rad) + (x4 - center_x) * sin(rotation_angle_in_rad) + center_y
+    y_dash_1 = (y1 - center_y) * cos(rotation_angle_in_rad) + \
+        (x1 - center_x) * sin(rotation_angle_in_rad) + center_y
+    y_dash_2 = (y2 - center_y) * cos(rotation_angle_in_rad) + \
+        (x2 - center_x) * sin(rotation_angle_in_rad) + center_y
+    y_dash_3 = (y3 - center_y) * cos(rotation_angle_in_rad) + \
+        (x3 - center_x) * sin(rotation_angle_in_rad) + center_y
+    y_dash_4 = (y4 - center_y) * cos(rotation_angle_in_rad) + \
+        (x4 - center_x) * sin(rotation_angle_in_rad) + center_y
     return x_dash_1, y_dash_1, x_dash_2, y_dash_2, x_dash_3, y_dash_3, x_dash_4, y_dash_4
 
 
@@ -335,8 +348,9 @@ def pad_image(image):
     Returns:
         image: page image
     """
-    
-    padded_image = Image.new('RGB', (image.size[0] + padding, image.size[1] + padding), "white")
+
+    padded_image = Image.new(
+        'RGB', (image.size[0] + padding, image.size[1] + padding), "white")
     padded_image.paste(im=image, box=(offset, offset))
     return padded_image
 
@@ -381,6 +395,7 @@ def set_line_image_data(image, line_id, image_file_name):
     imgray.save(image_path)
     image_fh.write(image_path + '\n')
 
+
 def get_line_images_from_page_image(image_file_name, madcat_file_path):
     """ Extracts the line image from page image.
     Args:
@@ -401,9 +416,11 @@ def get_line_images_from_page_image(image_file_name, madcat_file_path):
         for token_node in token_image:
             word_point = token_node.getElementsByTagName('point')
             for word_node in word_point:
-                word_coordinate = (int(word_node.getAttribute('x')), int(word_node.getAttribute('y')))
+                word_coordinate = (int(word_node.getAttribute(
+                    'x')), int(word_node.getAttribute('y')))
                 minimum_bounding_box_input.append(word_coordinate)
-        updated_mbb_input = update_minimum_bounding_box_input(minimum_bounding_box_input)
+        updated_mbb_input = update_minimum_bounding_box_input(
+            minimum_bounding_box_input)
         bounding_box = minimum_bounding_box(updated_mbb_input)
 
         p1, p2, p3, p4 = bounding_box.corner_points
@@ -428,19 +445,19 @@ def get_line_images_from_page_image(image_file_name, madcat_file_path):
         rot_points.append(p4_new)
 
         cropped_bounding_box = bounding_box_tuple(bounding_box.area,
-                bounding_box.length_parallel,
-                bounding_box.length_orthogonal,
-                bounding_box.length_orthogonal,
-                bounding_box.unit_vector,
-                bounding_box.unit_vector_angle,
-                set(rot_points)
-            )
+                                                  bounding_box.length_parallel,
+                                                  bounding_box.length_orthogonal,
+                                                  bounding_box.length_orthogonal,
+                                                  bounding_box.unit_vector,
+                                                  bounding_box.unit_vector_angle,
+                                                  set(rot_points)
+                                                  )
 
         rotation_angle_in_rad = get_smaller_angle(cropped_bounding_box)
-        img2 = region_initial.rotate(degrees(rotation_angle_in_rad), resample=Image.BICUBIC)
+        img2 = region_initial.rotate(
+            degrees(rotation_angle_in_rad), resample=Image.BICUBIC)
         x_dash_1, y_dash_1, x_dash_2, y_dash_2, x_dash_3, y_dash_3, x_dash_4, y_dash_4 = rotated_points(
-                cropped_bounding_box, get_center(region_initial))
-
+            cropped_bounding_box, get_center(region_initial))
 
         min_x = int(min(x_dash_1, x_dash_2, x_dash_3, x_dash_4))
         min_y = int(min(y_dash_1, y_dash_2, y_dash_3, y_dash_4))
@@ -462,7 +479,8 @@ def check_file_location():
                                   corresponding to the page image.
     """
 
-    madcat_file_path1 = os.path.join(data_path1, 'madcat', base_name + '.madcat.xml')
+    madcat_file_path1 = os.path.join(
+        data_path1, 'madcat', base_name + '.madcat.xml')
 
     image_file_path1 = os.path.join(data_path1, 'images', base_name + '.tif')
 
@@ -471,6 +489,7 @@ def check_file_location():
 
     print("ERROR: path does not exist")
     return None, None, None
+
 
 def parse_writing_conditions(writing_conditions):
     """ Returns a dictionary which have writing condition of each page image.
@@ -487,6 +506,7 @@ def parse_writing_conditions(writing_conditions):
             line_list = line.strip().split("\t")
             file_writing_cond[line_list[0]] = line_list[3]
     return file_writing_cond
+
 
 def check_writing_condition(wc_dict):
     """ Checks if a given page image is writing in a given writing condition.
@@ -520,7 +540,8 @@ output_directory = args.out_dir
 image_file = os.path.join(output_directory, 'images.scp')
 image_fh = open(image_file, 'w', encoding='utf-8')
 
-writing_conditions1 = os.path.join(args.database_path1, 'docs', 'writing_conditions.tab')
+writing_conditions1 = os.path.join(
+    args.database_path1, 'docs', 'writing_conditions.tab')
 
 wc_dict1 = parse_writing_conditions(writing_conditions1)
 

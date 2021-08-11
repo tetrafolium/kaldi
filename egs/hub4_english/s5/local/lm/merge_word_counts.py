@@ -24,7 +24,7 @@ def main():
 
     for word, count in words.items():
         if count >= int(sys.argv[1]):
-            print ("{0} {1}".format(count, word))
+            print("{0} {1}".format(count, word))
 
 
 if __name__ == '__main__':

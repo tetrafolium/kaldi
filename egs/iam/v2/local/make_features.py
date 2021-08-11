@@ -43,10 +43,10 @@ parser.add_argument('--feat-dim', type=int, default=40,
 parser.add_argument('--padding', type=int, default=5,
                     help='Number of white pixels to pad on the left'
                     'and right side of the image.')
-parser.add_argument('--fliplr', type=lambda x: (str(x).lower()=='true'), default=False,
-                   help="Flip the image left-right for right to left languages")
-parser.add_argument("--augment", type=lambda x: (str(x).lower()=='true'), default=False,
-                   help="performs image augmentation")
+parser.add_argument('--fliplr', type=lambda x: (str(x).lower() == 'true'), default=False,
+                    help="Flip the image left-right for right to left languages")
+parser.add_argument("--augment", type=lambda x: (str(x).lower() == 'true'), default=False,
+                    help="performs image augmentation")
 args = parser.parse_args()
 
 
@@ -67,11 +67,11 @@ def write_kaldi_matrix(file_handle, matrix, key):
     file_handle.write(" ]\n")
 
 
-def horizontal_pad(im, allowed_lengths = None):
+def horizontal_pad(im, allowed_lengths=None):
     if allowed_lengths is None:
         left_padding = right_padding = args.padding
     else:  # Find an allowed length for the image
-        imlen = im.shape[1] # width
+        imlen = im.shape[1]  # width
         allowed_len = 0
         for l in allowed_lengths:
             if l > imlen:
@@ -83,12 +83,13 @@ def horizontal_pad(im, allowed_lengths = None):
         padding = allowed_len - imlen
         left_padding = int(padding // 2)
         right_padding = padding - left_padding
-    dim_y = im.shape[0] # height
+    dim_y = im.shape[0]  # height
     im_pad = np.concatenate((255 * np.ones((dim_y, left_padding),
                                            dtype=int), im), axis=1)
     im_pad1 = np.concatenate((im_pad, 255 * np.ones((dim_y, right_padding),
                                                     dtype=int)), axis=1)
     return im_pad1
+
 
 def get_scaled_image_aug(im, mode='normal'):
     scale_size = args.feat_dim
@@ -96,7 +97,7 @@ def get_scaled_image_aug(im, mode='normal'):
     sy = im.shape[0]
     scale = (1.0 * scale_size) / sy
     nx = int(scale_size)
-    ny = int(scale * sx) 
+    ny = int(scale * sx)
     scale_size = random.randint(10, 30)
     scale = (1.0 * scale_size) / sy
     down_nx = int(scale_size)
@@ -109,6 +110,7 @@ def get_scaled_image_aug(im, mode='normal'):
         im_scaled_up = misc.imresize(im_scaled_down, (nx, ny))
         return im_scaled_up
     return im
+
 
 def contrast_normalization(im, low_pct, high_pct):
     element_number = im.size
@@ -220,7 +222,7 @@ data_list_path = args.images_scp_path
 if args.out_ark == '-':
     out_fh = sys.stdout
 else:
-    out_fh = open(args.out_ark,'w')
+    out_fh = open(args.out_ark, 'w')
 
 allowed_lengths = None
 allowed_len_handle = args.allowed_len_file_path

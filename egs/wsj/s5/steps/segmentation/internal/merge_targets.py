@@ -16,13 +16,13 @@ The column dimension is num-sources * dim, which dim is specified by --dim
 option.
 """
 
+import libs.common as common_lib
 import argparse
 import logging
 import numpy as np
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -123,12 +123,12 @@ def should_remove_frame(row, dim):
     best_class = max_idx % dim
 
     confident_in_source = []  # List of length num_sources
-                              # Element 'i' is 1,
-                              # if the best value for the source 'i' is > 0.5
+    # Element 'i' is 1,
+    # if the best value for the source 'i' is > 0.5
     best_values_for_source = []  # Element 'i' is a pair (value, class),
-                                 # where 'class' is argmax over the scores
-                                 # corresponding to the source 'i' and
-                                 # 'value' is the corresponding score.
+    # where 'class' is argmax over the scores
+    # corresponding to the source 'i' and
+    # 'value' is the corresponding score.
     for source_idx in range(num_sources):
         idx = np.argmax(row[(source_idx * dim):
                             ((source_idx+1) * dim)])
@@ -181,14 +181,14 @@ def run(args):
                     else:
                         for i in range(num_sources):
                             out_mat[n, :] += (
-                                mat[n, (i * args.dim) : ((i+1) * args.dim)]
+                                mat[n, (i * args.dim): ((i+1) * args.dim)]
                                 * (1.0 if args.weights is None
                                    else args.weights[i]))
             else:
                 # Just interpolate the targets
                 for i in range(num_sources):
                     out_mat += (
-                        mat[:, (i * args.dim) : ((i+1) * args.dim)]
+                        mat[:, (i * args.dim): ((i+1) * args.dim)]
                         * (1.0 if args.weights is None else args.weights[i]))
 
             common_lib.write_matrix_ascii(targets_writer, out_mat.tolist(),

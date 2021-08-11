@@ -9,36 +9,38 @@ import argparse
 import sys
 import string
 
+
 def GetArgs():
     parser = argparse.ArgumentParser(
-        description = "The purpose of this script is to use a ctm and a vocab file"
+        description="The purpose of this script is to use a ctm and a vocab file"
         "to extract sub-utterances and a sub-segmentation. Extracted sub-utterances"
         "are all the strings of consecutive in-vocab words from the ctm"
         "surrounded by an out-of-vocab word at each end if present.",
-        epilog = "e.g. steps/dict/internal/get_subsegments.py exp/tri3_lex_0.4_work/phonetic_decoding/word.ctm \\"
+        epilog="e.g. steps/dict/internal/get_subsegments.py exp/tri3_lex_0.4_work/phonetic_decoding/word.ctm \\"
         "exp/tri3_lex_0.4_work/learn_vocab.txt exp/tri3_lex_0.4_work/resegmentation/subsegments \\"
         "exp/tri3_lex_0.4_work/resegmentation/text"
         "See steps/dict/learn_lexicon_greedy.sh for an example.")
 
-    parser.add_argument("ctm", metavar='<ctm>', type = str,
-                        help = "Input ctm file."
+    parser.add_argument("ctm", metavar='<ctm>', type=str,
+                        help="Input ctm file."
                         "each line must be <utt-id> <chanel> <start-time> <duration> <word>")
-    parser.add_argument("vocab", metavar='<vocab>', type = str,
-                        help = "Vocab file."
+    parser.add_argument("vocab", metavar='<vocab>', type=str,
+                        help="Vocab file."
                         "each line must be <word>")
-    parser.add_argument("subsegment", metavar='<subsegtment>', type = str,
-                        help = "Subsegment file. Each line is in format:"
+    parser.add_argument("subsegment", metavar='<subsegtment>', type=str,
+                        help="Subsegment file. Each line is in format:"
                         "<new-utt> <old-utt> <start-time-within-old-utt> <end-time-within-old-utt>")
-    parser.add_argument("text", metavar='<text>', type = str,
-                        help = "Text file. Each line is in format:"
+    parser.add_argument("text", metavar='<text>', type=str,
+                        help="Text file. Each line is in format:"
                         " <new-utt> <word1> <word2> ... <wordN>.")
-  
-    print (' '.join(sys.argv), file = sys.stderr)
+
+    print(' '.join(sys.argv), file=sys.stderr)
 
     args = parser.parse_args()
     args = CheckArgs(args)
 
     return args
+
 
 def CheckArgs(args):
     if args.ctm == "-":
@@ -57,6 +59,7 @@ def CheckArgs(args):
 
     return args
 
+
 def GetSubsegments(args, vocab):
     sub_utt = list()
     last_is_oov = False
@@ -71,7 +74,7 @@ def GetSubsegments(args, vocab):
     for line in args.ctm_handle:
         splits = line.strip().split()
         if len(splits) < 5:
-            raise Exception("problematic line",line)
+            raise Exception("problematic line", line)
 
         utt_id = splits[0]
         start = float(splits[2])
@@ -79,8 +82,9 @@ def GetSubsegments(args, vocab):
         word = splits[4]
         if utt_id != utt_id_last:
             sub_utt_id = 1
-            if len(sub_utt)>1:
-                sub_utts[utt_id_last+'-'+str(sub_utt_id_last)] = (utt_id_last, sub_utt)
+            if len(sub_utt) > 1:
+                sub_utts[utt_id_last+'-' +
+                         str(sub_utt_id_last)] = (utt_id_last, sub_utt)
                 end_times[utt_id_last+'-'+str(sub_utt_id_last)] = ent_time_last
             sub_utt = []
             start_times[utt_id+'-'+str(sub_utt_id)] = start
@@ -105,16 +109,18 @@ def GetSubsegments(args, vocab):
         sub_utt_id_last = sub_utt_id
         is_oov_last = is_oov
         ent_time_last = start + dur
-        
+
     if is_oov:
         if word != '<eps>':
             sub_utt.append(word)
         sub_utts[utt_id+'-'+str(sub_utt_id_last)] = (utt_id, sub_utt)
         end_times[utt_id+'-'+str(sub_utt_id_last)] = start + dur
 
-    for utt,v in sorted(sub_utts.items()):
+    for utt, v in sorted(sub_utts.items()):
         print(utt, ' '.join(sub_utts[utt][1]), file=args.text_handle)
-        print(utt, sub_utts[utt][0], start_times[utt], end_times[utt], file=args.subsegment_handle)
+        print(utt, sub_utts[utt][0], start_times[utt],
+              end_times[utt], file=args.subsegment_handle)
+
 
 def ReadVocab(vocab_file_handle):
     vocab = set()
@@ -125,16 +131,18 @@ def ReadVocab(vocab_file_handle):
                 continue
             if len(splits) > 1:
                 raise Exception('Invalid format of line ' + line
-                                    + ' in vocab file.')
+                                + ' in vocab file.')
             word = splits[0]
             vocab.add(word)
     return vocab
+
 
 def Main():
     args = GetArgs()
 
     vocab = ReadVocab(args.vocab_handle)
     GetSubsegments(args, vocab)
-   
+
+
 if __name__ == "__main__":
     Main()

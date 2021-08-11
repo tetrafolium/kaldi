@@ -23,7 +23,7 @@ import sys
 import re
 import writenumbers
 
-## Global vars
+# Global vars
 
 # normdict = {",": " ",
 #             ":": " ",
@@ -37,13 +37,13 @@ import writenumbers
 # t_table = str.maketrans(normdict)
 
 
-## Utility function
+# Utility function
 
 def getuttid_text(line):
     return line.split(" ", 1)
 
 
-## Main
+# Main
 
 numtable = writenumbers.loadNumTable(sys.argv[1])
 textin = codecs.open(sys.argv[2], "r", "utf8")
@@ -51,13 +51,13 @@ fid = codecs.open(sys.argv[3], "w", "utf8")
 outtext = codecs.open(sys.argv[4], "w", "utf8")
 
 for line in textin:
-        utt_id, text = getuttid_text(line)
-        normtext1 = re.sub(r'[\.,:;\?]', '', text)
-        normtext2 = re.sub(r'[\t\\]', ' ', normtext1)
-        normtext3 = re.sub(r'  +', ' ', normtext2.strip())
-        normtext4 = writenumbers.normNumber(normtext3, numtable)
-        outtext.write(normtext4)
-        fid.write(utt_id + "\n")
+    utt_id, text = getuttid_text(line)
+    normtext1 = re.sub(r'[\.,:;\?]', '', text)
+    normtext2 = re.sub(r'[\t\\]', ' ', normtext1)
+    normtext3 = re.sub(r'  +', ' ', normtext2.strip())
+    normtext4 = writenumbers.normNumber(normtext3, numtable)
+    outtext.write(normtext4)
+    fid.write(utt_id + "\n")
 
 
 textin.close()

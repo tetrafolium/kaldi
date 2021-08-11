@@ -3,17 +3,18 @@
 # Copyright  2017  Jian Wang
 # License: Apache 2.0.
 
+import re
 import os
 import argparse
 import sys
 sys.stdout = open(1, 'w', encoding='utf-8', closefd=False)
 
-import re
-
 
 parser = argparse.ArgumentParser(description="This script get a vocab from unigram counts "
                                  "of words produced by get_unigram_counts.sh",
-                                 epilog="E.g. " + sys.argv[0] + " data/rnnlm/data > data/rnnlm/vocab/words.txt",
+                                 epilog="E.g. " +
+                                 sys.argv[0] +
+                                 " data/rnnlm/data > data/rnnlm/vocab/words.txt",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument("data_dir",
@@ -37,6 +38,7 @@ def add_counts(word_counts, counts_file):
                 word_counts[word_and_count[0]] += int(word_and_count[1])
             else:
                 word_counts[word_and_count[0]] = int(word_and_count[1])
+
 
 word_counts = {}
 
@@ -63,4 +65,5 @@ for word, _ in sorted(word_counts.items(), key=lambda x: x[1], reverse=True):
     print("{0} {1}".format(word, idx))
     idx += 1
 
-print(sys.argv[0] + ": vocab is generated with {0} words.".format(idx), file=sys.stderr)
+print(sys.argv[0] +
+      ": vocab is generated with {0} words.".format(idx), file=sys.stderr)

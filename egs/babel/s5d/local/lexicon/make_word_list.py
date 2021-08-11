@@ -48,7 +48,7 @@ def process_transcripts(transcripts_dir, transcripts_list):
                                         misprons[w] += 1
                                     except KeyError:
                                         misprons[w] = 1
-    
+
     word_list = sorted(word_list.items(), key=lambda x: x[0])
     misprons = sorted(misprons.items(), key=lambda x: x[0])
     print("")
@@ -59,9 +59,9 @@ def process_transcripts(transcripts_dir, transcripts_list):
 def main():
     if len(sys.argv[1:]) == 0:
         print("Usage: ./make_word_list.py "
-            "<transcripts_list> <transcripts_dir> <word_list>", file=sys.stderr)
+              "<transcripts_list> <transcripts_dir> <word_list>", file=sys.stderr)
         sys.exit(1)
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument("transcripts_list", help="Path to list of training "
                         "transcripts")
@@ -91,6 +91,7 @@ def main():
         with codecs.open(args.misprons, "w", encoding="utf-8") as f:
             for word, count in misprons:
                 f.write("%d %s\n" % (count, word))
+
 
 if __name__ == "__main__":
     main()

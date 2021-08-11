@@ -28,7 +28,7 @@ from sprakparser import Session
 n = 0
 
 
-### Utility functions
+# Utility functions
 def find_ext_folders(topfolder, extfolderlist, file_ext):
     '''Recursive function that finds all the folders containing $file_ext files
     and returns a list of folders.'''
@@ -42,7 +42,7 @@ def find_ext_folders(topfolder, extfolderlist, file_ext):
                 extfolderlist.append(topfolder)
                 return
         else:
-                pass
+            pass
 
 
 def create_parallel_file_list(session, sndlist, txtlist):
@@ -51,9 +51,10 @@ def create_parallel_file_list(session, sndlist, txtlist):
     file, the other list contains the location of a text file that contains the
     transcription for that sound file. The text file is output by this function, but
     to save disk space, the sound file remains where it is.'''
-    
+
     shadow = False
-    if os.path.exists(session.sessiondir):  # The dir exists, i.e. the sessiondir name is not unique
+    # The dir exists, i.e. the sessiondir name is not unique
+    if os.path.exists(session.sessiondir):
 
         # Append counter to create new directory. Use global counter to prevent resetting every time
         # the function is called.
@@ -68,20 +69,20 @@ def create_parallel_file_list(session, sndlist, txtlist):
         os.mkdir(session.sessiondir)
 
     for recnum, recording in enumerate(session.record_states):
-        #print(session.record_states)
+        # print(session.record_states)
         if recnum == 0:     # skip the first recording of silence
             continue
         oldsound = os.path.join(session.wavdir, recording[1])
 
         # Some wavdirs are empty, check for files
-        if not os.path.exists(oldsound): 
+        if not os.path.exists(oldsound):
             continue
 
         # create file and write the transcription
         txtout = session.create_filename(recnum+1, "txt")
         txtline = os.path.join(session.sessiondir, txtout)
         fout = codecs.open(txtline, "w", "utf8")
-        fout.write(recording[0] + "\n")   
+        fout.write(recording[0] + "\n")
         fout.close()
 
         # write locations to lists
@@ -89,7 +90,7 @@ def create_parallel_file_list(session, sndlist, txtlist):
         oldsound = oldsound.replace('791213 8232', '791213_8232')
         txtlist.write(txtline + "\n")  # write lists of txt files
         sndlist.write(oldsound + "\n")   # write lists of recordings
-        
+
     if recnum == 10:
         sys.exit('Are there files?')
 
@@ -104,7 +105,7 @@ def make_speech_corpus(top, dest, txtdest, snddest, srcfolder):
     '''This function tests whether the information in an spl file is sufficient to
     extract the recording and text. It also creates a directory name based on the
     speaker id and the sessions id for the processed files.'''
-    
+
     spls = os.listdir(srcfolder)
     for splfile in sorted(spls):
         if os.path.splitext(splfile)[1] != ".spl":
@@ -121,10 +122,12 @@ def make_speech_corpus(top, dest, txtdest, snddest, srcfolder):
             continue
         if len(session.record_states) < 2:  # unsure whether this has an effect
             continue
-        session.sessiondir = os.path.join(dest, session.filestem) + "." + session.speaker_id
+        session.sessiondir = os.path.join(
+            dest, session.filestem) + "." + session.speaker_id
 
-        # 
+        #
         create_parallel_file_list(session, snddest, txtdest)
+
 
 if __name__ == '__main__':
 
@@ -133,7 +136,7 @@ if __name__ == '__main__':
         dest = sys.argv[2]
     except:
         print('Usage: python3 sprak2kaldi.py <corpus project dir> <processed corpus project subdir>')
-        print('E.g. python3 sprak2kaldi.py /path/to/data/local/data/0565-1  /path/to/data/local/data/corpus_processed/0565-1' )
+        print('E.g. python3 sprak2kaldi.py /path/to/data/local/data/0565-1  /path/to/data/local/data/corpus_processed/0565-1')
         sys.exit('exit 1')
 
     if os.path.exists(dest):
@@ -143,17 +146,14 @@ if __name__ == '__main__':
         except:
             print('Failed to remove ' + dest)
             sys.exit('Must remove ' + dest + ' to proceed corpus preparation.')
-        
 
-    ## Find the subdirectories containing '.spl' files. These files contain information that
+    # Find the subdirectories containing '.spl' files. These files contain information that
     #  pairs a recording with speaker information, id and script
     spldirs = []
     find_ext_folders(topfolder, spldirs, ".spl")
 
     sndlist = codecs.open(os.path.join(dest, "sndlist"), "w", "utf8")
     txtlist = codecs.open(os.path.join(dest, "txtlist"), "w", "utf8")
-
-
 
     for num, folder in enumerate(spldirs):
         make_speech_corpus(topfolder, dest, txtlist, sndlist, folder)

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os, sys, io
+import os
+import sys
+import io
 
 # This script is originally from qatip project (http://qatsdemo.cloudapp.net/qatip/demo/)
 # of Qatar Computing Research Institute (http://qcri.qa/)

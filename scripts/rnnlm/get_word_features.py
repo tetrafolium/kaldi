@@ -14,7 +14,9 @@ import re
 
 parser = argparse.ArgumentParser(description="This script turns the words into the sparse feature representation, "
                                              "using features from rnnlm/choose_features.py.",
-                                 epilog="E.g. " + sys.argv[0] + " --unigram-probs=exp/rnnlm/unigram_probs.txt "
+                                 epilog="E.g. " +
+                                 sys.argv[0] +
+                                 " --unigram-probs=exp/rnnlm/unigram_probs.txt "
                                         "data/rnnlm/vocab/words.txt exp/rnnlm/features.txt "
                                         "> exp/rnnlm/word_feats.txt",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -134,9 +136,11 @@ def read_features(features_file):
                 if order < feats['min_ngram_order']:
                     feats['min_ngram_order'] = order
             else:
-                sys.exit(sys.argv[0] + ": error feature type: {0}".format(feat_type))
+                sys.exit(
+                    sys.argv[0] + ": error feature type: {0}".format(feat_type))
 
     return feats
+
 
 vocab = read_vocab(args.vocab_file)
 if args.unigram_probs != '':
@@ -147,14 +151,17 @@ feats = read_features(args.features_file)
 
 treat_as_bos_word_set = args.treat_as_bos.split(',')
 
+
 def treat_as_bos(word):
-  return word in treat_as_bos_word_set
+    return word in treat_as_bos_word_set
+
 
 def get_feature_list(word, idx):
     """Return a dict from feat_id to value (as int or float), e.g.
       { 0 -> 1.0, 100 -> 1 }
     """
-    ans = defaultdict(int)  # the default is only used for character-ngram features.
+    ans = defaultdict(
+        int)  # the default is only used for character-ngram features.
     if idx == 0:
         return ans
 
@@ -166,13 +173,13 @@ def get_feature_list(word, idx):
         (feat_id, scale) = feats['special'][word]
         ans[feat_id] = 1 * scale
         return ans   # return because words with the 'special' feature do
-                     # not get any other features (except the constant
-                     # feature).
+        # not get any other features (except the constant
+        # feature).
 
     if 'unigram' in feats:
         if unigram_probs is None:
             sys.exit(sys.argv[0] + ": if unigram feature is present, you must specify the "
-                     "--unigram-probs option.");
+                     "--unigram-probs option.")
         (feat_id, offset, scale) = feats['unigram']
         logp = math.log(unigram_probs[idx])
         ans[feat_id] = offset + logp * scale
@@ -213,12 +220,14 @@ def get_feature_list(word, idx):
                 ans[feat_id] += 1 * scale
     return ans
 
+
 for word, idx in sorted(vocab.items(), key=lambda x: x[1]):
     if treat_as_bos(word):
-      feature_list = get_feature_list("<s>", idx)
+        feature_list = get_feature_list("<s>", idx)
     else:
-      feature_list = get_feature_list(word, idx)
+        feature_list = get_feature_list(word, idx)
     print("{0}\t{1}".format(idx,
                             " ".join(["%s %.3g" % (f, v) for f, v in sorted(feature_list.items())])))
 
-print(sys.argv[0] + ": made features for {0} words.".format(len(vocab)), file=sys.stderr)
+print(sys.argv[0] +
+      ": made features for {0} words.".format(len(vocab)), file=sys.stderr)

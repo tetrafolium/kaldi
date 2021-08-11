@@ -64,7 +64,7 @@ logger.addHandler(handler)
 
 
 parser = argparse.ArgumentParser(
-    description = "This program modifies the reference in the ctm-edits which "
+    description="This program modifies the reference in the ctm-edits which "
     "is output by steps/cleanup/internal/get_ctm_edits.py, to allow insertions, deletions and "
     "substitutions of non-scored words, and [if --allow-repetitions=true], "
     "duplications of single words or pairs of scored words (to account for dysfluencies "
@@ -74,12 +74,12 @@ parser = argparse.ArgumentParser(
     "the original reference.  Also by defaults tags non-scored words as such when "
     "they are correct; see the --tag-non-scored option.")
 
-parser.add_argument("--verbose", type = int, default = 1,
-                    choices=[0,1,2,3],
-                    help = "Verbose level, higher = more verbose output")
-parser.add_argument("--allow-repetitions", type = str, default = 'true',
-                    choices=['true','false'],
-                    help = "If true, allow repetitions in the transcript of one or "
+parser.add_argument("--verbose", type=int, default=1,
+                    choices=[0, 1, 2, 3],
+                    help="Verbose level, higher = more verbose output")
+parser.add_argument("--allow-repetitions", type=str, default='true',
+                    choices=['true', 'false'],
+                    help="If true, allow repetitions in the transcript of one or "
                     "two-word sequences: for instance if the ref says 'i' but "
                     "the hyp says 'i i', or the ref says 'but then' and the hyp says "
                     "'but then but then', fix the reference accordingly.  Intervening "
@@ -88,18 +88,17 @@ parser.add_argument("--allow-repetitions", type = str, default = 'true',
                     "generally no way to tell which repetition was the 'real' one "
                     "(and since we're generally confident that such things were "
                     "actually uttered).")
-parser.add_argument("non_scored_words_in", metavar = "<non-scored-words-file>",
+parser.add_argument("non_scored_words_in", metavar="<non-scored-words-file>",
                     help="Filename of file containing a list of non-scored words, "
                     "one per line. See steps/cleanup/get_nonscored_words.py.")
-parser.add_argument("ctm_edits_in", metavar = "<ctm-edits-in>",
-                    help = "Filename of input ctm-edits file. "
+parser.add_argument("ctm_edits_in", metavar="<ctm-edits-in>",
+                    help="Filename of input ctm-edits file. "
                     "Use /dev/stdin for standard input.")
-parser.add_argument("ctm_edits_out", metavar = "<ctm-edits-out>",
-                    help = "Filename of output ctm-edits file. "
+parser.add_argument("ctm_edits_out", metavar="<ctm-edits-out>",
+                    help="Filename of output ctm-edits file. "
                     "Use /dev/stdout for standard output.")
 
 args = parser.parse_args()
-
 
 
 def ReadNonScoredWords(non_scored_words_file):
@@ -116,7 +115,6 @@ def ReadNonScoredWords(non_scored_words_file):
                      "file {0}: {1}".format(non_scored_words_file, line))
         non_scored_words.add(a[0])
     f.close()
-
 
 
 # The ctm-edits file format is as follows [note: file-id is really utterance-id
@@ -182,6 +180,8 @@ def ProcessLineForNonScoredWords(a):
 # ref to match.
 # It returns the modified list-of-lists [but note that the input
 # is actually modified].
+
+
 def ProcessUtteranceForRepetitions(split_lines_of_utt):
     global non_scored_words, repetition_stats
     # The array 'selected_lines' will contain the indexes of of selected
@@ -250,23 +250,23 @@ def ProcessUtteranceForRepetitions(split_lines_of_utt):
            this_hyp_words[0] != this_hyp_words[1]:
             # if the hyp words were of the form [ 'a', 'b', 'a', 'b' ]...
             this_edits = selected_edits[i:i+4]
-            if this_edits == [ 'cor', 'cor', 'ins', 'ins' ] or \
-                    this_edits == [ 'ins', 'ins', 'cor', 'cor' ]:
+            if this_edits == ['cor', 'cor', 'ins', 'ins'] or \
+                    this_edits == ['ins', 'ins', 'cor', 'cor']:
                 if this_edits[0] == 'cor':
-                    indexes_to_fix += [ i+2, i+3 ]
+                    indexes_to_fix += [i+2, i+3]
                 else:
-                    indexes_to_fix += [ i, i+1 ]
+                    indexes_to_fix += [i, i+1]
 
                 # the next line prevents this region of the text being used
                 # in any further edits.
-                selected_edits[i:i+4] = [ None, None, None, None ]
-                word_pair = this_hyp_words[0] + ' '  + this_hyp_words[1]
+                selected_edits[i:i+4] = [None, None, None, None]
+                word_pair = this_hyp_words[0] + ' ' + this_hyp_words[1]
                 # e.g. word_pair = 'hi there'
                 # add 2 because these stats are of words.
                 repetition_stats[word_pair] += 2
                 # the next line prevents this region of the text being used
                 # in any further edits.
-                selected_edits[i:i+4] = [ None, None, None, None ]
+                selected_edits[i:i+4] = [None, None, None, None]
 
     # This loop scans for, and fixes, one-word insertions that follow,
     # or precede, the corresponding correct words.
@@ -277,7 +277,7 @@ def ProcessUtteranceForRepetitions(split_lines_of_utt):
         if this_hyp_words[0] == this_hyp_words[1]:
             # if the hyp words were of the form [ 'a', 'a' ]...
             this_edits = selected_edits[i:i+2]
-            if this_edits == [ 'cor', 'ins' ] or this_edits == [ 'ins', 'cor' ]:
+            if this_edits == ['cor', 'ins'] or this_edits == ['ins', 'cor']:
                 if this_edits[0] == 'cor':
                     indexes_to_fix.append(i+1)
                 else:
@@ -285,7 +285,7 @@ def ProcessUtteranceForRepetitions(split_lines_of_utt):
                 repetition_stats[this_hyp_words[0]] += 1
                 # the next line prevents this region of the text being used
                 # in any further edits.
-                selected_edits[i:i+2] = [ None, None ]
+                selected_edits[i:i+2] = [None, None]
 
     for i in indexes_to_fix:
         j = selected_line_indexes[i]
@@ -311,7 +311,8 @@ def ProcessUtterance(split_lines_of_utt):
         if new_split_line != []:
             new_split_lines_of_utt.append(new_split_line)
     if args.allow_repetitions == 'true':
-        new_split_lines_of_utt = ProcessUtteranceForRepetitions(new_split_lines_of_utt)
+        new_split_lines_of_utt = ProcessUtteranceForRepetitions(
+            new_split_lines_of_utt)
     return new_split_lines_of_utt
 
 
@@ -328,7 +329,6 @@ def ProcessData():
                  "file {0}".format(args.ctm_edits_out))
     num_lines_processed = 0
 
-
     # Most of what we're doing in the lines below is splitting the input lines
     # and grouping them per utterance, before giving them to ProcessUtterance()
     # and then printing the modified lines.
@@ -343,9 +343,10 @@ def ProcessData():
 
     while True:
         if len(split_pending_line) == 0 or split_pending_line[0] != cur_utterance:
-            split_lines_of_cur_utterance = ProcessUtterance(split_lines_of_cur_utterance)
+            split_lines_of_cur_utterance = ProcessUtterance(
+                split_lines_of_cur_utterance)
             for split_line in split_lines_of_cur_utterance:
-                print(' '.join(split_line), file = f_out)
+                print(' '.join(split_line), file=f_out)
             split_lines_of_cur_utterance = []
             if len(split_pending_line) == 0:
                 break
@@ -357,22 +358,25 @@ def ProcessData():
         split_pending_line = next_line.split()
         if len(split_pending_line) == 0:
             if next_line != '':
-                sys.exit("modify_ctm_edits.py: got an empty or whitespace input line")
+                sys.exit(
+                    "modify_ctm_edits.py: got an empty or whitespace input line")
     try:
         f_out.close()
     except:
         sys.exit("modify_ctm_edits.py: error closing ctm-edits output "
                  "(broken pipe or full disk?)")
 
+
 def PrintNonScoredStats():
     if args.verbose < 1:
         return
     if num_lines == 0:
-        print("modify_ctm_edits.py: processed no input.", file = sys.stderr)
+        print("modify_ctm_edits.py: processed no input.", file=sys.stderr)
     num_lines_modified = sum(ref_change_stats.values())
     num_incorrect_lines = num_lines - num_correct_lines
-    percent_lines_incorrect= '%.2f' % (num_incorrect_lines * 100.0 / num_lines)
-    percent_modified = '%.2f' % (num_lines_modified * 100.0 / num_lines);
+    percent_lines_incorrect = '%.2f' % (
+        num_incorrect_lines * 100.0 / num_lines)
+    percent_modified = '%.2f' % (num_lines_modified * 100.0 / num_lines)
     if num_incorrect_lines > 0:
         percent_of_incorrect_modified = '%.2f' % (num_lines_modified * 100.0 /
                                                   num_incorrect_lines)
@@ -381,20 +385,20 @@ def PrintNonScoredStats():
     print("modify_ctm_edits.py: processed {0} lines of ctm ({1}% of which incorrect), "
           "of which {2} were changed fixing the reference for non-scored words "
           "({3}% of lines, or {4}% of incorrect lines)".format(
-            num_lines, percent_lines_incorrect, num_lines_modified,
-            percent_modified, percent_of_incorrect_modified),
-          file = sys.stderr)
+              num_lines, percent_lines_incorrect, num_lines_modified,
+              percent_modified, percent_of_incorrect_modified),
+          file=sys.stderr)
 
     keys = sorted(ref_change_stats.keys(), reverse=True,
-                  key = lambda x: ref_change_stats[x])
+                  key=lambda x: ref_change_stats[x])
     num_keys_to_print = 40 if args.verbose >= 2 else 10
 
     print("modify_ctm_edits.py: most common edits (as percentages "
           "of all such edits) are:\n" +
-          ('\n'.join([ '%s [%.2f%%]' % (k, ref_change_stats[k]*100.0/num_lines_modified)
-                     for k in keys[0:num_keys_to_print]]))
+          ('\n'.join(['%s [%.2f%%]' % (k, ref_change_stats[k]*100.0/num_lines_modified)
+                      for k in keys[0:num_keys_to_print]]))
           + '\n...'if num_keys_to_print < len(keys) else '',
-          file = sys.stderr)
+          file=sys.stderr)
 
 
 def PrintRepetitionStats():
@@ -402,8 +406,9 @@ def PrintRepetitionStats():
         return
     num_lines_modified = sum(repetition_stats.values())
     num_incorrect_lines = num_lines - num_correct_lines
-    percent_lines_incorrect= '%.2f' % (num_incorrect_lines * 100.0 / num_lines)
-    percent_modified = '%.2f' % (num_lines_modified * 100.0 / num_lines);
+    percent_lines_incorrect = '%.2f' % (
+        num_incorrect_lines * 100.0 / num_lines)
+    percent_modified = '%.2f' % (num_lines_modified * 100.0 / num_lines)
     if num_incorrect_lines > 0:
         percent_of_incorrect_modified = '%.2f' % (num_lines_modified * 100.0 /
                                                   num_incorrect_lines)
@@ -412,20 +417,20 @@ def PrintRepetitionStats():
     print("modify_ctm_edits.py: processed {0} lines of ctm ({1}% of which incorrect), "
           "of which {2} were changed fixing the reference for repetitions ({3}% of "
           "lines, or {4}% of incorrect lines)".format(
-            num_lines, percent_lines_incorrect, num_lines_modified,
-            percent_modified, percent_of_incorrect_modified),
-          file = sys.stderr)
+              num_lines, percent_lines_incorrect, num_lines_modified,
+              percent_modified, percent_of_incorrect_modified),
+          file=sys.stderr)
 
     keys = sorted(repetition_stats.keys(), reverse=True,
-                  key = lambda x: repetition_stats[x])
+                  key=lambda x: repetition_stats[x])
     num_keys_to_print = 40 if args.verbose >= 2 else 10
 
     print("modify_ctm_edits.py: most common repetitions inserted into reference (as percentages "
           "of all words fixed in this way) are:\n" +
-          ('\n'.join([ '%s [%.2f%%]' % (k, repetition_stats[k]*100.0/num_lines_modified)
-                     for k in keys[0:num_keys_to_print]]))
+          ('\n'.join(['%s [%.2f%%]' % (k, repetition_stats[k]*100.0/num_lines_modified)
+                      for k in keys[0:num_keys_to_print]]))
           + '\n...' if num_keys_to_print < len(keys) else '',
-          file = sys.stderr)
+          file=sys.stderr)
 
 
 non_scored_words = set()

@@ -11,12 +11,12 @@ The posterior probabilities of the phones of each of the classes are
 summed up to get the target matrix values.
 """
 
+import libs.common as common_lib
 import argparse
 import logging
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

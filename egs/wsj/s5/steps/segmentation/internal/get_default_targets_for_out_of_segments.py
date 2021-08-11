@@ -15,6 +15,7 @@ the application and data, this could be [ 0 0 0 ] or [ 0 0 1 ] or
 something with fractional weights.
 """
 from __future__ import division
+import libs.common as common_lib
 
 import argparse
 import logging
@@ -23,7 +24,6 @@ import subprocess
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -56,7 +56,7 @@ def get_args():
                         "region")
     parser.add_argument("--length-tolerance", type=int, default=2,
                         help="Tolerate length mismatches of this many frames")
-    parser.add_argument("--verbose", type=int, default=0, choices=[0,1,2],
+    parser.add_argument("--verbose", type=int, default=0, choices=[0, 1, 2],
                         help="Verbose level")
 
     parser.add_argument("--reco2num-frames", type=str, required=True,
@@ -125,7 +125,8 @@ def run(args):
     num_reco = 0
 
     if args.default_targets is not None:
-        default_targets = np.matrix(common_lib.read_matrix_ascii(args.default_targets))
+        default_targets = np.matrix(
+            common_lib.read_matrix_ascii(args.default_targets))
     else:
         default_targets = np.matrix([[1, 0, 0]])
     assert (np.shape(default_targets)[0] == 1

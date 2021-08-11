@@ -42,9 +42,11 @@ args = parser.parse_args()
 
 # validate arguments
 if args.keep_latest and args.keep_best:
-    sys.exit(script_name + ": can only use one of 'keep_latest' or 'keep_best', but not both")
+    sys.exit(script_name +
+             ": can only use one of 'keep_latest' or 'keep_best', but not both")
 elif not args.keep_latest and not args.keep_best:
-    sys.exit(script_name + ": no cleanup strategy specified: use 'keep_latest' or 'keep_best'")
+    sys.exit(script_name +
+             ": no cleanup strategy specified: use 'keep_latest' or 'keep_best'")
 
 
 class IterationInfo:
@@ -86,7 +88,8 @@ def get_compute_prob_info(log_file):
         if "# Ended" in line:
             compute_prob_done = True
     if objf == -2000:
-        print(script_name + ": warning: could not parse objective function from " + log_file, file=sys.stderr)
+        print(script_name + ": warning: could not parse objective function from " +
+              log_file, file=sys.stderr)
     return iteration, objf, compute_prob_done
 
 
@@ -104,15 +107,22 @@ def get_iteration_files(exp_dir):
             model_files = []
             # when there are multiple jobs per iteration, there can be several model files
             # we need to potentially clean them all up without mixing them up
-            model_files.extend(glob.glob("{0}/word_embedding.{1}.mat".format(exp_dir, iteration)))
-            model_files.extend(glob.glob("{0}/word_embedding.{1}.[0-9]*.mat".format(exp_dir, iteration)))
-            model_files.extend(glob.glob("{0}/feat_embedding.{1}.mat".format(exp_dir, iteration)))
-            model_files.extend(glob.glob("{0}/feat_embedding.{1}.[0-9]*.mat".format(exp_dir, iteration)))
-            model_files.extend(glob.glob("{0}/{1}.raw".format(exp_dir, iteration)))
-            model_files.extend(glob.glob("{0}/{1}.[0-9]*.raw".format(exp_dir, iteration)))
+            model_files.extend(
+                glob.glob("{0}/word_embedding.{1}.mat".format(exp_dir, iteration)))
+            model_files.extend(
+                glob.glob("{0}/word_embedding.{1}.[0-9]*.mat".format(exp_dir, iteration)))
+            model_files.extend(
+                glob.glob("{0}/feat_embedding.{1}.mat".format(exp_dir, iteration)))
+            model_files.extend(
+                glob.glob("{0}/feat_embedding.{1}.[0-9]*.mat".format(exp_dir, iteration)))
+            model_files.extend(
+                glob.glob("{0}/{1}.raw".format(exp_dir, iteration)))
+            model_files.extend(
+                glob.glob("{0}/{1}.[0-9]*.raw".format(exp_dir, iteration)))
             # compute_prob logs outlive model files, only consider iterations that do still have model files
             if len(model_files) > 0:
-                iterations[iteration] = IterationInfo(model_files, objf, compute_prob_done)
+                iterations[iteration] = IterationInfo(
+                    model_files, objf, compute_prob_done)
     return iterations
 
 
@@ -138,7 +148,8 @@ def keep_best(iteration_dict):
     for iter, iter_info in iteration_dict.items():
         objf = iter_info.objf
         if objf == -2000:
-            print(script_name + ": warning: objf unavailable for iter " + str(iter), file=sys.stderr)
+            print(script_name + ": warning: objf unavailable for iter " +
+                  str(iter), file=sys.stderr)
             continue
         # add potential best, sort by objf, trim to iters_to_keep size
         best.append((iter, objf))

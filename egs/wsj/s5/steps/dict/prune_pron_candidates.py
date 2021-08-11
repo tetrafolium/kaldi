@@ -10,34 +10,36 @@ import argparse
 import sys
 import math
 
+
 def GetArgs():
-    parser = argparse.ArgumentParser(description = "Prune pronunciation candidates based on soft-counts from lattice-alignment"
+    parser = argparse.ArgumentParser(description="Prune pronunciation candidates based on soft-counts from lattice-alignment"
                                      "outputs, and a reference lexicon. Basically, for each word we sort all pronunciation"
                                      "cadidates according to their soft-counts, and then select the top r * N candidates"
                                      "(For words in the reference lexicon, N = # pron variants given by the reference"
                                      "lexicon; For oov words, N = avg. # pron variants per word in the reference lexicon)."
                                      "r is a user-specified constant, like 2.",
-                                     epilog = "See steps/dict/learn_lexicon_greedy.sh for example")
+                                     epilog="See steps/dict/learn_lexicon_greedy.sh for example")
 
-    parser.add_argument("--r", type = float, default = "2.0",
-                        help = "a user-specified ratio parameter which determines how many"
+    parser.add_argument("--r", type=float, default="2.0",
+                        help="a user-specified ratio parameter which determines how many"
                         "pronunciation candidates we want to keep for each word.")
-    parser.add_argument("pron_stats", metavar = "<pron-stats>", type = str,
-                        help = "File containing soft-counts of all pronounciation candidates; "
+    parser.add_argument("pron_stats", metavar="<pron-stats>", type=str,
+                        help="File containing soft-counts of all pronounciation candidates; "
                         "each line must be <soft-counts> <word> <phones>")
-    parser.add_argument("ref_lexicon", metavar = "<ref-lexicon>", type = str,
-                        help = "Reference lexicon file, where we obtain # pron variants for"
+    parser.add_argument("ref_lexicon", metavar="<ref-lexicon>", type=str,
+                        help="Reference lexicon file, where we obtain # pron variants for"
                         "each word, based on which we prune the pron candidates.")
-    parser.add_argument("pruned_prons", metavar = "<pruned-prons>", type = str,
-                        help = "A file in lexicon format, which contains prons we want to" 
+    parser.add_argument("pruned_prons", metavar="<pruned-prons>", type=str,
+                        help="A file in lexicon format, which contains prons we want to"
                         "prune away from the pron_stats file.")
 
-    print (' '.join(sys.argv), file=sys.stderr)
+    print(' '.join(sys.argv), file=sys.stderr)
 
     args = parser.parse_args()
     args = CheckArgs(args)
 
     return args
+
 
 def CheckArgs(args):
     args.pron_stats_handle = open(args.pron_stats)
@@ -48,6 +50,7 @@ def CheckArgs(args):
         args.pruned_prons_handle = open(args.pruned_prons, "w")
     return args
 
+
 def ReadStats(pron_stats_handle):
     stats = defaultdict(list)
     for line in pron_stats_handle.readlines():
@@ -56,7 +59,7 @@ def ReadStats(pron_stats_handle):
             continue
         if len(splits) < 2:
             raise Exception('Invalid format of line ' + line
-                                + ' in stats file.')
+                            + ' in stats file.')
         count = float(splits[0])
         word = splits[1]
         phones = ' '.join(splits[2:])
@@ -66,6 +69,7 @@ def ReadStats(pron_stats_handle):
         entry.sort(key=lambda x: x[1])
     return stats
 
+
 def ReadLexicon(ref_lexicon_handle):
     ref_lexicon = defaultdict(set)
     for line in ref_lexicon_handle.readlines():
@@ -74,7 +78,7 @@ def ReadLexicon(ref_lexicon_handle):
             continue
         if len(splits) < 2:
             raise Exception('Invalid format of line ' + line
-                                + ' in lexicon file.')
+                            + ' in lexicon file.')
         word = splits[0]
         try:
             phones = ' '.join(splits[2:])
@@ -83,6 +87,7 @@ def ReadLexicon(ref_lexicon_handle):
         ref_lexicon[word].add(phones)
     return ref_lexicon
 
+
 def PruneProns(args, stats, ref_lexicon):
     # Compute the average # pron variants counts per word in the reference lexicon.
     num_words_ref = 0
@@ -90,7 +95,8 @@ def PruneProns(args, stats, ref_lexicon):
     for word, prons in ref_lexicon.items():
         num_words_ref += 1
         num_prons_ref += len(prons)
-    avg_variants_counts_ref = math.ceil(float(num_prons_ref) / float(num_words_ref))
+    avg_variants_counts_ref = math.ceil(
+        float(num_prons_ref) / float(num_words_ref))
 
     for word, entry in stats.items():
         if word in ref_lexicon:
@@ -105,17 +111,20 @@ def PruneProns(args, stats, ref_lexicon):
                     num_variants += 1
             except IndexError:
                 break
-        
+
     for word, entry in stats.items():
         for pron, prob in entry:
             if word not in ref_lexicon or pron not in ref_lexicon[word]:
-                print('{0} {1}'.format(word, pron), file=args.pruned_prons_handle)
+                print('{0} {1}'.format(word, pron),
+                      file=args.pruned_prons_handle)
+
 
 def Main():
     args = GetArgs()
     ref_lexicon = ReadLexicon(args.ref_lexicon_handle)
     stats = ReadStats(args.pron_stats_handle)
     PruneProns(args, stats, ref_lexicon)
+
 
 if __name__ == "__main__":
     Main()

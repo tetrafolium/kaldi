@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-  
+
 # Copyright 2016 Johns Hopkins University (Author: Matthew Wiesner)
 # Apache 2.0
 
@@ -9,7 +9,7 @@
 # This script takes a list of either words or words and corresponding
 # morphemes and returns a graphemic lexicon in the "standard" kaldi format,
 # i.e. a single word with its correpsonding pronunciation per line; multiple
-# pronunciations of a word are listed on separate lines. 
+# pronunciations of a word are listed on separate lines.
 #
 # Example:
 #   word w o r d
@@ -18,14 +18,14 @@
 #
 # It also creates a mapping file describing how each grapheme is transformed
 # into graphemic acoustic units. It has the following form:
-# 
+#
 # Example:
 #   በ b a
-#   â a_combiningcircumflex 
+#   â a_combiningcircumflex
 #   ü ucombiningdiaeresis
 #   b b
 #   c c
-# 
+#
 # When the script is called with the option (--apply-map mapfile) the map
 # provided in "mapfile" is used to expand the words in the provided wordlist
 # into graphemic-acoustic units and the resulting lexicon is output along with
@@ -63,7 +63,7 @@
 #   CHAR_TYPE: The type of grapheme (LETTER, SYLLABLE, VOWEL SIGN, etc.).
 #              This field sometimes determines the way the character is mapped;
 #              a syllable for instance would result in a one-to-many mapping.
-# 
+#
 #   LANGUAGE: The script from which the grapheme originated.
 #             Examples are LATIN, ETHIOPIC, or KATAKANA.
 #   MAP0: The first acoustic unit to which the grapheme maps.
@@ -72,7 +72,7 @@
 #   SYMBOL: The actual grapheme.
 #   TAG: The unicode description of any diacritics attached to the base
 #        grapheme in the unicode description.
-#   TAG0: The name of the first combining character in the NFKD form for the 
+#   TAG0: The name of the first combining character in the NFKD form for the
 #         unicode character.
 #   TAG1, TAG2, ...: The name of subsequent combining characters in the NFKD
 #                    form of the grapheme.
@@ -86,7 +86,7 @@
 # single phoneme.
 
 # Similarly a base grapheme may have more than one diacritic. The name of each
-# diactritic, represented as a combining character in the NFKD baseform, is 
+# diactritic, represented as a combining character in the NFKD baseform, is
 # stored in order in the fields TAG0, TAG1, etc.. A field is present in the
 # table if any grapheme occurring in the vocabulary has said field.
 
@@ -100,7 +100,7 @@
 # completely distinct unit is an option to the script (-T). Using -T 1.0,
 # results in all combining characters being treated as tags. Using -T 0.0 means
 # that no acoustic units are tagged and each grapheme-combining character
-# combination results in a distinct acoustic unit. 
+# combination results in a distinct acoustic unit.
 # ===============================================================
 
 # Import Statements
@@ -119,7 +119,7 @@ import numpy as np
 def main():
     args = parse_input()
     baseforms = get_word_list(args.word2baseform)
-    
+
     if args.apply_map:
         grapheme_map = {}
         with codecs.open(args.apply_map, "r", encoding="utf-8") as f:
@@ -134,12 +134,13 @@ def main():
     else:
         unicode_transcription = baseform2unicode(baseforms)
         encoded_transcription, table, grapheme_map = encode(unicode_transcription,
-                                                        args.tag_percentage,
-                                                        log=args.verbose)
+                                                            args.tag_percentage,
+                                                            log=args.verbose)
         if args.verbose:
             if not os.path.exists(args.verbose):
                 os.makedirs(args.verbose)
-            write_table(table, os.path.join(args.verbose, "grapheme_table.txt"))
+            write_table(table, os.path.join(
+                args.verbose, "grapheme_table.txt"))
 
     # Extract nonspeech lexicon (e.g. <laugh>, <silence>, <cough>)
     try:
@@ -211,7 +212,7 @@ def get_word_list(input_file):
 
         Arguments: input_file -- path to the input word list optionally with
                                  baseforms (1 per line word baseform).
-        
+
         Output:
             words -- list of tuples (word, baseform)
     '''
@@ -228,7 +229,7 @@ def baseform2unicode(baseforms):
     '''
         Convert each baseform in the list, baseforms, to a parsed unicode
         description stored as a list of lists of dictionaries.
-    
+
         unicode_transcription = [
             [{'NAME':'word1_grapheme1','FIELD1':'FIELD1_VAL',...},
             {'NAME':'word1_grapheme2','FIELD1':'FIELD1_VAL',...},...],
@@ -239,7 +240,7 @@ def baseform2unicode(baseforms):
         Arguments:
             baseforms -- List of tuples (word, baseform)
                          e.g. baseforms = get_word_list()
-  
+
         Output:
             unicode_transcription -- See above description
     '''
@@ -254,7 +255,7 @@ def baseform2unicode(baseforms):
         r"|SEMIVOWEL |TONE |SYLLABLE |LIGATURE |KATAKANA )"
         r"(?P<NAME>((?!WITH).)+)"
         r"(?P<TAG>WITH .+)?"
-        )
+    )
 
     # For each graphemic baseform generate a parsed unicode description
     unicode_transcription = []
@@ -267,16 +268,16 @@ def baseform2unicode(baseforms):
             # Use the canonical unicode decomposition
             tags = unicodedata.normalize('NFD', graph)
             match_obj = pattern.match(unicode_desc)
-      
+
             # Grapheme's unicode description is non-standard
             if(not match_obj):
                 # Underscore, dash, hastag have special meaning
                 if(graph in ("_", "-", "#")):
                     graph_dict = {
-                                  'CHAR_TYPE': 'LINK',
-                                  'SYMBOL': graph,
-                                  'NAME': graph
-                                 }
+                        'CHAR_TYPE': 'LINK',
+                        'SYMBOL': graph,
+                        'NAME': graph
+                    }
                 # The grapheme is whitespace
                 elif(unicode_desc in ("ZERO WIDTH SPACE",
                                       "ZERO WIDTH NON-JOINER",
@@ -286,7 +287,7 @@ def baseform2unicode(baseforms):
                     continue
                 else:
                     graph_dict = {'SYMBOL': graph, 'NAME': 'NOT_FOUND'}
-     
+
             # Grapheme's unicode description is standard
             else:
                 graph_dict = match_obj.groupdict()
@@ -296,7 +297,7 @@ def baseform2unicode(baseforms):
             if(len(tags) > 1):
                 for i, t in enumerate(tags[1:]):
                     graph_dict["TAG" + str(i)] = unicodedata.name(t)
-    
+
             # Add grapheme unicode description dictionary to baseform list
             baseform_transcription.append(graph_dict)
         # Add baseform transcription to unicode transcription list
@@ -311,10 +312,10 @@ def encode(unicode_transcription, tag_percentage, log=False):
                                    respresented as a list of dictionaries whose
                                    fields contain information about parsed
                                    unicode descriptions.
-      
+
             tag_percentage -- percent of least frequent graphemes to tag
             log -- optional printing
-              
+
         Outputs:
             encoded_transcription -- baseforms mapped to the graphemeic
                                      acoustic units
@@ -341,16 +342,17 @@ def encode(unicode_transcription, tag_percentage, log=False):
     int2graph = {v: k for k, v in graph2int.items()}
     graph_list_int = [graph2int[g] for g in graph_list]
     bin_edges = range(0, len(int2graph.keys()) + 1)
-    graph_counts = np.histogram(graph_list_int, bins=bin_edges)[0]/float(len(graph_list_int))
+    graph_counts = np.histogram(graph_list_int, bins=bin_edges)[
+        0]/float(len(graph_list_int))
     # Set count threshold to frequency that tags the bottom 10% of graphemes
     bottom_idx = int(np.floor(tag_percentage * len(graph_counts)))
     count_thresh = sorted(graph_counts)[bottom_idx]
     graph_counts_dict = {}
     for i, count in enumerate(graph_counts):
         graph_counts_dict[int2graph[i]] = count
-    
+
     graph_counts = graph_counts_dict
-  
+
     # Print grapheme counts to histogram
     if log:
         graph_counts_sorted = sorted(graph_counts, reverse=True,
@@ -374,7 +376,7 @@ def encode(unicode_transcription, tag_percentage, log=False):
             # Case 1: Check that the grapheme has a unicode description type
             # ---------------------------------------------------------------
             if("CHAR_TYPE" not in [k.strip() for k in graph.keys()]):
-                if(graph["SYMBOL"] == "."):        
+                if(graph["SYMBOL"] == "."):
                     try:
                         graph["MAP0"] = "\t"
                         if word_transcription[-1] == " ":
@@ -395,12 +397,12 @@ def encode(unicode_transcription, tag_percentage, log=False):
                 # Backoff diacritics
                 base_grapheme = graph["NAME"].strip().replace(" ", "-").lower()
                 graph["MAP0"] = _backoff_diacritics(graph["SYMBOL"].lower(),
-                                                   base_grapheme,
-                                                   graph_counts,
-                                                   count_thresh)
+                                                    base_grapheme,
+                                                    graph_counts,
+                                                    count_thresh)
                 # Add final space
                 word_transcription += graph["MAP0"] + " "
-      
+
             # Case 3: Syllable (Assume consonant vowel pattern)
             # At some point we will make it (cvc), but for now
             # this is basically just here for Amharic
@@ -422,13 +424,13 @@ def encode(unicode_transcription, tag_percentage, log=False):
                                  "consonant-vowel pattern.")
 
                     graph_dict = parsed_graph.groupdict()
-          
+
                     # Get consonant if it exists
                     if("CONSONANT" in graph_dict.keys() and
                             graph_dict["CONSONANT"]):
                         graph["MAP0"] = graph_dict["CONSONANT"].lower()
                         word_transcription += graph["MAP0"] + " "
-          
+
                     # Get vowel if it exists
                     if("VOWEL" in graph_dict.keys() and graph_dict["VOWEL"]):
                         graph["MAP1"] = graph_dict["VOWEL"].lower() + "\t"
@@ -457,7 +459,7 @@ def encode(unicode_transcription, tag_percentage, log=False):
             if(graph["SYMBOL"] not in graphemes):
                 table.append(graph)
                 graphemes.append(graph["SYMBOL"])
-          
+
         # Append the newly transcribed word
         encoded_transcription.append(word_transcription.strip())
 
@@ -472,7 +474,7 @@ def encode(unicode_transcription, tag_percentage, log=False):
                 map_number = map_number + 1
 
         grapheme_map[g_dict["SYMBOL"]] = g_map.strip(' ')
-   
+
     return encoded_transcription, table, grapheme_map
 
 
@@ -550,7 +552,7 @@ def write_table(table, outfile):
     '''
         Creates table of graphemes and fields of each grapheme's corresponding
         unicode description.
-    
+
         Arguments:
             table   -- table to write
             outfile -- name of the output lexicon debug file 
@@ -566,7 +568,7 @@ def write_table(table, outfile):
         # Write headers
         for h in header_names[:-1]:
             fo.write("%s\t" % h)
-    
+
         fo.write("%s\n" % header_names[-1])
 
         # Write values if present
@@ -618,14 +620,14 @@ def write_lexicon(baseforms, encoded_transcription, outfile, sil_lex=None,
                 f.write("%s\t%s\n" % (w, sil_lex[w]))
         except AttributeError:
             pass
-        
-        # Then write extra-speech words 
+
+        # Then write extra-speech words
         try:
             for w in extra_lex.keys():
                 f.write("%s\t%s\n" % (w, extra_lex[w]))
         except AttributeError:
             pass
-  
+
         # Then write the rest of the words
         for idx, w in enumerate(baseforms):
             # This is really just for BABEL in case <hes> is written as a word
@@ -635,6 +637,6 @@ def write_lexicon(baseforms, encoded_transcription, outfile, sil_lex=None,
                 f.write("%s\t%s\n" % (w[0],
                                       encoded_transcription[idx]))
 
+
 if __name__ == "__main__":
     main()
-

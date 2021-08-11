@@ -330,9 +330,9 @@ def run(args):
                 best_index=best_index, best_score=best_score))
         assert (best_doc_id, 1.0, 1.0) in best_docs
 
-        print ("{0} {1}".format(query_id, " ".join(
+        print("{0} {1}".format(query_id, " ".join(
             ["%s,%.2f,%.2f" % x for x in best_docs])),
-               file=args.relevant_docs)
+            file=args.relevant_docs)
 
     if num_queries == 0:
         raise RuntimeError("Failed to retrieve any document.")

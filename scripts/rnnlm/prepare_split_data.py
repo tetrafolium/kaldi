@@ -13,7 +13,9 @@ import re
 
 parser = argparse.ArgumentParser(description="This script prepares files containing integerized text, "
                                  "for consumption by nnet3-get-egs.",
-                                 epilog="E.g. " + sys.argv[0] + " --vocab-file=data/rnnlm/vocab/words.txt "
+                                 epilog="E.g. " +
+                                 sys.argv[0] +
+                                 " --vocab-file=data/rnnlm/vocab/words.txt "
                                         "--num-splits=5 "
                                         "--data-weights-file=exp/rnnlm/data_weights.txt data/rnnlm/data "
                                         "exp/rnnlm1/split_text",
@@ -40,7 +42,6 @@ parser.add_argument("split_dir",
 
 
 args = parser.parse_args()
-
 
 
 # get the name with txt and counts file path for all data sources except dev
@@ -79,13 +80,12 @@ def read_data_weights(weights_file, data_sources):
                 sys.exit(sys.argv[0] + ": bad data-weights line: '" +
                          line.rstrip("\n") + "': " + str(e))
 
-
     for name in data_sources.keys():
         if name not in data_weights:
-            sys.exit(sys.argv[0] + ": Weight for data source '{0}' not set".format(name))
+            sys.exit(
+                sys.argv[0] + ": Weight for data source '{0}' not set".format(name))
 
     return data_weights
-
 
 
 # This function opens the file with filename 'source_filename',
@@ -108,20 +108,18 @@ def distribute_to_outputs(source_filename, weight, output_filehandles):
         try:
             print(weight_str + line, end='', file=output_filehandle)
         except:
-            sys.exit(sys.argv[0] + ": failed to write to temporary file (disk full?)")
+            sys.exit(
+                sys.argv[0] + ": failed to write to temporary file (disk full?)")
         n += 1
         print
     f.close()
-
-
-
 
 
 data_sources = get_all_data_sources_except_dev(args.text_dir)
 data_weights = read_data_weights(args.data_weights_file, data_sources)
 
 if not os.path.exists(args.split_dir + "/info"):
-    os.makedirs(args.split_dir +  "/info")
+    os.makedirs(args.split_dir + "/info")
 
 # set up the 'num_splits' file, which contains an integer.
 with open("{0}/info/num_splits".format(args.split_dir), 'w', encoding="utf-8") as f:
@@ -130,7 +128,8 @@ with open("{0}/info/num_splits".format(args.split_dir), 'w', encoding="utf-8") a
 # e.g. set temp_files = [ 'foo/1.tmp', 'foo/2.tmp', ..., 'foo/5.tmp' ]
 # we write the text data to here, later we convert to integer
 # while writing to the *.txt files.
-temp_files = [ "{0}/{1}.tmp".format(args.split_dir, n) for n in range(1, args.num_splits + 1) ]
+temp_files = ["{0}/{1}.tmp".format(args.split_dir, n)
+              for n in range(1, args.num_splits + 1)]
 
 # create filehandles for writing to each of these '.tmp' output files.
 temp_filehandles = []
@@ -164,7 +163,8 @@ for name in data_sources.keys():
         # up writing the same lines to the same file.
         offset = (n * args.num_splits) // multiplicity
         assert offset < args.num_splits
-        rotated_filehandles = temp_filehandles[offset:] + temp_filehandles[:offset]
+        rotated_filehandles = temp_filehandles[offset:] + \
+            temp_filehandles[:offset]
 
         # The following line is the core of what we're doing; see the
         # documentation for this function for more details.
@@ -175,7 +175,7 @@ for f in temp_filehandles:
     try:
         f.close()
     except:
-        sys.exit(sys.argv[0] + ": error closing temporary file (disk full?)");
+        sys.exit(sys.argv[0] + ": error closing temporary file (disk full?)")
 
 
 print(sys.argv[0] + ": converting from text to integer form.")
@@ -214,7 +214,7 @@ command = "utils/sym2int.pl {unk_opt} {vocab_file} <{input_file} | {awk_command}
 ret = os.system(command)
 if ret != 0:
     sys.exit(sys.argv[0] + ": command '{0}' returned with status {1}".format(
-            command, ret))
+        command, ret))
 
 
 print(sys.argv[0] + ": created split data in {0}".format(args.split_dir))

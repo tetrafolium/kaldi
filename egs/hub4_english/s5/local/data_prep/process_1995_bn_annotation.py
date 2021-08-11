@@ -91,20 +91,20 @@ class Segment(object):
 
     def write_utt2spk(self, out_file):
         """Writes this segment's entry into utt2spk file."""
-        print ("{0} {1}".format(self.get_utt_id(), self.get_spk_id()),
-               file=out_file)
+        print("{0} {1}".format(self.get_utt_id(), self.get_spk_id()),
+              file=out_file)
 
     def write_segment(self, out_file):
         """Writes this segment's entry into segments file."""
-        print ("{0} {1} {2:.3f} {3:.3f}".format(
-                    self.get_utt_id(), self.reco_id,
-                    self.start_time, self.end_time),
-               file=out_file)
+        print("{0} {1} {2:.3f} {3:.3f}".format(
+            self.get_utt_id(), self.reco_id,
+            self.start_time, self.end_time),
+            file=out_file)
 
     def write_text(self, out_file):
         """Writes this segment's entry into kaldi text file."""
-        print ("{0} {1}".format(self.get_utt_id(), self.text),
-               file=out_file)
+        print("{0} {1}".format(self.get_utt_id(), self.text),
+              file=out_file)
 
 
 def write_segments(segments, args):

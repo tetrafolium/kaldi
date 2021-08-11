@@ -26,11 +26,16 @@ parser.add_argument("--log-base", type=float, default=math.exp(1),
                     help="Log base for log porbability")
 args = parser.parse_args()
 
+
 def check_args(args):
-    args.text_in_handle = sys.stdin if args.text_in == "-" else open(args.text_in, "r")
-    args.prob_file_handle = sys.stdout if args.prob_file == "-" else open(args.prob_file, "w")
+    args.text_in_handle = sys.stdin if args.text_in == "-" else open(
+        args.text_in, "r")
+    args.prob_file_handle = sys.stdout if args.prob_file == "-" else open(
+        args.prob_file, "w")
     if args.log_base <= 0:
-        sys.exit("compute_sentence_probs_arpa.py: Invalid log base (must be greater than 0)")
+        sys.exit(
+            "compute_sentence_probs_arpa.py: Invalid log base (must be greater than 0)")
+
 
 def is_logprob(input):
     if input[0] == "-":
@@ -41,6 +46,7 @@ def is_logprob(input):
             return False
     else:
         return False
+
 
 def check_number(model_file, tot_num):
     cur_num = 0
@@ -55,6 +61,8 @@ def check_number(model_file, tot_num):
 
 # This function load language model in arpa form and save in a dictionary for
 # computing sentence probabilty of input text file.
+
+
 def load_model(model_file):
     with open(model_file) as model:
         ngram_dict = {}
@@ -62,7 +70,8 @@ def load_model(model_file):
 
         # check arpa form
         if lines[0][:-1] != "\\data\\":
-            sys.exit("compute_sentence_probs_arpa.py: Please make sure that language model is in arpa form.")
+            sys.exit(
+                "compute_sentence_probs_arpa.py: Please make sure that language model is in arpa form.")
 
         # read line
         for line in lines:
@@ -71,19 +80,23 @@ def load_model(model_file):
                 if is_logprob(line_split[-1]):
                     ngram_key = " ".join(line_split[1:-1])
                     if ngram_key in ngram_dict:
-                        sys.exit("compute_sentence_probs_arpa.py: Duplicated ngram in arpa language model: {}.".format(ngram_key))
+                        sys.exit(
+                            "compute_sentence_probs_arpa.py: Duplicated ngram in arpa language model: {}.".format(ngram_key))
                     ngram_dict[ngram_key] = (line_split[0], line_split[-1])
                 else:
                     ngram_key = " ".join(line_split[1:])
                     if ngram_key in ngram_dict:
-                        sys.exit("compute_sentence_probs_arpa.py: Duplicated ngram in arpa language model: {}.".format(ngram_key))
+                        sys.exit(
+                            "compute_sentence_probs_arpa.py: Duplicated ngram in arpa language model: {}.".format(ngram_key))
                     ngram_dict[ngram_key] = (line_split[0],)
 
     return ngram_dict, len(ngram_dict)
 
+
 def compute_sublist_prob(sub_list):
     if len(sub_list) == 0:
-        sys.exit("compute_sentence_probs_arpa.py: Ngram substring not found in arpa language model, please check.")
+        sys.exit(
+            "compute_sentence_probs_arpa.py: Ngram substring not found in arpa language model, please check.")
 
     sub_string = " ".join(sub_list)
     if sub_string in ngram_dict:
@@ -91,8 +104,9 @@ def compute_sublist_prob(sub_list):
     else:
         backoff_substring = " ".join(sub_list[:-1])
         backoff_weight = 0.0 if (backoff_substring not in ngram_dict or len(ngram_dict[backoff_substring]) < 2) \
-                         else -float(ngram_dict[backoff_substring][1][1:])
+            else -float(ngram_dict[backoff_substring][1][1:])
         return compute_sublist_prob(sub_list[1:]) + backoff_weight
+
 
 def compute_begin_prob(sub_list):
     logprob = 0
@@ -108,6 +122,8 @@ def compute_begin_prob(sub_list):
 # p(word_N | word_N-1 ... word_1) = p(word_N | word_(N-1) ... word_2) * backoff_weight(word_(N-1) | word_(N-2) ... word_1)
 # If the sequence (word_(N-1) ... word_1) is not in the dictionary, then the backoff_weight gets replaced with 0.0 (log1)
 # More details can be found in https://cmusphinx.github.io/wiki/arpaformat/
+
+
 def compute_sentence_prob(sentence, ngram_order):
     sentence_split = sentence.split()
     for i in range(len(sentence_split)):
@@ -123,7 +139,7 @@ def compute_sentence_prob(sentence, ngram_order):
         logprob += compute_begin_prob(begin_sublist)
 
         for i in range(sen_length - ngram_order + 1):
-            cur_sublist = sentence_split[i : i + ngram_order]
+            cur_sublist = sentence_split[i: i + ngram_order]
             logprob += compute_sublist_prob(cur_sublist)
 
     return logprob
@@ -150,6 +166,6 @@ if __name__ == "__main__":
         sys.exit("compute_sentence_probs_arpa.py: Wrong loading model.")
     if args.ngram_order <= 0 or args.ngram_order > max_ngram_order:
         sys.exit("compute_sentence_probs_arpa.py: " +
-            "Invalid ngram_order (either negative or greater than maximum ngram number ({}) allowed)".format(max_ngram_order))
+                 "Invalid ngram_order (either negative or greater than maximum ngram number ({}) allowed)".format(max_ngram_order))
 
     output_result(args.text_in_handle, args.prob_file_handle, args.ngram_order)

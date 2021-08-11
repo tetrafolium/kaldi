@@ -36,16 +36,16 @@ def write_segment(start_time, end_time, text, reco_id,
         reco_id=reco_id,
         st=int(start_time * 100), end=int(end_time * 100))
 
-    print ("{utt_id} {reco_id} {st} {end}"
-           "".format(utt_id=utt_id, reco_id=reco_id,
-                     st=start_time, end=end_time),
-           file=segments_fh)
-    print ("{utt_id} {reco_id}"
-           "".format(utt_id=utt_id, reco_id=reco_id),
-           file=utt2spk_fh)
-    print ("{utt_id} {text}"
-           "".format(utt_id=utt_id, text=text),
-           file=text_fh)
+    print("{utt_id} {reco_id} {st} {end}"
+          "".format(utt_id=utt_id, reco_id=reco_id,
+                    st=start_time, end=end_time),
+          file=segments_fh)
+    print("{utt_id} {reco_id}"
+          "".format(utt_id=utt_id, reco_id=reco_id),
+          file=utt2spk_fh)
+    print("{utt_id} {text}"
+          "".format(utt_id=utt_id, text=text),
+          file=text_fh)
 
 
 def parse_calls_transcript_file(transcript_file, segments_fh,
@@ -107,7 +107,7 @@ def parse_non_calls_transcript_file(transcript_file, segments_fh,
             raise Exception("Transcript file {0} does not start with [0.000"
                             "".format(transcript_file))
         try:
-            start_time  = float(re.sub(r"\[([^\]]+)\]", r"\1", line))
+            start_time = float(re.sub(r"\[([^\]]+)\]", r"\1", line))
         except Exception:
             print("Could not parse line {0}".format(line), file=sys.stderr)
             raise
@@ -120,7 +120,7 @@ def parse_non_calls_transcript_file(transcript_file, segments_fh,
                 raise Exception("Time-stamp in transcript file {0} does not start with [; error parsing line {1} after text {2}"
                                 "".format(transcript_file, line, text))
             try:
-                end_time  = float(re.sub(r"\[([^\]]+)\]", r"\1", line))
+                end_time = float(re.sub(r"\[([^\]]+)\]", r"\1", line))
             except Exception:
                 print("Could not parse line {0}".format(line), file=sys.stderr)
                 raise
@@ -133,8 +133,8 @@ def parse_non_calls_transcript_file(transcript_file, segments_fh,
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:
-        print ("Usage: {0} <corpus-root-dir> <calls-list> <non-calls-list> <data-dir>",
-               file=sys.stderr)
+        print("Usage: {0} <corpus-root-dir> <calls-list> <non-calls-list> <data-dir>",
+              file=sys.stderr)
         raise SystemExit(1)
 
     root_path = sys.argv[1]
@@ -159,13 +159,14 @@ if __name__ == "__main__":
 
         for channel in [1, 2]:
             reco_id = file_id + ("_inLine" if channel == 1 else "_outLine")
-            print ("{reco_id} {file_id} {channel}"
-                   "".format(reco_id=reco_id, file_id=file_id,
-                             channel="A" if channel == 1 else "B"),
-                   file=reco2file_and_channel_fh)
-            print ("{reco_id} sox {wav_file} -r 8000 -b 16 -c 1 -t wav - remix {channel} |"
-                   "".format(reco_id=reco_id, wav_file=wav_file, channel=channel),
-                   file=wav_scp_fh)
+            print("{reco_id} {file_id} {channel}"
+                  "".format(reco_id=reco_id, file_id=file_id,
+                            channel="A" if channel == 1 else "B"),
+                  file=reco2file_and_channel_fh)
+            print("{reco_id} sox {wav_file} -r 8000 -b 16 -c 1 -t wav - remix {channel} |"
+                  "".format(reco_id=reco_id, wav_file=wav_file,
+                            channel=channel),
+                  file=wav_scp_fh)
 
         parse_calls_transcript_file(transcript_file, segments_fh,
                                     utt2spk_fh, text_fh)
@@ -178,12 +179,12 @@ if __name__ == "__main__":
         wav_file = "{root_path}/src/{file_id}.wav".format(
             root_path=root_path, file_id=file_id)
 
-        print ("{file_id} {file_id} 1"
-               "".format(file_id=file_id),
-               file=reco2file_and_channel_fh)
-        print ("{reco_id} sox {wav_file} -r 8000 -b 16 -c 1 -t wav - |"
-               "".format(reco_id=file_id, wav_file=wav_file),
-               file=wav_scp_fh)
+        print("{file_id} {file_id} 1"
+              "".format(file_id=file_id),
+              file=reco2file_and_channel_fh)
+        print("{reco_id} sox {wav_file} -r 8000 -b 16 -c 1 -t wav - |"
+              "".format(reco_id=file_id, wav_file=wav_file),
+              file=wav_scp_fh)
 
         parse_non_calls_transcript_file(transcript_file, segments_fh,
                                         utt2spk_fh, text_fh)

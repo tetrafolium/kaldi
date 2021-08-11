@@ -67,7 +67,7 @@ def decode(d, pcm):
 
 
 def decode_wrap(argv, audio_batch_size, wav_paths,
-        file_output, wst_path=None):
+                file_output, wst_path=None):
     wst = wst2dict(wst_path)
     d = PyOnlineLatgenRecogniser()
     d.setup(argv)

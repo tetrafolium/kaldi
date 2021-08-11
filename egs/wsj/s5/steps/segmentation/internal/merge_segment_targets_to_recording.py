@@ -10,6 +10,7 @@ in any of the segments are assigned the default targets vector, specified by
 the option --default-targets or [ 0 0 0 ] if unspecified.
 """
 from __future__ import division
+import libs.common as common_lib
 
 import argparse
 import logging
@@ -18,7 +19,6 @@ import subprocess
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -235,7 +235,7 @@ def run(args):
                                    "i.e. this segment is completely within "
                                    "another segment. Ignoring this segment."
                                    "".format(utt=utt, end=end_frame))
-                    num_utt_err +=1
+                    num_utt_err += 1
                     continue
 
                 if start_frame < end_frame_accounted:

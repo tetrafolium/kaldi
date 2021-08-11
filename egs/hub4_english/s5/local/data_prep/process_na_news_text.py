@@ -7,6 +7,8 @@
 or NA New Text Supplement Corpus (LDC98T30)."""
 
 from __future__ import print_function
+import libs.common as common_lib
+import hub4_utils
 import argparse
 import gzip
 import logging
@@ -17,10 +19,8 @@ import sys
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, 'local/data_prep')
-import hub4_utils
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

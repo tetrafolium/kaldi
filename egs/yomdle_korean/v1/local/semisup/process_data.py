@@ -24,9 +24,11 @@ import itertools
 import unicodedata
 import re
 import string
-parser = argparse.ArgumentParser(description="Creates text, utt2spk, and images.scp files")
+parser = argparse.ArgumentParser(
+    description="Creates text, utt2spk, and images.scp files")
 parser.add_argument('database_path', type=str, help='Path to data')
-parser.add_argument('data_split', type=str, help='Path to file that contain datasplits')
+parser.add_argument('data_split', type=str,
+                    help='Path to file that contain datasplits')
 parser.add_argument('out_dir', type=str, help='directory to output files')
 args = parser.parse_args()
 
@@ -45,17 +47,20 @@ with open(args.data_split) as f:
         line = line.strip()
         image_id = line
         image_filename = image_id + '.png'
-        image_filepath = os.path.join(args.database_path, 'truth_line_image', image_filename)
-        if not os.path.isfile (image_filepath):
+        image_filepath = os.path.join(
+            args.database_path, 'truth_line_image', image_filename)
+        if not os.path.isfile(image_filepath):
             print("File does not exist {}".format(image_filepath))
             continue
         line_id = int(line.split('_')[-1])
         csv_filename = '_'.join(line.split('_')[:-1]) + '.csv'
-        csv_filepath = os.path.join(args.database_path, 'truth_csv', csv_filename)
+        csv_filepath = os.path.join(
+            args.database_path, 'truth_csv', csv_filename)
         csv_file = open(csv_filepath, 'r', encoding='utf-8')
         for row in csv.reader(csv_file):
             if row[1] == image_filename:
                 text = 'semisup'
                 text_fh.write(image_id + ' ' + text + '\n')
-                utt2spk_fh.write(image_id + ' ' + '_'.join(line.split('_')[:-1]) + '\n')
-                image_fh.write(image_id + ' ' + image_filepath +  '\n')
+                utt2spk_fh.write(image_id + ' ' +
+                                 '_'.join(line.split('_')[:-1]) + '\n')
+                image_fh.write(image_id + ' ' + image_filepath + '\n')

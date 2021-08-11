@@ -11,7 +11,8 @@ import argparse
 import os
 import unicodedata
 
-parser = argparse.ArgumentParser(description="""Takes in word segmentations and normalizes character form.""")
+parser = argparse.ArgumentParser(
+    description="""Takes in word segmentations and normalizes character form.""")
 parser.add_argument('segmentation_path', type=str,
                     help='Path to chinese word segmentation')
 parser.add_argument('out_dir', type=str,

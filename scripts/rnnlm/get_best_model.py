@@ -42,7 +42,8 @@ for i in range(1, num_iters):
     try:
         f = open(this_logfile, 'r', encoding='utf-8')
     except:
-        sys.exit(sys.argv[0] + ": could not open log-file {0}".format(this_logfile))
+        sys.exit(sys.argv[0] +
+                 ": could not open log-file {0}".format(this_logfile))
     this_objf = -1000
     for line in f:
         m = re.search('Overall objf .* (\S+)$', str(line))

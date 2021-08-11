@@ -24,32 +24,34 @@ import warnings
 # file may not always be well aligned.  As a result of some of these heuristics the counts will
 # not always be integers.
 
+
 def GetArgs():
-    parser = argparse.ArgumentParser(description = "Accumulate pronounciation statistics from "
+    parser = argparse.ArgumentParser(description="Accumulate pronounciation statistics from "
                                      "a ctm_prons.txt file.",
-                                     epilog = "See steps/cleanup/debug_lexicon.sh for example")
-    parser.add_argument("ctm_prons_file", metavar = "<ctm-prons-file>", type = str,
-                        help = "File containing word-pronounciation alignments obtained from a ctm file; "
+                                     epilog="See steps/cleanup/debug_lexicon.sh for example")
+    parser.add_argument("ctm_prons_file", metavar="<ctm-prons-file>", type=str,
+                        help="File containing word-pronounciation alignments obtained from a ctm file; "
                         "It represents phonetic decoding results, aligned with word boundaries obtained"
                         "from forced alignments."
                         "each line must be <utt_id> <word> <phones>")
-    parser.add_argument("silence_file", metavar = "<silphone-file>", type = str,
-                        help = "File containing a list of silence phones.")
-    parser.add_argument("optional_silence_file", metavar = "<optional_silence>", type = str,
-                        help = "File containing the optional silence phone. We'll be replacing empty prons by this,"
+    parser.add_argument("silence_file", metavar="<silphone-file>", type=str,
+                        help="File containing a list of silence phones.")
+    parser.add_argument("optional_silence_file", metavar="<optional_silence>", type=str,
+                        help="File containing the optional silence phone. We'll be replacing empty prons by this,"
                         "because empty prons would cause a problem for lattice word alignment.")
-    parser.add_argument("non_scored_words_file", metavar = "<non-scored-words-file>", type = str,
-                        help = "File containing a list of non-scored words.")
-    parser.add_argument("stats_file", metavar = "<stats-file>", type = str,
-                        help = "Write accumulated statitistics to this file; each line represents how many times "
+    parser.add_argument("non_scored_words_file", metavar="<non-scored-words-file>", type=str,
+                        help="File containing a list of non-scored words.")
+    parser.add_argument("stats_file", metavar="<stats-file>", type=str,
+                        help="Write accumulated statitistics to this file; each line represents how many times "
                         "a specific word-pronunciation pair appears in the phonetic decoding results (ctm_pron_file)."
                         "each line is <count> <word> <phones>")
-    print (' '.join(sys.argv), file=sys.stderr)
+    print(' '.join(sys.argv), file=sys.stderr)
 
     args = parser.parse_args()
     args = CheckArgs(args)
 
     return args
+
 
 def CheckArgs(args):
     if args.ctm_prons_file == "-":
@@ -64,6 +66,7 @@ def CheckArgs(args):
     else:
         args.stats_file_handle = open(args.stats_file, "w")
     return args
+
 
 def ReadEntries(file_handle):
     entries = set()
@@ -118,6 +121,7 @@ def ReadEntries(file_handle):
 # of a word, each pronounciation candidate gets equal soft counts. e.g. In the above
 # example, each pron candidate of "because" gets a count of 1/4. The stats is stored
 # in a dictionary (word, pron) : count.
+
 
 def GetStatsFromCtmProns(silphones, optional_silence, non_scored_words, ctm_prons_file_handle):
     info = []
@@ -211,18 +215,23 @@ def GetStatsFromCtmProns(silphones, optional_silence, non_scored_words, ctm_pron
                 stats[(word, phones)] = stats.get((word, phones), 0) + count
     return stats
 
+
 def WriteStats(stats, file_handle):
     for word_pron, count in stats.items():
-        print('{0} {1} {2}'.format(count, word_pron[0], word_pron[1]), file=file_handle)
+        print('{0} {1} {2}'.format(
+            count, word_pron[0], word_pron[1]), file=file_handle)
     file_handle.close()
+
 
 def Main():
     args = GetArgs()
     silphones = ReadEntries(args.silence_file_handle)
     non_scored_words = ReadEntries(args.non_scored_words_file_handle)
     optional_silence = ReadEntries(args.optional_silence_file_handle)
-    stats = GetStatsFromCtmProns(silphones, optional_silence.pop(), non_scored_words, args.ctm_prons_file_handle)
+    stats = GetStatsFromCtmProns(silphones, optional_silence.pop(
+    ), non_scored_words, args.ctm_prons_file_handle)
     WriteStats(stats, args.stats_file_handle)
+
 
 if __name__ == "__main__":
     Main()

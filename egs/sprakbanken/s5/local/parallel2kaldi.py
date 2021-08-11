@@ -5,7 +5,9 @@ specify the absolute path to the corpus from the root. The text files may only c
 
 '''
 
-import sys, os, codecs
+import sys
+import os
+import codecs
 
 srcdir = sys.argv[1]
 dest = sys.argv[2]
@@ -30,19 +32,19 @@ for line in corpus:
 
 stems = sorted(list(set(sndlist) & set(txtlist)))
 
-#print(stems)
+# print(stems)
 
 # Use the filename as utterance id
 
 for uttid in stems:
-    fin = uttid+ "." +txt_ext
+    fin = uttid + "." + txt_ext
     utt = codecs.open(os.path.join(srcdir, fin), "r", "utf8").read()
-    text.write(uttid+ " " +utt)
+    text.write(uttid + " " + utt)
     spkid = uttid.rsplit("_")[0]
-    wavscp.write(uttid+ " " +os.path.join(srcdir, uttid+ "." +snd_ext)+ "\n")
-    utt2spk.write(uttid+ " " +spkid+ "\n")
-    
+    wavscp.write(uttid + " " + os.path.join(srcdir,
+                                            uttid + "." + snd_ext) + "\n")
+    utt2spk.write(uttid + " " + spkid + "\n")
+
 utt2spk.close()
 text.close()
 wavscp.close()
-    

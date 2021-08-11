@@ -27,6 +27,7 @@ from collections import defaultdict, Counter
 from io import open
 argparse.open = open
 
+
 def create_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -48,12 +49,13 @@ def create_parser():
         '--min-frequency', type=int, default=2, metavar='FREQ',
         help='Stop if no symbol pair has frequency >= FREQ (default: %(default)s))')
     parser.add_argument('--dict-input', action="store_true",
-        help="If set, input file is interpreted as a dictionary where each line contains a word-count pair")
+                        help="If set, input file is interpreted as a dictionary where each line contains a word-count pair")
     parser.add_argument(
         '--verbose', '-v', action="store_true",
         help="verbose mode.")
 
     return parser
+
 
 def get_vocabulary(fobj, is_dict=False):
     """Read text and return dictionary that encodes vocabulary
@@ -64,7 +66,8 @@ def get_vocabulary(fobj, is_dict=False):
             try:
                 word, count = line.strip().split(' ')
             except:
-                print('Failed reading vocabulary file at line {0}: {1}'.format(i, line))
+                print(
+                    'Failed reading vocabulary file at line {0}: {1}'.format(i, line))
                 sys.exit(1)
             vocab[word] += int(count)
         else:
@@ -72,6 +75,7 @@ def get_vocabulary(fobj, is_dict=False):
                 if word:
                     vocab[word] += 1
     return vocab
+
 
 def update_pair_statistics(pair, changed, stats, indices):
     """Minimally update the indices and frequency of symbol pairs
@@ -138,7 +142,7 @@ def get_pair_statistics(vocab):
     # data structure of pair frequencies
     stats = defaultdict(int)
 
-    #index from pairs to words
+    # index from pairs to words
     indices = defaultdict(lambda: defaultdict(int))
 
     for i, (word, freq) in enumerate(vocab):
@@ -155,9 +159,10 @@ def replace_pair(pair, vocab, indices):
     """Replace all occurrences of a symbol pair ('A', 'B') with a new symbol 'AB'"""
     first, second = pair
     pair_str = ''.join(pair)
-    pair_str = pair_str.replace('\\','\\\\')
+    pair_str = pair_str.replace('\\', '\\\\')
     changes = []
-    pattern = re.compile(r'(?<!\S)' + re.escape(first + ' ' + second) + r'(?!\S)')
+    pattern = re.compile(
+        r'(?<!\S)' + re.escape(first + ' ' + second) + r'(?!\S)')
     if sys.version_info < (3, 0):
         iterator = indices[pair].iteritems()
     else:
@@ -175,6 +180,7 @@ def replace_pair(pair, vocab, indices):
 
     return changes
 
+
 def prune_stats(stats, big_stats, threshold):
     """Prune statistics dict for efficiency of max()
 
@@ -182,7 +188,7 @@ def prune_stats(stats, big_stats, threshold):
     (until we the most frequent pair is less frequent than a pair we previously pruned)
     big_stats keeps full statistics for when we need to access pruned items
     """
-    for item,freq in list(stats.items()):
+    for item, freq in list(stats.items()):
         if freq < threshold:
             del stats[item]
             if freq < 0:
@@ -200,7 +206,8 @@ def main(infile, outfile, num_symbols, min_frequency=2, verbose=False, is_dict=F
     outfile.write('#version: 0.2\n')
 
     vocab = get_vocabulary(infile, is_dict)
-    vocab = dict([(tuple(x[:-1])+(x[-1]+'</w>',) ,y) for (x,y) in vocab.items()])
+    vocab = dict([(tuple(x[:-1])+(x[-1]+'</w>',), y)
+                  for (x, y) in vocab.items()])
     sorted_vocab = sorted(vocab.items(), key=lambda x: x[1], reverse=True)
 
     stats, indices = get_pair_statistics(sorted_vocab)
@@ -221,11 +228,13 @@ def main(infile, outfile, num_symbols, min_frequency=2, verbose=False, is_dict=F
             prune_stats(stats, big_stats, threshold)
 
         if stats[most_frequent] < min_frequency:
-            sys.stderr.write('no pair has frequency >= {0}. Stopping\n'.format(min_frequency))
+            sys.stderr.write(
+                'no pair has frequency >= {0}. Stopping\n'.format(min_frequency))
             break
 
         if verbose:
-            sys.stderr.write('pair {0}: {1} {2} -> {1}{2} (frequency {3})\n'.format(i, most_frequent[0], most_frequent[1], stats[most_frequent]))
+            sys.stderr.write('pair {0}: {1} {2} -> {1}{2} (frequency {3})\n'.format(
+                i, most_frequent[0], most_frequent[1], stats[most_frequent]))
         outfile.write('{0} {1}\n'.format(*most_frequent))
         changes = replace_pair(most_frequent, sorted_vocab, indices)
         update_pair_statistics(most_frequent, changes, stats, indices)
@@ -255,4 +264,5 @@ if __name__ == '__main__':
     if args.output.name != '<stdout>':
         args.output = codecs.open(args.output.name, 'w', encoding='utf-8')
 
-    main(args.input, args.output, args.symbols, args.min_frequency, args.verbose, is_dict=args.dict_input)
+    main(args.input, args.output, args.symbols,
+         args.min_frequency, args.verbose, is_dict=args.dict_input)

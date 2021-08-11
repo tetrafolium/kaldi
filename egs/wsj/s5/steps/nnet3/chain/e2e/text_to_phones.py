@@ -40,7 +40,7 @@ oov_word = open(join(args.langdir, "oov.txt")).readline().strip()
 lexicon = {}
 with open(join(args.langdir, "phones/align_lexicon.txt")) as f:
     for line in f:
-        line = line.strip();
+        line = line.strip()
         parts = line.split()
         lexicon[parts[0]] = parts[2:]  # ignore parts[1]
 
@@ -59,14 +59,16 @@ for line in sys.stdin:
         if word not in lexicon:
             n_fail += 1
             if n_fail < 20:
-                sys.stderr.write("{} not found in lexicon, replacing with {}\n".format(word, oov_word))
+                sys.stderr.write(
+                    "{} not found in lexicon, replacing with {}\n".format(word, oov_word))
             elif n_fail == 20:
                 sys.stderr.write("Not warning about OOVs any more.\n")
             pronunciation = lexicon[oov_word]
         else:
             pronunciation = copy.deepcopy(lexicon[word])
         phone_trans += pronunciation
-        prob = args.between_silprob if i < len(word_trans) - 1 else args.edge_silprob
+        prob = args.between_silprob if i < len(
+            word_trans) - 1 else args.edge_silprob
         if random.random() < prob:
             phone_trans += [sil]
     print(key + " " + " ".join(phone_trans))

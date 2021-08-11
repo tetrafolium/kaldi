@@ -25,14 +25,14 @@ or lexiconp_silprob.txt, in which case the format is
 'word pron-prob sil-prob1 sil-prob2 sil-prob3 p1 p2 p3....'.
 It is an error if there is not exactly one pronunciation of
 the unknown word in the lexicon.""",
-epilog="""E.g.: modify_unk_pron.py data/local/lang/lexiconp.txt '<unk>'.
+                                 epilog="""E.g.: modify_unk_pron.py data/local/lang/lexiconp.txt '<unk>'.
 This script is called from prepare_lang.sh.""")
 
-parser.add_argument('lexicon_file', type = str,
-                    help = 'Filename of the lexicon file to operate on (this is '
+parser.add_argument('lexicon_file', type=str,
+                    help='Filename of the lexicon file to operate on (this is '
                     'both an input and output of this script).')
-parser.add_argument('unk_word', type = str,
-                    help = "The printed form of the unknown/OOV word, normally '<unk>'.")
+parser.add_argument('unk_word', type=str,
+                    help="The printed form of the unknown/OOV word, normally '<unk>'.")
 
 args = parser.parse_args()
 
@@ -49,7 +49,7 @@ if basename != 'lexiconp.txt' and basename != 'lexiconp_silprob.txt':
 # lexiconp_silprob.txt has 3 extra real-valued fields after the pron-prob.
 num_fields_before_pron = 2 if basename == 'lexiconp.txt' else 5
 
-print(' '.join(sys.argv), file = sys.stderr)
+print(' '.join(sys.argv), file=sys.stderr)
 
 try:
     lexicon_in = open(args.lexicon_file, 'r')
@@ -88,7 +88,8 @@ if unk_index == -1:
 lexicon_in.close()
 
 # now modify the pron.
-split_lines[unk_index] = split_lines[unk_index][0:num_fields_before_pron] + [ '#1', '#2', '#3' ]
+split_lines[unk_index] = split_lines[unk_index][0:num_fields_before_pron] + \
+    ['#1', '#2', '#3']
 
 
 try:
@@ -99,7 +100,7 @@ except:
         sys.argv[0], args.lexicon_file))
 
 for split_line in split_lines:
-    print(' '.join(split_line), file = lexicon_out)
+    print(' '.join(split_line), file=lexicon_out)
 
 try:
     lexicon_out.close()

@@ -6,20 +6,20 @@ import os
 import sys
 import subprocess
 
-latticeLocation = {1:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-1/latjosh-2/lattices-pushed/",
-2:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-2/latjosh-2/lattices-pushed/",
-3:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-3/latjosh-2/lattices-pushed/",
-4:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-4/latjosh-2/lattices-pushed/",
-5:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-5/latjosh-2/lattices-pushed/",
-6:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-6/latjosh-2/lattices-pushed/",
-7:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-7/latjosh-2/lattices-pushed/",
-8:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-8/latjosh-2/lattices-pushed/",
-9:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-9/latjosh-2/lattices-pushed/",
-10:"/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-10/latjosh-2/lattices-pushed/"}
+latticeLocation = {1: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-1/latjosh-2/lattices-pushed/",
+                   2: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-2/latjosh-2/lattices-pushed/",
+                   3: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-3/latjosh-2/lattices-pushed/",
+                   4: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-4/latjosh-2/lattices-pushed/",
+                   5: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-5/latjosh-2/lattices-pushed/",
+                   6: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-6/latjosh-2/lattices-pushed/",
+                   7: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-7/latjosh-2/lattices-pushed/",
+                   8: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-8/latjosh-2/lattices-pushed/",
+                   9: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-9/latjosh-2/lattices-pushed/",
+                   10: "/export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-10/latjosh-2/lattices-pushed/"}
 
 latticeDict = {}
 
-for key,location in latticeLocation.items():
+for key, location in latticeLocation.items():
     for root, dirs, filenames in os.walk(location):
         for f in filenames:
             latticeDict[f] = str(key)
@@ -33,6 +33,7 @@ if not os.path.exists(invalidplfdir):
 else:
     os.system("rm " + invalidplfdir + "/*")
 
+
 def latticeConcatenate(lat1, lat2):
     '''
     Concatenates lattices, writes temporary results to tmpdir
@@ -42,7 +43,8 @@ def latticeConcatenate(lat1, lat2):
             os.system('rm ' + tmpdir + '/tmp.lat')
         return lat2
     else:
-        proc = subprocess.Popen(['fstconcat', lat1, lat2, (tmpdir + '/tmp.lat')])
+        proc = subprocess.Popen(
+            ['fstconcat', lat1, lat2, (tmpdir + '/tmp.lat')])
         proc.wait()
         return tmpdir + '/tmp.lat'
 
@@ -60,7 +62,8 @@ def findLattice(timeDetail):
 
 # Now read list of files in conversations
 fileList = []
-conversationList = open('/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/train')
+conversationList = open(
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/train')
 for line in conversationList:
     line = line.strip()
     line = line[:-4]
@@ -69,17 +72,22 @@ for line in conversationList:
 # IN what order were the conversations added to the spanish files?
 # Now get timing information to concatenate the ASR outputs
 
-provFile = open('/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/asr.train.plf', 'w+')
+provFile = open(
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/asr.train.plf', 'w+')
 lineNo = 1
-invalidPLF = open('/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/invalidPLF', 'w+')
-blankPLF = open('/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/blankPLF', 'w+')
-rmLines = open('/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/removeLines', 'w+')
+invalidPLF = open(
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/invalidPLF', 'w+')
+blankPLF = open(
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/blankPLF', 'w+')
+rmLines = open(
+    '/export/a04/gkumar/corpora/fishcall/jack-splits/split-matt/removeLines', 'w+')
 for item in fileList:
-    timingFile = open('/export/a04/gkumar/corpora/fishcall/fisher/tim/' + item + '.es')
+    timingFile = open(
+        '/export/a04/gkumar/corpora/fishcall/fisher/tim/' + item + '.es')
     for line in timingFile:
         timeInfo = line.split()
 
-        # For utterances that are concatenated in the translation file, 
+        # For utterances that are concatenated in the translation file,
         # the corresponding FSTs have to be translated as well
         mergedTranslation = ""
         for timeDetail in timeInfo:
@@ -89,26 +97,30 @@ for item in fileList:
                 mergedTranslation = latticeConcatenate(mergedTranslation, tmp)
 
         if mergedTranslation != "":
-            
+
             # Sanjeev's Recipe : Remove epsilons and topo sort
             finalFST = tmpdir + "/final.fst"
-            os.system("fstrmepsilon " + mergedTranslation + " | fsttopsort - " + finalFST)
-        
+            os.system("fstrmepsilon " + mergedTranslation +
+                      " | fsttopsort - " + finalFST)
+
             # Now convert to PLF
-            proc = subprocess.Popen('/export/a04/gkumar/corpora/fishcall/bin/fsm2plf.sh /export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-matt/data/lang/words.clean.txt ' + finalFST, stdout=subprocess.PIPE, shell=True)
+            proc = subprocess.Popen(
+                '/export/a04/gkumar/corpora/fishcall/bin/fsm2plf.sh /export/a04/gkumar/kaldi-trunk/egs/fishcall_es/j-matt/data/lang/words.clean.txt ' + finalFST, stdout=subprocess.PIPE, shell=True)
             PLFline = proc.stdout.readline()
             finalPLFFile = tmpdir + "/final.plf"
             finalPLF = open(finalPLFFile, "w+")
             finalPLF.write(PLFline)
             finalPLF.close()
 
-            # now check if this is a valid PLF, if not write it's ID in a 
+            # now check if this is a valid PLF, if not write it's ID in a
             # file so it can be checked later
-            proc = subprocess.Popen("/export/a04/gkumar/moses/mosesdecoder/checkplf < " + finalPLFFile + " 2>&1 | awk 'FNR == 2 {print}'", stdout=subprocess.PIPE, shell=True)
+            proc = subprocess.Popen("/export/a04/gkumar/moses/mosesdecoder/checkplf < " +
+                                    finalPLFFile + " 2>&1 | awk 'FNR == 2 {print}'", stdout=subprocess.PIPE, shell=True)
             line = proc.stdout.readline()
             print("{} {}".format(line, lineNo))
             if line.strip() != "PLF format appears to be correct.":
-                os.system("cp " + finalFST + " " + invalidplfdir + "/" + timeInfo[0])
+                os.system("cp " + finalFST + " " +
+                          invalidplfdir + "/" + timeInfo[0])
                 invalidPLF.write(invalidplfdir + "/" + timeInfo[0] + "\n")
                 rmLines.write("{}\n".format(lineNo))
             else:

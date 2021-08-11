@@ -7,6 +7,10 @@
 """ This script is based on steps/nnet3/chain/train.sh
 """
 from __future__ import division
+import libs.nnet3.report.log_parse as nnet3_log_parse
+import libs.nnet3.train.chain_objf.acoustic_model as chain_lib
+import libs.common as common_lib
+import libs.nnet3.train.common as common_train_lib
 from __future__ import print_function
 
 import argparse
@@ -18,10 +22,6 @@ import sys
 import traceback
 
 sys.path.insert(0, 'steps')
-import libs.nnet3.train.common as common_train_lib
-import libs.common as common_lib
-import libs.nnet3.train.chain_objf.acoustic_model as chain_lib
-import libs.nnet3.report.log_parse as nnet3_log_parse
 
 
 logger = logging.getLogger('libs')
@@ -208,7 +208,8 @@ def process_args(args):
         raise Exception("--egs.chunk-width has an invalid value")
 
     if not common_train_lib.validate_minibatch_size_str(args.num_chunk_per_minibatch):
-        raise Exception("--trainer.num-chunk-per-minibatch has an invalid value")
+        raise Exception(
+            "--trainer.num-chunk-per-minibatch has an invalid value")
 
     if args.chunk_left_context < 0:
         raise Exception("--egs.chunk-left-context should be non-negative")
@@ -229,7 +230,7 @@ def process_args(args):
         raise Exception("Directory specified with --dir={0} "
                         "does not exist.".format(args.dir))
     if (not os.path.exists(args.dir + "/configs") and
-        (args.input_model is None or not os.path.exists(args.input_model))):
+            (args.input_model is None or not os.path.exists(args.input_model))):
         raise Exception("Either --trainer.input-model option should be supplied, "
                         "and exist; or the {0}/configs directory should exist."
                         "".format(args.dir))
@@ -370,10 +371,12 @@ def train(args, run_opts):
     default_egs_dir = '{0}/egs'.format(args.dir)
 
     if (args.egs_dir is not None) and (args.cmvn_opts != "--norm-means=false --norm-vars=false"):
-        logger.warning("the --feat.cmvn-opts option has no effect because we are not dumping egs")
+        logger.warning(
+            "the --feat.cmvn-opts option has no effect because we are not dumping egs")
 
     if (args.egs_dir is not None) and (args.frames_per_iter != 800000):
-        logger.warning("the --trainer.frames-per-iter option has no effect because we are not dumping egs")
+        logger.warning(
+            "the --trainer.frames-per-iter option has no effect because we are not dumping egs")
 
     if ((args.stage <= -3) and args.egs_dir is None):
         logger.info("Generating egs")
@@ -425,7 +428,8 @@ def train(args, run_opts):
 
     # copy the properties of the egs to dir for
     # use during decoding
-    logger.info("Copying the properties from {0} to {1}".format(egs_dir, args.dir))
+    logger.info("Copying the properties from {0} to {1}".format(
+        egs_dir, args.dir))
     common_train_lib.copy_egs_properties_to_exp_dir(egs_dir, args.dir)
 
     if not os.path.exists('{0}/valid_diagnostic.cegs'.format(egs_dir)):
@@ -479,7 +483,7 @@ def train(args, run_opts):
     if args.deriv_truncate_margin is not None:
         min_deriv_time = -args.deriv_truncate_margin - model_left_context
         max_deriv_time_relative = \
-           args.deriv_truncate_margin + model_right_context
+            args.deriv_truncate_margin + model_right_context
 
     logger.info("Training will run for {0} epochs = "
                 "{1} iterations".format(args.num_epochs, num_iters))
@@ -653,6 +657,7 @@ def main():
         if not isinstance(e, KeyboardInterrupt):
             traceback.print_exc()
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

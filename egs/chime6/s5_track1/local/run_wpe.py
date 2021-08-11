@@ -11,7 +11,8 @@
 import numpy as np
 import soundfile as sf
 import time
-import os, errno
+import os
+import errno
 from tqdm import tqdm
 import argparse
 
@@ -59,4 +60,4 @@ Z = wpe(Y, iterations=iterations, statistics_mode='full').transpose(1, 2, 0)
 z = istft(Z, size=stft_options['size'], shift=stft_options['shift'])
 
 for d in range(len(signal_list)):
-    sf.write(output_files[d], z[d,:], sampling_rate)
+    sf.write(output_files[d], z[d, :], sampling_rate)

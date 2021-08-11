@@ -11,6 +11,7 @@ from __future__ import print_function
 import re
 import sys
 
+
 def normalize(utt):
     utt = utt.lower() \
              .replace('[uh]', 'uh') \
@@ -25,6 +26,7 @@ def normalize(utt):
     utt = re.sub(r"'([a-z]+)'", r'\1', utt)  # Unquote quoted words
     return utt
 
+
 def main():
     if len(sys.argv) != 2:
         print('Usage: local/normalize_transcript.py [text_file]')
@@ -33,9 +35,11 @@ def main():
         for line in f.readlines():
             chunks = line.split(' ')
             if len(chunks) > 1:
-                sys.stdout.write(chunks[0].strip() + ' ' + normalize(' '.join(chunks[1:])))
+                sys.stdout.write(chunks[0].strip() +
+                                 ' ' + normalize(' '.join(chunks[1:])))
             else:
                 sys.stdout.write(chunks[0].strip() + '\n')
+
 
 if __name__ == '__main__':
     main()

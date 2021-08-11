@@ -12,12 +12,12 @@ e.g.: align_ctm_ref.py --hyp-format=CTM --ref=data/train/text --hyp=foo/ctm
 """
 
 from __future__ import print_function
+import libs.common as common_lib
 import argparse
 import logging
 import sys
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -268,7 +268,7 @@ def smith_waterman_alignment(ref, hyp, similarity_score_function,
                     "".format(ref_index, hyp_index-1, ref_index, hyp_index,
                               H[ref_index][hyp_index]))
 
-            #if hyp_index == hyp_len and H[ref_index][hyp_index] >= max_score:
+            # if hyp_index == hyp_len and H[ref_index][hyp_index] >= max_score:
             if ((not align_full_hyp or hyp_index == hyp_len)
                     and H[ref_index][hyp_index] >= max_score):
                 max_score = H[ref_index][hyp_index]
@@ -329,9 +329,9 @@ def smith_waterman_alignment(ref, hyp, similarity_score_function,
     if verbose_level > 2:
         for ref_index in range(ref_len+1):
             for hyp_index in range(hyp_len+1):
-                print ("{0} ".format(H[ref_index][hyp_index]), end='',
-                       file=sys.stderr)
-            print ("", file=sys.stderr)
+                print("{0} ".format(H[ref_index][hyp_index]), end='',
+                      file=sys.stderr)
+            print("", file=sys.stderr)
 
     logger.debug("Aligned output:")
     logger.debug("  -  ".join(["({0},{1})".format(x[4], x[5])
@@ -353,7 +353,7 @@ def print_alignment(recording, alignment, out_file_handle):
             logger.error("Something wrong with alignment. "
                          "Invalid line {0}".format(line))
             raise
-    print (" ".join(out_text), file=out_file_handle)
+    print(" ".join(out_text), file=out_file_handle)
 
 
 def get_edit_type(hyp_word, ref_word, duration=-1, eps_symbol='<eps>',
@@ -470,11 +470,11 @@ def get_ctm_edits(alignment_output, ctm_array, eps_symbol="<eps>",
         except Exception:
             logger.error("Could not get ctm edits for "
                          "edits@{edits_pos} = {0}, ctm@{ctm_pos} = {1}".format(
-                            ("NONE" if ali_pos >= ali_len
-                             else alignment_output[ali_pos]),
-                            ("NONE" if ctm_pos >= ctm_len
-                             else ctm_array[ctm_pos]),
-                            edits_pos=ali_pos, ctm_pos=ctm_pos))
+                             ("NONE" if ali_pos >= ali_len
+                              else alignment_output[ali_pos]),
+                             ("NONE" if ctm_pos >= ctm_len
+                                 else ctm_array[ctm_pos]),
+                             edits_pos=ali_pos, ctm_pos=ctm_pos))
             logger.error("alignment = {0}".format(alignment_output))
             raise
     return ctm_edits

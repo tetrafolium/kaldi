@@ -18,6 +18,7 @@ if len(sys.argv) != 3:
 input_file = sys.argv[1]
 output_file = sys.argv[2]
 
+
 def main():
 
     with open(input_file, 'r', encoding='utf-8') as fh, open(output_file, 'w', encoding='utf-8') as fh_out:
@@ -248,7 +249,6 @@ for base in BASE_TO_PRESENTATION:
         if presentation == '':
             continue
         PRESENTATION_TO_BASE[presentation.lower()] = base.lower()
-
 
 
 if __name__ == "__main__":

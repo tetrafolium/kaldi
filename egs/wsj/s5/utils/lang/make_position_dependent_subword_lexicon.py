@@ -19,6 +19,7 @@ from make_lexicon_fst import read_lexiconp
 import argparse
 import math
 
+
 def get_args():
     parser = argparse.ArgumentParser(description="""This script creates a
         position-dependent subword lexicon from a position-independent subword lexicon
@@ -36,10 +37,12 @@ def get_args():
     args = parser.parse_args()
     return args
 
+
 def is_end(subword, separator):
     """Return true if the subword can appear at the end of a word (i.e., the subword 
     does not end with separator). Return false otherwise."""
     return not subword.endswith(separator)
+
 
 def write_position_dependent_lexicon(lexiconp, separator):
     """Print a position-dependent lexicon for each subword from the input lexiconp by adding
@@ -74,34 +77,41 @@ def write_position_dependent_lexicon(lexiconp, separator):
         if is_end(word, separator):
             # print end subword lexicon by replacing the last phone suffix by "_E"
             suffix_list[-1] = "_E"
-            phones_list = [phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
+            phones_list = [
+                phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
             print("{} {} {}".format(word, prob, ' '.join(phones_list)))
 
             # print singleton subword lexicon
             # the phone suffix is "_S" if the there is only 1 phone.
             if phones_length == 1:
                 suffix_list[0] = "_S"
-                phones_list = [phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
+                phones_list = [
+                    phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
                 print("{} {} {}".format(word, prob, ' '.join(phones_list)))
             # the first phone suffix is "_B" is there is more than 1 phones.
             else:
                 suffix_list[0] = "_B"
-                phones_list = [phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
+                phones_list = [
+                    phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
                 print("{} {} {}".format(word, prob, ' '.join(phones_list)))
         else:
             # print middle subword lexicon
-            phones_list = [phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
+            phones_list = [
+                phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
             print("{} {} {}".format(word, prob, ' '.join(phones_list)))
 
             # print beginning subword lexicon by replacing the first phone suffix by "_B"
             suffix_list[0] = "_B"
-            phones_list = [phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
+            phones_list = [
+                phone + suffix for (phone, suffix) in zip(phones, suffix_list)]
             print("{} {} {}".format(word, prob, ' '.join(phones_list)))
+
 
 def main():
     args = get_args()
     lexiconp = read_lexiconp(args.lexiconp)
     write_position_dependent_lexicon(lexiconp, args.separator)
+
 
 if __name__ == "__main__":
     main()

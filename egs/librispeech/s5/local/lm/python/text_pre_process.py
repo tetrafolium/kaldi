@@ -14,9 +14,11 @@
 #    end of each sentence, to make possible to recover them after NSW normalization
 
 import argparse
-import codecs, unicodedata
+import codecs
+import unicodedata
 import re
 import nltk
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Pre-process a book's text")
@@ -29,14 +31,18 @@ def parse_args():
     parser.add_argument("out_text", help="Output text")
     return parser.parse_args()
 
+
 # http://rosettacode.org/wiki/Roman_numerals/Decode#Python
 _rdecode = dict(zip('XVI', (10, 5, 1)))
+
+
 def decode(roman):
     result = 0
     for r, r1 in zip(roman, roman[1:]):
         rd, rd1 = _rdecode[r], _rdecode[r1]
         result += -rd if rd < rd1 else rd
     return result + _rdecode[roman[-1]]
+
 
 def convert_roman(text):
     """
@@ -48,16 +54,19 @@ def convert_roman(text):
     for i, l in enumerate(lines):
         m = re.match('^(\s*C((hapter)|(HAPTER))\s+)(([IVX]+)|([ivx]+))(.*)', l)
         if m is not None:
-            new_line = "%s%s%s" % (m.group(1), decode(m.group(5).upper()), m.group(8))
+            new_line = "%s%s%s" % (m.group(1), decode(
+                m.group(5).upper()), m.group(8))
             new_lines.append(new_line)
             continue
         m = re.match('^(\s*)(([IVX]+)|([ivx]+))([\s\.]+[A-Z].*)', l)
         if m is not None:
-            new_line = "%s%s%s" % (m.group(1), decode(m.group(2).upper()), m.group(5))
+            new_line = "%s%s%s" % (m.group(1), decode(
+                m.group(2).upper()), m.group(5))
             new_lines.append(new_line)
             continue
         new_lines.append(l)
     return '\n'.join(new_lines)
+
 
 def segment_sentences(text, sent_marker):
     punkt = nltk.data.load('tokenizers/punkt/english.pickle')
@@ -65,6 +74,7 @@ def segment_sentences(text, sent_marker):
     line_sents = [re.sub('\r?\n', ' ', s) for s in sents]
     line_sep = ' %s \n' % sent_marker
     return (line_sep.join(line_sents) + sent_marker)
+
 
 def pre_segment(text):
     """
@@ -78,11 +88,12 @@ def pre_segment(text):
     punkt = set(['?', '!', '.'])
     for i, l in enumerate(lines[:-2]):
         if len(l.strip()) != 0 and l.strip()[-1] not in punkt and\
-           len(lines[i+1].strip()) == 0: #  and len(lines[i+2].strip()) == 0:
+           len(lines[i+1].strip()) == 0:  # and len(lines[i+2].strip()) == 0:
             out_text.append(l + '.')
         else:
             out_text.append(l)
     return '\n'.join(out_text)
+
 
 if __name__ == '__main__':
     opts = parse_args()
@@ -90,12 +101,10 @@ if __name__ == '__main__':
         text_in = src.read()
 
     text = unicodedata.normalize(
-                'NFKD', text_in).encode(opts.out_encoding, 'ignore')
+        'NFKD', text_in).encode(opts.out_encoding, 'ignore')
     text = convert_roman(text)
     text = pre_segment(text)
     text = segment_sentences(text, opts.sent_end_marker)
 
     with open(opts.out_text, 'w') as dst:
         dst.write(text)
-
-

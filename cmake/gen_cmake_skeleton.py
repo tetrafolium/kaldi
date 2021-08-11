@@ -9,33 +9,43 @@ parser.add_argument("working_dir")
 parser.add_argument("--quiet", default=False, action="store_true")
 args = parser.parse_args()
 
+
 def print_wrapper(*args_, **kwargs):
     if not args.quiet:
         print(*args_, **kwargs)
 
+
 def get_subdirectories(d):
     return [name for name in os.listdir(d) if os.path.isdir(os.path.join(d, name))]
+
 
 def is_bin_dir(d):
     return d.endswith("bin")
 
+
 def get_files(d):
     return [name for name in os.listdir(d) if os.path.isfile(os.path.join(d, name))]
+
 
 def is_header(f):
     return f.endswith(".h")
 
+
 def is_cu_source(f):
     return f.endswith(".cu")
+
 
 def is_test_source(f):
     return f.endswith("-test.cc")
 
+
 def is_source(f):
     return f.endswith(".cc") and not is_test_source(f)
 
+
 def dir_name_to_lib_target(dir_name):
     return "kaldi-" + dir_name
+
 
 def wrap_notwin32_condition(should_wrap, lines):
     if isinstance(lines, str):
@@ -48,10 +58,10 @@ def wrap_notwin32_condition(should_wrap, lines):
 
 def get_exe_additional_depends(t):
     additional = {
-        "transform-feats" : ["transform"],
-        "interpolate-pitch" : ["transform"],
-        "post-to-feats" : ["hmm"],
-        "append-post-to-feats" : ["hmm"],
+        "transform-feats": ["transform"],
+        "interpolate-pitch": ["transform"],
+        "post-to-feats": ["hmm"],
+        "append-post-to-feats": ["hmm"],
         "gmm-est-fmllr-gpost": ["sgmm2", "hmm"],
         "gmm-est-fmllr": ["hmm", "transform"],
         "gmm-latgen-faster": ["decoder"],
@@ -85,6 +95,7 @@ def get_exe_additional_depends(t):
     else:
         return []
 
+
 def disable_for_win32(t):
     disabled = [
         "online-audio-client",
@@ -94,6 +105,7 @@ def disable_for_win32(t):
         "online-audio-server-decode-faster"
     ]
     return t in disabled
+
 
 class CMakeListsHeaderLibrary(object):
     def __init__(self, dir_name):
@@ -122,7 +134,8 @@ class CMakeListsHeaderLibrary(object):
             ret.append(")\n")
 
         ret.append("add_library(" + self.target_name + " INTERFACE)")
-        ret.append("target_include_directories(" + self.target_name + " INTERFACE ")
+        ret.append("target_include_directories(" +
+                   self.target_name + " INTERFACE ")
         ret.append("     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>")
         ret.append("     $<INSTALL_INTERFACE:include/kaldi>")
         ret.append(")\n")
@@ -134,6 +147,7 @@ install(FILES ${{PUBLIC_HEADERS}} DESTINATION include/kaldi/{dir})
 """.format(tgt=self.target_name, dir=self.dir_name))
 
         return "\n".join(ret)
+
 
 class CMakeListsLibrary(object):
 
@@ -181,7 +195,8 @@ class CMakeListsLibrary(object):
         if len(self.cuda_source_list) > 0:
             self.source_list.append("${CUDA_OBJS}")
             ret.append("if(CUDA_FOUND)")
-            ret.append("    cuda_include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)")
+            ret.append(
+                "    cuda_include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)")
             ret.append("    cuda_compile(CUDA_OBJS")
             for f in self.cuda_source_list:
                 ret.append("        " + f)
@@ -192,7 +207,8 @@ class CMakeListsLibrary(object):
         for f in self.source_list:
             ret.append("    " + f)
         ret.append(")\n")
-        ret.append("target_include_directories(" + self.target_name + " PUBLIC ")
+        ret.append("target_include_directories(" +
+                   self.target_name + " PUBLIC ")
         ret.append("     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>")
         ret.append("     $<INSTALL_INTERFACE:include/kaldi>")
         ret.append(")\n")
@@ -214,9 +230,10 @@ class CMakeListsLibrary(object):
             ret.append("if(KALDI_BUILD_TEST)")
             for f in self.test_source_list:
                 exe_target = get_test_exe_name(f)
-                depends = (self.target_name + " " + " ".join(get_exe_additional_depends(exe_target))).strip()
+                depends = (self.target_name + " " +
+                           " ".join(get_exe_additional_depends(exe_target))).strip()
                 ret.extend(wrap_notwin32_condition(disable_for_win32(self.target_name),
-                    "    add_kaldi_test_executable(NAME " + exe_target + " SOURCES " + f + " DEPENDS " + depends + ")"))
+                                                   "    add_kaldi_test_executable(NAME " + exe_target + " SOURCES " + f + " DEPENDS " + depends + ")"))
             ret.append("endif()")
 
         ret.append("""
@@ -233,7 +250,6 @@ install(FILES ${{PUBLIC_HEADERS}} DESTINATION include/kaldi/{dir})
         return "\n".join(ret)
 
 
-
 class CMakeListsExecutable(object):
 
     def __init__(self, dir_name, filename):
@@ -247,11 +263,13 @@ class CMakeListsExecutable(object):
     def gen_code(self):
         ret = []
         for exe_name, file_name, depend in self.list:
-            depends = (depend + " " + " ".join(get_exe_additional_depends(exe_name))).strip()
+            depends = (depend + " " +
+                       " ".join(get_exe_additional_depends(exe_name))).strip()
             ret.extend(wrap_notwin32_condition(disable_for_win32(exe_name),
-                       "add_kaldi_executable(NAME " + exe_name + " SOURCES " + file_name + " DEPENDS " + depends + ")"))
+                                               "add_kaldi_executable(NAME " + exe_name + " SOURCES " + file_name + " DEPENDS " + depends + ")"))
 
         return "\n".join(ret)
+
 
 class CMakeListsFile(object):
 
@@ -265,7 +283,7 @@ class CMakeListsFile(object):
         self.sections.append(section)
 
     def write_file(self):
-        with open(self.path, "w", newline='\n') as f: # good luck for python2
+        with open(self.path, "w", newline='\n') as f:  # good luck for python2
             f.write(CMakeListsFile.GEN_CMAKE_HEADER)
             for s in self.sections:
                 code = s.gen_code()

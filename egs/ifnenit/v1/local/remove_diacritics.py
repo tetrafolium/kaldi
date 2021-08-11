@@ -7,10 +7,14 @@
 # Delete Mark,Nonspacing unicode characters.
 
 import unicodedata
-import sys, io
+import sys
+import io
+
+
 def strip_accents(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s)
-        if unicodedata.category(c) != 'Mn')
+                   if unicodedata.category(c) != 'Mn')
+
 
 in_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
 out_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')

@@ -11,7 +11,9 @@ import re
 
 
 parser = argparse.ArgumentParser(description="This script gets the unigram probabilities of words.",
-                                 epilog="E.g. " + sys.argv[0] + " --vocab-file=data/rnnlm/vocab/words.txt "
+                                 epilog="E.g. " +
+                                 sys.argv[0] +
+                                 " --vocab-file=data/rnnlm/vocab/words.txt "
                                         "--data-weights-file=exp/rnnlm/data_weights.txt data/rnnlm/data "
                                         "> exp/rnnlm/unigram_probs.txt",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -43,6 +45,8 @@ SPECIAL_SYMBOLS = ["<eps>", "<s>", "<brk>"]
 # get the name with txt and counts file path for all data sources except dev
 # return a dict with key is the name of data_source,
 #                    value is a tuple (txt_file_path, counts_file_path)
+
+
 def get_all_data_sources_except_dev(text_dir):
     data_sources = {}
     for f in os.listdir(text_dir):
@@ -67,7 +71,8 @@ def get_all_data_sources_except_dev(text_dir):
 
     for name, (txt_file, counts_file) in data_sources.items():
         if txt_file is None or counts_file is None:
-            sys.exit(sys.argv[0] + ": Missing .txt or .counts file for data source: " + name)
+            sys.exit(
+                sys.argv[0] + ": Missing .txt or .counts file for data source: " + name)
 
     return data_sources
 
@@ -90,10 +95,10 @@ def read_data_weights(weights_file, data_sources):
                 sys.exit(sys.argv[0] + ": bad data-weights line: '" +
                          line.rstrip("\n") + "': " + str(e))
 
-
     for name in data_sources.keys():
         if name not in data_weights:
-            sys.exit(sys.argv[0] + ": Weight for data source '{0}' not set".format(name))
+            sys.exit(
+                sys.argv[0] + ": Weight for data source '{0}' not set".format(name))
 
     return data_weights
 
@@ -134,7 +139,9 @@ def get_counts(data_sources, data_weights, vocab):
         with open(counts_file, 'r', encoding="utf-8") as f:
             for line in f:
                 fields = line.split()
-                if len(fields) != 2: print("Warning, should be 2 cols:", fields, line, file=sys.stderr);
+                if len(fields) != 2:
+                    print("Warning, should be 2 cols:",
+                          fields, line, file=sys.stderr)
                 assert(len(fields) == 2)
                 word = fields[0]
                 count = fields[1]
@@ -180,6 +187,7 @@ def get_unigram_probs(vocab, counts, smooth_constant):
         probs.append(count / total_counts)
 
     return probs
+
 
 if os.system("rnnlm/ensure_counts_present.sh {0}".format(args.text_dir)) != 0:
     print(sys.argv[0] + ": command 'rnnlm/ensure_counts_present.sh {0}' failed.".format(

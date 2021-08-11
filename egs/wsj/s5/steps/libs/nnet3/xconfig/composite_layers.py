@@ -65,20 +65,21 @@ from libs.nnet3.xconfig.basic_layers import XconfigLayerBase
 # This is passed through to the linear and affine components.  You'll normally
 # want this to be set to a nonzero value, e.g. 0.004.
 
+
 class XconfigTdnnfLayer(XconfigLayerBase):
 
-    def __init__(self, first_token, key_to_value, prev_names = None):
+    def __init__(self, first_token, key_to_value, prev_names=None):
         assert first_token == "tdnnf-layer"
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input':'[-1]',
-                       'dim':-1,
-                       'bottleneck-dim':-1,
-                       'bypass-scale':0.66,
-                       'dropout-proportion':-1.0,
-                       'time-stride':1,
-                       'l2-regularize':0.0,
+        self.config = {'input': '[-1]',
+                       'dim': -1,
+                       'bottleneck-dim': -1,
+                       'bypass-scale': 0.66,
+                       'dropout-proportion': -1.0,
+                       'time-stride': 1,
+                       'l2-regularize': 0.0,
                        'max-change': 0.75,
                        'self-repair-scale': 1.0e-05,
                        'context': 'default'}
@@ -109,7 +110,6 @@ class XconfigTdnnfLayer(XconfigLayerBase):
             raise RuntimeError('context must be default, left-only shift-left or none, got {}'.format(
                 self.config['context']))
 
-
     def output_name(self, auxiliary_output=None):
         assert auxiliary_output is None
         output_component = ''
@@ -123,7 +123,6 @@ class XconfigTdnnfLayer(XconfigLayerBase):
             output_component = 'batchnorm'
         return '{0}.{1}'.format(self.name, output_component)
 
-
     def output_dim(self, auxiliary_output=None):
         return self.config['dim']
 
@@ -135,7 +134,6 @@ class XconfigTdnnfLayer(XconfigLayerBase):
             for config_name in ['ref', 'final']:
                 ans.append((config_name, line))
         return ans
-
 
     def _generate_config(self):
         configs = []
@@ -238,17 +236,19 @@ class XconfigTdnnfLayer(XconfigLayerBase):
 # This layer is really just for convenience in writing config files: it doesn't
 # do anything that's particular hard or unusual, but it encapsulates a commonly
 # repeated pattern.
+
+
 class XconfigPrefinalLayer(XconfigLayerBase):
 
-    def __init__(self, first_token, key_to_value, prev_names = None):
+    def __init__(self, first_token, key_to_value, prev_names=None):
         assert first_token == "prefinal-layer"
         XconfigLayerBase.__init__(self, first_token, key_to_value, prev_names)
 
     def set_default_configs(self):
-        self.config = {'input':'[-1]',
-                       'big-dim':-1,
-                       'small-dim':-1,
-                       'l2-regularize':0.0,
+        self.config = {'input': '[-1]',
+                       'big-dim': -1,
+                       'small-dim': -1,
+                       'l2-regularize': 0.0,
                        'max-change': 0.75,
                        'self-repair-scale': 1.0e-05}
 
@@ -276,7 +276,6 @@ class XconfigPrefinalLayer(XconfigLayerBase):
             for config_name in ['ref', 'final']:
                 ans.append((config_name, line))
         return ans
-
 
     def _generate_config(self):
         configs = []

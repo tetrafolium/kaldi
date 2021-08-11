@@ -15,6 +15,7 @@ import re
 import random
 import sys
 
+
 def get_args():
     parser = argparse.ArgumentParser(description="""
         This script reads a wav.scp file from the input and perturbs the
@@ -92,14 +93,14 @@ def run(args):
         # Handle three cases of rxfilenames appropriately;
         # 'input piped command', 'file offset' and 'filename'
         if line.strip()[-1] == '|':
-            print ('{0} sox --vol {1} -t wav - -t wav - |'.format(
+            print('{0} sox --vol {1} -t wav - -t wav - |'.format(
                 line.strip(), vol))
         elif re.search(':[0-9]+$', line.strip()) is not None:
-            print ('{id} wav-copy {wav} - | '
-                   'sox --vol {vol} -t wav - -t wav - |'.format(
-                       id=parts[0], wav=' '.join(parts[1:]), vol=vol))
+            print('{id} wav-copy {wav} - | '
+                  'sox --vol {vol} -t wav - -t wav - |'.format(
+                      id=parts[0], wav=' '.join(parts[1:]), vol=vol))
         else:
-            print ('{id} sox --vol {vol} -t wav {wav} -t wav - |'.format(
+            print('{id} sox --vol {vol} -t wav {wav} -t wav - |'.format(
                 id=parts[0], wav=' '.join(parts[1:]), vol=vol))
 
         if args.write_reco2vol is not None:

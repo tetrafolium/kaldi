@@ -25,7 +25,7 @@ parser.add_argument('database_path', type=str,
 parser.add_argument('out_dir', type=str,
                     help='Where to write output files.')
 parser.add_argument('--dataset', type=str, default='train',
-                    choices=['train', 'test','validation'],
+                    choices=['train', 'test', 'validation'],
                     help='Subset of data to process.')
 args = parser.parse_args()
 
@@ -42,41 +42,44 @@ dataset_path = os.path.join(args.database_path,
                             args.dataset + '.uttlist')
 
 text_file_path = os.path.join(args.database_path,
-                              'ascii','lines.txt')
+                              'ascii', 'lines.txt')
 text_dict = {}
+
+
 def process_text_file_for_word_model():
-  with open (text_file_path, 'rt') as in_file:
-    for line in in_file:
-      if line[0]=='#':
-        continue
-      line = line.strip()
-      utt_id = line.split(' ')[0]
-      text_vect = line.split(' ')[8:]
-      text = "".join(text_vect)
-      text = text.replace("|", " ")
-      text_dict[utt_id] = text
+    with open(text_file_path, 'rt') as in_file:
+        for line in in_file:
+            if line[0] == '#':
+                continue
+            line = line.strip()
+            utt_id = line.split(' ')[0]
+            text_vect = line.split(' ')[8:]
+            text = "".join(text_vect)
+            text = text.replace("|", " ")
+            text_dict[utt_id] = text
+
 
 print("Processing '{}' data...".format(args.dataset))
 process_text_file_for_word_model()
 
 with open(dataset_path) as f:
-  for line in f:
-    line = line.strip()
-    line_vect = line.split('-')
-    xml_file = line_vect[0] + '-' + line_vect[1]
-    xml_path = os.path.join(args.database_path, 'xml', xml_file + '.xml')
-    img_num = line[-3:]
-    doc = minidom.parse(xml_path)
+    for line in f:
+        line = line.strip()
+        line_vect = line.split('-')
+        xml_file = line_vect[0] + '-' + line_vect[1]
+        xml_path = os.path.join(args.database_path, 'xml', xml_file + '.xml')
+        img_num = line[-3:]
+        doc = minidom.parse(xml_path)
 
-    form_elements = doc.getElementsByTagName('form')[0]
-    writer_id = form_elements.getAttribute('writer-id')
-    outerfolder = form_elements.getAttribute('id')[0:3]
-    innerfolder = form_elements.getAttribute('id')
-    lines_path = os.path.join(args.database_path, 'lines',
-                              outerfolder, innerfolder, innerfolder)
-    image_file_path = lines_path + img_num + '.png'
-    text =  text_dict[line]
-    utt_id = writer_id + '_' + line
-    text_fh.write(utt_id + ' ' + text + '\n')
-    utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
-    image_fh.write(utt_id + ' ' + image_file_path + '\n')
+        form_elements = doc.getElementsByTagName('form')[0]
+        writer_id = form_elements.getAttribute('writer-id')
+        outerfolder = form_elements.getAttribute('id')[0:3]
+        innerfolder = form_elements.getAttribute('id')
+        lines_path = os.path.join(args.database_path, 'lines',
+                                  outerfolder, innerfolder, innerfolder)
+        image_file_path = lines_path + img_num + '.png'
+        text = text_dict[line]
+        utt_id = writer_id + '_' + line
+        text_fh.write(utt_id + ' ' + text + '\n')
+        utt2spk_fh.write(utt_id + ' ' + writer_id + '\n')
+        image_fh.write(utt_id + ' ' + image_file_path + '\n')

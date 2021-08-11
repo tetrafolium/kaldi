@@ -129,8 +129,8 @@ def run(args):
                         output_document.extend(
                             doc[int(end_fraction * num_words):])
 
-            print ("{0} {1}".format(query, " ".join(output_document)),
-                   file=args.output_documents)
+            print("{0} {1}".format(query, " ".join(output_document)),
+                  file=args.output_documents)
         except Exception:
             logger.error("Error processing line %s in file %s", line,
                          args.query2docs.name)

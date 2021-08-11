@@ -62,14 +62,17 @@ while True:
         raise Exception("All rows should be of the same length")
     line = [float(i) for i in line]  # string to float
     if max(line) > 1:
-        raise Excetion("Element value in the matrix should be normalized and no larger than 1")
-    line = [int(x * 255) for x in line]  # float to integer ranging from 0 to 255
+        raise Excetion(
+            "Element value in the matrix should be normalized and no larger than 1")
+    # float to integer ranging from 0 to 255
+    line = [int(x * 255) for x in line]
     matrix.append(line)
     num_rows += 1
 
 if args.color == 3:
     if num_cols % 3 != 0:
-        raise Exception("Number of columns should be a multiple of 3 in the color mode")
+        raise Exception(
+            "Number of columns should be a multiple of 3 in the color mode")
     width = num_rows
     height = num_cols/3
     # reform the image matrix

@@ -11,6 +11,7 @@
     they all have an allowed length. This is intended for end2end chain training.
 """
 from __future__ import division
+import libs.common as common_lib
 
 import argparse
 import os
@@ -20,7 +21,6 @@ import math
 import logging
 
 sys.path.insert(0, 'steps')
-import libs.common as common_lib
 
 logger = logging.getLogger('libs')
 logger.setLevel(logging.INFO)
@@ -30,6 +30,7 @@ formatter = logging.Formatter("%(asctime)s [%(pathname)s:%(lineno)s - "
                               "%(funcName)s - %(levelname)s ] %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
 
 def get_args():
     parser = argparse.ArgumentParser(description="""This script finds a set of
@@ -63,6 +64,7 @@ def read_kaldi_mapfile(path):
             val = line[sp_pos+1:]
             m[key] = val
     return m
+
 
 def find_duration_range(img2len, coverage_factor):
     """Given a list of utterances, find the start and end duration to cover
@@ -118,27 +120,29 @@ def find_allowed_durations(start_len, end_len, args):
                           (length // args.frame_subsampling_factor))
             allowed_lengths.append(length)
             fp.write("{}\n".format(int(length)))
-            length = max(length * args.factor, length + args.frame_subsampling_factor)
+            length = max(length * args.factor, length +
+                         args.frame_subsampling_factor)
     return allowed_lengths
-
 
 
 def main():
     args = get_args()
     args.factor = 1.0 + args.factor/100.0
 
-    image2length = read_kaldi_mapfile(os.path.join(args.srcdir, 'image2num_frames'))
+    image2length = read_kaldi_mapfile(
+        os.path.join(args.srcdir, 'image2num_frames'))
 
-    start_dur, end_dur = find_duration_range(image2length, args.coverage_factor)
+    start_dur, end_dur = find_duration_range(
+        image2length, args.coverage_factor)
     logger.info("Lengths in the range [{},{}] will be covered. "
                 "Coverage rate: {}%".format(start_dur, end_dur,
-                                      100.0 - args.coverage_factor * 2))
+                                            100.0 - args.coverage_factor * 2))
     logger.info("There will be {} unique allowed lengths "
-                "for the images.".format(int((math.log(float(end_dur)/start_dur))/
+                "for the images.".format(int((math.log(float(end_dur)/start_dur)) /
                                              math.log(args.factor))))
 
     allowed_durations = find_allowed_durations(start_dur, end_dur, args)
 
 
 if __name__ == '__main__':
-      main()
+    main()

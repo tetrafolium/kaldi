@@ -5,6 +5,8 @@
   into per_array per_session per_speaker hypothesis (text) files"""
 
 import argparse
+
+
 def get_args():
     parser = argparse.ArgumentParser(
         description="""This script splits a kaldi text file
@@ -20,7 +22,7 @@ def get_args():
 def main():
     # S09_U06.ENH-4-704588-704738
     args = get_args()
-    sessionid_micid_speakerid_dict= {}
+    sessionid_micid_speakerid_dict = {}
     for line in open(args.input_text_path):
         parts = line.strip().split()
         uttid_id = parts[0]
@@ -30,13 +32,14 @@ def main():
         sessionid = uttid_id.strip().split('_')[0]
         sessionid_micid_speakerid = sessionid + '_' + micid + '_' + speakerid
         if sessionid_micid_speakerid not in sessionid_micid_speakerid_dict:
-            sessionid_micid_speakerid_dict[sessionid_micid_speakerid]=list()
+            sessionid_micid_speakerid_dict[sessionid_micid_speakerid] = list()
         sessionid_micid_speakerid_dict[sessionid_micid_speakerid].append(line)
 
     for sessionid_micid_speakerid in sorted(sessionid_micid_speakerid_dict):
         hyp_file = args.output_dir_path + '/' + 'hyp' + '_' + sessionid_micid_speakerid
         hyp_writer = open(hyp_file, 'w')
-        combined_hyp_file = args.output_dir_path + '/' + 'hyp' + '_' + sessionid_micid_speakerid + '_comb'
+        combined_hyp_file = args.output_dir_path + '/' + \
+            'hyp' + '_' + sessionid_micid_speakerid + '_comb'
         combined_hyp_writer = open(combined_hyp_file, 'w')
         utterances = sessionid_micid_speakerid_dict[sessionid_micid_speakerid]
         text = ''
@@ -53,4 +56,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

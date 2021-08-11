@@ -9,6 +9,7 @@ import sys
 import collections
 from collections import defaultdict
 
+
 def get_args():
     parser = argparse.ArgumentParser(description="""
         This script combines segments into utterances at
@@ -55,11 +56,11 @@ def main():
                 utts = ' '.join([seg[0] for seg in sorted(
                     segments_in_reco, key=lambda x:(x[1], x[2]))])
                 print("{0} {1}".format(reco, utts), file=reco2utt_writer)
-                print ("{0} {0}".format(reco), file=utt2spk_writer)
+                print("{0} {0}".format(reco), file=utt2spk_writer)
     else:
         with open(args.utt2spk_out, 'w') as utt2spk_writer:
             for reco in segments_for_reco.keys():
-                print ("{0} {0}".format(reco), file=utt2spk_writer)
+                print("{0} {0}".format(reco), file=utt2spk_writer)
 
 
 if __name__ == "__main__":

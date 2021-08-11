@@ -5,6 +5,8 @@
 # Apache 2.0.
 
 from __future__ import division
+import libs.common as common_lib
+import libs.nnet3.report.log_parse as log_parse
 import argparse
 import errno
 import logging
@@ -14,8 +16,6 @@ import sys
 import warnings
 
 sys.path.insert(0, 'steps')
-import libs.nnet3.report.log_parse as log_parse
-import libs.common as common_lib
 
 try:
     import matplotlib as mpl
@@ -70,18 +70,20 @@ def get_args():
 
     args = parser.parse_args()
     if ((args.comparison_dir is not None and len(args.comparison_dir) > 6) or
-        (args.exp_dir is not None and len(args.exp_dir) > 7)):
+            (args.exp_dir is not None and len(args.exp_dir) > 7)):
         raise Exception(
             "Up to 6 comparison directories may be specified. "
             "If you want to compare with more experiments, you would have to carefully tune "
             "the plot_colors variable which specified colors used for plotting.")
     assert args.start_iter >= 1
     if args.is_chain and args.is_rnnlm:
-        raise Exception("Options --is-chain and --is-rnnlm cannot be both true.")
+        raise Exception(
+            "Options --is-chain and --is-rnnlm cannot be both true.")
     return args
 
 
 g_plot_colors = ['red', 'blue', 'green', 'black', 'magenta', 'yellow', 'cyan']
+
 
 class LatexReport(object):
     """Class for writing a Latex report"""
@@ -150,8 +152,8 @@ def latex_compliant_name(name_string):
 
 
 def generate_acc_logprob_plots(exp_dir, output_dir, plot, key='accuracy',
-        file_basename='accuracy', comparison_dir=None,
-        start_iter=1, latex_report=None, output_name='output'):
+                               file_basename='accuracy', comparison_dir=None,
+                               start_iter=1, latex_report=None, output_name='output'):
 
     assert start_iter >= 1
 
@@ -164,7 +166,7 @@ def generate_acc_logprob_plots(exp_dir, output_dir, plot, key='accuracy',
     index = 0
     for dir in dirs:
         [report, times, data] = log_parse.generate_acc_logprob_report(dir, key,
-                output_name)
+                                                                      output_name)
         if index == 0:
             # this is the main experiment directory
             with open("{0}/{1}.log".format(output_dir,
@@ -207,28 +209,32 @@ def generate_acc_logprob_plots(exp_dir, output_dir, plot, key='accuracy',
 
 
 # The name of five gates of lstmp
-g_lstm_gate = ['i_t_sigmoid', 'f_t_sigmoid', 'c_t_tanh', 'o_t_sigmoid', 'm_t_tanh']
+g_lstm_gate = ['i_t_sigmoid', 'f_t_sigmoid',
+               'c_t_tanh', 'o_t_sigmoid', 'm_t_tanh']
 
 # The "extra" item is a placeholder. As each unit in python plot is
 # composed by a legend_handle(linestyle) and a legend_label(description).
 # For the unit which doesn't have linestyle, we use the "extra" placeholder.
 if g_plot:
-    extra = Rectangle((0, 0), 1, 1, facecolor="w", fill=False, edgecolor='none', linewidth=0)
+    extra = Rectangle((0, 0), 1, 1, facecolor="w",
+                      fill=False, edgecolor='none', linewidth=0)
 
 # This function is used to insert a column to the legend, the column_index is 1-based
+
+
 def insert_a_column_legend(legend_handle, legend_label, lp, mp, hp,
-        dir, prefix_length, column_index):
+                           dir, prefix_length, column_index):
     handle = [extra, lp, mp, hp]
     label = ["[1]{0}".format(dir[prefix_length:]), "", "", ""]
-    for row in range(1,5):
+    for row in range(1, 5):
         legend_handle.insert(column_index*row-1, handle[row-1])
         legend_label.insert(column_index*row-1, label[row-1])
 
 
 # This function is used to plot a normal nonlinearity component or a gate of lstmp
 def plot_a_nonlin_component(fig, dirs, stat_tables_per_component_per_dir,
-        component_name, common_prefix, prefix_length, component_type,
-        start_iter, gate_index=0, with_oderiv=0):
+                            component_name, common_prefix, prefix_length, component_type,
+                            start_iter, gate_index=0, with_oderiv=0):
     fig.clf()
     index = 0
     legend_handle = [extra, extra, extra, extra]
@@ -239,12 +245,13 @@ def plot_a_nonlin_component(fig, dirs, stat_tables_per_component_per_dir,
             color_val = g_plot_colors[index]
             index += 1
             try:
-                iter_stats = (stat_tables_per_component_per_dir[dir][component_name])
+                iter_stats = (
+                    stat_tables_per_component_per_dir[dir][component_name])
             except KeyError:
                 # this component is not available in this network so lets
                 # not just plot it
                 insert_a_column_legend(legend_handle, legend_label, lp, mp, hp,
-                        dir, prefix_length, index+1)
+                                       dir, prefix_length, index+1)
                 continue
 
             data = np.array(iter_stats)
@@ -252,32 +259,32 @@ def plot_a_nonlin_component(fig, dirs, stat_tables_per_component_per_dir,
 
             ax = plt.subplot(211)
             lp, = ax.plot(data[:, 0], data[:, gate_index*10+5], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             mp, = ax.plot(data[:, 0], data[:, gate_index*10+6], color=color_val,
-                    linestyle='-')
+                          linestyle='-')
             hp, = ax.plot(data[:, 0], data[:, gate_index*10+7], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             insert_a_column_legend(legend_handle, legend_label, lp, mp, hp,
-                    dir, prefix_length, index+1)
+                                   dir, prefix_length, index+1)
 
             ax.set_ylabel('Value-{0}'.format(component_type))
             ax.grid(True)
 
             ax = plt.subplot(212)
             lp, = ax.plot(data[:, 0], data[:, gate_index*10+8], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             mp, = ax.plot(data[:, 0], data[:, gate_index*10+9], color=color_val,
-                    linestyle='-')
+                          linestyle='-')
             hp, = ax.plot(data[:, 0], data[:, gate_index*10+10], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             ax.set_xlabel('Iteration')
             ax.set_ylabel('Derivative-{0}'.format(component_type))
             ax.grid(True)
 
         lgd = plt.legend(legend_handle, legend_label, loc='lower center',
-                bbox_to_anchor=(0.5 , -0.5 + len(dirs) * -0.2),
-                ncol=4, handletextpad = -2, title="[1]:{0}".format(common_prefix),
-                borderaxespad=0.)
+                         bbox_to_anchor=(0.5, -0.5 + len(dirs) * -0.2),
+                         ncol=4, handletextpad=-2, title="[1]:{0}".format(common_prefix),
+                         borderaxespad=0.)
         plt.grid(True)
 
     else:
@@ -285,55 +292,56 @@ def plot_a_nonlin_component(fig, dirs, stat_tables_per_component_per_dir,
             color_val = g_plot_colors[index]
             index += 1
             try:
-                iter_stats = (stat_tables_per_component_per_dir[dir][component_name])
+                iter_stats = (
+                    stat_tables_per_component_per_dir[dir][component_name])
             except KeyError:
                 # this component is not available in this network so lets
                 # not just plot it
                 insert_a_column_legend(legend_handle, legend_label, lp, mp, hp,
-                        dir, prefix_length, index+1)
+                                       dir, prefix_length, index+1)
                 continue
 
             data = np.array(iter_stats)
             data = data[data[:, 0] >= start_iter, :]
             ax = plt.subplot(311)
             lp, = ax.plot(data[:, 0], data[:, gate_index*10+7], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             mp, = ax.plot(data[:, 0], data[:, gate_index*10+8], color=color_val,
-                    linestyle='-')
+                          linestyle='-')
             hp, = ax.plot(data[:, 0], data[:, gate_index*10+9], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             insert_a_column_legend(legend_handle, legend_label, lp, mp, hp,
-                    dir, prefix_length, index+1)
+                                   dir, prefix_length, index+1)
 
             ax.set_ylabel('Value-{0}'.format(component_type))
             ax.grid(True)
 
             ax = plt.subplot(312)
             lp, = ax.plot(data[:, 0], data[:, gate_index*10+10], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             mp, = ax.plot(data[:, 0], data[:, gate_index*10+11], color=color_val,
-                    linestyle='-')
+                          linestyle='-')
             hp, = ax.plot(data[:, 0], data[:, gate_index*10+12], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             ax.set_ylabel('Derivative-{0}'.format(component_type))
             ax.grid(True)
 
             ax = plt.subplot(313)
             lp, = ax.plot(data[:, 0], data[:, gate_index*10+13], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             mp, = ax.plot(data[:, 0], data[:, gate_index*10+14], color=color_val,
-                    linestyle='-')
+                          linestyle='-')
             hp, = ax.plot(data[:, 0], data[:, gate_index*10+15], color=color_val,
-                    linestyle='--')
+                          linestyle='--')
             ax.set_xlabel('Iteration')
             ax.set_ylabel('Oderivative-{0}'.format(component_type))
             ax.grid(True)
 
-            plt.subplots_adjust(top=0.8, hspace = 1.0, bottom = -0.2)
+            plt.subplots_adjust(top=0.8, hspace=1.0, bottom=-0.2)
         lgd = plt.legend(legend_handle, legend_label, loc='lower center',
-                bbox_to_anchor=(0.5 , -1.5 + len(dirs) * -0.2),
-                ncol=4, handletextpad = -2, title="[1]:{0}".format(common_prefix),
-                borderaxespad=0.)
+                         bbox_to_anchor=(0.5, -1.5 + len(dirs) * -0.2),
+                         ncol=4, handletextpad=-2, title="[1]:{0}".format(common_prefix),
+                         borderaxespad=0.)
         plt.grid(True)
 
     return lgd
@@ -391,7 +399,7 @@ def generate_nonlin_stats_plots(exp_dir, output_dir, plot, comparison_dir=None,
     for component_name in main_stat_tables.keys():
         # this is the main experiment directory
         with open("{dir}/nonlinstats_{comp_name}.log".format(
-                    dir=output_dir, comp_name=component_name), "w") as f:
+                dir=output_dir, comp_name=component_name), "w") as f:
             if with_oderiv:
                 # with oderiv-rms
                 f.write("Iteration\tValueMean\tValueStddev\tDerivMean\tDerivStddev\t"
@@ -432,51 +440,50 @@ def generate_nonlin_stats_plots(exp_dir, output_dir, plot, comparison_dir=None,
 
         for component_name in main_component_names:
             if stats_per_dir[exp_dir][component_name]['type'] == 'LstmNonlinearity':
-                for i in range(0,5):
+                for i in range(0, 5):
                     component_type = 'Lstm-' + g_lstm_gate[i]
                     lgd = plot_a_nonlin_component(fig, dirs,
-                            stat_tables_per_component_per_dir, component_name,
-                            common_prefix, prefix_length, component_type, start_iter, i, with_oderiv)
+                                                  stat_tables_per_component_per_dir, component_name,
+                                                  common_prefix, prefix_length, component_type, start_iter, i, with_oderiv)
                     fig.suptitle("Per-dimension average-(value, derivative) percentiles for "
-                         "{component_name}-{gate}".format(component_name=component_name, gate=g_lstm_gate[i]))
+                                 "{component_name}-{gate}".format(component_name=component_name, gate=g_lstm_gate[i]))
                     comp_name = latex_compliant_name(component_name)
                     figfile_name = '{dir}/nonlinstats_{comp_name}_{gate}.pdf'.format(
                         dir=output_dir, comp_name=comp_name, gate=g_lstm_gate[i])
                     fig.savefig(figfile_name, bbox_extra_artists=(lgd,),
-                        bbox_inches='tight')
+                                bbox_inches='tight')
                     if latex_report is not None:
                         latex_report.add_figure(
-                        figfile_name,
-                        "Per-dimension average-(value, derivative) percentiles for "
-                        "{0}-{1}".format(component_name, g_lstm_gate[i]))
+                            figfile_name,
+                            "Per-dimension average-(value, derivative) percentiles for "
+                            "{0}-{1}".format(component_name, g_lstm_gate[i]))
             else:
                 component_type = stats_per_dir[exp_dir][component_name]['type']
                 lgd = plot_a_nonlin_component(fig, dirs,
-                        stat_tables_per_component_per_dir,component_name,
-                        common_prefix, prefix_length, component_type, start_iter, 0, with_oderiv)
+                                              stat_tables_per_component_per_dir, component_name,
+                                              common_prefix, prefix_length, component_type, start_iter, 0, with_oderiv)
                 if with_oderiv:
                     fig.suptitle("Per-dimension average-(value, derivative) and rms-oderivative percentiles for "
-                         "{component_name}".format(component_name=component_name))
+                                 "{component_name}".format(component_name=component_name))
                 else:
                     fig.suptitle("Per-dimension average-(value, derivative) percentiles for "
-                         "{component_name}".format(component_name=component_name))
+                                 "{component_name}".format(component_name=component_name))
                 comp_name = latex_compliant_name(component_name)
                 figfile_name = '{dir}/nonlinstats_{comp_name}.pdf'.format(
                     dir=output_dir, comp_name=comp_name)
                 fig.savefig(figfile_name, bbox_extra_artists=(lgd,),
-                        bbox_inches='tight')
+                            bbox_inches='tight')
                 if latex_report is not None:
                     if with_oderiv:
                         latex_report.add_figure(
-                        figfile_name,
-                        "Per-dimension average-(value, derivative) and rms-oderivative percentiles for "
-                        "{0}".format(component_name))
+                            figfile_name,
+                            "Per-dimension average-(value, derivative) and rms-oderivative percentiles for "
+                            "{0}".format(component_name))
                     else:
                         latex_report.add_figure(
-                        figfile_name,
-                        "Per-dimension average-(value, derivative) percentiles for "
-                        "{0}".format(component_name))
-
+                            figfile_name,
+                            "Per-dimension average-(value, derivative) percentiles for "
+                            "{0}".format(component_name))
 
 
 def generate_clipped_proportion_plots(exp_dir, output_dir, plot,
@@ -517,11 +524,13 @@ def generate_clipped_proportion_plots(exp_dir, output_dir, plot,
     file.close()
 
     if plot:
-        main_component_names = sorted(stats_per_dir[exp_dir]['cp_per_iter_per_component'])
+        main_component_names = sorted(
+            stats_per_dir[exp_dir]['cp_per_iter_per_component'])
         plot_component_names = set(main_component_names)
         for dir in dirs:
             try:
-                component_names = set(stats_per_dir[dir]['cp_per_iter_per_component'])
+                component_names = set(
+                    stats_per_dir[dir]['cp_per_iter_per_component'])
                 plot_component_names = (
                     plot_component_names.intersection(component_names))
             except KeyError:
@@ -564,7 +573,7 @@ def generate_clipped_proportion_plots(exp_dir, output_dir, plot,
                              ncol=1, borderaxespad=0.)
             plt.grid(True)
             fig.suptitle("Clipped-proportion value at {comp_name}".format(
-                            comp_name=component_name))
+                comp_name=component_name))
             comp_name = latex_compliant_name(component_name)
             figfile_name = '{dir}/clipped_proportion_{comp_name}.pdf'.format(
                 dir=output_dir, comp_name=comp_name)
@@ -619,7 +628,7 @@ def generate_parameter_diff_plots(exp_dir, output_dir, plot,
                         and not gave_user_warning):
                     logger.warning("There are more than %.0f missing iterations per component. "
                                    "Something might be wrong.",
-                                   float(total_missing_iterations)/ len(component_names))
+                                   float(total_missing_iterations) / len(component_names))
                     gave_user_warning = True
 
                 f.write(" ".join(iter_data) + "\n")
@@ -627,12 +636,15 @@ def generate_parameter_diff_plots(exp_dir, output_dir, plot,
     if plot:
         # get the component names
         diff_type = list(key_file.keys())[0]
-        main_component_names = sorted(stats_per_dir[exp_dir][diff_type]['progress_per_component'])
+        main_component_names = sorted(
+            stats_per_dir[exp_dir][diff_type]['progress_per_component'])
         plot_component_names = set(main_component_names)
         for dir in dirs:
             try:
-                component_names = set(stats_per_dir[dir][diff_type]['progress_per_component'])
-                plot_component_names = plot_component_names.intersection(component_names)
+                component_names = set(
+                    stats_per_dir[dir][diff_type]['progress_per_component'])
+                plot_component_names = plot_component_names.intersection(
+                    component_names)
             except KeyError:
                 continue
         plot_component_names = sorted(plot_component_names)
@@ -730,28 +742,32 @@ def generate_plots(exp_dir, output_dir, output_names, comparison_dir=None,
                 start_iter=start_iter,
                 latex_report=latex_report, output_name=output_name)
 
-            logger.info("Generating log-likelihood plots for '%s'", output_name)
+            logger.info(
+                "Generating log-likelihood plots for '%s'", output_name)
             generate_acc_logprob_plots(
                 exp_dir, output_dir, g_plot, key='log-likelihood',
                 file_basename='loglikelihood', comparison_dir=comparison_dir,
                 start_iter=start_iter,
                 latex_report=latex_report, output_name=output_name)
         elif objective_type == "chain":
-            logger.info("Generating log-probability plots for '%s'", output_name)
+            logger.info(
+                "Generating log-probability plots for '%s'", output_name)
             generate_acc_logprob_plots(
                 exp_dir, output_dir, g_plot,
                 key='log-probability', file_basename='log_probability',
                 comparison_dir=comparison_dir, start_iter=start_iter,
                 latex_report=latex_report, output_name=output_name)
         elif objective_type == "rnnlm_objective":
-            logger.info("Generating RNNLM objective plots for '%s'", output_name)
+            logger.info(
+                "Generating RNNLM objective plots for '%s'", output_name)
             generate_acc_logprob_plots(
                 exp_dir, output_dir, g_plot, key='rnnlm_objective',
                 file_basename='objective', comparison_dir=comparison_dir,
                 start_iter=start_iter,
                 latex_report=latex_report, output_name=output_name)
         else:
-            logger.info("Generating %s objective plots for '%s'", objective_type, output_name)
+            logger.info("Generating %s objective plots for '%s'",
+                        objective_type, output_name)
             generate_acc_logprob_plots(
                 exp_dir, output_dir, g_plot, key='objective',
                 file_basename='objective', comparison_dir=comparison_dir,
@@ -776,7 +792,8 @@ def generate_plots(exp_dir, output_dir, output_names, comparison_dir=None,
     if g_plot and latex_report is not None:
         has_compiled = latex_report.close()
         if has_compiled:
-            logger.info("Report file %s/report.pdf has been generated successfully.", output_dir)
+            logger.info(
+                "Report file %s/report.pdf has been generated successfully.", output_dir)
 
 
 def main():
@@ -806,17 +823,17 @@ def main():
         output_nodes.append(('output', 'linear'))
 
     if args.comparison_dir is not None:
-      generate_plots(args.exp_dir[0], args.output_dir, output_nodes,
-                     comparison_dir=args.comparison_dir,
-                     start_iter=args.start_iter)
+        generate_plots(args.exp_dir[0], args.output_dir, output_nodes,
+                       comparison_dir=args.comparison_dir,
+                       start_iter=args.start_iter)
     else:
-      if len(args.exp_dir) == 1:
-        generate_plots(args.exp_dir[0], args.output_dir, output_nodes,
-                       start_iter=args.start_iter)
-      if len(args.exp_dir) > 1:
-        generate_plots(args.exp_dir[0], args.output_dir, output_nodes,
-                       comparison_dir=args.exp_dir[1:],
-                       start_iter=args.start_iter)
+        if len(args.exp_dir) == 1:
+            generate_plots(args.exp_dir[0], args.output_dir, output_nodes,
+                           start_iter=args.start_iter)
+        if len(args.exp_dir) > 1:
+            generate_plots(args.exp_dir[0], args.output_dir, output_nodes,
+                           comparison_dir=args.exp_dir[1:],
+                           start_iter=args.start_iter)
 
 
 if __name__ == "__main__":

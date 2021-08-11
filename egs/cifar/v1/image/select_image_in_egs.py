@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # You can use this to select an image in an egs file:
-# e.g.: 
+# e.g.:
 # nnet3-copy-egs ark:exp/cifar10_egs/egs.1.ark ark,t:- | \
 #     image/select_image_in_egs.py 00001 | image/matrix_to_image.py --color 3 > 00001.bmp
 # e.g.:
@@ -25,11 +25,10 @@ while True:
     if not line:
         break
     if line.find(args.img_id + ' <Nnet3Eg>') != -1:
-        found=True
+        found = True
         print('[')
         continue
     if found and line.find('</NnetIo>') != -1:
         break
     if found:
         print(line)
-

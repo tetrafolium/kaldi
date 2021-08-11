@@ -6,7 +6,7 @@ import re
 import writenumbers
 from string import maketrans
 
-## Global vars
+# Global vars
 
 normdict = {".": "",
             ",": "",
@@ -23,7 +23,7 @@ to_chars = ''.join(list(normdict.values()))
 #t_table = maketrans(from_chars, to_chars)
 
 
-## Main
+# Main
 
 numtable = writenumbers.loadNumTable(sys.argv[1])
 transcript = codecs.open(sys.argv[2], "r", "utf8")

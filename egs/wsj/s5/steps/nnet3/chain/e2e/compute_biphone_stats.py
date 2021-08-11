@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(description="""This script reads
     following format:
     <phone-id> <count>""")
 parser.add_argument('langdir', type=str)
-parser.add_argument('--shared-phones', type=str, choices=['true','false'],
+parser.add_argument('--shared-phones', type=str, choices=['true', 'false'],
                     default='true',
                     help="If true, stats will be collected for shared phones.")
 
@@ -51,11 +51,13 @@ for line in sys.stdin:
     line_phones = line[1:]
     for pair in zip([0] + line_phones, line_phones):  # 0 is for the no left-context case
         if args.shared_phones:
-            pair = (phone_to_shard_phone[pair[0]], phone_to_shard_phone[pair[1]])
+            pair = (phone_to_shard_phone[pair[0]],
+                    phone_to_shard_phone[pair[1]])
         if pair not in biphone_counts:
             biphone_counts[pair] = 0
         biphone_counts[pair] += 1
-        mono_counts[pair[1]] = 1 if pair[1] not in mono_counts else mono_counts[pair[1]] + 1
+        mono_counts[pair[1]
+                    ] = 1 if pair[1] not in mono_counts else mono_counts[pair[1]] + 1
 
 for phone1 in [0] + phones:
     for phone2 in phones:

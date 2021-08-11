@@ -5,9 +5,11 @@
 # of Qatar Computing Research Institute (http://qcri.qa/)
 
 # Convert unicode words to position dependent latin form.
-# This script make creating lexicon very easy. 
+# This script make creating lexicon very easy.
 
-import os, sys, io
+import os
+import sys
+import io
 
 map = {
     'ء': 'hh',
@@ -48,41 +50,41 @@ map = {
 }
 
 connecting = {
-  'hh': False,
-  'am': False,
-  'ae': False,
-  'ah': False,
-  'al': False,
-  'aa': False,
-  'ba': True,
-  'te': False,
-  'ta': True,
-  'th': True,
-  'ja': True,
-  'ha': True,
-  'kh': True,
-  'da': False,
-  'dh': False,
-  'ra': False,
-  'zy': False,
-  'se': True,
-  'sh': True,
-  'sa': True,
-  'de': True,
-  'to': True,
-  'za': True,
-  'ay': True,
-  'gh': True,
-  'fa': True,
-  'ka': True,
-  'ke': True,
-  'la': True,
-  'ma': True,
-  'na': True,
-  'he': True,
-  'wa': False,
-  'ee': False,
-  'ya': True
+    'hh': False,
+    'am': False,
+    'ae': False,
+    'ah': False,
+    'al': False,
+    'aa': False,
+    'ba': True,
+    'te': False,
+    'ta': True,
+    'th': True,
+    'ja': True,
+    'ha': True,
+    'kh': True,
+    'da': False,
+    'dh': False,
+    'ra': False,
+    'zy': False,
+    'se': True,
+    'sh': True,
+    'sa': True,
+    'de': True,
+    'to': True,
+    'za': True,
+    'ay': True,
+    'gh': True,
+    'fa': True,
+    'ka': True,
+    'ke': True,
+    'la': True,
+    'ma': True,
+    'na': True,
+    'he': True,
+    'wa': False,
+    'ee': False,
+    'ya': True
 }
 
 in_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
@@ -98,21 +100,22 @@ for line in in_stream:
         if char == '=':
             connected = True
             continue
-        out_stream.write((" " if lastChar else "") + lastChar + lastType + (" conn" if connected else " sil"))
+        out_stream.write((" " if lastChar else "") + lastChar +
+                         lastType + (" conn" if connected else " sil"))
         if char in map:
             lastChar = map[char]
             if connected:
                 if connecting[lastChar]:
-                    lastType="M"
+                    lastType = "M"
                 else:
-                    lastType="E"
+                    lastType = "E"
             else:
                 if connecting[lastChar]:
-                    lastType="B"
+                    lastType = "B"
                 else:
-                    lastType="A"
-            connected=connecting[lastChar]
-        else: # Not in map
+                    lastType = "A"
+            connected = connecting[lastChar]
+        else:  # Not in map
             if char == '#':
                 lastChar = 'hash'
             elif char == '_':
@@ -124,7 +127,7 @@ for line in in_stream:
             else:
                 lastChar = char
             lastType = "A"
-            connected=False
+            connected = False
     if lastType == "M":
         lastType = "E"
     elif lastType == "B":

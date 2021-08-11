@@ -22,7 +22,7 @@ import codecs
 import sys
 import re
 
-## Global vars
+# Global vars
 
 normdict = {",": " ",
             ":": " ",
@@ -37,24 +37,24 @@ normdict = {",": " ",
 t_table = str.maketrans(normdict)
 
 
-## Utility function
+# Utility function
 
 def getuttid_text(line):
     return line.split(" ", 1)
 
 
-## Main
+# Main
 
 textin = codecs.open(sys.argv[1], "r", "utf8")
 fid = codecs.open(sys.argv[2], "w", "utf8")
 outtext = codecs.open(sys.argv[3], "w", "utf8")
 
 for line in textin:
-        utt_id, text = getuttid_text(line)
-        normtext1 = text.translate(t_table)
-        normtext2 = re.sub(r'  +', ' ', normtext1.strip())
-        fid.write(utt_id + "\n")
-        outtext.write(normtext2.upper() + "\n")
+    utt_id, text = getuttid_text(line)
+    normtext1 = text.translate(t_table)
+    normtext2 = re.sub(r'  +', ' ', normtext1.strip())
+    fid.write(utt_id + "\n")
+    outtext.write(normtext2.upper() + "\n")
 
 textin.close()
 outtext.close()

@@ -5,14 +5,17 @@
 #
 # This file is meant to be invoked by make_musan.sh.
 
-import os, sys, argparse
+import libs.common as common_lib
+import os
+import sys
+import argparse
 sys.path.append("steps/data/")
 sys.path.insert(0, 'steps/')
-import libs.common as common_lib
+
 
 def get_args():
     parser = argparse.ArgumentParser(description="Create MUSAN corpus",
-                        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--use-vocals", type=str,
                         dest='use_vocals', default=True,
                         action=common_lib.StrToBoolAction,
@@ -31,6 +34,7 @@ def get_args():
 
     return args
 
+
 def check_args(args):
     if not os.path.exists(args.in_dir):
         raise Exception('input dir {0} does not exist'.format(args.in_dir))
@@ -39,6 +43,7 @@ def check_args(args):
         os.makedirs(args.out_dir)
 
     return args
+
 
 def process_music_annotations(path):
     utt2spk = {}
@@ -50,6 +55,7 @@ def process_music_annotations(path):
         utt2spk[utt] = utt
         utt2vocals[utt] = vocals == "Y"
     return utt2spk, utt2vocals
+
 
 def prepare_music(root_dir, use_vocals, sampling_rate):
     utt2vocals = {}
@@ -65,7 +71,8 @@ def prepare_music(root_dir, use_vocals, sampling_rate):
                 utt = str(file).replace(".wav", "")
                 utt2wav[utt] = file_path
             elif str(file) == "ANNOTATIONS":
-                utt2spk_part, utt2vocals_part = process_music_annotations(file_path)
+                utt2spk_part, utt2vocals_part = process_music_annotations(
+                    file_path)
                 utt2spk.update(utt2spk_part)
                 utt2vocals.update(utt2vocals_part)
 
@@ -79,13 +86,13 @@ def prepare_music(root_dir, use_vocals, sampling_rate):
                     utt2wav_str = utt2wav_str + utt + " " + utt2wav[utt] + "\n"
                 else:
                     utt2wav_str = utt2wav_str + utt + " sox -t wav " + utt2wav[utt] + " -r" \
-                                    " {fs} -t wav - |\n".format(fs=sampling_rate)
+                        " {fs} -t wav - |\n".format(fs=sampling_rate)
             num_good_files += 1
         else:
             print("Missing file {}".format(utt))
             num_bad_files += 1
     print("In music directory, processed {} files; {} had missing wav data".format(
-                                                    num_good_files, num_bad_files))
+        num_good_files, num_bad_files))
     return utt2spk_str, utt2wav_str
 
 
@@ -112,13 +119,13 @@ def prepare_speech(root_dir, sampling_rate):
                 utt2wav_str = utt2wav_str + utt + " " + utt2wav[utt] + "\n"
             else:
                 utt2wav_str = utt2wav_str + utt + " sox -t wav " + utt2wav[utt] + " -r" \
-                                    " {fs} -t wav - |\n".format(fs=sampling_rate)
+                    " {fs} -t wav - |\n".format(fs=sampling_rate)
             num_good_files += 1
         else:
             print("Missing file {}".format(utt))
             num_bad_files += 1
     print("In speech directory, processed {} files; {} had missing wav data".format(
-                                                    num_good_files, num_bad_files))
+        num_good_files, num_bad_files))
     return utt2spk_str, utt2wav_str
 
 
@@ -145,13 +152,13 @@ def prepare_noise(root_dir, sampling_rate):
                 utt2wav_str = utt2wav_str + utt + " " + utt2wav[utt] + "\n"
             else:
                 utt2wav_str = utt2wav_str + utt + " sox -t wav " + utt2wav[utt] + " -r" \
-                                    " {fs} -t wav - |\n".format(fs=sampling_rate)
+                    " {fs} -t wav - |\n".format(fs=sampling_rate)
             num_good_files += 1
         else:
             print("Missing file {}".format(utt))
             num_bad_files += 1
     print("In noise directory, processed {} files; {} had missing wav data".format(
-                                    num_good_files, num_bad_files))
+        num_good_files, num_bad_files))
     return utt2spk_str, utt2wav_str
 
 
@@ -162,7 +169,8 @@ def main():
     use_vocals = args.use_vocals
     sampling_rate = args.sampling_rate
 
-    utt2spk_music, utt2wav_music = prepare_music(in_dir, use_vocals, sampling_rate)
+    utt2spk_music, utt2wav_music = prepare_music(
+        in_dir, use_vocals, sampling_rate)
     utt2spk_speech, utt2wav_speech = prepare_speech(in_dir, sampling_rate)
     utt2spk_noise, utt2wav_noise = prepare_noise(in_dir, sampling_rate)
 
@@ -174,5 +182,5 @@ def main():
     utt2spk_fi.write(utt2spk)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

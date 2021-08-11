@@ -28,17 +28,22 @@ parser = argparse.ArgumentParser(description="""
     Generate kneser-ney language model as arpa format. By default,
     it will read the corpus from standard input, and output to standard output.
     """)
-parser.add_argument("-ngram-order", type=int, default=4, choices=[2, 3, 4, 5, 6, 7], help="Order of n-gram")
-parser.add_argument("-text", type=str, default=None, help="Path to the corpus file")
-parser.add_argument("-lm", type=str, default=None, help="Path to output arpa file for language models")
-parser.add_argument("-verbose", type=int, default=0, choices=[0, 1, 2, 3, 4, 5], help="Verbose level")
+parser.add_argument("-ngram-order", type=int, default=4,
+                    choices=[2, 3, 4, 5, 6, 7], help="Order of n-gram")
+parser.add_argument("-text", type=str, default=None,
+                    help="Path to the corpus file")
+parser.add_argument("-lm", type=str, default=None,
+                    help="Path to output arpa file for language models")
+parser.add_argument("-verbose", type=int, default=0,
+                    choices=[0, 1, 2, 3, 4, 5], help="Verbose level")
 args = parser.parse_args()
 
-default_encoding = "latin-1"  # For encoding-agnostic scripts, we assume byte stream as input.
-                              # Need to be very careful about the use of strip() and split()
-                              # in this case, because there is a latin-1 whitespace character
-                              # (nbsp) which is part of the unicode encoding range.
-                              # Ref: kaldi/egs/wsj/s5/utils/lang/bpe/prepend_words.py @ 69cd717
+# For encoding-agnostic scripts, we assume byte stream as input.
+default_encoding = "latin-1"
+# Need to be very careful about the use of strip() and split()
+# in this case, because there is a latin-1 whitespace character
+# (nbsp) which is part of the unicode encoding range.
+# Ref: kaldi/egs/wsj/s5/utils/lang/bpe/prepend_words.py @ 69cd717
 strip_chars = " \t\r\n"
 whitespace = re.compile("[ \t]+")
 
@@ -52,7 +57,8 @@ class CountsForHistory:
         # The 'lambda: defaultdict(float)' is an anonymous function taking no
         # arguments that returns a new defaultdict(float).
         self.word_to_count = defaultdict(int)
-        self.word_to_context = defaultdict(set)  # using a set to count the number of unique contexts
+        # using a set to count the number of unique contexts
+        self.word_to_context = defaultdict(set)
         self.word_to_f = dict()  # discounted probability
         self.word_to_bow = dict()  # back-off weight
         self.total_count = 0
@@ -65,7 +71,7 @@ class CountsForHistory:
         return ' total={0}: {1}'.format(
             str(self.total_count),
             ', '.join(['{0} -> {1}'.format(word, count)
-                      for word, count in self.word_to_count.items()]))
+                       for word, count in self.word_to_count.items()]))
 
     def add_count(self, predicted_word, context_word, count):
         assert count >= 0
@@ -103,7 +109,8 @@ class NgramCounts:
     # would be (6,7,8) and 'predicted_word' would be 9; 'count' would be
     # 1.
     def add_count(self, history, predicted_word, context_word, count):
-        self.counts[len(history)][history].add_count(predicted_word, context_word, count)
+        self.counts[len(history)][history].add_count(
+            predicted_word, context_word, count)
 
     # 'line' is a string containing a sequence of integer word-ids.
     # This function adds the un-smoothed counts from this line of text.
@@ -127,7 +134,8 @@ class NgramCounts:
 
     def add_raw_counts_from_standard_input(self):
         lines_processed = 0
-        infile = io.TextIOWrapper(sys.stdin.buffer, encoding=default_encoding)  # byte stream as input
+        infile = io.TextIOWrapper(
+            sys.stdin.buffer, encoding=default_encoding)  # byte stream as input
         for line in infile:
             line = line.strip(strip_chars)
             if line == '':
@@ -135,7 +143,8 @@ class NgramCounts:
             self.add_raw_counts_from_line(line)
             lines_processed += 1
         if lines_processed == 0 or args.verbose > 0:
-            print("make_phone_lm.py: processed {0} lines of input".format(lines_processed), file=sys.stderr)
+            print("make_phone_lm.py: processed {0} lines of input".format(
+                lines_processed), file=sys.stderr)
 
     def add_raw_counts_from_file(self, filename):
         lines_processed = 0
@@ -147,7 +156,8 @@ class NgramCounts:
                 self.add_raw_counts_from_line(line)
                 lines_processed += 1
         if lines_processed == 0 or args.verbose > 0:
-            print("make_phone_lm.py: processed {0} lines of input".format(lines_processed), file=sys.stderr)
+            print("make_phone_lm.py: processed {0} lines of input".format(
+                lines_processed), file=sys.stderr)
 
     def cal_discounting_constants(self):
         # For each order N of N-grams, we calculate discounting constant D_N = n1_N / (n1_N + 2 * n2_N),
@@ -155,9 +165,10 @@ class NgramCounts:
         # This constant is used similarly to absolute discounting.
         # Return value: d is a list of floats, where d[N+1] = D_N
 
-        self.d = [0]  # for the lowest order, i.e., 1-gram, we do not need to discount, thus the constant is 0
-                      # This is a special case: as we currently assumed having seen all vocabularies in the dictionary,
-                      # but perhaps this is not the case for some other scenarios.
+        # for the lowest order, i.e., 1-gram, we do not need to discount, thus the constant is 0
+        self.d = [0]
+        # This is a special case: as we currently assumed having seen all vocabularies in the dictionary,
+        # but perhaps this is not the case for some other scenarios.
         for n in range(1, self.ngram_order):
             this_order_counts = self.counts[n]
             n1 = 0
@@ -182,7 +193,8 @@ class NgramCounts:
         this_order_counts = self.counts[n]
         for hist, counts_for_hist in this_order_counts.items():
             for w, c in counts_for_hist.word_to_count.items():
-                counts_for_hist.word_to_f[w] = max((c - self.d[n]), 0) * 1.0 / counts_for_hist.total_count
+                counts_for_hist.word_to_f[w] = max(
+                    (c - self.d[n]), 0) * 1.0 / counts_for_hist.total_count
 
         # lower order N-grams
         for n in range(0, self.ngram_order - 1):
@@ -196,11 +208,13 @@ class NgramCounts:
                 if n_star_star != 0:
                     for w in counts_for_hist.word_to_count.keys():
                         n_star_z = len(counts_for_hist.word_to_context[w])
-                        counts_for_hist.word_to_f[w] = max((n_star_z - self.d[n]), 0) * 1.0 / n_star_star
+                        counts_for_hist.word_to_f[w] = max(
+                            (n_star_z - self.d[n]), 0) * 1.0 / n_star_star
                 else:  # patterns begin with <s>, they do not have "modified count", so use raw count instead
                     for w in counts_for_hist.word_to_count.keys():
                         n_star_z = counts_for_hist.word_to_count[w]
-                        counts_for_hist.word_to_f[w] = max((n_star_z - self.d[n]), 0) * 1.0 / counts_for_hist.total_count
+                        counts_for_hist.word_to_f[w] = max(
+                            (n_star_z - self.d[n]), 0) * 1.0 / counts_for_hist.total_count
 
     def cal_bow(self):
         # Backoff weights are only necessary for ngrams which form a prefix of a longer ngram.
@@ -243,7 +257,8 @@ class NgramCounts:
                         for u in a_counts_for_hist.word_to_count.keys():  # Should be careful here: what is Z1
                             sum_z1_f_z += _counts_for_hist.word_to_f[u]
 
-                        counts_for_hist.word_to_bow[w] = (1.0 - sum_z1_f_a_z) / (1.0 - sum_z1_f_z)
+                        counts_for_hist.word_to_bow[w] = (
+                            1.0 - sum_z1_f_a_z) / (1.0 - sum_z1_f_z)
 
     def print_raw_counts(self, info_string):
         # these are useful for debug.
@@ -255,7 +270,8 @@ class NgramCounts:
                     ngram = " ".join(hist) + " " + w
                     ngram = ngram.strip(strip_chars)
 
-                    res.append("{0}\t{1}".format(ngram, counts_for_hist.word_to_count[w]))
+                    res.append("{0}\t{1}".format(
+                        ngram, counts_for_hist.word_to_count[w]))
         res.sort(reverse=True)
         for r in res:
             print(r)
@@ -318,7 +334,8 @@ class NgramCounts:
                     if bow is None:
                         res.append("{1}\t{0}".format(ngram, math.log(f, 10)))
                     else:
-                        res.append("{1}\t{0}\t{2}".format(ngram, math.log(f, 10), math.log(bow, 10)))
+                        res.append("{1}\t{0}\t{2}".format(
+                            ngram, math.log(f, 10), math.log(bow, 10)))
         res.sort(reverse=True)
         for r in res:
             print(r)
@@ -350,7 +367,8 @@ class NgramCounts:
                     if prob == 0:  # f(<s>) is always 0
                         prob = 1e-99
 
-                    line = '{0}\t{1}'.format('%.7f' % math.log10(prob), ' '.join(ngram))
+                    line = '{0}\t{1}'.format(
+                        '%.7f' % math.log10(prob), ' '.join(ngram))
                     if bow is not None:
                         line += '\t{0}'.format('%.7f' % math.log10(bow))
                     print(line, file=fout)

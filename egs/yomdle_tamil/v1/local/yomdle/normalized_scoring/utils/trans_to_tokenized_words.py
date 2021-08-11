@@ -19,15 +19,17 @@ input_file = sys.argv[1]
 output_file = sys.argv[2]
 
 
-punc =  set(chr(i) for i in range(sys.maxunicode)
-            if unicodedata.category(chr(i)).startswith('P'))
-currency_symbols =  set(chr(i) for i in range(sys.maxunicode)
-                        if unicodedata.category(chr(i)) == "Sc")
-digits =  set(chr(i) for i in range(sys.maxunicode)
-                        if unicodedata.category(chr(i)) == "Nd")
+punc = set(chr(i) for i in range(sys.maxunicode)
+           if unicodedata.category(chr(i)).startswith('P'))
+currency_symbols = set(chr(i) for i in range(sys.maxunicode)
+                       if unicodedata.category(chr(i)) == "Sc")
+digits = set(chr(i) for i in range(sys.maxunicode)
+             if unicodedata.category(chr(i)) == "Nd")
 
 split_punc = True
 split_digits = True
+
+
 def main():
 
     with open(input_file, 'r', encoding='utf-8') as fh, open(output_file, 'w', encoding='utf-8') as fh_out:
@@ -42,7 +44,6 @@ def main():
 
             # Finally write out uttid and newline
             fh_out.write(" (%s)\n" % uttid)
-
 
 
 if __name__ == "__main__":
